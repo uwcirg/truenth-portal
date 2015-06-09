@@ -166,19 +166,18 @@ def home():
             cookies=request.cookies)
 
 
-@app.route('/client')
+@app.route('/client', methods=['GET', 'POST'])
 def client():
     user = current_user()
     if not user:
         return redirect('/')
+    if request.method == 'GET':
+        return render_template('register_client.html')
+    redirect_uri = request.form.get('redirect_uri', None)
     item = Client(
         client_id=gen_salt(40),
         client_secret=gen_salt(50),
-        _redirect_uris=' '.join([
-            'http://docker-dev-1.cirg.washington.edu:8000/authorized',
-            'http://decision-dev.au.truenth.org:8000/authorized',
-            'http://truenth-dev-lr1.cirg.washington.edu:8080/c/login/facebook_connect_oauth',
-            ]),
+        _redirect_uris=redirect_uri,
         _default_scopes='email',
         user_id=user.id,
     )
@@ -187,6 +186,7 @@ def client():
     return jsonify(
         client_id=item.client_id,
         client_secret=item.client_secret,
+        redirect_uris=item._redirect_uris
     )
 
 
