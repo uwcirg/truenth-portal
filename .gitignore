@@ -1,0 +1,9 @@
+*.sqlite
+*.pyc
+*~
+*.swp
+application.cfg
+bin
+lib
+include
+

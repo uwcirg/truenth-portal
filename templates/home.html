@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+    <h2>Portal Home</h2>
+  {% if user %}
+    <p>Logged in as {{ user.username }}</p>
+    <a href="http://decision-dev.au.truenth.org:8000/">
+        Demo Intervention
+    </a>
+    <p><a href="logout">Log Out</a></p>
+  {% else %}
+    <p>You are not authenticated</p>
+    <a href="login">Log In</a>
+  {% endif %}
+  {% if session %}
+  <p> Session </p>
+  <table>
+      {% for key, value in session.iteritems() %}
+      <tr>
+          <th> {{ key }} </th>
+          <td> {{ value }} </td>
+      </tr>
+      {% endfor %}
+  </table>
+  {% endif %}
+
+  {% if cookies %}
+  <p> cookies </p>
+  <table>
+      {% for key, value in cookies.iteritems() %}
+      <tr>
+          <th> {{ key }} </th>
+          <td> {{ value }} </td>
+      </tr>
+      {% endfor %}
+  </table>
+  {% endif %}
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Configuration values for application.
+DEBUG = True
+SECRET_KEY = 'some random secret string'
+CONSUMER_KEY = '<value from FB>'
+CONSUMER_SECRET = '<value from FB>'
+SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
