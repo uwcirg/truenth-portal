@@ -1,0 +1,50 @@
+
+
+/* ==========================================================================
+   Custom styles
+   ========================================================================== */
+
+body {
+	margin: 0;
+	overflow: hidden;
+	padding-bottom: 38px;
+}
+.hide-initial, .form-group.hide-initial {
+  display: none;
+}
+.page-background {
+  top: 105px;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+.lead-well {
+	background-color: rgba(255, 255, 255, 0.8);
+	min-height: 200px;
+	margin: 2em auto;
+}
+.lead-well h3 {
+  margin-top: 0;
+}
+
+.btn-tnth-primary {
+  color: #fff;
+  background-color: #3d6548;
+  border-color: #33553d;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+}
+.btn-tnth-primary:hover,
+.btn-tnth-primary:focus,
+.btn-tnth-primary:active,
+.btn-tnth-primary.active,
+.open > .dropdown-toggle.btn-tnth-primary {
+  color: #fff;
+  background-color: #2a4531;
+  border-color: #1c2f21;
+}
+
+
+
+
