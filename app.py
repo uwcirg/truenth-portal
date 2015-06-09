@@ -274,6 +274,42 @@ def me():
     user = request.oauth.user
     return jsonify(username=user.username)
 
+@app.route('/api/demographics')
+@oauth.require_oauth()
+def demographics():
+    demographics_data = {
+        "id": 854387,
+        "name": {
+            "given": "Patrick",
+            "family": "Testa"
+        },
+        "birthDate": "1970-06-09",
+        "communication": "en-US",
+        "telecom": [
+            {
+                "system": "email",
+                "value": "helloworld@movember.com"
+            },
+            {
+                "system": "phone",
+                "value": "(123) 456-7890"
+            },
+
+        ],
+        "status": "registered",
+    }
+    return jsonify(demographics_data)
+
+@app.route('/api/clinical')
+@oauth.require_oauth()
+def clinical():
+    clinical_data = {
+        "TNM-Condition-stage": {
+            "summary": "T1 N0 M0"
+        },
+        "Gleason-score": "2"
+    }
+    return jsonify(clinical_data)
 
 @app.route('/api/assessments')
 @oauth.require_oauth()
@@ -288,6 +324,33 @@ def assessments():
         user_id=request.oauth.user.id
     )
     return jsonify(count=aments.count())
+
+@app.route('/api/portal-wrapper-html')
+def portal_wrapper_html():
+    return """
+<div class="container">
+    <div class="pull-left nav-logos">
+        <!-- Probably need to use absolute links for images -->
+        <a href="http://truenth-demo.cirg.washington.edu"><img src="img/logo_truenth.png" /></a>
+        <a href="http://us.movember.com"><img src="img/logo_movember.png" /></a>
+    </div>
+
+    <div class="pull-right nav-links">
+        <a href="#" class="btn btn-default">About</a>
+        <a href="#" class="btn btn-default">Help</a>
+        <a href="#" class="btn btn-default">My Profile</a>
+        <a href="index.html" class="btn btn-default">Log Out</a>
+        <form class="navbar-form" role="search">
+        <div class="form-group">
+            <div class="hide-initial" id="search-box">
+                <input type="text" class="form-control" placeholder="Search">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-default show-search"><i class="fa fa-search"></i></button>
+      </form>
+    </div>
+</div>
+"""
 
 @app.route('/login')
 @fa.login('fb')
