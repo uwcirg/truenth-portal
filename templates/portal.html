@@ -11,26 +11,26 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/topnav.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/topnav.css') }}">
 </head>
 <body>
 
-    <img src="img/TrueNthHoldBackground.jpg" class="page-background" />
+    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background" />
     <div id="mainNav" class="nav-import">
         <div class="container">
             <!-- Top Nav begins here -->
             <div class="">
                 <div class="pull-left nav-logos">
-                    <a href="http://truenth-demo.cirg.washington.edu"><img src="img/logo_truenth.png" /></a>
-                    <a href="http://us.movember.com"><img src="img/logo_movember.png" /></a>
+                    <a href="{{ PORTAL }}"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
+                    <a href="http://us.movember.com"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
                 </div>
                 
                 <div class="pull-right nav-links">
                     <a href="#" class="btn btn-default">About</a>
                     <a href="#" class="btn btn-default">Help</a>
                     <a href="#" class="btn btn-default">My Profile</a>
-                    <a href="index.html" class="btn btn-default">Log Out</a>
+                    <a href="logout" class="btn btn-default">Log Out</a>
                     <form class="navbar-form" role="search">
                     <div class="form-group">
                         <div class="hide-initial" id="search-box">
@@ -63,6 +63,7 @@
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
                     <h3>Managing prostate cancer</h3>
+                    <a href="http://decision-dev.au.truenth.org:8000/" class="btn btn-primary btn-tnth-primary">Go to intervention</a>
                     <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
                 </div>
             </div>                        
@@ -90,7 +91,7 @@
     
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="js/main.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
 </script>
 

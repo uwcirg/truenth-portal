@@ -154,19 +154,27 @@ def current_user():
     return None
 
 
-@app.route('/terms-of-use', methods=('GET',))
+@app.route('/terms-of-use')
 def termsofuse():
     return render_template('termsofuse.html')
 
 
-@app.route('/', methods=('GET', 'POST'))
-def home():
+#@app.route('/', methods=('GET', 'POST'))
+#def home():
+#    user = current_user()
+#    return render_template('home.html', user=user, session=session,
+#            cookies=request.cookies)
+
+
+@app.route('/')
+def index():
     user = current_user()
-    return render_template('home.html', user=user, session=session,
-            cookies=request.cookies)
+    if user:
+        return render_template('portal.html', PORTAL=app.config['PORTAL'])
+    return render_template('index.html', PORTAL=app.config['PORTAL'])
 
 
-@app.route('/client', methods=['GET', 'POST'])
+@app.route('/client', methods=('GET', 'POST'))
 def client():
     user = current_user()
     if not user:
