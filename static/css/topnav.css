@@ -25,6 +25,10 @@
 .nav-links .btn {
 	margin: 0 0 0 5px;
 }
-
+.nav-userinfo {
+	clear: both;
+	text-align: right;
+	margin-top: 1.5em;
+}
 
 
