@@ -327,7 +327,7 @@ def assessments():
 
 @app.route('/api/portal-wrapper-html')
 def portal_wrapper_html():
-    return """
+    html =  """
 <div class="container">
     <div class="pull-left nav-logos">
         <!-- Probably need to use absolute links for images -->
@@ -351,6 +351,10 @@ def portal_wrapper_html():
     </div>
 </div>
 """
+    resp = make_response(html)
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+    return resp
 
 @app.route('/login')
 @fa.login('fb')
