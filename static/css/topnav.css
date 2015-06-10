@@ -35,5 +35,7 @@
 .nav-userinfo {
 	margin-right: 10px;
 }
-
+.hide-initial, .form-group.hide-initial {
+  display: none;
+}
 
