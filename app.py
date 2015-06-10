@@ -74,7 +74,7 @@ class Client(db.Model):
         # Chop query string and confirm it's in the list
         redirect_uri = redirect_uri.split('?')[0]
         return redirect_uri in self.redirect_uris
-        
+
 
 class Grant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -336,37 +336,18 @@ def assessments():
 
 @app.route('/api/portal-wrapper-html')
 def portal_wrapper_html():
-    images = {
-        'logo_truenth':
-            app.config['PORTAL'] +
-            url_for('static', filename='img/logo_truenth.png'),
-        'logo_movember':
-            app.config['PORTAL'] +
-            url_for('static', filename='img/logo_movember.png')}
-    html =  """
-<div class="container">
-    <div class="pull-left nav-logos">
-        <!-- Probably need to use absolute links for images -->
-        <a href="http://truenth-demo.cirg.washington.edu"><img src="{logo_truenth}" /></a>
-        <a href="http://us.movember.com"><img src="{logo_movember}" /></a>
-    </div>
-
-    <div class="pull-right nav-links">
-        <a href="#" class="btn btn-default">About</a>
-        <a href="#" class="btn btn-default">Help</a>
-        <a href="#" class="btn btn-default">My Profile</a>
-        <a href="index.html" class="btn btn-default">Log Out</a>
-        <form class="navbar-form" role="search">
-        <div class="form-group">
-            <div class="hide-initial" id="search-box">
-                <input type="text" class="form-control" placeholder="Search">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-default show-search"><i class="fa fa-search"></i></button>
-      </form>
-    </div>
-</div>
-""".format(**images)
+    html = render_template(
+        'portal_wrapper.html',
+        PORTAL=app.config['PORTAL'],
+        logo_truenth=url_for(
+            'static',
+            filename='img/logo_truenth.png',
+        ),
+        logo_movember=url_for(
+            'static',
+            filename='img/logo_movember.png',
+        ),
+    )
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
@@ -384,7 +365,7 @@ def login():
         elif fa.result.user:
             if not (fa.result.user.name and fa.result.user.id):
                 fa.result.user.update()
-            # Success - add or pull this user to/from portal store 
+            # Success - add or pull this user to/from portal store
             username = fa.result.user.name
             user = User.query.filter_by(username=username).first()
             if not user:
