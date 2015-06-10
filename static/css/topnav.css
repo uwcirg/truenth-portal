@@ -15,6 +15,12 @@
 .xs-nav .navbar-brand img {
 	height: 54px;
 }
+.xs-nav .navbar-brand.logo-movember {
+	padding: 8px;
+}
+.xs-nav .navbar-brand.logo-movember img {
+	height: 46px;
+}
 .portal-nav {
 	height: 95px;
 	width: 100%;
