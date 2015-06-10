@@ -9,6 +9,12 @@
 .xs-nav {
 	margin-bottom: 5px;
 }
+.xs-nav .navbar-brand {
+	padding: 4px;
+}
+.xs-nav .navbar-brand img {
+	height: 54px;
+}
 .portal-nav {
 	height: 95px;
 	width: 100%;
