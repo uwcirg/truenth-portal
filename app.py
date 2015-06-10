@@ -6,7 +6,7 @@ from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth2
 from datetime import datetime, timedelta
 from flask import Flask, make_response
-from flask import session, request
+from flask import session, request, url_for
 from flask import render_template, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
@@ -327,12 +327,19 @@ def assessments():
 
 @app.route('/api/portal-wrapper-html')
 def portal_wrapper_html():
+    images = {
+        'logo_truenth':
+            app.config['PORTAL'] +
+            url_for('static', filename='img/logo_truenth.png'),
+        'logo_movember':
+            app.config['PORTAL'] +
+            url_for('static', filename='img/logo_movember.png')}
     html =  """
 <div class="container">
     <div class="pull-left nav-logos">
         <!-- Probably need to use absolute links for images -->
-        <a href="http://truenth-demo.cirg.washington.edu"><img src="img/logo_truenth.png" /></a>
-        <a href="http://us.movember.com"><img src="img/logo_movember.png" /></a>
+        <a href="http://truenth-demo.cirg.washington.edu"><img src="{logo_truenth}" /></a>
+        <a href="http://us.movember.com"><img src="{logo_movember}" /></a>
     </div>
 
     <div class="pull-right nav-links">
@@ -350,7 +357,7 @@ def portal_wrapper_html():
       </form>
     </div>
 </div>
-"""
+""".format(**images)
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
