@@ -17,11 +17,11 @@
 </head>
 <body>
 
-    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background" />
+    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
     <div id="mainNav" class="nav-import">
        <!-- Top Nav begins here --> 
-
-        <div class="container hidden-xs">
+       <!-- Main Nav for most screen sizes -->
+        <div class="container hidden-xs main-nav">
             <div class="pull-left nav-logos">
                 <a href="{{ PORTAL }}">
                     <img src="{{ url_for('static', filename='img/logo_truenth.png') }}" />
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Responsive navbar for xs width -->
-        <nav class="navbar navbar-static-top visible-xs" style="margin-bottom: 5px; border-bottom: 2px solid #8D8D8D">
+        <nav class="navbar navbar-static-top visible-xs xs-nav">
             <div class="container-fluid">
               <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
