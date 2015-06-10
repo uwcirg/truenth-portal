@@ -6,6 +6,7 @@
 
 body {
 	margin: 0;
+  background-color: #9AA19A;
 }
 .hide-initial, .form-group.hide-initial {
   display: none;
@@ -42,7 +43,5 @@ body {
   background-color: #2a4531;
   border-color: #1c2f21;
 }
-
-
 
 
