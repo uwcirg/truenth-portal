@@ -1,6 +1,1 @@
-$(document).ready(function(){
-	$(".show-search").on("click",function(){
-		$("#search-box").fadeIn("slow");
-		return false;
-	});
-})
+/*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
