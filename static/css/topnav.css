@@ -18,17 +18,18 @@
 .nav-logos a {
 	margin-right: 1.25em;
 }
-.nav-import form {
+.nav-links form {
 	display: inline-block;
-	padding: 0 0 0 15px;
+	padding: 0;
+}
+.nav-links .form-group {
+	margin-left: 10px;
 }
 .nav-links .btn {
-	margin: 0 0 0 5px;
+	margin: 0;
 }
 .nav-userinfo {
-	clear: both;
-	text-align: right;
-	margin-top: 1.5em;
+	margin-right: 10px;
 }
 
 
