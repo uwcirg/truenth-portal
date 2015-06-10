@@ -6,8 +6,6 @@
 
 body {
 	margin: 0;
-	overflow: hidden;
-	padding-bottom: 38px;
 }
 .hide-initial, .form-group.hide-initial {
   display: none;
