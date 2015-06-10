@@ -1,5 +1,5 @@
 function showSearch() {
-	$("body").on("click",".container",function(){
+	$("body").on("click",".show-search",function(){
 		$("#search-box").fadeIn("slow");
 		return false;
 	});
