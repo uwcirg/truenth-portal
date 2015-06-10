@@ -170,7 +170,8 @@ def termsofuse():
 def index():
     user = current_user()
     if user:
-        return render_template('portal.html', PORTAL=app.config['PORTAL'])
+        return render_template('portal.html', PORTAL=app.config['PORTAL'],
+                user=user)
     return render_template('index.html', PORTAL=app.config['PORTAL'])
 
 
