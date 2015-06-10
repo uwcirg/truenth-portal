@@ -6,10 +6,10 @@
     </div>
 
     <div class="pull-right nav-links">
-        {% if user %}
+        {% if username %}
         <div class="btn-group nav-userinfo">
           <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-            Welcome, {{ user.username }} <span class="fa fa-caret-down"></span>
+            Welcome, {{ username }} <span class="fa fa-caret-down"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
             <li><a href="#">My Profile</a></li>

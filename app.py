@@ -333,11 +333,13 @@ def assessments():
     return jsonify(count=aments.count())
 
 
-@app.route('/api/portal-wrapper-html')
-def portal_wrapper_html():
+@app.route('/api/portal-wrapper-html/', defaults={'username': None})
+@app.route('/api/portal-wrapper-html/<username>')
+def portal_wrapper_html(username):
     html = render_template(
         'portal_wrapper.html',
         PORTAL=app.config['PORTAL'],
+        username=username,
         logo_truenth=url_for(
             'static',
             filename='img/logo_truenth.png',
