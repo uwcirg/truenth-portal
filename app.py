@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import logging
+import requests
 
 from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth2
@@ -159,13 +160,6 @@ def termsofuse():
     return render_template('termsofuse.html')
 
 
-#@app.route('/', methods=('GET', 'POST'))
-#def home():
-#    user = current_user()
-#    return render_template('home.html', user=user, session=session,
-#            cookies=request.cookies)
-
-
 @app.route('/')
 def index():
     user = current_user()
@@ -277,11 +271,13 @@ def authorize(*args, **kwargs):
     # let portal give API access to intervetion.
     return True
 
+
 @app.route('/api/me')
 @oauth.require_oauth()
 def me():
     user = request.oauth.user
     return jsonify(username=user.username)
+
 
 @app.route('/api/demographics')
 @oauth.require_oauth()
@@ -309,6 +305,7 @@ def demographics():
     }
     return jsonify(demographics_data)
 
+
 @app.route('/api/clinical')
 @oauth.require_oauth()
 def clinical():
@@ -319,6 +316,7 @@ def clinical():
         "Gleason-score": "2"
     }
     return jsonify(clinical_data)
+
 
 @app.route('/api/assessments')
 @oauth.require_oauth()
@@ -333,6 +331,7 @@ def assessments():
         user_id=request.oauth.user.id
     )
     return jsonify(count=aments.count())
+
 
 @app.route('/api/portal-wrapper-html')
 def portal_wrapper_html():
@@ -352,6 +351,7 @@ def portal_wrapper_html():
     resp.headers.add('Access-Control-Allow-Origin', '*')
     resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
     return resp
+
 
 @app.route('/login')
 @fa.login('fb')
@@ -375,6 +375,7 @@ def login():
             user_id = user.id
             session['id'] = user_id
             session['fa_user_id'] = fa.result.user.id
+            session['fa_token'] = fa.result.provider.credentials.token
             return redirect('/')
     else:
         return fa.response
@@ -382,6 +383,11 @@ def login():
 
 @app.route('/logout')
 def logout():
+    headers = {'Authorization': 
+            'Bearer {0}'.format(session['fa_token'])}
+    url = "https://graph.facebook.com/{0}/permissions".\
+        format(session['fa_user_id'])
+    result = requests.delete(url, headers=headers)
     session.clear()
     return redirect('/')
 
