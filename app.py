@@ -166,7 +166,7 @@ def index():
     if user:
         return render_template('portal.html',
                 PORTAL=app.config['PORTAL'],
-                P3P_URL=app.config['P3P_URL'],
+                DEMO_INTERVENTION=app.config['DEMO_INTERVENTION'],
                 user=user)
     return render_template('index.html', PORTAL=app.config['PORTAL'])
 
