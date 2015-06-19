@@ -240,7 +240,7 @@ def save_token(token, request, *args, **kwargs):
     for t in toks:
         db.session.delete(t)
 
-    expires_in = token.pop('expires_in')
+    expires_in = token.get('expires_in')
     expires = datetime.utcnow() + timedelta(seconds=expires_in)
 
     tok = Token(
@@ -255,6 +255,11 @@ def save_token(token, request, *args, **kwargs):
     db.session.add(tok)
     db.session.commit()
     return tok
+
+
+@app.route('/oauth/errors', methods=['GET', 'POST'])
+def oauth_errors():
+    return jsonify(error=request.args.get('error'))
 
 
 @app.route('/oauth/token', methods=['GET', 'POST'])
@@ -278,7 +283,8 @@ def authorize(*args, **kwargs):
 @oauth.require_oauth()
 def me():
     user = request.oauth.user
-    return jsonify(username=user.username)
+    return jsonify(id=user.id, username=user.username,
+            email='placeholder@uw.edu')
 
 
 @app.route('/api/demographics')
