@@ -42,3 +42,30 @@ Obtain `consumer_key` and `consumer_secret` values from https://developers.faceb
 ```bash
 $ python client.py
 ```
+
+## DATABASE
+
+The value of `SQLALCHEMY_DATABASE_URI` defines which database engine
+and database to use.  In general, sqlite is used for small testing
+instances, and PostgreSQL is used otherwise.
+
+### Migrations
+
+Thanks to Alembic and Flask-Migrate, database migrations are easily
+managed and run.  Update the python source files containing table
+definitions (typically classes derrived from db.Model) and run the
+manage script to generate the necessary migration code:
+
+'''python
+cd PROJECT_HOME
+source bin/activate
+python manage.py db migrate
+'''
+
+Then execute the upgrade on any database (edit `SQLALCHEMY_DATABASE_URI`
+to alter database target):
+
+'''python
+python manage.py db upgrade
+'''
+
