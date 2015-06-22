@@ -56,16 +56,16 @@ managed and run.  Update the python source files containing table
 definitions (typically classes derrived from db.Model) and run the
 manage script to generate the necessary migration code:
 
-'''python
+```python
 cd PROJECT_HOME
 source bin/activate
 python manage.py db migrate
-'''
+```
 
 Then execute the upgrade on any database (edit `SQLALCHEMY_DATABASE_URI`
 to alter database target):
 
-'''python
+```python
 python manage.py db upgrade
-'''
+```
 
