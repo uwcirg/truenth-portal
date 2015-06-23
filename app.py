@@ -52,6 +52,20 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True)
     phone = db.Column(db.String(40), unique=True)
     gender = db.Column('gender', gender_types)
+    birthdate = db.Column(db.Date)
+
+
+providers_list = ENUM('facebook', 'twitter', 'truenth', name='providers',
+        create_type=False)
+
+
+class AuthProvider(db.Model):
+    __tablename__ = 'auth_providers'
+    id = db.Column(db.Integer, primary_key=True)
+    provider = db.Column('provider', providers_list)
+    provider_id = db.Column(db.BigInteger)
+    user_id = db.Column(db.ForeignKey('users.id'))
+    user = db.relationship('User')
 
 
 class Client(db.Model):
@@ -288,36 +302,42 @@ def authorize(*args, **kwargs):
 @app.route('/api/me')
 @oauth.require_oauth()
 def me():
-    user = request.oauth.user
+    #user = request.oauth.user
+    user = User.query.get(request.oauth.user.id)
     return jsonify(id=user.id, username=user.username,
-            email='placeholder@uw.edu')
+            email=user.email)
 
 
 @app.route('/api/demographics')
 @oauth.require_oauth()
 def demographics():
-    demographics_data = {
-        "id": 854387,
-        "name": {
-            "given": "Patrick",
-            "family": "Testa"
-        },
-        "birthDate": "1970-06-09",
-        "communication": "en-US",
-        "telecom": [
-            {
-                "system": "email",
-                "value": "helloworld@movember.com"
-            },
-            {
-                "system": "phone",
-                "value": "(123) 456-7890"
-            },
-
-        ],
-        "status": "registered",
-    }
-    return jsonify(demographics_data)
+    """return user demographis as a FHIR patient resource (in JSON)
+    
+    http://www.hl7.org/fhir/patient.html
+    """
+    user = current_user()
+    d = {}
+    d['resourceType'] = "Patient"
+    d['identifier'] = []
+    d['identifier'].append({'label': 'Truenth identifier',
+                'value': user.id})
+    d['identifier'].append({'label': 'Truenth username',
+                'value': user.username})
+    d['name'] = {}
+    if user.first_name:
+        d['name']['given'] = user.first_name
+    if user.last_name:
+        d['name']['family'] = user.last_name
+    if user.birthdate:
+        d['birthDate'] = user.birthdate.strftime('%Y-%m-%d')
+    d['status'] = 'registered' if user.registered else 'unknown'
+    d['communication'] = 'en-US'
+    d['telecom'] = []
+    if user.email:
+        d['telecom'].append({'system': 'email', 'value': user.email})
+    if user.phone:
+        d['telecom'].append({'system': 'phone', 'value': user.phone})
+    return jsonify(d)
 
 
 @app.route('/api/clinical')
@@ -367,14 +387,27 @@ def login():
             if not (fa.result.user.name and fa.result.user.id):
                 fa.result.user.update()
             # Success - add or pull this user to/from portal store
-            username = fa.result.user.name
-            user = User.query.filter_by(username=username).first()
-            if not user:
-                user = User(username=username)
+            ap = AuthProvider.query.filter_by(provider='facebook',
+                    provider_id=fa.result.user.id).first()
+            if ap:
+                user = User.query.filter_by(id=ap.user_id).first()
+            else:
+                # Looks like first valid login from this auth provider
+                # generate what we know and redirect to get the rest
+                user = User(username=fa.result.user.name,
+                        first_name=fa.result.user.first_name,
+                        last_name=fa.result.user.last_name,
+                        birthdate=fa.result.user.birth_date,
+                        gender=fa.result.user.gender,
+                        email=fa.result.user.email)
                 db.session.add(user)
                 db.session.commit()
-            user_id = user.id
-            session['id'] = user_id
+                ap = AuthProvider(provider='facebook',
+                        provider_id=fa.result.user.id,
+                        user_id=user.id)
+                db.session.add(ap)
+                db.session.commit()
+            session['id'] = user.id
             session['fa_user_id'] = fa.result.user.id
             session['fa_token'] = fa.result.provider.credentials.token
             return redirect('/')
@@ -384,10 +417,12 @@ def login():
 
 @app.route('/logout')
 def logout():
+    ap = AuthProvider.query.filter_by(provider='facebook',
+            user_id=session['id']).first()
     headers = {'Authorization': 
             'Bearer {0}'.format(session['fa_token'])}
     url = "https://graph.facebook.com/{0}/permissions".\
-        format(session['fa_user_id'])
+        format(ap.provider_id)
     result = requests.delete(url, headers=headers)
     session.clear()
     return redirect('/')
