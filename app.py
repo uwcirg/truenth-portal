@@ -12,6 +12,7 @@ from flask import render_template, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
 from flask_oauthlib.provider import OAuth2Provider
+from sqlalchemy.dialects.postgresql import ENUM
 
 logger = logging.getLogger('authomatic.core')
 logger.addHandler(logging.StreamHandler())
@@ -36,20 +37,29 @@ fa = FlaskAuthomatic(
 )
 
 
+# http://hl7.org/fhir/v3/AdministrativeGender/
+gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
+        create_type=False)
+
+
 class User(db.Model):
+    __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.now)
     email = db.Column(db.String(120), unique=True)
+    phone = db.Column(db.String(40), unique=True)
+    gender = db.Column('gender', gender_types)
 
 
 class Client(db.Model):
+    __tablename__ = 'clients'  # Override default 'client'
     client_id = db.Column(db.String(40), primary_key=True)
     client_secret = db.Column(db.String(55), nullable=False)
 
-    user_id = db.Column(db.ForeignKey('user.id'))
+    user_id = db.Column(db.ForeignKey('users.id'))
     user = db.relationship('User')
 
     _redirect_uris = db.Column(db.Text)
@@ -82,15 +92,16 @@ class Client(db.Model):
 
 
 class Grant(db.Model):
+    __tablename__ = 'grants'  # Override default 'grant'
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')
+        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')
     )
     user = db.relationship('User')
 
     client_id = db.Column(
-        db.String(40), db.ForeignKey('client.client_id'),
+        db.String(40), db.ForeignKey('clients.client_id'),
         nullable=False,
     )
     client = db.relationship('Client')
@@ -115,15 +126,16 @@ class Grant(db.Model):
 
 
 class Token(db.Model):
+    __tablename__ = 'tokens'  # Override default 'token'
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(
-        db.String(40), db.ForeignKey('client.client_id'),
+        db.String(40), db.ForeignKey('clients.client_id'),
         nullable=False,
     )
     client = db.relationship('Client')
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id')
+        db.Integer, db.ForeignKey('users.id')
     )
     user = db.relationship('User')
 
@@ -140,16 +152,6 @@ class Token(db.Model):
         if self._scopes:
             return self._scopes.split()
         return []
-
-
-class Assessment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id')
-    )
-    user = db.relationship('User')
-    assessment_type = db.Column(db.String(40))
-    taken = db.Column(db.DateTime)
 
 
 def current_user():
@@ -330,21 +332,6 @@ def clinical():
     return jsonify(clinical_data)
 
 
-@app.route('/api/assessments')
-@oauth.require_oauth()
-def assessments():
-    addone = Assessment(
-        user_id=request.oauth.user.id,
-        assessment_type='test type',
-        taken=datetime.now())
-    db.session.add(addone)
-    db.session.commit()
-    aments = Assessment.query.filter_by(
-        user_id=request.oauth.user.id
-    )
-    return jsonify(count=aments.count())
-
-
 @app.route('/api/portal-wrapper-html/', defaults={'username': None})
 @app.route('/api/portal-wrapper-html/<username>')
 def portal_wrapper_html(username):
@@ -406,6 +393,10 @@ def logout():
     return redirect('/')
 
 
-if __name__ == '__main__':
+def init_db():
     db.create_all()
+
+
+if __name__ == '__main__':
+    init_db()
     app.run(host='0.0.0.0')
