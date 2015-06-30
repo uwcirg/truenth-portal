@@ -56,7 +56,7 @@ managed and run.  Update the python source files containing table
 definitions (typically classes derrived from db.Model) and run the
 manage script to generate the necessary migration code:
 
-```python
+```bash
 cd PROJECT_HOME
 source bin/activate
 python manage.py db migrate
@@ -65,7 +65,16 @@ python manage.py db migrate
 Then execute the upgrade on any database (edit `SQLALCHEMY_DATABASE_URI`
 to alter database target):
 
-```python
+```bash
 python manage.py db upgrade
 ```
 
+## Testing
+
+Activate the virtual environment and initiate the `portal_tests` module
+
+```bash
+cd PROJECT_HOME
+source bin/activate
+python portal_tests.py
+```

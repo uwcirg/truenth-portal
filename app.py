@@ -2,13 +2,14 @@
 
 import logging
 import requests
+from functools import wraps
 
 from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth2
 from datetime import datetime, timedelta
 from flask import Flask, make_response
 from flask import session, request, url_for
-from flask import render_template, redirect, jsonify
+from flask import render_template, redirect, jsonify, abort
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import gen_salt
 from flask_oauthlib.provider import OAuth2Provider
@@ -20,8 +21,60 @@ logger.addHandler(logging.StreamHandler())
 app = Flask(__name__, template_folder='templates')
 app.config.from_pyfile('application.cfg', silent=False)
 
+class OAuthOrAlternateAuth(OAuth2Provider):
+    """Specialize OAuth2Provider with alternate authorization"""
+
+    def __init__(self, app=None):
+        super(OAuthOrAlternateAuth, self).__init__(app)
+
+    def require_oauth(self, *scopes):
+        """Specialze the superclass decorator with alternates
+
+        This method is intended to be in lock step with the
+        super class, with the following two exceptions:
+
+        1. if actively "TESTING", skip oauth and return
+           the function, effectively undecorated.
+
+        2. if the user appears to be locally logged in (i.e. browser
+           session cookie with a valid user.id),
+           return the effecively undecorated function.
+
+        """
+        def wrapper(f):
+            @wraps(f)
+            def decorated(*args, **kwargs):
+                # TESTING backdoor
+                if app.config.get('TESTING'):
+                    return f(*args, **kwargs)
+                # Local login backdoor
+                if current_user():
+                    return f(*args, **kwargs)
+
+                # Unmodified superclass method follows
+                for func in self._before_request_funcs:
+                    func()
+
+                if hasattr(request, 'oauth') and request.oauth:
+                    return f(*args, **kwargs)
+
+                valid, req = self.verify_request(scopes)
+
+                for func in self._after_request_funcs:
+                    valid, req = func(valid, req)
+
+                if not valid:
+                    if self._invalid_response:
+                        return self._invalid_response(req)
+                    return abort(401)
+                request.oauth = req
+                return f(*args, **kwargs)
+            return decorated
+        return wrapper
+
+
 db = SQLAlchemy(app)
-oauth = OAuth2Provider(app)
+oauth = OAuthOrAlternateAuth(app)
 
 fa = FlaskAuthomatic(
     config={
@@ -302,7 +355,6 @@ def authorize(*args, **kwargs):
 @app.route('/api/me')
 @oauth.require_oauth()
 def me():
-    #user = request.oauth.user
     user = User.query.get(request.oauth.user.id)
     return jsonify(id=user.id, username=user.username,
             email=user.email)
@@ -408,8 +460,7 @@ def login():
                 db.session.add(ap)
                 db.session.commit()
             session['id'] = user.id
-            session['fa_user_id'] = fa.result.user.id
-            session['fa_token'] = fa.result.provider.credentials.token
+            session['remote_token'] = fa.result.provider.credentials.token
             return redirect('/')
     else:
         return fa.response
@@ -420,7 +471,7 @@ def logout():
     ap = AuthProvider.query.filter_by(provider='facebook',
             user_id=session['id']).first()
     headers = {'Authorization': 
-            'Bearer {0}'.format(session['fa_token'])}
+            'Bearer {0}'.format(session['remote_token'])}
     url = "https://graph.facebook.com/{0}/permissions".\
         format(ap.provider_id)
     result = requests.delete(url, headers=headers)
