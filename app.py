@@ -237,11 +237,8 @@ def termsofuse():
 def index():
     user = current_user()
     if user:
-        return render_template('portal.html',
-                PORTAL=app.config['PORTAL'],
-                DEMO_INTERVENTION=app.config['DEMO_INTERVENTION'],
-                user=user)
-    return render_template('index.html', PORTAL=app.config['PORTAL'])
+        return render_template('portal.html', user=user)
+    return render_template('index.html')
 
 
 @app.route('/client', methods=('GET', 'POST'))

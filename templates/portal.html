@@ -23,7 +23,7 @@
         <!-- Main Nav for most screen sizes -->
         <div class="container hidden-xs main-nav">
             <div class="pull-left nav-logos">
-                <a href="{{ PORTAL }}"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
+                <a href="{{ config['PORTAL'] }}"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
                 <a href="http://us.movember.com"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
             </div>
             <div class="pull-right nav-links">
@@ -95,6 +95,7 @@
                 <div class="well lead-well">
                     <h3>I'm deciding what to do</h3>
                     <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <p><a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-4">
@@ -107,7 +108,7 @@
                 <div class="well lead-well">
                     <h3>Managing prostate cancer</h3>
                     <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
-                    <p><a href="{{ DEMO_INTERVENTION }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
                 </div>
             </div>                        
 
