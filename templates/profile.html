@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <title>True NTH USA Portal Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/topnav.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+</head>
+<body>
+
+    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
+    <div id="mainNav" class="nav-import">
+        <!-- Top Nav begins here --> 
+        <!-- Main Nav for most screen sizes -->
+        <div class="container hidden-xs main-nav">
+            <div class="pull-left nav-logos">
+                <a href="{{ config['PORTAL'] }}"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
+                <a href="http://us.movember.com"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
+            </div>
+            <div class="pull-right nav-links">
+                {% if user %}
+                <div class="btn-group nav-userinfo">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Welcome, {{ user.username }} <span class="fa fa-caret-down"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">My Profile</a></li>
+                    <li><a href="logout">Log Out</a></li>
+                  </ul>
+                </div>
+                {% endif %}
+                <a href="#" class="btn btn-default">About</a>
+                <a href="#" class="btn btn-default">Help</a>
+                <form class="navbar-form" role="search">
+                    <div class="form-group">
+                        <div class="hide-initial" id="search-box">
+                            <input type="text" class="form-control" placeholder="Search">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default show-search"><i class="fa fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Responsive navbar for xs width -->
+        <nav class="navbar navbar-static-top visible-xs xs-nav">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle menu</span>
+                  <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
+                </button>
+                <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
+                <a class="navbar-brand logo-movember" href="#"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
+              </div>
+              <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+                <ul class="nav navbar-nav">
+                    {% if user %}
+                    <li><a href="#">My Profile</a></li>
+                    {% endif %}
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Help</a></li>
+                    {% if user %}
+                    <li><a href="logout">Log Out</a></li>
+                    {% endif %}
+                </ul>
+                <form class="navbar-form" role="search">
+                    <div class="form-group">
+                        <div>
+                            <input type="text" class="form-control" placeholder="Search">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                </form>
+              </div>
+            </div>
+        </nav>
+
+        <!-- Top Nav ends here -->
+    </div>
+      
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-md-12">
+                <div class="well lead-well">
+                    <h3>My Profile</h3>
+                    
+                    <p>You can add or edit any details here.</p>
+
+                    <form id="profileForm" class="form" role="form">
+                        <input type="hidden" name="birthday" id="birthday">    
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Name</label>
+                            <div class="row">
+                                <div class="col-xs-6 col-md-6">
+                                    <input class="form-control" name="firstname" placeholder="First Name" type="text" />
+                                </div>
+                                <div class="col-xs-6 col-md-6">
+                                    <input class="form-control" name="lastname" placeholder="Last Name" type="text" />
+                                </div>
+                            </div>
+                        </div>    
+                        <div class="form-group" id="bdGroup">
+                            <label>Birth Date</label>
+                            <div class="row">
+                                <div class="col-xs-4 col-md-4">
+                                    <select class="form-control bd-element" name="birthdayMonth" id="month">
+                                        <option value="">Month...</option>
+                                        <option value="01">January</option>
+                                        <option value="02">February</option>
+                                        <option value="03">March</option>
+                                        <option value="04">April</option>
+                                        <option value="05">May</option>
+                                        <option value="06">June</option>
+                                        <option value="07">July</option>
+                                        <option value="08">August</option>
+                                        <option value="09">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="Date" type="text" maxlength="2" />
+                                </div>
+                                <div class="col-xs-4 col-md-4">
+                                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="Year" type="text" maxlength="4" />
+                                </div>
+                            </div>
+                            <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" id="sexM" value="male" />
+                                    Male
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sex" id="sexF" value="female" />
+                                    Female
+                                </label>
+                                 <label class="radio-inline">
+                                    <input type="radio" name="sex" id="sexO" value="other" />
+                                    Other
+                                </label>                               
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email address</label>
+                            <input type="email" class="form-control" name="email" placeholder="Email">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Cell phone</label>
+                            <input type="email" class="form-control" name="phone" placeholder="Mobile phone">
+                        </div>
+                        <br />
+                        <br />
+                        <button class="btn btn-lg btn-primary" id="updateProfile">Save</button>
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>        
+    </div>
+    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/topnav.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+$(document).ready(function(){
+    
+    // Validate birthday and combine the 3 fields
+    $(".bd-element").on("change",function(){
+        var m = parseInt($("#month").val());
+        var d = parseInt($("#date").val());
+        var y = parseInt($("#year").val());
+        // If all three have been entered, run check
+        var goodDate = false;
+        var errorMsg = "Sorry, this isn't a valid date. Please try again.";
+        if (m && d && y) {
+            var today = new Date();
+            // Check to see if this is a real date
+            var date = new Date(y,m-1,d);
+            if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+                goodDate = true;
+                // Only allow if birthdate is before today
+                if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                    goodDate = false;
+                    errorMsg = "Your birthdate must be in the past.";
+                }
+            }
+            if (y.length < 3) {
+                goodDate = false;
+                errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
+            }
+            // After tests display errors if necessary
+            if (goodDate) {
+                $("#bdGroup").removeClass("has-error");
+                $("#bdError").hide();
+                $("#birthday").val(date);
+            } else {
+                $("#bdGroup").addClass("has-error");
+                $("#bdError").html(errorMsg).show();
+                $("#birthday").val("");
+            }
+        }
+    });
+    $("#updateProfile").on("click", function(event){
+        event.preventDefault();
+        var dataToPass = $("#profileForm").serializeArray();
+        console.log(dataToPass);
+        /** Sample POST AJAX
+        var request = $.ajax ({
+            type: "POST",
+            url: 'servicegoeshere',
+            dataType: 'json',
+            data: dataToPass
+        });
+        request.done(function(data, textStatus, jqXHR) {
+            console.log('done');
+        });
+        request.fail(function(jqXHR, textStatus, errorThrown) {
+            var failMsg = $.parseJSON(jqXHR.responseText);
+            var alertTxt = 'There was a problem with your profle: ' + failMsg.message;
+            alert(alertTxt);           
+        }); 
+        **/
+    });
+});
+</script>
+
+</body>
+</html>
