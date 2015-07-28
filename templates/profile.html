@@ -33,7 +33,7 @@
                     Welcome, {{ user.username }} <span class="fa fa-caret-down"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">My Profile</a></li>
+                    <li><a href="profile">My Profile</a></li>
                     <li><a href="logout">Log Out</a></li>
                   </ul>
                 </div>
@@ -65,7 +65,7 @@
               <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
                     {% if user %}
-                    <li><a href="#">My Profile</a></li>
+                    <li><a href="profile">My Profile</a></li>
                     {% endif %}
                     <li><a href="#">About</a></li>
                     <li><a href="#">Help</a></li>
@@ -103,10 +103,10 @@
                             <label for="exampleInputEmail1">Name</label>
                             <div class="row">
                                 <div class="col-xs-6 col-md-6">
-                                    <input class="form-control" name="firstname" placeholder="First Name" type="text" />
+                                    <input class="form-control" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
                                 </div>
                                 <div class="col-xs-6 col-md-6">
-                                    <input class="form-control" name="lastname" placeholder="Last Name" type="text" />
+                                    <input class="form-control" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
                                 </div>
                             </div>
                         </div>    
@@ -143,26 +143,26 @@
                             <label>Gender</label>
                             <div>
                                 <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexM" value="male" />
+                                    <input type="radio" name="sex" id="sexM" value="male" {{ "checked" if user.gender == "male"}}/>
                                     Male
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexF" value="female" />
+                                    <input type="radio" name="sex" id="sexF" value="female"  {{ "checked" if user.gender == "female"}}/>
                                     Female
                                 </label>
                                  <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexO" value="other" />
+                                    <input type="radio" name="sex" id="sexO" value="other"  {{ "checked" if user.gender == "undifferentiated"}}/>
                                     Other
                                 </label>                               
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="email">Email address</label>
-                            <input type="email" class="form-control" name="email" placeholder="Email">
+                            <input type="email" class="form-control" name="email" placeholder="Email" value="{{ user.email if user.email }}">
                         </div>
                         <div class="form-group">
                             <label for="phone">Cell phone</label>
-                            <input type="email" class="form-control" name="phone" placeholder="Mobile phone">
+                            <input type="email" class="form-control" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
                         </div>
                         <br />
                         <br />

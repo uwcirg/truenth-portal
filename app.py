@@ -476,6 +476,12 @@ def logout():
     return redirect('/')
 
 
+@app.route('/profile')
+@oauth.require_oauth()
+def profile():
+    return render_template('profile.html', user=current_user())
+
+
 def init_db():
     db.create_all()
 

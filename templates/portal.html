@@ -33,7 +33,7 @@
                     Welcome, {{ user.username }} <span class="fa fa-caret-down"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">My Profile</a></li>
+                    <li><a href="profile">My Profile</a></li>
                     <li><a href="logout">Log Out</a></li>
                   </ul>
                 </div>
@@ -65,7 +65,7 @@
               <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
                     {% if user %}
-                    <li><a href="#">My Profile</a></li>
+                    <li><a href="profile">My Profile</a></li>
                     {% endif %}
                     <li><a href="#">About</a></li>
                     <li><a href="#">Help</a></li>
