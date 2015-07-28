@@ -36,11 +36,18 @@ Copy the default to the named configuration file
 $ cp application.cfg.default application.cfg
 ```
 
-Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps (write values to `application.cfg`)
+Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps  Write the values from Facebook to `application.cfg`:
+
+'''bash
+# application.cfg
+[...]
+CONSUMER_KEY = '<App ID From FB>'
+CONSUMER_SECRET = '<App Secret From FB>'
+'''
 
 ## RUN
 ```bash
-$ python client.py
+$ python app.py
 ```
 
 ## DATABASE
