@@ -98,9 +98,9 @@
                     <p>You can add or edit any details here.</p>
 
                     <form id="profileForm" class="form" role="form">
-                        <input type="hidden" name="birthday" id="birthday">    
+                        <input type="hidden" name="birthday" id="birthday" value="{{ user.birthdate if user.birthdate }}">
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Name</label>
+                            <label>Name</label>
                             <div class="row">
                                 <div class="col-xs-6 col-md-6">
                                     <input class="form-control" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
@@ -147,22 +147,24 @@
                                     Male
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexF" value="female"  {{ "checked" if user.gender == "female"}}/>
+                                    <input type="radio" name="sex" id="sexF" value="female" {{ "checked" if user.gender == "female"}}/>
                                     Female
                                 </label>
                                  <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexO" value="other"  {{ "checked" if user.gender == "undifferentiated"}}/>
+                                    <input type="radio" name="sex" id="sexO" value="other" {{ "checked" if user.gender == "undifferentiated"}}/>
                                     Other
                                 </label>                               
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="email">Email address</label>
-                            <input type="email" class="form-control" name="email" placeholder="Email" value="{{ user.email if user.email }}">
+                            <label for="email">Email address
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email if user.email }}">
+                            </label>
                         </div>
                         <div class="form-group">
-                            <label for="phone">Cell phone</label>
-                            <input type="email" class="form-control" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
+                            <label for="phone">Cell phone
+                                <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
+                            </label>
                         </div>
                         <br />
                         <br />
@@ -182,7 +184,17 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
 $(document).ready(function(){
-    
+
+    // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
+    var currentBd = $("#birthday").val();
+    if (currentBd) {
+        var bdArray = currentBd.split("-");
+        $("#year").val(bdArray[0]);
+        $("#month").val(bdArray[1]);
+        $("#date").val(bdArray[2]);
+    }
+
+
     // Validate birthday and combine the 3 fields
     $(".bd-element").on("change",function(){
         var m = parseInt($("#month").val());
