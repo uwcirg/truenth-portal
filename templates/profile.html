@@ -91,14 +91,14 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-lg-10 col-md-12">
+            <div class="col-lg-10 col-lg-offset-1 col-md-12">
                 <div class="well lead-well">
                     <h3>My Profile</h3>
                     
                     <p>You can add or edit any details here.</p>
 
                     <form id="profileForm" class="form" role="form">
-                        <input type="hidden" data-field="[birthDate]" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
+                        <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
                         <div class="form-group">
                             <label>Name</label>
                             <div class="row">
@@ -193,7 +193,6 @@ $(document).ready(function(){
         $("#date").val(bdArray[2]);
     }
 
-
     // Validate birthday and combine the 3 fields
     $(".bd-element").on("change",function(){
         var m = parseInt($("#month").val());
@@ -252,6 +251,7 @@ $(document).ready(function(){
     $("#updateProfile").on("click", function(event){
         event.preventDefault();
 
+        // Grab profile field values
         var getBirthday = $("input[name=birthDate]").val();
         var getFirstname = $("input[name=firstname]").val();
         var getLastname = $("input[name=lastname]").val();
