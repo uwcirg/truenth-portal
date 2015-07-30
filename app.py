@@ -21,6 +21,7 @@ logger.addHandler(logging.StreamHandler())
 app = Flask(__name__, template_folder='templates')
 app.config.from_pyfile('application.cfg', silent=False)
 
+
 class OAuthOrAlternateAuth(OAuth2Provider):
     """Specialize OAuth2Provider with alternate authorization"""
 
@@ -107,6 +108,51 @@ class User(db.Model):
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
 
+    def as_fhir(self):
+        d = {}
+        d['resourceType'] = "Patient"
+        d['identifier'] = []
+        d['identifier'].append({'label': 'Truenth identifier',
+                    'value': self.id})
+        d['identifier'].append({'label': 'Truenth username',
+                    'value': self.username})
+        d['name'] = {}
+        if self.first_name:
+            d['name']['given'] = self.first_name
+        if self.last_name:
+            d['name']['family'] = self.last_name
+        if self.birthdate:
+            d['birthDate'] = self.birthdate.strftime('%Y-%m-%d')
+        if self.gender:
+            d['gender'] = {'coding': [{'system':
+                "http://hl7.org/fhir/v3/AdministrativeGender",
+                'code': self.gender[0].upper(),
+                'display': self.gender.capitalize()}]}
+        d['status'] = 'registered' if self.registered else 'unknown'
+        d['communication'] = 'en-US'
+        d['telecom'] = []
+        if self.email:
+            d['telecom'].append({'system': 'email', 'value': self.email})
+        if self.phone:
+            d['telecom'].append({'system': 'phone', 'value': self.phone})
+        return d
+
+    def update_from_fhir(self, fhir):
+        if 'name' in fhir:
+            self.first_name = fhir['name']['given'] or self.first_name
+            self.last_name = fhir['name']['family'] or self.last_name
+        if 'birthDate' in fhir:
+            self.birthdate = datetime.strptime(fhir['birthDate'],'%Y-%m-%d')
+        if 'gender' in fhir:
+            self.gender = fhir['gender']['coding'][0]['display'].lower()
+        if 'telecom' in fhir:
+            for e in fhir['telecom']:
+                if e['system'] == 'email':
+                    self.email = e['value']
+                if e['system'] == 'phone':
+                    self.phone = e['value']
+        db.session.add(self)
+        db.session.commit()
 
 providers_list = ENUM('facebook', 'twitter', 'truenth', name='providers',
         create_type=False)
@@ -364,29 +410,25 @@ def demographics():
     
     http://www.hl7.org/fhir/patient.html
     """
+    return jsonify(current_user().as_fhir())
+
+
+@app.route('/api/demographics/<int:uid>', methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def demographics_set(uid):
+    """set defined values from FHIR patient resource (in JSON)
+    
+    http://www.hl7.org/fhir/patient.html
+    """
+    # Need roles to allow changing user other than self
     user = current_user()
-    d = {}
-    d['resourceType'] = "Patient"
-    d['identifier'] = []
-    d['identifier'].append({'label': 'Truenth identifier',
-                'value': user.id})
-    d['identifier'].append({'label': 'Truenth username',
-                'value': user.username})
-    d['name'] = {}
-    if user.first_name:
-        d['name']['given'] = user.first_name
-    if user.last_name:
-        d['name']['family'] = user.last_name
-    if user.birthdate:
-        d['birthDate'] = user.birthdate.strftime('%Y-%m-%d')
-    d['status'] = 'registered' if user.registered else 'unknown'
-    d['communication'] = 'en-US'
-    d['telecom'] = []
-    if user.email:
-        d['telecom'].append({'system': 'email', 'value': user.email})
-    if user.phone:
-        d['telecom'].append({'system': 'phone', 'value': user.phone})
-    return jsonify(d)
+    if user.id != uid:
+        abort(401, "You lack authority to alter other users")
+    if not request.json or 'resourceType' not in request.json or\
+            request.json['resourceType'] != 'Patient':
+        abort(400, "Requires FHIR resourceType of 'Patient'")
+    user.update_from_fhir(request.json)
+    return jsonify(current_user().as_fhir())
 
 
 @app.route('/api/clinical')
