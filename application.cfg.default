@@ -1,8 +1,9 @@
-# Configuration values for application.
+# Configuration values for application.  Don't commit private copy!
 DEBUG = True
 SECRET_KEY = 'generate some random secret string'
 CONSUMER_KEY = '<value from FB>'
 CONSUMER_SECRET = '<value from FB>'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///db.sqlite'
-PORTAL = 'http://truenth-demo.cirg.washington.edu'
-DEMO_INTERVENTION = 'https://truenth-intervention-demo.cirg.washington.edu'
+SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost/dbname'
+PORTAL = '<base URI for this installation>'
+DECIDING_INTERVENTION = '<entry URI for intervention>'
+SELF_MANAGE_INTERVENTION = '<entry URI for intervention>'
