@@ -154,6 +154,15 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def check_role(self, permission, other_id):
+        """Placeholder - till we have roles ready - only allows
+        self views and edits at this time
+        """
+        if self.id == other_id:
+            return True
+        abort(401, "Inadequate role for %s of %d" % (permission, other_id))
+
+
 providers_list = ENUM('facebook', 'twitter', 'truenth', name='providers',
         create_type=False)
 
@@ -268,10 +277,26 @@ class Token(db.Model):
 
 
 def current_user():
+    """Obtain the "current" user object
+
+    Works for both remote oauth sessions and locally logged in sessions.
+
+    returns current user object, or None if not logged in (local or remote)
+    """
+    uid = None
     if 'id' in session:
+        # Locally logged in
         uid = session['id']
+    elif hasattr(request, 'oauth'):
+        # Remote OAuth - 'id' lives in request.oauth.user.id:
+        uid = request.oauth.user.id
+    if uid:
         return User.query.get(uid)
     return None
+
+
+def get_user(uid):
+    return User.query.get(uid)
 
 
 @app.route('/terms-of-use')
@@ -398,37 +423,58 @@ def authorize(*args, **kwargs):
 @app.route('/api/me')
 @oauth.require_oauth()
 def me():
-    user = User.query.get(request.oauth.user.id)
+    user = current_user()
     return jsonify(id=user.id, username=user.username,
             email=user.email)
 
 
-@app.route('/api/demographics')
+@app.route('/api/demographics', defaults={'uid': None})
+@app.route('/api/demographics/<int:uid>')
 @oauth.require_oauth()
-def demographics():
-    """return user demographis as a FHIR patient resource (in JSON)
-    
-    http://www.hl7.org/fhir/patient.html
+def demographics(uid):
+    """Access demographics as a FHIR patient resource (in JSON)
+
+    Returns demographics for requested portal user id as a FHIR
+    patient resource (http://www.hl7.org/fhir/patient.html) in JSON.
+    Defaults to logged-in user if `uid` is not provided.
+
+    Raises 401 if logged-in user lacks permission to view requested
+    patient.
+
     """
-    return jsonify(current_user().as_fhir())
+    if uid:
+        current_user().check_role(permission='view', other_id=uid)
+        patient = get_user(uid)
+    else:
+        patient = current_user()
+    return jsonify(patient.as_fhir())
 
 
 @app.route('/api/demographics/<int:uid>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def demographics_set(uid):
-    """set defined values from FHIR patient resource (in JSON)
-    
-    http://www.hl7.org/fhir/patient.html
-    """
-    # Need roles to allow changing user other than self
-    user = current_user()
-    if user.id != uid:
-        abort(401, "You lack authority to alter other users")
+    """Update demographics via FHIR Resource Patient
+
+    Submit a minimal FHIR doc in JSON format including the 'Patient'
+    resource type, and any fields to set.  For example, to update
+    just the first name, POST or PUT:
+
+    {"resourceType": "Patient", "name": [ {"given": ["John"]} ] }
+
+    Returns the updated, complete FHIR patient resource
+    (http://www.hl7.org/fhir/patient.html) in JSON
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    """ 
+    current_user().check_role(permission='edit', other_id=uid)
+    patient = get_user(uid)
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
-    user.update_from_fhir(request.json)
-    return jsonify(current_user().as_fhir())
+    patient.update_from_fhir(request.json)
+    return jsonify(patient.as_fhir())
 
 
 @app.route('/api/clinical')
