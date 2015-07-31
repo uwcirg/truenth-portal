@@ -44,4 +44,37 @@ body {
   border-color: #1c2f21;
 }
 
+/** styles specific to profile **/
+#updateProfile {
+    opacity: 0.5;
+}
+#saveMsg {
+    margin-left: 1em;
+    display: inline-block;
+}
+.loading-indicator {
+    display: none;
+    position: absolute;
+    top: 200px;
+    left: 50%;
+    margin-left: -40px;
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    z-index: 99999;
+    color: #444;
+}
+.loading {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=40);
+    -moz-opacity: 0.4;
+    -khtml-opacity: 0.4;
+    opacity: 0.4;
+}
+@media (max-width: 767px) {
+    #saveMsg {
+        margin: 1em 0;
+    }
+}
+
 

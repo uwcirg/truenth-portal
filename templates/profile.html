@@ -95,9 +95,15 @@
                 <div class="well lead-well">
                     <h3>My Profile</h3>
                     
-                    <p>You can add or edit any details here.</p>
+                    <div id="loadingIndicator" class="loading-indicator">
+                        <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
+                        <p class="lead">Saving...</p>
+                    </div>
 
                     <form id="profileForm" class="form" role="form">
+
+                        <p id="profileIntro">Use the form below to update any of your details.</p>
+
                         <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
                         <div class="form-group">
                             <label>Name</label>
@@ -166,8 +172,7 @@
                             <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
                         </div>
                         <br />
-                        <br />
-                        <button class="btn btn-lg btn-primary" id="updateProfile">Save</button>
+                        <button class="btn btn-lg btn-default" id="updateProfile">Save</button> <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="#">cancel</a>.</span>
 
                     </form>
 
@@ -223,6 +228,7 @@ $(document).ready(function(){
                 $("#bdError").hide();
                 // Set date if YYYY-MM-DD
                 $("#birthday").val(y+"-"+m+"-"+d);
+                giveFeedback();
             } else {
                 $("#bdGroup").addClass("has-error");
                 $("#bdError").html(errorMsg).show();
@@ -231,6 +237,31 @@ $(document).ready(function(){
         } else {
             $("#birthday").val("");
         }
+    });
+
+    var feedbackGiven = false;
+    function giveFeedback(submitted) {
+        if (submitted) {
+            feedbackGiven = false;
+            $("#saveMsg").hide();
+            $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
+            setTimeout(function(){
+                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a>.");
+                $("#profileForm").removeClass("loading");
+                $("#loadingIndicator").fadeOut();
+            }, 1200);
+        } else {
+            if (feedbackGiven) return false;
+            feedbackGiven = true;
+            $("#saveMsg").fadeIn("slow");
+            $("#updateProfile").removeClass("btn-default").addClass("btn-primary").animate({
+                opacity: 1
+            }, 700);
+        }
+    }
+    // Trigger feedback when form changes
+    $('#profileForm input').not("#email, .bd-element").on("keyup change", function(){
+        giveFeedback();
     });
 
     // Simple email validation
@@ -245,11 +276,15 @@ $(document).ready(function(){
        } else {
            $("#emailGroup").removeClass("has-error");
            $("#emailError").hide();
+           giveFeedback();
        }
     });
 
     $("#updateProfile").on("click", function(event){
         event.preventDefault();
+
+        $("#profileForm").addClass("loading");
+        $("#loadingIndicator").show();
 
         // Grab profile field values
         var getBirthday = $("input[name=birthDate]").val();
@@ -261,8 +296,13 @@ $(document).ready(function(){
 
         // Put form data into FHIR array
         var demoArray = {};
+        demoArray["resourceType"] = "Patient";
         demoArray["birthDate"] = getBirthday;
-        demoArray["gender"] = getSex;
+        demoArray["gender"] = {
+            "coding": [{
+                "display": getSex
+            }]
+        };
         demoArray["name"] = {
             "given": getFirstname,
             "family": getLastname
@@ -270,25 +310,19 @@ $(document).ready(function(){
         demoArray["telecom"] = [
             { "system": "email", "value": getEmail },
             { "system": "phone", "value": getPhone }
-        ]
-        console.log(JSON.stringify(demoArray));
-
-        /** Sample POST AJAX
-        var request = $.ajax ({
+        ];
+        /** Send the AJAX **/
+        $.ajax ({
             type: "POST",
-            url: 'servicegoeshere',
+            url: 'api/demographics/{{ user.id }}',
+            contentType: "application/json; charset=utf-8",
             dataType: 'json',
-            data: demoArray
-        });
-        request.done(function(data, textStatus, jqXHR) {
-            console.log('done');
-        });
-        request.fail(function(jqXHR, textStatus, errorThrown) {
-            var failMsg = $.parseJSON(jqXHR.responseText);
-            var alertTxt = 'There was a problem with your profle: ' + failMsg.message;
-            alert(alertTxt);           
+            data: JSON.stringify(demoArray)
+        }).done(function() {
+            giveFeedback(true);
+        }).fail(function() {
+            alert("There was a problem updating your profile. Please try again.");
         }); 
-        **/
     });
 });
 </script>
