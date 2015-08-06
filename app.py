@@ -6,7 +6,8 @@ from functools import wraps
 
 from authomatic.extras.flask import FlaskAuthomatic
 from authomatic.providers import oauth2
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from dateutil import parser
 from flask import Flask, make_response
 from flask import session, request, url_for
 from flask import render_template, redirect, jsonify, abort
@@ -91,6 +92,15 @@ fa = FlaskAuthomatic(
 )
 
 
+def as_fhir(obj):
+    if hasattr(obj, 'as_fhir'):
+        return obj.as_fhir()
+    if isinstance(obj, datetime):
+        return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
+    if isinstance(obj, date):
+        return obj.strftime('%Y-%m-%d')
+
+
 # http://hl7.org/fhir/v3/AdministrativeGender/
 gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
         create_type=False)
@@ -108,6 +118,54 @@ class User(db.Model):
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
 
+    observations = db.relationship('Observation',
+            secondary="user_observations", backref=db.backref('users'))
+
+    def add_observation(self, fhir):
+        if not 'coding' in fhir['name']:
+            return 400, "requires at least one CodeableConcept"
+        if not 'valueQuantity' in fhir:
+            return 400, "missing required 'valueQuantity'"
+
+        # Only retaining first Codeable Concept at this time
+        first_cc = fhir['name']['coding'][0]
+        cc = CodeableConcept(system=first_cc.get('system'),
+                code=first_cc.get('code'),
+                display=first_cc.get('display')).add_if_not_found()
+
+        v = fhir['valueQuantity']
+        vq = ValueQuantity(value=v.get('value'),
+                units=v.get('units'),
+                system=v.get('system'),
+                code=v.get('code')).add_if_not_found()
+
+        issued = fhir.get('issued') and\
+                parser.parse(fhir.get('issued')) or None
+        observation = Observation(status=fhir.get('status'),
+                issued=issued,
+                codeable_concept_id=cc.id,
+                value_quantity_id=vq.id).add_if_not_found()
+
+        UserObservation(user_id=self.id,
+                observation_id=observation.id).add_if_not_found()
+        db.session.commit()
+        return 200, "ok"
+
+    def clinical_history(self, requestURL=None):
+        now = datetime.now()
+        fhir = {"resourceType": "Bundle",
+                "title": "Clinical History",
+                "link": [{ "rel": "self", "href": requestURL},],
+                "updated": as_fhir(now),
+                "entry": []}
+
+        for ob in self.observations:
+            fhir['entry'].append({ "title": "Patient Observation",
+                    "updated": as_fhir(now),
+                    "author": [{ "name": "Truenth Portal"},],
+                    "content": ob.as_fhir()})
+        return fhir
+
     def as_fhir(self):
         d = {}
         d['resourceType'] = "Patient"
@@ -122,7 +180,7 @@ class User(db.Model):
         if self.last_name:
             d['name']['family'] = self.last_name
         if self.birthdate:
-            d['birthDate'] = self.birthdate.strftime('%Y-%m-%d')
+            d['birthDate'] = as_fhir(self.birthdate)
         if self.gender:
             d['gender'] = {'coding': [{'system':
                 "http://hl7.org/fhir/v3/AdministrativeGender",
@@ -165,6 +223,139 @@ class User(db.Model):
 
 providers_list = ENUM('facebook', 'twitter', 'truenth', name='providers',
         create_type=False)
+
+
+class CodeableConcept(db.Model):
+    __tablename__ = 'codeable_concepts'
+    id = db.Column(db.Integer, primary_key=True)
+    system = db.Column(db.String(255), nullable=False)
+    code = db.Column(db.String(80), nullable=False)
+    display = db.Column(db.Text, nullable=False)
+
+    def as_fhir(self):
+        d = {}
+        for i in ("system", "code", "display"):
+            if getattr(self, i):
+                d[i] = getattr(self, i)
+        return {"name": {"coding": [d,]}}
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for similar, existing CodeableConcept (matches on 
+        system and code alone).  Populates self.id if found, adds
+        to database first if not.
+
+        """
+        match = self.query.filter_by(system=self.system,
+                code=self.code).first()
+        if match:
+            self.id = match.id
+        else:
+            db.session.add(self)
+            db.session.flush()
+        assert(self.id)
+        return self
+
+
+class ValueQuantity(db.Model):
+    __tablename__ = 'value_quantities'
+    id = db.Column(db.Integer, primary_key=True)
+    value = db.Column(db.String(80))
+    units = db.Column(db.String(80))
+    system = db.Column(db.String(255))
+    code = db.Column(db.String(80))
+
+    def as_fhir(self):
+        d = {}
+        for i in ("value", "units", "system", "code"):
+            if getattr(self, i):
+                d[i] = getattr(self, i)
+        return {"valueQuantity": d}
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for similar, existing ValueQuantity (matches on 
+        value, units and system alone).  Populates self.id if found, adds
+        to database first if not.
+
+        """
+        lookup_value = self.value and str(self.value) or None
+        match = self.query.filter_by(value=lookup_value,
+                units=self.units, system=self.system).first()
+        if match:
+            self.id = match.id
+        else:
+            db.session.add(self)
+            db.session.flush()
+        assert(self.id)
+        return self
+
+
+class Observation(db.Model):
+    __tablename__ = 'observations'
+    id = db.Column(db.Integer, primary_key=True)
+    issued = db.Column(db.DateTime, default=datetime.now)
+    status = db.Column(db.String(80))
+    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
+    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'))
+
+    codeable_concept = db.relationship(CodeableConcept)
+    value_quantity = db.relationship(ValueQuantity)
+
+    def as_fhir(self):
+        fhir = {"resourceType": "Observation"}
+        if self.issued:
+            fhir['issued'] = as_fhir(self.issued)
+        if self.status:
+            fhir['status'] = self.status
+        fhir.update(self.codeable_concept.as_fhir())
+        fhir.update(self.value_quantity.as_fhir())
+        return fhir
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for matching, existing Observation.
+        Populates self.id if found, adds to database first if not.
+
+        """
+        match = self.query.filter_by(issued=self.issued,
+                status=self.status,
+                codeable_concept_id=self.codeable_concept_id,
+                value_quantity_id=self.value_quantity_id).first()
+        if match:
+            self.id = match.id
+        else:
+            db.session.add(self)
+            db.session.flush()
+        assert(self.id)
+        return self
+
+
+class UserObservation(db.Model):
+    __tablename__ = 'user_observations'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id'))
+    observation_id = db.Column(db.ForeignKey('observations.id'))
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for matching, existing UserObservation.
+        Populates self.id if found, adds to database first if not.
+
+        """
+        match = self.query.filter_by(user_id=self.user_id,
+                observation_id=self.observation_id).first()
+        if match:
+            self.id = match.id
+        else:
+            db.session.add(self)
+            db.session.flush()
+        assert(self.id)
+        return self
 
 
 class AuthProvider(db.Model):
@@ -477,16 +668,53 @@ def demographics_set(uid):
     return jsonify(patient.as_fhir())
 
 
-@app.route('/api/clinical')
+@app.route('/api/clinical', defaults={'uid': None})
+@app.route('/api/clinical/<int:uid>')
 @oauth.require_oauth()
-def clinical():
-    clinical_data = {
-        "TNM-Condition-stage": {
-            "summary": "T1 N0 M0"
-        },
-        "Gleason-score": "2"
-    }
-    return jsonify(clinical_data)
+def clinical(uid):
+    """Access clinical data as a FHIR bundle of observations (in JSON)
+
+    Returns clinical data for requested portal user id as a FHIR
+    bundle of observations (http://www.hl7.org/fhir/observation.html)
+    in JSON.  Defaults to logged-in user if `uid` is not provided.
+
+    Raises 401 if logged-in user lacks permission to view requested
+    patient.
+
+    """
+    if uid:
+        current_user().check_role(permission='view', other_id=uid)
+        patient = get_user(uid)
+    else:
+        patient = current_user()
+    return jsonify(patient.clinical_history(requestURL=request.url))
+
+
+@app.route('/api/clinical/<int:uid>', methods=('POST','PUT'))
+@oauth.require_oauth()
+def clinical_set(uid):
+    """Add clinical entry via FHIR Resource Observation
+
+    Submit a minimal FHIR doc in JSON format including the 'Observation'
+    resource type, and any fields to retain.  NB, only a subset
+    are persisted in the portal including {"name"(CodeableConcept),
+    "valueQuantity", "status", "issued"} - others will be ignored.
+
+    Returns a json friendly message, i.e. {"message": "ok"}
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    """ 
+    current_user().check_role(permission='edit', other_id=uid)
+    patient = get_user(uid)
+    if not request.json or 'resourceType' not in request.json or\
+            request.json['resourceType'] != 'Observation':
+        abort(400, "Requires FHIR resourceType of 'Observation'")
+    code, result = patient.add_observation(request.json)
+    if code != 200:
+        abort(code, result)
+    return jsonify(message=result)
 
 
 @app.route('/api/portal-wrapper-html/', defaults={'username': None})
