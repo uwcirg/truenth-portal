@@ -1,14 +1,21 @@
-from flask.ext.script import Manager
+""" Defines a series of scripts for running server and maintenance
+
+python manage.py --help
+
+"""
+from flask.ext.script import Manager, Server
 from flask.ext.migrate import Migrate, MigrateCommand
-import os
 
-from app import app, db
-app.config.from_pyfile('application.cfg', silent=False)
+from portal.app import create_app
+from portal.extensions import db
 
-migrate = Migrate(app, db)
+app = create_app()
 manager = Manager(app)
 
+migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
+manager.add_command('runserver', Server(host='0.0.0.0'))
+
 
 if __name__ == '__main__':
-        manager.run()
+    manager.run()

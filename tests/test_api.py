@@ -1,33 +1,15 @@
+"""Unit test module for API"""
 import json
-import os
-import tempfile
-import unittest
+from tests import TestCase, LAST_NAME, FIRST_NAME, TEST_USER_ID
 
-import app
+from portal.extensions import db
+from portal.models.fhir import Observation, UserObservation
+from portal.models.fhir import CodeableConcept, ValueQuantity
 
-TEST_USER_ID = '5'
-FIRST_NAME = 'First'
-LAST_NAME = 'Last'
-
-class PortalTestCase(unittest.TestCase):
-
-    def setUp(self):
-        app.app.config['TESTING'] = True
-        app.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'
-        app.init_db()
-        def create_test_user():
-            test_user = app.User(username='testy', id=TEST_USER_ID,
-                    first_name=FIRST_NAME, last_name=LAST_NAME)
-            app.db.session.add(test_user)
-            app.db.session.commit()
-        create_test_user()
-
-    def tearDown(self):
-        app.db.session.remove()
-        app.db.drop_all()
+class TestAPI(TestCase):
 
     def test_demographicsGET(self):
-        with app.app.test_client() as c:
+        with self.client as c:
             with c.session_transaction() as sess:
                 sess['id'] = TEST_USER_ID
             rv = c.get('/api/demographics')
@@ -48,15 +30,15 @@ class PortalTestCase(unittest.TestCase):
                 "resourceType": "Patient",
                 "birthDate": dob,
                 "gender": {"coding": [{
-                    "code": "M", 
-                    "display": gender, 
+                    "code": "M",
+                    "display": gender,
                     "system": "http://hl7.org/fhir/v3/AdministrativeGender"
                     }]},
                 "telecom": [{
-                    "system": "phone", 
+                    "system": "phone",
                     "value": "867-5309"
                     }]}
-        with app.app.test_client() as c:
+        with self.client as c:
             with c.session_transaction() as sess:
                 sess['id'] = TEST_USER_ID
             rv = c.put('/api/demographics/%s' % TEST_USER_ID,
@@ -72,18 +54,18 @@ class PortalTestCase(unittest.TestCase):
 
     def test_clinicalGET(self):
         # First push some clinical data into the db for the test user
-        observation = app.Observation()
-        observation.codeable_concept = app.CodeableConcept(
+        observation = Observation()
+        observation.codeable_concept = CodeableConcept(
                 system='SNOMED-CT', code='372278000',
                 display='Gleason score')
-        observation.value_quantity = app.ValueQuantity(value=2)
-        app.db.session.add(observation)
-        app.db.session.flush()
-        app.db.session.add(app.UserObservation(user_id=int(TEST_USER_ID),
+        observation.value_quantity = ValueQuantity(value=2)
+        db.session.add(observation)
+        db.session.flush()
+        db.session.add(UserObservation(user_id=int(TEST_USER_ID),
             observation_id=observation.id))
-        app.db.session.commit()
+        db.session.commit()
 
-        with app.app.test_client() as c:
+        with self.client as c:
             with c.session_transaction() as sess:
                 sess['id'] = TEST_USER_ID
             rv = c.get('/api/clinical/%s' % TEST_USER_ID)
@@ -115,7 +97,7 @@ class PortalTestCase(unittest.TestCase):
                 "issued": "2015-08-04T13:27:00+01:00"
                 }
 
-        with app.app.test_client() as c:
+        with self.client as c:
             with c.session_transaction() as sess:
                 sess['id'] = TEST_USER_ID
             rv = c.post('/api/clinical/%s' % TEST_USER_ID,
@@ -124,6 +106,3 @@ class PortalTestCase(unittest.TestCase):
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['message'], "ok")
-
-if __name__ == '__main__':
-    unittest.main()

@@ -25,7 +25,19 @@ project requirements (into the virtual environment)
 ```bash
 $ source bin/activate
 $ pip install -U setuptools
-$ pip install -r requirements.txt
+```
+
+To install for development (so changes to source files don't require
+another round of install, use the develop flag
+
+```bash
+$ python setup.py develop
+```
+
+To install on a server, use the install flag
+
+```bash
+$ python setup.py install
 ```
 
 ## CONFIGURE
@@ -33,7 +45,7 @@ $ pip install -r requirements.txt
 Copy the default to the named configuration file
 
 ```bash
-$ cp application.cfg.default application.cfg
+$ cp portal/application.cfg.default portal/application.cfg
 ```
 
 Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps  Write the values from Facebook to `application.cfg`:
@@ -47,7 +59,7 @@ CONSUMER_SECRET = '<App Secret From FB>'
 
 ## RUN
 ```bash
-$ python app.py
+$ python manage.py runserver
 ```
 
 ## DATABASE
@@ -70,7 +82,7 @@ python manage.py db migrate
 ```
 
 Then execute the upgrade on any database (edit `SQLALCHEMY_DATABASE_URI`
-to alter database target):
+in the `application.cfg` file to alter database target):
 
 ```bash
 python manage.py db upgrade
@@ -78,10 +90,9 @@ python manage.py db upgrade
 
 ## Testing
 
-Activate the virtual environment and initiate the `portal_tests` module
+All test modules under the `tests` directory can be executed via `nosetests`
+(again from project root with the virtual environment activated)
 
 ```bash
-cd PROJECT_HOME
-source bin/activate
-python portal_tests.py
+$ nosetests
 ```
