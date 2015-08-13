@@ -137,6 +137,17 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 <script src="{{ url_for('static', filename='js/topnav.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+$(document).ready(function(){
+    equalHeightBoxes("lead-well");
+    $(window).resize(function() {
+        // Fire resize if browser window size changes. Delay by 200ms to avoid
+        // too many firings as user drags browser window
+        clearTimeout(this.id);
+        this.id = setTimeout(equalHeightBoxes("lead-well"), 200);
+    });
+});
+</script>
 
 </body>
 </html>
