@@ -15,7 +15,7 @@ class BaseConfig(object):
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
-    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_ECHO = False
 
 
 class TestConfig(BaseConfig):

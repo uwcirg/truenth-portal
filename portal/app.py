@@ -8,8 +8,14 @@ from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
 
+log = logging.getLogger('flask_oauthlib')
+log.addHandler(logging.StreamHandler())
+log.setLevel(logging.DEBUG)
+
+
 logger = logging.getLogger('authomatic.core')
 logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
 
 DEFAULT_BLUEPRINTS = (api, auth, portal)
 
