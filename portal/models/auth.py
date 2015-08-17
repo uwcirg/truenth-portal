@@ -73,7 +73,7 @@ class Grant(db.Model):
 
     code = db.Column(db.String(255), index=True, nullable=False)
 
-    redirect_uri = db.Column(db.String(255))
+    redirect_uri = db.Column(db.Text)
     expires = db.Column(db.DateTime)
 
     _scopes = db.Column(db.Text)
