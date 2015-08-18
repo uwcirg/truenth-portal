@@ -35,26 +35,17 @@
     color: #333;
     background-color: #fff;
 }
-
-.banner-img {
-	height: 95px;
+.tnth-search {
+    display: inline-block;
+    padding: 0;
 }
-.nav-logos a {
-	margin-right: 1.25em;
-}
-.nav-links form {
-	display: inline-block;
-	padding: 0;
+.tnth-show-search {
+    height: 43px;
 }
 
-.nav-links .btn {
-	margin: 0;
-}
 .hide-initial, .form-group.hide-initial {
   display: none;
 }
 
-.nav-links .show-search {
-    height: 43px;
-}
+
 

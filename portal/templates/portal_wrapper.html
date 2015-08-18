@@ -1,7 +1,7 @@
 <div class="tnth-nav-wrapper">
 
     <div class="container hidden-xs tnth-nav-main">
-        <div class="pull-left nav-logos">
+        <div class="pull-left">
             <!-- Probably need to use absolute links for images -->
             <a href="{{PORTAL}}"><img src="{{PORTAL}}{{logo_truenth_alt}}" /></a>
         </div>
@@ -23,13 +23,13 @@
                 <i class="fa fa-home fa-2x"></i>
             </a>
             {% endif %}
-            <form class="navbar-form" role="search">
+            <form class="navbar-form tnth-search" role="search">
                 <div class="form-group">
-                    <div class="hide-initial" id="search-box">
+                    <div class="hide-initial" id="tnth-search-box">
                         <input type="text" class="form-control" placeholder="Search TrueNTH">
                     </div>
                 </div>
-                <button type="submit" class="btn tnth-white show-search"><i class="fa fa-search fa-lg"></i></button>
+                <button type="submit" class="btn tnth-white tnth-show-search"><i class="fa fa-search fa-lg"></i></button>
             </form>
             <div class="btn-group nav-userinfo">
                 <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -77,3 +77,22 @@
     </nav>
 
 </div>
+
+<script>
+// Initiate trigger functionality on search box
+function showTnthSearch() {
+    $("body").on("click",".tnth-show-search",function(){
+        if ($(this).hasClass("now-open")) {
+            $(this).removeClass("now-open");
+            $("#tnth-search-box").hide();
+        } else {
+            $(this).addClass("now-open");
+            $("#tnth-search-box").fadeIn("slow");
+        }
+        return false;
+    });
+}
+$(document).ready(function(){
+    showTnthSearch();
+});
+</script>

@@ -54,7 +54,7 @@ $(document).ready(function() {
     }, 'html')
         .done(function(data) {
             embed_page(data);
-            showSearch();
+            //showSearch();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             alert("Error loading nav elements from " + PORTAL_HOSTNAME);
