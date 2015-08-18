@@ -25,7 +25,13 @@ body {
 .lead-well h3 {
   margin-top: 0;
 }
-
+.int-sub {
+    margin: 0 0 10px;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 18px;
+    color: #777;
+}
 .btn-tnth-primary {
   color: #fff;
   background-color: #3d6548;

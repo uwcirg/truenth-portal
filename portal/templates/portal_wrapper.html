@@ -7,7 +7,6 @@
         </div>
 
         <div class="pull-right nav-links">
-            <a href="" class="btn btn-default"><i class="fa fa-chevron-left"></i> Back to TrueNTH Home</a>
             {% if username %}
             <div class="btn-group nav-userinfo">
                 <button type="button" class="btn tnth-white btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -20,10 +19,10 @@
                     <li><a href="{{PORTAL}}/logout">Log Out</a></li>
                 </ul>
             </div>
-            {% endif %}
             <a class="btn tnth-white dropdown-toggle" href="{{PORTAL}}" title="Return to TrueNTH Home">
                 <i class="fa fa-home fa-2x"></i>
             </a>
+            {% endif %}
             <form class="navbar-form" role="search">
                 <div class="form-group">
                     <div class="hide-initial" id="search-box">
@@ -41,36 +40,23 @@
                     <li><a href="#">About TrueNTH</a></li>
                 </ul>
             </div>
-            <!--<div class="pull-right text" style="margin-top: 1em">
-                <em>You are currently using <span id="intName"></span></em> &nbsp;
-                <a href="{{PORTAL}}" class="btn btn-sm btn-default"><i class="fa fa-chevron-left"></i> Back to TrueNTH Home</a>
-            </div>
-             Removing search for now
-            <form class="navbar-form" role="search">
-                <div class="form-group">
-                    <div class="hide-initial" id="search-box">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-default show-search"><i class="fa fa-search"></i></button>
-            </form>
-            -->
         </div>
     </div>
     <!-- Responsive navbar for xs width -->
     <nav class="navbar navbar-static-top visible-xs tnth-nav-xs">
         <div class="container-fluid">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <button type="button" class="tnth-white navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                     <span class="sr-only">Toggle menu</span>
                     <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
                 </button>
-                <a class="navbar-brand" href="#"><img src="{{PORTAL}}{{logo_truenth}}" /></a>
+                <a class="navbar-brand" href="#"><img src="{{PORTAL}}{{logo_truenth_alt}}" /></a>
             </div>
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">
+                    <li><a href="{{PORTAL}}">Home</a></li>
                     {% if username %}
-                    <li><a href="#">My Profile</a></li>
+                    <li><a href="{{PORTAL}}/profile">My Profile</a></li>
                     {% endif %}
                     <li><a href="#">About</a></li>
                     <li><a href="#">Help</a></li>

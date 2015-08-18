@@ -18,123 +18,61 @@
 <body>
 
     <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
-    <div id="mainNav" class="tnth-nav-wrapper">
-        <!-- Top Nav begins here --> 
-        <!-- Main Nav for most screen sizes -->
-        <div class="container hidden-xs tnth-nav-main">
-            <div class="pull-left nav-logos">
-                <a href="{{ config['PORTAL'] }}"><img src="{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
-            </div>
-            <div class="pull-right nav-links">
-                {% if user %}
-                <div class="btn-group nav-userinfo">
-                  <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Welcome, {{ user.username }}
-                      <img src="{{ url_for('static', filename='img/movember_profile_thumb.png') }}" />
-                      <span class="fa fa-caret-down"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="profile">My Profile</a></li>
-                    <li><a href="logout">Log Out</a></li>
-                  </ul>
-                </div>
-                {% endif %}
-                <form class="navbar-form" role="search">
-                    <div class="form-group">
-                        <div class="hide-initial" id="search-box">
-                            <input type="text" class="form-control" placeholder="Search TrueNTH">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn tnth-white show-search"><i class="fa fa-search fa-lg"></i></button>
-                </form>
-                <div class="btn-group nav-userinfo">
-                    <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                        <i class="fa fa-question fa-2x"></i>
-                    </button>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#">Help</a></li>
-                        <li><a href="#">About TrueNTH</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Responsive navbar for xs width -->
-        <nav class="navbar navbar-static-top visible-xs tnth-nav-xs">
-            <div class="container-fluid">
-              <div class="navbar-header">
-                <button type="button" class="tnth-white navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                  <span class="sr-only">Toggle menu</span>
-                  <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
-                </button>
-                <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
-              </div>
-              <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
-                <ul class="nav navbar-nav">
-                    {% if user %}
-                    <li><a href="profile">My Profile</a></li>
-                    {% endif %}
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Help</a></li>
-                    {% if user %}
-                    <li><a href="logout">Log Out</a></li>
-                    {% endif %}
-                </ul>
-                <form class="navbar-form" role="search">
-                    <div class="form-group">
-                        <div>
-                            <input type="text" class="form-control" placeholder="Search TrueNTH">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-default">Search</button>
-                </form>
-              </div>
-            </div>
-        </nav>
-
-        <!-- Top Nav ends here -->
+    <!-- topNav loads here -->
+    <div id="mainNav">
     </div>
-      
+
 
     <div class="container">
         <div class="row">
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>I'm deciding what to do</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <h3>Decision Support</h3>
+                    <div class="int-sub">What treatment is best for me?</div>
+                    <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
                     <p><a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>Care plan &amp; navigation</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <h3>Self Management</h3>
+                    <div class="int-sub">How do I cope with my symptoms?</div>
+                    <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>Managing prostate cancer</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
-                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Go to intervention <i class="fa fa-chevron-right"></i></a></p>
+                    <h3>Care Plan</h3>
+                    <div class="int-sub">How to I help with my symptoms?</div>
+                    <p>You’ve been treated for prostate cancer, so what’s next? Develop a customized survivorship plan, to help remind you of your health needs as you move back to the care of your regular doctor.</p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-tnth-primary" disabled>Coming soon</a></p>
                 </div>
-            </div>                        
+            </div>
+
 
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>Community of wellness &amp; lifestyle</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <h3>Community of Wellness</h3>
+                    <div class="int-sub">How can I be healthy?</div>
+                    <p>Health covers a broad range of topics, including exercise, diet, friends and social environments. Learn how to improve your overall health as you progress through your treatment.</p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-tnth-primary" disabled>Coming soon</a></p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>Social support network</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <h3>Sexual Recovery</h3>
+                    <div class="int-sub">What about sex?</div>
+                    <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-tnth-primary" disabled>Coming soon</a></p>
                 </div>
             </div>
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well">
-                    <h3>I've had androgen suppression therapy</h3>
-                    <p>Latine aliquam vix et, latine euripidis delicatissimi ex vix. Ne duo summo graecis, minimum voluptaria dissentiet in cum. Eu dicit paulo mei, eam error dissentiunt eu. Sed ex fabulas mandamus, eum et cibo dicam efficiendi. Cum legere cetero hendrerit id.</p>
+                    <h3>Social Support Network</h3>
+                    <div class="int-sub">Who can I talk with?</div>
+                    <p>Find out how to connect with others who've experienced what you're going through. Building a strong support network leads to better outcomes.</p>
+                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-tnth-primary" disabled>Coming soon</a></p>
                 </div>
             </div>                        
         </div>        
@@ -145,6 +83,12 @@
 <script src="{{ url_for('static', filename='js/topnav.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
+PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
+{% if user.username%}
+    PORTAL_NAV_PAGE = PORTAL_NAV_PAGE + '/{{ user.username }}';
+{% endif %}
+PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+
 $(document).ready(function(){
     equalHeightBoxes("lead-well");
     $(window).resize(function() {
