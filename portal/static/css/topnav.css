@@ -28,6 +28,8 @@
     border-color: transparent;
     transition: all 0.2s ease-in-out 0s;
     -webkit-transition: all 0.2s ease-in-out 0s;
+    text-shadow: none;
+    background-image: none;
 }
 .tnth-white:hover,
 .tnth-white:focus,
