@@ -1,6 +1,11 @@
 function showSearch() {
 	$("body").on("click",".show-search",function(){
-		$("#search-box").fadeIn("slow");
+        if ($(this).hasClass("now-open")) {
+            $("#search-box").hide();
+        } else {
+            $(this).addClass("now-open");
+            $("#search-box").fadeIn("slow")
+        }
 		return false;
 	});
 }

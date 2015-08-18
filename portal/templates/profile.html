@@ -18,70 +18,77 @@
 <body>
 
     <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
-    <div id="mainNav" class="nav-import">
-        <!-- Top Nav begins here --> 
+    <div id="mainNav" class="tnth-nav">
+        <!-- Top Nav begins here -->
         <!-- Main Nav for most screen sizes -->
-        <div class="container hidden-xs main-nav">
+        <div class="container hidden-xs tnth-nav-main">
             <div class="pull-left nav-logos">
-                <a href="{{ config['PORTAL'] }}"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
-                <a href="http://us.movember.com"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
+                <a href="{{ config['PORTAL'] }}"><img src="{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
             </div>
             <div class="pull-right nav-links">
                 {% if user %}
                 <div class="btn-group nav-userinfo">
-                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Welcome, {{ user.username }} <span class="fa fa-caret-down"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="profile">My Profile</a></li>
-                    <li><a href="logout">Log Out</a></li>
-                  </ul>
+                    <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        Welcome, {{ user.username }}
+                        <img src="{{ url_for('static', filename='img/movember_profile_thumb.png') }}" />
+                        <span class="fa fa-caret-down"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="profile">My Profile</a></li>
+                        <li><a href="logout">Log Out</a></li>
+                    </ul>
                 </div>
                 {% endif %}
-                <a href="#" class="btn btn-default">About</a>
-                <a href="#" class="btn btn-default">Help</a>
                 <form class="navbar-form" role="search">
                     <div class="form-group">
                         <div class="hide-initial" id="search-box">
-                            <input type="text" class="form-control" placeholder="Search">
+                            <input type="text" class="form-control" placeholder="Search TrueNTH">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-default show-search"><i class="fa fa-search"></i></button>
+                    <button type="submit" class="btn tnth-white show-search"><i class="fa fa-search fa-lg"></i></button>
                 </form>
+                <div class="btn-group nav-userinfo">
+                    <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-question fa-2x"></i>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Help</a></li>
+                        <li><a href="#">About TrueNTH</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
         <!-- Responsive navbar for xs width -->
-        <nav class="navbar navbar-static-top visible-xs xs-nav">
+        <nav class="navbar navbar-static-top visible-xs tnth-nav-xs">
             <div class="container-fluid">
-              <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                  <span class="sr-only">Toggle menu</span>
-                  <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
-                </button>
-                <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_truenth.png') }}" /></a>
-                <a class="navbar-brand logo-movember" href="#"><img src="{{ url_for('static', filename='img/logo_movember.png') }}" /></a>
-              </div>
-              <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
-                <ul class="nav navbar-nav">
-                    {% if user %}
-                    <li><a href="profile">My Profile</a></li>
-                    {% endif %}
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Help</a></li>
-                    {% if user %}
-                    <li><a href="logout">Log Out</a></li>
-                    {% endif %}
-                </ul>
-                <form class="navbar-form" role="search">
-                    <div class="form-group">
-                        <div>
-                            <input type="text" class="form-control" placeholder="Search">
+                <div class="navbar-header">
+                    <button type="button" class="tnth-white navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle menu</span>
+                        <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
+                </div>
+                <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+                    <ul class="nav navbar-nav">
+                        {% if user %}
+                        <li><a href="profile">My Profile</a></li>
+                        {% endif %}
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Help</a></li>
+                        {% if user %}
+                        <li><a href="logout">Log Out</a></li>
+                        {% endif %}
+                    </ul>
+                    <form class="navbar-form" role="search">
+                        <div class="form-group">
+                            <div>
+                                <input type="text" class="form-control" placeholder="Search TrueNTH">
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="btn btn-default">Search</button>
-                </form>
-              </div>
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </form>
+                </div>
             </div>
         </nav>
 

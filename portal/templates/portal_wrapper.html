@@ -1,16 +1,17 @@
-<div class="container hidden-xs main-nav">
+<div class="container hidden-xs tnth-nav-main">
     <div class="pull-left nav-logos">
         <!-- Probably need to use absolute links for images -->
-        <a href="{{PORTAL}}"><img src="{{PORTAL}}{{logo_truenth}}" /></a>
-        <a href="http://us.movember.com"><img src="{{PORTAL}}{{logo_movember}}" /></a>
+        <a href="{{PORTAL}}"><img src="{{PORTAL}}{{logo_truenth_alt}}" /></a>
     </div>
 
     <div class="pull-right nav-links">
         <a href="" class="btn btn-default"><i class="fa fa-chevron-left"></i> Back to TrueNTH Home</a>
         {% if username %}
         <div class="btn-group nav-userinfo">
-          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-            Welcome, {{ username }} <span class="fa fa-caret-down"></span>
+          <button type="button" class="btn tnth-white btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            Welcome, {{ username }}
+              <img src="{{PORTAL}}{{movember_profile}}" />
+              <span class="fa fa-caret-down"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
             <li><a href="{{PORTAL}}/profile">My Profile</a></li>
@@ -18,13 +19,31 @@
           </ul>
         </div>
         {% endif %}
-        <a href="#" class="btn btn-default">About</a>
-        <a href="#" class="btn btn-default">Help</a>
-        <div class="pull-right text" style="margin-top: 1em">
+        <a class="btn tnth-white dropdown-toggle" href="{{PORTAL}}" title="Return to TrueNTH Home">
+            <i class="fa fa-home fa-2x"></i>
+        </a>
+        <form class="navbar-form" role="search">
+            <div class="form-group">
+                <div class="hide-initial" id="search-box">
+                    <input type="text" class="form-control" placeholder="Search TrueNTH">
+                </div>
+            </div>
+            <button type="submit" class="btn tnth-white show-search"><i class="fa fa-search fa-lg"></i></button>
+        </form>
+        <div class="btn-group nav-userinfo">
+            <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-question fa-2x"></i>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Help</a></li>
+                <li><a href="#">About TrueNTH</a></li>
+            </ul>
+        </div>
+        <!--<div class="pull-right text" style="margin-top: 1em">
             <em>You are currently using <span id="intName"></span></em> &nbsp;
             <a href="{{PORTAL}}" class="btn btn-sm btn-default"><i class="fa fa-chevron-left"></i> Back to TrueNTH Home</a>
         </div>
-        <!-- Removing search for now
+         Removing search for now
         <form class="navbar-form" role="search">
             <div class="form-group">
                 <div class="hide-initial" id="search-box">
@@ -37,7 +56,7 @@
     </div>
 </div>
 <!-- Responsive navbar for xs width -->
-<nav class="navbar navbar-static-top visible-xs xs-nav">
+<nav class="navbar navbar-static-top visible-xs tnth-nav-xs">
     <div class="container-fluid">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -45,7 +64,6 @@
           <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
         </button>
         <a class="navbar-brand" href="#"><img src="{{PORTAL}}{{logo_truenth}}" /></a>
-        <a class="navbar-brand logo-movember" href="#"><img src="{{PORTAL}}{{logo_movember}}" /></a>
       </div>
       <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
         <ul class="nav navbar-nav">
@@ -61,7 +79,7 @@
         <form class="navbar-form" role="search">
             <div class="form-group">
                 <div>
-                    <input type="text" class="form-control" placeholder="Search">
+                    <input type="text" class="form-control" placeholder="Search TrueNTH">
                 </div>
             </div>
             <button type="submit" class="btn btn-default">Search</button>

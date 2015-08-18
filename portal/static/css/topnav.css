@@ -1,33 +1,41 @@
 .nav-import {
 	width: 100%;
-	background-color: #fff;
+	background-color: #1A1919;
 	border-bottom: 2px solid #8D8D8D;
 }
-.main-nav {
+.tnth-nav-main {
 	padding: 5px 15px;
 }
-.xs-nav {
+.tnth-nav-xs {
 	margin-bottom: 5px;
 }
-.xs-nav .navbar-brand {
+.tnth-nav-xs .navbar-brand {
 	padding: 4px;
 }
-.xs-nav .navbar-brand img {
+.tnth-nav-xs .navbar-brand img {
 	height: 54px;
 }
-.xs-nav .navbar-brand.logo-movember {
-	padding: 8px;
+.tnth-nav-xs .nav a {
+    color: #fff;
 }
-.xs-nav .navbar-brand.logo-movember img {
-	height: 46px;
+.tnth-nav-xs .nav a:active, .tnth-nav-xs .nav a:hover {
+    color: #333;
 }
-.portal-nav {
-	height: 95px;
-	width: 100%;
-	background: #fff url("../img/banner_logos.png") no-repeat left top; 
-	/*background-size: auto 95px;*/
-	background-size: contain;
+
+.tnth-white {
+    color: #ECF7E5;
+    background-color: transparent;
+    border-color: transparent;
+    transition: all 0.2s ease-in-out 0s;
+    -webkit-transition: all 0.2s ease-in-out 0s;
 }
+.tnth-white:hover,
+.tnth-white:focus,
+.tnth-white.active {
+    color: #333;
+    background-color: #fff;
+}
+
 .banner-img {
 	height: 95px;
 }
@@ -38,16 +46,15 @@
 	display: inline-block;
 	padding: 0;
 }
-.nav-links .form-group {
-	margin-left: 10px;
-}
+
 .nav-links .btn {
 	margin: 0;
 }
-.nav-userinfo {
-	margin-right: 10px;
-}
 .hide-initial, .form-group.hide-initial {
   display: none;
+}
+
+.nav-links .show-search {
+    height: 43px;
 }
 

@@ -134,6 +134,14 @@ def portal_wrapper_html(username):
             'static',
             filename='img/logo_movember.png',
         ),
+        logo_truenth_alt=url_for(
+            'static',
+            filename='img/logo_truenth_alt.png',
+        ),
+        movember_profile=url_for(
+            'static',
+            filename='img/movember_profile_thumb.png',
+        ),
     )
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', '*')
