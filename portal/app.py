@@ -1,5 +1,7 @@
 """Poral module"""
+from logging import handlers
 import logging
+import os
 from flask import Flask
 
 from .config import DefaultConfig
@@ -8,11 +10,6 @@ from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
 
-# Echo oauth libraries debug logging for connection debugging
-for logger in ('oauthlib', 'flask_oauthlib', 'authomatic.core'):
-    log = logging.getLogger(logger)
-    log.addHandler(logging.StreamHandler())
-    log.setLevel(logging.DEBUG)
 
 DEFAULT_BLUEPRINTS = (api, auth, portal)
 
@@ -28,6 +25,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_app(app, config)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
+    configure_logging(app)
     return app
 
 
@@ -52,3 +50,33 @@ def configure_blueprints(app, blueprints):
     """Register blueprints with application"""
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
+
+
+def configure_logging(app):
+    """Configure logging."""
+    if app.testing:
+        # Skip test mode. Just check standard output.
+        return
+
+    if not os.path.exists(app.config['LOG_FOLDER']):
+        os.mkdir(app.config['LOG_FOLDER'])
+
+    level = getattr(logging, app.config['LOG_LEVEL'].upper())
+
+    info_log = os.path.join(app.config['LOG_FOLDER'], 'info.log')
+    info_file_handler = handlers.RotatingFileHandler(info_log, maxBytes=100000, backupCount=10)
+    info_file_handler.setLevel(level)
+    info_file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s '
+        '[in %(pathname)s:%(lineno)d]')
+    )
+
+    app.logger.setLevel(level)
+    app.logger.addHandler(info_file_handler)
+
+    # OAuth library logging tends to be helpful for connection
+    # debugging
+    for logger in ('oauthlib', 'flask_oauthlib', 'authomatic.core'):
+        log = logging.getLogger(logger)
+        log.setLevel(level)
+        log.addHandler(info_file_handler)

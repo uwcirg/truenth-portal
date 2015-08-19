@@ -8,6 +8,8 @@ class BaseConfig(object):
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     DEBUG = False
+    LOG_FOLDER = os.path.join('/var/log', __package__)
+    LOG_LEVEL = 'DEBUG'
     TESTING = False
     SECRET_KEY = 'override this secret key'
 
