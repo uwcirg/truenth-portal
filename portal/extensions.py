@@ -84,7 +84,7 @@ fa = FlaskAuthomatic(
             'class_': oauth2.Facebook,
             'consumer_key': app_config['CONSUMER_KEY'],
             'consumer_secret': app_config['CONSUMER_SECRET'],
-            'scope': ['user_about_me', 'email'],
+            'scope': ['public_profile', 'email'],
         },
     },
     secret=app_config['SECRET_KEY'],
