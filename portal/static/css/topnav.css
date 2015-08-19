@@ -7,7 +7,7 @@
 	padding: 5px 15px;
 }
 .tnth-nav-xs {
-	margin-bottom: 5px;
+	margin: 0 0 5px;
 }
 .tnth-nav-xs .navbar-brand {
 	padding: 4px;
@@ -36,6 +36,9 @@
 .tnth-white.active {
     color: #333;
     background-color: #fff;
+}
+.tnth-white.navbar-toggle {
+    margin: 8px 15px 8px 0;
 }
 .tnth-search {
     display: inline-block;
