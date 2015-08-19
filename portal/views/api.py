@@ -1,6 +1,7 @@
 """API view functions"""
 from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
+from urlparse import urlparse
 
 from ..models.user import current_user, get_user
 from ..extensions import oauth
@@ -148,3 +149,68 @@ def portal_wrapper_html(username):
     resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
     return resp
 
+
+@api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
+def pre_flight_portal_wrapper():
+    """For in browser requests - first need to communicate via OPTIONS
+
+    oauth protected views served to the browser require an OPTIONS
+    view function with Access-Control headers, as a pre-flight check
+    before the protected GET request is made.
+
+    """
+    resp = make_response()
+
+    # TODO: validate the referrer is really someone we trust
+    # either by use of whitelist, or perhaps just a similar URL
+    # in clients._redirect_uris
+    ref = request.referrer
+    if ref:
+        parsed = urlparse(ref)
+        origin = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
+        resp.headers.add('Access-Control-Allow-Origin', origin)
+    resp.headers.add('Access-Control-Allow-Credentials', 'true')
+    resp.headers.add('Access-Control-Allow-Headers',
+            'Authorization, X-Requested-With')
+    return resp
+
+
+@api.route('/protected-portal-wrapper-html')
+@oauth.require_oauth()
+def protected_portal_wrapper_html():
+    """Returns portal wrapper for insertion at top of interventions
+
+    Protected version of the 'portal_wrapper_html API function - only
+    functional with valid oauth token
+
+    """
+    username = current_user()
+    if username:
+        username = ' '.join((username.first_name, username.last_name))
+
+    html = render_template(
+        'portal_wrapper.html',
+        PORTAL=current_app.config['PORTAL'],
+        username=username,
+        logo_truenth=url_for(
+            'static',
+            filename='img/logo_truenth.png',
+        ),
+        logo_movember=url_for(
+            'static',
+            filename='img/logo_movember.png',
+        ),
+        logo_truenth_alt=url_for(
+            'static',
+            filename='img/logo_truenth_alt.png',
+        ),
+        movember_profile=url_for(
+            'static',
+            filename='img/movember_profile_thumb.png',
+        ),
+    )
+    resp = make_response(html)
+    resp.headers.add('Access-Control-Allow-Origin', 'http://truenth-intervention-demo.cirg.washington.edu:8000')
+    resp.headers.add('Access-Control-Allow-Credentials', 'true')
+    resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+    return resp
