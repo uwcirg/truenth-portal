@@ -6,7 +6,13 @@
 
 body {
 	margin: 0;
-  background-color: #9AA19A;
+    background-color: #9AA19A;
+}
+a {
+    color: #497856;
+}
+a:hover, a:active {
+    color: #2a4531;
 }
 .hide-initial, .form-group.hide-initial {
   display: none;
