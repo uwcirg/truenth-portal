@@ -2,6 +2,7 @@
 from logging import handlers
 import logging
 import os
+import sys
 from flask import Flask
 
 from .config import DefaultConfig
@@ -64,6 +65,18 @@ def configure_logging(app):
     level = getattr(logging, app.config['LOG_LEVEL'].upper())
 
     info_log = os.path.join(app.config['LOG_FOLDER'], 'info.log')
+    # For WSGI servers, the log file is only writable by www-data
+    # This prevents users from being able to run other management
+    # commands as themselves.  If current user can't write to the
+    # info_log, bail out - relying on stdout/stderr
+    try:
+        with open(info_log, 'w'):
+            pass
+    except IOError:
+        print >> sys.stderr, "Can't open log file '%s', use stdout" %\
+            info_log
+        return
+
     info_file_handler = handlers.RotatingFileHandler(info_log, maxBytes=100000, backupCount=10)
     info_file_handler.setLevel(level)
     info_file_handler.setFormatter(logging.Formatter(
