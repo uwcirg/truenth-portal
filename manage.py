@@ -17,5 +17,13 @@ manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', Server(host='0.0.0.0'))
 
 
+@manager.command
+def initdb():
+    """Init/reset database."""
+
+    db.drop_all()
+    db.create_all()
+
+
 if __name__ == '__main__':
     manager.run()
