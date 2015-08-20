@@ -24,6 +24,7 @@ class User(db.Model):
     phone = db.Column(db.String(40), unique=True)
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
+    image_url = db.Column(db.Text)
 
     observations = db.relationship('Observation',
             secondary="user_observations", backref=db.backref('users'))

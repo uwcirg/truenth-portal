@@ -30,11 +30,23 @@ def login():
         elif fa.result.user:
             if not (fa.result.user.name and fa.result.user.id):
                 fa.result.user.update()
+                # Grab the profile image as well
+                url = '?'.join(("https://graph.facebook.com/{0}/picture",
+                    "redirect=false")).format(fa.result.user.id)
+                response = fa.result.provider.access(url)
+                if response.status == 200:
+                    image_url = response.data['data']['url']
+                else:
+                    image_url = None
             # Success - add or pull this user to/from portal store
             ap = AuthProvider.query.filter_by(provider='facebook',
                     provider_id=fa.result.user.id).first()
             if ap:
                 user = User.query.filter_by(id=ap.user_id).first()
+                if image_url and not user.image_url:
+                    user.image_url = image_url
+                    db.session.add(user)
+                    db.session.commit()
             else:
                 # Looks like first valid login from this auth provider
                 # generate what we know and redirect to get the rest
@@ -43,7 +55,8 @@ def login():
                         last_name=fa.result.user.last_name,
                         birthdate=fa.result.user.birth_date,
                         gender=fa.result.user.gender,
-                        email=fa.result.user.email)
+                        email=fa.result.user.email,
+                        image_url=image_url)
                 db.session.add(user)
                 db.session.commit()
                 ap = AuthProvider(provider='facebook',
