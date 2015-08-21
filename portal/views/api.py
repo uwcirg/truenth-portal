@@ -123,14 +123,13 @@ def clinical_set(uid):
 @api.route('/portal-wrapper-html/<username>')
 def portal_wrapper_html(username):
     """Returns portal wrapper for insertion at top of interventions"""
+    movember_profile = "".join((current_app.config['PORTAL'],
+        url_for('static', filename='img/movember_profile_thumb.png')))
     html = render_template(
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
         username=username,
-        movember_profile=url_for(
-            'static',
-            filename='img/movember_profile_thumb.png',
-        ),
+        movember_profile=movember_profile
     )
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', '*')
@@ -172,18 +171,20 @@ def protected_portal_wrapper_html():
     functional with valid oauth token
 
     """
-    username = current_user()
-    if username:
-        username = ' '.join((username.first_name, username.last_name))
+    user = current_user()
+    username = ' '.join((user.first_name, user.last_name))
+
+    if user.image_url:
+        movember_profile = user.image_url
+    else:
+        movember_profile = "".join((current_app.config['PORTAL'],
+            url_for('static', filename='img/movember_profile_thumb.png')))
 
     html = render_template(
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
         username=username,
-        movember_profile=url_for(
-            'static',
-            filename='img/movember_profile_thumb.png',
-        ),
+        movember_profile=movember_profile
     )
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', 'http://truenth-intervention-demo.cirg.washington.edu:8000')
