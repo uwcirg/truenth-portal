@@ -29,31 +29,42 @@
             <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
                 <div class="well lead-well">
-                    <p>TrueNTH is a revolutionary new program, funded by the Movember Foundation, that will sigificantly improve the physical and mental health of men diagnosed and living with prostate cancer.</p>
+                    <p><strong>TrueNTH</strong></p>
+                    <ul>
+                        <li style="margin-bottom: 0.25em">is a revolutionary new program, funded by the Movember Foundation, that will significantly improve the physical and mental health of men diagnosed and living with prostate cancer.</li>
+                        <li style="margin-bottom: 0.25em">helps men and their families get their lives back on track following diagnosis and treatment.</li>
+                        <li>helps you feel knowledgeable and confident on your journey.</li>
+                    </ul>
 
-                    <p>TrueNTH helps men and their families get their lives back on track following diagnosis and treatment.</p>
-                    <p>TrueNTH helps you feel knowledgeable and confident on your journey.</p>
+                    <h4 class="sign-in">Sign in with:</h4>
 
                     <div class="row">
-                        <div class="col-xs-5">
-                            <h4>Sign in with:</h4>
+                        <div class="col-sm-4">
                             <a href="login" class="btn btn-block btn-social btn-facebook">
                                 <i class="fa fa-facebook"></i>
                                 Facebook
                             </a><br />
+                        </div>
+                        <div class="col-sm-4">
                             <button data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-google demo-disabled">
                                 <i class="fa fa-google"></i>
                                 Google
                             </button><br />
-                            <button  data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-movember demo-disabled">
+                        </div>
+                        <div class="col-sm-4">
+                            <button data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-movember demo-disabled">
                                 <img src="{{ url_for('static', filename='img/icon_movember.png') }}" />
                                 Movember
                             </button><br />
                         </div>
-                        <div class="col-sm-2 text-muted text-center hidden-xs">
-                            <div class="or-divider">or</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 text-center">
+                            <div class="or-holder"><div class="or-divider">or</div></div>
                         </div>
-                        <div class="col-xs-7 col-sm-5">
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
                             <h4>Sign in with TrueNTH:</h4>
                             <form>
                                 <div class="form-group">
@@ -62,18 +73,17 @@
                                 <div class="form-group">
                                     <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
                                 </div>
-                                <button type="submit" class="btn btn-tnth-primary">Sign In</button>
+                                <button type="submit" data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-tnth-primary demo-disabled">Sign In</button>
+                                <a href="#" style="margin-left: 3em" data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This function not available in demo."><small>Forgot your password?</small></a>
                             </form>
-                            <br />
-                            <p class="pull-right"><a href="#">Forgot your password?</a></p>
                         </div>
-
                     </div>
+
                     <hr />
                     <div class="row">
                         <div class="col-xs-12">
                             <h4>Create a New TrueNTH Account</h4>
-                            <p>Don't have a TrueNTH login? <a href="#">Sign up for a free account</a>.</p>
+                            <p>Don't have a TrueNTH login? <a href="#" data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This function not available in demo.">Sign up for a free account</a>.</p>
                         </div>
                     </div>
                 </div>
@@ -89,6 +99,8 @@
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+
+console.log(PORTAL_NAV_PAGE);
 
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();

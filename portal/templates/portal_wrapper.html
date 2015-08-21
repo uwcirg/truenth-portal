@@ -36,8 +36,8 @@
                     <i class="fa fa-question fa-2x"></i>
                 </button>
                 <ul class="dropdown-menu pull-right" role="menu">
-                    <li><a href="#">Help</a></li>
-                    <li><a href="#">About TrueNTH</a></li>
+                    <li class="disabled"><a href="#">Help</a></li>
+                    <li><a href="http://truenth.org" target="_blank">About TrueNTH</a></li>
                 </ul>
             </div>
         </div>
@@ -58,8 +58,8 @@
                     {% if username %}
                     <li><a href="{{PORTAL}}/profile">My Profile</a></li>
                     {% endif %}
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Help</a></li>
+                    <li><a href="http://truenth.org" target="_blank">About</a></li>
+                    <li class="disabled"><a href="#">Help</a></li>
                     {% if username %}
                     <li><a href="{{PORTAL}}/logout">Log Out</a></li>
                     {% endif %}

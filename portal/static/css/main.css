@@ -33,10 +33,11 @@ a:hover, a:active {
 }
 .int-cards {
     position: relative;
+    padding-bottom: 4em;
 }
 .int-cards .btn-tnth-primary {
     position: absolute;
-    bottom: 2em;
+    bottom: 1em;
 }
 .demo-disabled {
     opacity: 0.65;
@@ -48,8 +49,11 @@ a:hover, a:active {
     font-size: 18px;
     color: #777;
 }
+.sign-in {
+    margin-top: 2em;
+}
 .or-divider {
-    margin-top: 4.5em;
+    margin-bottom: 0.5em;
     padding: 0.5em;
     background-color: #aaa;
     color: #fff;
@@ -106,6 +110,9 @@ a:hover, a:active {
     .int-cards .btn-tnth-primary {
         position: inherit;
         bottom: auto;
+    }
+    .int-cards {
+        padding-bottom: 19px;
     }
 }
 
