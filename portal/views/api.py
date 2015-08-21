@@ -125,6 +125,16 @@ def portal_wrapper_html(username):
     """Returns portal wrapper for insertion at top of interventions"""
     movember_profile = "".join((current_app.config['PORTAL'],
         url_for('static', filename='img/movember_profile_thumb.png')))
+
+    # workarounds till we can call protected_portal_wrapper from portal
+    user = current_user()
+    if user:
+        if user.image_url:
+            movember_profile = user.image_url
+
+        if not username:
+            username = ' '.join((user.first_name, user.last_name))
+
     html = render_template(
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
