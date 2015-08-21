@@ -164,8 +164,8 @@ def pre_flight_portal_wrapper(resp=None):
     # either by use of whitelist, or perhaps just a similar URL
     # in clients._redirect_uris
     origin_url = request.headers.get('Origin')
-    if ref:
-        parsed = urlparse(ref)
+    if origin_url:
+        parsed = urlparse(origin_url)
         origin = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
         resp.headers.add('Access-Control-Allow-Origin', origin)
     resp.headers.add('Access-Control-Allow-Credentials', 'true')
