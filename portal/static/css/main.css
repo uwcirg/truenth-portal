@@ -31,6 +31,13 @@ a:hover, a:active {
 .lead-well h3 {
   margin-top: 0;
 }
+.int-cards {
+    position: relative;
+}
+.int-cards .btn-tnth-primary {
+    position: absolute;
+    bottom: 2em;
+}
 .demo-disabled {
     opacity: 0.65;
 }
@@ -95,6 +102,10 @@ a:hover, a:active {
 @media (max-width: 767px) {
     #saveMsg {
         margin: 1em 0;
+    }
+    .int-cards .btn-tnth-primary {
+        position: inherit;
+        bottom: auto;
     }
 }
 
