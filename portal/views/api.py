@@ -184,7 +184,6 @@ def protected_portal_wrapper_html():
 
     """
     user = current_user()
-    username = ' '.join((user.first_name, user.last_name))
 
     if user.image_url:
         movember_profile = user.image_url
@@ -195,7 +194,7 @@ def protected_portal_wrapper_html():
     html = render_template(
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
-        username=username,
+        username=user.username,
         movember_profile=movember_profile
     )
     resp = make_response(html)
