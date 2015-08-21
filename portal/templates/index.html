@@ -41,18 +41,17 @@
                                 <i class="fa fa-facebook"></i>
                                 Facebook
                             </a><br />
-                            <a class="btn btn-block btn-social btn-google" disabled>
+                            <button data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-google demo-disabled">
                                 <i class="fa fa-google"></i>
                                 Google
-                            </a><br />
-                            <a class="btn btn-block btn-social btn-movember" disabled>
+                            </button><br />
+                            <button  data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-movember demo-disabled">
                                 <img src="{{ url_for('static', filename='img/icon_movember.png') }}" />
                                 Movember
-
-                            </a><br />
+                            </button><br />
                         </div>
                         <div class="col-sm-2 text-muted text-center hidden-xs">
-                            <div style="margin-top: 4.5em; padding: 0.5em; background-color: #aaa; color: #fff; border-radius: 4px; display: inline-block">or</div>
+                            <div class="or-divider">or</div>
                         </div>
                         <div class="col-xs-7 col-sm-5">
                             <h4>Sign in with TrueNTH:</h4>
@@ -90,6 +89,11 @@
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+
 </script>
 
 

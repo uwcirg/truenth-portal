@@ -41,6 +41,14 @@ a:hover, a:active {
     font-size: 18px;
     color: #777;
 }
+.or-divider {
+    margin-top: 4.5em;
+    padding: 0.5em;
+    background-color: #aaa;
+    color: #fff;
+    border-radius: 4px;
+    display: inline-block;
+}
 .btn-tnth-primary {
   color: #fff;
   background-color: #3d6548;
