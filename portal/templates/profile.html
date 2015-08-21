@@ -163,6 +163,7 @@ $(document).ready(function(){
             }
             // After tests display errors if necessary
             if (goodDate) {
+                $("#updateProfile").prop("disabled",false);
                 $("#bdGroup").removeClass("has-error");
                 $("#bdError").hide();
                 // Set date if YYYY-MM-DD
@@ -172,6 +173,7 @@ $(document).ready(function(){
                 $("#bdGroup").addClass("has-error");
                 $("#bdError").html(errorMsg).show();
                 $("#birthday").val("");
+                $("#updateProfile").prop("disabled",true);
             }
         } else {
             $("#birthday").val("");
@@ -210,9 +212,11 @@ $(document).ready(function(){
     }
     $("#email").on("change",function(){
        if (!validateEmail($(this).val())) {
+           $("#updateProfile").prop("disabled",true);
            $("#emailGroup").addClass("has-error");
            $("#emailError").show();
        } else {
+           $("#updateProfile").prop("disabled",false);
            $("#emailGroup").removeClass("has-error");
            $("#emailError").hide();
            giveFeedback();
