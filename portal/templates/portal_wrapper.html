@@ -3,7 +3,7 @@
     <div class="container hidden-xs tnth-nav-main">
         <div class="pull-left">
             <!-- Probably need to use absolute links for images -->
-            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{logo_truenth_alt}}" /></a>
+            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
         </div>
 
         <div class="pull-right nav-links">
@@ -50,7 +50,7 @@
                     <span class="sr-only">Toggle menu</span>
                     <i class="fa fa-bars fa-lg"></i> &nbsp; Menu
                 </button>
-                <a class="navbar-brand" href="#"><img src="{{PORTAL}}{{logo_truenth_alt}}" /></a>
+                <a class="navbar-brand" href="#"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt.png')}}" /></a>
             </div>
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
                 <ul class="nav navbar-nav">

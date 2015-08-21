@@ -127,18 +127,6 @@ def portal_wrapper_html(username):
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
         username=username,
-        logo_truenth=url_for(
-            'static',
-            filename='img/logo_truenth.png',
-        ),
-        logo_movember=url_for(
-            'static',
-            filename='img/logo_movember.png',
-        ),
-        logo_truenth_alt=url_for(
-            'static',
-            filename='img/logo_truenth_alt.png',
-        ),
         movember_profile=url_for(
             'static',
             filename='img/movember_profile_thumb.png',
@@ -192,18 +180,6 @@ def protected_portal_wrapper_html():
         'portal_wrapper.html',
         PORTAL=current_app.config['PORTAL'],
         username=username,
-        logo_truenth=url_for(
-            'static',
-            filename='img/logo_truenth.png',
-        ),
-        logo_movember=url_for(
-            'static',
-            filename='img/logo_movember.png',
-        ),
-        logo_truenth_alt=url_for(
-            'static',
-            filename='img/logo_truenth_alt.png',
-        ),
         movember_profile=url_for(
             'static',
             filename='img/movember_profile_thumb.png',
