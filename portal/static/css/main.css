@@ -31,6 +31,9 @@ a:hover, a:active {
 .lead-well h3 {
   margin-top: 0;
 }
+.demo-disabled {
+    opacity: 0.65;
+}
 .int-sub {
     margin: 0 0 10px;
     font-style: italic;
