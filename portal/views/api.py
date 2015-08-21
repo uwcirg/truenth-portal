@@ -148,7 +148,7 @@ def portal_wrapper_html(username):
 
 
 @api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
-def pre_flight_portal_wrapper():
+def pre_flight_portal_wrapper(resp=None):
     """For in browser requests - first need to communicate via OPTIONS
 
     oauth protected views served to the browser require an OPTIONS
@@ -156,12 +156,14 @@ def pre_flight_portal_wrapper():
     before the protected GET request is made.
 
     """
-    resp = make_response()
+
+    if resp is None:
+        resp = make_response()
 
     # TODO: validate the referrer is really someone we trust
     # either by use of whitelist, or perhaps just a similar URL
     # in clients._redirect_uris
-    ref = request.referrer
+    origin_url = request.headers.get('Origin')
     if ref:
         parsed = urlparse(ref)
         origin = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
@@ -197,7 +199,4 @@ def protected_portal_wrapper_html():
         movember_profile=movember_profile
     )
     resp = make_response(html)
-    resp.headers.add('Access-Control-Allow-Origin', 'http://truenth-intervention-demo.cirg.washington.edu:8000')
-    resp.headers.add('Access-Control-Allow-Credentials', 'true')
-    resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
-    return resp
+    return pre_flight_portal_wrapper(resp)
