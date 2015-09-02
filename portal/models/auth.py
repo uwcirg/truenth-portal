@@ -1,6 +1,8 @@
 """Auth related model classes """
+from flask import current_app
 from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import ENUM
+from urlparse import urlparse
 
 from ..extensions import db, oauth
 from .user import current_user
@@ -37,7 +39,13 @@ class Client(db.Model):
     @property
     def redirect_uris(self):
         if self._redirect_uris:
-            return self._redirect_uris.split()
+            # Should just store the scheme:hostname:port,
+            # but for now, clean here for validate_redirect_uri
+            uris = [] 
+            for uri in self._redirect_uris.split():
+                parsed = urlparse(uri)
+                uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
+            return uris
         return []
 
     @property
@@ -51,9 +59,23 @@ class Client(db.Model):
         return []
 
     def validate_redirect_uri(self, redirect_uri):
-        # Chop query string and confirm it's in the list
-        redirect_uri = redirect_uri.split('?')[0]
-        return redirect_uri in self.redirect_uris
+        """Validate the redirect_uri from the OAuth Token request
+
+        The RFC requires exact match on the redirect_uri.  In practice
+        this is too great of a burden for the interventions.  Make
+        sure it's from the same scheme:://host:port the client 
+        registered with
+
+        http://tools.ietf.org/html/rfc6749#section-4.1.3
+
+        """
+        parsed = urlparse(redirect_uri)
+        redirect_uri = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
+        if redirect_uri not in self.redirect_uris:
+            current_app.logger.warn("%s not in redirect_uris: %s",
+                    redirect_uri, self.redirect_uris)
+            return False
+        return True
 
 
 class Grant(db.Model):
@@ -88,6 +110,20 @@ class Grant(db.Model):
         if self._scopes:
             return self._scopes.split()
         return []
+
+    def validate_redirect_uri(self, redirect_uri):
+        """Validate the redirect_uri from the OAuth Grant request
+
+        The RFC requires exact match on the redirect_uri.  In practice
+        this is too great of a burden for the interventions.  Make
+        sure it's from the same scheme:://host:port the client 
+        registered with
+
+        http://tools.ietf.org/html/rfc6749#section-4.1.3
+
+        """
+        # Use same implementation found in client
+        return self.client.validate_redirect_uri(redirect_uri)
 
 
 class Token(db.Model):
