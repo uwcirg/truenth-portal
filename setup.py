@@ -11,12 +11,18 @@ to install:
 from setuptools import setup
 
 project = "portal"
+version_file = open('VERSION')
+
+long_description =\
+"""Alpha version of the TrueNTH Central Services RESTful API, to be used by TrueNTH intervention applications. Can be found at https://raw.githubusercontent.com/uwcirg/true_nth_usa_services/master/true-nth-portal.yaml This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
+"""
 
 setup(
     name=project,
-    version='0.1',
+    version=version_file.read().strip(),
     url='https://github.com/uwcirg/true_nth_usa_portal_demo',
-    description='Movember Truenth USA Portal',
+    description='TrueNTH Central Services',
+    long_description=long_description,
     author='University of Washington',
     packages=["portal"],
     include_package_data=True,
@@ -28,6 +34,7 @@ setup(
         'Flask-OAuthlib',
         'Flask-SQLAlchemy',
         'Flask-Script',
+        'Flask-Swagger',
         'Flask-Testing',
         'nose',
         'oauthlib',

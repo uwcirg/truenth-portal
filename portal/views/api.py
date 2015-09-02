@@ -11,9 +11,37 @@ api = Blueprint('api', __name__, url_prefix='/api')
 @api.route('/me')
 @oauth.require_oauth()
 def me():
-    """Example 'me' api method.
+    """Access basics for current user
 
     returns logged in user's id, username and email in JSON
+    ---
+    tags:
+      - User
+    operationId: me
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: user
+          required:
+            - id
+            - username
+            - email
+          properties:
+            id:
+              type: integer
+              format: int64
+              description: Central Services ID for user
+            username:
+              type: string
+              description: User's username
+            email:
+              type: string
+              description: User's preferred email address
+      401:
+        description: if missing valid OAuth token
 
     """
     user = current_user()
@@ -21,48 +49,86 @@ def me():
                    email=user.email)
 
 
-@api.route('/demographics', defaults={'uid': None})
-@api.route('/demographics/<int:uid>')
+@api.route('/demographics', defaults={'patient_id': None})
+@api.route('/demographics/<int:patient_id>')
 @oauth.require_oauth()
-def demographics(uid):
-    """Access demographics as a FHIR patient resource (in JSON)
+def demographics(patient_id):
+    """Get patient demographics
 
-    Returns demographics for requested portal user id as a FHIR
-    patient resource (http://www.hl7.org/fhir/patient.html) in JSON.
-    Defaults to logged-in user if `uid` is not provided.
-
-    Raises 401 if logged-in user lacks permission to view requested
-    patient.
+    Return defined patient demographics fields (eg first name, last name,
+    DOB, email, cell phone), as a FHIR patient resource (in JSON)
+    ---
+    tags:
+      - Demographics
+    operationId: getPatientDemographics
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description:
+          Optional TrueNTH patient ID, defaults to the authenticated user.
+        required: false
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns demographics for requested portal user id as a FHIR
+          patient resource (http://www.hl7.org/fhir/patient.html) in JSON.
+          Defaults to logged-in user if `patient_id` is not provided.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
 
     """
-    if uid:
-        current_user().check_role(permission='view', other_id=uid)
-        patient = get_user(uid)
+    if patient_id:
+        current_user().check_role(permission='view', other_id=patient_id)
+        patient = get_user(patient_id)
     else:
         patient = current_user()
     return jsonify(patient.as_fhir())
 
 
-@api.route('/demographics/<int:uid>', methods=('POST', 'PUT'))
+@api.route('/demographics/<int:patient_id>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
-def demographics_set(uid):
+def demographics_set(patient_id):
     """Update demographics via FHIR Resource Patient
 
     Submit a minimal FHIR doc in JSON format including the 'Patient'
-    resource type, and any fields to set.  For example, to update
-    just the first name, POST or PUT:
-
-    {"resourceType": "Patient", "name": [ {"given": ["John"]} ] }
-
-    Returns the updated, complete FHIR patient resource
-    (http://www.hl7.org/fhir/patient.html) in JSON
-
-    Raises 401 if logged-in user lacks permission to edit requested
-    patient.
+    resource type, and any fields to set.
+    ---
+    operationId: setPatientDemographics
+    tags:
+      - Demographics
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: FHIRPatient
+          required:
+            - resourceType
+          properties:
+            resourceType:
+              type: string
+              description: defines FHIR resource type, must be Patient
+    responses:
+      200:
+        description:
+          Returns updated demographics for requested portal user id as FHIR
+          patient resource (http://www.hl7.org/fhir/patient.html) in JSON.
+          Defaults to logged-in user if `patient_id` is not provided.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
 
     """
-    current_user().check_role(permission='edit', other_id=uid)
-    patient = get_user(uid)
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
@@ -70,31 +136,53 @@ def demographics_set(uid):
     return jsonify(patient.as_fhir())
 
 
-@api.route('/clinical', defaults={'uid': None})
-@api.route('/clinical/<int:uid>')
+@api.route('/clinical', defaults={'patient_id': None})
+@api.route('/clinical/<int:patient_id>')
 @oauth.require_oauth()
-def clinical(uid):
+def clinical(patient_id):
     """Access clinical data as a FHIR bundle of observations (in JSON)
 
-    Returns clinical data for requested portal user id as a FHIR
+    Returns a patient's clinical data (eg TNM, Gleason score) as a FHIR
     bundle of observations (http://www.hl7.org/fhir/observation.html)
-    in JSON.  Defaults to logged-in user if `uid` is not provided.
-
-    Raises 401 if logged-in user lacks permission to view requested
-    patient.
+    in JSON.  Defaults to logged-in user if `patient_id` is not provided.
+    ---
+    tags:
+      - Clinical
+    operationId: getPatientObservations
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description:
+          Optional TrueNTH patient ID, defaults to the authenticated user.
+        required: false
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns clinical information for requested portal user id as a
+          FHIR bundle of observations
+          (http://www.hl7.org/fhir/observation.html) in JSON.
+          Defaults to logged-in user if `patient_id` is not provided.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
 
     """
-    if uid:
-        current_user().check_role(permission='view', other_id=uid)
-        patient = get_user(uid)
+    if patient_id:
+        current_user().check_role(permission='view', other_id=patient_id)
+        patient = get_user(patient_id)
     else:
         patient = current_user()
     return jsonify(patient.clinical_history(requestURL=request.url))
 
 
-@api.route('/clinical/<int:uid>', methods=('POST', 'PUT'))
+@api.route('/clinical/<int:patient_id>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
-def clinical_set(uid):
+def clinical_set(patient_id):
     """Add clinical entry via FHIR Resource Observation
 
     Submit a minimal FHIR doc in JSON format including the 'Observation'
@@ -107,9 +195,51 @@ def clinical_set(uid):
     Raises 401 if logged-in user lacks permission to edit requested
     patient.
 
+    ---
+    operationId: setPatientObservation
+    tags:
+      - Clinical
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description:
+          Optional TrueNTH patient ID, defaults to the authenticated user.
+        required: false
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: FHIRObservation
+          required:
+            - resourceType
+          properties:
+            resourceType:
+              type: string
+              description:
+                defines FHIR resource type, must be Observation
+                http://www.hl7.org/fhir/observation.html
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
     """
-    current_user().check_role(permission='edit', other_id=uid)
-    patient = get_user(uid)
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
@@ -122,7 +252,37 @@ def clinical_set(uid):
 @api.route('/portal-wrapper-html/', defaults={'username': None})
 @api.route('/portal-wrapper-html/<username>')
 def portal_wrapper_html(username):
-    """Returns portal wrapper for insertion at top of interventions"""
+    """Returns portal wrapper for insertion at top of interventions
+
+    Get html for the portal site UI wrapper (top-level nav elements, etc)
+    This is the unauthorized version, useful prior to logging in with
+    Central Services.  See `protected_portal_wrapper_html` for authorized
+    version.
+    ---
+    tags:
+      - Central Services
+    operationId: getPortalWrapperHTML
+    produces:
+      - text/html
+    parameters:
+      - name: username
+        in: path
+        description:
+          Optional username, used to personalize the header.
+        required: false
+        type: string
+    responses:
+      200:
+        description:
+          html for direct insertion near the top of the intervention's
+          page.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+
+    """
     movember_profile = "".join((current_app.config['PORTAL'],
         url_for('static', filename='img/movember_profile_thumb.png')))
 
@@ -179,8 +339,23 @@ def pre_flight_portal_wrapper(resp=None):
 def protected_portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
-    Protected version of the 'portal_wrapper_html API function - only
-    functional with valid oauth token
+    Get html for the portal site UI wrapper (top-level nav elements, etc)
+    This is the authorized version, only useful after to logging in with
+    Central Services.  See `portal_wrapper_html` for the unauthorized
+    version.
+    ---
+    tags:
+      - Central Services
+    operationId: getProtectedPortalWrapperHTML
+    produces:
+      - text/html
+    responses:
+      200:
+        description:
+          html for direct insertion near the top of the intervention's
+          page.
+      401:
+        description: if missing valid OAuth token
 
     """
     user = current_user()
