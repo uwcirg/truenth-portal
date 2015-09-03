@@ -14,9 +14,7 @@ project = "portal"
 version_file = open('VERSION')
 
 long_description =\
-"""Alpha version of the TrueNTH Central Services RESTful API, to be
-used by TrueNTH intervention applications. This API attempts to conform
-with the HL7 FHIR specification as much as is reasonable.
+"""Alpha version of the TrueNTH Central Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
 """
 
 setup(
