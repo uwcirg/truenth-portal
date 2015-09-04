@@ -12,6 +12,7 @@ class BaseConfig(object):
     LOG_LEVEL = 'DEBUG'
     TESTING = False
     SECRET_KEY = 'override this secret key'
+    USER_UNAUTHORIZED_ENDPOINT = 'portal.index'
 
 
 class DefaultConfig(BaseConfig):

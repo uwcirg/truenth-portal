@@ -2,6 +2,7 @@
 from datetime import datetime
 from dateutil import parser
 from flask import abort, request, session
+from flask.ext.user import UserMixin
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..extensions import db
@@ -13,7 +14,7 @@ gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
                     create_type=False)
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True)
@@ -25,9 +26,18 @@ class User(db.Model):
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
+    active = db.Column('is_active', db.Boolean(), nullable=False,
+            server_default='1')
+
+    # Only used for local accounts
+    password = db.Column(db.String(255))
+    reset_password_token = db.Column(db.String(100))
+    confirmed_at = db.Column(db.DateTime())
 
     observations = db.relationship('Observation',
             secondary="user_observations", backref=db.backref('users'))
+    roles = db.relationship('Role', secondary='user_roles',
+            backref=db.backref('users', lazy='dynamic'))
 
     def add_observation(self, fhir):
         if not 'coding' in fhir['name']:
@@ -152,3 +162,17 @@ def current_user():
 
 def get_user(uid):
     return User.query.get(uid)
+
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+
+class UserRoles(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
+        ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('roles.id',
+        ondelete='CASCADE'))

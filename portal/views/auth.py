@@ -2,10 +2,12 @@
 import requests
 from flask import Blueprint, jsonify, redirect, current_app
 from flask import render_template, request, session
+from flask.ext.login import login_user, logout_user
+from flask.ext.user import roles_required
 from werkzeug.security import gen_salt
 
 from ..models.auth import AuthProvider, Client
-from ..models.user import current_user, User
+from ..models.user import current_user, User, Role, UserRoles
 from ..extensions import db, fa, oauth
 
 auth = Blueprint('auth', __name__)
@@ -40,11 +42,11 @@ def login():
                     image_url = response.data['data']['url']
                 else:
                     image_url = None
-            # Success - add or pull this user to/from portal store
+            # Success - add or pull this user to/from database
             ap = AuthProvider.query.filter_by(provider='facebook',
                     provider_id=fa.result.user.id).first()
             if ap:
-                current_app.logger.debug("Existing Central Account Found %d",
+                current_app.logger.debug("Login existing user.id %d",
 		    ap.user_id)
                 user = User.query.filter_by(id=ap.user_id).first()
                 if image_url and not user.image_url:
@@ -63,15 +65,20 @@ def login():
                         image_url=image_url)
                 db.session.add(user)
                 db.session.commit()
-                current_app.logger.debug("Created Central Account For %d",
-		    ap.user_id)
+                current_app.logger.debug("Login new user.id %d",
+		    user.id)
                 ap = AuthProvider(provider='facebook',
                         provider_id=fa.result.user.id,
                         user_id=user.id)
                 db.session.add(ap)
+                patient = Role.query.filter_by(name='patient').first()
+                default_role = UserRoles(user_id=user.id,
+                        role_id=patient.id)
+                db.session.add(default_role)
                 db.session.commit()
             session['id'] = user.id
             session['remote_token'] = fa.result.provider.credentials.token
+            login_user(user)
             return redirect('/')
     else:
         return fa.response
@@ -93,11 +100,14 @@ def logout():
     url = "https://graph.facebook.com/{0}/permissions".\
         format(ap.provider_id)
     requests.delete(url, headers=headers)
+    current_app.logger.debug("Logout user.id %d", session['id'])
+    logout_user()
     session.clear()
     return redirect('/')
 
 
 @auth.route('/client', methods=('GET', 'POST'))
+@roles_required('admin')
 def client():
     """client view function
 
@@ -111,8 +121,6 @@ def client():
 
     """
     user = current_user()
-    if not user:
-        return redirect('/')
     if request.method == 'GET':
         return render_template('register_client.html')
     redirect_uri = request.form.get('redirect_uri', None)

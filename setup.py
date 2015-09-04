@@ -13,6 +13,8 @@ from setuptools import setup
 project = "portal"
 version_file = open('VERSION')
 
+# maintain long_description as a single long line.
+# workaround for a bug in pkg_info._get_metadata('PKG-INFO')
 long_description =\
 """Alpha version of the TrueNTH Central Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
 """
@@ -36,6 +38,7 @@ setup(
         'Flask-Script',
         'Flask-Swagger',
         'Flask-Testing',
+        'Flask-User',
         'nose',
         'oauthlib',
         'psycopg2',

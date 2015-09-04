@@ -2,8 +2,14 @@
 
 # SQLAlchemy provides the database object relational mapping (ORM)
 from flask.ext.sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
 
+# Flask-User
+from flask.ext.user import UserManager, SQLAlchemyAdapter
+from .models.user import User
+db_adapter = SQLAlchemyAdapter(db, User)
+user_manager = UserManager(db_adapter)
 
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps

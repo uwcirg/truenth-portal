@@ -6,7 +6,7 @@ import sys
 from flask import Flask
 
 from .config import DefaultConfig
-from .extensions import db, oauth
+from .extensions import db, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
@@ -43,6 +43,9 @@ def configure_extensions(app):
     # flask-sqlalchemy - the ORM / DB used
     db.init_app(app)
 
+    # flask-user
+    user_manager.init_app(app)
+
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
 
@@ -77,7 +80,8 @@ def configure_logging(app):
             info_log
         return
 
-    info_file_handler = handlers.RotatingFileHandler(info_log, maxBytes=100000, backupCount=10)
+    info_file_handler = handlers.RotatingFileHandler(info_log,
+            maxBytes=100000, backupCount=10)
     info_file_handler.setLevel(level)
     info_file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '
