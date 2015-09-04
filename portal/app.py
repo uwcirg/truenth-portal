@@ -70,7 +70,7 @@ def configure_logging(app):
     # commands as themselves.  If current user can't write to the
     # info_log, bail out - relying on stdout/stderr
     try:
-        with open(info_log, 'w'):
+        with open(info_log, 'a+'):
             pass
     except IOError:
         print >> sys.stderr, "Can't open log file '%s', use stdout" %\
@@ -93,3 +93,6 @@ def configure_logging(app):
         log = logging.getLogger(logger)
         log.setLevel(level)
         log.addHandler(info_file_handler)
+
+    #app.logger.debug("initiate logging done at level %s, %d",
+    #    app.config['LOG_LEVEL'], level)

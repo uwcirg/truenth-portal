@@ -75,6 +75,7 @@ class Client(db.Model):
             current_app.logger.warn("%s not in redirect_uris: %s",
                     redirect_uri, self.redirect_uris)
             return False
+        current_app.logger.debug("validated redirect_uri: %s", redirect_uri)
         return True
 
 

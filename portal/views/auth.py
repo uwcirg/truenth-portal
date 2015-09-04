@@ -1,6 +1,6 @@
 """Auth related view functions"""
 import requests
-from flask import Blueprint, jsonify, redirect
+from flask import Blueprint, jsonify, redirect, current_app
 from flask import render_template, request, session
 from werkzeug.security import gen_salt
 
@@ -26,8 +26,10 @@ def login():
         return redirect('/')
     if fa.result:
         if fa.result.error:
+            current_app.logger.error(fa.result.error.message)
             return fa.result.error.message
         elif fa.result.user:
+            current_app.logger.debug("Successful FB login")
             if not (fa.result.user.name and fa.result.user.id):
                 fa.result.user.update()
                 # Grab the profile image as well
@@ -42,6 +44,8 @@ def login():
             ap = AuthProvider.query.filter_by(provider='facebook',
                     provider_id=fa.result.user.id).first()
             if ap:
+                current_app.logger.debug("Existing Central Account Found %d",
+		    ap.user_id)
                 user = User.query.filter_by(id=ap.user_id).first()
                 if image_url and not user.image_url:
                     user.image_url = image_url
@@ -59,6 +63,8 @@ def login():
                         image_url=image_url)
                 db.session.add(user)
                 db.session.commit()
+                current_app.logger.debug("Created Central Account For %d",
+		    ap.user_id)
                 ap = AuthProvider(provider='facebook',
                         provider_id=fa.result.user.id,
                         user_id=user.id)
@@ -129,6 +135,7 @@ def client():
 @auth.route('/oauth/errors', methods=['GET', 'POST'])
 def oauth_errors():
     """Called in the event of an error during the oauth dance"""
+    current_app.logger.error(request.args.get('error'))
     return jsonify(error=request.args.get('error'))
 
 
