@@ -1,51 +1,85 @@
 # true_nth_usa_portal_demo
-Demo for the Movember True NTH USA portal - early summer 2015
+Movember True NTH USA Central Services
 
 ## INSTALLATION
 
-Pull down prerequisite packages
+Pick any path for installation
 
 ```bash
-$ sudo apt-get install python-virtualenv
+$ export PROJECT_HOME=~/CentralServices
 ```
 
-From the parent directory where you wish to install the portal, pull
-down the code and create a virtual environment to isolate the 
-requirements from the system python
+### Prerequisites (done one time)
+
+#### Install required packages
 
 ```bash
-$ git clone https://github.com/uwcirg/true_nth_usa_portal_demo.git portal
-$ virtualenv portal
-$ cd portal
+$ sudo apt-get install python-virtualenv libffi-dev
 ```
 
-Activate the virtual environment, patch setuptools, and install the
-project requirements (into the virtual environment)
+#### Clone the Project
 
 ```bash
+$ git clone https://github.com/uwcirg/true_nth_usa_portal_demo.git \
+    $PROJECT_HOME
+```
+
+#### Create a Virtual Environment
+
+This critical step enables isolation of the project from system python,
+making dependency maintenance easier and more stable.  It does require
+that you ```activate``` the virtual environment before you interact
+with python or the installer scripts.
+
+```bash
+$ virtualenv $PROJECT_HOME
+```
+
+#### Activate the Virtual Environment
+
+Required to interact with the python installed in this virtual
+environment.  Forgetting this step will result in obvious warnings
+about missing dependencies.
+
+```bash
+$ cd $PROJECT_HOME
+$ source bin/activate
+```
+
+#### Patch setuptools
+
+A one time workaround to a bootstrap upgrade problem with setuptools:
+
+```bash
+$ cd $PROJECT_HOME
 $ source bin/activate
 $ pip install -U setuptools
 ```
 
-To install for development (so changes to source files don't require
-another round of install, use the develop flag
+### Install the Lastest Package
 
 ```bash
-$ python setup.py develop
+$ cd $PROJECT_HOME
+$ git pull
 ```
 
-To install on a server, use the install flag
+Technically, the following `pip` step only needs to be re-run when the
+project requirements change (i.e. new values in setup.py
+install_requires), but it's safe to run anytime to make sure.
 
 ```bash
-$ python setup.py install
+$ pip install -e .
 ```
+
+If new files in the `migrations/versions` directories showed up on the
+pull, a database upgrade as detailed below also needs to be run.
 
 ## CONFIGURE
 
 Copy the default to the named configuration file
 
 ```bash
-$ cp portal/application.cfg.default portal/application.cfg
+$ cp $PROJECT_ROOT/application.cfg{.default,}
 ```
 
 Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps  Write the values from Facebook to `application.cfg`:
@@ -57,7 +91,7 @@ CONSUMER_KEY = '<App ID From FB>'
 CONSUMER_SECRET = '<App Secret From FB>'
 ```
 
-## RUN
+## Run the Central Services Server
 ```bash
 $ python manage.py runserver
 ```
@@ -71,18 +105,32 @@ instances, and PostgreSQL is used otherwise.
 ### Migrations
 
 Thanks to Alembic and Flask-Migrate, database migrations are easily
-managed and run.  Update the python source files containing table
-definitions (typically classes derrived from db.Model) and run the
-manage script to generate the necessary migration code:
+managed and run.
+
+#### Upgrade
+
+Anytime a database (might) need an upgrade, run the manage script with
+the `db upgrade` arguments.
+
+This is idempotent process, meaning it's safe to run again on a database
+that already received the upgrade.
 
 ```bash
-cd PROJECT_HOME
-source bin/activate
+python manage.py db upgrade
+```
+
+#### Schema Changes
+
+Update the python source files containing table
+definitions (typically classes derrived from db.Model) and run the
+manage script to sniff out the code changes and generate the necessary
+migration steps:
+
+```bash
 python manage.py db migrate
 ```
 
-Then execute the upgrade on any database (edit `SQLALCHEMY_DATABASE_URI`
-in the `application.cfg` file to alter database target):
+Then execute the upgrade as previously mentioned:
 
 ```bash
 python manage.py db upgrade
