@@ -79,7 +79,7 @@ pull, a database upgrade as detailed below also needs to be run.
 Copy the default to the named configuration file
 
 ```bash
-$ cp $PROJECT_ROOT/application.cfg{.default,}
+$ cp $PROJECT_ROOT/portal/application.cfg{.default,}
 ```
 
 Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps  Write the values from Facebook to `application.cfg`:
