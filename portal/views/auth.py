@@ -109,15 +109,47 @@ def logout():
 @auth.route('/client', methods=('GET', 'POST'))
 @roles_required('admin')
 def client():
-    """client view function
+    """client registration
 
-    For interventions wanting to be OAuth clients to the portal
-    (acting as the OAuth server), they must first register with
-    the portal, and provide one or more redirect URIs used during
-    the OAuth authentication process.
-
-    returns a client_id and client_secret for intervention's
-    OAuth client configuration
+    Central Services uses the OAuth 2.0 Authorization Code Grant flow
+    to authorize all sensitive API access. As a prerequisite, any
+    client (intervention) wishing to make authorized calls must first
+    register at this endpoint.
+    ---
+    tags:
+      - OAuth
+    operationId: client
+    parameters:
+      - name: redirect_uri
+        in: formData
+        description:
+          Redirect URIs. The service will only redirect to URIs in
+          the list. All URIs must be protected with TLS security
+          (i.e. https) beyond inital testing. Separate multiple
+          URIs with a single whitespace character.
+        required: true
+        type: string
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: client_response
+          required:
+            - client_id
+            - client_secret
+          properties:
+            client_id:
+              type: string
+              description:
+                Identification unique to a Central Serivce client.
+                Passed in calls to obtain an authorization token
+            client_secret:
+              type: string
+              description:
+                Safe guarded secret used by Intervention's OAuth 
+                client library.
 
     """
     user = current_user()
@@ -140,37 +172,182 @@ def client():
     )
 
 
-@auth.route('/oauth/errors', methods=['GET', 'POST'])
+@auth.route('/oauth/errors', methods=('GET', 'POST'))
 def oauth_errors():
-    """Called in the event of an error during the oauth dance"""
+    """Redirect target for oauth errors
+    
+    Shouldn't be called directly, this endpoint is the redirect target
+    when something goes wrong during authorization code requests
+    ---
+    tags:
+      - OAuth
+    operationId: oauth_errors
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: error_response
+          required:
+            - error
+          properties:
+            error:
+              type: string
+              description: Known details of error situation.
+
+    """
     current_app.logger.error(request.args.get('error'))
-    return jsonify(error=request.args.get('error'))
+    return jsonify(error=request.args.get('error')), 400
 
 
-@auth.route('/oauth/token', methods=['GET', 'POST'])
+@auth.route('/oauth/token', methods=('GET', 'POST'))
 @oauth.token_handler
 def access_token():
-    """Part of the oauth dance between intervention and portal"""
+    """Exchange authorization code for access token
+    
+    OAuth client libraries must POST the authorization code obtained
+    from /oauth/authorize in exchange for a Bearer Access Token.
+    ---
+    tags:
+      - OAuth
+    operationId: access_token
+    parameters:
+      - name: client_id
+        in: formData
+        description:
+          Client's unique identifier, obtained during registration
+        required: true
+        type: string
+      - name: client_secret
+        in: formData
+        description:
+          Client's secret, obtained during registration
+        required: true
+        type: string
+      - name: code
+        in: formData
+        description:
+          The authorization code obtained from /oauth/authorize
+        required: true
+        type: string
+      - name: grant_type
+        in: formData
+        description:
+          Type of OAuth authorization requested.  Use "authorization_code"
+        required: true
+        type: string
+      - name: redirect_uri
+        in: formData
+        description:
+          Intervention's target URI for call back.
+        required: true
+        type: string
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: access_token
+          required:
+            - access_token
+            - token_type
+            - expires_in
+            - refresh_token
+            - scope
+          properties:
+            access_token:
+              type: string
+              description:
+                The access token to include in the Authorization header
+                for protected API use.
+              required: true
+            token_type:
+              type: string
+              description: Type of access token, always 'Bearer'
+              required: true
+            expires_in:
+              type: integer
+              format: int64
+              description:
+                Number of seconds for which the access token will
+                remain valid
+              required: true
+            refresh_token:
+              type: string
+              description:
+                Use to refresh an access token, in place of the
+                authorizion token.
+              required: true
+            scope:
+              type: string
+              description: The authorized scope.
+
+    """
     return None
 
 
-@auth.route('/oauth/authorize', methods=['GET', 'POST'])
+@auth.route('/oauth/authorize', methods=('GET','POST'))
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
-    """Part of the oauth dance between intervention and portal
+    """Authorize the client to access Central Service resources
+    
+    For OAuth 2.0, the resource owner communicates their desire
+    to grant the client (intervention) access to their data on 
+    the server (Central Services).
 
-    Returns true, thus authorizing the client, IFF the user
-    is authenticated as a portal user.  Otherwise, redirects
-    to the portal root.
+    For ease of use, this decision has been hardwired to "allow access"
+    on Central Services. Making a GET request to this endpoint is still
+    the required initial step in the OAuth 2.0 access code flow, likely
+    handled by the OAuth 2.0 library used by the client.
+    ---
+    tags:
+      - OAuth
+    operationId: oauth_authorize
+    parameters:
+      - name: response_type
+        in: formData
+        description:
+          Type of OAuth authorization requested.  Use "code"
+        required: true
+        type: string
+      - name: client_id
+        in: formData
+        description:
+          Client's unique identifier, obtained during registration
+        required: true
+        type: string
+      - name: redirect_uri
+        in: formData
+        description:
+          Intervention's target URI for call back. Central Services
+          will include an authorization code in the call (to be
+          subsequently exchanged for an access token).
+        required: true
+        type: string
+      - name: scope
+        in: formData
+        description:
+          Extent of authorization requested.  At this time, only 'email'
+          is supported.
+        required: true
+        type: string
+    produces:
+      - application/json
+    responses:
+      302:
+        description:
+          redirect to requested redirect_uri with a valid
+          authorization code. NB - this is not the bearer
+          token needed for API access, but the code to be
+          exchanged for such an access token. In the
+          event of an error, redirection will target /oauth/errors
+          of Central Services.
 
     """
     user = current_user()
     if not user:
         return redirect('/')
-    # Typically an OAuth server (such as this portal) would
-    # now request user confirmation before returning a valid
-    # token to the client.  Intentionally skipping confirmation,
-    # giving the intervention access to the portal anytime
-    # there's an authorized portal user initiating this request
-    # from the intervention.
+    # See "hardwired" note in docstring above
     return True
