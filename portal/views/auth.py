@@ -112,6 +112,7 @@ def client():
     """client registration
 
     Central Services uses the OAuth 2.0 Authorization Code Grant flow
+    (http://tools.ietf.org/html/rfc6749#section-4.1)
     to authorize all sensitive API access. As a prerequisite, any
     client (intervention) wishing to make authorized calls must first
     register at this endpoint.
@@ -299,7 +300,8 @@ def authorize(*args, **kwargs):
 
     For ease of use, this decision has been hardwired to "allow access"
     on Central Services. Making a GET request to this endpoint is still
-    the required initial step in the OAuth 2.0 access code flow, likely
+    the required initial step in the OAuth 2.0 Authorization Code
+    Grant (http://tools.ietf.org/html/rfc6749#section-4.1), likely
     handled by the OAuth 2.0 library used by the client.
     ---
     tags:
