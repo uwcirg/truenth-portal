@@ -283,8 +283,10 @@ def portal_wrapper_html(username):
 
 
     """
-    movember_profile = "".join((current_app.config['PORTAL'],
-        url_for('static', filename='img/movember_profile_thumb.png')))
+    movember_profile = ''.join((
+        current_app.config['PORTAL'],
+        url_for('static', filename='img/movember_profile_thumb.png'),
+    ))
 
     # workarounds till we can call protected_portal_wrapper from portal
     user = current_user()
@@ -346,13 +348,14 @@ def protected_portal_wrapper_html():
         description: if missing valid OAuth token
 
     """
-    user = current_user()
+    movember_profile = ''.join((
+        current_app.config['PORTAL'],
+        url_for('static', filename='img/movember_profile_thumb.png'),
+    ))
 
+    user = current_user()
     if user.image_url:
         movember_profile = user.image_url
-    else:
-        movember_profile = "".join((current_app.config['PORTAL'],
-            url_for('static', filename='img/movember_profile_thumb.png')))
 
     html = render_template(
         'portal_wrapper.html',
