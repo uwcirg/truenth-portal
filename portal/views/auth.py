@@ -107,7 +107,7 @@ def logout():
 
 
 @auth.route('/client', methods=('GET', 'POST'))
-@roles_required('admin')
+@roles_required('patient')
 def client():
     """client registration
 
@@ -166,7 +166,7 @@ def client():
     )
     db.session.add(item)
     db.session.commit()
-    return jsonify(
+    return render_template('review_client.html',
         client_id=item.client_id,
         client_secret=item.client_secret,
         redirect_uris=item._redirect_uris

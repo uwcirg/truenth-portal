@@ -14,21 +14,12 @@
                 <div class="well lead-well">
                     <div class="row">
                         <div class="col-xs-12 col-sm-6">
-                            <h4>Obtain OAuth 2.0 Credentials from Central Services </h4>
+                            <h4>Central Services OAuth 2.0 Credentials </h4>
                             <ul>
-                                
-                                <li style="margin-bottom: 0.25em; font-size: 15px">
-To add an application to Central Services, one must first register
-the application origin or URL.  Multiple origins may be entered,
-separated by white space.
-                                </li>
+                                <li style="margin-bottom: 0.25em; font-size: 15px">Site URL {{ redirect_uris }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client_id }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client_secret }} </li> 
                             </ul>
-                            <form action="/client" method="post">
-                                <div class="form-group">
-                                    <input type="text" class="form-control" name="redirect_uri" size='79' value="https://hostname">
-                                </div>
-                                <button type="submit" class="btn btn-tnth-primary">Register App</button>
-                            </form>
                         </div>
                     </div>
                 </div>
