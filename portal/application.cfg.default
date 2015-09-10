@@ -1,8 +1,8 @@
 # Configuration values for application.  Don't commit private copy!
 DEBUG = True
 SECRET_KEY = 'generate some random secret string'
-CONSUMER_KEY = '<value from FB>'
-CONSUMER_SECRET = '<value from FB>'
+CONSUMER_KEY = '<App ID from Facebook>'
+CONSUMER_SECRET = '<App Secret from Facebook>'
 SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost/dbname'
 PORTAL = '<base URI for this installation>'
 DECIDING_INTERVENTION = '<entry URI for intervention>'
