@@ -1,5 +1,5 @@
 """Auth related model classes """
-from flask import current_app
+from flask import abort, current_app
 from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import ENUM
 from urlparse import urlparse
@@ -72,10 +72,7 @@ class Client(db.Model):
         parsed = urlparse(redirect_uri)
         redirect_uri = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
         if redirect_uri not in self.redirect_uris:
-            current_app.logger.warn("%s not in redirect_uris: %s",
-                    redirect_uri, self.redirect_uris)
             return False
-        current_app.logger.debug("validated redirect_uri: %s", redirect_uri)
         return True
 
 
@@ -216,3 +213,22 @@ def save_token(token, request, *args, **kwargs):
     db.session.commit()
     return tok
 
+
+def validate_client_origin(origin):
+    """Validate the origin is one we recognize
+
+    For CORS, limit the requesting origin to the list we know about,
+    namely any origins belonging to our OAuth clients.
+
+    @raises: 401 if we don't find a match.
+
+    """
+    if not origin:
+        current_app.logger.error("Can't validate missing origin")
+        abort(401)
+
+    for client in Client.query.all():
+        if client.validate_redirect_uri(origin):
+            return True
+    current_app.logger.error("Failed to validate origin: %s", origin)
+    abort(401)

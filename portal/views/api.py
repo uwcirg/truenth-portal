@@ -1,10 +1,10 @@
 """API view functions"""
 from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
-from urlparse import urlparse
 
 from ..models.user import current_user, get_user
 from ..extensions import oauth
+from .crossdomain import crossdomain
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
@@ -308,34 +308,22 @@ def portal_wrapper_html(username):
 
 
 @api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
-def pre_flight_portal_wrapper(resp=None):
-    """For in browser requests - first need to communicate via OPTIONS
+@crossdomain()
+def preflight():
+    """CORS requires preflight headers
 
-    oauth protected views served to the browser require an OPTIONS
-    view function with Access-Control headers, as a pre-flight check
-    before the protected GET request is made.
+    For in browser CORS requests, first respond to an OPTIONS request
+    including the necessary Access-Control headers.
+
+    Requires separate route for OPTIONS to avoid authorization tangles.
 
     """
-
-    if resp is None:
-        resp = make_response()
-
-    # TODO: validate the referrer is really someone we trust
-    # either by use of whitelist, or perhaps just a similar URL
-    # in clients._redirect_uris
-    origin_url = request.headers.get('Origin')
-    if origin_url:
-        parsed = urlparse(origin_url)
-        origin = '{uri.scheme}://{uri.netloc}'.format(uri=parsed)
-        resp.headers.add('Access-Control-Allow-Origin', origin)
-    resp.headers.add('Access-Control-Allow-Credentials', 'true')
-    resp.headers.add('Access-Control-Allow-Headers',
-            'Authorization, X-Requested-With')
-    return resp
+    pass  # all work for OPTIONS done in crossdomain decorator
 
 
-@api.route('/protected-portal-wrapper-html')
+@api.route('/protected-portal-wrapper-html', methods=('GET',))
 @oauth.require_oauth()
+@crossdomain()
 def protected_portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
@@ -372,5 +360,4 @@ def protected_portal_wrapper_html():
         username=user.username,
         movember_profile=movember_profile
     )
-    resp = make_response(html)
-    return pre_flight_portal_wrapper(resp)
+    return make_response(html)
