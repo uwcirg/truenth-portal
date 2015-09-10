@@ -284,7 +284,8 @@ def portal_wrapper_html(username):
 
     """
     movember_profile = ''.join((
-        current_app.config['PORTAL'],
+        '//',
+        current_app.config['SERVER_NAME'],
         url_for('static', filename='img/movember_profile_thumb.png'),
     ))
 
@@ -299,7 +300,7 @@ def portal_wrapper_html(username):
 
     html = render_template(
         'portal_wrapper.html',
-        PORTAL=current_app.config['PORTAL'],
+        PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=username,
         movember_profile=movember_profile
     )
@@ -349,7 +350,8 @@ def protected_portal_wrapper_html():
 
     """
     movember_profile = ''.join((
-        current_app.config['PORTAL'],
+        '//',
+        current_app.config['SERVER_NAME'],
         url_for('static', filename='img/movember_profile_thumb.png'),
     ))
 
@@ -359,7 +361,7 @@ def protected_portal_wrapper_html():
 
     html = render_template(
         'portal_wrapper.html',
-        PORTAL=current_app.config['PORTAL'],
+        PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=user.username,
         movember_profile=movember_profile
     )
