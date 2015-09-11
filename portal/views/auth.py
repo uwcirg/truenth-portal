@@ -131,26 +131,35 @@ def client():
         required: true
         type: string
     produces:
-      - application/json
+      - text/html
     responses:
       200:
         description: successful operation
         schema:
           id: client_response
           required:
-            - client_id
-            - client_secret
+            - App ID
+            - App Secret
+            - Site URL
           properties:
-            client_id:
+            App ID:
               type: string
               description:
-                Identification unique to a Central Serivce client.
-                Passed in calls to obtain an authorization token
-            client_secret:
+                Identification unique to a Central Serivce application.
+                Pass as `client_id` in OAuth Authorization Code Grant
+                calls to obtain an authorization token
+            App Secret:
               type: string
               description:
-                Safe guarded secret used by Intervention's OAuth 
-                client library.
+                Safe guarded secret used by Intervention's OAuth
+                client library.  Pass as `client_secret` in calls
+                to `/oauth/token`
+            Site URL:
+              type: string
+              description:
+                Application's site Origin or URL.
+                Required to include the origin of OAuth callbacks
+                and site origins making in-browser requests via CORS
 
     """
     user = current_user()
