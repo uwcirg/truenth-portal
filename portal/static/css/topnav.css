@@ -49,8 +49,8 @@
     color: #333;
 }
 .tnth-nav-xs .tnth-white.navbar-toggle {
-    margin: 2px;
-    padding: 0;
+    margin: 2px 8px 2px 4px;
+    padding: 0 0 0 10px;
 }
 
 
