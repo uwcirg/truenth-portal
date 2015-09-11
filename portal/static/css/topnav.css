@@ -5,20 +5,12 @@
 .tnth-nav-main {
 	padding: 5px 15px;
 }
-.tnth-nav-xs {
-	margin: 0 0 5px;
+
+#tnthLogo {
+    float: left;
 }
-.tnth-nav-xs .navbar-brand {
-	padding: 4px;
-}
-.tnth-nav-xs .navbar-brand img {
-	height: 54px;
-}
-.tnth-nav-xs .nav a {
-    color: #fff;
-}
-.tnth-nav-xs .nav a:active, .tnth-nav-xs .nav a:hover {
-    color: #333;
+#tnthTopLinks {
+    float: right;
 }
 
 .tnth-white {
@@ -39,17 +31,28 @@
 .tnth-white.navbar-toggle {
     margin: 8px 15px 8px 0;
 }
-.tnth-search {
-    display: inline-block;
+
+/*** Styles for responsive xs size ***/
+.tnth-nav-xs {
+	margin: 0 0 5px;
+}
+.tnth-nav-xs .navbar-brand {
+	padding: 4px;
+}
+.tnth-nav-xs .navbar-brand img {
+	height: 50px;
+}
+.tnth-nav-xs .nav a {
+    color: #fff;
+}
+.tnth-nav-xs .nav a:active, .tnth-nav-xs .nav a:hover {
+    color: #333;
+}
+.tnth-nav-xs .tnth-white.navbar-toggle {
+    margin: 2px;
     padding: 0;
 }
-.tnth-show-search {
-    height: 43px;
-}
 
-.hide-initial, .form-group.hide-initial {
-  display: none;
-}
 
 
 
