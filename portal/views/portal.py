@@ -1,6 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
+from flask import redirect, request, session
 from flask_swagger import swagger
 
 from ..models.user import current_user
@@ -18,7 +19,16 @@ def index():
     """
     user = current_user()
     if user:
+        # now logged in, redirect if next was previously stored
+        if 'next' in session and session['next']:
+            next = session['next']
+            session['next'] = None
+            return redirect(next)
         return render_template('portal.html', user=user)
+
+    # next is added as a query parameter when login is required 
+    # store in session to survive a multi-request login process
+    session['next'] = request.args.get('next', None)
     return render_template('index.html')
 
 

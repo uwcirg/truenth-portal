@@ -13,6 +13,7 @@ class BaseConfig(object):
     TESTING = False
     SECRET_KEY = 'override this secret key'
     USER_UNAUTHORIZED_ENDPOINT = 'portal.index'
+    USER_UNAUTHENTICATED_ENDPOINT = 'portal.index'
 
 
 class DefaultConfig(BaseConfig):
