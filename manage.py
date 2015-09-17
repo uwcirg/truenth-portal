@@ -3,11 +3,11 @@
 python manage.py --help
 
 """
-from flask.ext.script import Manager, Server
+from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
-from portal.extensions import db
+from portal.extensions import db, ConfigServer
 from portal.models.user import User, Role, UserRoles
 
 app = create_app()
@@ -15,7 +15,7 @@ manager = Manager(app)
 
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
-manager.add_command('runserver', Server(host='0.0.0.0'))
+manager.add_command('runserver', ConfigServer(host='0.0.0.0'))
 
 
 @manager.command
