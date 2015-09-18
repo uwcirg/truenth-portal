@@ -1,4 +1,10 @@
 """Auth related model classes """
+import base64
+import hashlib
+import hmac
+import json
+import requests
+import time
 from flask import abort, current_app
 from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import ENUM
@@ -31,6 +37,7 @@ class Client(db.Model):
 
     _redirect_uris = db.Column(db.Text)
     _default_scopes = db.Column(db.Text)
+    callback_url = db.Column(db.Text)
 
     @property
     def client_type(self):
@@ -41,7 +48,7 @@ class Client(db.Model):
         if self._redirect_uris:
             # Should just store the scheme:hostname:port,
             # but for now, clean here for validate_redirect_uri
-            uris = [] 
+            uris = []
             for uri in self._redirect_uris.split():
                 parsed = urlparse(uri)
                 uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
@@ -57,6 +64,43 @@ class Client(db.Model):
         if self._default_scopes:
             return self._default_scopes.split()
         return []
+
+    def notify(self, data):
+        """POST data to client's callback_url if defined
+
+        Clients can register a callback URL.  Events such as
+        logout are then reported to the client via POST.
+
+        A "signed_request" is POSTed, of the following form
+           encoded_signature.payload
+
+        The "payload" is a base64 url encoded string.
+        The "encoded signature" is a HMAC_SHA256 hash using
+        the client's secret key to encode the payload.
+
+        Data should be a dictionary.  Additional fields (algorithm,
+        issued_at) will be added before transmission.
+
+        """
+        if not self.callback_url:
+            return
+
+        data['algorithm'] = 'HMAC-SHA256'
+        data['issued_at'] = int(time.time())
+        payload = base64.urlsafe_b64encode(json.dumps(data))
+        sig = hmac.new(str(self.client_secret), msg=payload,
+            digestmod=hashlib.sha256).digest()
+        encoded_sig = base64.urlsafe_b64encode(sig)
+
+        formdata = {'signed_request': "{0}.{1}".format(encoded_sig,
+            payload)}
+        current_app.logger.debug("POSTing event to %s",
+                self.callback_url)
+        # NB - this is a BLOCKing call!
+        resp = requests.post(self.callback_url, data=formdata) 
+        current_app.logger.debug("POST complete with status %d",
+                resp.status_code)
+
 
     def validate_redirect_uri(self, redirect_uri):
         """Validate the redirect_uri from the OAuth Token request

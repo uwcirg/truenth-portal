@@ -132,11 +132,12 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
     def check_role(self, permission, other_id):
-        """Placeholder - till we have roles ready - only allows
-        self views and edits at this time
-        """
+        """check user for adequate role"""
         if self.id == other_id:
             return True
+        if 'admin' in [r.name for r in self.roles]:
+            return True
+        # TODO: address permission details, etc.
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
 

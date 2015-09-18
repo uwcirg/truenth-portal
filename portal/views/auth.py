@@ -1,16 +1,60 @@
 """Auth related view functions"""
+import base64
+import hashlib
+import hmac
+import json
 import requests
 from flask import Blueprint, jsonify, redirect, current_app
-from flask import render_template, request, session
+from flask import render_template, request, session, abort
 from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
 from werkzeug.security import gen_salt
 
-from ..models.auth import AuthProvider, Client
+from ..models.auth import AuthProvider, Client, Token
 from ..models.user import current_user, User, Role, UserRoles
 from ..extensions import db, fa, oauth
 
 auth = Blueprint('auth', __name__)
+
+
+@auth.route('/deauthorized', methods=('POST',))
+def deauthorized():
+    """Callback URL configured on facebook when user deauthorizes
+
+    We receive POST data when a user deauthorizes the session
+    between Central Services and Facebook.  The POST includes
+    a signed_request, decoded as seen below.
+
+    Configuration set on Facebook Developer pages:
+      app->settings->advanced->Deauthorize Callback URL
+
+    """
+    def base64_url_decode(s):
+        """url safe base64 decoding method"""
+        padding_factor = (4 - len(s) % 4)
+        s += "="*padding_factor
+        return base64.b64decode(unicode(s).translate(
+            dict(zip(map(ord, u'-_'), u'+/'))))
+
+    encoded_sig, payload = request.form['signed_request'].split('.')
+    sig = base64_url_decode(encoded_sig)
+    data = base64_url_decode(payload)
+
+    secret = current_app.config['CONSUMER_SECRET']
+    expected_sig = hmac.new(secret, msg=payload,
+            digestmod=hashlib.sha256).digest()
+    if expected_sig != sig:
+        current_app.logger.error("Signed request from FB doesn't match!")
+        return jsonify(error='bad signature')
+
+    current_app.logger.debug("data: %s", str(data))
+    data = json.loads(data)
+    # Should probably remove all tokens obtained during this session
+    # for now, just logging the event.
+    message = 'User {0} deauthorized Central Services from Facebook'.\
+            format(data['user_id'])
+    current_app.logger.info(message)
+    return jsonify(message=message)
 
 
 @auth.route('/login')
@@ -93,16 +137,32 @@ def logout():
     clearing the browser session.
 
     """
+    user_id = session['id']
+    current_app.logger.debug("Logout user.id %d", user_id)
+
+    delete_facebook_authorization = False  # Fencing out for now
     ap = AuthProvider.query.filter_by(provider='facebook',
-            user_id=session['id']).first()
-    headers = {'Authorization':
+            user_id=user_id).first()
+    if ap and delete_facebook_authorization:
+        headers = {'Authorization':
             'Bearer {0}'.format(session['remote_token'])}
-    url = "https://graph.facebook.com/{0}/permissions".\
-        format(ap.provider_id)
-    requests.delete(url, headers=headers)
-    current_app.logger.debug("Logout user.id %d", session['id'])
+        url = "https://graph.facebook.com/{0}/permissions".\
+            format(ap.provider_id)
+        requests.delete(url, headers=headers)
+
     logout_user()
     session.clear()
+
+    # Inform any client apps of this event.  Look for tokens this
+    # user obtained, and notify those clients of the event
+    tokens = Token.query.filter_by(user_id=user_id).all()
+    for token in tokens:
+        client = Client.query.filter_by(client_id=token.client_id).first()
+        client.notify({'event':'logout', 'user_id':user_id})
+
+        # Invalidate the access token by deletion
+        db.session.delete(token)
+    db.session.commit()
     return redirect('/')
 
 
@@ -175,17 +235,96 @@ def client():
     )
     db.session.add(item)
     db.session.commit()
-    return render_template('review_client.html',
-        client_id=item.client_id,
-        client_secret=item.client_secret,
-        redirect_uris=item._redirect_uris
-    )
+    return render_template('review_client.html', client=item)
+
+
+@auth.route('/client/<client_id>', methods=('GET', 'POST'))
+@roles_required('patient')
+def client_edit(client_id):
+    """client edit
+
+    View details and edit settings for a Central Services client (also
+    known as an Intervention or App).
+    ---
+    tags:
+      - OAuth
+    operationId: client_edit
+    parameters:
+      - name: client_id
+        in: path
+        required: true
+        description: The App ID (client_id) from client registration
+      - name: callback_url
+        in: formData
+        description:
+          An optional callback URL to be hit on significant
+          events, such as a user terminating a session via logout
+        required: false
+        type: string
+    produces:
+      - text/html
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: client_response
+          required:
+            - App ID
+            - App Secret
+            - Site URL
+            - Callback URL
+          properties:
+            App ID:
+              type: string
+              description:
+                Identification unique to a Central Serivce application.
+                Pass as `client_id` in OAuth Authorization Code Grant
+                calls to obtain an authorization token
+            App Secret:
+              type: string
+              description:
+                Safe guarded secret used by Intervention's OAuth
+                client library.  Pass as `client_secret` in calls
+                to `/oauth/token`
+            Site URL:
+              type: string
+              description:
+                Application's site Origin or URL.
+                Required to include the origin of OAuth callbacks
+                and site origins making in-browser requests via CORS
+            Callback URL:
+              type: string
+              description:
+                Callback URL hit on significant events such as a
+                session termination.  If defined, a POST to the
+                callback will include a "signed_request" using
+                the client_secret.  See numerous resources
+                published for decoding Facebook signed_request, as
+                the format is identical.
+
+    """
+    client = Client.query.get(client_id)
+    if not client:
+        abort(404)
+    user = current_user()
+    current_user().check_role(permission='edit', other_id=client.user_id)
+    if request.method == 'GET':
+        return render_template('register_client.html', client=client)
+    callback_url = request.form.get('callback_url', None)
+    redirect_uri = request.form.get('redirect_uri', None)
+    if callback_url:
+        client.callback_url = callback_url
+    if redirect_uri:
+        client.redirect_uri = redirect_uri
+    db.session.add(client)
+    db.session.commit()
+    return render_template('review_client.html', client=item)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
 def oauth_errors():
     """Redirect target for oauth errors
-    
+
     Shouldn't be called directly, this endpoint is the redirect target
     when something goes wrong during authorization code requests
     ---
@@ -215,7 +354,7 @@ def oauth_errors():
 @oauth.token_handler
 def access_token():
     """Exchange authorization code for access token
-    
+
     OAuth client libraries must POST the authorization code obtained
     from /oauth/authorize in exchange for a Bearer Access Token.
     ---
@@ -298,13 +437,13 @@ def access_token():
     return None
 
 
-@auth.route('/oauth/authorize', methods=('GET','POST'))
+@auth.route('/oauth/authorize', methods=('GET', 'POST'))
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
     """Authorize the client to access Central Service resources
-    
+
     For OAuth 2.0, the resource owner communicates their desire
-    to grant the client (intervention) access to their data on 
+    to grant the client (intervention) access to their data on
     the server (Central Services).
 
     For ease of use, this decision has been hardwired to "allow access"

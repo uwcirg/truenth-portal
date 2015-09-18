@@ -16,9 +16,10 @@
                         <div class="col-xs-12 col-sm-6">
                             <h4>Central Services OAuth 2.0 Credentials </h4>
                             <ul>
-                                <li style="margin-bottom: 0.25em; font-size: 15px">Site URL {{ redirect_uris }} </li> 
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client_id }} </li> 
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client_secret }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">Site URL {{ client._redirect_uris }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client.client_id }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client.client_secret }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">Callback URL {{ client.callback_url }} </li> 
                             </ul>
                         </div>
                     </div>
