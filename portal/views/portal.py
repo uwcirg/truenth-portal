@@ -21,14 +21,20 @@ def index():
     if user:
         # now logged in, redirect if next was previously stored
         if 'next' in session and session['next']:
+            current_app.logger.debug("redirect to session[next]: %s",
+                    session['next'])
             next = session['next']
             session['next'] = None
             return redirect(next)
         return render_template('portal.html', user=user)
 
-    # next is added as a query parameter when login is required 
+    # 'next' is optionally added as a query parameter during login
+    # steps, as the redirection target after login concludes.
     # store in session to survive a multi-request login process
-    session['next'] = request.args.get('next', None)
+    if request.args.get('next', None):
+        current_app.logger.debug('storing session[next]: %s',
+                request.args.get('next'))
+        session['next'] = request.args.get('next', None)
     return render_template('index.html')
 
 

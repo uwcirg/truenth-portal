@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import requests
+from urlparse import urlparse, parse_qs
 from flask import Blueprint, jsonify, redirect, current_app
 from flask import render_template, request, session, abort
 from flask.ext.login import login_user, logout_user
@@ -458,31 +459,39 @@ def authorize(*args, **kwargs):
     operationId: oauth_authorize
     parameters:
       - name: response_type
-        in: formData
+        in: query
         description:
           Type of OAuth authorization requested.  Use "code"
         required: true
         type: string
       - name: client_id
-        in: formData
+        in: query
         description:
           Client's unique identifier, obtained during registration
         required: true
         type: string
       - name: redirect_uri
-        in: formData
+        in: query
         description:
           Intervention's target URI for call back. Central Services
           will include an authorization code in the call (to be
-          subsequently exchanged for an access token).
+          subsequently exchanged for an access token).  May optionally
+          include an encoded 'next' value in its query string, or pass
+          'next' as a separate parameter.
         required: true
         type: string
       - name: scope
-        in: formData
+        in: query
         description:
           Extent of authorization requested.  At this time, only 'email'
           is supported.
         required: true
+        type: string
+      - name: next
+        in: query
+        description:
+          Target for redirection after authorization is complete
+        required: false
         type: string
     produces:
       - application/json
@@ -497,6 +506,21 @@ def authorize(*args, **kwargs):
           of Central Services.
 
     """
+    # Likely entry point for OAuth dance.  Capture the 'next' target
+    # in the session for redirection after dance concludes
+    if 'next' in request.args:
+        current_app.logger.debug('storing session[next]: %s',
+            request.args.get('next'))
+        session['next'] = request.args['next']
+    else:
+        # Pluck the next out of the redirect_uri, if there
+        parsed = urlparse(request.args['redirect_uri'])
+        qs = parse_qs(parsed.query)
+        if 'next' in qs:
+            current_app.logger.debug('storing session[next]: %s',
+                qs['next'])
+            session['next'] = qs['next'][0]
+
     user = current_user()
     if not user:
         return redirect('/')
