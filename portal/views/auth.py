@@ -309,11 +309,11 @@ def client_edit(client_id):
     user = current_user()
     current_user().check_role(permission='edit', other_id=client.user_id)
     if request.method == 'GET':
-        return render_template('register_client.html', client=client)
+        return render_template('edit_client.html', client=client)
     callback_url = request.form.get('callback_url', None)
-    redirect_uri = request.form.get('redirect_uri', None)
     if callback_url:
         client.callback_url = callback_url
+    redirect_uri = request.form.get('redirect_uri', None)
     if redirect_uri:
         client.redirect_uri = redirect_uri
     db.session.add(client)
