@@ -254,6 +254,7 @@ def client_edit(client_id):
         in: path
         required: true
         description: The App ID (client_id) from client registration
+        type: string
       - name: callback_url
         in: formData
         description:
@@ -267,7 +268,7 @@ def client_edit(client_id):
       200:
         description: successful operation
         schema:
-          id: client_response
+          id: client_edit_response
           required:
             - App ID
             - App Secret
@@ -318,7 +319,7 @@ def client_edit(client_id):
         client.redirect_uri = redirect_uri
     db.session.add(client)
     db.session.commit()
-    return render_template('review_client.html', client=item)
+    return render_template('review_client.html', client=client)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
