@@ -23,9 +23,9 @@ def index():
         if 'next' in session and session['next']:
             current_app.logger.debug("redirect to session[next]: %s",
                     session['next'])
-            next = session['next']
+            next_url = session['next']
             session['next'] = None
-            return redirect(next)
+            return redirect(next_url)
         return render_template('portal.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
