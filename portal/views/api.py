@@ -279,6 +279,14 @@ def portal_wrapper_html(username):
     produces:
       - text/html
     parameters:
+      - name: login_url
+        in: path
+        description:
+          Location to direct login requests.  Typically an entry
+          point on the intervention, to initiate OAuth dance with
+          Central Services.
+        required: false
+        type: string
       - name: username
         in: path
         description:
