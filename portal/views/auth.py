@@ -6,7 +6,7 @@ import json
 import requests
 from urlparse import urlparse, parse_qs
 from flask import Blueprint, jsonify, redirect, current_app
-from flask import render_template, request, session, abort
+from flask import render_template, request, session, abort, url_for
 from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
 from werkzeug.security import gen_salt
@@ -124,7 +124,15 @@ def login():
             session['id'] = user.id
             session['remote_token'] = fa.result.provider.credentials.token
             login_user(user)
-            return redirect('/')
+            # If client auth was pushed aside, resume now
+            if 'pending_authorize_args' in session:
+                args = session['pending_authorize_args']
+                current_app.logger.debug("redirecting to interrupted " +
+                    "client authorization: %s", str(args))
+                del session['pending_authorize_args']
+                return redirect(url_for('.authorize', **args))
+            else:
+                return redirect('/')
     else:
         return fa.response
 
@@ -523,6 +531,14 @@ def authorize(*args, **kwargs):
 
     user = current_user()
     if not user:
+        # Entry point when intervetion is requesting OAuth token, but
+        # the user has yet to authenticate via FB or otherwise.  Need
+        # to retain the request, and replay after Central Services login
+        # has completed.
+        current_app.logger.debug('Postponing oauth client authorization' +
+            ' till user authenticates with CS: ', str(request.args))
+        session['pending_authorize_args'] = request.args 
+
         return redirect('/')
     # See "hardwired" note in docstring above
     return True

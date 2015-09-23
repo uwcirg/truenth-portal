@@ -6,8 +6,8 @@
         </div>
 
         <div id="tnthTopLinks">
-            {% if username %}
             <div class="btn-group nav-userinfo">
+            {% if username %}
                 <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Welcome, {{ username }}
                     <img src="{{movember_profile}}" />
@@ -17,8 +17,16 @@
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                 </ul>
-            </div>
+            {% elif login_url %}
+                <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    Welcome
+                    <span class="fa fa-caret-down"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
+                </ul> 
             {% endif %}
+            </div>
             <a class="btn tnth-white" href="{{PORTAL}}" title="Return to TrueNTH Home">
                 <i class="fa fa-home fa-2x"></i>
             </a>

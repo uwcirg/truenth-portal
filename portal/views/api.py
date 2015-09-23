@@ -249,6 +249,20 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
+@api.route('/portal-wrapper-html/', methods=('OPTIONS',))
+@crossdomain(origin='*')
+def preflight_unprotected():
+    """CORS requires preflight headers
+
+    For in browser CORS requests, first respond to an OPTIONS request
+    including the necessary Access-Control headers.
+
+    Requires separate route for OPTIONS to avoid authorization tangles.
+
+    """
+    pass  # all work for OPTIONS done in crossdomain decorator
+
+
 @api.route('/portal-wrapper-html/', defaults={'username': None})
 @api.route('/portal-wrapper-html/<username>')
 def portal_wrapper_html(username):
@@ -302,7 +316,8 @@ def portal_wrapper_html(username):
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=username,
-        movember_profile=movember_profile
+        movember_profile=movember_profile,
+        login_url=request.args.get('login_url')
     )
     resp = make_response(html)
     resp.headers.add('Access-Control-Allow-Origin', '*')

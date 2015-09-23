@@ -24,7 +24,7 @@ def index():
             current_app.logger.debug("redirect to session[next]: %s",
                     session['next'])
             next_url = session['next']
-            session['next'] = None
+            del session['next']
             return redirect(next_url)
         return render_template('portal.html', user=user)
 
