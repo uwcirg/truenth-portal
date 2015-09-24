@@ -97,9 +97,14 @@ class Client(db.Model):
         current_app.logger.debug("POSTing event to %s",
                 self.callback_url)
         # NB - this is a BLOCKing call!
-        resp = requests.post(self.callback_url, data=formdata) 
-        current_app.logger.debug("POST complete with status %d",
-                resp.status_code)
+        try:
+            resp = requests.post(self.callback_url, data=formdata) 
+            current_app.logger.debug("POST complete with status %d",
+                    resp.status_code)
+        except requests.ConnectionError as e:
+            current_app.logger.error("Unable to connect to registered "
+                    "client callback @ %s", self.callback_url)
+            current_app.logger.exception(e)
 
 
     def validate_redirect_uri(self, redirect_uri):
