@@ -14,20 +14,14 @@
                 <div class="well lead-well">
                     <div class="row">
                         <div class="col-xs-12 col-sm-6">
-                            <h4>Central Services OAuth 2.0 Credentials </h4>
+                            <h4>Central Services OAuth 2.0 Client Applications </h4>
                             <ul>
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client.client_id }} </li> 
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client.client_secret }} </li> 
+                                {% for client in clients %}
+                                <a href="{{ url_for('.client_edit', client_id=client.client_id) }}">
+                                    <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client.client_id }} Site URL {{ client._redirect_uris }} </li>
+                                </a>
+                                {% endfor %}
                             </ul>
-                            <form action="/client/{{ client.client_id }}" method="post">
-                                <div class="form-group">
-                                    <label for="redirect_url">Application URL</label>
-                                    <input type="text" class="form-control" name="redirect_uri" id="redirect_url" size='200' value="{{ client._redirect_uris }}">
-                                    <label for="callback_url">Callback URL</label>
-                                    <input type="text" class="form-control" name="callback_url" id="callback_url" size='200' value="{{ client.callback_url }}">
-                                </div>
-                                <button type="submit" class="btn btn-tnth-primary">Update App Settings</button>
-                            </form>
                         </div>
                     </div>
                 </div>

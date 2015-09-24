@@ -330,14 +330,54 @@ def client_edit(client_id):
     if request.method == 'GET':
         return render_template('edit_client.html', client=client)
     callback_url = request.form.get('callback_url', None)
-    if callback_url:
+    if callback_url and callback_url != 'None':
         client.callback_url = callback_url
     redirect_uri = request.form.get('redirect_uri', None)
-    if redirect_uri:
+    if redirect_uri and redirect_uri != 'None':
         client.redirect_uri = redirect_uri
     db.session.add(client)
     db.session.commit()
     return render_template('review_client.html', client=client)
+
+
+@auth.route('/clients')
+@roles_required('patient')
+def clients_list():
+    """clients list
+
+    List all clients created by the authenticated user.
+    ---
+    tags:
+      - OAuth
+    operationId: clients_list
+    produces:
+      - text/html
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: clients_list_response
+          required:
+            - App ID
+            - Site URL
+          properties:
+            App ID:
+              type: string
+              description:
+                Identification unique to a Central Serivce application.
+                Pass as `client_id` in OAuth Authorization Code Grant
+                calls to obtain an authorization token
+            Site URL:
+              type: string
+              description:
+                Application's site Origin or URL.
+                Required to include the origin of OAuth callbacks
+                and site origins making in-browser requests via CORS
+
+    """
+    user = current_user()
+    clients = Client.query.filter_by(user_id=user.id).all()
+    return render_template('clients_list.html', clients=clients)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
