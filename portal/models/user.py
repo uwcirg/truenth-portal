@@ -177,3 +177,10 @@ class UserRoles(db.Model):
         ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id',
         ondelete='CASCADE'))
+
+
+def add_static_data(db):
+    """Seed database with default static data"""
+    db.session.add(Role(name='patient'))
+    db.session.add(Role(name='admin'))
+    db.session.commit()

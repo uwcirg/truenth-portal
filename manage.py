@@ -8,7 +8,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
 from portal.extensions import db, ConfigServer
-from portal.models.user import User, Role, UserRoles
+from portal.models.user import User, Role, UserRoles, add_static_data
 
 app = create_app()
 manager = Manager(app)
@@ -24,15 +24,12 @@ def initdb():
 
     db.drop_all()
     db.create_all()
+    add_static_data(db)
 
 
 @manager.command
 def seed():
     """Seed database with required data"""
-    db.session.add(Role(name='patient'))
-    db.session.add(Role(name='admin'))
-    db.session.commit()
-
     admin = db.session.query(Role.id).filter(Role.name=='admin').first()
     patient = db.session.query(Role.id).filter(Role.name=='patient').first()
 

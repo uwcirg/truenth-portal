@@ -68,6 +68,15 @@ def login():
     token are retained in the session for subsequent use.
 
     """
+    # Unittesting backdoor - see tests.login() for use
+    if current_app.config['TESTING']:
+        id = request.args.get('user_id')
+        assert (int(id) < 10)  # allowed for test users only!
+        session['id'] = id
+        user = current_user()
+        login_user(user)
+        return redirect('/')
+
     user = current_user()
     if user:
         return redirect('/')

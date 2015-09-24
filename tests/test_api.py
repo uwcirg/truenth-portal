@@ -9,10 +9,8 @@ from portal.models.fhir import CodeableConcept, ValueQuantity
 class TestAPI(TestCase):
 
     def test_demographicsGET(self):
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['id'] = TEST_USER_ID
-            rv = c.get('/api/demographics')
+        self.login()
+        rv = self.app.get('/api/demographics')
 
         fhir = json.loads(rv.data)
         self.assertEquals(len(fhir['identifier']), 2)
@@ -38,12 +36,11 @@ class TestAPI(TestCase):
                     "system": "phone",
                     "value": "867-5309"
                     }]}
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['id'] = TEST_USER_ID
-            rv = c.put('/api/demographics/%s' % TEST_USER_ID,
-                    content_type='application/json',
-                    data=json.dumps(data))
+
+        self.login()
+        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['birthDate'], dob)
@@ -65,10 +62,8 @@ class TestAPI(TestCase):
             observation_id=observation.id))
         db.session.commit()
 
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['id'] = TEST_USER_ID
-            rv = c.get('/api/clinical/%s' % TEST_USER_ID)
+        self.login()
+        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
 
         clinical_data = json.loads(rv.data)
         self.assertEquals('Gleason score',
@@ -97,12 +92,10 @@ class TestAPI(TestCase):
                 "issued": "2015-08-04T13:27:00+01:00"
                 }
 
-        with self.client as c:
-            with c.session_transaction() as sess:
-                sess['id'] = TEST_USER_ID
-            rv = c.post('/api/clinical/%s' % TEST_USER_ID,
-                    content_type='application/json',
-                    data=json.dumps(data))
+        self.login()
+        rv = self.app.post('/api/clinical/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['message'], "ok")
