@@ -185,7 +185,7 @@ def logout():
 
 
 @auth.route('/client', methods=('GET', 'POST'))
-@roles_required('patient')
+@roles_required('application_developer')
 def client():
     """client registration
 
@@ -242,7 +242,7 @@ def client():
     """
     user = current_user()
     if request.method == 'GET':
-        return render_template('register_client.html')
+        return render_template('client_add.html')
     redirect_uri = request.form.get('redirect_uri', None)
     item = Client(
         client_id=gen_salt(40),
@@ -253,11 +253,11 @@ def client():
     )
     db.session.add(item)
     db.session.commit()
-    return render_template('review_client.html', client=item)
+    return redirect(url_for('.client_edit', client_id=item.client_id))
 
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
-@roles_required('patient')
+@roles_required('application_developer')
 def client_edit(client_id):
     """client edit
 
@@ -328,20 +328,24 @@ def client_edit(client_id):
     user = current_user()
     current_user().check_role(permission='edit', other_id=client.user_id)
     if request.method == 'GET':
-        return render_template('edit_client.html', client=client)
-    callback_url = request.form.get('callback_url', None)
-    if callback_url and callback_url != 'None':
-        client.callback_url = callback_url
-    redirect_uri = request.form.get('redirect_uri', None)
-    if redirect_uri and redirect_uri != 'None':
-        client.redirect_uri = redirect_uri
-    db.session.add(client)
+        return render_template('client_edit.html', client=client)
+
+    if request.form.get('delete'):
+        db.session.delete(client)
+    else:
+        callback_url = request.form.get('callback_url', None)
+        if callback_url and callback_url != 'None':
+            client.callback_url = callback_url
+        redirect_uri = request.form.get('redirect_uri', None)
+        if redirect_uri and redirect_uri != 'None':
+            client._redirect_uris = redirect_uri
+        db.session.add(client)
     db.session.commit()
-    return render_template('review_client.html', client=client)
+    return redirect(url_for('.clients_list'))
 
 
 @auth.route('/clients')
-@roles_required('patient')
+@roles_required('application_developer')
 def clients_list():
     """clients list
 

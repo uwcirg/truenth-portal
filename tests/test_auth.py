@@ -15,6 +15,7 @@ class TestAuth(TestCase):
                 client_secret='tc_secret', user_id=TEST_USER_ID)
         db.session.add(client)
         db.session.commit()
+        self.promote_user(role_name='application_developer')
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com'))

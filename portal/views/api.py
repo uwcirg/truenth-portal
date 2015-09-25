@@ -319,11 +319,14 @@ def portal_wrapper_html(username):
 
         if not username:
             username = ' '.join((user.first_name, user.last_name))
+    else:
+        user = None
 
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=username,
+        user=user,
         movember_profile=movember_profile,
         login_url=request.args.get('login_url')
     )
@@ -386,6 +389,7 @@ def protected_portal_wrapper_html():
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=user.username,
+        user=user,
         movember_profile=movember_profile
     )
     return make_response(html)

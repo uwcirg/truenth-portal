@@ -8,6 +8,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
 from portal.extensions import db, ConfigServer
+from portal.models.auth import Client
 from portal.models.user import User, Role, UserRoles, add_static_data
 
 app = create_app()
@@ -30,13 +31,21 @@ def initdb():
 @manager.command
 def seed():
     """Seed database with required data"""
-    admin = db.session.query(Role.id).filter(Role.name=='admin').first()
-    patient = db.session.query(Role.id).filter(Role.name=='patient').first()
+    app_dev = db.session.query(Role.id).\
+            filter(Role.name=='application_developer').first()
+    if not app_dev:
+        db.session.add(Role(name='application_developer'))
+        db.session.commit()
 
-    for u in User.query.all():
-        if u.email == 'bob25mary@gmail.com':
-            db.session.add(UserRoles(user_id=u.id, role_id=admin))
-        db.session.add(UserRoles(user_id=u.id, role_id=patient))
+    u_r = {}
+    for c in Client.query.all():
+        existing = UserRoles.query.filter_by(user_id=c.user_id,
+                role_id=app_dev).first()
+        if not existing:
+            u_r[c.user_id] = app_dev
+
+    for u, r in u_r.items():
+        db.session.add(UserRoles(user_id=u, role_id=r))
     db.session.commit()
 
 

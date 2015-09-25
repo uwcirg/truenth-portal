@@ -35,11 +35,18 @@ class TestCase(Base):
         """Push minimal test data in test database"""
         test_user = User(username=TEST_USERNAME, id=TEST_USER_ID,
                 first_name=FIRST_NAME, last_name=LAST_NAME)
-        patient = db.session.query(Role.id).\
-                filter(Role.name=='patient').first()[0]
 
         db.session.add(test_user)
-        db.session.add(UserRoles(user_id=TEST_USER_ID, role_id=patient))
+        db.session.commit()
+        self.promote_user(user_id=test_user.id, role_name='patient')
+
+
+    def promote_user(self, user_id=TEST_USER_ID, role_name=None):
+        """Bless a user with role needed for a test"""
+        assert (role_name)
+        role_id = db.session.query(Role.id).\
+                filter(Role.name==role_name).first()[0]
+        db.session.add(UserRoles(user_id=user_id, role_id=role_id))
         db.session.commit()
 
 

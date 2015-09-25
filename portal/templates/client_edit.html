@@ -26,8 +26,13 @@
                                     <label for="callback_url">Callback URL</label>
                                     <input type="text" class="form-control" name="callback_url" id="callback_url" size='200' value="{{ client.callback_url }}">
                                 </div>
-                                <button type="submit" class="btn btn-tnth-primary">Update App Settings</button>
+                                <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button>
+                                <button type="submit" name="delete" value="delete" class="btn btn-tnth-primary">Delete Application</button>
                             </form>
+                            <ul>
+                                <li style="margin-bottom: 0.25em; font-size: 15px">The <b>Application URL</b> may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.</li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">Provide a <b>Callback URL</b> to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined</li> 
+                            </ul>
                         </div>
                     </div>
                 </div>
