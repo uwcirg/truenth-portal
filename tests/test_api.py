@@ -99,3 +99,24 @@ class TestAPI(TestCase):
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['message'], "ok")
+
+    def test_default_role(self):
+        self.login()
+        rv = self.app.get('/api/roles/{0}'.format(TEST_USER_ID))
+
+        result_roles = json.loads(rv.data)
+        self.assertEquals(len(result_roles['roles']), 1)
+        self.assertEquals(result_roles['roles'][0]['name'], 'patient')
+
+    def test_unauth_role(self):
+        self.login()
+        rv = self.app.get('/api/roles/66')
+
+        self.assertEquals(rv.status_code, 401)
+
+    def test_all_roles(self):
+        self.login()
+        rv = self.app.get('/api/roles')
+
+        result_roles = json.loads(rv.data)
+        self.assertEquals(len(result_roles['roles']), 3)

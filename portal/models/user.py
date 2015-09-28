@@ -170,6 +170,7 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.Text)
 
 
 class UserRoles(db.Model):
@@ -185,7 +186,12 @@ class UserRoles(db.Model):
 
 def add_static_data(db):
     """Seed database with default static data"""
-    db.session.add(Role(name='patient'))
-    db.session.add(Role(name='admin'))
-    db.session.add(Role(name='application_developer'))
+    db.session.add(Role(name='patient',
+            description='Default role for all patients, may only view '
+            'their own patient data'))
+    db.session.add(Role(name='admin',
+            description='Administrator privledges, i.e. carte blanche'))
+    db.session.add(Role(name='application_developer',
+            description='Gives users permission to add/view/edit '
+            'Central Services applications'))
     db.session.commit()

@@ -2,7 +2,7 @@
 from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
 
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, Role
 from ..extensions import oauth
 from .crossdomain import crossdomain
 
@@ -393,3 +393,55 @@ def protected_portal_wrapper_html():
         movember_profile=movember_profile
     )
     return make_response(html)
+
+
+@api.route('/roles', defaults={'user_id': None})
+@api.route('/roles/<int:user_id>')
+@oauth.require_oauth()
+def roles(user_id):
+    """Returns simple JSON defining system or user roles
+
+    Returns a list of all known roles.  Users belong to one or more
+    roles used to control authorization.  If a user_id is provided,
+    only the list of roles that user belongs to is returned.
+    ---
+    tags:
+      - User
+    operationId: getRoles
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns a list of all known roles.  Users belong to one or more
+          roles used to control authorization.  If a user_id is provided,
+          only the list of roles that user belongs to is returned.
+        schema:
+          id: roles
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Role name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user_id:
+        if user.id != user_id:
+            current_user().check_role(permission='view', other_id=user_id)
+            user = get_user(user_id)
+        roles = user.roles
+    else:
+        roles = Role.query.all()
+    results = [{'name': r.name, 'description': r.description} for r in roles]
+    return jsonify(roles=results)
