@@ -1,14 +1,18 @@
 """Unit test module for auth"""
-import json
-from flask.ext.login import login_user, logout_user
-from tests import TestCase, LAST_NAME, FIRST_NAME, TEST_USER_ID
+from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.auth import Client
 
 class TestAuth(TestCase):
+    """Auth API tests"""
+
+    def test_nouser_logout(self):
+        """Confirm logout works without a valid user"""
+        rv = self.app.get('/logout')
 
     def test_client_edit(self):
+        """Test editing a client application"""
         # Generate a minimal client belonging to test user
         client_id = 'test_client'
         client = Client(client_id=client_id,

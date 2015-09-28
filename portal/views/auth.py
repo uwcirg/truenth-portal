@@ -155,32 +155,35 @@ def logout():
     clearing the browser session.
 
     """
-    user_id = session['id']
-    current_app.logger.debug("Logout user.id %d", user_id)
+    user_id = None
+    if 'id' in session:
+        user_id = session['id']
+        current_app.logger.debug("Logout user.id %d", user_id)
 
-    delete_facebook_authorization = False  # Fencing out for now
-    ap = AuthProvider.query.filter_by(provider='facebook',
-            user_id=user_id).first()
-    if ap and delete_facebook_authorization:
-        headers = {'Authorization':
-            'Bearer {0}'.format(session['remote_token'])}
-        url = "https://graph.facebook.com/{0}/permissions".\
-            format(ap.provider_id)
-        requests.delete(url, headers=headers)
+        delete_facebook_authorization = False  # Fencing out for now
+        ap = AuthProvider.query.filter_by(provider='facebook',
+                user_id=user_id).first()
+        if ap and delete_facebook_authorization:
+            headers = {'Authorization':
+                'Bearer {0}'.format(session['remote_token'])}
+            url = "https://graph.facebook.com/{0}/permissions".\
+                format(ap.provider_id)
+            requests.delete(url, headers=headers)
 
     logout_user()
     session.clear()
 
     # Inform any client apps of this event.  Look for tokens this
     # user obtained, and notify those clients of the event
-    tokens = Token.query.filter_by(user_id=user_id).all()
-    for token in tokens:
-        client = Client.query.filter_by(client_id=token.client_id).first()
-        client.notify({'event':'logout', 'user_id':user_id})
+    if user_id:
+        tokens = Token.query.filter_by(user_id=user_id).all()
+        for token in tokens:
+            client = Client.query.filter_by(client_id=token.client_id).first()
+            client.notify({'event':'logout', 'user_id':user_id})
 
-        # Invalidate the access token by deletion
-        db.session.delete(token)
-    db.session.commit()
+            # Invalidate the access token by deletion
+            db.session.delete(token)
+        db.session.commit()
     return redirect('/')
 
 
