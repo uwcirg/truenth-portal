@@ -20,6 +20,5 @@ class TestAuth(TestCase):
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com'))
 
-        self.assertEquals(rv.status_code, 200)
         client = Client.query.get('test_client')
         self.assertEquals(client.callback_url, 'http://tryme.com')
