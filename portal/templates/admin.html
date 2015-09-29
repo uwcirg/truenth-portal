@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block body %}
+    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
+
+    <!-- topNav loads here -->
+    <div id="mainNav">
+    </div>
+      
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1 col-md-12">
+                <div class="well lead-well">
+                    <h3>User Administration</h3>
+
+                    <p id="profileIntro">Select any user to view details or make changes.</p>
+                    {% for user in users %}
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-xs-2">
+                                    <a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.username }}</a>
+                                </div>
+                                <div class="col-xs-2">
+                                    <p id="name">({{ user.last_name if user.last_name }}, {{ user.first_name if user.first_name }})</p>
+                                </div>
+                                <div class="col-xs-3">
+                                    <p id="email">&lt;{{ user.email if user.email }}&gt;</p>
+                                </div>
+                                <div class="col-xs-1"><b>Roles:</b></div>
+                                <div class="col-xs-3">
+                                    <p id="roles">{{ user.rolelist }} </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>        
+    </div>
+    
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
+PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+
+$(document).ready(function(){
+
+    $('[data-toggle="popover"]').popover();
+
+    equalHeightBoxes("lead-well");
+    $(window).resize(function() {
+        // Fire resize if browser window size changes. Delay by 200ms to avoid
+        // too many firings as user drags browser window
+        clearTimeout(this.id);
+        this.id = setTimeout(equalHeightBoxes("lead-well"), 200);
+    });
+});
+</script>
+{% endblock %}

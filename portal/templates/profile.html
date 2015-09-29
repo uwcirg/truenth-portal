@@ -11,7 +11,7 @@
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1 col-md-12">
                 <div class="well lead-well">
-                    <h3>My Profile</h3>
+                    <h3>Profile for {{ user.username }}</h3>
                     
                     <div id="loadingIndicator" class="loading-indicator">
                         <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
@@ -170,7 +170,7 @@ $(document).ready(function(){
             $("#saveMsg").hide();
             $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
             setTimeout(function(){
-                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a>.");
+                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
                 $("#profileForm").removeClass("loading");
                 $("#loadingIndicator").fadeOut();
             }, 1200);
@@ -240,7 +240,7 @@ $(document).ready(function(){
         /** Send the AJAX **/
         $.ajax ({
             type: "POST",
-            url: 'api/demographics/{{ user.id }}',
+            url: '/api/demographics/{{ user.id }}',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             data: JSON.stringify(demoArray)

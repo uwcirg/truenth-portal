@@ -17,7 +17,7 @@ from portal.models.user import User, Role, UserRoles, add_static_data
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
 
-TEST_USER_ID = '5'
+TEST_USER_ID = 1
 TEST_USERNAME = 'testy'
 FIRST_NAME = 'First'
 LAST_NAME = 'Last'
@@ -33,13 +33,23 @@ class TestCase(Base):
 
     def init_data(self):
         """Push minimal test data in test database"""
-        test_user = User(username=TEST_USERNAME, id=TEST_USER_ID,
+        test_user_id = self.add_user(username=TEST_USERNAME,
                 first_name=FIRST_NAME, last_name=LAST_NAME)
+        assert(test_user_id == TEST_USER_ID)
+
+    def add_user(self, username, first_name="", last_name=""):
+        """Create a user with default 'patient' role
+        
+        Returns the newly created user id
+
+        """
+        test_user = User(username=username, first_name=first_name,
+                last_name=last_name)
 
         db.session.add(test_user)
         db.session.commit()
         self.promote_user(user_id=test_user.id, role_name='patient')
-
+        return test_user.id
 
     def promote_user(self, user_id=TEST_USER_ID, role_name=None):
         """Bless a user with role needed for a test"""
@@ -48,7 +58,6 @@ class TestCase(Base):
                 filter(Role.name==role_name).first()[0]
         db.session.add(UserRoles(user_id=user_id, role_id=role_id))
         db.session.commit()
-
 
     def login(self, user_id=TEST_USER_ID):
         """Bless the self.app session with a logged in user
@@ -61,7 +70,6 @@ class TestCase(Base):
         """
         return self.app.get('/login?user_id={0}'.format(user_id),
                 follow_redirects=True)
-
 
     def setUp(self):
         """Reset all tables before testing."""

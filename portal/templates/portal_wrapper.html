@@ -20,6 +20,10 @@
 
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
                     {% endif %}
+                    {% if user and user.has_roles('admin') %}
+
+                    <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                    {% endif %}
                 </ul>
             {% elif login_url %}
                 <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">

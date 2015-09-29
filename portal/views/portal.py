@@ -2,9 +2,10 @@
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import redirect, request, session
+from flask.ext.user import roles_required
 from flask_swagger import swagger
 
-from ..models.user import current_user
+from ..models.user import current_user, get_user, User
 from ..extensions import oauth
 from .crossdomain import crossdomain
 
@@ -38,11 +39,28 @@ def index():
     return render_template('index.html')
 
 
-@portal.route('/profile')
+@portal.route('/admin')
 @oauth.require_oauth()
-def profile():
+@roles_required('admin')
+def admin():
+    """user admin view function"""
+    # can't do list comprehension in template - prepopulate a 'rolelist'
+    users = User.query.all()
+    for u in users:
+        u.rolelist = ', '.join([r.name for r in u.roles])
+    return render_template('admin.html', users=users)
+
+
+@portal.route('/profile', defaults={'user_id': None})
+@portal.route('/profile/<int:user_id>')
+@oauth.require_oauth()
+def profile(user_id):
     """profile view function"""
-    return render_template('profile.html', user=current_user())
+    user = current_user()
+    if user_id:
+        user.check_role("edit", other_id=user_id)
+        user = get_user(user_id)
+    return render_template('profile.html', user=user)
 
 
 @portal.route('/terms-of-use')
