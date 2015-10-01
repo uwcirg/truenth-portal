@@ -56,3 +56,9 @@ class TestPortal(TestCase):
         self.assertTrue(rv.data.find(sent_at.strftime('%m/%d/%Y %H:%M:%S'))
             > 0)
         self.assertTrue(rv.data.find('one@ex1.com two@two.org') > 0)
+
+    def test_missing_message(self):
+        """Request to view non existant message should 404"""
+        self.login()
+        rv = self.app.get('/invite/404')
+        self.assertEquals(rv.status_code, 404)

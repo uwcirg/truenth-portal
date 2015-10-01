@@ -1,7 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
-from flask import redirect, request, session, url_for
+from flask import abort, redirect, request, session, url_for
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 
