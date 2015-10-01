@@ -8,6 +8,7 @@ class BaseConfig(object):
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     DEBUG = False
+    DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     LOG_FOLDER = os.path.join('/var/log', __package__)
     LOG_LEVEL = 'DEBUG'
     TESTING = False

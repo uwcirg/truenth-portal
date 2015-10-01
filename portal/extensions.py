@@ -97,6 +97,12 @@ fa = FlaskAuthomatic(
     debug=True,
 )
 
+
+# Flask-Mail is used for email communication
+from flask.ext.mail import Mail
+mail = Mail()
+
+
 # Flask-Script 2.0.5 does not read host and port specified in SERVER_NAME, this fixes that
 # Bug: https://github.com/smurfix/flask-script/blob/7dfaf2898d648761632dc5b3ba6654edff67ec57/flask_script/commands.py#L343
 from flask.ext.script import Server

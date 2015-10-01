@@ -1,7 +1,10 @@
 """Unit test module for portal views"""
-from tests import TestCase
+from datetime import datetime
+from tests import TestCase, TEST_USER_ID
 
+from portal.extensions import db
 from portal.models.user import User
+from portal.models.message import EmailInvite
 
 
 class TestPortal(TestCase):
@@ -22,3 +25,34 @@ class TestPortal(TestCase):
 
         # Should at least see an entry per user in system
         self.assertEquals(rv.data.count('id="name"'), User.query.count())
+
+    def test_invite(self):
+        """Test email invite form"""
+        test_user = User.query.get(TEST_USER_ID)
+        test_user.email = 'pbugni@uw.edu'
+        db.session.add(test_user)
+        db.session.commit()
+
+        self.login()
+        postdata = { 'subject': 'unittest subject',
+                'recipients': 'bugni@yahoo.com pbugni@uw.edu',
+                'body': "Ode to joy" }
+        rv = self.app.post('/invite', data=postdata, follow_redirects=True)
+        self.assertTrue("Email Invite Sent" in rv.data)
+
+    def test_message_sent(self):
+        """Email invites - test view for sent messages"""
+        sent_at = datetime.strptime("2000/01/01 12:31:00",
+                "%Y/%m/%d %H:%M:%S")
+        message = EmailInvite(subject='a subject', user_id=TEST_USER_ID,
+                sender="testuser@email.com",
+                body='Welcome to testing', sent_at=sent_at,
+                recipients="one@ex1.com two@two.org")
+        db.session.add(message)
+        db.session.commit()
+
+        self.login()
+        rv = self.app.get('/invite/{0}'.format(message.id))
+        self.assertTrue(rv.data.find(sent_at.strftime('%m/%d/%Y %H:%M:%S'))
+            > 0)
+        self.assertTrue(rv.data.find('one@ex1.com two@two.org') > 0)

@@ -6,7 +6,7 @@ import sys
 from flask import Flask
 
 from .config import DefaultConfig
-from .extensions import db, oauth, user_manager
+from .extensions import db, mail, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
@@ -48,6 +48,9 @@ def configure_extensions(app):
 
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
+
+    # flask-mail - Email communication
+    mail.init_app(app)
 
 
 def configure_blueprints(app, blueprints):

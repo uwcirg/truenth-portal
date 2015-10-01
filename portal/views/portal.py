@@ -1,12 +1,13 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
-from flask import redirect, request, session
+from flask import redirect, request, session, url_for
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 
+from ..models.message import EmailInvite
 from ..models.user import current_user, get_user, User
-from ..extensions import oauth
+from ..extensions import db, oauth
 from .crossdomain import crossdomain
 
 
@@ -49,6 +50,39 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users)
+
+
+@portal.route('/invite', methods=('GET', 'POST'))
+@oauth.require_oauth()
+@roles_required('patient')
+def invite():
+    """invite other users"""
+    if request.method == 'GET': 
+        return render_template('invite.html')
+
+    subject = request.form.get('subject')
+    body = request.form.get('body')
+    recipients = request.form.get('recipients')
+    user = current_user()
+    email = EmailInvite(subject=subject, body=body,
+            recipients=recipients, sender=user.email,
+            user_id=user.id)
+    email.send_message()
+    db.session.add(email)
+    db.session.commit()
+    return redirect(url_for('.invite_sent', message_id=email.id))
+
+
+@portal.route('/invite/<int:message_id>')
+@oauth.require_oauth()
+@roles_required('patient')
+def invite_sent(message_id):
+    """show invite sent"""
+    message = EmailInvite.query.get(message_id)
+    if not message:
+        abort (404, "Message not found")
+    current_user().check_role('view', other_id=message.user_id)
+    return render_template('invite_sent.html', message=message)
 
 
 @portal.route('/profile', defaults={'user_id': None})

@@ -17,12 +17,13 @@
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                     {% if user and user.has_roles('application_developer') %}
-
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
                     {% endif %}
                     {% if user and user.has_roles('admin') %}
-
                     <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                    {% endif %}
+                    {% if user %}
+                    <li><a href="{{PORTAL}}/invite">Send an Invite</a></li>
                     {% endif %}
                 </ul>
             {% elif login_url %}
