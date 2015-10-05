@@ -280,7 +280,7 @@ def portal_wrapper_html(username):
       - text/html
     parameters:
       - name: login_url
-        in: path
+        in: query
         description:
           Location to direct login requests.  Typically an entry
           point on the intervention, to initiate OAuth dance with
