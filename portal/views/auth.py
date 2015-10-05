@@ -477,24 +477,20 @@ def access_token():
               description:
                 The access token to include in the Authorization header
                 for protected API use.
-              required: true
             token_type:
               type: string
               description: Type of access token, always 'Bearer'
-              required: true
             expires_in:
               type: integer
               format: int64
               description:
                 Number of seconds for which the access token will
                 remain valid
-              required: true
             refresh_token:
               type: string
               description:
                 Use to refresh an access token, in place of the
                 authorizion token.
-              required: true
             scope:
               type: string
               description: The authorized scope.
