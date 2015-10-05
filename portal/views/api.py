@@ -68,7 +68,7 @@ def demographics(patient_id):
         in: path
         description:
           Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: false
+        required: true
         type: integer
         format: int64
     responses:
@@ -156,7 +156,7 @@ def clinical(patient_id):
         in: path
         description:
           Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: false
+        required: true
         type: integer
         format: int64
     responses:
@@ -206,7 +206,7 @@ def clinical_set(patient_id):
         in: path
         description:
           Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: false
+        required: true
         type: integer
         format: int64
       - in: body
@@ -291,7 +291,7 @@ def portal_wrapper_html(username):
         in: path
         description:
           Optional username, used to personalize the header.
-        required: false
+        required: true
         type: string
     responses:
       200:
