@@ -248,6 +248,159 @@ def clinical_set(patient_id):
         abort(code, result)
     return jsonify(message=result)
 
+@api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def assessment_set(patient_id):
+    """Add a questionnaire response to a patient's record
+
+    Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
+    resource type.
+    ---
+    operationId: addQuestionnaireResponse
+    tags:
+      - QuestionnaireResponse
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: QuestionnaireResponse
+          description: A patient's responses to a questionnaire (a set of instruments, some standardized, some not), and metadata about the presentation and context of the assessment session (date, etc).
+          externalDocs:
+            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse.html
+          required:
+            - status
+          properties:
+            status:
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.status
+              description: The lifecycle status of the questionnaire response as a whole
+              type: string
+              enum:
+                - in progress
+                - completed
+            subject:
+              type: object
+              description: The subject of the questionnaire response
+              $ref: "#/definitions/Patient"
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject
+            author:
+              type: object
+              description: Person who received the answers to the questions in the QuestionnaireResponse and recorded them in the system.
+              $ref: "#/definitions/Patient"
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.author
+            authored:
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.authored
+              description: The datetime this resource was last updated
+              type: string
+              format: date-time
+            source:
+              type: object
+              description: The person who answered the questions about the subject
+              $ref: "#/definitions/Patient"
+              externalDocs:
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.source
+            group:
+              description: A group of related questions or sub-groups. May only contain either questions or groups
+              schema:
+                id: group
+                externalDocs:
+                  url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group
+                properties:
+                  group:
+                    description: Subgroup for questions or additional nested groups
+                    $ref: "#/definitions/group"
+                  title:
+                    type: string
+                    description: Group name
+                    externalDocs:
+                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.title
+                  text:
+                    type: string
+                    description: Additional text for this group
+                    externalDocs:
+                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.text
+                  question:
+                    description: Set of questions within this group. The order of questions within the group is relevant.
+                    type: array
+                    externalDocs:
+                      url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question
+                    items:
+                      description: An individual question and related attributes
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          description: Question text
+                        answer:
+                          type: array
+                          description: The respondent's answer(s) to the question
+                          externalDocs:
+                            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer
+                          items:
+                            description: An individual answer to a question and related attributes. May only contain a single `value[x]` attribute
+                            type: object
+                            externalDocs:
+                              url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.value_x_
+                            properties:
+                              valueBoolean:
+                                type: boolean
+                                description: Boolean value answer to a question
+                              valueDecimal:
+                                type: number
+                                description: Decimal value answer to a question
+                              valueInteger:
+                                type: integer
+                                description: Integer value answer to a question
+                              valueDate:
+                                type: string
+                                format: date
+                                description: Date value answer to a question
+                              valueDateTime:
+                                type: string
+                                format: date-time
+                                description: Datetime value answer to a question
+                              valueInstant:
+                                type: string
+                                format: date-time
+                                description: Instant value answer to a question
+                              valueTime:
+                                type: string
+                                description: Time value answer to a question
+                              valueString:
+                                type: string
+                                description: String value answer to a question
+                              valueUri:
+                                type: string
+                                description: URI value answer to a question
+                              valueAttachment:
+                                type: object
+                                description: Attachment value answer to a question
+                              valueCoding:
+                                type: object
+                                description: Coding value answer to a question
+                              valueQuantity:
+                                type: object
+                                description: Quantity value answer to a question
+                              valueReference:
+                                type: object
+                                description: Reference value answer to a question
+                              group:
+                                $ref: "#/definitions/group"
+                                description: Group for "sub-questions", questions which normally appear when certain answers are given and which collect additional details.
+                                externalDocs:
+                                  url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.group
+    responses:
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+    """
+    return jsonify(message={'test':True})
 
 @api.route('/portal-wrapper-html/', methods=('OPTIONS',))
 @crossdomain(origin='*')
