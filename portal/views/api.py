@@ -463,6 +463,8 @@ def portal_wrapper_html(username):
         current_app.config['SERVER_NAME'],
         url_for('static', filename='img/movember_profile_thumb.png'),
     ))
+    movember_email = ''
+    movember_id = ''
 
     # workarounds till we can call protected_portal_wrapper from portal
     user = current_user()
@@ -472,6 +474,9 @@ def portal_wrapper_html(username):
 
         if user.email:
             movember_email = user.email
+
+        if user.id:
+            movember_id = user.id
 
         if not username:
             username = ' '.join((user.first_name, user.last_name))
@@ -485,6 +490,7 @@ def portal_wrapper_html(username):
         user=user,
         movember_profile=movember_profile,
         movember_email=movember_email,
+        movember_id=movember_id,
         login_url=request.args.get('login_url')
     )
     resp = make_response(html)
@@ -537,6 +543,8 @@ def protected_portal_wrapper_html():
         current_app.config['SERVER_NAME'],
         url_for('static', filename='img/movember_profile_thumb.png'),
     ))
+    movember_email = ''
+    movember_id = ''
 
     user = current_user()
     if user.image_url:
@@ -545,13 +553,17 @@ def protected_portal_wrapper_html():
     if user.email:
         movember_email = user.email
 
+    if user.id:
+        movember_id = user.id
+
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=user.username,
         user=user,
         movember_profile=movember_profile,
-        movember_email=movember_email
+        movember_email=movember_email,
+        movember_id=movember_id
     )
     return make_response(html)
 
