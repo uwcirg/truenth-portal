@@ -470,6 +470,9 @@ def portal_wrapper_html(username):
         if user.image_url:
             movember_profile = user.image_url
 
+        if user.email:
+            movember_email = user.email
+
         if not username:
             username = ' '.join((user.first_name, user.last_name))
     else:
@@ -481,6 +484,7 @@ def portal_wrapper_html(username):
         username=username,
         user=user,
         movember_profile=movember_profile,
+        movember_email=movember_email,
         login_url=request.args.get('login_url')
     )
     resp = make_response(html)
@@ -538,12 +542,16 @@ def protected_portal_wrapper_html():
     if user.image_url:
         movember_profile = user.image_url
 
+    if user.email:
+        movember_email = user.email
+
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         username=user.username,
         user=user,
-        movember_profile=movember_profile
+        movember_profile=movember_profile,
+        movember_email=movember_email
     )
     return make_response(html)
 
