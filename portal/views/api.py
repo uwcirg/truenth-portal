@@ -437,7 +437,8 @@ def portal_wrapper_html(username):
         description:
           Location to direct login requests.  Typically an entry
           point on the intervention, to initiate OAuth dance with
-          Central Services.
+          Central Services.  Inclusion of this parameter affects
+          the apperance of a "login" option in the portal menu.
         required: false
         type: string
       - name: username
@@ -613,8 +614,9 @@ def roles(user_id):
         if user.id != user_id:
             current_user().check_role(permission='view', other_id=user_id)
             user = get_user(user_id)
-        roles = user.roles
+        use_roles = user.roles
     else:
-        roles = Role.query.all()
-    results = [{'name': r.name, 'description': r.description} for r in roles]
+        use_roles = Role.query.all()
+    results = [{'name': r.name, 'description': r.description}
+            for r in use_roles]
     return jsonify(roles=results)
