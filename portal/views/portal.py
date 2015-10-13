@@ -57,7 +57,7 @@ def admin():
 @roles_required('patient')
 def invite():
     """invite other users"""
-    if request.method == 'GET': 
+    if request.method == 'GET':
         return render_template('invite.html')
 
     subject = request.form.get('subject')
@@ -80,7 +80,7 @@ def invite_sent(message_id):
     """show invite sent"""
     message = EmailInvite.query.get(message_id)
     if not message:
-        abort (404, "Message not found")
+        abort(404, "Message not found")
     current_user().check_role('view', other_id=message.user_id)
     return render_template('invite_sent.html', message=message)
 
