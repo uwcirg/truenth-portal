@@ -98,7 +98,7 @@ class Client(db.Model):
                 self.callback_url)
         # NB - this is a BLOCKing call!
         try:
-            resp = requests.post(self.callback_url, data=formdata) 
+            resp = requests.post(self.callback_url, data=formdata)
             current_app.logger.debug("POST complete with status %d",
                     resp.status_code)
         except requests.ConnectionError as e:
@@ -112,7 +112,7 @@ class Client(db.Model):
 
         The RFC requires exact match on the redirect_uri.  In practice
         this is too great of a burden for the interventions.  Make
-        sure it's from the same scheme:://host:port the client 
+        sure it's from the same scheme:://host:port the client
         registered with
 
         http://tools.ietf.org/html/rfc6749#section-4.1.3
@@ -163,7 +163,7 @@ class Grant(db.Model):
 
         The RFC requires exact match on the redirect_uri.  In practice
         this is too great of a burden for the interventions.  Make
-        sure it's from the same scheme:://host:port the client 
+        sure it's from the same scheme:://host:port the client
         registered with
 
         http://tools.ietf.org/html/rfc6749#section-4.1.3
