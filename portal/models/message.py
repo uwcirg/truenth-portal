@@ -2,8 +2,18 @@
 from datetime import date, datetime
 from flask import current_app
 from flask.ext.mail import Message
+from flask.ext.mail import email_dispatched
 
 from ..extensions import db, mail
+
+
+def log_message(message, app):
+    """Configured to handle signals on email_dispatched - log the event"""
+    app.logger.debug("Message sent; To: {0} Subj: {1}".\
+            format(message.recipients, message.subject))
+
+
+email_dispatched.connect(log_message)
 
 
 class EmailInvite(db.Model):
