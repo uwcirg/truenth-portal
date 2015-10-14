@@ -13,7 +13,7 @@ from flask.ext.user import roles_required
 from werkzeug.security import gen_salt
 
 from ..models.auth import AuthProvider, Client, Token
-from ..models.user import current_user, User, Role, UserRoles
+from ..models.user import add_authomatic_user, current_user, User
 from ..extensions import authomatic, db, oauth
 
 auth = Blueprint('auth', __name__)
@@ -68,21 +68,34 @@ def login(provider_name):
     token are retained in the session for subsequent use.
 
     """
-    # Unittesting backdoor - see tests.login() for use
-    if provider_name == 'TESTING' and current_app.config['TESTING']:
-        user_id = request.args.get('user_id')
+    def testing_backdoor(user_id):
+        "Unittesting backdoor - see tests.login() for use"
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
         user = current_user()
         login_user(user)
         return redirect('/')
 
+    def picture_url(result):
+        """Using OAuth result, fetch the user's picture URL"""
+        image_url = result.user.picture
+        if provider_name == 'facebook':
+            # Additional request needed for FB profile image 
+            url = '?'.join(("https://graph.facebook.com/{0}/picture",
+                "redirect=false")).format(result.user.id)
+            response = result.provider.access(url)
+            if response.status == 200:
+                image_url = response.data['data']['url']
+        return image_url
+
+    if provider_name == 'TESTING' and current_app.config['TESTING']:
+        return testing_backdoor(request.args.get('user_id'))
+
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
     result = authomatic.login(adapter, provider_name)
 
-    user = current_user()
-    if user:
+    if current_user():
         return redirect('/')
     if result:
         if result.error:
@@ -93,50 +106,32 @@ def login(provider_name):
                     provider_name)
             if not (result.user.name and result.user.id):
                 result.user.update()
-                if result.user.picture:
-                    image_url = result.user.picture
-                if provider_name == 'facebook':
-                    # Additional request needed for FB profile image 
-                    url = '?'.join(("https://graph.facebook.com/{0}/picture",
-                        "redirect=false")).format(result.user.id)
-                    response = result.provider.access(url)
-                    if response.status == 200:
-                        image_url = response.data['data']['url']
-                    else:
-                        image_url = None
+                image_url = picture_url(result)
+
             # Success - add or pull this user to/from database
             ap = AuthProvider.query.filter_by(provider=provider_name,
                     provider_id=result.user.id).first()
             if ap:
-                current_app.logger.debug("Login existing user.id %d via %s",
-		    ap.user_id, provider_name)
+                current_app.logger.debug("Login user.id %d via %s",
+                        ap.user_id, provider_name)
                 user = User.query.filter_by(id=ap.user_id).first()
-                if image_url and not user.image_url:
-                    user.image_url = image_url
-                    db.session.add(user)
-                    db.session.commit()
             else:
-                # Looks like first valid login from this auth provider
-                # generate what we know and redirect to get the rest
-                user = User(username=result.user.name,
-                        first_name=result.user.first_name,
-                        last_name=result.user.last_name,
-                        birthdate=result.user.birth_date,
-                        gender=result.user.gender,
-                        email=result.user.email,
-                        image_url=image_url)
-                db.session.add(user)
-                db.session.commit()
-                current_app.logger.debug("Login new user.id %d",
-		    user.id)
+                # Confirm we haven't seen user from a different IdP
+                user = User.query.filter_by(email=result.user.email).\
+                        first() if result.user.email else None
+
+                if not user:
+                    user = add_authomatic_user(result.user, image_url)
+                    current_app.logger.debug("Login new user.id %d",
+        	        user.id)
+                else:
+                    current_app.logger.debug("Login user.id %d via NEW "
+                            "IdP %s", user.id, provider_name)
+
                 ap = AuthProvider(provider=provider_name,
                         provider_id=result.user.id,
                         user_id=user.id)
                 db.session.add(ap)
-                patient = Role.query.filter_by(name='patient').first()
-                default_role = UserRoles(user_id=user.id,
-                        role_id=patient.id)
-                db.session.add(default_role)
                 db.session.commit()
             session['id'] = user.id
             session['remote_token'] = result.provider.credentials.token

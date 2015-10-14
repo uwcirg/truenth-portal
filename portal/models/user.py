@@ -142,6 +142,26 @@ class User(db.Model, UserMixin):
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
 
+def add_authomatic_user(authomatic_user, image_url):
+    """Given the result from an external IdP, create a new user"""
+    user = User(username=authomatic_user.name,
+            first_name=authomatic_user.first_name,
+            last_name=authomatic_user.last_name,
+            birthdate=authomatic_user.birth_date,
+            gender=authomatic_user.gender,
+            email=authomatic_user.email,
+            image_url=image_url)
+    db.session.add(user)
+    db.session.commit()
+
+    # All new users are given the patient role by default
+    patient = Role.query.filter_by(name='patient').first()
+    default_role = UserRoles(user_id=user.id,
+            role_id=patient.id)
+    db.session.add(default_role)
+    db.session.commit()
+    return user
+
 
 def current_user():
     """Obtain the "current" user object
