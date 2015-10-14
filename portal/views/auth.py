@@ -5,7 +5,8 @@ import hmac
 import json
 import requests
 from urlparse import urlparse, parse_qs
-from flask import Blueprint, jsonify, redirect, current_app
+from authomatic.adapters import WerkzeugAdapter
+from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
@@ -13,7 +14,7 @@ from werkzeug.security import gen_salt
 
 from ..models.auth import AuthProvider, Client, Token
 from ..models.user import current_user, User, Role, UserRoles
-from ..extensions import db, fa, oauth
+from ..extensions import authomatic, db, oauth
 
 auth = Blueprint('auth', __name__)
 
@@ -58,9 +59,8 @@ def deauthorized():
     return jsonify(message=message)
 
 
-@auth.route('/login')
-@fa.login('fb')
-def login():
+@auth.route('/login/<provider_name>/')
+def login(provider_name):
     """login view function
 
     After successful authorization at OAuth server, control
@@ -69,39 +69,47 @@ def login():
 
     """
     # Unittesting backdoor - see tests.login() for use
-    if current_app.config['TESTING']:
-        id = request.args.get('user_id')
-        assert (int(id) < 10)  # allowed for test users only!
-        session['id'] = id
+    if provider_name == 'TESTING' and current_app.config['TESTING']:
+        user_id = request.args.get('user_id')
+        assert int(user_id) < 10  # allowed for test users only!
+        session['id'] = user_id
         user = current_user()
         login_user(user)
         return redirect('/')
 
+    response = make_response()
+    adapter = WerkzeugAdapter(request, response)
+    result = authomatic.login(adapter, provider_name)
+
     user = current_user()
     if user:
         return redirect('/')
-    if fa.result:
-        if fa.result.error:
-            current_app.logger.error(fa.result.error.message)
-            return fa.result.error.message
-        elif fa.result.user:
-            current_app.logger.debug("Successful FB login")
-            if not (fa.result.user.name and fa.result.user.id):
-                fa.result.user.update()
-                # Grab the profile image as well
-                url = '?'.join(("https://graph.facebook.com/{0}/picture",
-                    "redirect=false")).format(fa.result.user.id)
-                response = fa.result.provider.access(url)
-                if response.status == 200:
-                    image_url = response.data['data']['url']
-                else:
-                    image_url = None
+    if result:
+        if result.error:
+            current_app.logger.error(result.error.message)
+            return result.error.message
+        elif result.user:
+            current_app.logger.debug("Successful authentication at %s",
+                    provider_name)
+            if not (result.user.name and result.user.id):
+                result.user.update()
+                if result.user.picture:
+                    image_url = result.user.picture
+                if provider_name == 'facebook':
+                    # Additional request needed for FB profile image 
+                    url = '?'.join(("https://graph.facebook.com/{0}/picture",
+                        "redirect=false")).format(result.user.id)
+                    response = result.provider.access(url)
+                    if response.status == 200:
+                        image_url = response.data['data']['url']
+                    else:
+                        image_url = None
             # Success - add or pull this user to/from database
-            ap = AuthProvider.query.filter_by(provider='facebook',
-                    provider_id=fa.result.user.id).first()
+            ap = AuthProvider.query.filter_by(provider=provider_name,
+                    provider_id=result.user.id).first()
             if ap:
-                current_app.logger.debug("Login existing user.id %d",
-		    ap.user_id)
+                current_app.logger.debug("Login existing user.id %d via %s",
+		    ap.user_id, provider_name)
                 user = User.query.filter_by(id=ap.user_id).first()
                 if image_url and not user.image_url:
                     user.image_url = image_url
@@ -110,19 +118,19 @@ def login():
             else:
                 # Looks like first valid login from this auth provider
                 # generate what we know and redirect to get the rest
-                user = User(username=fa.result.user.name,
-                        first_name=fa.result.user.first_name,
-                        last_name=fa.result.user.last_name,
-                        birthdate=fa.result.user.birth_date,
-                        gender=fa.result.user.gender,
-                        email=fa.result.user.email,
+                user = User(username=result.user.name,
+                        first_name=result.user.first_name,
+                        last_name=result.user.last_name,
+                        birthdate=result.user.birth_date,
+                        gender=result.user.gender,
+                        email=result.user.email,
                         image_url=image_url)
                 db.session.add(user)
                 db.session.commit()
                 current_app.logger.debug("Login new user.id %d",
 		    user.id)
-                ap = AuthProvider(provider='facebook',
-                        provider_id=fa.result.user.id,
+                ap = AuthProvider(provider=provider_name,
+                        provider_id=result.user.id,
                         user_id=user.id)
                 db.session.add(ap)
                 patient = Role.query.filter_by(name='patient').first()
@@ -131,7 +139,7 @@ def login():
                 db.session.add(default_role)
                 db.session.commit()
             session['id'] = user.id
-            session['remote_token'] = fa.result.provider.credentials.token
+            session['remote_token'] = result.provider.credentials.token
             login_user(user)
             # If client auth was pushed aside, resume now
             if 'pending_authorize_args' in session:
@@ -143,7 +151,7 @@ def login():
             else:
                 return redirect('/')
     else:
-        return fa.response
+        return response
 
 
 @auth.route('/logout')
@@ -178,8 +186,8 @@ def logout():
     if user_id:
         tokens = Token.query.filter_by(user_id=user_id).all()
         for token in tokens:
-            client = Client.query.filter_by(client_id=token.client_id).first()
-            client.notify({'event':'logout', 'user_id':user_id})
+            c = Client.query.filter_by(client_id=token.client_id).first()
+            c.notify({'event':'logout', 'user_id':user_id})
 
             # Invalidate the access token by deletion
             db.session.delete(token)

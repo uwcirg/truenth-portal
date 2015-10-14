@@ -79,18 +79,24 @@ oauth = OAuthOrAlternateAuth()
 
 # Flask-Authomatic provides OAuth between the Portal and upstream
 # identity providers such as Facebook
-from authomatic.extras.flask import FlaskAuthomatic
+from authomatic import Authomatic
 from authomatic.providers import oauth2
 from .config import early_app_config_access
 
 app_config = early_app_config_access()
-fa = FlaskAuthomatic(
+authomatic = Authomatic(
     config={
-        'fb': {
+        'facebook': {
             'class_': oauth2.Facebook,
-            'consumer_key': app_config['CONSUMER_KEY'],
-            'consumer_secret': app_config['CONSUMER_SECRET'],
+            'consumer_key': app_config['FB_CONSUMER_KEY'],
+            'consumer_secret': app_config['FB_CONSUMER_SECRET'],
             'scope': ['public_profile', 'email'],
+        },
+        'google': {
+            'class_': oauth2.Google,
+            'consumer_key': app_config['GOOGLE_CONSUMER_KEY'],
+            'consumer_secret': app_config['GOOGLE_CONSUMER_SECRET'],
+            'scope': ['profile', 'email'],
         },
     },
     secret=app_config['SECRET_KEY'],

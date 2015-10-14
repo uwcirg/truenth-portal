@@ -14,15 +14,15 @@ from ..extensions import db, oauth
 from .user import current_user
 
 
-providers_list = ENUM('facebook', 'twitter', 'truenth', name='providers',
-                      create_type=False)
+providers_list = ENUM('facebook', 'google', 'twitter', 'truenth',
+        name='providers', create_type=False)
 
 
 class AuthProvider(db.Model):
     __tablename__ = 'auth_providers'
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column('provider', providers_list)
-    provider_id = db.Column(db.BigInteger)
+    provider_id = db.Column(db.String(40))
     user_id = db.Column(db.ForeignKey('users.id'))
     user = db.relationship('User')
 

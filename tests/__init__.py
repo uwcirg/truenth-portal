@@ -68,7 +68,7 @@ class TestCase(Base):
         Taking advantage of testing backdoor in views.auth.login()
 
         """
-        return self.app.get('/login?user_id={0}'.format(user_id),
+        return self.app.get('/login/TESTING?user_id={0}'.format(user_id),
                 follow_redirects=True)
 
     def setUp(self):
