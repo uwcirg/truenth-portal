@@ -93,9 +93,10 @@ FB_CONSUMER_SECRET = '<App Secret From FB>'
 
 To enable Google OAuth, obtain similar values from
 https://console.developers.google.com/project/_/apiui/credential?pli=1
-Under APIs Credentials, select `OAuth 2.0 client ID`.  Also
-be sure to set the `Authorized redirect URIs` to exactly match
-the location of `<scheme>://<hostname>/login/google/`
+
+- Under APIs Credentials, select `OAuth 2.0 client ID`
+- Set the `Authorized redirect URIs` to exactly match the location of `<scheme>://<hostname>/login/google/`
+- Enable the `Google+ API`
 
 Write to the respective GOOGLE_CONSUMER_KEY and GOOGLE_CONSUMER_SECRET
 variables in the same `application.cfg` configuration file.
