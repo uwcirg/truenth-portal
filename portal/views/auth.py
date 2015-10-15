@@ -1,5 +1,6 @@
 """Auth related view functions"""
 import base64
+from datetime import datetime
 import hashlib
 import hmac
 import json
@@ -388,6 +389,65 @@ def clients_list():
     user = current_user()
     clients = Client.query.filter_by(user_id=user.id).all()
     return render_template('clients_list.html', clients=clients)
+
+
+@auth.route('/oauth/token-status')
+@oauth.require_oauth()
+def token_status():
+    """Return remaining valid time and other info for oauth token
+
+    Endpoint for clients needing to double check status on a token.
+    Returns essentially the same JSON obtained from the /oauth/token
+    call, with `expires_in` updated to show remaining seconds.
+
+    ---
+    tags:
+      - OAuth
+    operationId: token_status
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: token_status
+          required:
+            - access_token
+            - token_type
+            - expires_in
+            - refresh_token
+            - scope
+          properties:
+            access_token:
+              type: string
+              description:
+                The access token to include in the Authorization header
+                for protected API use.
+            token_type:
+              type: string
+              description: Type of access token, always 'Bearer'
+            expires_in:
+              type: integer
+              format: int64
+              description:
+                Number of seconds for which the access token will
+                remain valid
+            refresh_token:
+              type: string
+              description:
+                Use to refresh an access token, in place of the
+                authorizion token.
+            scopes:
+              type: string
+              description: The authorized scopes.
+
+    """
+    token_type, access_token = request.headers.get('Authorization').split()
+    token = Token.query.filter_by(access_token=access_token).first()
+    expires_in = token.expires - datetime.utcnow()
+    return jsonify(access_token=access_token,
+            refresh_token=token.refresh_token, token_type=token_type,
+            expires_in=expires_in.seconds, scopes=token._scopes)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
