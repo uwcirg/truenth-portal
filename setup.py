@@ -30,7 +30,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'Authomatic',
+        'Authomatic>=0.1.0',
         'Flask>=0.10.1',
         'Flask-Migrate',
         'Flask-OAuthlib',
