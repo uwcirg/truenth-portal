@@ -18,7 +18,7 @@ gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
 class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(40), unique=True)
+    username = db.Column(db.String(40))
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.now)
