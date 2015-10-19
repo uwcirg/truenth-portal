@@ -5,6 +5,8 @@ from tests import TestCase, LAST_NAME, FIRST_NAME, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.user import User
+
 
 class TestAPI(TestCase):
 
@@ -120,3 +122,58 @@ class TestAPI(TestCase):
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), 3)
+
+    def test_roles_add(self):
+        data = {"roles": [
+                {"name": "application_developer"},
+                {"name": "patient"},
+                {"name": "admin"}
+                ]}
+
+        self.promote_user(role_name='admin')
+        self.login()
+        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), len(data['roles']))
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), len(data['roles']))
+
+    def test_roles_delete(self):
+        self.promote_user(role_name='admin')
+        self.promote_user(role_name='application_developer')
+        data = {"roles": [
+                {"name": "patient"},
+                ]}
+
+        self.login()
+        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), len(data['roles']))
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), len(data['roles']))
+
+    def test_roles_nochange(self):
+        data = {"roles": [
+                {"name": "patient"},
+                {"name": "admin"}
+                ]}
+
+        self.promote_user(role_name='admin')
+        self.login()
+        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), len(data['roles']))
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles), len(data['roles']))

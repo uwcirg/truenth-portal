@@ -1,6 +1,7 @@
 """API view functions"""
 from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
+from flask.ext.user import roles_required
 
 from ..models.user import current_user, get_user, Role
 from ..extensions import oauth
@@ -598,4 +599,81 @@ def roles(user_id):
         use_roles = Role.query.all()
     results = [{'name': r.name, 'description': r.description}
             for r in use_roles]
+    return jsonify(roles=results)
+
+
+@api.route('/roles/<int:user_id>', methods=('PUT',))
+@oauth.require_oauth()
+@roles_required('admin')
+def set_roles(user_id):
+    """Set roles for user, returns simple JSON defining user roles
+
+    Used to set role assignments for a user.  Include all roles
+    the user should be a member of.  If a list doesn't include current
+    roles for the user, the users roles will be reduced to match.
+
+    Only the 'name' field of the roles is referenced.  Must match
+    current roles in the system.
+
+    Returns a list of all roles user belongs to after change.
+    ---
+    tags:
+      - User
+    operationId: setRoles
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: roles
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description:
+                The string defining the name of each role the user should
+                belong to.  Must exist as an available role in the system.
+    responses:
+      200:
+        description:
+          Returns a list of all roles user belongs to after change.
+        schema:
+          id: user_roles
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Role name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the role.
+      400:
+        description: if the request incudes an unknown role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+
+    if not request.json or 'roles' not in request.json:
+        abort(400, "Requires role list")
+    requested_roles = [r['name'] for r in request.json['roles']]
+    roles = Role.query.filter(Role.name.in_(requested_roles)).all()
+    if len(roles) != len(requested_roles):
+        abort(404, "One or more roles requested not found")
+    user.roles = roles 
+
+    # Return user's updated role list
+    results = [{'name': r.name, 'description': r.description}
+            for r in user.roles]
     return jsonify(roles=results)
