@@ -36,6 +36,8 @@ def seed():
     if not app_dev:
         db.session.add(Role(name='application_developer'))
         db.session.commit()
+        app_dev = db.session.query(Role.id).\
+                filter(Role.name=='application_developer').first()
 
     u_r = {}
     for c in Client.query.all():
