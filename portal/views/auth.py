@@ -186,7 +186,8 @@ def logout():
         tokens = Token.query.filter_by(user_id=user_id).all()
         for token in tokens:
             c = Client.query.filter_by(client_id=token.client_id).first()
-            c.notify({'event':'logout', 'user_id':user_id})
+            c.notify({'event': 'logout', 'user_id': user_id,
+                    'refresh_token': token.refresh_token})
 
             # Invalidate the access token by deletion
             db.session.delete(token)
