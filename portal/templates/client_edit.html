@@ -21,14 +21,35 @@
                             </ul>
                             <form action="/client/{{ client.client_id }}" method="post">
                                 <div class="form-group">
-                                    <label for="redirect_url">Application URL</label>
-                                    <input type="text" class="form-control" name="redirect_uri" id="redirect_url" size='200' value="{{ client._redirect_uris }}">
-                                    <label for="callback_url">Callback URL</label>
-                                    <input type="text" class="form-control" name="callback_url" id="callback_url" size='200' value="{{ client.callback_url }}">
+                                    {{ form.hidden_tag() }}
+
+                                    {{ form.application_origins.label }}
+                                    {% if form.application_origins.errors %}
+                                    <ul class="errors">{% for error in form.application_origins.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                    {% endif %}
+                                    {{ form.application_origins(size=200, class="form-control") }}
+
+                                    {{ form.callback_url.label }}
+                                    {% if form.callback_url.errors %}
+                                    <ul class="errors">{% for error in form.callback_url.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                    {% endif %}
+                                    {{ form.callback_url(size=200, class="form-control") }}
                                 </div>
                                 <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button>
                                 <button type="submit" name="delete" value="delete" class="btn btn-tnth-primary">Delete Application</button>
                             </form>
+                            {% macro render_field(field) %}
+                              <dt>{{ field.label }}
+                                <dd>{{ field(**kwargs)|safe }}
+                                  {% if field.errors %}
+                                      <ul class=errors>
+                                              {% for error in field.errors %}
+                                                    <li>{{ error }}</li>
+                                                        {% endfor %}
+                                                            </ul>
+                                                              {% endif %}
+                                                                </dd>
+                                                                {% endmacro %}
                             <ul>
                                 <li style="margin-bottom: 0.25em; font-size: 15px">The <b>Application URL</b> may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.</li> 
                                 <li style="margin-bottom: 0.25em; font-size: 15px">Provide a <b>Callback URL</b> to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined</li> 

@@ -56,6 +56,16 @@ class Client(db.Model):
         return []
 
     @property
+    def application_origins(self):
+        """One or more application origins, white space delimited"""
+        return self._redirect_uris
+
+    @application_origins.setter
+    def application_origins(self, values):
+        "Set application origins, single string of space delimited URLs"
+        self._redirect_uris = values
+
+    @property
     def default_redirect_uri(self):
         return self.redirect_uris[0]
 

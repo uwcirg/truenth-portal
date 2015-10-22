@@ -29,6 +29,7 @@ class TestConfig(BaseConfig):
     TESTING = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    WTF_CSRF_ENABLED = False
 
 
 from flask import Config

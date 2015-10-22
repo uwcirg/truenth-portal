@@ -43,6 +43,7 @@ setup(
         'oauthlib',
         'psycopg2',
         'python-dateutil',
+        'validators',
     ],
     test_suite='tests',
     classifiers=[

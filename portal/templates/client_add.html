@@ -25,8 +25,13 @@ separated by white space.
                             </ul>
                             <form action="/client" method="post">
                                 <div class="form-group">
-                                    <label for="redirect_url">Application URL</label>
-                                    <input type="text" class="form-control" name="redirect_uri" id="redirect_uri" size='79' value="https://hostname">
+                                    {{ form.hidden_tag() }}
+
+                                    {{ form.application_origins.label }}
+                                    {% if form.application_origins.errors %}
+                                    <ul class="errors">{% for error in form.application_origins.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                                    {% endif %}
+                                    {{ form.application_origins(size=200, class="form-control") }}
                                 </div>
                                 <button type="submit" class="btn btn-tnth-primary">Register App</button>
                             </form>

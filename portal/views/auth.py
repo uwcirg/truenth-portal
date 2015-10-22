@@ -11,7 +11,10 @@ from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
+from flask_wtf import Form
+from wtforms import TextField, validators
 from werkzeug.security import gen_salt
+from validators import url as url_validation
 
 from ..models.auth import AuthProvider, Client, Token
 from ..models.user import add_authomatic_user, current_user, User
@@ -191,6 +194,22 @@ def logout():
     return redirect('/')
 
 
+class ClientEditForm(Form):
+    """wtform class for validation during client edits"""
+    application_origins = TextField('Application URL',
+            validators=[validators.Required()])
+    callback_url = TextField('Callback URL',
+            validators=[validators.optional(),
+                validators.URL(require_tld=False)])
+
+    def validate_application_origins(form, field):
+        """Custom validation to handle multiple, space delimited URLs"""
+        origins = field.data.split()
+        for url in origins:
+            if not url_validation(url, require_tld=False):
+                raise validators.ValidationError("Invalid URL")
+
+
 @auth.route('/client', methods=('GET', 'POST'))
 @roles_required('application_developer')
 def client():
@@ -206,10 +225,10 @@ def client():
       - OAuth
     operationId: client
     parameters:
-      - name: redirect_uri
+      - name: application_origins
         in: formData
         description:
-          Redirect URIs. The service will only redirect to URIs in
+          Application origins. The service will only redirect to URIs in
           the list. All URIs must be protected with TLS security
           (i.e. https) beyond inital testing. Separate multiple
           URIs with a single whitespace character.
@@ -242,25 +261,27 @@ def client():
             Site URL:
               type: string
               description:
-                Application's site Origin or URL.
+                Application's site Origin(s) or URL(s).
                 Required to include the origin of OAuth callbacks
                 and site origins making in-browser requests via CORS
 
     """
     user = current_user()
-    if request.method == 'GET':
-        return render_template('client_add.html')
-    redirect_uri = request.form.get('redirect_uri', None)
-    item = Client(
+    form = ClientEditForm()
+    if not form.validate_on_submit():
+        return render_template('client_add.html', form=form)
+    client = Client(
         client_id=gen_salt(40),
         client_secret=gen_salt(50),
-        _redirect_uris=redirect_uri,
+        _redirect_uris=form.application_origins.data,
         _default_scopes='email',
         user_id=user.id,
     )
-    db.session.add(item)
+    db.session.add(client)
     db.session.commit()
-    return redirect(url_for('.client_edit', client_id=item.client_id))
+    return redirect(url_for('.client_edit', client_id=client.client_id))
+
+
 
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
@@ -332,21 +353,16 @@ def client_edit(client_id):
     client = Client.query.get(client_id)
     if not client:
         abort(404)
-    user = current_user()
     current_user().check_role(permission='edit', other_id=client.user_id)
-    if request.method == 'GET':
-        return render_template('client_edit.html', client=client)
+
+    form = ClientEditForm(obj=client)
+    if not form.validate_on_submit():
+        return render_template('client_edit.html', client=client, form=form)
 
     if request.form.get('delete'):
         db.session.delete(client)
     else:
-        callback_url = request.form.get('callback_url', None)
-        if callback_url and callback_url != 'None':
-            client.callback_url = callback_url
-        redirect_uri = request.form.get('redirect_uri', None)
-        if redirect_uri and redirect_uri != 'None':
-            client._redirect_uris = redirect_uri
-        db.session.add(client)
+        form.populate_obj(client)
     db.session.commit()
     return redirect(url_for('.clients_list'))
 
