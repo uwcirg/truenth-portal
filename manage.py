@@ -7,7 +7,8 @@ from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
-from portal.extensions import db, ConfigServer
+from portal.config import ConfigServer
+from portal.extensions import db
 from portal.models.auth import Client
 from portal.models.user import User, Role, UserRoles, add_static_data
 

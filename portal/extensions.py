@@ -1,4 +1,14 @@
-"""Extensions used at application level"""
+"""Extensions used at application level
+
+Generally the objects instantiated here are needed for imports
+throughout the system, but require factory pattern initialization
+once the flask `app` comes to life.
+
+Defined here to break the circular dependencies.  See `app.py` for
+additional configuration of most objects defined herein.
+
+"""
+
 
 # SQLAlchemy provides the database object relational mapping (ORM)
 from flask.ext.sqlalchemy import SQLAlchemy
