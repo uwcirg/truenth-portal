@@ -125,10 +125,11 @@ class ConfigServer(Server):
         """Override default port and host to allow fallback to configured values"""
         super(ConfigServer, self).__init__(port=port, host=host, **kwargs)
 
-    def __call__(self,app=None,host=None, port=None, *args, **kwargs):
+    def __call__(self, app=None, host=None, port=None, *args, **kwargs):
         """Call app.run() with highest precedent configuration values"""
         # Fallback to initialized value if None is passed
         port = self.port if port is None else port
         host = self.host if host is None else host
-        super(ConfigServer, self).__call__(app=app,host=host, port=port,*args,**kwargs)
+        super(ConfigServer, self).__call__(app=app, host=host,
+                port=port, *args, **kwargs)
 
