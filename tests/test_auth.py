@@ -3,6 +3,7 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.auth import Client
+from portal.models.role import ROLE 
 from portal.models.user import add_authomatic_user, User
 
 class AuthomaticMock(object):
@@ -21,7 +22,7 @@ class TestAuth(TestCase):
                 client_secret='tc_secret', user_id=TEST_USER_ID)
         db.session.add(client)
         db.session.commit()
-        self.promote_user(role_name='application_developer')
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         return client
 
     def test_nouser_logout(self):
@@ -32,7 +33,7 @@ class TestAuth(TestCase):
     def test_client_add(self):
         """Test adding a client application"""
         origins = "https://test.com https://two.com"
-        self.promote_user(role_name='application_developer')
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
         rv = self.app.post('/client', data=dict(
             application_origins=origins))
@@ -43,7 +44,7 @@ class TestAuth(TestCase):
 
     def test_client_bad_add(self):
         """Test adding a bad client application"""
-        self.promote_user(role_name='application_developer')
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
         rv = self.app.post('/client',
                 data=dict(application_origins="bad data in"))

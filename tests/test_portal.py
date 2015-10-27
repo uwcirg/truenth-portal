@@ -3,6 +3,7 @@ from datetime import datetime
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.models.role import ROLE
 from portal.models.user import User
 from portal.models.message import EmailInvite
 
@@ -15,11 +16,11 @@ class TestPortal(TestCase):
         # Generate a few users with a splattering of roles
         u1 = self.add_user(username='u1')
         u2 = self.add_user(username='u2')
-        self.promote_user(u1, role_name='admin')
-        self.promote_user(u2, role_name='application_developer')
+        self.promote_user(u1, role_name=ROLE.ADMIN)
+        self.promote_user(u2, role_name=ROLE.APPLICATION_DEVELOPER)
 
         # Test user needs admin role to view list
-        self.promote_user(role_name='admin')
+        self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         rv = self.app.get('/admin')
 

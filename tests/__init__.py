@@ -13,9 +13,10 @@ from flask.ext.testing import TestCase as Base
 from portal.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
-from portal.models.user import User, Role, UserRoles, add_static_data
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.role import Role, add_static_data, ROLE
+from portal.models.user import User, UserRoles
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy'
@@ -38,7 +39,7 @@ class TestCase(Base):
         assert(test_user_id == TEST_USER_ID)
 
     def add_user(self, username, first_name="", last_name=""):
-        """Create a user with default 'patient' role
+        """Create a user with default role
         
         Returns the newly created user id
 
@@ -48,7 +49,8 @@ class TestCase(Base):
 
         db.session.add(test_user)
         db.session.commit()
-        self.promote_user(user_id=test_user.id, role_name='patient')
+        self.promote_user(user_id=test_user.id,
+                role_name=ROLE.PATIENT)
         return test_user.id
 
     def promote_user(self, user_id=TEST_USER_ID, role_name=None):
@@ -75,7 +77,7 @@ class TestCase(Base):
         """Reset all tables before testing."""
 
         db.create_all()
-        add_static_data(db)
+        add_static_data()
         self.init_data()
 
         self.app = self.__app.test_client()

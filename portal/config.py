@@ -1,6 +1,7 @@
 """Configuration"""
 import os
 from flask.ext.script import Server
+from flask import Config
 
 
 class BaseConfig(object):
@@ -33,7 +34,6 @@ class TestConfig(BaseConfig):
     WTF_CSRF_ENABLED = False
 
 
-from flask import Config
 def early_app_config_access():
     """Workaround to bootstrap configuration problems
 
@@ -45,7 +45,8 @@ def early_app_config_access():
     chain of overwrites.  i.e. use app.config whenever possible.
 
     """
-    _app_config = Config(None)
+    root_path = os.path.join(os.path.dirname(__file__), "..")
+    _app_config = Config(root_path=root_path)
     _app_config.from_pyfile(os.path.join(\
             os.path.dirname(__file__), 'application.cfg'))
     return _app_config

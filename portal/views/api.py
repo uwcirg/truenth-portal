@@ -3,7 +3,8 @@ from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
 from flask.ext.user import roles_required
 
-from ..models.user import current_user, get_user, Role
+from ..models.role import ROLE, Role
+from ..models.user import current_user, get_user
 from ..extensions import oauth
 from .crossdomain import crossdomain
 
@@ -604,7 +605,7 @@ def roles(user_id):
 
 @api.route('/roles/<int:user_id>', methods=('PUT',))
 @oauth.require_oauth()
-@roles_required('admin')
+@roles_required(ROLE.ADMIN)
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
 

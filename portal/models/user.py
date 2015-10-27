@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import CodeableConcept, ValueQuantity
+from .role import Role, ROLE
 
 # http://hl7.org/fhir/v3/AdministrativeGender/
 gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
@@ -136,7 +137,7 @@ class User(db.Model, UserMixin):
         """check user for adequate role"""
         if self.id == other_id:
             return True
-        if 'admin' in [r.name for r in self.roles]:
+        if ROLE.ADMIN in [r.name for r in self.roles]:
             return True
         # TODO: address permission details, etc.
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
@@ -155,7 +156,7 @@ def add_authomatic_user(authomatic_user, image_url):
     db.session.commit()
 
     # All new users are given the patient role by default
-    patient = Role.query.filter_by(name='patient').first()
+    patient = Role.query.filter_by(name=ROLE.PATIENT).first()
     default_role = UserRoles(user_id=user.id,
             role_id=patient.id)
     db.session.add(default_role)
@@ -186,13 +187,6 @@ def get_user(uid):
     return User.query.get(uid)
 
 
-class Role(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-    description = db.Column(db.Text)
-
-
 class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
@@ -202,16 +196,3 @@ class UserRoles(db.Model):
 
     __table_args__ = (UniqueConstraint('user_id', 'role_id',
         name='_user_role'),)
-
-
-def add_static_data(db):
-    """Seed database with default static data"""
-    db.session.add(Role(name='patient',
-            description='Default role for all patients, may only view '
-            'their own patient data'))
-    db.session.add(Role(name='admin',
-            description='Administrator privledges, i.e. carte blanche'))
-    db.session.add(Role(name='application_developer',
-            description='Gives users permission to add/view/edit '
-            'Central Services applications'))
-    db.session.commit()

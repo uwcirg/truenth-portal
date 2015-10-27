@@ -17,6 +17,7 @@ from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..models.auth import AuthProvider, Client, Token
+from ..models.role import ROLE
 from ..models.user import add_authomatic_user, current_user, User
 from ..extensions import authomatic, db, oauth
 
@@ -212,7 +213,7 @@ class ClientEditForm(Form):
 
 
 @auth.route('/client', methods=('GET', 'POST'))
-@roles_required('application_developer')
+@roles_required(ROLE.APPLICATION_DEVELOPER)
 def client():
     """client registration
 
@@ -286,7 +287,7 @@ def client():
 
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
-@roles_required('application_developer')
+@roles_required(ROLE.APPLICATION_DEVELOPER)
 def client_edit(client_id):
     """client edit
 
@@ -369,7 +370,7 @@ def client_edit(client_id):
 
 
 @auth.route('/clients')
-@roles_required('application_developer')
+@roles_required(ROLE.APPLICATION_DEVELOPER)
 def clients_list():
     """clients list
 

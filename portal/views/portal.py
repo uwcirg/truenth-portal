@@ -6,6 +6,7 @@ from flask.ext.user import roles_required
 from flask_swagger import swagger
 
 from ..models.message import EmailInvite
+from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
 from ..extensions import db, oauth
 from .crossdomain import crossdomain
@@ -42,7 +43,7 @@ def index():
 
 @portal.route('/admin')
 @oauth.require_oauth()
-@roles_required('admin')
+@roles_required(ROLE.ADMIN)
 def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
@@ -54,7 +55,7 @@ def admin():
 
 @portal.route('/invite', methods=('GET', 'POST'))
 @oauth.require_oauth()
-@roles_required('patient')
+@roles_required(ROLE.PATIENT)
 def invite():
     """invite other users"""
     if request.method == 'GET':
@@ -75,7 +76,7 @@ def invite():
 
 @portal.route('/invite/<int:message_id>')
 @oauth.require_oauth()
-@roles_required('patient')
+@roles_required(ROLE.PATIENT)
 def invite_sent(message_id):
     """show invite sent"""
     message = EmailInvite.query.get(message_id)

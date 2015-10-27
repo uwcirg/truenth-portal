@@ -5,6 +5,7 @@ from tests import TestCase, LAST_NAME, FIRST_NAME, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.role import ROLE, STATIC_ROLES
 from portal.models.user import User
 
 
@@ -108,7 +109,7 @@ class TestAPI(TestCase):
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), 1)
-        self.assertEquals(result_roles['roles'][0]['name'], 'patient')
+        self.assertEquals(result_roles['roles'][0]['name'], ROLE.PATIENT)
 
     def test_unauth_role(self):
         self.login()
@@ -121,16 +122,16 @@ class TestAPI(TestCase):
         rv = self.app.get('/api/roles')
 
         result_roles = json.loads(rv.data)
-        self.assertEquals(len(result_roles['roles']), 3)
+        self.assertEquals(len(result_roles['roles']), len(STATIC_ROLES))
 
     def test_roles_add(self):
         data = {"roles": [
-                {"name": "application_developer"},
-                {"name": "patient"},
-                {"name": "admin"}
+                {"name": ROLE.APPLICATION_DEVELOPER},
+                {"name": ROLE.PATIENT},
+                {"name": ROLE.ADMIN}
                 ]}
 
-        self.promote_user(role_name='admin')
+        self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
                 content_type='application/json',
@@ -143,10 +144,10 @@ class TestAPI(TestCase):
         self.assertEquals(len(user.roles), len(data['roles']))
 
     def test_roles_delete(self):
-        self.promote_user(role_name='admin')
-        self.promote_user(role_name='application_developer')
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         data = {"roles": [
-                {"name": "patient"},
+                {"name": ROLE.PATIENT},
                 ]}
 
         self.login()
@@ -162,11 +163,11 @@ class TestAPI(TestCase):
 
     def test_roles_nochange(self):
         data = {"roles": [
-                {"name": "patient"},
-                {"name": "admin"}
+                {"name": ROLE.PATIENT},
+                {"name": ROLE.ADMIN}
                 ]}
 
-        self.promote_user(role_name='admin')
+        self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
                 content_type='application/json',
