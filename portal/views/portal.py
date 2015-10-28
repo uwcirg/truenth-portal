@@ -133,3 +133,23 @@ def spec():
     swag['schemes'] = ['http', 'https']
 
     return jsonify(swag)
+
+
+from ..tasks import add
+@portal.route("/celery-test")
+def celery_test(x=16, y=16):
+    """Simple view to test asynchronous tasks via celery"""
+    x = int(request.args.get("x", x))
+    y = int(request.args.get("y", y))
+    res = add.apply_async((x, y))
+    context = {"id": res.task_id, "x": x, "y": y}
+    result = "add((x){}, (y){})".format(context['x'], context['y'])
+    task_id = "{}".format(context['id'])
+    result_url = url_for('.celery_result', task_id=task_id)
+    return jsonify(result=result, task_id=task_id, result_url=result_url)
+
+
+@portal.route("/celery-result/<task_id>")
+def celery_result(task_id):
+    retval = add.AsyncResult(task_id).get(timeout=1.0)
+    return repr(retval)

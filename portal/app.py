@@ -6,7 +6,7 @@ import sys
 from flask import Flask
 
 from .config import DefaultConfig
-from .extensions import db, mail, oauth, user_manager
+from .extensions import celery, db, mail, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
@@ -51,6 +51,9 @@ def configure_extensions(app):
 
     # flask-mail - Email communication
     mail.init_app(app)
+
+    # celery - task queue for asynchronous tasks
+    celery.conf.update(app.config)
 
 
 def configure_blueprints(app, blueprints):
@@ -100,6 +103,10 @@ def configure_logging(app):
         log = logging.getLogger(logger)
         log.setLevel(level)
         log.addHandler(info_file_handler)
+
+    from .tasks import logger
+    logger.setLevel(level)
+    logger.addHandler(info_file_handler)
 
     #app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)

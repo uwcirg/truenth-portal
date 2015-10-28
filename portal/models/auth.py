@@ -11,6 +11,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from urlparse import urlparse
 
 from ..extensions import db, oauth
+from ..tasks import post_request
 from .user import current_user
 
 
@@ -106,15 +107,13 @@ class Client(db.Model):
             payload)}
         current_app.logger.debug("POSTing event to %s",
                 self.callback_url)
-        # NB - this is a BLOCKing call!
-        try:
-            resp = requests.post(self.callback_url, data=formdata)
-            current_app.logger.debug("POST complete with status %d",
-                    resp.status_code)
-        except requests.ConnectionError as e:
-            current_app.logger.error("Unable to connect to registered "
-                    "client callback @ %s", self.callback_url)
-            current_app.logger.exception(e)
+
+        # Use celery asynchronous task 'post_request'
+        kwargs = {'url': self.callback_url, 'data': formdata}
+        res = post_request.apply_async(kwargs=kwargs)
+        context = {"id": res.task_id, "url": kwargs['url'],
+                "data": kwargs['data']}
+        current_app.logger.debug(str(context))
 
 
     def validate_redirect_uri(self, redirect_uri):

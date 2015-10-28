@@ -31,6 +31,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'Authomatic>=0.1.0',
+        'celery',
         'Flask>=0.10.1',
         'Flask-Migrate',
         'Flask-OAuthlib',
@@ -43,6 +44,7 @@ setup(
         'oauthlib',
         'psycopg2',
         'python-dateutil',
+        'redis',
         'validators',
     ],
     test_suite='tests',

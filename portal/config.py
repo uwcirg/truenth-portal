@@ -6,16 +6,19 @@ from flask import Config
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
-    PROJECT = "portal"
-    PROJECT_ROOT =\
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_IMPORTS = ('portal.tasks', )
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     LOG_FOLDER = os.path.join('/var/log', __package__)
     LOG_LEVEL = 'DEBUG'
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 60 * 60  # units: seconds
-    TESTING = False
+    PROJECT = "portal"
+    PROJECT_ROOT =\
+            os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     SECRET_KEY = 'override this secret key'
+    TESTING = False
     USER_UNAUTHORIZED_ENDPOINT = 'portal.index'
     USER_UNAUTHENTICATED_ENDPOINT = 'portal.index'
 
