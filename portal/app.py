@@ -53,7 +53,7 @@ def configure_extensions(app):
     mail.init_app(app)
 
     # celery - task queue for asynchronous tasks
-    celery.conf.update(app.config)
+    celery.init_app(app)
 
 
 def configure_blueprints(app, blueprints):

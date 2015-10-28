@@ -119,8 +119,6 @@ from flask.ext.mail import Mail
 mail = Mail()
 
 
-# Celery is used as a task queue for any tasks that should happen
-# outside of the request scope
-from celery import Celery
-celery = Celery(app_config['PROJECT'],
-        broker=app_config['CELERY_BROKER_URL'])
+# Celery (Distributed Task Queue) is used for any asynchronous tasks
+from flask.ext.celery import Celery
+celery = Celery()
