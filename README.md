@@ -14,7 +14,7 @@ $ export PROJECT_HOME=~/CentralServices
 #### Install required packages
 
 ```bash
-$ sudo apt-get install python-virtualenv libffi-dev
+$ sudo apt-get install python-virtualenv libffi-dev redis-server
 ```
 
 #### Clone the Project
@@ -104,6 +104,11 @@ variables in the same `application.cfg` configuration file.
 ## Run the Central Services Server
 ```bash
 $ python manage.py runserver
+```
+
+## Run the Celery Worker
+```bash
+$ celery worker -A portal.celery_worker.celery --loglevel=info
 ```
 
 ## DATABASE
