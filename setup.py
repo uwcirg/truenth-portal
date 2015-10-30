@@ -39,6 +39,7 @@ setup(
         'Flask-Swagger',
         'Flask-Testing',
         'Flask-User',
+        'jsonschema',
         'nose',
         'oauthlib',
         'psycopg2',
