@@ -10,6 +10,7 @@ from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
 from ..extensions import db, oauth
 from .crossdomain import crossdomain
+from ..tasks import add, post_request
 
 
 portal = Blueprint('portal', __name__)
@@ -135,7 +136,7 @@ def spec():
     return jsonify(swag)
 
 
-from ..tasks import add
+
 @portal.route("/celery-test")
 def celery_test(x=16, y=16):
     """Simple view to test asynchronous tasks via celery"""
@@ -153,3 +154,10 @@ def celery_test(x=16, y=16):
 def celery_result(task_id):
     retval = add.AsyncResult(task_id).get(timeout=1.0)
     return repr(retval)
+
+
+@portal.route("/post-result/<task_id>")
+def post_result(task_id):
+    r = post_request.AsyncResult(task_id).get(timeout=1.0)
+    return jsonify(status_code=r.status_code, url=r.url, text=r.text)
+
