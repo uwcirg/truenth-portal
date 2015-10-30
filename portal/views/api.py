@@ -2,6 +2,9 @@
 from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
 from flask.ext.user import roles_required
+from flask_swagger import swagger
+import jsonschema
+
 
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
@@ -402,7 +405,33 @@ def assessment_set(patient_id):
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
     """
-    return jsonify(message={'test':True})
+
+    swag = swagger(current_app)
+
+    draft4_schema = {
+        '$schema': 'http://json-schema.org/draft-04/schema#',
+        'type': 'object',
+        'definitions': swag['definitions'],
+    }
+
+    validation_schema = 'QuestionnaireResponse'
+    # Copy desired schema (to validate against) to outermost dict
+    draft4_schema.update(swag['definitions'][validation_schema])
+
+    if hasattr(request, 'json') and request.json:
+        try:
+            jsonschema.validate(request.json, draft4_schema)
+            return jsonify({'ok': True})
+        except jsonschema.ValidationError as e:
+            response = {
+                'ok': False,
+                'message': e.message,
+                'reference': e.schema,
+            }
+
+            return jsonify(response)
+
+    return abort(400, 'Invalid request')
 
 @api.route('/portal-wrapper-html/', methods=('OPTIONS',))
 @crossdomain(origin='*')
