@@ -23,22 +23,27 @@
                         <p id="profileIntro">Use the form below to update any of your details.</p>
 
                         <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
-                        <div class="form-group">
                             <label>Name</label>
                             <div class="row">
                                 <div class="col-xs-6">
-                                    <input class="form-control" id="firstname" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
+                                    <div class="form-group">
+                                        <input required="required" data-error="First name is required" class="form-control" id="firstname" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
+                                        <div class="help-block with-errors"></div>
+                                    </div>
                                 </div>
                                 <div class="col-xs-6">
-                                    <input class="form-control" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
+                                    <div class="form-group">
+                                        <input required="required" data-error="Last name is required" class="form-control" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
+                                        <div class="help-block with-errors"></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>    
+
                         <div class="form-group" id="bdGroup">
                             <label>Birth Date</label>
                             <div class="row">
                                 <div class="col-xs-4">
-                                    <select class="form-control bd-element" name="birthdayMonth" id="month">
+                                    <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                                         <option value="">Month...</option>
                                         <option value="01">January</option>
                                         <option value="02">February</option>
@@ -55,10 +60,10 @@
                                     </select>
                                 </div>
                                 <div class="col-xs-4">
-                                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="Date" type="text" maxlength="2" />
+                                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="Date" type="text" maxlength="2" data-birthday="true" required />
                                 </div>
                                 <div class="col-xs-4">
-                                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="Year" type="text" maxlength="4" />
+                                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="Year" type="text" maxlength="4" data-birthday="true" required />
                                 </div>
                             </div>
                             <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
@@ -67,30 +72,33 @@
                             <label>Gender</label>
                             <div>
                                 <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexM" value="male" {{ "checked" if user.gender == "male"}}/>
+                                    <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if user.gender == "male"}}/>
                                     Male
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexF" value="female" {{ "checked" if user.gender == "female"}}/>
+                                    <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if user.gender == "female"}}/>
                                     Female
                                 </label>
                                  <label class="radio-inline">
-                                    <input type="radio" name="sex" id="sexO" value="undifferentiated" {{ "checked" if user.gender == "undifferentiated"}}/>
+                                    <input type="radio" name="sex" id="sexO" value="undifferentiated" required {{ "checked" if user.gender == "undifferentiated"}}/>
                                     Other
-                                </label>                               
+                                </label>
                             </div>
                         </div>
                         <div class="form-group" id="emailGroup">
                             <label for="email">Email address</label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email if user.email }}">
-                            <span id="emailError" class="help-block" style="display: none">This isn't a valid e-mail address, please double-check.</span>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email if user.email }}" data-customemail="true" required>
+                            <div class="help-block with-errors"></div>
                         </div>
                         <div class="form-group">
                             <label for="phone">Cell phone</label>
                             <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
                         </div>
                         <br />
-                        <button class="btn btn-lg btn-default" id="updateProfile">Save</button> <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="#">cancel</a>.</span>
+                        <div class="form-group">
+                            <button id="updateProfile" type="submit" class="btn btn-lg btn-default">Save</button>
+                            <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
+                        </div>
 
                     </form>
 
@@ -102,6 +110,7 @@
     
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+<script src="//1000hz.github.io/bootstrap-validator/dist/validator.min.js"></script>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script>
@@ -110,6 +119,87 @@ PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/porta
     PORTAL_NAV_PAGE = PORTAL_NAV_PAGE + '/{{ user.username }}';
     {% endif %}
 $(document).ready(function(){
+
+    $('#profileForm').validator({
+        custom: {
+            birthday: function() {
+                var m = parseInt($("#month").val());
+                var d = parseInt($("#date").val());
+                var y = parseInt($("#year").val());
+                // If all three have been entered, run check
+                var goodDate = false;
+                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
+                if (m && d && y) {
+                    var today = new Date();
+                    // Check to see if this is a real date
+                    var date = new Date(y,m-1,d);
+                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+                        goodDate = true;
+                        // Only allow if birthdate is before today
+                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                            goodDate = false;
+                            errorMsg = "Your birthdate must be in the past.";
+                        }
+                    }
+                    if (y.toString().length < 3) {
+                        goodDate = false;
+                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
+                    }
+                    // After tests display errors if necessary
+                    if (goodDate) {
+                        $("#bdError").hide();
+                        // Set date if YYYY-MM-DD
+                        $("#birthday").val(y+"-"+m+"-"+d);
+                    } else {
+                        $("#bdError").html(errorMsg).show();
+                        $("#birthday").val("");
+                    }
+                } else {
+                    // If NaN then the values haven't been entered yet, so we
+                    // validate as true until other fields are entered
+                    if (isNaN(d) || isNaN(y)) {
+                        return true;
+                    }
+                    $("#bdError").html(errorMsg).show();
+                    $("#birthday").val("");
+                }
+                if (goodDate) {
+                    return true;
+                } else {
+                    return false;
+                }
+
+            },
+            customemail: function($el) {
+                if ($el.val() == "") {
+                    return false;
+                }
+                var emailReg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+                return emailReg.test( $el.val() );
+            }
+        },
+        errors: {
+            birthday: "Sorry, this isn't a valid date. Please try again.",
+            customemail: "This isn't a valid e-mail address, please double-check."
+        }
+    });
+
+    $('#profileForm').on('validated.bs.validator', function(e) {
+        var validator = $(this).data('bs.validator');
+        if (!validator.hasErrors()) {
+            $("#saveMsg").fadeIn("slow");
+            $("#updateProfile").removeClass("btn-default").addClass("btn-primary").animate({
+                opacity: 1
+            }, 700);
+        } else {
+            $("#saveMsg").hide();
+            $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
+        }
+    });
+    $('#profileForm input, #profileForm select').on('invalid.bs.validator', function() {
+        $("#saveMsg").hide();
+        $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
+    });
 
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
     var currentBd = $("#birthday").val();
@@ -120,92 +210,7 @@ $(document).ready(function(){
         $("#date").val(bdArray[2]);
     }
 
-    // Validate birthday and combine the 3 fields
-    $(".bd-element").on("change",function(){
-        var m = parseInt($("#month").val());
-        var d = parseInt($("#date").val());
-        var y = parseInt($("#year").val());
-        // If all three have been entered, run check
-        var goodDate = false;
-        var errorMsg = "Sorry, this isn't a valid date. Please try again.";
-        if (m && d && y) {
-            var today = new Date();
-            // Check to see if this is a real date
-            var date = new Date(y,m-1,d);
-            if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                goodDate = true;
-                // Only allow if birthdate is before today
-                if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    goodDate = false;
-                    errorMsg = "Your birthdate must be in the past.";
-                }
-            }
-            if (y.length < 3) {
-                goodDate = false;
-                errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
-            }
-            // After tests display errors if necessary
-            if (goodDate) {
-                $("#updateProfile").prop("disabled",false);
-                $("#bdGroup").removeClass("has-error");
-                $("#bdError").hide();
-                // Set date if YYYY-MM-DD
-                $("#birthday").val(y+"-"+m+"-"+d);
-                giveFeedback();
-            } else {
-                $("#bdGroup").addClass("has-error");
-                $("#bdError").html(errorMsg).show();
-                $("#birthday").val("");
-                $("#updateProfile").prop("disabled",true);
-            }
-        } else {
-            $("#birthday").val("");
-        }
-    });
-
-    var feedbackGiven = false;
-    function giveFeedback(submitted) {
-        if (submitted) {
-            feedbackGiven = false;
-            $("#saveMsg").hide();
-            $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
-            setTimeout(function(){
-                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
-                $("#profileForm").removeClass("loading");
-                $("#loadingIndicator").fadeOut();
-            }, 1200);
-        } else {
-            if (feedbackGiven) return false;
-            feedbackGiven = true;
-            $("#saveMsg").fadeIn("slow");
-            $("#updateProfile").removeClass("btn-default").addClass("btn-primary").animate({
-                opacity: 1
-            }, 700);
-        }
-    }
-    // Trigger feedback when form changes
-    $('#profileForm input').not("#email, .bd-element").on("keyup change", function(){
-        giveFeedback();
-    });
-
-    // Simple email validation
-    function validateEmail($email) {
-        var emailReg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
-        return emailReg.test( $email );
-    }
-    $("#email").on("change",function(){
-       if (!validateEmail($(this).val())) {
-           $("#updateProfile").prop("disabled",true);
-           $("#emailGroup").addClass("has-error");
-           $("#emailError").show();
-       } else {
-           $("#updateProfile").prop("disabled",false);
-           $("#emailGroup").removeClass("has-error");
-           $("#emailError").hide();
-           giveFeedback();
-       }
-    });
-
+    // Submit the form here
     $("#updateProfile").on("click", function(event){
         event.preventDefault();
 
@@ -245,7 +250,13 @@ $(document).ready(function(){
             dataType: 'json',
             data: JSON.stringify(demoArray)
         }).done(function() {
-            giveFeedback(true);
+            $("#saveMsg").hide();
+            $("#updateProfile").removeClass("btn-primary").addClass("btn-default").css("opacity","");
+            setTimeout(function(){
+                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
+                $("#profileForm").removeClass("loading");
+                $("#loadingIndicator").fadeOut();
+            }, 1200);
         }).fail(function() {
             alert("There was a problem updating your profile. Please try again.");
         }); 
