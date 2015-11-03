@@ -13,12 +13,17 @@ class BaseConfig(object):
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     LOG_FOLDER = os.path.join('/var/log', __package__)
     LOG_LEVEL = 'DEBUG'
+
+    MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
+    MAIL_DEFAULT_SENDER = '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu'
+
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 60 * 60  # units: seconds
     PROJECT = "portal"
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     SECRET_KEY = 'override this secret key'
     TESTING = False
+    USER_APP_NAME = 'TrueNTH Central Services'  # used by email templates
     USER_UNAUTHORIZED_ENDPOINT = 'portal.index'
     USER_UNAUTHENTICATED_ENDPOINT = 'portal.index'
 
