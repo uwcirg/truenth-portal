@@ -1,12 +1,5 @@
 {% extends "layout.html" %}
-{% block body %}
-    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
-
-    <!-- topNav loads here -->
-    <div id="mainNav">
-    </div>
-      
-
+{% block main %}
     <div class="container">
         <div class="row">
             <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
@@ -74,20 +67,4 @@
         </div>
 
     </div>
-    
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
-PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
-PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
-
-console.log(PORTAL_NAV_PAGE);
-
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-});
-
-</script>
 {% endblock %}

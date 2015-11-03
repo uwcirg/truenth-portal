@@ -1,12 +1,5 @@
 {% extends "layout.html" %}
-{% block body %}
-    <img src="{{ url_for('static', filename='img/TrueNthHoldBackground.jpg') }}" class="page-background hidden-xs" />
-
-    <!-- topNav loads here -->
-    <div id="mainNav">
-    </div>
-      
-
+{% block main %}
     <div class="container">
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1 col-md-12">
@@ -107,16 +100,8 @@
             </div>
         </div>        
     </div>
-    
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
-PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html";
-{% if user.username%}
-    PORTAL_NAV_PAGE = PORTAL_NAV_PAGE + '/{{ user.username }}';
-    {% endif %}
+{% endblock %}
+{% block document_ready %}
 $(document).ready(function(){
 
     $('#profileForm').validator({
@@ -261,5 +246,4 @@ $(document).ready(function(){
         }); 
     });
 });
-</script>
 {% endblock %}
