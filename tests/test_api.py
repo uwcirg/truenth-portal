@@ -11,6 +11,20 @@ from portal.models.user import User
 
 class TestAPI(TestCase):
 
+    def test_portal_wrapper_html(self):
+        self.login()
+        rv = self.app.get('/api/portal-wrapper-html/')
+
+        self.assertTrue(FIRST_NAME in rv.data)
+        self.assertTrue(LAST_NAME in rv.data)
+
+    def test_portal_wrapper_wo_name(self):
+        uid = self.add_user(username='test2', first_name=None)
+        self.login(user_id=uid)
+        rv = self.app.get('/api/portal-wrapper-html/')
+
+        self.assertEquals(rv.status_code, 200)
+
     def test_demographicsGET(self):
         self.login()
         rv = self.app.get('/api/demographics')

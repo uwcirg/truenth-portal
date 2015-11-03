@@ -502,7 +502,10 @@ def portal_wrapper_html(username):
         if user.image_url:
             movember_profile = user.image_url
         if not username:
-            username = ' '.join((user.first_name, user.last_name))
+            if user.first_name and user.last_name:
+                username = ' '.join((user.first_name, user.last_name))
+            else:
+                username = user.username
     else:
         user = None
 
