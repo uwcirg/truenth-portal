@@ -120,6 +120,8 @@ def login(provider_name):
                 current_app.logger.debug("Login user.id %d via %s",
                         ap.user_id, provider_name)
                 user = User.query.filter_by(id=ap.user_id).first()
+                user.image_url=image_url
+                db.session.commit()
             else:
                 # Confirm we haven't seen user from a different IdP
                 user = User.query.filter_by(email=result.user.email).\
@@ -132,6 +134,7 @@ def login(provider_name):
                 else:
                     current_app.logger.debug("Login user.id %d via NEW "
                             "IdP %s", user.id, provider_name)
+                    user.image_url=image_url
 
                 ap = AuthProvider(provider=provider_name,
                         provider_id=result.user.id,
