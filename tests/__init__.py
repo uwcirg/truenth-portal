@@ -40,7 +40,7 @@ class TestCase(Base):
 
     def add_user(self, username, first_name="", last_name=""):
         """Create a user with default role
-        
+
         Returns the newly created user id
 
         """
