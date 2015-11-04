@@ -9,3 +9,4 @@ lib
 local
 include
 man
+pip-selfcheck.json
