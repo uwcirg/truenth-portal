@@ -286,15 +286,27 @@ def assessment_set(patient_id):
                 - in progress
                 - completed
             subject:
-              type: object
               description: The subject of the questionnaire response
-              $ref: "#/definitions/Patient"
               externalDocs:
-                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject              
+              schema:
+                id: Reference
+                type: object
+                description: A reference from one resource to another
+                externalDocs:
+                  url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html
+                properties:
+                  reference:
+                    type: string
+                    externalDocs:
+                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.reference
+                  display:
+                    type: string
+                    externalDocs:
+                      url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.display
             author:
-              type: object
               description: Person who received the answers to the questions in the QuestionnaireResponse and recorded them in the system.
-              $ref: "#/definitions/Patient"
+              $ref: "#/definitions/Reference"
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.author
             authored:
@@ -304,9 +316,8 @@ def assessment_set(patient_id):
               type: string
               format: date-time
             source:
-              type: object
               description: The person who answered the questions about the subject
-              $ref: "#/definitions/Patient"
+              $ref: "#/definitions/Reference"
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.source
             group:
