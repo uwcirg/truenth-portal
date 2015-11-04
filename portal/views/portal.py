@@ -18,7 +18,7 @@ portal = Blueprint('portal', __name__)
 def index():
     """portal root view function
 
-    Renders portal.html with a valid user, index.html otherwise
+    Renders portal.html with a valid user, otherwise redirects for login.
 
     """
     user = current_user()
@@ -39,7 +39,7 @@ def index():
         current_app.logger.debug('storing session[next]: %s',
                 request.args.get('next'))
         session['next'] = request.args.get('next', None)
-    return render_template('index.html')
+    return redirect(url_for('user.login'))
 
 
 @portal.route('/admin')

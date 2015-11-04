@@ -30,6 +30,18 @@ class TestAuth(TestCase):
         rv = self.app.get('/logout')
         self.assertEquals(302, rv.status_code)
 
+    def test_local_user_add(self):
+        """Add a local user via flask_user forms"""
+        data = {'username': 'OneTestUser',
+                'password': 'one2Three',
+                'retype_password': 'one2Three',
+                'email': 'otu@example.com',
+               }
+        rv = self.app.post('/user/register', data=data)
+        self.assertEquals(rv.status_code, 302)
+        new_user = User.query.filter_by(username=data['username']).first()
+        self.assertTrue(new_user.roles[0].name, ROLE.PATIENT)
+
     def test_client_add(self):
         """Test adding a client application"""
         origins = "https://test.com https://two.com"

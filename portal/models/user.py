@@ -5,6 +5,8 @@ from flask import abort, request, session
 from flask.ext.user import UserMixin
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
+from flask.ext.login import current_user as flask_login_current_user
+from flask.ext.user.signals import user_logged_in, user_registered
 
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
@@ -154,14 +156,31 @@ def add_authomatic_user(authomatic_user, image_url):
             image_url=image_url)
     db.session.add(user)
     db.session.commit()
+    add_default_role(user)
 
-    # All new users are given the patient role by default
+
+def add_default_role(user):
+    """All new users are given the patient role by default"""
     patient = Role.query.filter_by(name=ROLE.PATIENT).first()
     default_role = UserRoles(user_id=user.id,
             role_id=patient.id)
     db.session.add(default_role)
     db.session.commit()
     return user
+
+
+def flask_user_login_event(app, user, **extra):
+    app.logger.debug("Log in local user %d", user.id)
+
+
+def flask_user_registered_event(app, user, **extra):
+    app.logger.debug("New local user %d added", user.id)
+    add_default_role(user)
+
+
+# Register functions to receive signals from flask_user
+user_logged_in.connect(flask_user_login_event)
+user_registered.connect(flask_user_registered_event)
 
 
 def current_user():
@@ -175,6 +194,8 @@ def current_user():
     if 'id' in session:
         # Locally logged in
         uid = session['id']
+    elif flask_login_current_user.is_authenticated():
+        uid = flask_login_current_user.id
     elif hasattr(request, 'oauth'):
         # Remote OAuth - 'id' lives in request.oauth.user.id:
         uid = request.oauth.user.id

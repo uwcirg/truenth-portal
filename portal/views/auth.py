@@ -85,7 +85,7 @@ def login(provider_name):
         """Using OAuth result, fetch the user's picture URL"""
         image_url = result.user.picture
         if provider_name == 'facebook':
-            # Additional request needed for FB profile image 
+            # Additional request needed for FB profile image
             url = '?'.join(("https://graph.facebook.com/{0}/picture",
                 "redirect=false")).format(result.user.id)
             response = result.provider.access(url)
@@ -166,9 +166,9 @@ def logout():
     clearing the browser session.
 
     """
-    user_id = None
-    if 'id' in session:
-        user_id = session['id']
+    user = current_user()
+    user_id = user.id if user else None
+    if user_id:
         current_app.logger.debug("Logout user.id %d", user_id)
 
         delete_facebook_authorization = False  # Fencing out for now
