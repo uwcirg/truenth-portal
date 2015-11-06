@@ -5,6 +5,7 @@ import os
 import sys
 from flask import Flask
 
+from .audit import configure_audit_log
 from .config import DefaultConfig
 from .extensions import celery, db, mail, oauth, user_manager
 from .views.api import api
@@ -27,6 +28,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
+    configure_audit_log(app)
     return app
 
 

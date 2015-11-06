@@ -16,6 +16,7 @@ from wtforms import TextField, validators
 from werkzeug.security import gen_salt
 from validators import url as url_validation
 
+from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user, current_user, User
@@ -117,8 +118,8 @@ def login(provider_name):
             ap = AuthProvider.query.filter_by(provider=provider_name,
                     provider_id=result.user.id).first()
             if ap:
-                current_app.logger.debug("Login user.id %d via %s",
-                        ap.user_id, provider_name)
+                auditable_event("login via {0}".format(provider_name),
+                                user_id=ap.user_id)
                 user = User.query.filter_by(id=ap.user_id).first()
                 user.image_url=image_url
                 db.session.commit()
@@ -129,11 +130,11 @@ def login(provider_name):
 
                 if not user:
                     user = add_authomatic_user(result.user, image_url)
-                    current_app.logger.debug("Login new user.id %d",
-        	        user.id)
+                    auditable_event("register new user via {0}".\
+                                    format(provider_name), user_id=user.id)
                 else:
-                    current_app.logger.debug("Login user.id %d via NEW "
-                            "IdP %s", user.id, provider_name)
+                    auditable_event("login user via NEW IdP {0}".\
+                                    format(provider_name), user_id=user.id)
                     user.image_url=image_url
 
                 ap = AuthProvider(provider=provider_name,
@@ -169,7 +170,7 @@ def logout():
     user = current_user()
     user_id = user.id if user else None
     if user_id:
-        current_app.logger.debug("Logout user.id %d", user_id)
+        auditable_event("logout", user_id=user_id)
 
         delete_facebook_authorization = False  # Fencing out for now
         ap = AuthProvider.query.filter_by(provider='facebook',

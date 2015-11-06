@@ -8,6 +8,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 from flask.ext.user.signals import user_logged_in, user_registered
 
+from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import CodeableConcept, ValueQuantity
@@ -170,11 +171,11 @@ def add_default_role(user):
 
 
 def flask_user_login_event(app, user, **extra):
-    app.logger.debug("Log in local user %d", user.id)
+    auditable_event("local user login", user_id=user.id)
 
 
 def flask_user_registered_event(app, user, **extra):
-    app.logger.debug("New local user %d added", user.id)
+    auditable_event("local user registered", user_id=user.id)
     add_default_role(user)
 
 
