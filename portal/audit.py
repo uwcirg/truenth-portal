@@ -11,21 +11,17 @@ import sys
 import logging
 from flask import current_app
 
-from .models.user import current_user
-
 AUDIT = 60  # special log level for auditable events
 
 
-def auditable_event(message, user_id=None, other_user_id=None):
+def auditable_event(message, user_id, other_user_id=None):
     """Record auditable event
 
     message: The message to record, i.e. "log in via facebook"
-    user_id: The authenticated user or current_user if not provided
+    user_id: The authenticated user id performing the action
     other_user_id: Optional for events performed on user other than
                    authenticated
     """
-    if not user_id:
-        user_id = current_user().id
     if other_user_id:
         text = "{0} performed on user {1}: {2}".format(user_id, other_user_id,
                                                        message)
