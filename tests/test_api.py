@@ -1,6 +1,6 @@
 """Unit test module for API"""
 import json
-from tests import TestCase, LAST_NAME, FIRST_NAME, TEST_USER_ID
+from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
@@ -34,6 +34,7 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['resourceType'], 'Patient')
         self.assertEquals(fhir['name']['family'], LAST_NAME)
         self.assertEquals(fhir['name']['given'], FIRST_NAME)
+        self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
 
 
     def test_demographicsPUT(self):

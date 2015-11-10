@@ -112,10 +112,13 @@ class User(db.Model, UserMixin):
         d['status'] = 'registered' if self.registered else 'unknown'
         d['communication'] = 'en-US'
         d['telecom'] = []
+        d['photo'] = []
         if self.email:
             d['telecom'].append({'system': 'email', 'value': self.email})
         if self.phone:
             d['telecom'].append({'system': 'phone', 'value': self.phone})
+        if self.image_url:
+            d['photo'].append({'url': self.image_url})
         return d
 
     def update_from_fhir(self, fhir):

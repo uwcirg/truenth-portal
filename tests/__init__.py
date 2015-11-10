@@ -22,6 +22,7 @@ TEST_USER_ID = 1
 TEST_USERNAME = 'testy'
 FIRST_NAME = 'First'
 LAST_NAME = 'Last'
+IMAGE_URL = 'http://examle.com/photo.jpg'
 
 class TestCase(Base):
     """Base TestClass for application."""
@@ -35,17 +36,18 @@ class TestCase(Base):
     def init_data(self):
         """Push minimal test data in test database"""
         test_user_id = self.add_user(username=TEST_USERNAME,
-                first_name=FIRST_NAME, last_name=LAST_NAME)
+                first_name=FIRST_NAME, last_name=LAST_NAME,
+                image_url=IMAGE_URL)
         assert(test_user_id == TEST_USER_ID)
 
-    def add_user(self, username, first_name="", last_name=""):
+    def add_user(self, username, first_name="", last_name="", image_url=None):
         """Create a user with default role
 
         Returns the newly created user id
 
         """
         test_user = User(username=username, first_name=first_name,
-                last_name=last_name)
+                last_name=last_name, image_url=image_url)
 
         db.session.add(test_user)
         db.session.commit()
