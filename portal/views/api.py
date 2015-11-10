@@ -288,7 +288,7 @@ def assessment_set(patient_id):
             subject:
               description: The subject of the questionnaire response
               externalDocs:
-                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject              
+                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject
               schema:
                 id: Reference
                 type: object
@@ -712,10 +712,10 @@ def set_roles(user_id):
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
     requested_roles = [r['name'] for r in request.json['roles']]
-    roles = Role.query.filter(Role.name.in_(requested_roles)).all()
-    if len(roles) != len(requested_roles):
-        abort(404, "One or more roles requested not found")
-    user.roles = roles 
+    matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
+    if len(matching_roles) != len(requested_roles):
+        abort(404, "One or more roles requested not available")
+    user.roles = matching_roles
 
     # Return user's updated role list
     results = [{'name': r.name, 'description': r.description}
