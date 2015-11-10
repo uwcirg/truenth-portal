@@ -122,9 +122,13 @@ class User(db.Model, UserMixin):
         return d
 
     def update_from_fhir(self, fhir):
+        def v_or_n(value):
+            """Return None unless the value contains data"""
+            return value.rstrip() or None
+
         if 'name' in fhir:
-            self.first_name = fhir['name']['given'] or self.first_name
-            self.last_name = fhir['name']['family'] or self.last_name
+            self.first_name = v_or_n(fhir['name']['given']) or self.first_name
+            self.last_name = v_or_n(fhir['name']['family']) or self.last_name
         if 'birthDate' in fhir:
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
@@ -133,9 +137,9 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             for e in fhir['telecom']:
                 if e['system'] == 'email':
-                    self.email = e['value']
+                    self.email = v_or_n(e['value'])
                 if e['system'] == 'phone':
-                    self.phone = e['value']
+                    self.phone = v_or_n(e['value'])
         db.session.add(self)
         db.session.commit()
 
