@@ -26,7 +26,7 @@ def auditable_event(message, user_id, other_user_id=None):
         text = "{0} performed on user {1}: {2}".format(user_id, other_user_id,
                                                        message)
     else:
-        text = "{0} performed on self: {1}".format(user_id, message)
+        text = "{0} performed: {1}".format(user_id, message)
     current_app.logger.log(AUDIT, text)
 
 

@@ -6,6 +6,7 @@ from flask_swagger import swagger
 import jsonschema
 
 
+from ..audit import auditable_event
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
 from ..extensions import oauth
@@ -253,6 +254,7 @@ def clinical_set(patient_id):
         abort(code, result)
     return jsonify(message=result)
 
+
 @api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def assessment_set(patient_id):
@@ -443,6 +445,57 @@ def assessment_set(patient_id):
             return jsonify(response)
 
     return abort(400, 'Invalid request')
+
+
+@api.route('/auditlog', methods=('POST',))
+@oauth.require_oauth()
+def auditlog_addevent():
+    """Add event to audit log
+
+    API for client applications to add any event to the audit log.  The message
+    will land in the same audit log as any auditable internal event, including
+    recording the authenticated user making the call.
+
+    Returns a json friendly message, i.e. {"message": "ok"}
+    ---
+    operationId: auditlog_addevent
+    tags:
+      - Central Services
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: message
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: message text
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description: if missing valid OAuth token
+
+    """
+    message = request.form.get('message')
+    if not message:
+        return jsonify(message="missing required 'message' in post")
+    auditable_event('remote message: {0}'.format(message),
+                    user_id=current_user().id)
+    return jsonify(message='ok')
+
 
 @api.route('/portal-wrapper-html/', methods=('OPTIONS',))
 @crossdomain(origin='*')
