@@ -3,7 +3,7 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.auth import Client
-from portal.models.role import ROLE 
+from portal.models.role import ROLE
 from portal.models.user import add_authomatic_user, User
 
 class AuthomaticMock(object):
@@ -87,10 +87,11 @@ class TestAuth(TestCase):
         authomatic_user.gender = u'male'
         authomatic_user.email = 'test@test.org'
 
-        add_authomatic_user(authomatic_user, None)
+        new_user = add_authomatic_user(authomatic_user, None)
 
         user = User.query.filter_by(email='test@test.org').first()
         self.assertEquals(user.last_name, u'Bugn\xed')
+        self.assertEquals(new_user, user)
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
