@@ -165,6 +165,7 @@ def add_authomatic_user(authomatic_user, image_url):
     db.session.add(user)
     db.session.commit()
     add_default_role(user)
+    return user
 
 
 def add_default_role(user):
