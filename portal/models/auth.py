@@ -47,8 +47,10 @@ class Client(db.Model):
     @property
     def redirect_uris(self):
         if self._redirect_uris:
-            # Should just store the scheme:hostname:port,
-            # but for now, clean here for validate_redirect_uri
+            # OAuth 2 spec requires a full path to the authorize URL
+            # but in practice, this is too high of a bar (at least for
+            # Liferay).  Only comparing by origin (scheme:hostname:port)
+            # in validate_redirect_uri - so that's all we return
             uris = []
             for uri in self._redirect_uris.split():
                 parsed = urlparse(uri)
