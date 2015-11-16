@@ -89,7 +89,7 @@ def configure_logging(app):
         return
 
     info_file_handler = handlers.RotatingFileHandler(info_log,
-            maxBytes=100000, backupCount=10)
+            maxBytes=1000000, backupCount=20)
     info_file_handler.setLevel(level)
     info_file_handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)s: %(message)s '
