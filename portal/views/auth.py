@@ -11,6 +11,7 @@ from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
+from flask.ext.user.signals import user_logged_in, user_registered
 from flask_wtf import Form
 from wtforms import TextField, validators
 from werkzeug.security import gen_salt
@@ -19,7 +20,8 @@ from validators import url as url_validation
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token
 from ..models.role import ROLE
-from ..models.user import add_authomatic_user, current_user, User
+from ..models.user import add_authomatic_user, add_default_role
+from ..models.user import current_user, User
 from ..extensions import authomatic, db, oauth
 
 auth = Blueprint('auth', __name__)
@@ -63,6 +65,45 @@ def deauthorized():
             format(data['user_id'])
     current_app.logger.info(message)
     return jsonify(message=message)
+
+
+def flask_user_login_event(app, user, **extra):
+    auditable_event("local user login", user_id=user.id)
+
+def flask_user_registered_event(app, user, **extra):
+    auditable_event("local user registered", user_id=user.id)
+    add_default_role(user)
+
+
+# Register functions to receive signals from flask_user
+user_logged_in.connect(flask_user_login_event)
+user_registered.connect(flask_user_registered_event)
+
+
+@auth.route('/next-after-login')
+def next_after_login():
+    """Redirect to appropriate target depending on client auth status
+
+    When client applications request OAuth tokens, we sometimes need
+    to postpone the action of authorizing the client while the user
+    logs in to Central Services.
+
+    After completing authentication with Central Services, this handles
+    redirecting the browser to the appropriate target (either resume
+    the client auth in process or the root).
+
+    Implemented as a view method for integration with flask-user config.
+
+    """
+    # If client auth was pushed aside, resume now
+    if 'pending_authorize_args' in session:
+        args = session['pending_authorize_args']
+        current_app.logger.debug("redirecting to interrupted " +
+            "client authorization: %s", str(args))
+        del session['pending_authorize_args']
+        return redirect(url_for('auth.authorize', **args))
+    else:
+        return redirect('/')
 
 
 @auth.route('/login/<provider_name>/')
@@ -145,15 +186,7 @@ def login(provider_name):
             session['id'] = user.id
             session['remote_token'] = result.provider.credentials.token
             login_user(user)
-            # If client auth was pushed aside, resume now
-            if 'pending_authorize_args' in session:
-                args = session['pending_authorize_args']
-                current_app.logger.debug("redirecting to interrupted " +
-                    "client authorization: %s", str(args))
-                del session['pending_authorize_args']
-                return redirect(url_for('.authorize', **args))
-            else:
-                return redirect('/')
+            return next_after_login()
     else:
         return response
 
@@ -169,34 +202,53 @@ def logout():
     """
     user = current_user()
     user_id = user.id if user else None
-    if user_id:
-        auditable_event("logout", user_id=user_id)
 
-        delete_facebook_authorization = False  # Fencing out for now
+    def delete_facebook_authorization(user_id):
+        """Remove OAuth authorization for Central Services on logout
+
+        If the user has ever authorized Central Services via Facebook,
+        tell facebook to delete the authorization now (on logout).
+
+        NB - this isn't standard OAuth behavior, users only expect to
+        authorize Central Services one time to use their Facebook
+        authentication.
+
+        """
         ap = AuthProvider.query.filter_by(provider='facebook',
                 user_id=user_id).first()
-        if ap and delete_facebook_authorization:
+        if ap:
             headers = {'Authorization':
                 'Bearer {0}'.format(session['remote_token'])}
             url = "https://graph.facebook.com/{0}/permissions".\
                 format(ap.provider_id)
             requests.delete(url, headers=headers)
 
-    logout_user()
-    session.clear()
 
-    # Inform any client apps of this event.  Look for tokens this
-    # user obtained, and notify those clients of the event
-    if user_id:
-        tokens = Token.query.filter_by(user_id=user_id).all()
-        for token in tokens:
+    def notify_clients(user_id):
+        """Inform any client apps of the logout event.
+
+        Look for tokens this user obtained, and notify those clients
+        of the logout event
+
+        """
+        if not user_id:
+            return
+        for token in Token.query.filter_by(user_id=user_id):
             c = Client.query.filter_by(client_id=token.client_id).first()
             c.notify({'event': 'logout', 'user_id': user_id,
                     'refresh_token': token.refresh_token})
-
             # Invalidate the access token by deletion
             db.session.delete(token)
         db.session.commit()
+
+
+    if user_id:
+        auditable_event("logout", user_id=user_id)
+        # delete_facebook_authorization()  #Not using at this time
+
+    logout_user()
+    session.clear()
+    notify_clients(user_id)
     return redirect('/')
 
 
@@ -662,7 +714,7 @@ def authorize(*args, **kwargs):
         parsed = urlparse(request.args['redirect_uri'])
         qs = parse_qs(parsed.query)
         if 'next' in qs:
-            current_app.logger.debug('storing session[next]: %s',
+            current_app.logger.debug('storing ssession[next]: %s',
                 qs['next'])
             session['next'] = qs['next'][0]
 
@@ -673,7 +725,7 @@ def authorize(*args, **kwargs):
         # to retain the request, and replay after Central Services login
         # has completed.
         current_app.logger.debug('Postponing oauth client authorization' +
-            ' till user authenticates with CS: ', str(request.args))
+            ' till user authenticates with CS: %s', str(request.args))
         session['pending_authorize_args'] = request.args 
 
         return redirect('/')

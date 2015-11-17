@@ -6,7 +6,6 @@ from flask.ext.user import UserMixin
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
-from flask.ext.user.signals import user_logged_in, user_registered
 
 from ..audit import auditable_event
 from ..extensions import db
@@ -176,20 +175,6 @@ def add_default_role(user):
     db.session.add(default_role)
     db.session.commit()
     return user
-
-
-def flask_user_login_event(app, user, **extra):
-    auditable_event("local user login", user_id=user.id)
-
-
-def flask_user_registered_event(app, user, **extra):
-    auditable_event("local user registered", user_id=user.id)
-    add_default_role(user)
-
-
-# Register functions to receive signals from flask_user
-user_logged_in.connect(flask_user_login_event)
-user_registered.connect(flask_user_registered_event)
 
 
 def current_user():
