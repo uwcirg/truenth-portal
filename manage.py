@@ -9,16 +9,14 @@ from flask.ext.migrate import Migrate, MigrateCommand
 from portal.app import create_app
 from portal.config import ConfigServer
 from portal.extensions import db
-from portal.models.auth import Client
-from portal.models.user import User, UserRoles
-from portal.models.role import Role, add_static_data
+from portal.models.role import add_static_data
 
 app = create_app()
 manager = Manager(app)
 
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
-manager.add_command('runserver', ConfigServer(host='0.0.0.0'))
+manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
 
 @manager.command
