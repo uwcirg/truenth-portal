@@ -2,7 +2,7 @@
 from datetime import datetime
 from dateutil import parser
 from flask import abort, request, session
-from flask.ext.user import UserMixin
+from flask.ext.user import UserMixin, _call_or_get
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
@@ -188,7 +188,7 @@ def current_user():
     if 'id' in session:
         # Locally logged in
         uid = session['id']
-    elif flask_login_current_user.is_authenticated():
+    elif _call_or_get(flask_login_current_user.is_authenticated):
         uid = flask_login_current_user.id
     elif hasattr(request, 'oauth'):
         # Remote OAuth - 'id' lives in request.oauth.user.id:
