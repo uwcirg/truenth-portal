@@ -419,6 +419,9 @@ def assessment_set(patient_id):
           to view requested patient
     """
 
+    if not hasattr(request, 'json') or not request.json:
+        return abort(400, 'Invalid request')
+
     swag = swagger(current_app)
 
     draft4_schema = {
@@ -431,20 +434,30 @@ def assessment_set(patient_id):
     # Copy desired schema (to validate against) to outermost dict
     draft4_schema.update(swag['definitions'][validation_schema])
 
-    if hasattr(request, 'json') and request.json:
-        try:
-            jsonschema.validate(request.json, draft4_schema)
-            return jsonify({'ok': True})
-        except jsonschema.ValidationError as e:
-            response = {
-                'ok': False,
-                'message': e.message,
-                'reference': e.schema,
-            }
+    response = {
+        'ok': False,
+        'message': 'error saving questionnaire reponse',
+        'valid': False,
+    }
 
-            return jsonify(response)
+    try:
+        jsonschema.validate(request.json, draft4_schema)
 
-    return abort(400, 'Invalid request')
+    except jsonschema.ValidationError as e:
+        response = {
+            'ok': False,
+            'message': e.message,
+            'reference': e.schema,
+        }
+        return jsonify(response)
+
+    response.update({
+        'ok': True,
+        'message': 'questionnaire response valid',
+        'valid': True,
+    })
+
+    return jsonify(response)
 
 
 @api.route('/auditlog', methods=('POST',))
