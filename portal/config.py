@@ -21,6 +21,7 @@ class BaseConfig(object):
     PROJECT = "portal"
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
     TESTING = False
     USER_APP_NAME = 'TrueNTH Central Services'  # used by email templates
