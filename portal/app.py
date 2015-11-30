@@ -86,6 +86,8 @@ def configure_logging(app):
     except IOError:
         print >> sys.stderr, "Can't open log file '%s', use stdout" %\
             info_log
+        print >> sys.stderr,\
+            "Set LOG_FOLDER to a writable directory in configuration file"
         return
 
     info_file_handler = handlers.RotatingFileHandler(info_log,
