@@ -256,6 +256,7 @@ def clinical_set(patient_id):
 
 
 @api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/assessment/<int:patient_id>/', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def assessment_set(patient_id):
     """Add a questionnaire response to a patient's record
