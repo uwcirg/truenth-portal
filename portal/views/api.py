@@ -257,6 +257,21 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
+@api.route('/assessment/<int:questionnaire_response_id>')
+@api.route('/assessment/<int:questionnaire_response_id>/')
+@oauth.require_oauth()
+def assessment(questionnaire_response_id):
+    """Return a patient's responses to a questionnaire
+
+    """
+
+    questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
+
+    if not questionnaire_response:
+        abort(404)
+
+    return jsonify(questionnaire_response.document)
+
 @api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def assessment_set(patient_id):
