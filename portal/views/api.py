@@ -7,9 +7,11 @@ import jsonschema
 
 
 from ..audit import auditable_event
+from ..models.fhir import QuestionnaireResponse
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
 from ..extensions import oauth
+from ..extensions import db
 from .crossdomain import crossdomain
 
 api = Blueprint('api', __name__, url_prefix='/api')
@@ -255,6 +257,21 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
+@api.route('/assessment/<int:questionnaire_response_id>')
+@api.route('/assessment/<int:questionnaire_response_id>/')
+@oauth.require_oauth()
+def assessment(questionnaire_response_id):
+    """Return a patient's responses to a questionnaire
+
+    """
+
+    questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
+
+    if not questionnaire_response:
+        abort(404)
+
+    return jsonify(questionnaire_response.document)
+
 @api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
 @api.route('/assessment/<int:patient_id>/', methods=('POST', 'PUT'))
 @oauth.require_oauth()
@@ -286,7 +303,7 @@ def assessment_set(patient_id):
               description: The lifecycle status of the questionnaire response as a whole
               type: string
               enum:
-                - in progress
+                - in-progress
                 - completed
             subject:
               description: The subject of the questionnaire response
@@ -420,6 +437,9 @@ def assessment_set(patient_id):
           to view requested patient
     """
 
+    if not hasattr(request, 'json') or not request.json:
+        return abort(400, 'Invalid request')
+
     swag = swagger(current_app)
 
     draft4_schema = {
@@ -432,20 +452,39 @@ def assessment_set(patient_id):
     # Copy desired schema (to validate against) to outermost dict
     draft4_schema.update(swag['definitions'][validation_schema])
 
-    if hasattr(request, 'json') and request.json:
-        try:
-            jsonschema.validate(request.json, draft4_schema)
-            return jsonify({'ok': True})
-        except jsonschema.ValidationError as e:
-            response = {
-                'ok': False,
-                'message': e.message,
-                'reference': e.schema,
-            }
+    response = {
+        'ok': False,
+        'message': 'error saving questionnaire reponse',
+        'valid': False,
+    }
 
-            return jsonify(response)
+    try:
+        jsonschema.validate(request.json, draft4_schema)
 
-    return abort(400, 'Invalid request')
+    except jsonschema.ValidationError as e:
+        response = {
+            'ok': False,
+            'message': e.message,
+            'reference': e.schema,
+        }
+        return jsonify(response)
+
+    response.update({
+        'ok': True,
+        'message': 'questionnaire response valid',
+        'valid': True,
+    })
+
+    questionnaire_response = QuestionnaireResponse(
+        user_id=current_user().id,
+        document=request.json,
+    )
+
+    db.session.add(questionnaire_response)
+    db.session.commit()
+
+    response.update({'message': 'questionnaire response saved successfully'})
+    return jsonify(response)
 
 
 @api.route('/auditlog', methods=('POST',))
