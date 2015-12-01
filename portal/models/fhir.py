@@ -153,16 +153,31 @@ class UserObservation(db.Model):
         return self
 
 class QuestionnaireResponse(db.Model):
+
+    def default_status(context):
+        return context.current_parameters['document']['status']
+
+    def default_authored(context):
+        return context.current_parameters['document']['authored']
+
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('users.id'))
-
     document = db.Column(JSONB)
 
     # Fields derived from document content
-    status = db.Column(ENUM(
-        'in-progress',
-        'completed',
-        name='questionnaire_response_statuses'
-    ))
-    authored = db.Column(db.DateTime)
+    status = db.Column(
+        ENUM(
+            'in-progress',
+            'completed',
+            name='questionnaire_response_statuses'
+        ),
+        default=default_status
+    )
+
+    authored = db.Column(
+        db.DateTime,
+        default=default_authored
+    )
+
+
