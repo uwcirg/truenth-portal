@@ -285,7 +285,7 @@ def assessment_set(patient_id):
               description: The lifecycle status of the questionnaire response as a whole
               type: string
               enum:
-                - in progress
+                - in-progress
                 - completed
             subject:
               description: The subject of the questionnaire response
