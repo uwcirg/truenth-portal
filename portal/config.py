@@ -6,6 +6,7 @@ from flask import Config
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
+    ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
@@ -27,8 +28,6 @@ class BaseConfig(object):
     USER_APP_NAME = 'TrueNTH Central Services'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
-    USER_UNAUTHORIZED_ENDPOINT = 'portal.index'
-    USER_UNAUTHENTICATED_ENDPOINT = 'portal.index'
 
 
 class DefaultConfig(BaseConfig):

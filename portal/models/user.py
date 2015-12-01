@@ -7,7 +7,6 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 
-from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import CodeableConcept, ValueQuantity
@@ -167,12 +166,34 @@ def add_authomatic_user(authomatic_user, image_url):
     return user
 
 
+def add_anon_user():
+    """Anonymous user generation.
+
+    Acts like real user without any authentication.  Used to persist
+    data and handle similar communication with client apps (interventions).
+
+    Bound to the session - an anonymous user can also be promoted to
+    a real user at a later time in the session.
+
+    """
+    user = User(username='Anonymous')
+    db.session.add(user)
+    db.session.commit()
+    add_default_role(user)
+    add_role(user, ROLE.ANON)
+    return user
+
+
 def add_default_role(user):
     """All new users are given the patient role by default"""
-    patient = Role.query.filter_by(name=ROLE.PATIENT).first()
-    default_role = UserRoles(user_id=user.id,
-            role_id=patient.id)
-    db.session.add(default_role)
+    return add_role(user, ROLE.PATIENT)
+
+
+def add_role(user, role_name):
+    role = Role.query.filter_by(name=role_name).first()
+    new_role = UserRoles(user_id=user.id,
+            role_id=role.id)
+    db.session.add(new_role)
     db.session.commit()
     return user
 

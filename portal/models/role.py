@@ -24,6 +24,9 @@ class Role(db.Model):
 
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
+    'anon':
+        'Anonymous role - exclusive to accounts generated prior to '
+        'user authentication',
     'patient':
         'Default role for all patients, may only view their own '
         'patient data',

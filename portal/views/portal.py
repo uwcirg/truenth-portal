@@ -2,25 +2,33 @@
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
+from flask.ext.login import login_user
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 
+from ..audit import auditable_event
 from ..models.message import EmailInvite
 from ..models.role import ROLE
-from ..models.user import current_user, get_user, User
+from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth
 from .crossdomain import crossdomain
 from ..tasks import add, post_request
 
 
 portal = Blueprint('portal', __name__)
+
+
 @portal.route('/')
-def index():
-    """portal root view function
+def landing():
+    """landing page view function"""
+    if current_user():
+        return redirect('home')
+    return render_template('landing.html', user=None)
 
-    Renders portal.html with a valid user, otherwise redirects for login.
 
-    """
+@portal.route('/home')
+def home():
+    """home page view function"""
     user = current_user()
     if user:
         # now logged in, redirect if next was previously stored
@@ -31,6 +39,12 @@ def index():
             del session['next']
             return redirect(next_url)
         return render_template('portal.html', user=user)
+    if current_app.config['ANONYMOUS_USER_ACCOUNT']:
+        user = add_anon_user()
+        auditable_event("register new anonymous user", user_id=user.id)
+        session['id'] = user.id
+        login_user(user)
+        return render_template('portal.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
     # steps, as the redirection target after login concludes.
@@ -39,6 +53,7 @@ def index():
         current_app.logger.debug('storing session[next]: %s',
                 request.args.get('next'))
         session['next'] = request.args.get('next', None)
+
     return redirect(url_for('user.login'))
 
 

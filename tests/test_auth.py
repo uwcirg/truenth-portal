@@ -30,6 +30,12 @@ class TestAuth(TestCase):
         rv = self.app.get('/logout')
         self.assertEquals(302, rv.status_code)
 
+    def test_nouser_creates_anon(self):
+        """A request for the home page results in anon user"""
+        rv = self.app.get('/home')
+        anon_user = User.query.filter_by(username='Anonymous').first()
+        self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
+
     def test_local_user_add(self):
         """Add a local user via flask_user forms"""
         data = {'username': 'OneTestUser',
