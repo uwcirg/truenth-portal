@@ -5,6 +5,7 @@
 *.swp
 application.cfg
 bin
+env
 lib
 local
 include
