@@ -4,8 +4,7 @@ function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
     $('.'+passClass).css("height","auto");
-    if (windowsize > 768) {
-        // Get an array of all element heights
+    if (windowsize > 768 && $('.'+passClass).length > 1) {
         var elementHeights = $('.'+passClass).map(function() {
             return $(this).height();
         }).get();
@@ -52,18 +51,36 @@ $(document).ready(function() {
         crossDomain: true
         //xhrFields: {withCredentials: true},
     }, 'html')
-        .done(function(data) {
-            embed_page(data);
-            //showSearch();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            alert("Error loading nav elements from " + PORTAL_HOSTNAME);
-        })
-        .always(function() {
-            // alert( "complete" );
+    .done(function(data) {
+        embed_page(data);
+        //showSearch();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        alert("Error loading nav elements from " + PORTAL_HOSTNAME);
+    })
+    .always(function() {
+        // alert( "complete" );
+    });
+
+    $("#getStarted").on("click", function(){
+        $("#chooseSignIn").fadeOut("fast", function(){
+            $("#choosePath").fadeIn();
         });
+    });
+    $("#btnBrowse").on("click", function(){
+        $("#choosePath").fadeOut("fast", function(){
+            $("#chooseBrowse").fadeIn();
+        });
+    });
+    $("#btnAnon").on("click", function(){
+        $("#choosePath").fadeOut("fast", function(){
+            $("#chooseAnon").fadeIn();
+        });
+    });
+
+    $("[data-ans=no]").on("click", function(){
+       $(this).addClass("active");
+       $(this).parent().next().fadeIn("slow");
+    });
+
 });
-//$(document).ready(function() {
-//
-//
-//});
