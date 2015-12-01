@@ -7,9 +7,11 @@ import jsonschema
 
 
 from ..audit import auditable_event
+from ..models.fhir import QuestionnaireResponse
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
 from ..extensions import oauth
+from ..extensions import db
 from .crossdomain import crossdomain
 
 api = Blueprint('api', __name__, url_prefix='/api')
@@ -457,6 +459,15 @@ def assessment_set(patient_id):
         'valid': True,
     })
 
+    questionnaire_response = QuestionnaireResponse(
+        user_id=current_user().id,
+        document=request.json,
+    )
+
+    db.session.add(questionnaire_response)
+    db.session.commit()
+
+    response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
 
