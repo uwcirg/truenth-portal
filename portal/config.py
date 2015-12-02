@@ -40,7 +40,8 @@ class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    SQLALCHEMY_DATABASE_URI =\
+        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
     WTF_CSRF_ENABLED = False
 
 
