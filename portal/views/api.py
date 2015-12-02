@@ -7,6 +7,7 @@ import jsonschema
 
 
 from ..audit import auditable_event
+from ..models.fhir import CodeableConcept, ValueQuantity, Observation
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
 from ..extensions import oauth
@@ -140,6 +141,121 @@ def demographics_set(patient_id):
         abort(400, "Requires FHIR resourceType of 'Patient'")
     patient.update_from_fhir(request.json)
     return jsonify(patient.as_fhir())
+
+
+@api.route('/clinical/biopsy/<int:patient_id>')
+@oauth.require_oauth()
+def biopsy(patient_id):
+    """Shorthand for getting clinical biopsy data w/o FHIR
+
+    Returns 'true', 'false' or 'unknown' for the patient's clinical biopsy
+    value in JSON, i.e. '{"value": true}'
+    ---
+    tags:
+      - Clinical
+    operationId: getBiopsy
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns clinical biopsy information for requested portal user id
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    code = 119386002
+    key = 'Specimen from prostate'
+    for observation in patient.observations:
+        if observation.codeable_concept.code == code and\
+           observation.codeable_concept.display == key:
+            return jsonify(value=observation.value_quantity.value)
+
+    return jsonify(value='unknown')
+
+@api.route('/clinical/biopsy/<int:patient_id>', methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def biopsy_set(patient_id):
+    """Shorthand for setting clinical biopsy data w/o FHIR
+
+    Requires a simple JSON doc matching the SNOMED CT display for
+    prostate biopsy, namely: '{"Speciment from prostate": true}'
+
+    Returns a json friendly message, i.e. '{"message": "ok"}'
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    ---
+    operationId: setPatientObservation
+    tags:
+      - Clinical
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: ProstateBiopsy
+          required:
+            - Specimen from prostate
+          properties:
+            Specimen from prostate:
+              type: boolean
+              description: has the patient undergone a prostate biopsy
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    key = 'Specimen from prostate'
+    if not request.json or key not in request.json:
+        abort(400, "Expects '{0}' in JSON".format(key))
+    prostate_biopsy = CodeableConcept(system='http://snomed.info/sct',
+                                      code=119386002,
+                                      display=key)
+    prostate_biopsy.add_if_not_found()
+    value = str(request.json[key]).lower()
+    if value not in ('true', 'false'):
+        abort(400, "Expecting boolean value for '{0}'".format(key)) 
+    truthiness = ValueQuantity(value=value, units='boolean')
+    truthiness.add_if_not_found()
+    observation = Observation(codeable_concept=prostate_biopsy,
+                             value_quantity=truthiness)
+
+    patient.observations.append(observation)
+    return jsonify(message='ok')
 
 
 @api.route('/clinical', defaults={'patient_id': None})

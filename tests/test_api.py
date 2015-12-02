@@ -19,11 +19,14 @@ class TestAPI(TestCase):
         self.assertTrue(LAST_NAME in rv.data)
 
     def test_portal_wrapper_wo_name(self):
-        uid = self.add_user(username='test2', first_name=None)
+        "w/o a users first, last name, username should appear"
+        username = 'test2'
+        uid = self.add_user(username=username, first_name=None)
         self.login(user_id=uid)
         rv = self.app.get('/api/portal-wrapper-html/')
 
         self.assertEquals(rv.status_code, 200)
+        self.assertTrue(username in rv.data)
 
     def test_demographicsGET(self):
         self.login()
@@ -117,6 +120,39 @@ class TestAPI(TestCase):
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['message'], "ok")
+
+    def test_empty_clinical_get(self):
+        """Access clinical on user w/o any clinical info"""
+        self.login()
+        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        self.assert200(rv)
+
+    def test_empty_biopsy_get(self):
+        """Access biopsy on user w/o any clinical info"""
+        self.login()
+        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        self.assert200(rv)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'unknown')
+
+
+    def test_clinical_biopsy_put(self):
+        """Shortcut API - just biopsy data w/o FHIR overhead"""
+        self.login()
+        rv = self.app.post('/api/clinical/biopsy/%s' % TEST_USER_ID,
+                           content_type='application/json',
+                           data=json.dumps({'Specimen from prostate': True}))
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        self.assertTrue('119386002' in rv.data)  #  snomed code
+
+        # Access the direct biopsy value
+        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertTrue(data['value'], 'true')  #  snomed code
 
     def test_default_role(self):
         self.login()
