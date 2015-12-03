@@ -41,12 +41,6 @@ def home():
             del session['next']
             return redirect(next_url)
         return render_template('portal.html', user=user)
-    if current_app.config['ANONYMOUS_USER_ACCOUNT']:
-        user = add_anon_user()
-        auditable_event("register new anonymous user", user_id=user.id)
-        session['id'] = user.id
-        login_user(user)
-        return render_template('portal.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
     # steps, as the redirection target after login concludes.
@@ -121,10 +115,19 @@ def termsofuse():
     """terms of use view function"""
     return render_template('termsofuse.html')
 
+
 @portal.route('/questions')
 def questions():
-    """Pca questions function"""
-    return render_template('questions.html')
+    """New user question view.  Creates anon user if none in session"""
+    user = current_user()
+    if not user:
+        user = add_anon_user()
+        auditable_event("register new anonymous user", user_id=user.id)
+        session['id'] = user.id
+        login_user(user)
+
+    return render_template('questions.html', user=user)
+
 
 @portal.route('/spec')
 @crossdomain(origin='*')

@@ -39,10 +39,10 @@ $(document).ready(function(){
         var theVal = $(this).attr("data-value");
         $.ajax ({
             type: "POST",
-            url: '/api/'+toCall+'/', // add user id here when we have that
+            url: '/api/clinical/'+toCall+'/{{ user.id }}',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
-            data: theVal // Do we need to wrap in object?
+            data: JSON.stringify({value: theVal})
         }).done(function() {
             // Can reveal additional questions here if we display one at a time
         }).fail(function() {
