@@ -9,6 +9,7 @@ import jsonschema
 from ..audit import auditable_event
 from ..models.fhir import CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
+from ..models.fhir import BIOPSY, PCaDIAG
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
 from ..extensions import oauth
@@ -241,19 +242,128 @@ def biopsy_set(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
-    key = 'biopsy'
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
-    biopsy = CodeableConcept(system='http://us.truenth.org/clinical-codes',
-                                      code='111',
+    value = str(request.json['value']).lower()
+    if value not in ('true', 'false'):
+        abort(400, "Expecting boolean for 'value'") 
+    truthiness = ValueQuantity(value=value, units='boolean').add_if_not_found()
+    observation = Observation(codeable_concept=BIOPSY,
+                             value_quantity=truthiness)
+
+    patient.observations.append(observation)
+    return jsonify(message='ok')
+
+
+@api.route('/clinical/pca_diag/<int:patient_id>')
+@oauth.require_oauth()
+def pca_diag(patient_id):
+    """Shorthand for getting clinical PCa diagnosis status w/o FHIR
+
+    Returns 'true', 'false' or 'unknown' for the patient's clinical PCa
+    diagnosis value in JSON, i.e. '{"value": true}'
+    ---
+    tags:
+      - Clinical
+    operationId: getPCaDiagnosis
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns 'true', 'false' or 'unknown' for the patient's clinical PCa
+          diagnosis value in JSON, i.e. '{"value": true}'
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    code = '121'
+    key = 'PCa diagnosis'
+    for observation in patient.observations:
+        if observation.codeable_concept.code == code and\
+           observation.codeable_concept.display == key:
+            return jsonify(value=observation.value_quantity.value)
+
+    return jsonify(value='unknown')
+
+
+@api.route('/clinical/pca_diag/<int:patient_id>', methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def pca_diag_set(patient_id):
+    """Shorthand for setting clinical PCa diagnosis status w/o FHIR
+
+    Requires a simple JSON doc to set PCa diagnosis: '{"value": true}'
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    ---
+    operationId: setPCaDiagnosis
+    tags:
+      - Clinical
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: PCaDiagnosis
+          required:
+            - value
+          properties:
+            value:
+              type: boolean
+              description: the patient's PCa diagnosis 
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    code = '121'
+    key = 'PCa diagnosis'
+    if not request.json or 'value' not in request.json:
+        abort(400, "Expects 'value' in JSON")
+    pca_diag = CodeableConcept(system='http://us.truenth.org/clinical-codes',
+                                      code=code,
                                       display=key)
-    biopsy.add_if_not_found()
+    pca_diag.add_if_not_found()
     value = str(request.json['value']).lower()
     if value not in ('true', 'false'):
         abort(400, "Expecting boolean for 'value'") 
     truthiness = ValueQuantity(value=value, units='boolean')
     truthiness.add_if_not_found()
-    observation = Observation(codeable_concept=biopsy,
+    observation = Observation(codeable_concept=pca_diag,
                              value_quantity=truthiness)
 
     patient.observations.append(observation)
