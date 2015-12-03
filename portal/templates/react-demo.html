@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-lg-offset-1 col-md-12">
+                <div class="well lead-well">
+    <div id="content"></div>
+    <script type="text/babel" src={{ url_for('static', filename='js/example.js') }}></script>
+    <script type="text/babel">
+      // To get started with this tutorial running your own code, simply remove
+      // the script tag loading scripts/example.js and start writing code here.
+    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
