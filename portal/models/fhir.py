@@ -51,6 +51,15 @@ class CodeableConcept(db.Model):
         return self
 
 
+""" TrueNTH Clinical Codes """
+TRUENTH_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes' 
+BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
+                         display='biopsy')
+PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
+                          display='PCa diagnosis')
+
+
+
 class ValueQuantity(db.Model):
     __tablename__ = 'value_quantities'
     id = db.Column(db.Integer, primary_key=True)
@@ -179,5 +188,3 @@ class QuestionnaireResponse(db.Model):
         db.DateTime,
         default=default_authored
     )
-
-

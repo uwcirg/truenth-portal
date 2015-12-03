@@ -153,12 +153,40 @@ class TestAPI(TestCase):
         vq = data['entry'][0]['content']['valueQuantity'] 
 
         self.assertEquals(coding['code'], '111')
+        self.assertEquals(coding['display'], 'biopsy')
         self.assertEquals(coding['system'],
                           'http://us.truenth.org/clinical-codes')
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct biopsy value
         rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'true')
+
+    def test_clinical_pca_diag(self):
+        """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
+        self.login()
+        rv = self.app.post('/api/clinical/pca_diag/%s' % TEST_USER_ID,
+                           content_type='application/json',
+                           data=json.dumps({'value': True}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0] 
+        vq = data['entry'][0]['content']['valueQuantity'] 
+
+        self.assertEquals(coding['code'], '121')
+        self.assertEquals(coding['display'], 'PCa diagnosis')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'true')
+
+        # Access the direct biopsy value
+        rv = self.app.get('/api/clinical/pca_diag/%s' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
