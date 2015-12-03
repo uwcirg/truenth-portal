@@ -129,6 +129,11 @@ def questions():
     return render_template('questions.html', user=user)
 
 
+@portal.route('/questions_anon')
+def questions_anon():
+    """Anonymous questions function"""
+    return render_template('questions_anon.html')
+
 @portal.route('/spec')
 @crossdomain(origin='*')
 def spec():
