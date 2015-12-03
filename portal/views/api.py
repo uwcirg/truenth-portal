@@ -177,8 +177,8 @@ def biopsy(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
-    code = '119386002'
-    key = 'Specimen from prostate'
+    code = '111'
+    key = 'biopsy'
     for observation in patient.observations:
         if observation.codeable_concept.code == code and\
            observation.codeable_concept.display == key:
@@ -186,13 +186,13 @@ def biopsy(patient_id):
 
     return jsonify(value='unknown')
 
+
 @api.route('/clinical/biopsy/<int:patient_id>', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def biopsy_set(patient_id):
     """Shorthand for setting clinical biopsy data w/o FHIR
 
-    Requires a simple JSON doc matching the SNOMED CT display for
-    prostate biopsy, namely: '{"Speciment from prostate": true}'
+    Requires a simple JSON doc to set value for biopsy: '{"value": true}'
 
     Returns a json friendly message, i.e. '{"message": "ok"}'
 
@@ -200,7 +200,7 @@ def biopsy_set(patient_id):
     patient.
 
     ---
-    operationId: setPatientObservation
+    operationId: setBiopsy
     tags:
       - Clinical
     produces:
@@ -215,13 +215,13 @@ def biopsy_set(patient_id):
       - in: body
         name: body
         schema:
-          id: ProstateBiopsy
+          id: Biopsy
           required:
-            - Specimen from prostate
+            - value
           properties:
-            Specimen from prostate:
+            value:
               type: boolean
-              description: has the patient undergone a prostate biopsy
+              description: has the patient undergone a biopsy
     responses:
       200:
         description: successful operation
@@ -241,19 +241,19 @@ def biopsy_set(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
-    key = 'Specimen from prostate'
-    if not request.json or key not in request.json:
-        abort(400, "Expects '{0}' in JSON".format(key))
-    prostate_biopsy = CodeableConcept(system='http://snomed.info/sct',
-                                      code='119386002',
+    key = 'biopsy'
+    if not request.json or 'value' not in request.json:
+        abort(400, "Expects 'value' in JSON")
+    biopsy = CodeableConcept(system='http://us.truenth.org/clinical-codes',
+                                      code='111',
                                       display=key)
-    prostate_biopsy.add_if_not_found()
-    value = str(request.json[key]).lower()
+    biopsy.add_if_not_found()
+    value = str(request.json['value']).lower()
     if value not in ('true', 'false'):
-        abort(400, "Expecting boolean value for '{0}'".format(key)) 
+        abort(400, "Expecting boolean for 'value'") 
     truthiness = ValueQuantity(value=value, units='boolean')
     truthiness.add_if_not_found()
-    observation = Observation(codeable_concept=prostate_biopsy,
+    observation = Observation(codeable_concept=biopsy,
                              value_quantity=truthiness)
 
     patient.observations.append(observation)

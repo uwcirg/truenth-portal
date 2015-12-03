@@ -88,7 +88,7 @@ class TestAPI(TestCase):
 
         clinical_data = json.loads(rv.data)
         self.assertEquals('Gleason score',
-            clinical_data['entry'][0]['content']['name']['coding'][0]\
+            clinical_data['entry'][0]['content']['code']['coding'][0]\
                     ['display'])
         self.assertEquals('2',
             clinical_data['entry'][0]['content']['valueQuantity']\
@@ -97,7 +97,7 @@ class TestAPI(TestCase):
 
     def test_clinicalPOST(self):
         data = {"resourceType": "Observation",
-                "name": {
+                "code": {
                     "coding": [{
                         "system": "http://loinc.org",
                         "code": "28540-3",
@@ -141,18 +141,26 @@ class TestAPI(TestCase):
         self.login()
         rv = self.app.post('/api/clinical/biopsy/%s' % TEST_USER_ID,
                            content_type='application/json',
-                           data=json.dumps({'Specimen from prostate': True}))
+                           data=json.dumps({'value': True}))
+        self.assert200(rv)
         result = json.loads(rv.data)
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
         rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
-        self.assertTrue('119386002' in rv.data)  #  snomed code
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0] 
+        vq = data['entry'][0]['content']['valueQuantity'] 
+
+        self.assertEquals(coding['code'], '111')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'true')
 
         # Access the direct biopsy value
         rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
         data = json.loads(rv.data)
-        self.assertTrue(data['value'], 'true')  #  snomed code
+        self.assertEquals(data['value'], 'true')
 
     def test_default_role(self):
         self.login()

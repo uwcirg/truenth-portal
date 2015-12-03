@@ -43,13 +43,15 @@ class User(db.Model, UserMixin):
             backref=db.backref('users', lazy='dynamic'))
 
     def add_observation(self, fhir):
-        if not 'coding' in fhir['name']:
+        if not 'coding' in fhir['code']:
             return 400, "requires at least one CodeableConcept"
         if not 'valueQuantity' in fhir:
             return 400, "missing required 'valueQuantity'"
 
         # Only retaining first Codeable Concept at this time
-        first_cc = fhir['name']['coding'][0]
+        if len(fhir['code']['coding']) > 1:
+            return 400, "can't handle multiple codeable concepts"
+        first_cc = fhir['code']['coding'][0]
         cc = CodeableConcept(system=first_cc.get('system'),
                 code=first_cc.get('code'),
                 display=first_cc.get('display')).add_if_not_found()

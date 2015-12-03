@@ -30,7 +30,7 @@ class CodeableConcept(db.Model):
         for i in ("system", "code", "display"):
             if getattr(self, i):
                 d[i] = getattr(self, i)
-        return {"name": {"coding": [d,]}}
+        return {"code": {"coding": [d,]}}
 
     def add_if_not_found(self):
         """Add self to database, or return existing
