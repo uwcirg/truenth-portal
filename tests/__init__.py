@@ -38,7 +38,12 @@ class TestCase(Base):
         test_user_id = self.add_user(username=TEST_USERNAME,
                 first_name=FIRST_NAME, last_name=LAST_NAME,
                 image_url=IMAGE_URL)
-        assert(test_user_id == TEST_USER_ID)
+        if test_user_id != TEST_USER_ID:
+            print "apparent cruft from last run (test_user_id: %d)"\
+                    % test_user_id
+            print "try again..."
+            self.tearDown()
+            self.setUp()
 
     def add_user(self, username, first_name="", last_name="", image_url=None):
         """Create a user with default role
