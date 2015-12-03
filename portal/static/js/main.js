@@ -62,16 +62,11 @@ $(document).ready(function() {
         // alert( "complete" );
     });
 
-    $("#getStarted").on("click", function(){
-        $("#chooseSignIn").fadeOut("fast", function(){
-            $("#choosePath").fadeIn();
-        });
-    });
-    $("#btnBrowse").on("click", function(){
-        $("#choosePath").fadeOut("fast", function(){
-            $("#chooseBrowse").fadeIn();
-        });
-    });
+    //$("#btnBrowse").on("click", function(){
+    //    $("#choosePath").fadeOut("fast", function(){
+    //        $("#chooseBrowse").fadeIn();
+    //    });
+    //});
     $("#btnAnon").on("click", function(){
         $("#choosePath").fadeOut("fast", function(){
             $("#chooseAnon").fadeIn();

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+            <div class="well lead-well">
+
+                <h3>TrueNTH</h3>
+
+                <hr />
+                <h4>Tell Us About Yourself</h4>
+                <p>Tell us a bit about your experience with prostate cancer so we can personalize your experience.</p>
+                <br />
+
+                <p><strong>Have you had a prostate cancer biopsy?</strong></p>
+                <div class="btn btn-default" name="biopsy" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="biopsy" data-value="false">No</div>
+
+                <br /><br />
+                <p><strong>Have you been diagnosed with prostate cancer?</strong></p>
+                <div class="btn btn-default" name="pca_diag" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="pca_diag" data-value="false">No</div>
+
+                <br /><br />
+                <p><strong>Have you begun prostate cancer treatment?</strong></p>
+                <div class="btn btn-default" name="tx" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="tx" data-value="false">No</div>
+
+                <br /><br /><br />
+                <div class="btn btn-tnth-primary">Continue <i class="fa fa-chevron-right"></i></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+
+    $(".btn").on("click", function(){
+        var toCall = $(this).attr("name");
+        // Get value from div - either true or false
+        var theVal = $(this).attr("data-value");
+        $.ajax ({
+            type: "POST",
+            url: '/api/'+toCall+'/', // add user id here when we have that
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: theVal // Do we need to wrap in object?
+        }).done(function() {
+            // Can reveal additional questions here if we display one at a time
+        }).fail(function() {
+            alert("There was a problem updating your profile. Please try again.");
+        });
+    });
+    /** Send the AJAX **/
+
+});
+</script>
+{% endblock %}

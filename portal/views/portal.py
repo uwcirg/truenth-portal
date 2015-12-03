@@ -121,6 +121,10 @@ def termsofuse():
     """terms of use view function"""
     return render_template('termsofuse.html')
 
+@portal.route('/questions')
+def questions():
+    """Pca questions function"""
+    return render_template('questions.html')
 
 @portal.route('/spec')
 @crossdomain(origin='*')
