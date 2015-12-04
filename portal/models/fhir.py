@@ -40,6 +40,9 @@ class CodeableConcept(db.Model):
         to database first if not.
 
         """
+        if self.id:
+            return self
+
         match = self.query.filter_by(system=self.system,
                 code=self.code).first()
         if match:
@@ -57,7 +60,8 @@ BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
                          display='biopsy')
 PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
                           display='PCa diagnosis')
-
+TX = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='131',
+                          display='treatment begun')
 
 
 class ValueQuantity(db.Model):
@@ -125,6 +129,9 @@ class Observation(db.Model):
         Populates self.id if found, adds to database first if not.
 
         """
+        if self.id:
+            return self
+
         match = self.query.filter_by(issued=self.issued,
                 status=self.status,
                 codeable_concept_id=self.codeable_concept_id,
@@ -151,6 +158,9 @@ class UserObservation(db.Model):
         Populates self.id if found, adds to database first if not.
 
         """
+        if self.id:
+            return self
+
         match = self.query.filter_by(user_id=self.user_id,
                 observation_id=self.observation_id).first()
         if match:

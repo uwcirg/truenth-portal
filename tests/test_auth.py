@@ -31,8 +31,8 @@ class TestAuth(TestCase):
         self.assertEquals(302, rv.status_code)
 
     def test_nouser_creates_anon(self):
-        """A request for the home page results in anon user"""
-        rv = self.app.get('/home')
+        """A request for the questions page results in anon user"""
+        rv = self.app.get('/questions')
         anon_user = User.query.filter_by(username='Anonymous').first()
         self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
 

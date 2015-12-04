@@ -74,6 +74,45 @@ class User(db.Model, UserMixin):
         db.session.commit()
         return 200, "ok"
 
+    def fetch_values_for_concept(self, codeable_concept):
+        """Return any matching ValueQuantities for this user"""
+        # User may not have persisted concept - do so now for match
+        codeable_concept = codeable_concept.add_if_not_found()
+        return [obs.value_quantity for obs in self.observations if\
+                obs.codeable_concept_id == codeable_concept.id]
+
+    def save_constrained_observation(self, codeable_concept, value_quantity):
+        """Add or update the value for given concept as observation
+
+        We can store any number of observations for a patient, and
+        for a given concept, any number of values.  BUT sometimes we
+        just want to update the value and retain a single observation
+        for the concept.  Use this method is such a case, i.e. for
+        a user's 'biopsy' status.
+
+        """
+        # User may not have persisted concept or value - CYA
+        codeable_concept = codeable_concept.add_if_not_found()
+        value_quantity = value_quantity.add_if_not_found()
+
+        existing = [obs for obs in self.observations if\
+                    obs.codeable_concept_id == concept.id]
+        assert len(existing) < 2  # it's a constrained concept afterall
+
+        if existing:
+            if existing[0].value_quantity_id == value_quantity.id:
+                # perfect match -- done
+                return
+            else:
+                # We don't want multiple observations for this concept
+                # with different values.  Delete old and add new
+                patient.observations.delete(existing[0])
+
+        observation = Observation(codeable_concept=codeable_concept,
+                                  value_quantity=value_quantity)
+        self.observations.append(observation.add_if_not_found())
+        db.session.commit()
+
     def clinical_history(self, requestURL=None):
         now = datetime.now()
         fhir = {"resourceType": "Bundle",
