@@ -88,6 +88,9 @@ class ValueQuantity(db.Model):
         adds to database first if not.
 
         """
+        if self.id:
+            return
+
         lookup_value = self.value and str(self.value) or None
         match = self.query.filter_by(value=lookup_value,
                 units=self.units, system=self.system).first()

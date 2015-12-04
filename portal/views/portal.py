@@ -132,7 +132,13 @@ def questions():
 @portal.route('/questions_anon')
 def questions_anon():
     """Anonymous questions function"""
-    return render_template('questions_anon.html')
+    user = current_user()
+    if not user:
+        user = add_anon_user()
+        auditable_event("register new anonymous user", user_id=user.id)
+        session['id'] = user.id
+        login_user(user)
+    return render_template('questions_anon.html', user=user)
 
 @portal.route('/spec')
 @crossdomain(origin='*')

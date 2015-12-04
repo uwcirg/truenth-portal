@@ -78,6 +78,7 @@ class User(db.Model, UserMixin):
         """Return any matching ValueQuantities for this user"""
         # User may not have persisted concept - do so now for match
         codeable_concept = codeable_concept.add_if_not_found()
+
         return [obs.value_quantity for obs in self.observations if\
                 obs.codeable_concept_id == codeable_concept.id]
 
@@ -96,7 +97,7 @@ class User(db.Model, UserMixin):
         value_quantity = value_quantity.add_if_not_found()
 
         existing = [obs for obs in self.observations if\
-                    obs.codeable_concept_id == concept.id]
+                    obs.codeable_concept_id == codeable_concept.id]
         assert len(existing) < 2  # it's a constrained concept afterall
 
         if existing:
@@ -108,8 +109,8 @@ class User(db.Model, UserMixin):
                 # with different values.  Delete old and add new
                 patient.observations.delete(existing[0])
 
-        observation = Observation(codeable_concept=codeable_concept,
-                                  value_quantity=value_quantity)
+        observation = Observation(codeable_concept_id=codeable_concept.id,
+                                  value_quantity_id=value_quantity.id)
         self.observations.append(observation.add_if_not_found())
         db.session.commit()
 

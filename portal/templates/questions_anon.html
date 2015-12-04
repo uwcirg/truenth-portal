@@ -112,10 +112,10 @@ $(document).ready(function(){
         var theVal = thisDiv.data("value");
         $.ajax ({
             type: "POST",
-            url: '/api/'+toCall+'/', // add user id here when we have that
+            url: '/api/'+toCall+'/{{ user.id }}',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
-            data: theVal // Do we need to wrap in object?
+            data: JSON.stringify({value: theVal})
         }).always(function(){
             thisDiv.parent().find(".pat-q").removeClass("active");
             thisDiv.addClass("active");
