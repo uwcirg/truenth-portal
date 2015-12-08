@@ -1,6 +1,6 @@
 """API view functions"""
 from flask import abort, Blueprint, jsonify, make_response
-from flask import current_app, render_template, request, url_for
+from flask import current_app, render_template, request, url_for, redirect
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 import jsonschema
@@ -758,6 +758,27 @@ def assessment_set(patient_id):
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
+@api.route('/present-assessment/<assessment_code>')
+@oauth.require_oauth()
+def present_assessment(assessment_code):
+    # Todo: replace with proper models
+    instruments = current_app.config['INSTRUMENTS']
+    clients_instruments = current_app.config['CLIENTS_INSTRUMENTS']
+
+    if not assessment_code or not assessment_code in instruments:
+        abort(404, "No matching assessment found: %s" % assessment_code)
+
+    for client_id, instrument_urls in clients_instruments.items():
+        if assessment_code in instrument_urls:
+            assessment_url = instrument_urls[assessment_code]
+            break
+    else:
+        abort(404, "No assessment available: %s" % assessment_code)
+
+    # Todo: persist and return to when assessment complete
+    return_url = request.args.get('return')
+
+    return redirect(assessment_url, code=303)
 
 @api.route('/auditlog', methods=('POST',))
 @oauth.require_oauth()
