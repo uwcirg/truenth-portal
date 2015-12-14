@@ -204,7 +204,7 @@ def pca_diag(patient_id):
       200:
         description:
           Returns 'true', 'false' or 'unknown' for the patient's clinical PCa
-          diagnosis value in JSON, i.e. '{"value": true}'
+          diagnosis value in JSON
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -240,7 +240,7 @@ def treatment(patient_id):
       200:
         description:
           Returns 'true', 'false' or 'unknown' for the patient's clinical 
-          treatment begun status in JSON, i.e. '{"value": true}'
+          treatment begun status in JSON
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
