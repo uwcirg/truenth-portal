@@ -761,6 +761,37 @@ def assessment_set(patient_id):
 @api.route('/present-assessment/<assessment_code>')
 @oauth.require_oauth()
 def present_assessment(assessment_code):
+    """Request that central service present an assessment via the assessment engine
+
+    Redirects to the first assessment engine instance that is capable of administering the requested assessment
+    ---
+    operationId: present_assessment
+    produces:
+      - text/html
+    parameters:
+      - name: assessment_code
+        in: path
+        description: Code representing assessment to administer
+        required: true
+        type: string
+      - name: return
+        in: query
+        description: Intervention URL to return to after assessment completion
+        required: true
+        type: string
+        format: url
+    responses:
+      303:
+        description: successful operation
+        headers:
+          Location:
+            description: URL registered with assessment engine used to provide given assessment
+            type: string
+            format: url
+      401:
+        description: if missing valid OAuth token
+
+    """
     # Todo: replace with proper models
     instruments = current_app.config['INSTRUMENTS']
     clients_instruments = current_app.config['CLIENTS_INSTRUMENTS']
