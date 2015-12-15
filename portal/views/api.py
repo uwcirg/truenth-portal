@@ -820,6 +820,14 @@ def present_assessment(assessment_code):
 
     return redirect(assessment_url, code=303)
 
+@api.route('/complete-assessment')
+@oauth.require_oauth()
+def complete_assessment():
+    return_url = session.pop("assessment_return", "home")
+
+    current_app.logger.debug("assessment complete, redirect to: %s", return_url)
+    return redirect(return_url, code=303)
+
 @api.route('/auditlog', methods=('POST',))
 @oauth.require_oauth()
 def auditlog_addevent():
