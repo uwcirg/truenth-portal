@@ -823,6 +823,26 @@ def present_assessment(assessment_code):
 @api.route('/complete-assessment')
 @oauth.require_oauth()
 def complete_assessment():
+    """Return to the last intervention that requested an assessment be presented
+
+    Redirects to the URL passed to central services when present-assessment was last called (if valid) or central services home
+    ---
+    operationId: complete_assessment
+    produces:
+      - text/html
+    responses:
+      303:
+        description: successful operation
+        headers:
+          Location:
+            description: URL passed to central services when present-assessment was last called (if valid) or central services home
+            type: string
+            format: url
+      401:
+        description: if missing valid OAuth token
+
+    """
+
     return_url = session.pop("assessment_return", "home")
 
     current_app.logger.debug("assessment complete, redirect to: %s", return_url)
