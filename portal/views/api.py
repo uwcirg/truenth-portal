@@ -1,12 +1,14 @@
 """API view functions"""
 from flask import abort, Blueprint, jsonify, make_response
-from flask import current_app, render_template, request, url_for, redirect
+from flask import current_app, render_template, request, url_for, redirect, session
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 import jsonschema
 
 
 from ..audit import auditable_event
+
+from ..models.auth import validate_client_origin
 from ..models.fhir import CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import BIOPSY, PCaDIAG, TX
@@ -789,7 +791,7 @@ def present_assessment(assessment_code):
             type: string
             format: url
       401:
-        description: if missing valid OAuth token
+        description: if missing valid OAuth token or bad `return` parameter
 
     """
     # Todo: replace with proper models
@@ -806,8 +808,15 @@ def present_assessment(assessment_code):
     else:
         abort(404, "No assessment available: %s" % assessment_code)
 
-    # Todo: persist and return to when assessment complete
-    return_url = request.args.get('return')
+
+    if 'return' in request.args:
+        return_url = request.args.get('return')
+
+        # Validate return URL the same way CORS requests are
+        validate_client_origin(return_url)
+
+        current_app.logger.debug('storing session[assessment_return]: %s', return_url)
+        session['assessment_return'] = return_url
 
     return redirect(assessment_url, code=303)
 
