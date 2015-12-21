@@ -37,7 +37,7 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
-    observations = db.relationship('Observation',
+    observations = db.relationship('Observation', lazy='dynamic',
             secondary="user_observations", backref=db.backref('users'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
@@ -107,7 +107,7 @@ class User(db.Model, UserMixin):
             else:
                 # We don't want multiple observations for this concept
                 # with different values.  Delete old and add new
-                patient.observations.delete(existing[0])
+                self.observations.remove(existing[0])
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
                                   value_quantity_id=value_quantity.id)

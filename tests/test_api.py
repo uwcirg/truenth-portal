@@ -135,7 +135,6 @@ class TestAPI(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'unknown')
 
-
     def test_clinical_biopsy_put(self):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
@@ -162,6 +161,23 @@ class TestAPI(TestCase):
         rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
+
+        # Can we alter the value?
+        rv = self.app.post('/api/clinical/biopsy/%s' % TEST_USER_ID,
+                           content_type='application/json',
+                           data=json.dumps({'value': False}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Confirm it's altered
+        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'false')
+
+        # Confirm the db is clean
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.observations.count(), 1)
 
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
