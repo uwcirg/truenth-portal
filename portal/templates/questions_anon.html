@@ -35,7 +35,7 @@
 
                     </div>
                     <div class="col-xs-6">
-                        <a id="decision" href='/home'
+                        <a id="decision" href="{{ config['DECIDING_INTERVENTION'] }}"
                            class="btn btn-block btn-default btn-lg" style="white-space: normal">
                             Decision Support<br />
                             <small>Which option is best for me?</small>
@@ -55,7 +55,7 @@
 
                     </div>
                     <div class="col-xs-6">
-                        <a id="management" href='/home'
+                        <a id="management" href="{{ config['SELF_MANAGE_INTERVENTION'] }}"
                            class="btn btn-block btn-default btn-lg" style="white-space: normal">
                             Self Management<br />
                             <small>How do I cope with symptoms?</small>
@@ -99,6 +99,7 @@
 <script>
 $(document).ready(function(){
 
+    // Count number of "no" answers so that we can display feedback form if needed
     var noCount = 0;
 
     $(".pat-q").on("click", function(){
@@ -138,6 +139,14 @@ $(document).ready(function(){
         })
     });
     /** Send the AJAX **/
+
+    $("#tellUsSave").on("click", function(){
+        var theFeedback = $("#tellUs").val();
+        // TODO - What do we do with this feedback?
+        // submit via an API? Generate an email.
+
+        // When we're done with submission, do we give them an opportunity to submit again? Display an email address if they have further thoughts?
+    });
 
 });
 </script>

@@ -13,20 +13,55 @@
                 <br />
 
                 <div id="patientQuestions">
-                    <p><strong>Have you had a prostate cancer biopsy?</strong></p>
-                    <div class="btn btn-default" name="biopsy" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="biopsy" data-value="false">No</div>
 
-                    <br /><br />
-                    <p><strong>Have you been diagnosed with prostate cancer?</strong></p>
-                    <div class="btn btn-default" name="pca_diag" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="pca_diag" data-value="false">No</div>
+                    <h4>Have you had a prostate cancer biopsy?</h4>
 
-                    <br /><br />
-                    <p><strong>Have you begun prostate cancer treatment?</strong></p>
-                    <div class="btn btn-default" name="tx" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default" name="tx" data-value="false">No</div>
+                    <div data-topic="biopsy">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="biopsy" data-value="true" autocomplete="off"> Yes
+                            </label>
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="biopsy" data-value="false" autocomplete="off"> No
+                            </label>
+                        </div>
+                        <div style="display: none">
+
+                        </div>
+                    </div>
+
+                    <div data-topic="pca_diag" style="display: none">
+                        <br /><br />
+                        <h4>Have you been diagnosed with prostate cancer?</h4>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="pca_diag" data-value="true" autocomplete="off"> Yes
+                            </label>
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="pca_diag" data-value="false" autocomplete="off"> No
+                            </label>
+                        </div>
+                    </div>
+
+                    <div data-topic="tx" style="display: none;">
+                        <br /><br />
+                        <h4>Have you begun prostate cancer treatment?</h4>
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="tx" data-value="true" autocomplete="off"> Yes
+                            </label>
+                            <label class="btn btn-default btn-lg">
+                                <input type="radio" name="tx" data-value="false" autocomplete="off"> No
+                            </label>
+                        </div>
+                    </div>
+
                 </div>
 
                 <br /><br /><br />
-                <div class="btn btn-tnth-primary">Continue <i class="fa fa-chevron-right"></i></div>
+                <div style="display: none;">
+                    <a class="btn btn-tnth-primary" href="/home">Continue <i class="fa fa-chevron-right"></i></a>
+                </div>
 
             </div>
         </div>
@@ -35,7 +70,26 @@
 <script>
 $(document).ready(function(){
 
-    $("#patientQuestions .btn").on("click", function(){
+    var getQs = [ "biopsy", "pca_diag", "tx"];
+    $.each(getQs, function(i,val){
+        $.ajax ({
+            type: "GET",
+            url: '/api/clinical/'+val+'/{{ user.id }}'
+        }).done(function(data) {
+            // Mark existing answers
+            $("div[data-topic='"+val+"']").find("[data-value='"+data.value+"']").attr("checked", true).parent().addClass("active");
+            // Show in UI if already have an answer
+            if (data.value != "unknown") {
+                $("div[data-topic='"+val+"']").show();
+            }
+        }).fail(function() {
+            console.log("Problem retrieving data from server.")
+        });
+    });
+
+
+
+    $("#patientQuestions input").on("change", function(){
         var toCall = $(this).attr("name");
         // Get value from div - either true or false
         var theVal = $(this).attr("data-value");
@@ -46,9 +100,15 @@ $(document).ready(function(){
             dataType: 'json',
             data: JSON.stringify({value: theVal})
         }).done(function() {
-            // Can reveal additional questions here if we display one at a time
+            // If true, then display next question
+            if (theVal == "true") {
+                $("div[data-topic='"+toCall+"']").next().fadeIn("slow");
+            } else {
+                $("div[data-topic='"+toCall+"']").next().hide();
+                // TODO - clear any saved value here?
+            }
         }).fail(function() {
-            alert("There was a problem updating your profile. Please try again.");
+            alert("There was a problem saving your answers. Please try again.");
         });
     });
     /** Send the AJAX **/
