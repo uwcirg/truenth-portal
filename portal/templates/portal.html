@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block main %}
-    <div class="container">
+    <div class="container hide-initial" id="allContent">
         <div class="row">
             <div class="col-sm-6 col-md-4">
                 <div class="well lead-well int-cards">
@@ -54,4 +54,88 @@
             </div>                        
         </div>        
     </div>
+
+<div class="container hide-initial" id="conditionalContent">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="well" style="margin: 2em auto">
+                <h2>TrueNth</h2>
+                <p data-ans-count="0" class="hide-initial">You have told us that you have not yet had a prostate cancer biopsy. You can browse through our information on prostate cancer:</p>
+                <p data-ans-count="1" class="hide-initial">You have told us that you do not yet know if you have prostate cancer, or you have been told you do not have prostate cancer.  You may wish to look at the options below:</p>
+                <p data-ans-count="2" class="hide-initial">You have told us that you have been diagnosed but have not yet started treatment. Would you like to:</p>
+                <p data-ans-count="3" class="hide-initial">You have told us that you have already begun treatment. Would you like to:</p>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 hide-initial" id="p3p">
+            <div class="well lead-well int-cards">
+                <h3>Decision Support</h3>
+                <div class="int-sub">Which option is best for me?</div>
+                <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+                <a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Decision Support <i class="fa fa-chevron-right"></i></a>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 hide-initial" id="sm">
+            <div class="well lead-well int-cards">
+                <h3>Self Management</h3>
+                <div class="int-sub">How do I cope with my symptoms?</div>
+                <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
+                <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Self Management <i class="fa fa-chevron-right"></i></a></p>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6" id="infoPage">
+            <div class="well lead-well int-cards">
+                <h3>Information Page</h3>
+                <div class="int-sub">Links and whatnot</div>
+                <p>Generic links would either be here or be listed on a sub-page.</p>
+                <a href="#" class="btn btn-primary btn-tnth-primary">Info Page <i class="fa fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        var getQs = [ "biopsy", "pca_diag", "tx"];
+        var ansYes = 0;
+        var ansNo = 0;
+
+        $.each(getQs, function(i,val){
+            $.ajax ({
+                type: "GET",
+                url: '/api/clinical/'+val+'/{{ user.id }}'
+            }).done(function(data) {
+                // Temporary way of determining what to display based on question answers
+                if (data.value == "true") {
+                    ansYes++;
+                    $("#conditionalContent").show();
+                } else if (data.value == "false") {
+                    ansNo++;
+                    $("#conditionalContent").show();
+                }
+                // If last question, then decide what to display
+                if (i+1 == getQs.length) {
+                    // If yes to more than 2, then display self management
+                    if (ansYes > 2) {
+                        $("#sm").show();
+                    } else if (ansYes > 0) {
+                        // If yes is 1 or 2, then display p3p
+                        $("#p3p").show();
+                    } else {
+                        if (ansNo == 0) {
+                            // If all answers are unknown then display the old-school allContent
+                            $("#allContent").show();
+                        }
+                    }
+                    $("p[data-ans-count='"+ansYes+"']").show();
+                    equalHeightBoxes("lead-well");
+                }
+            }).fail(function() {
+                console.log("Problem retrieving data from server.")
+            });
+        });
+
+    });
+</script>
 {% endblock %}
