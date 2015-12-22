@@ -9,6 +9,7 @@ from flask.ext.user import roles_required
 from flask_swagger import swagger
 
 from ..audit import auditable_event
+from ..models.fhir import BIOPSY, PCaDIAG, TX
 from ..models.message import EmailInvite
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
@@ -40,7 +41,13 @@ def home():
             next_url = session['next']
             del session['next']
             return redirect(next_url)
-        return render_template('portal.html', user=user)
+
+        # If the user hasn't already answered any upfront questions
+        # ask them now - otherwise, off to the portal home..
+        for c in (BIOPSY, PCaDIAG, TX):
+            if user.fetch_values_for_concept(c):
+                return render_template('portal.html', user=user)
+        return render_template('questions.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
     # steps, as the redirection target after login concludes.
