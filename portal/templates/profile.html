@@ -5,7 +5,7 @@
             <div class="col-lg-10 col-lg-offset-1 col-md-12">
                 <div class="well lead-well">
                     <h3>Profile for {{ user.username }}</h3>
-                    
+
                     <div id="loadingIndicator" class="loading-indicator">
                         <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
                         <p class="lead">Saving...</p>
@@ -87,7 +87,53 @@
                             <label for="phone">Cell phone</label>
                             <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
                         </div>
-                        <br />
+
+                        <div id="patientQuestions">
+                            <div class="form-group">
+                                <label>Have you had a prostate cancer biopsy?</label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input class="history-q" type="radio" name="biopsy" value="true" />
+                                        Yes
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="biopsy" value="false" />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Have you been diagnosed with prostate cancer?</label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="pca_diag" value="true" />
+                                        Yes
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="pca_diag" value="false" />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Have you begun prostate cancer treatment?</label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="tx" value="true" />
+                                        Yes
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="tx" value="false" />
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+
+
                         <div class="form-group">
                             <button id="updateProfile" type="submit" class="btn btn-lg btn-default">Save</button>
                             <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
@@ -158,7 +204,7 @@ $(document).ready(function(){
                 if ($el.val() == "") {
                     return false;
                 }
-                var emailReg = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                 return emailReg.test( $el.val() );
             }
         },
@@ -244,6 +290,39 @@ $(document).ready(function(){
         }).fail(function() {
             alert("There was a problem updating your profile. Please try again.");
         }); 
+    });
+});
+
+var getQs = [ "biopsy", "pca_diag", "tx"];
+$.each(getQs, function(i,val){
+    $.ajax ({
+        type: "GET",
+        url: '/api/clinical/'+val+'/{{ user.id }}'
+    }).done(function(data) {
+        var $radios = $('input:radio[name='+val+']');
+        if($radios.is(':checked') === false) {
+            $radios.filter('[value='+data.value+']').prop('checked', true);
+        }
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    });
+});
+
+$("#patientQuestions input").on("change", function(){
+    var toCall = $(this).attr("name");
+    // Get value from div - either true or false
+    var theVal = $(this).val();
+    console.log(theVal);
+    $.ajax ({
+        type: "POST",
+        url: '/api/clinical/'+toCall+'/{{ user.id }}',
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        data: JSON.stringify({value: theVal})
+    }).done(function() {
+        console.log('done');
+    }).fail(function() {
+        alert("There was a problem saving your answers. Please try again.");
     });
 });
 {% endblock %}
