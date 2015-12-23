@@ -176,6 +176,9 @@
                         if (ansNo == 0) {
                             // If all answers are unknown then display the old-school allContent
                             $("#allContent").show();
+                        } else if (ansNo == 3) {
+                            $("#otherP3p").show();
+                            $("#otherSm").show();
                         }
                     }
                     $("p[data-ans-count='"+ansYes+"']").show();
