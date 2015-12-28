@@ -550,6 +550,10 @@ def assessment(instrument_id):
         required: true
         type: integer
         format: int64
+        type: string
+        enum:
+          - epic26
+          - eq5d 
       - name: patient_id
         in: query 
         description:
