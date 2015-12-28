@@ -548,8 +548,6 @@ def assessment(instrument_id):
         description:
           ID of the instrument, eg "epic26", "eq5d" 
         required: true
-        type: integer
-        format: int64
         type: string
         enum:
           - epic26
@@ -563,6 +561,16 @@ def assessment(instrument_id):
         format: int64
 
     responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
