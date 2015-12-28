@@ -531,10 +531,10 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
-@api.route('/assessment/<int:questionnaire_response_id>', methods=('GET'))
-@api.route('/assessment/<int:questionnaire_response_id>/', methods=('GET'))
+@api.route('/assessment', methods=('GET'))
+@api.route('/assessment/', methods=('GET'))
 @oauth.require_oauth()
-def assessment(questionnaire_response_id):
+def assessment(instrument_id):
     """Return a patient's responses to a questionnaire
     ---
     operationId: getQuestionnaireResponse
@@ -544,6 +544,20 @@ def assessment(questionnaire_response_id):
     produces:
       - application/json
     parameters:
+      - name: instrument_id
+        in: query 
+        description:
+          Optional TrueNTH patient ID, defaults to the authenticated user.
+        required: true
+        type: integer
+        format: int64
+      - name: patient_id
+        in: query 
+        description:
+          Optional TrueNTH patient ID, defaults to the authenticated user.
+        required: false
+        type: integer
+        format: int64
 
     responses:
       401:
@@ -552,7 +566,9 @@ def assessment(questionnaire_response_id):
           to view requested patient
     """
 
-    questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
+    # This is surely broken...
+    questionnaire_response = QuestionnaireResponse.query.filter_by(id=instrument_id).first()
+    #questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
 
     if not questionnaire_response:
         abort(404)
