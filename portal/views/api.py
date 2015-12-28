@@ -575,6 +575,7 @@ def assessment(instrument_id):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
+
     """
 
     # This is surely broken...
