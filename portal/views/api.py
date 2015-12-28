@@ -547,7 +547,7 @@ def assessment(instrument_id):
       - name: instrument_id
         in: query 
         description:
-          Optional TrueNTH patient ID, defaults to the authenticated user.
+          ID of the instrument, eg "epic26", "eq5d" 
         required: true
         type: integer
         format: int64
