@@ -531,12 +531,25 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
-@api.route('/assessment/<int:questionnaire_response_id>')
-@api.route('/assessment/<int:questionnaire_response_id>/')
+@api.route('/assessment/<int:questionnaire_response_id>', methods=('GET'))
+@api.route('/assessment/<int:questionnaire_response_id>/', methods=('GET'))
 @oauth.require_oauth()
 def assessment(questionnaire_response_id):
     """Return a patient's responses to a questionnaire
+    ---
+    operationId: getQuestionnaireResponse
+    tags:
+      - QuestionnaireResponse
+      - Assessment Engine 
+    produces:
+      - application/json
+    parameters:
 
+    responses:
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
     """
 
     questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
@@ -558,6 +571,7 @@ def assessment_set(patient_id):
     operationId: addQuestionnaireResponse
     tags:
       - QuestionnaireResponse
+      - Assessment Engine 
     produces:
       - application/json
     parameters:
@@ -768,6 +782,9 @@ def present_assessment(assessment_code):
     Redirects to the first assessment engine instance that is capable of administering the requested assessment
     ---
     operationId: present_assessment
+    tags:
+      - QuestionnaireResponse
+      - Assessment Engine 
     produces:
       - text/html
     parameters:
@@ -828,6 +845,9 @@ def complete_assessment():
     Redirects to the URL passed to central services when present-assessment was last called (if valid) or central services home
     ---
     operationId: complete_assessment
+    tags:
+      - QuestionnaireResponse
+      - Assessment Engine 
     produces:
       - text/html
     responses:
