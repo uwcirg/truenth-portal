@@ -538,7 +538,6 @@ def assessment(instrument_id):
     ---
     operationId: getQuestionnaireResponse
     tags:
-      - QuestionnaireResponse
       - Assessment Engine 
     produces:
       - application/json
@@ -598,7 +597,6 @@ def assessment_set(patient_id):
     ---
     operationId: addQuestionnaireResponse
     tags:
-      - QuestionnaireResponse
       - Assessment Engine 
     produces:
       - application/json
@@ -802,25 +800,28 @@ def assessment_set(patient_id):
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
-@api.route('/present-assessment/<assessment_code>')
+@api.route('/present-assessment/<instrument_id>')
 @oauth.require_oauth()
-def present_assessment(assessment_code):
+def present_assessment(instrument_id):
     """Request that central service present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of administering the requested assessment
     ---
     operationId: present_assessment
     tags:
-      - QuestionnaireResponse
       - Assessment Engine 
     produces:
       - text/html
     parameters:
-      - name: assessment_code
+      - name: instrument_id
         in: path
-        description: Code representing assessment to administer
+        description:
+          ID of the instrument, eg "epic26", "eq5d" 
         required: true
         type: string
+        enum:
+          - epic26
+          - eq5d 
       - name: return
         in: query
         description: Intervention URL to return to after assessment completion
@@ -843,15 +844,15 @@ def present_assessment(assessment_code):
     instruments = current_app.config['INSTRUMENTS']
     clients_instruments = current_app.config['CLIENTS_INSTRUMENTS']
 
-    if not assessment_code or not assessment_code in instruments:
-        abort(404, "No matching assessment found: %s" % assessment_code)
+    if not instrument_id or not instrument_id in instruments:
+        abort(404, "No matching assessment found: %s" % instrument_id)
 
     for client_id, instrument_urls in clients_instruments.items():
-        if assessment_code in instrument_urls:
-            assessment_url = instrument_urls[assessment_code]
+        if instrument_id in instrument_urls:
+            assessment_url = instrument_urls[instrument_id]
             break
     else:
-        abort(404, "No assessment available: %s" % assessment_code)
+        abort(404, "No assessment available: %s" % instrument_id)
 
 
     if 'return' in request.args:
@@ -874,8 +875,7 @@ def complete_assessment():
     ---
     operationId: complete_assessment
     tags:
-      - QuestionnaireResponse
-      - Assessment Engine 
+      - Internal
     produces:
       - text/html
     responses:
