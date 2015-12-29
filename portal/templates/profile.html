@@ -312,7 +312,6 @@ $("#patientQuestions input").on("change", function(){
     var toCall = $(this).attr("name");
     // Get value from div - either true or false
     var theVal = $(this).val();
-    console.log(theVal);
     $.ajax ({
         type: "POST",
         url: '/api/clinical/'+toCall+'/{{ user.id }}',
