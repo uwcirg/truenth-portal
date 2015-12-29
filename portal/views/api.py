@@ -531,9 +531,9 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
-@api.route('/assessments', methods=('GET',))
+@api.route('/assessment', methods=('GET',))
 @oauth.require_oauth()
-def assessments(instrument_id):
+def assessment(instrument_id):
     """Return a patient's responses to a questionnaire
     ---
     operationId: getQuestionnaireResponse
