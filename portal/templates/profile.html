@@ -133,6 +133,33 @@
 
                         </div>
 
+                        <div id="userRoles">
+                            <div class="form-group">
+                                <label>User Roles</label>
+                                <p>[ Limit to admin use only ]</p>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="patient"> Patient
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="anon"> Anon
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="admin"> Admin
+                                    </label>
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" value="application_developer"> Application Developer
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
 
                         <div class="form-group">
                             <button id="updateProfile" type="submit" class="btn btn-lg btn-default">Save</button>
@@ -319,9 +346,47 @@ $("#patientQuestions input").on("change", function(){
         dataType: 'json',
         data: JSON.stringify({value: theVal})
     }).done(function() {
-        console.log('done');
+        // Allow user to save with button, even though these answers have already been submitted
+        $('#updateProfile').removeClass("disabled");
     }).fail(function() {
         alert("There was a problem saving your answers. Please try again.");
     });
 });
+
+// GET and PUT user roles
+$.ajax ({
+    type: "GET",
+    url: '/api/roles/{{ user.id }}'
+}).done(function(data) {
+    $.each(data.roles,function(i,val){
+        $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
+    })
+}).fail(function() {
+    console.log("Problem retrieving data from server.")
+});
+$("#userRoles input:checkbox").on("click",function(){
+    var roles = [];
+    // Add all checked roles to array
+    $.each($("#userRoles input:checkbox"),function(){
+        if ($(this).prop('checked')) {
+            roles.push({name: $(this).val()})
+        }
+    });
+    console.log(roles);
+    console.log(JSON.stringify(roles));
+    $.ajax ({
+        type: "PUT",
+        url: '/api/roles/{{ user.id }}',
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        data: JSON.stringify(roles)
+    }).done(function(data) {
+        console.log(data);
+        // Allow user to save with button, even though these answers have already been submitted
+        $('#updateProfile').removeClass("disabled");
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    });
+})
+
 {% endblock %}
