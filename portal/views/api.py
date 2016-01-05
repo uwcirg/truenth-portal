@@ -566,10 +566,12 @@ def assessment(instrument_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: assessment_response
           required:
             - message
           properties:
+            items:
+              $ref: "#/definitions/QuestionnaireResponse"
             message:
               type: string
               description: Result, typically "ok"
