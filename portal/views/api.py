@@ -1100,6 +1100,49 @@ def protected_portal_wrapper_html():
     return make_response(html)
 
 
+@api.route('/account', methods=('POST',))
+@oauth.require_oauth()
+def account(external_id):
+    """Create a user account 
+    
+    Use cases: 
+    Interventions call this, get a truenth ID back, and subsequently call: 
+    1. set_roles to grant the user role(s)
+    2. the Truenth API to grant the user access to the intervention.
+    ---
+    tags:
+      - User
+    operationId: createAccount 
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns an array: {user_id (TrueNTH ID), external_id, webkey_url}
+        schema:
+          id: new_user_data
+          required:
+            - user_id
+            - external_id
+            - webkey_url 
+          properties:
+            user_id:
+              type: int
+              description:
+                Role name, always a lower case string with no white space.
+            webkey_url:
+              type: string
+              description: unique URL to a user-specific registration page
+      400:
+        description: if the request incudes an unknown role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    return
+
+
 @api.route('/roles', defaults={'user_id': None})
 @api.route('/roles/<int:user_id>')
 @oauth.require_oauth()
@@ -1151,60 +1194,6 @@ def roles(user_id):
     results = [{'name': r.name, 'description': r.description}
             for r in use_roles]
     return jsonify(roles=results)
-
-
-@api.route('/account', methods=('POST',))
-@oauth.require_oauth()
-def account(external_id):
-    """Create a user account 
-    
-    Use cases: 
-    Interventions call this by passing in their own ID and subsequently call: 
-    1. set_roles to grant the user role(s)
-    2. the Truenth API to grant the user access to the intervention.
-    ---
-    tags:
-      - User
-    operationId: createAccount 
-    produces:
-      - application/json
-    parameters:
-      - name: external_id
-        in: path
-        description:
-          Optional ID for intervention-side mapping w/ truenth ID. Note that this is not persisted in CS 
-        required: false
-        type: string 
-    responses:
-      200:
-        description:
-          Returns an array: {user_id (TrueNTH ID), external_id, webkey_url}
-        schema:
-          id: new_user_data
-          required:
-            - user_id
-            - external_id
-            - webkey_url 
-          properties:
-            user_id:
-              type: int
-              description:
-                Role name, always a lower case string with no white space.
-            external_id:
-              type: string
-              description: 
-                Intervention's ID for the user. Note that this is not persisted in CS.
-            webkey_url:
-              type: string
-              description: unique URL to a user-specific registration page
-      400:
-        description: if the request incudes an unknown role.
-      401:
-        description:
-          if missing valid OAuth token or if the authorized user lacks
-          permission to view requested user_id
-    """
-    return
 
 
 @api.route('/roles/<int:user_id>', methods=('PUT',))
