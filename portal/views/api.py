@@ -1102,7 +1102,7 @@ def protected_portal_wrapper_html():
 
 @api.route('/account', methods=('POST',))
 @oauth.require_oauth()
-def account(external_id):
+def account():
     """Create a user account 
     
     Use cases: 
@@ -1118,7 +1118,7 @@ def account(external_id):
     responses:
       200:
         description:
-          Returns an array: {user_id (TrueNTH ID), external_id, webkey_url}
+          Returns an array: {user_id (TrueNTH ID), webkey_url}
         schema:
           id: new_user_data
           required:
@@ -1127,13 +1127,10 @@ def account(external_id):
           properties:
             user_id:
               type: int
-              description:
-                Role name, always a lower case string with no white space.
+              description: the new TrueNTH user ID.
             webkey_url:
               type: string
               description: unique URL to a user-specific registration page
-      400:
-        description: if the request incudes an unknown role.
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
