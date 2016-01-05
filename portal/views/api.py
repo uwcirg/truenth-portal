@@ -1123,7 +1123,6 @@ def account(external_id):
           id: new_user_data
           required:
             - user_id
-            - external_id
             - webkey_url 
           properties:
             user_id:
