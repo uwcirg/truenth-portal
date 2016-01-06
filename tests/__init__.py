@@ -9,6 +9,7 @@ options:
 """
 
 from flask.ext.testing import TestCase as Base
+from flask.ext.webtest import SessionScope
 
 from portal.app import create_app
 from portal.config import TestConfig
@@ -54,10 +55,14 @@ class TestCase(Base):
         test_user = User(username=username, first_name=first_name,
                 last_name=last_name, image_url=image_url)
 
-        db.session.add(test_user)
-        db.session.commit()
+        with SessionScope(db):
+            db.session.add(test_user)
+            db.session.commit()
+
+        test_user = db.session.merge(test_user)
         self.promote_user(user_id=test_user.id,
                 role_name=ROLE.PATIENT)
+        test_user = db.session.merge(test_user)
         return test_user.id
 
     def promote_user(self, user_id=TEST_USER_ID, role_name=None):
@@ -65,8 +70,9 @@ class TestCase(Base):
         assert (role_name)
         role_id = db.session.query(Role.id).\
                 filter(Role.name==role_name).first()[0]
-        db.session.add(UserRoles(user_id=user_id, role_id=role_id))
-        db.session.commit()
+        with SessionScope(db):
+            db.session.add(UserRoles(user_id=user_id, role_id=role_id))
+            db.session.commit()
 
     def login(self, user_id=TEST_USER_ID):
         """Bless the self.app session with a logged in user
@@ -84,7 +90,8 @@ class TestCase(Base):
         """Reset all tables before testing."""
 
         db.create_all()
-        add_static_data()
+        with SessionScope(db):
+            add_static_data()
         self.init_data()
 
         self.app = self.__app.test_client()

@@ -145,6 +145,7 @@ def demographics_set(patient_id):
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
     patient.update_from_fhir(request.json)
+    db.session.commit()
     return jsonify(patient.as_fhir())
 
 
@@ -526,6 +527,7 @@ def clinical_set(patient_id):
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
     code, result = patient.add_observation(request.json)
+    db.session.commit()
     if code != 200:
         abort(code, result)
     return jsonify(message=result)
@@ -1239,6 +1241,7 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
                                          value_quantity=truthiness)
+    db.session.commit()
     return jsonify(message='ok')
 
 

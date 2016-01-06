@@ -1,5 +1,6 @@
 """Unit test module for API"""
 import json
+from flask.ext.webtest import SessionScope
 from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 
 from portal.extensions import db
@@ -72,16 +73,17 @@ class TestAPI(TestCase):
 
     def test_clinicalGET(self):
         # First push some clinical data into the db for the test user
-        observation = Observation()
-        observation.codeable_concept = CodeableConcept(
-                system='SNOMED-CT', code='372278000',
-                display='Gleason score')
-        observation.value_quantity = ValueQuantity(value=2)
-        db.session.add(observation)
-        db.session.flush()
-        db.session.add(UserObservation(user_id=int(TEST_USER_ID),
-            observation_id=observation.id))
-        db.session.commit()
+        with SessionScope(db):
+            observation = Observation()
+            observation.codeable_concept = CodeableConcept(
+                    system='SNOMED-CT', code='372278000',
+                    display='Gleason score')
+            observation.value_quantity = ValueQuantity(value=2)
+            db.session.add(observation)
+            db.session.flush()
+            db.session.add(UserObservation(user_id=int(TEST_USER_ID),
+                observation_id=observation.id))
+            db.session.commit()
 
         self.login()
         rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)

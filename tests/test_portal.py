@@ -13,7 +13,7 @@ class TestPortal(TestCase):
 
     def test_admin_list(self):
         """Test admin view lists all users"""
-        # Generate a few users with a splattering of roles
+        # Generate a few users with a smattering of roles
         u1 = self.add_user(username='u1')
         u2 = self.add_user(username='u2')
         self.promote_user(u1, role_name=ROLE.ADMIN)
@@ -25,7 +25,7 @@ class TestPortal(TestCase):
         rv = self.app.get('/admin')
 
         # Should at least see an entry per user in system
-        self.assertEquals(rv.data.count('id="name"'), User.query.count())
+        self.assertEquals(rv.data.count('/profile'), User.query.count())
 
     def test_invite(self):
         """Test email invite form"""
