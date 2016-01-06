@@ -1118,19 +1118,7 @@ def account():
     responses:
       200:
         description:
-          Returns an array: {user_id (TrueNTH ID), webkey_url}
-        schema:
-          id: response 
-          required:
-            - user_id
-            - webkey_url 
-          properties:
-            user_id:
-              type: int
-              description: the new TrueNTH user ID.
-            webkey_url:
-              type: string
-              description: unique URL to a user-specific registration page
+          Returns {new TrueNTH ID, webkey_url}
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
