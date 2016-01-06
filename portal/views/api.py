@@ -537,6 +537,9 @@ def clinical_set(patient_id):
 @oauth.require_oauth()
 def assessment(instrument_id):
     """Return a patient's responses to a questionnaire
+    
+    Retrieve a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
+    resource type.
     ---
     operationId: getQuestionnaireResponse
     tags:
@@ -565,10 +568,12 @@ def assessment(instrument_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: assessment_response
           required:
             - message
           properties:
+            items:
+              $ref: "#/definitions/QuestionnaireResponse"
             message:
               type: string
               description: Result, typically "ok"
@@ -824,7 +829,7 @@ def present_assessment(instrument_id):
         enum:
           - epic26
           - eq5d 
-      - name: return
+      - name: next 
         in: query
         description: Intervention URL to return to after assessment completion
         required: true
@@ -839,7 +844,7 @@ def present_assessment(instrument_id):
             type: string
             format: url
       401:
-        description: if missing valid OAuth token or bad `return` parameter
+        description: if missing valid OAuth token or bad `next` parameter
 
     """
     # Todo: replace with proper models
@@ -857,14 +862,14 @@ def present_assessment(instrument_id):
         abort(404, "No assessment available: %s" % instrument_id)
 
 
-    if 'return' in request.args:
-        return_url = request.args.get('return')
+    if 'next' in request.args:
+        next_url = request.args.get('next')
 
-        # Validate return URL the same way CORS requests are
-        validate_client_origin(return_url)
+        # Validate next URL the same way CORS requests are
+        validate_client_origin(next_url)
 
-        current_app.logger.debug('storing session[assessment_return]: %s', return_url)
-        session['assessment_return'] = return_url
+        current_app.logger.debug('storing session[assessment_return]: %s', next_url)
+        session['assessment_return'] = next_url
 
     return redirect(assessment_url, code=303)
 
@@ -893,10 +898,10 @@ def complete_assessment():
 
     """
 
-    return_url = session.pop("assessment_return", "home")
+    next_url = session.pop("assessment_return", "home")
 
-    current_app.logger.debug("assessment complete, redirect to: %s", return_url)
-    return redirect(return_url, code=303)
+    current_app.logger.debug("assessment complete, redirect to: %s", next_url)
+    return redirect(next_url, code=303)
 
 @api.route('/auditlog', methods=('POST',))
 @oauth.require_oauth()
@@ -1095,6 +1100,33 @@ def protected_portal_wrapper_html():
         movember_profile=movember_profile,
     )
     return make_response(html)
+
+
+@api.route('/account', methods=('POST',))
+@oauth.require_oauth()
+def account():
+    """Create a user account 
+    
+    Use cases: 
+    Interventions call this, get a truenth ID back, and subsequently call: 
+    1. set_roles to grant the user role(s)
+    2. the Truenth API to grant the user access to the intervention.
+    ---
+    tags:
+      - User
+    operationId: createAccount 
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns {new TrueNTH ID, webkey_url}
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+    """
+    return
 
 
 @api.route('/roles', defaults={'user_id': None})
