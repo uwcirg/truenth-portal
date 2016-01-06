@@ -1120,7 +1120,7 @@ def account():
         description:
           Returns an array: {user_id (TrueNTH ID), webkey_url}
         schema:
-          id: new_user_data
+          id: response 
           required:
             - user_id
             - webkey_url 
