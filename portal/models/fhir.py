@@ -40,17 +40,16 @@ class CodeableConcept(db.Model):
         to database first if not.
 
         """
+        self = db.session.merge(self)
         if self.id:
             return self
 
         match = self.query.filter_by(system=self.system,
                 code=self.code).first()
-        if match:
-            self.id = match.id
-        else:
+        if not match:
             db.session.add(self)
-            db.session.flush()
-        assert self.id
+        elif self is not match:
+            self = db.session.merge(match)
         return self
 
 
@@ -94,12 +93,10 @@ class ValueQuantity(db.Model):
         lookup_value = self.value and str(self.value) or None
         match = self.query.filter_by(value=lookup_value,
                 units=self.units, system=self.system).first()
-        if match:
-            self.id = match.id
-        else:
+        if not match:
             db.session.add(self)
-            db.session.flush()
-        assert self.id
+        elif self is not match:
+            self = db.session.merge(match)
         return self
 
 
@@ -111,7 +108,7 @@ class Observation(db.Model):
     codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'))
 
-    codeable_concept = db.relationship(CodeableConcept)
+    codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
 
     def as_fhir(self):
@@ -134,17 +131,18 @@ class Observation(db.Model):
         """
         if self.id:
             return self
+        match_dict = {'issued': self.issued,
+                      'status': self.status}
+        if self.codeable_concept_id:
+            match_dict['codeable_concept_id'] = self.codeable_concept_id
+        if self.value_quantity_id:
+            match_dict['value_quantity_id'] = self.value_quantity_id
 
-        match = self.query.filter_by(issued=self.issued,
-                status=self.status,
-                codeable_concept_id=self.codeable_concept_id,
-                value_quantity_id=self.value_quantity_id).first()
-        if match:
-            self.id = match.id
-        else:
+        match = self.query.filter_by(**match_dict).first()
+        if not match:
             db.session.add(self)
-            db.session.flush()
-        assert self.id
+        elif self is not match:
+            self = db.session.merge(match)
         return self
 
 
@@ -166,13 +164,12 @@ class UserObservation(db.Model):
 
         match = self.query.filter_by(user_id=self.user_id,
                 observation_id=self.observation_id).first()
-        if match:
-            self.id = match.id
-        else:
+        if not match:
             db.session.add(self)
-            db.session.flush()
-        assert self.id
+        elif self is not match:
+            self = db.session.merge(match)
         return self
+
 
 class QuestionnaireResponse(db.Model):
 

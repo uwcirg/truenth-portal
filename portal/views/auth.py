@@ -171,6 +171,7 @@ def login(provider_name):
 
                 if not user:
                     user = add_authomatic_user(result.user, image_url)
+                    db.session.commit()
                     auditable_event("register new user via {0}".\
                                     format(provider_name), user_id=user.id)
                 else:

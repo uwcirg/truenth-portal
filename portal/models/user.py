@@ -71,7 +71,6 @@ class User(db.Model, UserMixin):
 
         UserObservation(user_id=self.id,
                 observation_id=observation.id).add_if_not_found()
-        db.session.commit()
         return 200, "ok"
 
     def fetch_values_for_concept(self, codeable_concept):
@@ -112,7 +111,6 @@ class User(db.Model, UserMixin):
         observation = Observation(codeable_concept_id=codeable_concept.id,
                                   value_quantity_id=value_quantity.id)
         self.observations.append(observation.add_if_not_found())
-        db.session.commit()
 
     def clinical_history(self, requestURL=None):
         now = datetime.now()
@@ -181,7 +179,6 @@ class User(db.Model, UserMixin):
                 if e['system'] == 'phone':
                     self.phone = v_or_n(e['value'])
         db.session.add(self)
-        db.session.commit()
 
     def check_role(self, permission, other_id):
         """check user for adequate role"""
@@ -203,7 +200,6 @@ def add_authomatic_user(authomatic_user, image_url):
             email=authomatic_user.email,
             image_url=image_url)
     db.session.add(user)
-    db.session.commit()
     add_default_role(user)
     return user
 
@@ -220,7 +216,6 @@ def add_anon_user():
     """
     user = User(username='Anonymous')
     db.session.add(user)
-    db.session.commit()
     add_default_role(user)
     add_role(user, ROLE.ANON)
     return user
@@ -236,7 +231,6 @@ def add_role(user, role_name):
     new_role = UserRoles(user_id=user.id,
             role_id=role.id)
     db.session.add(new_role)
-    db.session.commit()
     return user
 
 
@@ -257,7 +251,8 @@ def current_user():
         # Remote OAuth - 'id' lives in request.oauth.user.id:
         uid = request.oauth.user.id
     if uid:
-        return User.query.get(uid)
+        with db.session.no_autoflush:
+            return User.query.get(uid)
     return None
 
 

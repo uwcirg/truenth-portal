@@ -41,6 +41,7 @@ setup(
         'Flask-Swagger',
         'Flask-Testing',
         'Flask-User',
+        'Flask-WebTest',
         'jsonschema',
         'nose',
         'oauthlib',

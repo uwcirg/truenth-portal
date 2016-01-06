@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from flask import Flask
+from flask.ext.webtest import get_scopefunc
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
@@ -44,6 +45,10 @@ def configure_extensions(app):
     """Bind extensions to application"""
     # flask-sqlalchemy - the ORM / DB used
     db.init_app(app)
+    if app.testing:
+        session_options = {}
+        session_options['scopefunc'] = get_scopefunc()
+        db.session_options = session_options
 
     # flask-user
     user_manager.init_app(app)

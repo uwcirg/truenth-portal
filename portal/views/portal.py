@@ -129,6 +129,7 @@ def questions():
     user = current_user()
     if not user:
         user = add_anon_user()
+        db.session.commit()
         auditable_event("register new anonymous user", user_id=user.id)
         session['id'] = user.id
         login_user(user)

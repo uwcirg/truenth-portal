@@ -1,5 +1,6 @@
 """Unit test module for auth"""
 from tests import TestCase, TEST_USER_ID
+from flask.ext.webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.auth import Client
@@ -16,13 +17,15 @@ class TestAuth(TestCase):
 
     def add_test_client(self):
         """Prep db with a test client for test user"""
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         client_id = 'test_client'
         client = Client(client_id=client_id,
                 _redirect_uris='http://localhost',
                 client_secret='tc_secret', user_id=TEST_USER_ID)
-        db.session.add(client)
-        db.session.commit()
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        with SessionScope(db):
+            db.session.add(client)
+            db.session.commit()
+        client = db.session.merge(client)
         return client
 
     def test_nouser_logout(self):
