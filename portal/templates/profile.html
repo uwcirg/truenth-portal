@@ -373,13 +373,14 @@ $("#userRoles input:checkbox").on("click",function(){
         }
     });
     console.log(roles);
-    console.log(JSON.stringify(roles));
+    var toSend = {"roles" : roles}
+
     $.ajax ({
         type: "PUT",
         url: '/api/roles/{{ user.id }}',
         contentType: "application/json; charset=utf-8",
         dataType: 'json',
-        data: JSON.stringify(roles)
+        data: JSON.stringify(toSend)
     }).done(function(data) {
         console.log(data);
         // Allow user to save with button, even though these answers have already been submitted
