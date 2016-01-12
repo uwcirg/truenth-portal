@@ -1252,6 +1252,9 @@ def set_roles(user_id):
     if len(matching_roles) != len(requested_roles):
         abort(404, "One or more roles requested not available")
     user.roles = matching_roles
+    if user not in db.session:
+        db.session.add(user)
+    db.session.commit()
 
     # Return user's updated role list
     results = [{'name': r.name, 'description': r.description}
