@@ -142,6 +142,7 @@
 
                     <hr />
 
+                    {% if user.has_role('admin') %}
                     <h3>User Roles for {{ user.username }}</h3>
                     <div id="userRoles">
                         <div class="form-group">
@@ -169,7 +170,7 @@
                         </div>
 
                     </div>
-
+                    {% endif %}
                 </div>
             </div>
         </div>        

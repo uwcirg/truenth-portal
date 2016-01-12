@@ -189,6 +189,9 @@ class User(db.Model, UserMixin):
         # TODO: address permission details, etc.
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
+    def has_role(self, role_name):
+        return role_name in [r.name for r in self.roles]
+
 
 def add_authomatic_user(authomatic_user, image_url):
     """Given the result from an external IdP, create a new user"""
