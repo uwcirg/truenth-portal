@@ -133,34 +133,6 @@
 
                         </div>
 
-                        <div id="userRoles">
-                            <div class="form-group">
-                                <label>User Roles</label>
-                                <p>[ Limit to admin use only ]</p>
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="patient"> Patient
-                                    </label>
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="anon"> Anon
-                                    </label>
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="admin"> Admin
-                                    </label>
-                                </div>
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" value="application_developer"> Application Developer
-                                    </label>
-                                </div>
-                            </div>
-
-                        </div>
-
                         <div class="form-group">
                             <button id="updateProfile" type="submit" class="btn btn-lg btn-default">Save</button>
                             <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
@@ -168,6 +140,35 @@
 
                     </form>
 
+                    <hr />
+
+                    <h3>User Roles for {{ user.username }}</h3>
+                    <div id="userRoles">
+                        <div class="form-group">
+                            <p>Editable by admins only.</p>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="patient"> Patient
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="anon"> Anon
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="admin"> Admin
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value="application_developer"> Application Developer
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
 
                 </div>
             </div>
@@ -372,9 +373,7 @@ $("#userRoles input:checkbox").on("click",function(){
             roles.push({name: $(this).val()})
         }
     });
-    console.log(roles);
     var toSend = {"roles" : roles}
-
     $.ajax ({
         type: "PUT",
         url: '/api/roles/{{ user.id }}',
@@ -382,11 +381,9 @@ $("#userRoles input:checkbox").on("click",function(){
         dataType: 'json',
         data: JSON.stringify(toSend)
     }).done(function(data) {
-        console.log(data);
-        // Allow user to save with button, even though these answers have already been submitted
-        $('#updateProfile').removeClass("disabled");
+
     }).fail(function() {
-        console.log("Problem retrieving data from server.")
+        console.log("Problem putting data on server.")
     });
 })
 
