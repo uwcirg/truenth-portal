@@ -1,19 +1,24 @@
 <div class="tnth-nav-wrapper">
 
 <script type="text/javascript">
-//fixme needs a better location/mechanism - mark47?
+//TODO needs a better location/mechanism - mark47?
   var _paq = _paq || [];
+
+  // uncomment for truenth-demo (TODO move to config)
+  //_paq.push(["setDomains", ["*.truenth-demo.cirg.washington.edu","*.careplan.miserver.it.umich.edu","*.dhair.cirg.washington.edu/assessment_engine-dev","*.p3p-dev.cirg.washington.edu/usa-p3p-demo","*.p3p-dev.cirg.washington.edu/usa-self-mgmt-demo"]]);
 
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
     var u="//piwik.cirg.washington.edu/";
     _paq.push(['setTrackerUrl', u+'piwik.php']);
+    // TODO move to portal config:
     _paq.push(['setSiteId', 2]);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
   })();
 </script>
+<!-- TODO move to portal config: -->
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
 
 
