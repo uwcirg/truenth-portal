@@ -7,6 +7,10 @@
   // uncomment for truenth-demo (TODO move to config)
   //_paq.push(["setDomains", ["*.truenth-demo.cirg.washington.edu","*.careplan.miserver.it.umich.edu","*.dhair.cirg.washington.edu/assessment_engine-dev","*.p3p-dev.cirg.washington.edu/usa-p3p-demo","*.p3p-dev.cirg.washington.edu/usa-self-mgmt-demo"]]);
 
+{% if username %}
+  _paq.push(["setUserId", "{{ user.id }}"]);
+{% endif %}
+
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
@@ -30,11 +34,6 @@
         <div id="tnthTopLinks">
             <div class="btn-group nav-userinfo">
             {% if username %}
-
-                <script type="text/javascript">
-                //fixme needs a better location/mechanism - mark47?
-                _paq.push(["setCustomDimension", 1, "{{ user.id }}"]);
-                </script>
 
                 <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Welcome, {{ username }}
