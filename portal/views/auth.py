@@ -28,7 +28,7 @@ from ..template_helpers import split_string
 auth = Blueprint('auth', __name__)
 
 
-@portal.context_processor
+@auth.context_processor
 def utility_processor():
     return dict(split_string=split_string)
 
