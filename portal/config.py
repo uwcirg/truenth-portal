@@ -19,6 +19,8 @@ class BaseConfig(object):
     MAIL_DEFAULT_SENDER = '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu'
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 60 * 60  # units: seconds
+    PIWIK_DOMAINS = "",
+    PIWIK_SITEID = 0
     PROJECT = "portal"
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))

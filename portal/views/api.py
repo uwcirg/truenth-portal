@@ -17,8 +17,15 @@ from ..models.user import current_user, get_user
 from ..extensions import oauth
 from ..extensions import db
 from .crossdomain import crossdomain
+from ..template_helpers import split_string
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
+
+@api.context_processor
+def utility_processor():
+    return dict(split_string=split_string)
+
 
 @api.route('/me')
 @oauth.require_oauth()

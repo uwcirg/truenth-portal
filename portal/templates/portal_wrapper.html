@@ -1,30 +1,27 @@
 <div class="tnth-nav-wrapper">
 
+{% if config.PIWIK_SITEID %}
 <script type="text/javascript">
 //TODO needs a better location/mechanism - mark47?
   var _paq = _paq || [];
+  _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
 
-  // uncomment for truenth-demo (TODO move to config)
-  //_paq.push(["setDomains", ["*.truenth-demo.cirg.washington.edu","*.careplan.miserver.it.umich.edu","*.dhair.cirg.washington.edu/assessment_engine-dev","*.p3p-dev.cirg.washington.edu/usa-p3p-demo","*.p3p-dev.cirg.washington.edu/usa-self-mgmt-demo"]]);
-
-{% if username %}
+  {% if user %}
   _paq.push(["setUserId", "{{ user.id }}"]);
-{% endif %}
+  {% endif %}
 
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
     var u="//piwik.cirg.washington.edu/";
     _paq.push(['setTrackerUrl', u+'piwik.php']);
-    // TODO move to portal config:
-    _paq.push(['setSiteId', 2]);
+    _paq.push(['setSiteId', {{ config.PIWIK_SITEID }}]);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
   })();
 </script>
-<!-- TODO move to portal config: -->
-<noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite=2" style="border:0;" alt="" /></p></noscript>
-
+<noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
+{% endif %}
 
     <div class="container hidden-xs tnth-nav-main">
         <div id="tnthLogo">

@@ -16,9 +16,14 @@ from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth
 from .crossdomain import crossdomain
 from ..tasks import add, post_request
-
+from ..template_helpers import split_string
 
 portal = Blueprint('portal', __name__)
+
+
+@portal.context_processor
+def utility_processor():
+    return dict(split_string=split_string)
 
 
 @portal.route('/')
