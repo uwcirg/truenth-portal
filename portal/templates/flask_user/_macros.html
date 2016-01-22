@@ -41,6 +41,6 @@
            >
 {%- endmacro %}
 
-{% macro client_back() -%}
-    <a href="{{PORTAL}}/clients" class="btn btn-xs btn-tnth-back"><i class="fa fa-chevron-left"></i> Back to Client Applications</a><br/>
+{% macro back_btn(url,text) -%}
+<a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><i class="fa fa-chevron-left"></i> Back to {{text}}</a><br/>
 {%- endmacro %}

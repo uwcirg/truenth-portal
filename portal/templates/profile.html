@@ -1,9 +1,15 @@
 {% extends "layout.html" %}
 {% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
     <div class="container">
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1 col-md-12">
                 <div class="well lead-well">
+
+                    {% if current_user.has_role('admin') %}
+                        {{ back_btn('admin','User List') }}
+                    {% endif %}
+
                     <h3>Profile for {{ user.username }}</h3>
 
                     <div id="loadingIndicator" class="loading-indicator">

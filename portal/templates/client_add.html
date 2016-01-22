@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block main %}
-{% from "flask_user/_macros.html" import render_field, client_back %}
+{% from "flask_user/_macros.html" import render_field, back_btn %}
 <div class="container">
     <div class="row">
         <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
             <div class="well lead-well">
 
-                {{ client_back() }}
+                {{ back_btn('clients','Client Applications') }}
 
                 <h3>Obtain OAuth 2.0 Credentials from Central Services</h3><br />
 
