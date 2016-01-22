@@ -40,3 +40,7 @@
            {% if tabindex %}tabindex="{{ tabindex }}"{% endif %}
            >
 {%- endmacro %}
+
+{% macro client_back() -%}
+    <a href="{{PORTAL}}/clients" class="btn btn-xs btn-tnth-back"><i class="fa fa-chevron-left"></i> Back to Client Applications</a><br/>
+{%- endmacro %}

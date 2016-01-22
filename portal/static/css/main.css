@@ -25,7 +25,8 @@ a:hover, a:active {
   height: 100%;
 }
 .lead-well {
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: #fff;
+	/**background-color: rgba(255, 255, 255, 0.8);**/
 	margin: 2em auto;
 }
 .lead-well h3 {
@@ -74,6 +75,10 @@ a:hover, a:active {
   color: #fff;
   background-color: #2a4531;
   border-color: #1c2f21;
+}
+.btn-tnth-back {
+    color: #777;
+    margin: -1em 0 1em -6px;
 }
 
 /** styles specific to profile **/
