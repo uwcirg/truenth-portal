@@ -1,11 +1,12 @@
 """Unit test module for auth"""
 from tests import TestCase, TEST_USER_ID
 from flask.ext.webtest import SessionScope
+import json
 
 from portal.extensions import db
-from portal.models.auth import Client
+from portal.models.auth import Client, Token, create_service_token
 from portal.models.role import ROLE
-from portal.models.user import add_authomatic_user, User
+from portal.models.user import add_authomatic_user, User, UserRelationship
 
 class AuthomaticMock(object):
     """Simple container for mocking Authomatic response"""
@@ -113,3 +114,22 @@ class TestAuth(TestCase):
 
         client = Client.query.get('test_client')
         self.assertEquals(client.callback_url, None)
+
+    def test_service_account_creation(self):
+        """Confirm we can create a service account and token"""
+        client = self.add_test_client()
+        test_user = User.query.get(TEST_USER_ID)
+        service_user = test_user.add_service_account()
+
+        # Did we get a service account with the correct roles and relationships
+        self.assertEquals(len(service_user.roles), 1)
+        self.assertEquals('service', service_user.roles[0].name)
+        sponsorship = UserRelationship.query.filter_by(
+            other_user_id=service_user.id).first()
+        self.assertEquals(sponsorship.user_id, TEST_USER_ID)
+        self.assertEquals(sponsorship.relationship.name, 'sponsor')
+
+        # Can we get a usable Bearer Token
+        create_service_token(client=client, user=service_user)
+        token = Token.query.filter_by(user_id=service_user.id).first()
+        self.assertTrue(token)

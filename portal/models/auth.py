@@ -13,7 +13,7 @@ from urlparse import urlparse
 from ..extensions import db, oauth
 from ..tasks import post_request
 from .user import current_user
-
+from .role import ROLE
 
 providers_list = ENUM('facebook', 'google', 'twitter', 'truenth',
         name='providers', create_type=False)
@@ -39,6 +39,11 @@ class Client(db.Model):
     _redirect_uris = db.Column(db.Text)
     _default_scopes = db.Column(db.Text)
     callback_url = db.Column(db.Text)
+
+    def __str__(self):
+        """print details needed in audit logs"""
+        return "Client: {0}, redirects: {1}, callback: {2}".format(
+            self.client_id, self._redirect_uris, self.callback_url)
 
     @property
     def client_type(self):
@@ -262,7 +267,8 @@ def save_token(token, request, *args, **kwargs):
 
     tok = Token(
         access_token=token['access_token'],
-        refresh_token=token['refresh_token'],
+        refresh_token=token['refresh_token'] if 'refresh_token' in token else
+            None,
         token_type=token['token_type'],
         _scopes=token['scope'],
         expires=expires,
@@ -292,3 +298,39 @@ def validate_client_origin(origin):
             return True
     current_app.logger.error("Failed to validate origin: %s", origin)
     abort(401)
+
+class Mock(object):
+    pass
+
+def create_service_token(client, user):
+    """Generate and return a bearer token for service calls
+
+    Partners need a mechanism for automated, authorized API access.  This
+    function returns a bearer token for subsequent authorized calls.
+
+    NB - as this opens a back door, it's only offered to users with the single
+    role 'service'.
+
+    """
+    if len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE:
+        raise ValueError("only service users can create service tokens")
+
+    # Hacking a backdoor into the OAuth protocol to generate a valid token
+    # Mock the request and validation needed to pass
+    from oauthlib.oauth2.rfc6749.tokens import BearerToken
+
+    fake_request = Mock()
+    fake_request.state, fake_request.extra_credentials = None, None
+    fake_request.client = client
+    fake_request.user = user
+    fake_request.scopes = ['email',]
+    fake_request.expires_in = 3600 * 30 * 12  # twelve months
+
+    request_validator = Mock()
+    request_validator.save_bearer_token = save_token
+
+    bt = BearerToken(request_validator=request_validator)
+    bt.create_token(fake_request)
+
+    # Token should now exist as only token for said user - return it
+    return Token.query.filter_by(user_id=user.id).first()

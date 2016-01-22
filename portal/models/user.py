@@ -7,9 +7,11 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 
+from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import CodeableConcept, ValueQuantity
+from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 
 # http://hl7.org/fhir/v3/AdministrativeGender/
@@ -72,6 +74,45 @@ class User(db.Model, UserMixin):
         UserObservation(user_id=self.id,
                 observation_id=observation.id).add_if_not_found()
         return 200, "ok"
+
+    def add_relationship(self, other_user, relationship_name):
+        # confirm it's not already defined
+        relationship = Relationship.query.filter_by(
+                name=relationship_name).first()
+        existing = UserRelationship.query.filter_by(user_id=self.id,
+                other_user_id=other_user.id,
+                relationship_id=relationship.id).first()
+        if existing:
+            raise ValueError("requested relationship already defined")
+
+        new_relationship = UserRelationship(user_id=self.id,
+                other_user_id=other_user.id,
+                relationship_id=relationship.id)
+        self.relationships.append(new_relationship)
+
+    def add_service_account(self):
+        """Service account generation.
+
+        For automated, authenticated access to protected API endpoints,
+        a service user can be created and used to generate a long-life
+        bearer token.  The account is a user with the service role,
+        attached to a sposor account - the (self) individual creating it.
+
+        Only a single service account is allowed per user.  If one is
+        found to exist for this user, simply return it.
+
+        """
+        for rel in self.relationships:
+            if rel.relationship.name == RELATIONSHIP.SPONSOR:
+                return User.query.get(rel.other_user_id)
+
+        service_user = User(username=(u'service account sponsored by {}'.
+                              format(self.username)))
+        db.session.add(service_user)
+        add_role(service_user, ROLE.SERVICE)
+        self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
+        auditable_event("Service account created by", user_id=self.id)
+        return service_user
 
     def fetch_values_for_concept(self, codeable_concept):
         """Return any matching ValueQuantities for this user"""
@@ -231,6 +272,7 @@ def add_default_role(user):
 
 def add_role(user, role_name):
     role = Role.query.filter_by(name=role_name).first()
+    assert(role)
     new_role = UserRoles(user_id=user.id,
             role_id=role.id)
     db.session.add(new_role)
@@ -272,3 +314,30 @@ class UserRoles(db.Model):
 
     __table_args__ = (UniqueConstraint('user_id', 'role_id',
         name='_user_role'),)
+
+
+class UserRelationship(db.Model):
+    """SQLAlchemy class for `user_relationships` table
+
+    Relationship is assumed to be ordered such that:
+        <user_id> has a <relationship.name> with <other_user_id>
+
+    """
+    __tablename__ = 'user_relationships'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
+        ondelete='CASCADE'))
+    other_user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
+        ondelete='CASCADE'))
+    relationship_id = db.Column(db.Integer(),
+        db.ForeignKey('relationships.id', ondelete='CASCADE'))
+
+    user = db.relationship("User", backref='relationships',
+                           foreign_keys="UserRelationship.user_id")
+    other_user = db.relationship("User",
+        foreign_keys="UserRelationship.other_user_id")
+    relationship = db.relationship("Relationship",
+        foreign_keys="UserRelationship.relationship_id")
+
+    __table_args__ = (UniqueConstraint('user_id', 'other_user_id',
+        'relationship_id', name='_user_relationship'),)

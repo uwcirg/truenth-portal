@@ -9,8 +9,13 @@
                         <div class="col-xs-12 col-sm-6">
                             <h4>Central Services OAuth 2.0 Credentials </h4>
                             <ul>
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client.client_id }} </li> 
-                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client.client_secret }} </li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App ID {{ client.client_id }} </li>
+                                <li style="margin-bottom: 0.25em; font-size: 15px">App Secret {{ client.client_secret }} </li>
+                                {% if service_token %}
+                                    <li style="margin-bottom: 0.25em;
+                                        font-size: 15px">Service Token {{
+                                        service_token.access_token }} </li>
+                                {% endif %}
                             </ul>
                             <form action="/client/{{ client.client_id }}" method="post">
                                 <div class="form-group">
@@ -30,6 +35,7 @@
                                 </div>
                                 <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button>
                                 <button type="submit" name="delete" value="delete" class="btn btn-tnth-primary">Delete Application</button>
+                                <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">Create/Update Service Token</button>
                             </form>
                             {% macro render_field(field) %}
                               <dt>{{ field.label }}
@@ -46,6 +52,7 @@
                             <ul>
                                 <li style="margin-bottom: 0.25em; font-size: 15px">The <b>Application URL</b> may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.</li> 
                                 <li style="margin-bottom: 0.25em; font-size: 15px">Provide a <b>Callback URL</b> to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined</li> 
+                                <li style="margin-bottom: 0.25em; font-size: 15px">Use a <b>Service Token</b> to make authenticated, automated service calls.  This token can then be used in the <i>Authorization</i> request header in the form <b>Bearer &lt;token-value&gt;</b>, as per the OAuth2 protocol.  This token should be carefully guarded on a secure system and only transmitted via HTTPS.  Valid for 12 months.</li>
                             </ul>
                         </div>
                     </div>

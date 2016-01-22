@@ -1,0 +1,48 @@
+"""Relationship module
+
+Relationship data lives in the `relationships` table, populated via:
+    `python manage.py seed`
+
+To extend the list of roles, add name: description pairs to the
+STATIC_RELATIONSHIPS dict within, and rerun the seed command above.
+
+"""
+from ..extensions import db
+from UserDict import IterableUserDict
+
+
+class Relationship(db.Model):
+    """SQLAlchemy class for `relationships` table"""
+    __tablename__ = 'relationships'
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    description = db.Column(db.Text)
+
+
+#Source definition for relationships, as dictionary {name: description,}
+STATIC_RELATIONSHIPS = IterableUserDict({
+    'sponsor':
+        'The sponsor of a service account.  One way relationship from '
+        'the user who created the account (the sponsor) to the service '
+        'account used for automatic protected access to API endpoints.',
+        })
+
+
+def enum(**items):
+    """Convert dictionary to Enumeration for direct access"""
+    return type('Enum', (), items)
+
+RELATIONSHIP = enum(**{unicode(r).upper():r for r in STATIC_RELATIONSHIPS})
+
+
+def add_static_relationships():
+    """Seed database with default static relationships
+
+    Idempotent - run anytime to pick up any new relationships in existing dbs
+
+    """
+    for r in STATIC_RELATIONSHIPS:
+        if not Relationship.query.filter_by(name=r).first():
+            db.session.add(Relationship(name=r,
+                                        description=STATIC_RELATIONSHIPS[r]))
+    db.session.commit()

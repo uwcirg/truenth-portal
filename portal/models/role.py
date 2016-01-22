@@ -37,7 +37,9 @@ STATIC_ROLES = IterableUserDict({
         'applications',
     'content_manager':
         'Gives user permission to add/view/edit associated content '
-        'managment systems'
+        'managment systems',
+    'service':
+        'Reserved for automated service accounts needing API access'
         })
 
 
@@ -48,8 +50,8 @@ def enum(**items):
 ROLE = enum(**{unicode(r).upper():r for r in STATIC_ROLES})
 
 
-def add_static_data():
-    """Seed database with default static data
+def add_static_roles():
+    """Seed database with default static roles
 
     Idempotent - run anytime to pick up any new roles in existing dbs
 

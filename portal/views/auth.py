@@ -18,10 +18,11 @@ from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
-from ..models.auth import AuthProvider, Client, Token
+from ..models.auth import AuthProvider, Client, Token, create_service_token
+from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user, add_default_role
-from ..models.user import current_user, User
+from ..models.user import current_user, get_user, User
 from ..extensions import authomatic, db, oauth
 from ..template_helpers import split_string
 
@@ -344,9 +345,9 @@ def client():
     )
     db.session.add(client)
     db.session.commit()
+    auditable_event("added intervention/client {}".format(
+        client.client_id), user_id=user.id)
     return redirect(url_for('.client_edit', client_id=client.client_id))
-
-
 
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
@@ -418,18 +419,48 @@ def client_edit(client_id):
     client = Client.query.get(client_id)
     if not client:
         abort(404)
-    current_user().check_role(permission='edit', other_id=client.user_id)
+    user = current_user()
+    user.check_role(permission='edit', other_id=client.user_id)
 
     form = ClientEditForm(obj=client)
-    if not form.validate_on_submit():
-        return render_template('client_edit.html', client=client, form=form)
 
+    def lookup_service_token(client):
+        client_user = get_user(client.user_id)
+        sponsor_relationship = [r for r in client_user.relationships if
+                                r.relationship.name == RELATIONSHIP.SPONSOR]
+        if (sponsor_relationship):
+            assert len(sponsor_relationship) == 1
+            return Token.query.filter_by(client_id=client.client_id,
+                user_id=sponsor_relationship[0].other_user_id).first()
+        return None
+
+    if not form.validate_on_submit():
+        return render_template('client_edit.html', client=client, form=form,
+                              service_token=lookup_service_token(client))
+
+    redirect_target = url_for('.clients_list')
     if request.form.get('delete'):
+        auditable_event("deleted intervention/client {}".format(
+            client.client_id), user_id=user.id)
         db.session.delete(client)
+    elif request.form.get('service_token'):
+        # limiting this to the client owner as sponsorship gets messy
+        if user.id != client.user_id:
+            raise ValueError("only client owner can add service accounts")
+        existing = lookup_service_token(client)
+        if existing:
+            db.session.delete(existing)
+        service_user = user.add_service_account()
+        token = create_service_token(client=client, user=service_user)
+        redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
+        auditable_event("edited intervention/client {}"
+                        "by".format(client.client_id), user_id=user.id)
+        auditable_event("before: {}".format(client), user_id=user.id)
         form.populate_obj(client)
+        auditable_event("after: {}".format(client), user_id=user.id)
     db.session.commit()
-    return redirect(url_for('.clients_list'))
+    return redirect(redirect_target)
 
 
 @auth.route('/clients')

@@ -16,7 +16,8 @@ from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
-from portal.models.role import Role, add_static_data, ROLE
+from portal.models.relationship import add_static_relationships
+from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.user import User, UserRoles
 
 TEST_USER_ID = 1
@@ -91,7 +92,8 @@ class TestCase(Base):
 
         db.create_all()
         with SessionScope(db):
-            add_static_data()
+            add_static_relationships()
+            add_static_roles()
         self.init_data()
 
         self.app = self.__app.test_client()
