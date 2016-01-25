@@ -193,13 +193,13 @@ class Token(db.Model):
     __tablename__ = 'tokens'  # Override default 'token'
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(
-        db.String(40), db.ForeignKey('clients.client_id'),
+        db.String(40), db.ForeignKey('clients.client_id', ondelete='CASCADE'),
         nullable=False,
     )
     client = db.relationship('Client')
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('users.id')
+        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')
     )
     user = db.relationship('User')
 
