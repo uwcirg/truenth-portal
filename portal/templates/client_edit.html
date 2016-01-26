@@ -15,10 +15,13 @@
 
                 <p><strong>App Secret:</strong><br />{{ client.client_secret }}</p>
 
+                <p><strong>Service Token:</strong><br />
                 {% if service_token %}
-                <p><strong>Service Token:</strong><br />{{
-                    service_token.access_token }}</p>
+                    {{ service_token.access_token }}
+                {% else %}
+                    <span class="text-muted">Not yet created</span>
                 {% endif %}
+                </p>
 
                 <form action="/client/{{ client.client_id }}" method="post">
                     {{ form.hidden_tag() }}
@@ -29,7 +32,13 @@
 
                     <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;
                     <button id="confirmDel" type="button" class="btn btn-tnth-primary" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
-                    <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">Create/Update Service Token</button>
+                    <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">
+                    {% if service_token %}
+                        Update Service Token
+                    {% else %}
+                        Create Service Token
+                    {% endif %}
+                    </button>
                 </form>
 
                 {% macro render_field(field) %}
