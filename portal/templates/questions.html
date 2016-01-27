@@ -1,69 +1,65 @@
 {% extends "layout.html" %}
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12 col-sm-10 col-sm-offset-1">
-            <div class="well lead-well">
 
-                <h3>TrueNTH</h3>
+    <div class="well">
 
-                <hr />
-                <h4>Tell Us About Yourself</h4>
-                <p>Tell us a bit about your experience with prostate cancer so we can personalize your experience.</p>
-                <br />
+    <h3 class="tnth-headline">TrueNTH</h3>
 
-                <div id="patientQuestions">
+    <hr />
+    <h4>Tell Us About Yourself</h4>
+    <p>Tell us a bit about your experience with prostate cancer so we can personalize your experience.</p>
+    <br />
 
-                    <h4>Have you had a prostate cancer biopsy?</h4>
+    <div id="patientQuestions">
 
-                    <div data-topic="biopsy">
-                        <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="biopsy" data-value="true" autocomplete="off"> Yes
-                            </label>
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="biopsy" data-value="false" autocomplete="off"> No
-                            </label>
-                        </div>
-                    </div>
+        <h4>Have you had a prostate cancer biopsy?</h4>
 
-                    <div data-topic="pca_diag" class="hide-initial">
-                        <br /><br />
-                        <h4>Have you been diagnosed with prostate cancer?</h4>
-                        <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="pca_diag" data-value="true" autocomplete="off"> Yes
-                            </label>
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="pca_diag" data-value="false" autocomplete="off"> No
-                            </label>
-                        </div>
-                    </div>
-
-                    <div data-topic="tx" class="hide-initial">
-                        <br /><br />
-                        <h4>Have you begun prostate cancer treatment?</h4>
-                        <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="tx" data-value="true" autocomplete="off"> Yes
-                            </label>
-                            <label class="btn btn-default btn-lg">
-                                <input type="radio" name="tx" data-value="false" autocomplete="off"> No
-                            </label>
-                        </div>
-                    </div>
-
-                </div>
-
-                <br /><br /><br />
-                <div class="hide-initial" id="continueBtn">
-                    <a class="btn btn-tnth-primary" href="/home">Continue <i class="fa fa-chevron-right"></i></a>
-                </div>
-
+        <div data-topic="biopsy">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="biopsy" data-value="true" autocomplete="off"> Yes
+                </label>
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="biopsy" data-value="false" autocomplete="off"> No
+                </label>
             </div>
         </div>
+
+        <div data-topic="pca_diag" class="hide-initial">
+            <br /><br />
+            <h4>Have you been diagnosed with prostate cancer?</h4>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="pca_diag" data-value="true" autocomplete="off"> Yes
+                </label>
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="pca_diag" data-value="false" autocomplete="off"> No
+                </label>
+            </div>
+        </div>
+
+        <div data-topic="tx" class="hide-initial">
+            <br /><br />
+            <h4>Have you begun prostate cancer treatment?</h4>
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="tx" data-value="true" autocomplete="off"> Yes
+                </label>
+                <label class="btn btn-default btn-lg">
+                    <input type="radio" name="tx" data-value="false" autocomplete="off"> No
+                </label>
+            </div>
+        </div>
+
     </div>
+
+    <br /><br /><br />
+    <div class="hide-initial" id="continueBtn">
+        <a class="btn btn-tnth-primary" href="/home">Continue <i class="fa fa-chevron-right"></i></a>
+    </div>
+
 </div>
+
 <script>
 $(document).ready(function(){
 

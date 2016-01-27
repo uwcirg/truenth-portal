@@ -14,6 +14,9 @@ a {
 a:hover, a:active {
     color: #2a4531;
 }
+.tnth-headline {
+    margin-top: 0;
+}
 .hide-initial, .form-group.hide-initial {
   display: none;
 }
@@ -27,19 +30,31 @@ a:hover, a:active {
 .lead-well {
 	background-color: #fff;
 	/**background-color: rgba(255, 255, 255, 0.8);**/
-	margin: 2em auto;
+    margin: 1em auto;
 }
 .lead-well h3 {
   margin-top: 0;
 }
 .int-cards {
     position: relative;
-    padding-bottom: 4em;
+    border: 1px solid #777;
+    border-radius: 5px;
+    padding: 0.5em 1em 4em;
 }
 .int-cards .btn-tnth-primary {
     position: absolute;
     bottom: 1em;
 }
+
+.other-interventions h4 {
+    margin: 20px 0 4px;
+}
+.other-interventions .int-sub {
+    margin: 0;
+    font-weight: normal;
+    font-size: 16px;
+}
+
 .demo-disabled {
     opacity: 0.65;
 }
@@ -80,7 +95,15 @@ a:hover, a:active {
     color: #777;
     margin: -1em 0 1em -6px;
 }
-
+.tnth-nav-list .list-group-item {
+    background-color: #83885F
+}
+.tnth-nav-list .list-group-item {
+    color: #fff;
+}
+.tnth-nav-list .list-group-item a:hover, .tnth-nav-list .list-group-item a:active {
+    text-decoration: none;
+}
 /** styles specific to profile **/
 #updateProfile {
     opacity: 0.5;
@@ -107,6 +130,11 @@ a:hover, a:active {
     -moz-opacity: 0.4;
     -khtml-opacity: 0.4;
     opacity: 0.4;
+}
+@media (min-width: 968px) {
+    .lead-well {
+        margin: 1em auto;
+    }
 }
 @media (max-width: 767px) {
     #saveMsg {

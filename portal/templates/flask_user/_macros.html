@@ -44,3 +44,33 @@
 {% macro back_btn(url,text) -%}
 <a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><i class="fa fa-chevron-left"></i> Back to {{text}}</a><br/>
 {%- endmacro %}
+
+{% macro left_nav(current_user) -%}
+<div class="col-sm-3 hidden-xs">
+
+    <div class="list-group tnth-nav-list">
+        <a class="list-group-item" href="{{PORTAL}}/">Home</a>
+        {% if current_user.roles %}
+        <a class="list-group-item" href="{{PORTAL}}/profile">My TrueNTH Profile</a>
+        <a class="list-group-item" href="{{PORTAL}}/invite">Send an Invite</a>
+        {% endif %}
+        <a class="list-group-item" href="#">TrueBLOG</a>
+        <a class="list-group-item" href="http://www.movember.com">Movember.com</a>
+    </div>
+    {% if current_user.roles %}
+    <br />
+
+    {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
+    <div class="list-group tnth-nav-list">
+        {% if current_user.has_roles('admin') %}
+        <a class="list-group-item" href="{{PORTAL}}/admin">User Administration</a>
+        {% endif %}
+        {% if current_user.has_roles('application_developer') %}
+        <a class="list-group-item" href="{{PORTAL}}/clients">Client Applications</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+</div>
+{%- endmacro %}
