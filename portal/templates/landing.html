@@ -1,68 +1,64 @@
 {% extends "layout.html" %}
 {% block main %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
-            <div class="well lead-well">
 
-                <div class="pull-right">
-                    <p><strong>Already have an account?</strong></p>
-                    <a href='/user/sign-in'
-                       class="btn btn-block btn-default">
-                        Sign In
-                    </a>
-                </div>
+<div class="well">
 
-                <h3>TrueNTH</h3>
-                <!--
-                <ul>
-                    <li style="margin-bottom: 0.25em; font-size: 15px">is a revolutionary new program, funded by the Movember Foundation, that will significantly <strong>improve the physical and mental health of men</strong> diagnosed and living with prostate cancer.</li>
-                    <li style="margin-bottom: 0.25em; font-size: 15px">helps men and their families <strong>get their lives back on track</strong> following diagnosis and treatment.</li>
-                    <li style="font-size: 15px">helps you <strong>feel knowledgeable and confident</strong> on your journey.</li>
-                </ul>
-                -->
-                <ul>
-                    <li style="margin-bottom: 0.25em; font-size: 15px">About the TrueNTH initiative...</li>
-                    <li style="font-size: 15px">About the TrueNTH website</li>
-                </ul>
-                <hr />
-                <div id="chooseSignIn">
-
-                    <h4 style="margin-top: 1em">What can I do?</h4>
-                    <p>Learn about support and guidance for men with prostate cancer and those who care about them.</p>
-                    <p>You can get started by...</p>
-
-                    <a href='/user/sign-in'
-                       class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                        Register for TrueNTH<br />
-                        <small>You can save your information for future visits.</small>
-                    </a>
-                    <div class="text-center">
-                        <div class="or-holder"><div class="or-divider">or</div></div>
-                    </div>
-                    <a href='/questions'
-                       class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                        Tell Us About Your Situation Without Registering<br />
-                        <small>So we can guide you to the best information.</small>
-                    </a>
-                    <div class="text-center">
-                        <div class="or-holder"><div class="or-divider">or</div></div>
-                    </div>
-                    <a href='/questions_anon'
-                       class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                        Explore On Your Own Without Registering<br />
-                        <small>Use this site without telling us about yourself. You'll see general information about prostate cancer.</small>
-                    </a>
-                    <br /><br />
-                    <p><strong>Our Privacy Policy</strong><br />
-                    Unless you choose to register as a user during this session, we will not keep any personal information about your visit.  We will record that an anonymous user explored the TrueNTH website, and note the time and activities of your visit. <a href='/terms-of-use'>See our privacy policy here</a>.
-                    </p>
-                    <br />
-
-                </div>
-
-            </div>
-        </div>
+    <div class="pull-right">
+        <p><strong>Already have an account?</strong></p>
+        <a href='/user/sign-in'
+           class="btn btn-block btn-default">
+            Sign In
+        </a>
     </div>
+
+    <h3 class="tnth-headline">TrueNTH</h3>
+    <!--
+    <ul>
+        <li style="margin-bottom: 0.25em; font-size: 15px">is a revolutionary new program, funded by the Movember Foundation, that will significantly <strong>improve the physical and mental health of men</strong> diagnosed and living with prostate cancer.</li>
+        <li style="margin-bottom: 0.25em; font-size: 15px">helps men and their families <strong>get their lives back on track</strong> following diagnosis and treatment.</li>
+        <li style="font-size: 15px">helps you <strong>feel knowledgeable and confident</strong> on your journey.</li>
+    </ul>
+    -->
+    <ul>
+        <li style="margin-bottom: 0.25em; font-size: 15px">About the TrueNTH initiative...</li>
+        <li style="font-size: 15px">About the TrueNTH website</li>
+    </ul>
+    <hr />
+    <div id="chooseSignIn">
+
+        <h4 style="margin-top: 1em">What can I do?</h4>
+        <p>Learn about support and guidance for men with prostate cancer and those who care about them.</p>
+        <p>You can get started by...</p>
+
+        <a href='/user/sign-in'
+           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
+            Register for TrueNTH<br />
+            <small>You can save your information for future visits.</small>
+        </a>
+        <div class="text-center">
+            <div class="or-holder"><div class="or-divider">or</div></div>
+        </div>
+        <a href='/questions'
+           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
+            Tell Us About Your Situation Without Registering<br />
+            <small>So we can guide you to the best information.</small>
+        </a>
+        <div class="text-center">
+            <div class="or-holder"><div class="or-divider">or</div></div>
+        </div>
+        <a href='/questions_anon'
+           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
+            Explore On Your Own Without Registering<br />
+            <small>Use this site without telling us about yourself. You'll see general information about prostate cancer.</small>
+        </a>
+        <br /><br />
+        <p><strong>Our Privacy Policy</strong><br />
+        Unless you choose to register as a user during this session, we will not keep any personal information about your visit.  We will record that an anonymous user explored the TrueNTH website, and note the time and activities of your visit. <a href='/terms-of-use'>See our privacy policy here</a>.
+        </p>
+        <br />
+
+    </div>
+
 </div>
+
 {% endblock %}

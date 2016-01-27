@@ -1,13 +1,21 @@
 .tnth-nav-wrapper {
-	width: 100%;
-	background-color: #1A1919;
+
 }
 .tnth-nav-main {
+    width: 100%;
+    background-color: #1A1919;
+    background-image: url('../img/truenth_mtn_background3.jpg');
+    height: 74px;
+    background-size: cover;
+    margin-bottom: 40px;
 	padding: 5px 15px;
 }
 
 #tnthLogo {
     float: left;
+}
+#tnthLogo img {
+    width: 87px;
 }
 #tnthTopLinks {
     float: right;
@@ -35,12 +43,19 @@
 /*** Styles for responsive xs size ***/
 .tnth-nav-xs {
 	margin: 0 0 5px;
+    width: 100%;
+    background-color: #83885F;
+    background-image: url('../img/truenth_mtn_background3.jpg');
+    background-size: auto 71px;
+    background-repeat: no-repeat;
+    margin-bottom: 40px;
+    padding: 5px 15px;
 }
 .tnth-nav-xs .navbar-brand {
 	padding: 4px;
 }
 .tnth-nav-xs .navbar-brand img {
-	height: 50px;
+	width: 76px;
 }
 .tnth-nav-xs .nav a {
     color: #fff;
@@ -49,10 +64,28 @@
     color: #333;
 }
 .tnth-nav-xs .tnth-white.navbar-toggle {
-    margin: 2px 8px 2px 4px;
+    margin: 6px 8px 2px 6px;
     padding: 0 0 0 10px;
 }
+#tnthNavbarXs {
+    padding-top: 30px;
+}
 
+@media (min-width: 1200px) {
+    .tnth-nav-main {
+        height: 104px;
+        margin-bottom: 50px;
+    }
+    #tnthLogo {
+        margin-left: 80px;
+    }
+    #tnthLogo img {
+        width: 124px;
+    }
+    #tnthTopLinks {
+        margin-top: 30px;
+    }
+}
 
 
 

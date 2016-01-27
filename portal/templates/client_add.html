@@ -1,28 +1,22 @@
 {% extends "layout.html" %}
 {% block main %}
-{% from "flask_user/_macros.html" import render_field, back_btn %}
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
+{% from "flask_user/_macros.html" import render_field, back_btn }
+<div class="well">
 
-            <div class="well lead-well">
+    {{ back_btn('clients','Client Applications') }}
 
-                {{ back_btn('clients','Client Applications') }}
+    <h3 class="tnth-headline">Obtain OAuth 2.0 Credentials from Central Services</h3><br />
 
-                <h3>Obtain OAuth 2.0 Credentials from Central Services</h3><br />
+    <p>To add an application to Central Services, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space.</p>
 
-                <p>To add an application to Central Services, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space.</p>
+    <form action="/client" method="post">
+        {{ form.hidden_tag() }}
 
-                <form action="/client" method="post">
-                    {{ form.hidden_tag() }}
+        {{ render_field(form.application_origins, tabindex=10) }}
 
-                    {{ render_field(form.application_origins, tabindex=10) }}
+        <button type="submit" class="btn btn-tnth-primary">Register App</button>
+    </form>
 
-                    <button type="submit" class="btn btn-tnth-primary">Register App</button>
-                </form>
-
-            </div>
-        </div>
-    </div>
 </div>
+
 {% endblock %}

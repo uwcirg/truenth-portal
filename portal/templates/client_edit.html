@@ -1,75 +1,70 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field, back_btn %}
-<div class="container">
-    <div class="row">
-        <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
-            <div class="well lead-well">
+<div class="well">
 
-                {{ back_btn('clients','Client Applications') }}
+    {{ back_btn('clients','Client Applications') }}
 
-                <h3>Central Services OAuth 2.0 Credentials</h3><br />
+    <h3 class="tnth-headline">Central Services OAuth 2.0 Credentials</h3><br />
 
-                <p><strong>App ID:</strong><br />{{ client.client_id }}</p>
+    <p><strong>App ID:</strong><br />{{ client.client_id }}</p>
 
-                <p><strong>App Secret:</strong><br />{{ client.client_secret }}</p>
+    <p><strong>App Secret:</strong><br />{{ client.client_secret }}</p>
 
-                <p><strong>Service Token:</strong><br />
-                {% if service_token %}
-                    {{ service_token.access_token }}
-                {% else %}
-                    <span class="text-muted">Not yet created</span>
-                {% endif %}
-                </p>
+    <p><strong>Service Token:</strong><br />
+    {% if service_token %}
+        {{ service_token.access_token }}
+        {{ service_token.expires_in }}
+    {% else %}
+        <span class="text-muted">Not yet created</span>
+    {% endif %}
+    </p>
 
-                <form action="/client/{{ client.client_id }}" method="post">
-                    {{ form.hidden_tag() }}
+    <form action="/client/{{ client.client_id }}" method="post">
+        {{ form.hidden_tag() }}
 
-                    {{ render_field(form.application_origins, tabindex=10) }}
+        {{ render_field(form.application_origins, tabindex=10) }}
 
-                    {{ render_field(form.callback_url, tabindex=20) }}
+        {{ render_field(form.callback_url, tabindex=20) }}
 
-                    <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;
-                    <button id="confirmDel" type="button" class="btn btn-tnth-primary" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
-                    <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">
-                    {% if service_token %}
-                        Update Service Token
-                    {% else %}
-                        Create Service Token
-                    {% endif %}
-                    </button>
-                </form>
+        <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;
+        <button id="confirmDel" type="button" class="btn btn-tnth-primary" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
+        <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">
+        {% if service_token %}
+            Update Service Token
+        {% else %}
+            Create Service Token
+        {% endif %}
+        </button>
+    </form>
 
-                {% macro render_field(field) %}
-                <dt>{{ field.label }}
-                <dd>{{ field(**kwargs)|safe }}
-                    {% if field.errors %}
-                    <ul class=errors>
-                        {% for error in field.errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </dd>
-                {% endmacro %}
+    {% macro render_field(field) %}
+    <dt>{{ field.label }}
+    <dd>{{ field(**kwargs)|safe }}
+        {% if field.errors %}
+        <ul class=errors>
+            {% for error in field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </dd>
+    {% endmacro %}
 
-                <br />
-                <p><strong>Application URL</strong><br />
-                    The Application URL may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.
-                </p>
-                <p><strong>Callback URL</strong><br />
-                    Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined.
-                </p>
-                <p><strong>Service Token</strong><br />
-                    Use a Service Token to make authenticated, automated service calls.  This token can then be used in the <i>Authorization</i> request header in the form <b>Bearer &lt;token-value&gt;</b>, as per the OAuth2 protocol.  This token should be carefully guarded on a secure system and only transmitted via HTTPS.  Valid for 12 months.
-                </p>
-
-            </div>
-        </div>
-    </div>
+    <br />
+    <p><strong>Application URL</strong><br />
+        The Application URL may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.
+    </p>
+    <p><strong>Callback URL</strong><br />
+        Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined.
+    </p>
+    <p><strong>Service Token</strong><br />
+        Use a Service Token to make authenticated, automated service calls.  This token can then be used in the <i>Authorization</i> request header in the form <b>Bearer &lt;token-value&gt;</b>, as per the OAuth2 protocol.  This token should be carefully guarded on a secure system and only transmitted via HTTPS.  Valid for 12 months.
+    </p>
 
 </div>
+
 <script>
 $(document).ready(function(){
     $('#confirmDel').popover({

@@ -25,21 +25,20 @@
 
     <div class="container hidden-xs tnth-nav-main">
         <div id="tnthLogo">
-            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt.png') }}" /></a>
+            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_diamond_white.png') }}" /></a>
         </div>
 
         <div id="tnthTopLinks">
             <div class="btn-group nav-userinfo">
             {% if username %}
 
-                <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <button id="tnthUserBtn" type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Welcome, {{ username }}
                     <img src="{{movember_profile}}" />
                     <span class="fa fa-caret-down"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
-                    <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                     {% if user and user.has_roles('application_developer') %}
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
                     {% endif %}
@@ -49,6 +48,7 @@
                     {% if user %}
                     <li><a href="{{PORTAL}}/invite">Send an Invite</a></li>
                     {% endif %}
+                    <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                 </ul>
             {% elif login_url %}
                 <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -79,10 +79,11 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="tnth-white navbar-toggle collapsed" data-toggle="collapse" data-target="#tnthNavbarXs" aria-expanded="false" aria-controls="tnthNavbarXs">
+                    <i class="fa fa-bars"></i> MENU&nbsp;&nbsp;
                     <img src="{{movember_profile}}" />
                     <span class="fa fa-caret-down"></span>
                 </button>
-                <a class="navbar-brand" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt.png')}}" /></a>
+                <a class="navbar-brand" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_diamond_white.png')}}" /></a>
             </div>
             <div id="tnthNavbarXs" class="navbar-collapse collapse" aria-expanded="false">
                 <ul class="nav navbar-nav">
@@ -92,6 +93,15 @@
                     {% endif %}
                     <li><a href="http://truenth.org" target="_blank">About</a></li>
                     <li class="disabled"><a href="#">Help</a></li>
+                    {% if user and user.has_roles('application_developer') %}
+                    <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                    {% endif %}
+                    {% if user and user.has_roles('admin') %}
+                    <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                    {% endif %}
+                    {% if user %}
+                    <li><a href="{{PORTAL}}/invite">Send an Invite</a></li>
+                    {% endif %}
                     {% if username %}
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                     {% endif %}

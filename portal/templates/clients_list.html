@@ -1,30 +1,24 @@
 {% extends "layout.html" %}
 {% block main %}
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
 
-                <div class="well lead-well">
+<div class="well">
 
-                    <h3>Central Services OAuth 2.0 Client Applications</h3>
+    <h3 class="tnth-headline">Central Services OAuth 2.0 Client Applications</h3>
 
-                    <div style="margin: 2em 1em 3em">
-                        <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">Create A New TrueNTH Client Application</a>
-                    </div>
-
-                    <h4>Your Current Applications</h4>
-                    {% if clients %}
-                    <ul>
-                        {% for client in clients %}
-                        <li><a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a></li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p>You have not created an client applications.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
+    <div style="margin: 2em 1em 3em">
+        <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">Create A New TrueNTH Client Application</a>
     </div>
+
+    <h4>Your Current Applications</h4>
+    {% if clients %}
+    <ul>
+        {% for client in clients %}
+        <li><a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a></li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>You have not created an client applications.</p>
+    {% endif %}
+</div>
+
 {% endblock %}
