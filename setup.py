@@ -33,6 +33,7 @@ setup(
         'Authomatic>=0.1.0',
         'celery',
         'Flask>=0.10.1',
+        'Flask-Babel',
         'Flask-Celery-Helper',
         'Flask-Migrate',
         'Flask-OAuthlib',

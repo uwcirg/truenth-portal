@@ -33,6 +33,8 @@ class User(db.Model, UserMixin):
     image_url = db.Column(db.Text)
     active = db.Column('is_active', db.Boolean(), nullable=False,
             server_default='1')
+    locale = db.Column(db.String(20), default='en')
+    timezone = db.Column(db.String(20), default='UTC')
 
     # Only used for local accounts
     password = db.Column(db.String(255))
