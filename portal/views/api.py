@@ -32,7 +32,7 @@ def utility_processor():
 def me():
     """Access basics for current user
 
-    returns logged in user's id, username and email in JSON
+    returns authenticated user's id, username and email in JSON
     ---
     tags:
       - User
@@ -87,7 +87,7 @@ def demographics(patient_id):
         in: path
         description:
           Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: true
+        required: false
         type: integer
         format: int64
     responses:
@@ -124,6 +124,12 @@ def demographics_set(patient_id):
     produces:
       - application/json
     parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
@@ -156,6 +162,7 @@ def demographics_set(patient_id):
     return jsonify(patient.as_fhir())
 
 
+@api.route('/clinical/biopsy', defaults={'patient_id': None})
 @api.route('/clinical/biopsy/<int:patient_id>')
 @oauth.require_oauth()
 def biopsy(patient_id):
@@ -172,8 +179,8 @@ def biopsy(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID
-        required: true
+        description: TrueNTH patient ID, defaults to the authenticated user
+        required: false
         type: integer
         format: int64
     responses:
@@ -186,10 +193,16 @@ def biopsy(patient_id):
           to view requested patient
 
     """
-    return clinical_api_shortcut_get(patient_id=patient_id,
+    if patient_id:
+        current_user().check_role(permission='view', other_id=patient_id)
+        patient = get_user(patient_id)
+    else:
+        patient = current_user()
+    return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=BIOPSY)
 
 
+@api.route('/clinical/pca_diag', defaults={'patient_id': None})
 @api.route('/clinical/pca_diag/<int:patient_id>')
 @oauth.require_oauth()
 def pca_diag(patient_id):
@@ -206,8 +219,8 @@ def pca_diag(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID
-        required: true
+        description: TrueNTH patient ID, defaults to the authenticated user
+        required: false
         type: integer
         format: int64
     responses:
@@ -221,11 +234,17 @@ def pca_diag(patient_id):
           to view requested patient
 
     """
-    return clinical_api_shortcut_get(patient_id=patient_id,
+    if patient_id:
+        current_user().check_role(permission='view', other_id=patient_id)
+        patient = get_user(patient_id)
+    else:
+        patient = current_user()
+    return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=PCaDIAG)
 
 
 
+@api.route('/clinical/tx', defaults={'patient_id': None})
 @api.route('/clinical/tx/<int:patient_id>')
 @oauth.require_oauth()
 def treatment(patient_id):
@@ -242,8 +261,8 @@ def treatment(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID
-        required: true
+        description: TrueNTH patient ID, defaults to the authenticated user
+        required: false
         type: integer
         format: int64
     responses:
@@ -257,7 +276,12 @@ def treatment(patient_id):
           to view requested patient
 
     """
-    return clinical_api_shortcut_get(patient_id=patient_id,
+    if patient_id:
+        current_user().check_role(permission='view', other_id=patient_id)
+        patient = get_user(patient_id)
+    else:
+        patient = current_user()
+    return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=TX)
 
 
