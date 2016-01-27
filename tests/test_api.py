@@ -71,7 +71,7 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['name']['given'], given)
 
 
-    def test_clinicalGET(self):
+    def prep_db_for_clinical(self):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
             observation = Observation()
@@ -85,6 +85,8 @@ class TestAPI(TestCase):
                 observation_id=observation.id))
             db.session.commit()
 
+    def test_clinicalGET(self):
+        self.prep_db_for_clinical()
         self.login()
         rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
 
@@ -96,6 +98,18 @@ class TestAPI(TestCase):
             clinical_data['entry'][0]['content']['valueQuantity']\
                     ['value'])
 
+    def test_clinicalGETimplicit(self):
+        self.prep_db_for_clinical()
+        self.login()
+        rv = self.app.get('/api/clinical')
+
+        clinical_data = json.loads(rv.data)
+        self.assertEquals('Gleason score',
+            clinical_data['entry'][0]['content']['code']['coding'][0]\
+                    ['display'])
+        self.assertEquals('2',
+            clinical_data['entry'][0]['content']['valueQuantity']\
+                    ['value'])
 
     def test_clinicalPOST(self):
         data = {"resourceType": "Observation",
@@ -133,6 +147,14 @@ class TestAPI(TestCase):
         """Access biopsy on user w/o any clinical info"""
         self.login()
         rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        self.assert200(rv)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'unknown')
+
+    def test_empty_biopsy_get_implicit(self):
+        """Access biopsy on implicit user w/o any clinical info"""
+        self.login()
+        rv = self.app.get('/api/clinical/biopsy')
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'unknown')
