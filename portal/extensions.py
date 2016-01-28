@@ -122,3 +122,7 @@ mail = Mail()
 # Celery (Distributed Task Queue) is used for any asynchronous tasks
 from flask.ext.celery import Celery
 celery = Celery()
+
+# Bable is used for i18n
+from flask.ext.babel import Babel
+babel = Babel()

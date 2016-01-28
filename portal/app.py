@@ -8,7 +8,7 @@ from flask.ext.webtest import get_scopefunc
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
-from .extensions import celery, db, mail, oauth, user_manager
+from .extensions import babel, celery, db, mail, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
 from .views.portal import portal
@@ -61,6 +61,9 @@ def configure_extensions(app):
 
     # celery - task queue for asynchronous tasks
     celery.init_app(app)
+
+    # babel - i18n
+    babel.init_app(app)
 
 
 def configure_blueprints(app, blueprints):
