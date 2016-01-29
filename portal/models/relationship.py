@@ -21,6 +21,8 @@ class Relationship(db.Model):
 
 #Source definition for relationships, as dictionary {name: description,}
 STATIC_RELATIONSHIPS = IterableUserDict({
+    'partner':
+        'An intimate partner relationship',
     'sponsor':
         'The sponsor of a service account.  One way relationship from '
         'the user who created the account (the sponsor) to the service '

@@ -6,8 +6,9 @@ from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import ROLE, STATIC_ROLES
-from portal.models.user import User
+from portal.models.user import User, UserRelationship
 
 
 class TestAPI(TestCase):
@@ -332,3 +333,92 @@ class TestAPI(TestCase):
         self.assertEquals(len(doc['roles']), len(data['roles']))
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
+
+    def test_all_relationships(self):
+        # obtain list of all relationships
+        rv = self.app.get('/api/relationships')
+        self.assert200(rv)
+        self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
+
+    def create_test_relationships(self):
+        other_user = self.add_user(username='other')
+        partner = Relationship.query.filter_by(name='partner').first()
+        rel = UserRelationship(user_id=TEST_USER_ID,
+                               relationship_id=partner.id,
+                               other_user_id=other_user)
+        sponsor = Relationship.query.filter_by(name='sponsor').first()
+        rel2 = UserRelationship(user_id=other_user,
+                               relationship_id=sponsor.id,
+                               other_user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(rel)
+            db.session.add(rel2)
+            db.session.commit()
+
+    def test_subject_relationships(self):
+        # make sure we get relationships for both subject and predicate
+        self.create_test_relationships()
+        self.login()
+        rv = self.app.get('/api/relationships/{}'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
+
+    def test_set_relationships(self):
+        other_user = self.add_user(username='other')
+        data = {'relationships':[{'user': TEST_USER_ID,
+                                  'has the relationship': 'partner',
+                                  'with': other_user},]
+               }
+        self.login()
+        rv = self.app.put('/api/relationships/{}'.format(TEST_USER_ID),
+                         content_type='application/json',
+                         data=json.dumps(data))
+        self.assert200(rv)
+
+        ur = UserRelationship.query.filter_by(other_user_id=other_user).first()
+        self.assertEquals(ur.relationship.name, RELATIONSHIP.PARTNER)
+
+    def test_delete_relationships(self):
+        self.create_test_relationships()
+        other_user = User.query.filter_by(username='other').first()
+        data = {'relationships':[{'user': TEST_USER_ID,
+                                  'has the relationship': 'partner',
+                                  'with': other_user.id},]
+               }
+        self.login()
+        rv = self.app.delete('/api/relationships/{}'.format(TEST_USER_ID),
+                         content_type='application/json',
+                         data=json.dumps(data))
+        self.assert200(rv)
+
+        # shouldn't find the deleted
+        ur = UserRelationship.query.filter_by(
+            other_user_id=other_user.id).first()
+        self.assertFalse(ur)
+
+        # but the other one should
+        ur = UserRelationship.query.filter_by(
+            other_user_id=TEST_USER_ID).first()
+        self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
+
+    def test_delete_relationships_wo_perms(self):
+        self.create_test_relationships()
+        other_user = User.query.filter_by(username='other').first()
+        data = {'relationships':[{'user': other_user.id,
+                                  'has the relationship': 'sponsor',
+                                  'with': TEST_USER_ID},]
+               }
+        self.login()
+        rv = self.app.delete('/api/relationships/{}'.format(TEST_USER_ID),
+                         content_type='application/json',
+                         data=json.dumps(data))
+        self.assert401(rv)
+
+        # should find both relationships intact
+        ur = UserRelationship.query.filter_by(
+            other_user_id=other_user.id).first()
+        self.assertEquals(ur.user_id, TEST_USER_ID)
+
+        ur = UserRelationship.query.filter_by(
+            other_user_id=TEST_USER_ID).first()
+        self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)

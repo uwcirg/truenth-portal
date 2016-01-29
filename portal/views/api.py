@@ -12,8 +12,9 @@ from ..models.auth import validate_client_origin
 from ..models.fhir import CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import BIOPSY, PCaDIAG, TX
+from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, UserRelationship
 from ..extensions import oauth
 from ..extensions import db
 from .crossdomain import crossdomain
@@ -1158,6 +1159,238 @@ def account():
           permission to view requested user_id
     """
     return
+
+
+@api.route('/relationships', defaults={'user_id': None})
+@api.route('/relationships/<int:user_id>')
+@oauth.require_oauth()
+def relationships(user_id):
+    """Returns simple JSON defining system or user relationships
+
+    Returns a list of all known relationships.  Users belong to one or more
+    relationships used to control authorization.  If a user_id is provided,
+    only the list of relationships that user belongs to is returned.
+    ---
+    tags:
+      - User
+    operationId: getrelationships
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns a list of all known relationships.  Users belong to one or
+          more relationships used to control authorization.  If a user_id is
+          provided, only the list of relationships that user belongs to is
+          returned.  Relationships are defined "one-way".  All relationships
+          in which a user is mentioned either as a subject or as part of the
+          predicate.
+        schema:
+          id: relationships
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                relationship name, a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the relationship.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user_id:
+        if user.id != user_id:
+            current_user().check_role(permission='view', other_id=user_id)
+            user = get_user(user_id)
+        results = []
+        for r in user.relationships:
+            results.append({'user': r.user_id,
+                            'has the relationship': r.relationship.name,
+                            'with': r.other_user_id})
+        # add in any relationships where the user is on the predicate side
+        predicates = UserRelationship.query.filter_by(other_user_id=user_id)
+        for r in predicates:
+            results.append({'user': r.user_id,
+                            'has the relationship': r.relationship.name,
+                            'with': r.other_user_id})
+    else:
+        results = [{'name': r.name, 'description': r.description}
+                   for r in Relationship.query.all()]
+    return jsonify(relationships=results)
+
+
+@api.route('/relationships/<int:user_id>', methods=('DELETE',))
+@oauth.require_oauth()
+def delete_relationships(user_id):
+    """Delete relationships for user, returns JSON defining user relationships
+
+    Used to delete relationship assignments for a user.
+
+    Returns a list of all relationships user belongs to after change.
+    ---
+    tags:
+      - User
+    operationId: deleterelationships
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: relationships
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description:
+                The string defining the name of each relationship the user should
+                belong to.  Must exist as an available relationship in the system.
+    responses:
+      200:
+        description:
+          Returns a list of all relationships user belongs to after change.
+        schema:
+          id: user_relationships
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                relationship name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the relationship.
+      400:
+        description: if the request incudes an unknown relationship.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+
+    if not request.json or 'relationships' not in request.json:
+        abort(400, "Requires relationship list in JSON")
+    # First confirm all the data is valid and the user has permission
+    system_relationships = [r.name for r in Relationship.query]
+    for r in request.json['relationships']:
+        if not r['has the relationship'] in system_relationships:
+            abort(404, "Unknown relationship '{}' can't be deleted".format(
+                r['has the relationship']))
+        # require edit on subject user only
+        user.check_role('edit', other_id=r['user'])
+
+    # Delete any requested that exist
+    for r in request.json['relationships']:
+        rel_id = Relationship.query.with_entities(
+            Relationship.id).filter_by(name=r['has the relationship']).first()
+        kwargs = {'user_id': r['user'],
+                  'relationship_id': rel_id[0],
+                  'other_user_id': r['with']}
+        existing = UserRelationship.query.filter_by(**kwargs).first()
+        if existing:
+            db.session.delete(existing)
+    db.session.commit()
+
+    # Return user's updated relationship list
+    return relationships(user.id)
+
+@api.route('/relationships/<int:user_id>', methods=('PUT',))
+@oauth.require_oauth()
+def set_relationships(user_id):
+    """Set relationships for user, returns JSON defining user relationships
+
+    Used to set relationship assignments for a user.
+
+    Returns a list of all relationships user belongs to after change.
+    ---
+    tags:
+      - User
+    operationId: setrelationships
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: relationships
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description:
+                The string defining the name of each relationship the user should
+                belong to.  Must exist as an available relationship in the system.
+    responses:
+      200:
+        description:
+          Returns a list of all relationships user belongs to after change.
+        schema:
+          id: user_relationships
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                relationship name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the relationship.
+      400:
+        description: if the request incudes an unknown relationship.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+
+    if not request.json or 'relationships' not in request.json:
+        abort(400, "Requires relationship list in JSON")
+    # First confirm all the data is valid and the user has permission
+    system_relationships = [r.name for r in Relationship.query]
+    for r in request.json['relationships']:
+        if not r['has the relationship'] in system_relationships:
+            abort(404, "Unknown relationship '{}' can't be added".format(
+                r['has the relationship']))
+        # require edit on subject user only
+        user.check_role('edit', other_id=r['user'])
+
+    # Add any requested that don't exist
+    for r in request.json['relationships']:
+        rel_id = Relationship.query.with_entities(
+            Relationship.id).filter_by(name=r['has the relationship']).first()
+        kwargs = {'user_id': r['user'],
+                  'relationship_id': rel_id[0],
+                  'other_user_id': r['with']}
+        existing = UserRelationship.query.filter_by(**kwargs).first()
+        if not existing:
+            db.session.add(UserRelationship(**kwargs))
+    db.session.commit()
+
+    # Return user's updated relationship list
+    return relationships(user.id)
 
 
 @api.route('/roles', defaults={'user_id': None})
