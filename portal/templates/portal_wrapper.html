@@ -33,7 +33,10 @@
             {% if username %}
 
                 <button id="tnthUserBtn" type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Welcome, {{ username }}
+                    Welcome
+                    {% if username != "Anonymous" %}
+                        , {{ username }}
+                    {% endif %}
                     <img src="{{movember_profile}}" />
                     <span class="fa fa-caret-down"></span>
                 </button>
