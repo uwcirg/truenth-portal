@@ -1,11 +1,13 @@
 {% extends 'flask_user/public_base.html' %}
 
 {% block content %}
-{% from "flask_user/_macros.html" import render_field, render_submit_field %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 
 <div class="well">
 
-    <h1>{%trans%}Register{%endtrans%}</h1>
+    {{ back_btn(PORTAL,'Home') }}
+
+    <h2>{%trans%}Register for TrueNTH{%endtrans%}</h2>
 
     <form action="" method="POST" novalidate formnovalidate class="form" role="form">
         {{ form.hidden_tag() }}

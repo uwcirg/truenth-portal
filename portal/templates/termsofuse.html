@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
 
 <div class="well">
+
+  {{ back_btn(PORTAL,'Home') }}
+
   <h3 class="tnth-headline">TrueNTH Terms of Use</h3>
   <p>
   This [AD-HOC DRAFT 6/5/2015] Privacy Policy applies solely to the True NTH USA website and not to third party websites reached through a link in the True NTH USA website.
