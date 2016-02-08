@@ -25,7 +25,7 @@ class TestPortal(TestCase):
         rv = self.app.get('/admin')
 
         # Should at least see an entry per user in system
-        self.assertEquals(rv.data.count('/profile'), User.query.count())
+        self.assertTrue(rv.data.count('/profile') >= User.query.count())
 
     def test_invite(self):
         """Test email invite form"""
