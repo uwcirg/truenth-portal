@@ -50,7 +50,7 @@ class TestAuth(TestCase):
         rv = self.app.post('/user/register', data=data)
         self.assertEquals(rv.status_code, 302)
         new_user = User.query.filter_by(username=data['username']).first()
-        self.assertTrue(new_user.roles[0].name, ROLE.PATIENT)
+        self.assertEquals(new_user.active, True)
 
     def test_client_add(self):
         """Test adding a client application"""

@@ -246,7 +246,6 @@ def add_authomatic_user(authomatic_user, image_url):
             email=authomatic_user.email,
             image_url=image_url)
     db.session.add(user)
-    add_default_role(user)
     return user
 
 
@@ -262,14 +261,8 @@ def add_anon_user():
     """
     user = User(username='Anonymous')
     db.session.add(user)
-    add_default_role(user)
     add_role(user, ROLE.ANON)
     return user
-
-
-def add_default_role(user):
-    """All new users are given the patient role by default"""
-    return add_role(user, ROLE.PATIENT)
 
 
 def add_role(user, role_name):

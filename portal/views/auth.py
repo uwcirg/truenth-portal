@@ -21,7 +21,7 @@ from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..models.user import add_authomatic_user, add_default_role
+from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
 from ..extensions import authomatic, db, oauth
 from ..template_helpers import split_string
@@ -79,7 +79,6 @@ def flask_user_login_event(app, user, **extra):
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event("local user registered", user_id=user.id)
-    add_default_role(user)
 
 
 # Register functions to receive signals from flask_user
