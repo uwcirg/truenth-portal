@@ -368,26 +368,25 @@ $.ajax ({
 }).fail(function() {
     console.log("Problem retrieving data from server.")
 });
+
 $("#userRoles input:checkbox").on("click",function(){
-    var roles = [];
-    // Add all checked roles to array
-    $.each($("#userRoles input:checkbox"),function(){
-        if ($(this).prop('checked')) {
-            roles.push({name: $(this).val()})
-        }
-    });
-    var toSend = {"roles" : roles}
+    var roles = []
+    roles.push({name: $(this).val()})
+    var toSend = {"roles": roles}
+    // If role is checked, type is PUT, otherwise DELETE
+    var ajaxType = "DELETE"
+    if ($(this).prop('checked')) {
+        ajaxType = "PUT"
+    }
     $.ajax ({
-        type: "PUT",
+        type: ajaxType,
         url: '/api/user/{{ user.id }}/roles',
         contentType: "application/json; charset=utf-8",
         dataType: 'json',
         data: JSON.stringify(toSend)
     }).done(function(data) {
-
     }).fail(function() {
-        console.log("Problem putting data on server.")
-    });
+        console.log("Problem updating role on server.")
+    })
 })
-
 {% endblock %}
