@@ -14,7 +14,7 @@ from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import BIOPSY, PCaDIAG, TX
 from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
-from ..models.user import current_user, get_user, UserRelationship
+from ..models.user import current_user, get_user, UserRelationship, UserRoles
 from ..extensions import oauth
 from ..extensions import db
 from .crossdomain import crossdomain
@@ -163,8 +163,7 @@ def demographics_set(patient_id):
     return jsonify(patient.as_fhir())
 
 
-@api.route('/clinical/biopsy', defaults={'patient_id': None})
-@api.route('/clinical/biopsy/<int:patient_id>')
+@api.route('/patient/<int:patient_id>/clinical/biopsy')
 @oauth.require_oauth()
 def biopsy(patient_id):
     """Simplified API for getting clinical biopsy data w/o FHIR
@@ -180,8 +179,8 @@ def biopsy(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID, defaults to the authenticated user
-        required: false
+        description: TrueNTH patient ID
+        required: true
         type: integer
         format: int64
     responses:
@@ -194,17 +193,13 @@ def biopsy(patient_id):
           to view requested patient
 
     """
-    if patient_id:
-        current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user(patient_id)
-    else:
-        patient = current_user()
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=BIOPSY)
 
 
-@api.route('/clinical/pca_diag', defaults={'patient_id': None})
-@api.route('/clinical/pca_diag/<int:patient_id>')
+@api.route('/patient/<int:patient_id>/clinical/pca_diag')
 @oauth.require_oauth()
 def pca_diag(patient_id):
     """Simplified API for getting clinical PCa diagnosis status w/o FHIR
@@ -220,8 +215,8 @@ def pca_diag(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID, defaults to the authenticated user
-        required: false
+        description: TrueNTH patient ID
+        required: true
         type: integer
         format: int64
     responses:
@@ -235,18 +230,14 @@ def pca_diag(patient_id):
           to view requested patient
 
     """
-    if patient_id:
-        current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user(patient_id)
-    else:
-        patient = current_user()
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=PCaDIAG)
 
 
 
-@api.route('/clinical/tx', defaults={'patient_id': None})
-@api.route('/clinical/tx/<int:patient_id>')
+@api.route('/patient/<int:patient_id>/clinical/tx')
 @oauth.require_oauth()
 def treatment(patient_id):
     """Simplified API for getting clinical treatment begun status w/o FHIR
@@ -262,8 +253,8 @@ def treatment(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description: TrueNTH patient ID, defaults to the authenticated user
-        required: false
+        description: TrueNTH patient ID
+        required: true
         type: integer
         format: int64
     responses:
@@ -277,17 +268,14 @@ def treatment(patient_id):
           to view requested patient
 
     """
-    if patient_id:
-        current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user(patient_id)
-    else:
-        patient = current_user()
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=TX)
 
 
 
-@api.route('/clinical/biopsy/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/patient/<int:patient_id>/clinical/biopsy', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def biopsy_set(patient_id):
     """Simplified API for setting clinical biopsy data w/o FHIR
@@ -343,7 +331,7 @@ def biopsy_set(patient_id):
                                      codeable_concept=BIOPSY)
 
 
-@api.route('/clinical/pca_diag/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/patient/<int:patient_id>/clinical/pca_diag', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def pca_diag_set(patient_id):
     """Simplified API for setting clinical PCa diagnosis status w/o FHIR
@@ -397,7 +385,7 @@ def pca_diag_set(patient_id):
                                      codeable_concept=PCaDIAG)
 
 
-@api.route('/clinical/tx/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/patient/<int:patient_id>/clinical/tx', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def tx_set(patient_id):
     """Simplified API for setting clinical treatment status w/o FHIR
@@ -451,15 +439,14 @@ def tx_set(patient_id):
 
 
 
-@api.route('/clinical', defaults={'patient_id': None})
-@api.route('/clinical/<int:patient_id>')
+@api.route('/patient/<int:patient_id>/clinical')
 @oauth.require_oauth()
 def clinical(patient_id):
     """Access clinical data as a FHIR bundle of observations (in JSON)
 
     Returns a patient's clinical data (eg TNM, Gleason score) as a FHIR
     bundle of observations (http://www.hl7.org/fhir/observation.html)
-    in JSON.  Defaults to logged-in user if `patient_id` is not provided.
+    in JSON.
     ---
     tags:
       - Clinical
@@ -469,8 +456,7 @@ def clinical(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description:
-          Optional TrueNTH patient ID, defaults to the authenticated user.
+        description: TrueNTH patient ID
         required: true
         type: integer
         format: int64
@@ -480,22 +466,18 @@ def clinical(patient_id):
           Returns clinical information for requested portal user id as a
           FHIR bundle of observations
           (http://www.hl7.org/fhir/observation.html) in JSON.
-          Defaults to logged-in user if `patient_id` is not provided.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
 
     """
-    if patient_id:
-        current_user().check_role(permission='view', other_id=patient_id)
-        patient = get_user(patient_id)
-    else:
-        patient = current_user()
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
     return jsonify(patient.clinical_history(requestURL=request.url))
 
 
-@api.route('/clinical/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/patient/<int:patient_id>/clinical', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def clinical_set(patient_id):
     """Add clinical entry via FHIR Resource Observation
@@ -519,8 +501,7 @@ def clinical_set(patient_id):
     parameters:
       - name: patient_id
         in: path
-        description:
-          Optional TrueNTH patient ID, defaults to the authenticated user.
+        description: TrueNTH patient ID
         required: true
         type: integer
         format: int64
@@ -565,36 +546,35 @@ def clinical_set(patient_id):
     return jsonify(message=result)
 
 
-@api.route('/assessment', methods=('GET',))
+@api.route('/patient/<int:patient_id>/assessment/<string:instrument_id>')
 @oauth.require_oauth()
-def assessment(instrument_id):
+def assessment(patient_id, instrument_id):
     """Return a patient's responses to a questionnaire
-    
+
     Retrieve a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
     resource type.
     ---
     operationId: getQuestionnaireResponse
     tags:
-      - Assessment Engine 
+      - Assessment Engine
     produces:
       - application/json
     parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
       - name: instrument_id
-        in: query 
+        in: path
         description:
-          ID of the instrument, eg "epic26", "eq5d" 
+          ID of the instrument, eg "epic26", "eq5d"
         required: true
         type: string
         enum:
           - epic26
-          - eq5d 
-      - name: patient_id
-        in: query 
-        description:
-          Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: false
-        type: integer
-        format: int64
+          - eq5d
 
     responses:
       200:
@@ -625,8 +605,8 @@ def assessment(instrument_id):
 
     return jsonify(questionnaire_response.document)
 
-@api.route('/assessment/<int:patient_id>', methods=('POST', 'PUT'))
-@api.route('/assessment/<int:patient_id>/', methods=('POST', 'PUT'))
+
+@api.route('/patient/<int:patient_id>/assessment', methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def assessment_set(patient_id):
     """Add a questionnaire response to a patient's record
@@ -636,7 +616,7 @@ def assessment_set(patient_id):
     ---
     operationId: addQuestionnaireResponse
     tags:
-      - Assessment Engine 
+      - Assessment Engine
     produces:
       - application/json
     parameters:
@@ -839,6 +819,7 @@ def assessment_set(patient_id):
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
+
 @api.route('/present-assessment/<instrument_id>')
 @oauth.require_oauth()
 def present_assessment(instrument_id):
@@ -848,20 +829,20 @@ def present_assessment(instrument_id):
     ---
     operationId: present_assessment
     tags:
-      - Assessment Engine 
+      - Assessment Engine
     produces:
       - text/html
     parameters:
       - name: instrument_id
         in: path
         description:
-          ID of the instrument, eg "epic26", "eq5d" 
+          ID of the instrument, eg "epic26", "eq5d"
         required: true
         type: string
         enum:
           - epic26
-          - eq5d 
-      - name: next 
+          - eq5d
+      - name: next
         in: query
         description: Intervention URL to return to after assessment completion
         required: true
@@ -905,6 +886,7 @@ def present_assessment(instrument_id):
 
     return redirect(assessment_url, code=303)
 
+
 @api.route('/complete-assessment')
 @oauth.require_oauth()
 def complete_assessment():
@@ -934,6 +916,7 @@ def complete_assessment():
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
+
 
 @api.route('/auditlog', methods=('POST',))
 @oauth.require_oauth()
@@ -1161,15 +1144,57 @@ def account():
     return
 
 
-@api.route('/relationships', defaults={'user_id': None})
-@api.route('/relationships/<int:user_id>')
+@api.route('/relationships')
+@oauth.require_oauth()
+def system_relationships():
+    """Returns simple JSON defining all system relationships
+
+    Returns a list of all known relationships.
+    ---
+    tags:
+      - User
+    operationId: system_relationships
+    produces:
+      - application/json
+    responses:
+      200:
+        description: Returns a list of all known relationships.
+        schema:
+          id: relationships
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                relationship name, a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the relationship.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view system relationships
+
+    """
+    results = [{'name': r.name, 'description': r.description}
+               for r in Relationship.query.all()]
+    return jsonify(relationships=results)
+
+
+@api.route('/user/<int:user_id>/relationships')
 @oauth.require_oauth()
 def relationships(user_id):
-    """Returns simple JSON defining system or user relationships
+    """Returns simple JSON defining user relationships
 
-    Returns a list of all known relationships.  Users belong to one or more
-    relationships used to control authorization.  If a user_id is provided,
-    only the list of relationships that user belongs to is returned.
+    Relationships may exist between user accounts.  A user may have
+    any number of relationships.  The relationship
+    is a one-way definition defined to extend permissions to appropriate
+    users, such as intimate partners or service account sponsors.
+
+    The JSON returned includes all relationships for the given user both
+    as subject and as part of the relationship predicate.
     ---
     tags:
       - User
@@ -1179,12 +1204,7 @@ def relationships(user_id):
     responses:
       200:
         description:
-          Returns a list of all known relationships.  Users belong to one or
-          more relationships used to control authorization.  If a user_id is
-          provided, only the list of relationships that user belongs to is
-          returned.  Relationships are defined "one-way".  All relationships
-          in which a user is mentioned either as a subject or as part of the
-          predicate.
+          Returns the list of relationships that user belongs to.
         schema:
           id: relationships
           required:
@@ -1205,28 +1225,24 @@ def relationships(user_id):
 
     """
     user = current_user()
-    if user_id:
-        if user.id != user_id:
-            current_user().check_role(permission='view', other_id=user_id)
-            user = get_user(user_id)
-        results = []
-        for r in user.relationships:
-            results.append({'user': r.user_id,
-                            'has the relationship': r.relationship.name,
-                            'with': r.other_user_id})
-        # add in any relationships where the user is on the predicate side
-        predicates = UserRelationship.query.filter_by(other_user_id=user_id)
-        for r in predicates:
-            results.append({'user': r.user_id,
-                            'has the relationship': r.relationship.name,
-                            'with': r.other_user_id})
-    else:
-        results = [{'name': r.name, 'description': r.description}
-                   for r in Relationship.query.all()]
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    results = []
+    for r in user.relationships:
+        results.append({'user': r.user_id,
+                        'has the relationship': r.relationship.name,
+                        'with': r.other_user_id})
+    # add in any relationships where the user is on the predicate side
+    predicates = UserRelationship.query.filter_by(other_user_id=user_id)
+    for r in predicates:
+        results.append({'user': r.user_id,
+                        'has the relationship': r.relationship.name,
+                        'with': r.other_user_id})
     return jsonify(relationships=results)
 
 
-@api.route('/relationships/<int:user_id>', methods=('DELETE',))
+@api.route('/user/<int:user_id>/relationships', methods=('DELETE',))
 @oauth.require_oauth()
 def delete_relationships(user_id):
     """Delete relationships for user, returns JSON defining user relationships
@@ -1286,9 +1302,9 @@ def delete_relationships(user_id):
     if not request.json or 'relationships' not in request.json:
         abort(400, "Requires relationship list in JSON")
     # First confirm all the data is valid and the user has permission
-    system_relationships = [r.name for r in Relationship.query]
+    known_relationships = [r.name for r in Relationship.query]
     for r in request.json['relationships']:
-        if not r['has the relationship'] in system_relationships:
+        if not r['has the relationship'] in known_relationships:
             abort(404, "Unknown relationship '{}' can't be deleted".format(
                 r['has the relationship']))
         # require edit on subject user only
@@ -1309,7 +1325,8 @@ def delete_relationships(user_id):
     # Return user's updated relationship list
     return relationships(user.id)
 
-@api.route('/relationships/<int:user_id>', methods=('PUT',))
+
+@api.route('/user/<int:user_id>/relationships', methods=('PUT',))
 @oauth.require_oauth()
 def set_relationships(user_id):
     """Set relationships for user, returns JSON defining user relationships
@@ -1393,15 +1410,56 @@ def set_relationships(user_id):
     return relationships(user.id)
 
 
-@api.route('/roles', defaults={'user_id': None})
-@api.route('/roles/<int:user_id>')
+@api.route('/roles')
 @oauth.require_oauth()
-def roles(user_id):
-    """Returns simple JSON defining system or user roles
+def system_roles():
+    """Returns simple JSON defining all system roles
 
     Returns a list of all known roles.  Users belong to one or more
-    roles used to control authorization.  If a user_id is provided,
-    only the list of roles that user belongs to is returned.
+    roles used to control authorization.
+    ---
+    tags:
+      - User
+    operationId: system_roles
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns a list of all known roles.  Users belong to one or more
+          roles used to control authorization.
+        schema:
+          id: roles
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Role name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view roles
+
+    """
+    results = [{'name': r.name, 'description': r.description}
+            for r in Role.query.all()]
+    return jsonify(roles=results)
+
+
+@api.route('/user/<int:user_id>/roles')
+@oauth.require_oauth()
+def roles(user_id):
+    """Returns simple JSON defining user roles
+
+    Returns a list of all known roles.  Users belong to one or more
+    roles used to control authorization.  Returns the list of roles that user
+    belongs to.
     ---
     tags:
       - User
@@ -1412,8 +1470,8 @@ def roles(user_id):
       200:
         description:
           Returns a list of all known roles.  Users belong to one or more
-          roles used to control authorization.  If a user_id is provided,
-          only the list of roles that user belongs to is returned.
+          roles used to control authorization.  Returns the list of roles that
+          user belongs to.
         schema:
           id: roles
           required:
@@ -1434,27 +1492,106 @@ def roles(user_id):
 
     """
     user = current_user()
-    if user_id:
-        if user.id != user_id:
-            current_user().check_role(permission='view', other_id=user_id)
-            user = get_user(user_id)
-        use_roles = user.roles
-    else:
-        use_roles = Role.query.all()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
     results = [{'name': r.name, 'description': r.description}
-            for r in use_roles]
+            for r in user.roles]
     return jsonify(roles=results)
 
 
-@api.route('/roles/<int:user_id>', methods=('PUT',))
+@api.route('/user/<int:user_id>/roles', methods=('DELETE',))
+@oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
+def delete_roles(user_id):
+    """Delete roles for user, returns simple JSON defining user roles
+
+    Used to delete role assignments for a user.  Include any roles
+    the user should no longer be a member of.  Duplicates will be ignored.
+
+    Only the 'name' field of the roles is referenced.  Must match
+    current roles in the system.
+
+    Returns a list of all roles user belongs to after change.
+    ---
+    tags:
+      - User
+    operationId: delete_roles
+    produces:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: roles
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description:
+                The string defining the name of each role the user should
+                no longer belong to.  Must exist as an available role in the
+                system.
+    responses:
+      200:
+        description:
+          Returns a list of all roles user belongs to after change.
+        schema:
+          id: user_roles
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Role name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the role.
+      400:
+        description: if the request incudes an unknown role.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+
+    if not request.json or 'roles' not in request.json:
+        abort(400, "Requires role list")
+    requested_roles = [r['name'] for r in request.json['roles']]
+    matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
+    if len(matching_roles) != len(requested_roles):
+        abort(404, "One or more roles requested not available")
+    # Delete any requested already set on user
+    for requested_role in matching_roles:
+        if requested_role in user.roles:
+            u_r = UserRoles.query.filter_by(user_id=user.id,
+                                            role_id=requested_role.id).first()
+            db.session.delete(u_r)
+    db.session.commit()
+
+    # Return user's updated role list
+    results = [{'name': r.name, 'description': r.description}
+            for r in user.roles]
+    return jsonify(roles=results)
+
+
+@api.route('/user/<int:user_id>/roles', methods=('PUT',))
 @oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
 
-    Used to set role assignments for a user.  Include all roles
-    the user should be a member of.  If a list doesn't include current
-    roles for the user, the users roles will be reduced to match.
+    Used to set role assignments for a user.  Include any roles
+    the user should become a member of.  Duplicates will be ignored.  Use
+    the DELETE method to remove one or more roles.
 
     Only the 'name' field of the roles is referenced.  Must match
     current roles in the system.
@@ -1515,7 +1652,11 @@ def set_roles(user_id):
     matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
     if len(matching_roles) != len(requested_roles):
         abort(404, "One or more roles requested not available")
-    user.roles = matching_roles
+    # Add any requested not already set on user
+    for requested_role in matching_roles:
+        if requested_role not in user.roles:
+            user.roles.append(requested_role)
+
     if user not in db.session:
         db.session.add(user)
     db.session.commit()

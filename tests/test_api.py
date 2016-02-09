@@ -89,20 +89,7 @@ class TestAPI(TestCase):
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
         self.login()
-        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
-
-        clinical_data = json.loads(rv.data)
-        self.assertEquals('Gleason score',
-            clinical_data['entry'][0]['content']['code']['coding'][0]\
-                    ['display'])
-        self.assertEquals('2',
-            clinical_data['entry'][0]['content']['valueQuantity']\
-                    ['value'])
-
-    def test_clinicalGETimplicit(self):
-        self.prep_db_for_clinical()
-        self.login()
-        rv = self.app.get('/api/clinical')
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
         clinical_data = json.loads(rv.data)
         self.assertEquals('Gleason score',
@@ -131,7 +118,7 @@ class TestAPI(TestCase):
                 }
 
         self.login()
-        rv = self.app.post('/api/clinical/%s' % TEST_USER_ID,
+        rv = self.app.post('/api/patient/%s/clinical' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -141,21 +128,13 @@ class TestAPI(TestCase):
     def test_empty_clinical_get(self):
         """Access clinical on user w/o any clinical info"""
         self.login()
-        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
         self.assert200(rv)
 
     def test_empty_biopsy_get(self):
         """Access biopsy on user w/o any clinical info"""
         self.login()
-        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
-        self.assert200(rv)
-        data = json.loads(rv.data)
-        self.assertEquals(data['value'], 'unknown')
-
-    def test_empty_biopsy_get_implicit(self):
-        """Access biopsy on implicit user w/o any clinical info"""
-        self.login()
-        rv = self.app.get('/api/clinical/biopsy')
+        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'unknown')
@@ -163,7 +142,7 @@ class TestAPI(TestCase):
     def test_clinical_biopsy_put(self):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
-        rv = self.app.post('/api/clinical/biopsy/%s' % TEST_USER_ID,
+        rv = self.app.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -171,7 +150,7 @@ class TestAPI(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0] 
         vq = data['entry'][0]['content']['valueQuantity'] 
@@ -183,12 +162,12 @@ class TestAPI(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct biopsy value
-        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
         # Can we alter the value?
-        rv = self.app.post('/api/clinical/biopsy/%s' % TEST_USER_ID,
+        rv = self.app.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': False}))
         self.assert200(rv)
@@ -196,7 +175,7 @@ class TestAPI(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Confirm it's altered
-        rv = self.app.get('/api/clinical/biopsy/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'false')
 
@@ -207,7 +186,7 @@ class TestAPI(TestCase):
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
         self.login()
-        rv = self.app.post('/api/clinical/pca_diag/%s' % TEST_USER_ID,
+        rv = self.app.post('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -215,7 +194,7 @@ class TestAPI(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0] 
         vq = data['entry'][0]['content']['valueQuantity'] 
@@ -227,14 +206,14 @@ class TestAPI(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct pca_diag value
-        rv = self.app.get('/api/clinical/pca_diag/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
     def test_clinical_tx(self):
         """Shortcut API - just treatment w/o FHIR overhead"""
         self.login()
-        rv = self.app.post('/api/clinical/tx/%s' % TEST_USER_ID,
+        rv = self.app.post('/api/patient/%s/clinical/tx' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -242,7 +221,7 @@ class TestAPI(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/clinical/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0] 
         vq = data['entry'][0]['content']['valueQuantity'] 
@@ -254,13 +233,13 @@ class TestAPI(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct tx api
-        rv = self.app.get('/api/clinical/tx/%s' % TEST_USER_ID)
+        rv = self.app.get('/api/patient/%s/clinical/tx' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
     def test_default_role(self):
         self.login()
-        rv = self.app.get('/api/roles/{0}'.format(TEST_USER_ID))
+        rv = self.app.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), 1)
@@ -268,7 +247,7 @@ class TestAPI(TestCase):
 
     def test_unauth_role(self):
         self.login()
-        rv = self.app.get('/api/roles/66')
+        rv = self.app.get('/api/user/66/roles')
 
         self.assertEquals(rv.status_code, 401)
 
@@ -288,7 +267,7 @@ class TestAPI(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -297,6 +276,24 @@ class TestAPI(TestCase):
         self.assertEquals(len(doc['roles']), len(data['roles']))
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
+
+    def test_roles_duplicate_add(self):
+        data = {"roles": [
+                {"name": ROLE.APPLICATION_DEVELOPER},
+                ]}
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        self.login()
+        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 200)
+        doc = json.loads(rv.data)
+        self.assertEquals(len(doc['roles']), 3)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(len(user.roles),  3)
 
     def test_roles_delete(self):
         self.promote_user(role_name=ROLE.ADMIN)
@@ -306,15 +303,15 @@ class TestAPI(TestCase):
                 ]}
 
         self.login()
-        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+        rv = self.app.delete('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
         self.assertEquals(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), len(data['roles']))
+        self.assertEquals(len(doc['roles']), 2)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles), len(data['roles']))
+        self.assertEquals(len(user.roles), 2)
 
     def test_roles_nochange(self):
         data = {"roles": [
@@ -324,7 +321,7 @@ class TestAPI(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/roles/%s' % TEST_USER_ID,
+        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -359,7 +356,7 @@ class TestAPI(TestCase):
         # make sure we get relationships for both subject and predicate
         self.create_test_relationships()
         self.login()
-        rv = self.app.get('/api/relationships/{}'.format(TEST_USER_ID))
+        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
@@ -370,7 +367,7 @@ class TestAPI(TestCase):
                                   'with': other_user},]
                }
         self.login()
-        rv = self.app.put('/api/relationships/{}'.format(TEST_USER_ID),
+        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -386,7 +383,7 @@ class TestAPI(TestCase):
                                   'with': other_user.id},]
                }
         self.login()
-        rv = self.app.delete('/api/relationships/{}'.format(TEST_USER_ID),
+        rv = self.app.delete('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -409,7 +406,7 @@ class TestAPI(TestCase):
                                   'with': TEST_USER_ID},]
                }
         self.login()
-        rv = self.app.delete('/api/relationships/{}'.format(TEST_USER_ID),
+        rv = self.app.delete('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert401(rv)
