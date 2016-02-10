@@ -27,6 +27,9 @@ a:hover, a:active {
   width: 100%;
   height: 100%;
 }
+#main-div {
+    margin: 1em 0;
+}
 .lead-well {
 	background-color: #fff;
 	/**background-color: rgba(255, 255, 255, 0.8);**/
