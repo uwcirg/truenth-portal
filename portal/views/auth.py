@@ -21,7 +21,7 @@ from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..models.user import add_authomatic_user, add_default_role
+from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
 from ..extensions import authomatic, db, oauth
 from ..template_helpers import split_string
@@ -79,7 +79,6 @@ def flask_user_login_event(app, user, **extra):
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event("local user registered", user_id=user.id)
-    add_default_role(user)
 
 
 # Register functions to receive signals from flask_user
@@ -728,6 +727,11 @@ def authorize(*args, **kwargs):
           Target for redirection after authorization is complete
         required: false
         type: string
+      - name: display_html
+        in: query
+        description: Additional HTML to customize registration
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -741,6 +745,14 @@ def authorize(*args, **kwargs):
           of Central Services.
 
     """
+    # Interventions may include additional text to display as a way
+    # to "customize registration".  Store in session for display in
+    # templates.
+    if 'display_html' in request.args:
+        session['display_html'] = request.args.get('display_html')
+        current_app.logger.debug("display_html:" +
+                                 request.args.get('display_html'))
+
     # Likely entry point for OAuth dance.  Capture the 'next' target
     # in the session for redirection after dance concludes
     if 'next' in request.args:
