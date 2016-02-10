@@ -727,6 +727,11 @@ def authorize(*args, **kwargs):
           Target for redirection after authorization is complete
         required: false
         type: string
+      - name: display_html
+        in: query
+        description: Additional HTML to customize registration
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -740,6 +745,14 @@ def authorize(*args, **kwargs):
           of Central Services.
 
     """
+    # Interventions may include additional text to display as a way
+    # to "customize registration".  Store in session for display in
+    # templates.
+    if 'display_html' in request.args:
+        session['display_html'] = request.args.get('display_html')
+        current_app.logger.debug("display_html:" +
+                                 request.args.get('display_html'))
+
     # Likely entry point for OAuth dance.  Capture the 'next' target
     # in the session for redirection after dance concludes
     if 'next' in request.args:
