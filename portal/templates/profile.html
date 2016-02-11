@@ -341,7 +341,6 @@ $.each(getQs, function(i,val){
 
 $("#patientQuestions input").on("change", function(){
     var toCall = $(this).attr("name");
-    // Get value from div - either true or false
     var theVal = $(this).val();
     $.ajax ({
         type: "POST",
