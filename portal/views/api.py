@@ -589,6 +589,257 @@ def assessment(patient_id, instrument_id):
             message:
               type: string
               description: Result, typically "ok"
+          example:
+            resourceType: Bundle
+            title: 'QuestionnaireResponses for Patient ID: 10015'
+            updated: '2016-02-10T14:02:51Z'
+            link:
+              rel: self
+              href: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+            totalResults: 2
+            entry:
+            - resourceType: QuestionnaireResponse
+              authored: '2016-01-22T12:32:17Z'
+              status: completed
+              identifier:
+                value: '101.1'
+                use: official
+                label: cPRO survey session ID
+              subject:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              author:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              source:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              group:
+                question:
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.0.4
+                  linkid: EPIC_26.0
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.1.3
+                  linkid: EPIC_26.1
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.2.1
+                  linkid: EPIC_26.2
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.3.2
+                  linkid: EPIC_26.3
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.4.0
+                  linkid: EPIC_26.4
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.5.1
+                  linkid: EPIC_26.5
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.6.2
+                  linkid: EPIC_26.6
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.7.3
+                  linkid: EPIC_26.7
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.8.1
+                  linkid: EPIC_26.8
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.9.0
+                  linkid: EPIC_26.9
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.10.1
+                  linkid: EPIC_26.10
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.11.2
+                  linkid: EPIC_26.11
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.12.3
+                  linkid: EPIC_26.12
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.13.4
+                  linkid: EPIC_26.13
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.14.3
+                  linkid: EPIC_26.14
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.15.1
+                  linkid: EPIC_26.15
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.16.0
+                  linkid: EPIC_26.16
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.17.0
+                  linkid: EPIC_26.17
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.18.2
+                  linkid: EPIC_26.18
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.19.1
+                  linkid: EPIC_26.19
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.20.3
+                  linkid: EPIC_26.20
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.21.0
+                  linkid: EPIC_26.21
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.22.1
+                  linkid: EPIC_26.22
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.23.2
+                  linkid: EPIC_26.23
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.24.2
+                  linkid: EPIC_26.24
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.25.2
+                  linkid: EPIC_26.25
+              questionnaire:
+                display: EPIC 26 Short Form
+                reference: http://truenth-dev.cirg.washington.edu/api/questionnaires/EPIC_26
+            - resourceType: QuestionnaireResponse
+              authored: '2016-02-02T10:07:15Z'
+              status: in-progress
+              identifier:
+                value: '109.1'
+                use: official
+                label: cPRO survey session ID
+              subject:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              author:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              source:
+                display: patient demographics
+                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              group:
+                question:
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.0.4
+                  linkid: EPIC_26.0
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.1.3
+                  linkid: EPIC_26.1
+                - answer: []
+                  linkid: EPIC_26.2
+                - answer: []
+                  linkid: EPIC_26.3
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.4.0
+                  linkid: EPIC_26.4
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.5.0
+                  linkid: EPIC_26.5
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.6.0
+                  linkid: EPIC_26.6
+                - answer:
+                  - valueCoding:
+                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
+                      code: EPIC_26.7.0
+                  linkid: EPIC_26.7
+                - answer: []
+                  linkid: EPIC_26.8
+                - answer: []
+                  linkid: EPIC_26.9
+                - answer: []
+                  linkid: EPIC_26.10
+                - answer: []
+                  linkid: EPIC_26.11
+                - answer: []
+                  linkid: EPIC_26.12
+                - answer: []
+                  linkid: EPIC_26.13
+                - answer: []
+                  linkid: EPIC_26.14
+                - answer: []
+                  linkid: EPIC_26.15
+                - answer: []
+                  linkid: EPIC_26.16
+                - answer: []
+                  linkid: EPIC_26.17
+                - answer: []
+                  linkid: EPIC_26.18
+                - answer: []
+                  linkid: EPIC_26.19
+                - answer: []
+                  linkid: EPIC_26.20
+                - answer: []
+                  linkid: EPIC_26.21
+                - answer: []
+                  linkid: EPIC_26.22
+                - answer: []
+                  linkid: EPIC_26.23
+                - answer: []
+                  linkid: EPIC_26.24
+                - answer: []
+                  linkid: EPIC_26.25
+              questionnaire:
+                display: EPIC 26 Short Form
+                reference: http://truenth-dev.cirg.washington.edu/api/questionnaires/EPIC_26
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
