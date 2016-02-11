@@ -580,23 +580,47 @@ def assessment(patient_id, instrument_id):
       200:
         description: successful operation
         schema:
-          id: assessment_response
+          id: assessment_bundle
+          externalDocs:
+            url: https://www.hl7.org/fhir/DSTU2/bundle.html
           required:
-            - message
+            - type
           properties:
-            items:
-              $ref: "#/definitions/QuestionnaireResponse"
-            message:
-              type: string
-              description: Result, typically "ok"
+            type:
+                description: Indicates the purpose of this bundle- how it was intended to be used.
+                type: string
+                enum:
+                  - document
+                  - message
+                  - transaction
+                  - transaction-response
+                  - batch
+                  - batch-response
+                  - history
+                  - searchset
+                  - collection
+            link:
+              description: A series of links that provide context to this bundle.
+              items:
+                properties:
+                  relation:
+                    description: A name which details the functional use for this link - see [[http://www.iana.org/assignments/link-relations/link-relations.xhtml]].
+                  url:
+                    description: The reference details for the link.
+            total:
+                description: If a set of search matches, this is the total number of matches for the search (as opposed to the number of results in this bundle).
+                type: integer
+            entry:
+              type: array
+              items:
+                $ref: "#/definitions/QuestionnaireResponse"
           example:
             resourceType: Bundle
-            title: 'QuestionnaireResponses for Patient ID: 10015'
-            updated: '2016-02-10T14:02:51Z'
+            type: searchset
             link:
-              rel: self
-              href: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
-            totalResults: 2
+              - rel: self
+                href: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+            total: 2
             entry:
             - resourceType: QuestionnaireResponse
               authored: '2016-01-22T12:32:17Z'
