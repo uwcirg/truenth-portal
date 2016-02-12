@@ -7,6 +7,7 @@ from portal.models.role import ROLE
 from portal.models.user import User
 from portal.models.message import EmailInvite
 
+from flask_swagger import swagger
 
 class TestPortal(TestCase):
     """Portal view tests"""
@@ -72,3 +73,12 @@ class TestPortal(TestCase):
                           format(x=x, y=y), follow_redirects=True)
         self.assert200(rv)
         self.assertEquals(rv.data, str(x + y))
+
+    def test_swagger_docgen(self):
+        """Build swagger docs for entire project"""
+
+        swag = swagger(self.app.application)
+        assert 'info' in swag
+        assert 'paths' in swag
+        assert 'swagger' in swag
+        assert 'definitions' in swag
