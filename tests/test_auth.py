@@ -1,4 +1,5 @@
 """Unit test module for auth"""
+import datetime
 from tests import TestCase, TEST_USER_ID
 from flask.ext.webtest import SessionScope
 import json
@@ -133,3 +134,7 @@ class TestAuth(TestCase):
         create_service_token(client=client, user=service_user)
         token = Token.query.filter_by(user_id=service_user.id).first()
         self.assertTrue(token)
+
+        # The token should have a very long life
+        self.assertTrue(token.expires > datetime.datetime.utcnow() +
+                        datetime.timedelta(days=364))

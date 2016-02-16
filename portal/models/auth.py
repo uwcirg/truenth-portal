@@ -324,12 +324,12 @@ def create_service_token(client, user):
     fake_request.client = client
     fake_request.user = user
     fake_request.scopes = ['email',]
-    fake_request.expires_in = 3600 * 30 * 12  # twelve months
 
     request_validator = Mock()
     request_validator.save_bearer_token = save_token
 
     bt = BearerToken(request_validator=request_validator)
+    bt.expires_in = int(timedelta(days=365).total_seconds())  # one year
     bt.create_token(fake_request)
 
     # Token should now exist as only token for said user - return it
