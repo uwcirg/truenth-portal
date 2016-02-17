@@ -146,7 +146,7 @@
 
     <hr />
 
-    {% if current_user.has_role('admin') %}
+    {% if current_user.has_role('admin') and not user.has_role('service') %}
     <h3>User Roles for {{ user.username }}</h3>
     <div id="userRoles">
         <div class="form-group">
