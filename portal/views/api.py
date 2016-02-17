@@ -2073,6 +2073,10 @@ def set_roles(user_id):
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
 
+    # Don't allow promotion of service accounts
+    if user.has_role(ROLE.SERVICE):
+        abort(400, "Promotion of service users not allowed")
+
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
     requested_roles = [r['name'] for r in request.json['roles']]
