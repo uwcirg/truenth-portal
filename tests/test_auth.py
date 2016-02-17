@@ -123,6 +123,13 @@ class TestAuth(TestCase):
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 
+        with SessionScope(db):
+            db.session.add(service_user)
+            db.session.add(client)
+            db.session.commit()
+        service_user = db.session.merge(service_user)
+        client = db.session.merge(client)
+
         # Did we get a service account with the correct roles and relationships
         self.assertEquals(len(service_user.roles), 1)
         self.assertEquals('service', service_user.roles[0].name)
