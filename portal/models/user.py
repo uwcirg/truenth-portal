@@ -224,11 +224,20 @@ class User(db.Model, UserMixin):
         db.session.add(self)
 
     def check_role(self, permission, other_id):
-        """check user for adequate role"""
+        """check user for adequate role
+
+        if user is an admin or a service account, grant carte blanche
+        otherwise, must be self or have a relationship granting permission
+        to "verb" the other user.
+
+        returns true if permission should be granted, otherwise raise a 401
+
+        """
         if self.id == other_id:
             return True
-        if ROLE.ADMIN in [r.name for r in self.roles]:
-            return True
+        for role in self.roles:
+            if role.name in (ROLE.ADMIN, ROLE.SERVICE):
+                return True
         # TODO: address permission details, etc.
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
