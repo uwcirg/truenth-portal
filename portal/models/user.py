@@ -265,9 +265,17 @@ def add_anon_user():
     return user
 
 
+class RoleError(ValueError):
+    pass
+
+
 def add_role(user, role_name):
     role = Role.query.filter_by(name=role_name).first()
     assert(role)
+    # don't allow promotion of service users
+    if user.has_role(ROLE.SERVICE):
+        raise RoleError("service accounts can't be promoted")
+
     new_role = UserRoles(user_id=user.id,
             role_id=role.id)
     db.session.add(new_role)

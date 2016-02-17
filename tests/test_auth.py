@@ -7,7 +7,8 @@ import json
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token
 from portal.models.role import ROLE
-from portal.models.user import add_authomatic_user, User, UserRelationship
+from portal.models.user import add_authomatic_user, add_role
+from portal.models.user import RoleError, User, UserRelationship
 
 class AuthomaticMock(object):
     """Simple container for mocking Authomatic response"""
@@ -138,3 +139,20 @@ class TestAuth(TestCase):
         # The token should have a very long life
         self.assertTrue(token.expires > datetime.datetime.utcnow() +
                         datetime.timedelta(days=364))
+
+
+    def test_service_account_promotion(self):
+        """Confirm we can not promote a service account """
+        client = self.add_test_client()
+        test_user = User.query.get(TEST_USER_ID)
+        service_user = test_user.add_service_account()
+
+        with SessionScope(db):
+            db.session.add(service_user)
+            db.session.commit()
+        service_user = db.session.merge(service_user)
+
+        # try to promote - which should fail
+        self.assertRaises(RoleError, add_role, service_user,
+                          ROLE.APPLICATION_DEVELOPER)
+        self.assertEquals(len(service_user.roles), 1)
