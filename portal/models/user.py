@@ -3,7 +3,7 @@ from datetime import datetime
 from dateutil import parser
 from flask import abort, request, session
 from flask.ext.user import UserMixin, _call_or_get
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 
@@ -22,7 +22,7 @@ gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
 class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64))
+    username = db.Column(db.String(64), default="Anonymous")
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.now)
@@ -202,6 +202,32 @@ class User(db.Model, UserMixin):
             d['photo'].append({'url': self.image_url})
         return d
 
+    def update_username(self, force=False):
+        """Update username from self.first_name, self.last_name
+
+        @param force: Default behavior only updates if username is
+        currently 'Anonymous'.  Set force=True to override.
+
+        """
+        if not force and self.username != 'Anonymous':
+            return
+        # Find a unique username
+        similar = User.query.filter(and_(User.username.like('{0} {1}%'.format(
+            self.first_name, self.last_name)), User.id != self.id))
+        if not similar.count():
+            self.username = '{0} {1}'.format(self.first_name, self.last_name)
+        else:
+            n = similar.count()
+            while True:
+                # start with the len and keep incrementing till we don't match
+                attempt = '{0} {1} {2}'.format(
+                    self.first_name, self.last_name, n)
+                if attempt not in [sim.username for sim in similar]:
+                    self.username = attempt
+                    break
+                else:
+                    n += 1
+
     def update_from_fhir(self, fhir):
         def v_or_n(value):
             """Return None unless the value contains data"""
@@ -210,6 +236,7 @@ class User(db.Model, UserMixin):
         if 'name' in fhir:
             self.first_name = v_or_n(fhir['name']['given']) or self.first_name
             self.last_name = v_or_n(fhir['name']['family']) or self.last_name
+            self.update_username()
         if 'birthDate' in fhir:
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
