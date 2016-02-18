@@ -30,6 +30,40 @@ class TestAPI(TestCase):
         self.assertEquals(rv.status_code, 200)
         self.assertTrue(username in rv.data)
 
+    def test_account_creation(self):
+        test_user = User.query.get(TEST_USER_ID)
+        service_user = test_user.add_service_account()
+
+        with SessionScope(db):
+            db.session.add(service_user)
+            db.session.commit()
+        service_user = db.session.merge(service_user)
+        self.login(user_id=service_user.id)
+        rv = self.app.post('/api/account')
+
+        self.assert200(rv)
+        self.assertTrue(rv.json['user_id'] > 0)
+        user_id = rv.json['user_id']
+
+        # can we add some demographics and role information
+        family = 'User'
+        given = 'Test'
+        data = {"name": {"family": family, "given": given},
+                "resourceType": "Patient"}
+        rv = self.app.put('/api/demographics/{}'.format(user_id),
+                content_type='application/json',
+                data=json.dumps(data))
+        new_user = User.query.get(user_id)
+        self.assertEquals(new_user.first_name, given)
+        self.assertEquals(new_user.last_name, family)
+        self.assertEquals(new_user.username, "{0} {1}".format(given, family))
+        self.assertEquals(len(new_user.roles), 0)
+        roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
+        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+                          content_type='application/json',
+                          data=json.dumps(roles))
+        self.assertEquals(len(new_user.roles), 1)
+
     def test_demographicsGET(self):
         self.login()
         rv = self.app.get('/api/demographics')

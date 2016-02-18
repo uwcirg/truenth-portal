@@ -3,6 +3,7 @@ from flask import abort, Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for, redirect, session
 from flask.ext.user import roles_required
 from flask_swagger import swagger
+import json
 import jsonschema
 
 
@@ -14,7 +15,8 @@ from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import BIOPSY, PCaDIAG, TX
 from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
-from ..models.user import current_user, get_user, UserRelationship, UserRoles
+from ..models.user import current_user, get_user
+from ..models.user import User, UserRelationship, UserRoles
 from ..extensions import oauth
 from ..extensions import db
 from .crossdomain import crossdomain
@@ -118,6 +120,12 @@ def demographics_set(patient_id):
 
     Submit a minimal FHIR doc in JSON format including the 'Patient'
     resource type, and any fields to set.
+
+    NB - as a side effect, if the username is still 'Anonymous', the given
+    first and last names will be used to generate a unique username of the
+    format "FirstName LastName N", where an integer N will only be included
+    if another matching username exists.
+
     ---
     operationId: setPatientDemographics
     tags:
@@ -160,6 +168,8 @@ def demographics_set(patient_id):
         abort(400, "Requires FHIR resourceType of 'Patient'")
     patient.update_from_fhir(request.json)
     db.session.commit()
+    auditable_event("Demographics set on user {0} from input {1}".format(
+        patient_id, json.dumps(request.json)), user_id=current_user().id)
     return jsonify(patient.as_fhir())
 
 
@@ -1547,12 +1557,13 @@ def protected_portal_wrapper_html():
 @api.route('/account', methods=('POST',))
 @oauth.require_oauth()
 def account():
-    """Create a user account 
-    
-    Use cases: 
-    Interventions call this, get a truenth ID back, and subsequently call: 
-    1. set_roles to grant the user role(s)
-    2. the Truenth API to grant the user access to the intervention.
+    """Create a user account
+
+    Use cases:
+    Interventions call this, get a truenth ID back, and subsequently call:
+    1. PUT /api/demographics/<id>, with known details for the new user
+    2. PUT /api/user/<id>/roles to grant the user role(s)
+    3. PUT /api/intervention/<id> to grant the user access to the intervention.
     ---
     tags:
       - User
@@ -1562,13 +1573,18 @@ def account():
     responses:
       200:
         description:
-          Returns {new TrueNTH ID, webkey_url}
+            Returns {user_id: id}
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     """
-    return
+    user = User(username='Anonymous')
+    db.session.add(user)
+    db.session.commit()
+    auditable_event("New account {} generated".format(user.id),
+                    user_id=current_user().id)
+    return jsonify(user_id=user.id)
 
 
 @api.route('/relationships')
