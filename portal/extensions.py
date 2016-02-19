@@ -19,7 +19,8 @@ db = SQLAlchemy()
 from flask.ext.user import UserManager, SQLAlchemyAdapter
 from .models.user import User
 db_adapter = SQLAlchemyAdapter(db, User)
-user_manager = UserManager(db_adapter)
+user_manager = UserManager(db_adapter,
+        password_validator=my_password_validator)
 
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps

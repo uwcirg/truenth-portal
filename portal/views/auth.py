@@ -14,6 +14,7 @@ from flask.ext.user import roles_required
 from flask.ext.user.signals import user_logged_in, user_registered
 from flask_wtf import Form
 from wtforms import TextField, validators
+from wtforms.validators import ValidationError
 from werkzeug.security import gen_salt
 from validators import url as url_validation
 
@@ -781,3 +782,9 @@ def authorize(*args, **kwargs):
         return redirect('/')
     # See "hardwired" note in docstring above
     return True
+
+
+def my_password_validator(form, field):
+    password = field.data
+    if len(password) < 8:
+        raise ValidationError(_('Password must have at least 8 characters'))
