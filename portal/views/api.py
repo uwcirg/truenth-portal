@@ -90,7 +90,7 @@ def demographics(patient_id):
         in: path
         description:
           Optional TrueNTH patient ID, defaults to the authenticated user.
-        required: false
+        required: true
         type: integer
         format: int64
     responses:
@@ -1573,7 +1573,7 @@ def account():
     responses:
       200:
         description:
-            Returns {user_id: id}
+            "Returns {user_id: id}"
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
