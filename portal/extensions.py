@@ -18,6 +18,13 @@ db = SQLAlchemy()
 # Flask-User
 from flask.ext.user import UserManager, SQLAlchemyAdapter
 from .models.user import User
+from wtforms.validators import ValidationError
+
+def my_password_validator(form, field):
+    password = field.data
+    if len(password) < 8:
+        raise ValidationError(_('Password must have at least 8 characters'))
+
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter,
         password_validator=my_password_validator)
