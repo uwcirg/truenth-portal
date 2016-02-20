@@ -1,4 +1,4 @@
-# true_nth_usa_portal_demo
+# true_nth_usa_portal
 Movember True NTH USA Central Services
 
 ## INSTALLATION
@@ -20,7 +20,7 @@ $ sudo apt-get install python-virtualenv libffi-dev redis-server
 #### Clone the Project
 
 ```bash
-$ git clone https://github.com/uwcirg/true_nth_usa_portal_demo.git \
+$ git clone https://github.com/uwcirg/true_nth_usa_portal.git \
     $PROJECT_HOME
 ```
 
