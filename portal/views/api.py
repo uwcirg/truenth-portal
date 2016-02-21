@@ -882,13 +882,17 @@ def assessment(patient_id, instrument_id):
     """
 
     # This is surely broken...
-    questionnaire_response = QuestionnaireResponse.query.filter_by(id=instrument_id).first()
+    questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).filter(
+        QuestionnaireResponse.document[("questionnaire", "reference")].astext.endswith(instrument_id)
+
+    ).order_by(QuestionnaireResponse.authored.desc())
+    documents = [qnr.document for qnr in questionnaire_responses]
+
     #questionnaire_response = QuestionnaireResponse.query.filter_by(id=questionnaire_response_id).first()
 
-    if not questionnaire_response:
-        abort(404)
 
-    return jsonify(questionnaire_response.document)
+    return jsonify(json_list = documents)
+
 
 
 @api.route('/patient/<int:patient_id>/assessment', methods=('POST', 'PUT'))
