@@ -24,20 +24,23 @@ class Role(db.Model):
 
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
+    'admin':
+        'Administrator privledges, i.e. carte blanche',
     'anon':
         'Anonymous role - exclusive to accounts generated prior to '
         'user authentication',
-    'patient':
-        'Default role for all patients, may only view their own '
-        'patient data',
-    'admin':
-        'Administrator privledges, i.e. carte blanche',
     'application_developer':
         'Gives users permission to add/view/edit Central Services '
         'applications',
     'content_manager':
         'Gives user permission to add/view/edit associated content '
         'managment systems',
+    'partner':
+        "An intimate partner, use the partner relationship to define "
+        "whom the patient's partner is",
+    'patient':
+        'Default role for all patients, may only view their own '
+        'patient data',
     'service':
         'Reserved for automated service accounts needing API access'
         })
