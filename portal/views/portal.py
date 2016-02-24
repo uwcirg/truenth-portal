@@ -181,9 +181,9 @@ def spec():
     swag['info']['contact'] = contact
     swag['schemes'] = ['http', 'https']
 
-    # Fix swagger docs for view functions whose routes have optional path parameters
+    # Fix swagger docs for paths with duplicate operationIds
 
-    # Routes (path and method) grouped by operationId
+    # Dict of offending routes (path and method), grouped by operationId
     operations = {}
 
     for path, path_options in swag['paths'].items():
@@ -196,9 +196,10 @@ def spec():
             operations.setdefault(operation_id, [])
             operations[operation_id].append({'path':path, 'method':method})
 
-    # Alter route-specific swagger info to prevent non-unique operationId
-    for operation_id, routes in operations.items():
 
+
+    # Alter route-specific swagger info (using operations dict) to prevent non-unique operationId
+    for operation_id, routes in operations.items():
         if len(routes) == 1:
             continue
 
@@ -225,7 +226,7 @@ def spec():
             if parameters:
                 swag['paths'][path][method]['parameters'] = parameters
 
-            # Add method as suffix to prevent duplicate operationIds
+            # Add method as suffix to prevent duplicate operationIds on synonymous routes
             if method == 'put' or method == 'post':
                 swag['paths'][path][method]['operationId'] = "{}-{}".format(operation_id, method)
 
