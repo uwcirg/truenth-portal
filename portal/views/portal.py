@@ -225,6 +225,10 @@ def spec():
             if parameters:
                 swag['paths'][path][method]['parameters'] = parameters
 
+            # Add method as suffix to prevent duplicate operationIds
+            if method == 'put' or method == 'post':
+                swag['paths'][path][method]['operationId'] = "{}-{}".format(operation_id, method)
+
     return jsonify(swag)
 
 
