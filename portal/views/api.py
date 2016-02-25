@@ -978,9 +978,9 @@ def assessment_set(patient_id):
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.source
             group:
-              description: A group of related questions or sub-groups. May only contain either questions or groups
               schema:
                 id: group
+                description: A group of related questions or sub-groups. May only contain either questions or groups
                 externalDocs:
                   url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group
                 properties:
