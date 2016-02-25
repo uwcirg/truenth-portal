@@ -50,7 +50,9 @@ def crossdomain(origin=None, methods=None,
                 return ', '.join(origin)
             return origin
 
-        use_origin = request.headers['Origin']
+        use_origin = None
+        if 'Origin' in request.headers:
+            use_origin = request.headers['Origin']
         validate_client_origin(use_origin)
         return use_origin
 
