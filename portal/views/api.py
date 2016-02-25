@@ -943,9 +943,6 @@ def assessment_set(patient_id):
                 - in-progress
                 - completed
             subject:
-              description: The subject of the questionnaire response
-              externalDocs:
-                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.subject
               schema:
                 id: Reference
                 type: object
@@ -962,10 +959,7 @@ def assessment_set(patient_id):
                     externalDocs:
                       url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.display
             author:
-              description: Person who received the answers to the questions in the QuestionnaireResponse and recorded them in the system.
               $ref: "#/definitions/Reference"
-              externalDocs:
-                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.author
             authored:
               externalDocs:
                 url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.authored
@@ -973,10 +967,7 @@ def assessment_set(patient_id):
               type: string
               format: date-time
             source:
-              description: The person who answered the questions about the subject
               $ref: "#/definitions/Reference"
-              externalDocs:
-                url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.source
             group:
               schema:
                 id: group
@@ -985,7 +976,6 @@ def assessment_set(patient_id):
                   url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group
                 properties:
                   group:
-                    description: Subgroup for questions or additional nested groups
                     $ref: "#/definitions/group"
                   title:
                     type: string
@@ -1064,9 +1054,6 @@ def assessment_set(patient_id):
                                 description: Reference value answer to a question
                               group:
                                 $ref: "#/definitions/group"
-                                description: Group for "sub-questions", questions which normally appear when certain answers are given and which collect additional details.
-                                externalDocs:
-                                  url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group.question.answer.group
           example:
             resourceType: QuestionnaireResponse
             authored: '2016-01-22T12:32:17Z'
