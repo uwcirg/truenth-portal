@@ -918,6 +918,12 @@ def assessment_set(patient_id):
     produces:
       - application/json
     parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
@@ -1655,6 +1661,13 @@ def relationships(user_id):
     tags:
       - User
     operationId: getrelationships
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
     produces:
       - application/json
     responses:
@@ -1713,6 +1726,12 @@ def delete_relationships(user_id):
     produces:
       - application/json
     parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
@@ -1797,6 +1816,12 @@ def set_relationships(user_id):
     produces:
       - application/json
     parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
@@ -1920,6 +1945,13 @@ def roles(user_id):
     tags:
       - User
     operationId: getRoles
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
     produces:
       - application/json
     responses:
@@ -1976,6 +2008,12 @@ def delete_roles(user_id):
     produces:
       - application/json
     parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
@@ -2060,6 +2098,12 @@ def set_roles(user_id):
     produces:
       - application/json
     parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
       - in: body
         name: body
         schema:
