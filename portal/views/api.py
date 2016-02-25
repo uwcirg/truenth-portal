@@ -272,7 +272,7 @@ def treatment(patient_id):
     responses:
       200:
         description:
-          Returns 'true', 'false' or 'unknown' for the patient's clinical 
+          Returns 'true', 'false' or 'unknown' for the patient's clinical
           treatment begun status in JSON
       401:
         description:
@@ -375,7 +375,7 @@ def pca_diag_set(patient_id):
           properties:
             value:
               type: boolean
-              description: the patient's PCa diagnosis 
+              description: the patient's PCa diagnosis
     responses:
       200:
         description: successful operation
@@ -1586,7 +1586,7 @@ def account():
     ---
     tags:
       - User
-    operationId: createAccount 
+    operationId: createAccount
     produces:
       - application/json
     responses:
@@ -2180,7 +2180,7 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
         abort(400, "Expects 'value' in JSON")
     value = str(request.json['value']).lower()
     if value not in ('true', 'false'):
-        abort(400, "Expecting boolean for 'value'") 
+        abort(400, "Expecting boolean for 'value'")
 
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
