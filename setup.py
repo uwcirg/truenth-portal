@@ -49,6 +49,7 @@ setup(
         'psycopg2',
         'python-dateutil',
         'redis',
+        'swagger_spec_validator',
         'validators',
     ],
     test_suite='tests',
