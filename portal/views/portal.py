@@ -181,6 +181,55 @@ def spec():
     swag['info']['contact'] = contact
     swag['schemes'] = ['http', 'https']
 
+    # Fix swagger docs for paths with duplicate operationIds
+
+    # Dict of offending routes (path and method), grouped by operationId
+    operations = {}
+
+    for path, path_options in swag['paths'].items():
+        for method, route in path_options.items():
+            if 'operationId' not in route:
+                continue
+
+            operation_id = route['operationId']
+
+            operations.setdefault(operation_id, [])
+            operations[operation_id].append({'path':path, 'method':method})
+
+
+
+    # Alter route-specific swagger info (using operations dict) to prevent non-unique operationId
+    for operation_id, routes in operations.items():
+        if len(routes) == 1:
+            continue
+
+        for route_info in routes:
+
+            path = route_info['path']
+            method = route_info['method']
+
+            route = swag['paths'][path][method]
+
+            parameters = []
+            # Remove swagger path parameters from routes where it is optional
+            for parameter in route.pop('parameters', ()):
+
+                if parameter['in'] == 'path' and ("{%s}" % parameter['name']) not in path:
+                    # Prevent duplicate operationIds by adding suffix
+                    # Assume "simple" version of API route if path parameter included but not in path
+                    swag['paths'][path][method]['operationId'] = "{}-simple".format(operation_id)
+                    continue
+
+                parameters.append(parameter)
+
+            # Overwrite old parameter list
+            if parameters:
+                swag['paths'][path][method]['parameters'] = parameters
+
+            # Add method as suffix to prevent duplicate operationIds on synonymous routes
+            if method == 'put' or method == 'post':
+                swag['paths'][path][method]['operationId'] = "{}-{}".format(operation_id, method)
+
     return jsonify(swag)
 
 
