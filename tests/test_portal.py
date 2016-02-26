@@ -1,5 +1,8 @@
 """Unit test module for portal views"""
+import tempfile
+
 from datetime import datetime
+from swagger_spec_validator import validate_spec_url
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
@@ -87,3 +90,16 @@ class TestPortal(TestCase):
 
         for key in expected_keys:
             self.assertIn(key, swag)
+
+    def test_swagger_validation(self):
+        """Ensure our swagger spec matches swagger schema"""
+
+        with tempfile.NamedTemporaryFile(
+            prefix='swagger_test_',
+            suffix='.json',
+            delete=True,
+        ) as temp_spec:
+            temp_spec.write(self.app.get('/spec').data)
+            temp_spec.seek(0)
+
+            validate_spec_url("file:%s" % temp_spec.name)
