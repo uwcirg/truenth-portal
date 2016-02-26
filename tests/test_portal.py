@@ -77,8 +77,13 @@ class TestPortal(TestCase):
     def test_swagger_docgen(self):
         """Build swagger docs for entire project"""
 
+        expected_keys = (
+            'info',
+            'paths',
+            'swagger',
+            'definitions',
+        )
         swag = swagger(self.app.application)
-        assert 'info' in swag
-        assert 'paths' in swag
-        assert 'swagger' in swag
-        assert 'definitions' in swag
+
+        for key in expected_keys:
+            self.assertIn(key, swag)
