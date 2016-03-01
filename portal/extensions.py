@@ -24,6 +24,7 @@ user_manager = UserManager(db_adapter)
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
 from flask import abort, request
+from flask.ext.login import login_user
 from flask_oauthlib.provider import OAuth2Provider
 from .models.user import current_user
 
@@ -63,11 +64,16 @@ class OAuthOrAlternateAuth(OAuth2Provider):
                 if current_user():
                     return eff(*args, **kwargs)
 
-                # Unmodified superclass method follows
+                # Superclass method follows
+                # all MODs clearly marked
                 for func in self._before_request_funcs:
                     func()
 
                 if hasattr(request, 'oauth') and request.oauth:
+                    # Start MOD
+                    # Need to log oauth user in for flask-user roles, etc.
+                    login_user(request.oauth.user)
+                    # End MOD
                     return eff(*args, **kwargs)
 
                 valid, req = self.verify_request(scopes)
@@ -80,6 +86,10 @@ class OAuthOrAlternateAuth(OAuth2Provider):
                         return self._invalid_response(req)
                     return abort(401)
                 request.oauth = req
+                # Start MOD
+                # Need to log oauth user in for flask-user roles, etc.
+                login_user(request.oauth.user)
+                # End MOD
                 return eff(*args, **kwargs)
             return decorated
         return wrapper
