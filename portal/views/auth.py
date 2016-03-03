@@ -155,7 +155,13 @@ def login(provider_name):
     if result:
         if result.error:
             current_app.logger.error(result.error.message)
-            return result.error.message
+            # Work around for w/ Safari and cookies set to current site only
+            # forcing a reload brings the local cookies back into view
+            # (they're missing with such a setting on returning from
+            # the 3rd party IdP redirect)
+            current_app.logger.info("attempting reload on oauth error")
+            return render_template('force_reload.html',
+                                   message=result.error.message)
         elif result.user:
             current_app.logger.debug("Successful authentication at %s",
                     provider_name)
