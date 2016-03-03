@@ -15,6 +15,7 @@ from ..models.auth import validate_client_origin
 from ..models.fhir import CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import BIOPSY, PCaDIAG, TX
+from ..models.intervention import Intervention, UserIntervention
 from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
@@ -175,6 +176,102 @@ def demographics_set(patient_id):
     return jsonify(patient.as_fhir())
 
 
+@api.route('/intervention/<string:intervention_name>', methods=('PUT',))
+@oauth.require_oauth()
+@roles_required(ROLE.SERVICE)
+def intervention_set(intervention_name):
+    """Update user access to the named intervention
+
+    Submit a JSON doc with the user_id and access {granted|forbidden}
+    for the named intervention.
+
+    Only available as a service account API - the named intervention
+    must be associated with the service account sponsor.
+
+    NB - interventions have a global 'public_access' setting.  Only
+    when unset are individual accounts consulted.
+
+    ---
+    operationId: setInterventionAccess
+    tags:
+      - Intervention
+    produces:
+      - application/json
+    parameters:
+      - name: intervention_name
+        in: path
+        description: TrueNTH intervention_name
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          id: intervention_access
+          required:
+            - user_id
+            - access
+          properties:
+            user_id:
+              type: string
+              description:
+                Truenth user identifier referring to whom the request applies
+            access:
+              type: string
+              enum:
+                - forbidden
+                - granted
+            card_html:
+              type: string
+              description:
+                Custom text for display on intervention card for the
+                referenced user
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description:
+          if missing valid OAuth SERVICE token or the service user owning
+          the token isn't sponsored by the named intervention owner.
+
+    """
+    intervention = Intervention.query.filter_by(name=intervention_name).first()
+    if not intervention:
+        abort (404, 'no such intervention {}'.format(intervention_name))
+
+    # service account being used must belong to the intervention owner
+    if not (intervention.client and intervention.client.user.has_relationship(
+        relationship_name=RELATIONSHIP.SPONSOR, other_user=current_user())):
+        abort(401, "Service account sponsored by intervention owner required")
+
+    if not request.json or 'user_id' not in request.json or\
+            "access" not in request.json:
+        abort(400, "Requires JSON defining at least user_id and access")
+    user_id = request.json.get('user_id')
+    current_user().check_role(permission='edit', other_id=user_id)
+
+    ui = UserIntervention.query.filter_by(
+        user_id=user_id, intervention_id=intervention.id).first()
+    if not ui:
+        ui = UserIntervention(user_id=user_id,
+                              intervention_id=intervention.id)
+        db.session.add(ui)
+    ui.access = request.json.get('access')
+    ui.card_html = request.json.get('card_html', None)
+    db.session.commit()
+    auditable_event("updated {0} using: {1}".format(
+        intervention.description, json.dumps(request.json)),
+        user_id=current_user().id)
+    return jsonify(message='ok')
+
+
 @api.route('/patient/<int:patient_id>/clinical/biopsy')
 @oauth.require_oauth()
 def biopsy(patient_id):
@@ -248,7 +345,6 @@ def pca_diag(patient_id):
                                      codeable_concept=PCaDIAG)
 
 
-
 @api.route('/patient/<int:patient_id>/clinical/tx')
 @oauth.require_oauth()
 def treatment(patient_id):
@@ -284,7 +380,6 @@ def treatment(patient_id):
     patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
                                      codeable_concept=TX)
-
 
 
 @api.route('/patient/<int:patient_id>/clinical/biopsy', methods=('POST', 'PUT'))
@@ -448,7 +543,6 @@ def tx_set(patient_id):
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id, codeable_concept=TX)
-
 
 
 @api.route('/patient/<int:patient_id>/clinical')
@@ -901,7 +995,6 @@ def assessment(patient_id, instrument_id):
     }
 
     return jsonify(bundle)
-
 
 
 @api.route('/patient/<int:patient_id>/assessment', methods=('POST', 'PUT'))
@@ -1569,7 +1662,7 @@ def account():
     Interventions call this, get a truenth ID back, and subsequently call:
     1. PUT /api/demographics/<id>, with known details for the new user
     2. PUT /api/user/<id>/roles to grant the user role(s)
-    3. PUT /api/intervention/<id> to grant the user access to the intervention.
+    3. PUT /api/intervention/<name> grants the user access to the intervention.
     ---
     tags:
       - User

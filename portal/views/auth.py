@@ -13,13 +13,15 @@ from flask.ext.login import login_user, logout_user
 from flask.ext.user import roles_required
 from flask.ext.user.signals import user_logged_in, user_registered
 from flask_wtf import Form
-from wtforms import TextField, validators
+from wtforms import BooleanField, FormField, HiddenField, SelectField
+from wtforms import validators, TextField
 from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.relationship import RELATIONSHIP
+from ..models.intervention import Intervention, INTERVENTION
+from ..models.intervention import STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
@@ -258,14 +260,48 @@ def logout():
     notify_clients(user_id)
     return redirect('/')
 
+class InterventionEditForm(Form):
+    """Intervention portion of client edits - part of ClientEditForm"""
+    public_access = BooleanField('Public Access', default=True)
+    card_html = TextField('Card HTML')
+    card_url = TextField('Card URL')
+
+    def __init__(self, *args, **kwargs):
+        """As a nested form, CSRF is handled by the parent"""
+        kwargs['csrf_enabled'] = False
+        super(InterventionEditForm, self).__init__(*args, **kwargs)
+
 
 class ClientEditForm(Form):
     """wtform class for validation during client edits"""
+    intervention_names = [(k, v) for k, v in STATIC_INTERVENTIONS.items()]
+
+    client_id = HiddenField('Client ID')
+    application_role = SelectField('Application Role',
+            choices=intervention_names,
+            validators=[validators.Required()])
     application_origins = TextField('Application URL',
             validators=[validators.Required()])
     callback_url = TextField('Callback URL',
             validators=[validators.optional(),
                 validators.URL(require_tld=False)])
+    intervention_or_default = FormField(InterventionEditForm)
+
+    def validate_application_role(form, field):
+        """Custom validation to confirm only one app per role"""
+        selected = field.data
+        # the default role isn't assigned or limited
+        if selected == INTERVENTION.DEFAULT:
+            return True
+
+        intervention = Intervention.query.filter_by(name=selected).first()
+
+        # if the selected intervention already has a client, make sure
+        # it's the client being edited or raise a validation error
+        if intervention and intervention.client_id and \
+            intervention.client_id != form.data['client_id']:
+            raise validators.ValidationError(
+                "This role currently belongs to another application")
 
     def validate_application_origins(form, field):
         """Custom validation to handle multiple, space delimited URLs"""
@@ -287,7 +323,7 @@ def client():
     register at this endpoint.
     ---
     tags:
-      - OAuth
+      - Intervention
     operationId: client
     parameters:
       - name: application_origins
@@ -332,7 +368,7 @@ def client():
 
     """
     user = current_user()
-    form = ClientEditForm()
+    form = ClientEditForm(application_role=INTERVENTION.DEFAULT)
     if not form.validate_on_submit():
         return render_template('client_add.html', form=form)
     client = Client(
@@ -346,6 +382,15 @@ def client():
     db.session.commit()
     auditable_event("added intervention/client {}".format(
         client.client_id), user_id=user.id)
+
+    # if user selected a role besides the default, set it.
+    if form.application_role.data != INTERVENTION.DEFAULT:
+        selected = form.application_role.data
+        intervention = Intervention.query.filter_by(name=selected).first()
+        auditable_event("New intervention {0} for {1}".format(
+            client.client_id, selected), user_id=user.id)
+        intervention.client_id = client.client_id
+        db.session.commit()
     return redirect(url_for('.client_edit', client_id=client.client_id))
 
 
@@ -358,7 +403,7 @@ def client_edit(client_id):
     known as an Intervention or App).
     ---
     tags:
-      - OAuth
+      - Intervention
     operationId: client_edit
     parameters:
       - name: client_id
@@ -421,43 +466,63 @@ def client_edit(client_id):
     user = current_user()
     user.check_role(permission='edit', other_id=client.user_id)
 
-    form = ClientEditForm(obj=client)
+    if request.method == 'POST':
+        form = ClientEditForm(request.form)
+    else:
+        form = ClientEditForm(obj=client,
+            application_role=client.intervention_or_default.name)
 
-    def lookup_service_token(client):
-        client_user = get_user(client.user_id)
-        sponsor_relationship = [r for r in client_user.relationships if
-                                r.relationship.name == RELATIONSHIP.SPONSOR]
-        if (sponsor_relationship):
-            assert len(sponsor_relationship) == 1
-            return Token.query.filter_by(client_id=client.client_id,
-                user_id=sponsor_relationship[0].other_user_id).first()
-        return None
+    # work around a testing bug in wtforms
+    if current_app.config['TESTING']:
+        form.client_id.data = client_id
+    assert form.client_id.data == client_id
+
+    def set_client_intervention(client, form):
+        current_role = client.intervention
+        selected = form.application_role.data
+        if current_role and current_role.name != selected:
+            current_role.client_id = None
+            auditable_event("client {0} releasing role {1}".format(
+                client.client_id, current_role.description), user_id=user.id)
+        if selected != INTERVENTION.DEFAULT:
+            intervention = Intervention.query.filter_by(name=selected).first()
+            if intervention.client_id != client.client_id:
+                intervention.client_id = client.client_id
+                auditable_event("client {0} assuming role {1}".format(
+                    client.client_id, intervention.description),
+                    user_id=user.id)
 
     if not form.validate_on_submit():
         return render_template('client_edit.html', client=client, form=form,
-                              service_token=lookup_service_token(client))
+                              service_token=client.lookup_service_token())
 
     redirect_target = url_for('.clients_list')
     if request.form.get('delete'):
         auditable_event("deleted intervention/client {}".format(
             client.client_id), user_id=user.id)
+        if client.intervention:
+            client.intervention.client_id = None
         db.session.delete(client)
     elif request.form.get('service_token'):
         # limiting this to the client owner as sponsorship gets messy
         if user.id != client.user_id:
             raise ValueError("only client owner can add service accounts")
-        existing = lookup_service_token(client)
+        existing = client.lookup_service_token()
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
         token = create_service_token(client=client, user=service_user)
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
-        auditable_event("edited intervention/client {}"
-                        "by".format(client.client_id), user_id=user.id)
-        auditable_event("before: {}".format(client), user_id=user.id)
+        b4 = str(client)
         form.populate_obj(client)
-        auditable_event("after: {}".format(client), user_id=user.id)
+        set_client_intervention(client, form)
+        after = str(client)
+        if b4 != after:
+            auditable_event("edited intervention/client {}"
+                            " before: <{}> after: <{}>".format(
+                            client.client_id, b4, after), user_id=user.id)
+
     db.session.commit()
     return redirect(redirect_target)
 
@@ -470,7 +535,7 @@ def clients_list():
     List all clients created by the authenticated user.
     ---
     tags:
-      - OAuth
+      - Intervention
     operationId: clients_list
     produces:
       - text/html
@@ -527,7 +592,7 @@ def token_status():
             - token_type
             - expires_in
             - refresh_token
-            - scope
+            - scopes
           properties:
             access_token:
               type: string
@@ -644,7 +709,7 @@ def access_token():
             - token_type
             - expires_in
             - refresh_token
-            - scope
+            - scopes
           properties:
             access_token:
               type: string
@@ -665,9 +730,9 @@ def access_token():
               description:
                 Use to refresh an access token, in place of the
                 authorizion token.
-            scope:
+            scopes:
               type: string
-              description: The authorized scope.
+              description: The authorized scopes.
 
     """
     return None
@@ -714,7 +779,7 @@ def authorize(*args, **kwargs):
           'next' as a separate parameter.
         required: true
         type: string
-      - name: scope
+      - name: scopes
         in: query
         description:
           Extent of authorization requested.  At this time, only 'email'

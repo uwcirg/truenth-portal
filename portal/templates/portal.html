@@ -5,52 +5,70 @@
     <div class="row">
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.decision_support_p3p %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Decision Support</h3>
                 <div class="int-sub">Which option is best for me?</div>
                 <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
-                <a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Decision Support <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.self_management %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Self Management</h3>
                 <div class="int-sub">How do I cope with my symptoms?</div>
                 <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
-                <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Self Management <i class="fa fa-chevron-right"></i></a></p>
+                <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.care_plan %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Care Plan</h3>
                 <div class="int-sub">How do I move forward after treatment?</div>
                 <p>You’ve been treated for prostate cancer, so what’s next? Develop a customized survivorship plan, to help remind you of your health needs as you move back to the care of your regular doctor.</p>
-                <a href="{{ config['CARE_PLAN_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Care Plan <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
             </div>
         </div>
 
 
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.community_of_wellness %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Community of Wellness</h3>
                 <div class="int-sub">How can I be healthy?</div>
                 <p>Health covers a broad range of topics, including exercise, diet, friends and social environments. Learn how to improve your overall health as you progress through your treatment.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Community of Wellness <i class="fa fa-chevron-right"></i></button></p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }}<i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.sexual_recovery %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Sexual Recovery</h3>
                 <div class="int-sub">What about sex?</div>
                 <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Sexual Recovery <i class="fa fa-chevron-right"></i></button></p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }}<i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
             </div>
         </div>
         <div class="col-sm-6 col-md-4">
             <div class="well lead-well int-cards">
+                {% set intervention = interventions.social_support %}
+                {% if intervention.user_has_access(user) %}
                 <h3>Social Support Network</h3>
                 <div class="int-sub">Who can I talk with?</div>
                 <p>Find out how to connect with others who've experienced what you're going through. Building a strong support network leads to better outcomes.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Social Support Network <i class="fa fa-chevron-right"></i></button></p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -68,19 +86,25 @@
         <div class="row">
             <div class="col-sm-12 col-md-6 hide-initial" id="p3p">
                 <div class="int-cards lead-well">
+                {% set intervention = interventions.decision_support_p3p %}
+                {% if intervention.user_has_access(user) %}
                     <h3>Decision Support</h3>
                     <div class="int-sub">Which option is best for me?</div>
                     <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
-                    <a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Decision Support <i class="fa fa-chevron-right"></i></a>
+                    <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
                 </div>
             </div>
             <div class="col-sm-12 col-md-6 hide-initial" id="sm">
                 <div class="int-cards lead-well">
+                {% set intervention = interventions.self_management %}
+                {% if intervention.user_has_access(user) %}
                     <h3>Self Management</h3>
                     <div class="int-sub">How do I cope with my symptoms?</div>
                     <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
-                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Self Management <i class="fa fa-chevron-right"></i></a></p>
+                    <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
                 </div>
+                {% endif %}
             </div>
             <div class="col-sm-12 col-md-6" id="infoPage">
                 <div class="int-cards lead-well">
@@ -100,39 +124,56 @@
                 <p><small>For demo use</small></p>
 
                 <div class="hide-initial" id="otherP3p">
+                    {% set intervention = interventions.decision_support_p3p %}
+                    {% if intervention.user_has_access(user) %}
                     <h4>Decision Support</h4>
                     <div class="int-sub">Which option is best for me?</div>
                     <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
-                    <a href="{{ config['DECIDING_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Decision Support <i class="fa fa-chevron-right"></i></a>
+                    <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
                 </div>
 
                 <div class="hide-initial" id="otherSm">
+                    {% set intervention = interventions.self_management %}
+                    {% if intervention.user_has_access(user) %}
                     <h4>Self Management</h4>
                     <div class="int-sub">How do I cope with my symptoms?</div>
                     <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
-                    <p><a href="{{ config['SELF_MANAGE_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Self Management <i class="fa fa-chevron-right"></i></a></p>
+                    <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
+                    {% endif %}
                 </div>
 
+                {% set intervention = interventions.care_plan %}
+                {% if intervention.user_has_access(user) %}
                 <h4>Care Plan</h4>
                 <div class="int-sub">How do I move forward after treatment?</div>
                 <p>You’ve been treated for prostate cancer, so what’s next? Develop a customized survivorship plan, to help remind you of your health needs as you move back to the care of your regular doctor.</p>
-                <a href="{{ config['CARE_PLAN_INTERVENTION'] }}" class="btn btn-primary btn-tnth-primary">Care Plan <i class="fa fa-chevron-right"></i></a>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
 
+                {% set intervention = interventions.community_of_wellness %}
+                {% if intervention.user_has_access(user) %}
                 <h4>Community of Wellness</h4>
                 <div class="int-sub">How can I be healthy?</div>
                 <p>Health covers a broad range of topics, including exercise, diet, friends and social environments. Learn how to improve your overall health as you progress through your treatment.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Community of Wellness <i class="fa fa-chevron-right"></i></button></p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
 
+                {% set intervention = interventions.sexual_recovery %}
+                {% if intervention.user_has_access(user) %}
                 <h4>Sexual Recovery</h4>
                 <div class="int-sub">What about sex?</div>
                 <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Sexual Recovery <i class="fa fa-chevron-right"></i></button></p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
 
+                {% set intervention = interventions.social_support %}
+                {% if intervention.user_has_access(user) %}
                 <h4>Social Support Network</h4>
                 <div class="int-sub">Who can I talk with?</div>
                 <p>Find out how to connect with others who've experienced what you're going through. Building a strong support network leads to better outcomes.</p>
-                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">Social Support Network <i class="fa fa-chevron-right"></i></button></p>
-
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
 
             </div>
         </div>

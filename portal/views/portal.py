@@ -9,12 +9,13 @@ from flask.ext.user import roles_required
 from flask_swagger import swagger
 
 from ..audit import auditable_event
+from .crossdomain import crossdomain
 from ..models.fhir import BIOPSY, PCaDIAG, TX
+from ..models.intervention import named_interventions
 from ..models.message import EmailInvite
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth
-from .crossdomain import crossdomain
 from ..tasks import add, post_request
 from ..template_helpers import split_string
 
@@ -51,7 +52,8 @@ def home():
         # ask them now - otherwise, off to the portal home..
         for c in (BIOPSY, PCaDIAG, TX):
             if user.fetch_values_for_concept(c):
-                return render_template('portal.html', user=user)
+                return render_template('portal.html', user=user,
+                                       interventions=named_interventions())
         return render_template('questions.html', user=user)
 
     # 'next' is optionally added as a query parameter during login

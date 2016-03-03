@@ -13,7 +13,14 @@
     {% if clients %}
     <ul>
         {% for client in clients %}
-        <li><a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a></li>
+            <li>
+                {% if client.intervention and
+                      client.intervention.name != 'other' %}
+                      <b>{{ client.intervention.description }}</b>
+                {% endif %}
+
+                <a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a>
+            </li>
         {% endfor %}
     </ul>
     {% else %}

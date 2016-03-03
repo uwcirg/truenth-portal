@@ -88,7 +88,7 @@ class ValueQuantity(db.Model):
 
         """
         if self.id:
-            return
+            return self
 
         lookup_value = self.value and str(self.value) or None
         match = self.query.filter_by(value=lookup_value,

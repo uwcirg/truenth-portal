@@ -4,6 +4,7 @@ from flask.ext.webtest import SessionScope
 from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 
 from portal.extensions import db
+from portal.models.intervention import Intervention, INTERVENTION
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
 from portal.models.relationship import Relationship, RELATIONSHIP
@@ -31,13 +32,7 @@ class TestAPI(TestCase):
         self.assertTrue(username in rv.data)
 
     def test_account_creation(self):
-        test_user = User.query.get(TEST_USER_ID)
-        service_user = test_user.add_service_account()
-
-        with SessionScope(db):
-            db.session.add(service_user)
-            db.session.commit()
-        service_user = db.session.merge(service_user)
+        service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         rv = self.app.post('/api/account')
 
@@ -270,6 +265,32 @@ class TestAPI(TestCase):
         rv = self.app.get('/api/patient/%s/clinical/tx' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
+
+    def test_intervention_wrong_service_user(self):
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        data = {'user_id': TEST_USER_ID, 'access': 'granted'}
+        rv = self.app.put('/api/intervention/sexual_recovery',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert401(rv)
+
+    def test_intervention(self):
+        client = self.add_test_client()
+        intervention = Intervention.query.filter_by(
+            name=INTERVENTION.SEXUAL_RECOVERY).first()
+        client.intervention = intervention
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        data = {'user_id': TEST_USER_ID,
+                'access': "granted",
+                'card_html': "unique HTML set via API"}
+        rv = self.app.put('/api/intervention/sexual_recovery',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert200(rv)
 
     def test_default_role(self):
         self.login()

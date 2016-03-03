@@ -6,6 +6,7 @@ import json
 
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token
+from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import add_authomatic_user, add_role
 from portal.models.user import RoleError, User, UserRelationship
@@ -17,19 +18,6 @@ class AuthomaticMock(object):
 
 class TestAuth(TestCase):
     """Auth API tests"""
-
-    def add_test_client(self):
-        """Prep db with a test client for test user"""
-        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
-        client_id = 'test_client'
-        client = Client(client_id=client_id,
-                _redirect_uris='http://localhost',
-                client_secret='tc_secret', user_id=TEST_USER_ID)
-        with SessionScope(db):
-            db.session.add(client)
-            db.session.commit()
-        client = db.session.merge(client)
-        return client
 
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
@@ -80,7 +68,8 @@ class TestAuth(TestCase):
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com',
-                    application_origins=client.application_origins))
+                         application_origins=client.application_origins,
+                         application_role=INTERVENTION.DEFAULT))
         self.assertEquals(302, rv.status_code)
 
         client = Client.query.get('test_client')

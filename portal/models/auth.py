@@ -11,9 +11,10 @@ from sqlalchemy.dialects.postgresql import ENUM
 from urlparse import urlparse
 
 from ..extensions import db, oauth
+from .relationship import RELATIONSHIP
+from .role import ROLE
 from ..tasks import post_request
 from .user import current_user
-from .role import ROLE
 
 providers_list = ENUM('facebook', 'google', 'twitter', 'truenth',
         name='providers', create_type=False)
@@ -40,14 +41,28 @@ class Client(db.Model):
     _default_scopes = db.Column(db.Text)
     callback_url = db.Column(db.Text)
 
-    def __str__(self):
-        """print details needed in audit logs"""
-        return "Client: {0}, redirects: {1}, callback: {2}".format(
-            self.client_id, self._redirect_uris, self.callback_url)
+    intervention = db.relationship('Intervention',
+        primaryjoin="Client.client_id==Intervention.client_id",
+        uselist=False, backref='Intervention')
 
     @property
-    def client_type(self):
-        return 'public'
+    def intervention_or_default(self):
+        """To use the WTForm classes, always need a live intervention
+
+        if there isn't an intervention assigned to this client, return
+        the default
+
+        """
+        from .intervention import Intervention, INTERVENTION
+        if self.intervention:
+            return self.intervention
+        return Intervention.query.filter_by(name=INTERVENTION.DEFAULT).one()
+
+    def __str__(self):
+        """print details needed in audit logs"""
+        return "Client: {0}, redirects: {1}, callback: {2} {3}".format(
+            self.client_id, self._redirect_uris, self.callback_url,
+            self.intervention_or_default)
 
     @property
     def redirect_uris(self):
@@ -122,6 +137,14 @@ class Client(db.Model):
                 "data": kwargs['data']}
         current_app.logger.debug(str(context))
 
+    def lookup_service_token(self):
+        sponsor_relationship = [r for r in self.user.relationships if
+                                r.relationship.name == RELATIONSHIP.SPONSOR]
+        if (sponsor_relationship):
+            assert len(sponsor_relationship) == 1
+            return Token.query.filter_by(client_id=self.client_id,
+                user_id=sponsor_relationship[0].other_user_id).first()
+        return None
 
     def validate_redirect_uri(self, redirect_uri):
         """Validate the redirect_uri from the OAuth Token request

@@ -24,9 +24,19 @@
     <form action="/client/{{ client.client_id }}" method="post">
         {{ form.hidden_tag() }}
 
+        {{ render_field(form.application_role, tabindex=5) }}
+
         {{ render_field(form.application_origins, tabindex=10) }}
 
         {{ render_field(form.callback_url, tabindex=20) }}
+
+        {% if form.intervention_or_default.name != 'default' %}
+            {{ render_field(form.intervention_or_default.card_url, tabindex=30) }}
+
+            {{ render_field(form.intervention_or_default.card_html, tabindex=40) }}
+
+            {{ render_field(form.intervention_or_default.public_access, tabindex=50) }}
+        {% endif %}
 
         <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;
         <button id="confirmDel" type="button" class="btn btn-tnth-primary" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
@@ -61,6 +71,12 @@
     </p>
     <p><strong>Service Token</strong><br />
         Use a Service Token to make authenticated, automated service calls.  This token can then be used in the <i>Authorization</i> request header in the form <b>Bearer &lt;token-value&gt;</b>, as per the OAuth2 protocol.  This token should be carefully guarded on a secure system and only transmitted via HTTPS.  Valid for 12 months.
+    </p>
+    <p><strong>Public Access</strong><br />
+    Turn off <b>Public Access</b> to control access to the application on a per
+    user basis.  Only available for interventions assigned an offical
+    application role.  If unchecked, a row for every user needing access must
+    be added via the <b>interventions API</b>.
     </p>
 
 </div>

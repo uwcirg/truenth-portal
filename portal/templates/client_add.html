@@ -12,6 +12,8 @@
     <form action="/client" method="post">
         {{ form.hidden_tag() }}
 
+        {{ render_field(form.application_role, tabindex=5) }}
+
         {{ render_field(form.application_origins, tabindex=10) }}
 
         <button type="submit" class="btn btn-tnth-primary">Register App</button>

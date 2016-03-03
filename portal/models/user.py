@@ -92,6 +92,15 @@ class User(db.Model, UserMixin):
                 relationship_id=relationship.id)
         self.relationships.append(new_relationship)
 
+    def has_relationship(self, relationship_name, other_user):
+        relationship = Relationship.query.filter_by(
+                name=relationship_name).first()
+        for r in self.relationships:
+            if (r.relationship_id == relationship.id and
+                r.other_user_id == other_user.id):
+                return True
+        return False
+
     def add_service_account(self):
         """Service account generation.
 
@@ -372,11 +381,11 @@ class UserRelationship(db.Model):
         db.ForeignKey('relationships.id', ondelete='CASCADE'))
 
     user = db.relationship("User", backref='relationships',
-                           foreign_keys="UserRelationship.user_id")
+                           foreign_keys=[user_id])
     other_user = db.relationship("User",
-        foreign_keys="UserRelationship.other_user_id")
+        foreign_keys=[other_user_id])
     relationship = db.relationship("Relationship",
-        foreign_keys="UserRelationship.relationship_id")
+        foreign_keys=[relationship_id])
 
     __table_args__ = (UniqueConstraint('user_id', 'other_user_id',
         'relationship_id', name='_user_relationship'),)

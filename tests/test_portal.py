@@ -1,19 +1,62 @@
 """Unit test module for portal views"""
-import tempfile
 
 from datetime import datetime
+from flask.ext.webtest import SessionScope
+from flask_swagger import swagger
 from swagger_spec_validator import validate_spec_url
-from tests import TestCase, TEST_USER_ID
+import tempfile
 
 from portal.extensions import db
+from portal.models.intervention import Intervention, INTERVENTION
+from portal.models.intervention import UserIntervention
 from portal.models.role import ROLE
 from portal.models.user import User
 from portal.models.message import EmailInvite
+from tests import TestCase, TEST_USER_ID
 
-from flask_swagger import swagger
 
 class TestPortal(TestCase):
     """Portal view tests"""
+
+    def test_card_html(self):
+        """Interventions can customize the button text """
+        client = self.add_test_client()
+        intervention = Intervention.query.filter_by(
+            name=INTERVENTION.DECISION_SUPPORT_P3P).first()
+        client.intervention = intervention
+        intervention.card_html = "Custom Label"
+
+        self.add_required_clinical_data()
+        self.login()
+        rv = self.app.get('/home')
+
+        self.assertIn('Decision Support', rv.data)
+        self.assertIn(intervention.card_html, rv.data)
+
+    def test_public_access(self):
+        """Interventions w/o public access should be hidden"""
+        client = self.add_test_client()
+        intervention = Intervention.query.filter_by(
+            name=INTERVENTION.DECISION_SUPPORT_P3P).first()
+        client.intervention = intervention
+        intervention.public_access = False
+
+        self.add_required_clinical_data()
+        self.login()
+        rv = self.app.get('/home')
+
+        self.assertNotIn('Decision Support', rv.data)
+
+        # now give just the test user access
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id,
+                              access="granted")
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+        rv = self.app.get('/home')
+
+        self.assertIn('Decision Support', rv.data)
 
     def test_admin_list(self):
         """Test admin view lists all users"""
@@ -34,13 +77,13 @@ class TestPortal(TestCase):
     def test_invite(self):
         """Test email invite form"""
         test_user = User.query.get(TEST_USER_ID)
-        test_user.email = 'pbugni@uw.edu'
+        test_user.email = 'test_user@uw.edu'
         db.session.add(test_user)
         db.session.commit()
 
         self.login()
         postdata = { 'subject': 'unittest subject',
-                'recipients': 'bugni@yahoo.com pbugni@uw.edu',
+                'recipients': 'test_user@yahoo.com test_user@uw.edu',
                 'body': "Ode to joy" }
         rv = self.app.post('/invite', data=postdata, follow_redirects=True)
         self.assertTrue("Email Invite Sent" in rv.data)

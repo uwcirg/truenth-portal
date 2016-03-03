@@ -14,8 +14,11 @@ from flask.ext.webtest import SessionScope
 from portal.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
+from portal.models.auth import Client
+from portal.models.fhir import ValueQuantity, BIOPSY, PCaDIAG, TX
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.intervention import add_static_interventions
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.user import User, UserRoles
@@ -46,6 +49,8 @@ class TestCase(Base):
             print "try again..."
             self.tearDown()
             self.setUp()
+        else:
+            self.test_user = User.query.get(TEST_USER_ID)
 
     def add_user(self, username, first_name="", last_name="", image_url=None):
         """Create a user with default role
@@ -87,11 +92,48 @@ class TestCase(Base):
         return self.app.get('/login/TESTING?user_id={0}'.format(user_id),
                 follow_redirects=True)
 
+    def add_test_client(self):
+        """Prep db with a test client for test user"""
+        self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
+        client_id = 'test_client'
+        client = Client(client_id=client_id,
+                _redirect_uris='http://localhost',
+                client_secret='tc_secret', user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(client)
+            db.session.commit()
+        return db.session.merge(client)
+
+    def add_service_user(self, sponsor=None):
+        """create and return a service user for sponsor
+
+        Assign any user to sponsor to use a sponsor other than the default
+        test_user
+
+        """
+        if not sponsor:
+            sponsor = self.test_user
+        if not sponsor in db.session:
+            sponsor = db.session.merge(sponsor)
+        service_user = sponsor.add_service_account()
+        with SessionScope(db):
+            db.session.add(service_user)
+            db.session.commit()
+        return db.session.merge(service_user)
+
+    def add_required_clinical_data(self):
+        " Add clinical data to get beyond the landing page "
+        truthiness = ValueQuantity(value=True, units='boolean')
+        for cc in BIOPSY, PCaDIAG, TX:
+            self.test_user.save_constrained_observation(
+                codeable_concept=cc, value_quantity=truthiness)
+
     def setUp(self):
         """Reset all tables before testing."""
 
         db.create_all()
         with SessionScope(db):
+            add_static_interventions()
             add_static_relationships()
             add_static_roles()
         self.init_data()
