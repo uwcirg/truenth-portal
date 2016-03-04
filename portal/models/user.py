@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):
     image_url = db.Column(db.Text)
     active = db.Column('is_active', db.Boolean(), nullable=False,
             server_default='1')
-    locale = db.Column(db.String(20), default='en')
+    locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
 
     # Only used for local accounts
@@ -45,6 +45,7 @@ class User(db.Model, UserMixin):
             secondary="user_observations", backref=db.backref('users'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
+    locale = db.relationship(CodeableConcept, cascade="save-update")
 
     def add_observation(self, fhir):
         if not 'coding' in fhir['code']:
@@ -200,7 +201,8 @@ class User(db.Model, UserMixin):
                 'code': self.gender[0].upper(),
                 'display': self.gender.capitalize()}]}
         d['status'] = 'registered' if self.registered else 'unknown'
-        d['communication'] = 'en-US'
+        if self.locale:
+            d['communication'] = [{"language": self.locale.as_fhir()}]
         d['telecom'] = []
         d['photo'] = []
         if self.email:
@@ -257,6 +259,10 @@ class User(db.Model, UserMixin):
                     self.email = v_or_n(e['value'])
                 if e['system'] == 'phone':
                     self.phone = v_or_n(e['value'])
+        if 'communication' in fhir:
+            for e in fhir['communication']:
+                if 'language' in e:
+                    self.locale = CodeableConcept.from_fhir(e['language'])
         db.session.add(self)
 
     def check_role(self, permission, other_id):

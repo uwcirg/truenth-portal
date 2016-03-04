@@ -43,8 +43,12 @@ class TestAPI(TestCase):
         # can we add some demographics and role information
         family = 'User'
         given = 'Test'
+        language = 'en-AU'
+        coding = {'code': language, 'display': "Australian English",
+                  'system': "urn:ietf:bcp:47"}
         data = {"name": {"family": family, "given": given},
-                "resourceType": "Patient"}
+                "resourceType": "Patient",
+                "communication": [{"language": {"coding": [coding]}}]}
         rv = self.app.put('/api/demographics/{}'.format(user_id),
                 content_type='application/json',
                 data=json.dumps(data))
@@ -58,6 +62,7 @@ class TestAPI(TestCase):
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
+        self.assertEquals(new_user.locale.code, language)
 
     def test_demographicsGET(self):
         self.login()
@@ -69,7 +74,6 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['name']['family'], LAST_NAME)
         self.assertEquals(fhir['name']['given'], FIRST_NAME)
         self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
-
 
     def test_demographicsPUT(self):
         family = 'User'

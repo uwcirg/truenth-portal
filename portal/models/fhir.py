@@ -24,13 +24,23 @@ class CodeableConcept(db.Model):
     code = db.Column(db.String(80), nullable=False)
     display = db.Column(db.Text, nullable=False)
 
+    @classmethod
+    def from_fhir(cls, data):
+        """Factory method to lookup or create instance from fhir"""
+        cc = cls()
+        coding = data['coding'][0]
+        for i in ("system", "code", "display"):
+            if i in coding:
+                cc.__setattr__(i, coding[i])
+        return cc.add_if_not_found()
+
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         d = {}
         for i in ("system", "code", "display"):
             if getattr(self, i):
                 d[i] = getattr(self, i)
-        return {"code": {"coding": [d,]}}
+        return {"coding": [d,]}
 
     def add_if_not_found(self):
         """Add self to database, or return existing
@@ -118,7 +128,7 @@ class Observation(db.Model):
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
             fhir['status'] = self.status
-        fhir.update(self.codeable_concept.as_fhir())
+        fhir['code'] = self.codeable_concept.as_fhir()
         fhir.update(self.value_quantity.as_fhir())
         return fhir
 
