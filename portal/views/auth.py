@@ -778,11 +778,10 @@ def authorize(*args, **kwargs):
       - name: redirect_uri
         in: query
         description:
-          Intervention's target URI for call back. Central Services
-          will include an authorization code in the call (to be
-          subsequently exchanged for an access token).  May optionally
-          include an encoded 'next' value in its query string, or pass
-          'next' as a separate parameter.
+          Intervention's target URI for call back, which may include
+          its own query string parameters for use by the intervention
+          on call back.  Must be urlencoded as per the OAuth specification
+          (https://tools.ietf.org/html/rfc6749#section-4.1.1)
         required: true
         type: string
       - name: scopes
@@ -791,12 +790,6 @@ def authorize(*args, **kwargs):
           Extent of authorization requested.  At this time, only 'email'
           is supported.
         required: true
-        type: string
-      - name: next
-        in: query
-        description:
-          Target for redirection after authorization is complete
-        required: false
         type: string
       - name: display_html
         in: query
@@ -823,21 +816,6 @@ def authorize(*args, **kwargs):
         session['display_html'] = request.args.get('display_html')
         current_app.logger.debug("display_html:" +
                                  request.args.get('display_html'))
-
-    # Likely entry point for OAuth dance.  Capture the 'next' target
-    # in the session for redirection after dance concludes
-    if 'next' in request.args:
-        current_app.logger.debug('storing session[next]: %s',
-            request.args.get('next'))
-        session['next'] = request.args['next']
-    else:
-        # Pluck the next out of the redirect_uri, if there
-        parsed = urlparse(request.args['redirect_uri'])
-        qs = parse_qs(parsed.query)
-        if 'next' in qs:
-            current_app.logger.debug('storing ssession[next]: %s',
-                qs['next'])
-            session['next'] = qs['next'][0]
 
     user = current_user()
     if not user:
