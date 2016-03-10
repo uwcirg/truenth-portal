@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
-<div class="tnth-nav-wrapper" id="tnthNavWrapper">
+<div id="tnthNavWrapper">
 
     {% if config.PIWIK_SITEID %}
     <script type="text/javascript">
@@ -25,7 +25,7 @@
     <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
     {% endif %}
 
-    <div class="tnth-nav-main" id="tnthNavMain">
+    <div id="tnthNavMain">
         <div id="tnthLogo">
             <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt3.png') }}" /></a>
         </div>
@@ -51,7 +51,7 @@
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                 </ul>
                 {% elif login_url %}
-                <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
                     Welcome
                 </button>
                 <ul class="tnth-dropdown-menu" role="menu">
@@ -63,7 +63,7 @@
                 <div id="tnthHomeBtn"></div>
             </a>
             <div class="tnth-btn-group">
-                <button type="button" class="btn tnth-white tnth-nav-btn tnth-dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <button type="button" class="btn tnth-white tnth-nav-btn tnth-dropdown-toggle" data-toggle="dropdown">
                     <div id="tnthHelpBtn"></div>
                 </button>
                 <ul class="tnth-dropdown-menu pull-right" role="menu">

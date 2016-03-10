@@ -14,29 +14,23 @@
                     <h4 class="sign-in">Sign in with:</h4>
 
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-4 col-md-3">
                             <a href="{{ url_for('auth.login', provider_name='facebook') }}"
                                 class="btn btn-block btn-social btn-facebook">
                                 <i class="fa fa-facebook"></i>
                                 Facebook
                             </a><br />
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-4 col-md-3">
                             <a href="{{ url_for('auth.login', provider_name='google') }}"
                                 class="btn btn-block btn-social btn-google">
                                 <i class="fa fa-google"></i>
                                 Google
                             </a><br />
                         </div>
-                        <div class="col-sm-4">
-                            <button data-placement="top" data-toggle="popover" title="Not Yet Available" data-content="This login method not available in demo." class="btn btn-block btn-social btn-movember demo-disabled">
-                                <img src="{{ url_for('static', filename='img/icon_movember.png') }}" />
-                                Movember
-                            </button><br />
-                        </div>
                     </div>
                     <div class="row">
-                        <div class="col-xs-12 text-center">
+                        <div class="col-xs-12 col-sm-8 col-md-6 text-center">
                             <div class="or-holder"><div class="or-divider">or</div></div>
                         </div>
                     </div>
