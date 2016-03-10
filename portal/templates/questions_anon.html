@@ -33,9 +33,10 @@
 
         </div>
         <div class="col-xs-6">
-            <a id="decision" href="{{ config['DECIDING_INTERVENTION'] }}"
+            {% set intervention = interventions.decision_support_p3p %}
+            <a id="decision" href="{{ intervention.card_url }}"
                class="btn btn-block btn-default btn-lg" style="white-space: normal">
-                Decision Support<br />
+                {{ intervention.card_html }}<br />
                 <small>Which option is best for me?</small>
             </a>
         </div>
@@ -53,9 +54,10 @@
 
         </div>
         <div class="col-xs-6">
-            <a id="management" href="{{ config['SELF_MANAGE_INTERVENTION'] }}"
+            {% set intervention = interventions.self_management %}
+            <a id="management" href="{{ intervention.card_url }}"
                class="btn btn-block btn-default btn-lg" style="white-space: normal">
-                Self Management<br />
+                {{ intervention.card_html }}<br />
                 <small>How do I cope with symptoms?</small>
             </a>
         </div>

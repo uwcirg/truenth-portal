@@ -153,7 +153,9 @@ def questions_anon():
         auditable_event("register new anonymous user", user_id=user.id)
         session['id'] = user.id
         login_user(user)
-    return render_template('questions_anon.html', user=user)
+    return render_template('questions_anon.html', user=user,
+                           interventions=named_interventions())
+
 
 @portal.route('/spec')
 @crossdomain(origin='*')
