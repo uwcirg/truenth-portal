@@ -1,92 +1,303 @@
-.tnth-nav-wrapper {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+/* TrueNTH Nav styles
+ * For use with portal_wrapper
+ * Namespaced to avoid conflicts. Some styles based on Bootstrap
+ */
+/** Overall wrapper with defaults **/
+#tnthNavWrapper {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
-.tnth-nav-main {
-    width: 100%;
-    max-width: 100%;
-    background-color: #1A1919;
-    background-image: url('../img/truenth_mtn_background3.jpg');
-    height: 74px;
-    background-size: cover;
-    margin: 0;
-	padding: 5px 15px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+#tnthNavWrapper a {
+  text-decoration: none;
 }
-
+#tnthNavWrapper img {
+  vertical-align: middle;
+}
+#tnthNavWrapper * {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#tnthNavWrapper :after,
+#tnthNavWrapper :before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.tnth-white,
+.tnth-white:visited {
+  color: #ECF7E5;
+  background-color: transparent;
+  border-color: transparent;
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  text-shadow: none;
+  background-image: none;
+}
+.tnth-white:hover,
+.tnth-white:visited:hover,
+.tnth-white:active,
+.tnth-white:visited:active {
+  background-color: #fff;
+  color: #333;
+}
+#tnthNavMain {
+  width: 100%;
+  max-width: 100%;
+  background-color: #1A1919;
+  background-image: url('../img/truenth_mtn_background3.jpg');
+  height: 74px;
+  background-size: cover;
+  margin: 0;
+  padding: 5px 15px;
+}
+#tnthNavXs {
+  display: none;
+  margin: 0 0 5px;
+  width: 100%;
+  background-color: #83885F;
+  background-image: url('../img/truenth_mtn_background3.jpg');
+  background-size: auto 71px;
+  background-repeat: no-repeat;
+  padding: 5px 15px;
+  z-index: 1000;
+  border-width: 0 0 1px;
+  position: relative;
+  min-height: 50px;
+  border: 1px solid transparent;
+}
+#tnthNavXs:after {
+  clear: both;
+  display: table;
+  content: " ";
+}
+#tnthNavXs .tnth-navbar-toggle {
+  margin: 0;
+  padding: 2px 2px 2px 20px;
+  position: relative;
+  float: right;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 4px 16px;
+  background-image: url('../img/fa_bars_ffffff.png');
+  background-size: auto 13px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+#tnthNavXs .tnth-navbar-toggle:hover,
+#tnthNavXs .tnth-navbar-toggle:active {
+  cursor: pointer;
+  background-image: url('../img/fa_bars_333333.png');
+}
+/** Logo **/
 #tnthLogo {
-    float: left;
+  float: left;
 }
 #tnthLogo img {
-    height: 64px;
+  height: 64px;
+}
+#tnthLogoXs {
+  padding: 0;
+}
+#tnthLogoXs img {
+  height: 50px;
 }
 #tnthTopLinks {
-    float: right;
+  float: right;
 }
-#tnthUserBtn {
-    padding: 6px 12px;
-    height: inherit;
+/** Buttons **/
+.tnth-btn-group {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
 }
 .tnth-nav-btn {
-    padding: 6px 12px;
-    height: inherit;
-    line-height: inherit;
+  display: inline-block;
+  height: inherit;
+  line-height: inherit;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: transparent;
+  padding: 0;
 }
-.tnth-white,.tnth-white .fa, .tnth-white:visited {
-    color: #ECF7E5;
-    background-color: transparent;
-    border-color: transparent;
-    transition: all 0.2s ease-in-out 0s;
-    -webkit-transition: all 0.2s ease-in-out 0s;
-    text-shadow: none;
-    background-image: none;
+.tnth-nav-btn:hover,
+.tnth-nav-btn:focus,
+.tnth-nav-btn:active {
+  background-color: #fff;
 }
-.tnth-white:hover, .tnth-white:hover .fa,
-.tnth-white:focus, .tnth-white:focus .fa,
-.tnth-white.active, .tnth-white:active .fa {
-    color: #333;
-    background-color: #fff;
+#tnthUserBtn {
+  padding: 6px 12px;
+  height: inherit;
 }
-.tnth-white.navbar-toggle {
-    margin: 8px 15px 8px 0;
+#tnthHomeBtn {
+  background-image: url('../img/fa_home_ffffff.png');
+  width: 38px;
+  height: 52px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
-
+#tnthHomeBtn:hover,
+#tnthHomeBtn:focus,
+#tnthHomeBtn:active {
+  background-image: url('../img/fa_home_333333.png');
+}
+#tnthHelpBtn {
+  background-image: url('../img/fa_question_ffffff.png');
+  width: 38px;
+  height: 52px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+#tnthHelpBtn:hover,
+#tnthHelpBtn:focus,
+#tnthHelpBtn:active,
+.tnth-open #tnthHelpBtn {
+  background-image: url('../img/fa_question_333333.png');
+}
+/** Dropdown styles - based on Bootstrap dropdown **/
+.tnth-dropdown {
+  position: relative;
+}
+.tnth-dropdown-toggle:focus {
+  outline: 0;
+}
+.tnth-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+.tnth-dropdown-menu.pull-right {
+  right: 0;
+  left: auto;
+}
+.tnth-dropdown-menu.divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+.tnth-dropdown-menu > li > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+}
+.tnth-dropdown-menu > li > a:hover,
+.tnth-dropdown-menu > li > a:focus {
+  text-decoration: none;
+  color: #262626;
+  background-color: #f5f5f5;
+}
+.tnth-dropdown-menu > .active > a,
+.tnth-dropdown-menu > .active > a:hover,
+.tnth-dropdown-menu > .active > a:focus {
+  color: #fff;
+  text-decoration: none;
+  background-color: #337ab7;
+  outline: 0;
+}
+.tnth-dropdown-menu > .tnth-disabled > a,
+.tnth-dropdown-menu > .tnth-disabled > a:hover,
+.tnth-dropdown-menu > .tnth-disabled > a:focus {
+  color: #777;
+}
+.tnth-dropdown-menu > .tnth-disabled > a:hover,
+.tnth-dropdown-menu > .tnth-disabled > a:focus {
+  text-decoration: none;
+  background-color: transparent;
+  background-image: none;
+  cursor: not-allowed;
+}
+.tnth-open > .tnth-dropdown-menu {
+  display: block;
+}
+.tnth-open > a {
+  outline: 0;
+}
 /*** Styles for responsive xs size ***/
-.tnth-nav-xs {
-	margin: 0 0 5px;
-    width: 100%;
-    background-color: #83885F;
-    background-image: url('../img/truenth_mtn_background3.jpg');
-    background-size: auto 71px;
-    background-repeat: no-repeat;
-    padding: 5px 15px;
+.tnth-container-fluid {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
-.tnth-nav-xs .navbar-brand {
-	padding: 0;
+.tnth-container-fluid .tnth-navbar-header {
+  margin-right: -15px;
+  margin-left: -15px;
 }
-.tnth-nav-xs .navbar-brand img {
-	height: 52px;
+.tnth-container-fluid .tnth-navbar-header:after,
+.tnth-container-fluid .tnth-navbar-header:before {
+  display: table;
+  content: " ";
 }
-.tnth-nav-xs .nav a {
-    color: #fff;
+.tnth-container-fluid .tnth-navbar-header:after {
+  clear: both;
 }
-.tnth-nav-xs .nav a:active, .tnth-nav-xs .nav a:hover {
-    color: #333;
-}
-.tnth-nav-xs .tnth-white.navbar-toggle {
-    margin: 0;
-    padding: 0 0 0 10px;
-}
+/** Navbar for XS size **/
 #tnthNavbarXs {
-    padding-top: 30px;
+  padding-top: 20px;
 }
-
+.tnth-navbar-xs {
+  margin: 7.5px -15px;
+  padding-left: 0;
+  list-style: none;
+}
+.tnth-navbar-xs > li {
+  position: relative;
+  display: block;
+}
+.tnth-navbar-xs > li > a {
+  line-height: 20px;
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  color: #fff;
+}
+.tnth-navbar-xs > li > a:hover {
+  background-color: #fff;
+  color: #333;
+}
+/** Responsive sizes **/
+@media (max-width: 767px) {
+  #tnthNavMain {
+    display: none !important;
+  }
+  #tnthNavXs {
+    display: block;
+  }
+}
 @media (min-width: 1200px) {
-    #tnthLogo {
-        margin-left: 80px;
-    }
+  #tnthLogo {
+    margin-left: 80px;
+  }
 }
-
-
-

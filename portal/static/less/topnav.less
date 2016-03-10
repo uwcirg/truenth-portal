@@ -1,0 +1,314 @@
+/* TrueNTH Nav styles
+ * For use with portal_wrapper
+ * Namespaced to avoid conflicts. Some styles based on Bootstrap
+ */
+
+/** Overall wrapper with defaults **/
+#tnthNavWrapper {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  a {
+    text-decoration: none;
+  }
+  img {
+    vertical-align: middle;
+  }
+  * {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  :after, :before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+}
+.tnth-white, .tnth-white:visited {
+  color: #ECF7E5;
+  background-color: transparent;
+  border-color: transparent;
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  text-shadow: none;
+  background-image: none;
+  &:hover, &:active {
+    background-color: #fff;
+    color: #333;
+  }
+}
+#tnthNavMain {
+  width: 100%;
+  max-width: 100%;
+  background-color: #1A1919;
+  background-image: url('../img/truenth_mtn_background3.jpg');
+  height: 74px;
+  background-size: cover;
+  margin: 0;
+  padding: 5px 15px;
+}
+#tnthNavXs {
+  display: none;
+  margin: 0 0 5px;
+  width: 100%;
+  background-color: #83885F;
+  background-image: url('../img/truenth_mtn_background3.jpg');
+  background-size: auto 71px;
+  background-repeat: no-repeat;
+  padding: 5px 15px;
+  z-index: 1000;
+  border-width: 0 0 1px;
+  position: relative;
+  min-height: 50px;
+  border: 1px solid transparent;
+  &:after {
+    clear: both;
+    display: table;
+    content: " ";
+  }
+  .tnth-navbar-toggle {
+    margin: 0;
+    padding: 2px 2px 2px 20px;
+    position: relative;
+    float: right;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: 4px 16px;
+    background-image: url('../img/fa_bars_ffffff.png');
+    background-size: auto 13px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    &:hover, &:active {
+      cursor: pointer;
+      background-image: url('../img/fa_bars_333333.png');
+    }
+  }
+}
+
+/** Logo **/
+#tnthLogo {
+  float: left;
+  img {
+    height: 64px;
+  }
+}
+#tnthLogoXs {
+  padding: 0;
+  img {
+    height: 50px;
+  }
+}
+#tnthTopLinks {
+  float: right;
+}
+
+/** Buttons **/
+.tnth-btn-group {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle; // match .btn alignment given font-size hack above
+}
+.tnth-nav-btn {
+  display: inline-block;
+  height: inherit;
+  line-height: inherit;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: transparent;
+  padding: 0;
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: #fff;
+  }
+}
+#tnthUserBtn {
+  padding: 6px 12px;
+  height: inherit;
+}
+#tnthHomeBtn {
+  background-image: url('../img/fa_home_ffffff.png');
+  width: 38px;
+  height: 52px;
+  background-repeat: no-repeat;
+  background-position: center;
+  &:hover,
+  &:focus,
+  &:active {
+    background-image: url('../img/fa_home_333333.png');
+  }
+}
+#tnthHelpBtn {
+  background-image: url('../img/fa_question_ffffff.png');
+  width: 38px;
+  height: 52px;
+  background-repeat: no-repeat;
+  background-position: center;
+  &:hover,
+  &:focus,
+  &:active,
+  .tnth-open & {
+    background-image: url('../img/fa_question_333333.png');
+  }
+}
+
+/** Dropdown styles - based on Bootstrap dropdown **/
+.tnth-dropdown {
+  position: relative;
+}
+// Prevent the focus on the dropdown toggle when closing dropdowns
+.tnth-dropdown-toggle:focus {
+  outline: 0;
+}
+.tnth-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-radius: 4px;
+  -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+  // Aligns the dropdown menu to right
+  &.pull-right {
+    right: 0;
+    left: auto;
+  }
+  &.divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+  }
+  // Links within the dropdown menu
+  > li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap; // prevent links from randomly breaking onto new lines
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: #262626;
+      background-color: #f5f5f5;
+    }
+  }
+  > .active > a {
+    &,
+    &:hover,
+    &:focus {
+      color: #fff;
+      text-decoration: none;
+      background-color: #337ab7;
+      outline: 0;
+    }
+  }
+  > .tnth-disabled > a {
+    &,
+    &:hover,
+    &:focus {
+      color: #777;
+    }
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      background-color: transparent;
+      background-image: none; // Remove CSS gradient
+      cursor: not-allowed;
+    }
+  }
+}
+// Open state for the dropdown
+.tnth-open {
+  // Show the menu
+  > .tnth-dropdown-menu {
+    display: block;
+  }
+  > a {
+    outline: 0;
+  }
+}
+
+/*** Styles for responsive xs size ***/
+.tnth-container-fluid {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  .tnth-navbar-header {
+    margin-right: -15px;
+    margin-left: -15px;
+    &:after, &:before {
+      display: table;
+      content: " ";
+    }
+    &:after {
+      clear: both;
+    }
+  }
+}
+/** Navbar for XS size **/
+#tnthNavbarXs {
+  padding-top: 20px;
+}
+.tnth-navbar-xs {
+  margin: 7.5px -15px;
+  padding-left: 0;
+  list-style: none;
+  > li {
+    position: relative;
+    display: block;
+  }
+  > li > a {
+    line-height: 20px;
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    &:hover {
+      background-color: #fff;
+      color: #333;
+    }
+  }
+}
+
+
+/** Responsive sizes **/
+@media (max-width: 767px) {
+  #tnthNavMain {
+    display: none !important;
+  }
+  #tnthNavXs {
+    display: block;
+  }
+}
+@media (min-width: 1200px) {
+  #tnthLogo {
+    margin-left: 80px;
+  }
+}

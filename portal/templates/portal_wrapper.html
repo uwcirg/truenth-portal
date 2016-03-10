@@ -1,46 +1,43 @@
-<div class="tnth-nav-wrapper">
+<link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
+<script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
+<div class="tnth-nav-wrapper" id="tnthNavWrapper">
 
-{% if config.PIWIK_SITEID %}
-<script type="text/javascript">
-//TODO needs a better location/mechanism - mark47?
-  var _paq = _paq || [];
-  _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
+    {% if config.PIWIK_SITEID %}
+    <script type="text/javascript">
+        //TODO needs a better location/mechanism - mark47?
+        var _paq = _paq || [];
+        _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
 
-  {% if user %}
-  _paq.push(["setUserId", "{{ user.id }}"]);
-  {% endif %}
+        {% if user %}
+        _paq.push(["setUserId", "{{ user.id }}"]);
+        {% endif %}
 
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//piwik.cirg.washington.edu/";
-    _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', {{ config.PIWIK_SITEID }}]);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
-{% endif %}
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+            var u="//piwik.cirg.washington.edu/";
+            _paq.push(['setTrackerUrl', u+'piwik.php']);
+            _paq.push(['setSiteId', {{ config.PIWIK_SITEID }}]);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+    </script>
+    <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
+    {% endif %}
 
-    <div class="hidden-xs tnth-nav-main">
+    <div class="tnth-nav-main" id="tnthNavMain">
         <div id="tnthLogo">
             <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt3.png') }}" /></a>
         </div>
 
         <div id="tnthTopLinks">
-            <div class="btn-group nav-userinfo">
-            {% if username %}
-
-                <button id="tnthUserBtn" type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Welcome
-                    {% if username != "Anonymous" %}
-                        , {{ username }}
-                    {% endif %}
+            <div class="tnth-btn-group">
+                {% if username %}
+                <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
+                    Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
                     <img src="{{movember_profile}}" />
-                    <span class="fa fa-caret-down"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="tnth-dropdown-menu" role="menu">
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     {% if user and user.has_roles('application_developer') %}
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
@@ -53,49 +50,46 @@
                     {% endif %}
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                 </ul>
-            {% elif login_url %}
-                <button type="button" class="btn tnth-white dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                {% elif login_url %}
+                <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Welcome
-                    <span class="fa fa-caret-down"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="tnth-dropdown-menu" role="menu">
                     <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
-                </ul> 
-            {% endif %}
+                </ul>
+                {% endif %}
             </div>
-            <a class="btn tnth-white tnth-nav-btn" href="{{PORTAL}}" id="tnthHomeBtn" title="Return to TrueNTH Home">
-                <i class="fa fa-home fa-2x"></i>
+            <a class="tnth-white tnth-nav-btn" href="{{PORTAL}}" title="Return to TrueNTH Home">
+                <div id="tnthHomeBtn"></div>
             </a>
-            <div class="btn-group nav-userinfo">
-                <button type="button" class="btn tnth-white tnth-nav-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-question fa-2x"></i>
+            <div class="tnth-btn-group">
+                <button type="button" class="btn tnth-white tnth-nav-btn tnth-dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <div id="tnthHelpBtn"></div>
                 </button>
-                <ul class="dropdown-menu pull-right" role="menu">
-                    <li class="disabled"><a href="#">Help</a></li>
+                <ul class="tnth-dropdown-menu pull-right" role="menu">
+                    <li class="tnth-disabled"><a href="#">Help</a></li>
                     <li><a href="http://truenth.org" target="_blank">About TrueNTH</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <!-- Responsive navbar for xs width -->
-    <nav class="navbar navbar-static-top visible-xs tnth-nav-xs">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="tnth-white navbar-toggle collapsed" data-toggle="collapse" data-target="#tnthNavbarXs" aria-expanded="false" aria-controls="tnthNavbarXs">
-                    <i class="fa fa-bars"></i> MENU&nbsp;&nbsp;
-                    <img src="{{movember_profile}}" />
-                    <span class="fa fa-caret-down"></span>
-                </button>
-                <a class="navbar-brand" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
+    <div id="tnthNavXs">
+        <div class="tnth-container-fluid">
+            <div class="tnth-navbar-header">
+                <div class="tnth-white tnth-navbar-toggle">
+                    MENU&nbsp;&nbsp; <img src="{{movember_profile}}" width="45px" height="45px" />
+                </div>
+                <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
             </div>
-            <div id="tnthNavbarXs" class="navbar-collapse collapse" aria-expanded="false">
-                <ul class="nav navbar-nav">
+            <div id="tnthNavbarXs" style="display: none;">
+                <ul class="tnth-navbar-xs">
                     <li><a href="{{PORTAL}}">Home</a></li>
                     {% if username %}
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     {% endif %}
                     <li><a href="http://truenth.org" target="_blank">About</a></li>
-                    <li class="disabled"><a href="#">Help</a></li>
+                    <li class="tnth-disabled"><a href="#">Help</a></li>
                     {% if user and user.has_roles('application_developer') %}
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
                     {% endif %}
@@ -111,6 +105,6 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
 </div>
