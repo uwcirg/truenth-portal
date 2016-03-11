@@ -1138,7 +1138,35 @@ def assessment_set(patient_id):
                                 description: Attachment value answer to a question
                               valueCoding:
                                 type: object
-                                description: Coding value answer to a question
+                                description: Coding value answer to a question, may include score as FHIR extension
+                                properties:
+                                  system:
+                                    description: Identity of the terminology system
+                                    type: string
+                                    format: uri
+                                  version:
+                                    description: Version of the system - if relevant
+                                    type: string
+                                  code:
+                                    description: Symbol in syntax defined by the system
+                                    type: string
+                                  display:
+                                    description: Representation defined by the system
+                                    type: string
+                                  userSelected:
+                                    description: If this coding was chosen directly by the user
+                                    type: boolean
+                                  extension:
+                                    description: Extension - Numerical value associated with the code
+                                    type: object
+                                    properties:
+                                      url:
+                                        description: Hardcoded reference to extension
+                                        type: string
+                                        format: uri
+                                      valueDecimal:
+                                        description: Numeric score value
+                                        type: number
                               valueQuantity:
                                 type: object
                                 description: Quantity value answer to a question
