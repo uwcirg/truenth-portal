@@ -5,4 +5,8 @@
 # See @<blueprint>.context_processor decorator for more info.
 
 def split_string(s, delimiter=','):
+    """Given string (or tuple) return the delimited values"""
+    # If given a tuple, split already happened
+    if isinstance(s, (list, tuple)):
+        return s
     return s.split(delimiter)
