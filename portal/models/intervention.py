@@ -98,7 +98,7 @@ def add_static_interventions():
             intervention = Intervention(name=k, description=v,
                                         card_html=v)
             if k in config_map:
-                intervention.card_url = current_app.config[config_map[k]]
+                intervention.card_url = current_app.config.get(config_map[k])
             db.session.add(intervention)
     db.session.commit()
 
