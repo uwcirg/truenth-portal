@@ -72,8 +72,8 @@
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn">
-                    MENU&nbsp;&nbsp; <img src="{{movember_profile}}" width="45px" height="45px" />
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not username %}tnth-navbar-no-profile{% endif %}">
+                    MENU <img src="{{movember_profile}}" width="45px" height="45px" />
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
             </div>
