@@ -81,7 +81,6 @@
   padding: 2px 2px 2px 20px;
   position: relative;
   float: right;
-  background-color: transparent;
   background-repeat: no-repeat;
   background-position: 4px 16px;
   background-image: url('../img/fa_bars_ffffff.png');
@@ -93,6 +92,7 @@
 #tnthNavXs .tnth-navbar-toggle:active {
   cursor: pointer;
   background-image: url('../img/fa_bars_333333.png');
+  background-color: #fff;
 }
 /** Logo **/
 #tnthLogo {
@@ -266,6 +266,7 @@
 /** Navbar for XS size **/
 #tnthNavbarXs {
   padding-top: 20px;
+  display: none;
 }
 .tnth-navbar-xs {
   margin: 7.5px -15px;

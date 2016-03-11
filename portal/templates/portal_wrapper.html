@@ -1,35 +1,31 @@
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
-<div id="tnthNavWrapper">
+{% if config.PIWIK_SITEID %}
+<script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
 
-    {% if config.PIWIK_SITEID %}
-    <script type="text/javascript">
-        //TODO needs a better location/mechanism - mark47?
-        var _paq = _paq || [];
-        _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
-
-        {% if user %}
-        _paq.push(["setUserId", "{{ user.id }}"]);
-        {% endif %}
-
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-            var u="//piwik.cirg.washington.edu/";
-            _paq.push(['setTrackerUrl', u+'piwik.php']);
-            _paq.push(['setSiteId', {{ config.PIWIK_SITEID }}]);
-            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-            g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-        })();
-    </script>
-    <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
+    {% if user %}
+    _paq.push(["setUserId", "{{ user.id }}"]);
     {% endif %}
 
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+        var u="//piwik.cirg.washington.edu/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', {{ config.PIWIK_SITEID }}]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script>
+<noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
+{% endif %}
+<div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthLogo">
             <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt3.png') }}" /></a>
         </div>
-
         <div id="tnthTopLinks">
             <div class="tnth-btn-group">
                 {% if username %}
@@ -73,16 +69,15 @@
             </div>
         </div>
     </div>
-    <!-- Responsive navbar for xs width -->
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle">
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn">
                     MENU&nbsp;&nbsp; <img src="{{movember_profile}}" width="45px" height="45px" />
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
             </div>
-            <div id="tnthNavbarXs" style="display: none;">
+            <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
                     <li><a href="{{PORTAL}}">Home</a></li>
                     {% if username %}
