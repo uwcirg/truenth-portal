@@ -154,6 +154,5 @@ $('.tnth-dropdown-toggle').dropdown()
 
 // Simple show/hide for XS menu
 $('.tnth-navbar-toggle').click(function(){
-  $('.tnth-xs-menu').slideToggle('fast');
+  $('#tnthNavbarXs').slideToggle('fast');
 });
-4

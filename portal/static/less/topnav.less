@@ -76,16 +76,26 @@
     padding: 2px 2px 2px 20px;
     position: relative;
     float: right;
-    background-color: transparent;
     background-repeat: no-repeat;
     background-position: 4px 16px;
     background-image: url('../img/fa_bars_ffffff.png');
     background-size: auto 13px;
     border: 1px solid transparent;
     border-radius: 4px;
+    img {
+      margin-left: 8px;
+    }
+    &.tnth-navbar-no-profile {
+      img {
+        visibility: hidden;
+        width: 1px;
+        margin-left: 0;
+      }
+    }
     &:hover, &:active {
       cursor: pointer;
       background-image: url('../img/fa_bars_333333.png');
+      background-color: #fff;
     }
   }
 }
@@ -275,6 +285,7 @@
 /** Navbar for XS size **/
 #tnthNavbarXs {
   padding-top: 20px;
+  display: none;
 }
 .tnth-navbar-xs {
   margin: 7.5px -15px;
