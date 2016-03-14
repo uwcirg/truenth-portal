@@ -687,8 +687,6 @@ def assessment(patient_id, instrument_id):
         description: successful operation
         schema:
           id: assessment_bundle
-          externalDocs:
-            url: https://www.hl7.org/fhir/DSTU2/bundle.html
           required:
             - type
           properties:
@@ -1227,8 +1225,6 @@ def assessment_set(patient_id):
         schema:
           id: QuestionnaireResponse
           description: A patient's responses to a questionnaire (a set of instruments, some standardized, some not), and metadata about the presentation and context of the assessment session (date, etc).
-          externalDocs:
-            url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse.html
           required:
             - status
           properties:
@@ -1245,8 +1241,6 @@ def assessment_set(patient_id):
                 id: Reference
                 type: object
                 description: A reference from one resource to another
-                externalDocs:
-                  url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html
                 properties:
                   reference:
                     type: string
@@ -1270,8 +1264,6 @@ def assessment_set(patient_id):
               schema:
                 id: group
                 description: A group of related questions or sub-groups. May only contain either questions or groups
-                externalDocs:
-                  url: http://hl7.org/implement/standards/fhir/DSTU2/questionnaireresponse-definitions.html#QuestionnaireResponse.group
                 properties:
                   group:
                     $ref: "#/definitions/group"
