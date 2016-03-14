@@ -721,255 +721,460 @@ def assessment(patient_id, instrument_id):
               items:
                 $ref: "#/definitions/QuestionnaireResponse"
           example:
-            resourceType: Bundle
-            type: searchset
-            link:
-              - rel: self
-                href: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
-            total: 2
             entry:
             - resourceType: QuestionnaireResponse
-              authored: '2016-01-22T12:32:17Z'
+              authored: '2016-01-22T20:32:17Z'
               status: completed
               identifier:
-                value: '101.1'
+                value: '101.0'
                 use: official
                 label: cPRO survey session ID
               subject:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               author:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               source:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               group:
                 question:
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.0.4
-                  linkid: EPIC_26.0
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.1.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 5
+                  linkId: epic26.1
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.1.3
-                  linkid: EPIC_26.1
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.2.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.2
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.2.1
-                  linkid: EPIC_26.2
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.3.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.3
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.3.2
-                  linkid: EPIC_26.3
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.4.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.4
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.4.0
-                  linkid: EPIC_26.4
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.5.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 0
+                  linkId: epic26.5
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.5.1
-                  linkid: EPIC_26.5
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.6.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.6
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.6.2
-                  linkid: EPIC_26.6
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.7.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.7
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.7.3
-                  linkid: EPIC_26.7
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.8.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.8
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.8.1
-                  linkid: EPIC_26.8
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.9.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.9
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.9.0
-                  linkid: EPIC_26.9
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.10.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 0
+                  linkId: epic26.10
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.10.1
-                  linkid: EPIC_26.10
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.11.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.11
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.11.2
-                  linkid: EPIC_26.11
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.12.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.12
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.12.3
-                  linkid: EPIC_26.12
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.13.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.13
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.13.4
-                  linkid: EPIC_26.13
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.14.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.14
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.14.3
-                  linkid: EPIC_26.14
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.15.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.15
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.15.1
-                  linkid: EPIC_26.15
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.16.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.16
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.16.0
-                  linkid: EPIC_26.16
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.17.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.17
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.17.0
-                  linkid: EPIC_26.17
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.18.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.18
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.18.2
-                  linkid: EPIC_26.18
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.19.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.19
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.19.1
-                  linkid: EPIC_26.19
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.20.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.20
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.20.3
-                  linkid: EPIC_26.20
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.21.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.21
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.21.0
-                  linkid: EPIC_26.21
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.22.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 0
+                  linkId: epic26.22
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.22.1
-                  linkid: EPIC_26.22
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.23.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.23
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.23.2
-                  linkid: EPIC_26.23
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.24.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.24
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.24.2
-                  linkid: EPIC_26.24
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.25.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.25
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.25.2
-                  linkid: EPIC_26.25
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.26.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.26
               questionnaire:
                 display: EPIC 26 Short Form
-                reference: http://truenth-dev.cirg.washington.edu/api/questionnaires/EPIC_26
+                reference: https://stg.us.truenth.org/api/questionnaires/epic26
             - resourceType: QuestionnaireResponse
-              authored: '2016-02-02T10:07:15Z'
-              status: in-progress
+              authored: '2016-03-11T23:47:28Z'
+              status: completed
               identifier:
-                value: '109.1'
+                value: '119.0'
                 use: official
                 label: cPRO survey session ID
               subject:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               author:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               source:
                 display: patient demographics
-                reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+                reference: https://stg.us.truenth.org/api/demographics/10015
               group:
                 question:
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.0.4
-                  linkid: EPIC_26.0
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.1.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.1
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.1.3
-                  linkid: EPIC_26.1
-                - answer: []
-                  linkid: EPIC_26.2
-                - answer: []
-                  linkid: EPIC_26.3
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.2.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.2
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.4.0
-                  linkid: EPIC_26.4
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.3.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.3
+                - answer: []
+                  linkId: epic26.4
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.5.0
-                  linkid: EPIC_26.5
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.5.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.5
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.6.0
-                  linkid: EPIC_26.6
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.6.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.6
                 - answer:
                   - valueCoding:
-                      system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                      code: EPIC_26.7.0
-                  linkid: EPIC_26.7
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.7.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.7
                 - answer: []
-                  linkid: EPIC_26.8
-                - answer: []
-                  linkid: EPIC_26.9
-                - answer: []
-                  linkid: EPIC_26.10
-                - answer: []
-                  linkid: EPIC_26.11
-                - answer: []
-                  linkid: EPIC_26.12
-                - answer: []
-                  linkid: EPIC_26.13
-                - answer: []
-                  linkid: EPIC_26.14
-                - answer: []
-                  linkid: EPIC_26.15
-                - answer: []
-                  linkid: EPIC_26.16
-                - answer: []
-                  linkid: EPIC_26.17
-                - answer: []
-                  linkid: EPIC_26.18
-                - answer: []
-                  linkid: EPIC_26.19
-                - answer: []
-                  linkid: EPIC_26.20
-                - answer: []
-                  linkid: EPIC_26.21
-                - answer: []
-                  linkid: EPIC_26.22
-                - answer: []
-                  linkid: EPIC_26.23
-                - answer: []
-                  linkid: EPIC_26.24
-                - answer: []
-                  linkid: EPIC_26.25
+                  linkId: epic26.8
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.9.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.9
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.10.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.10
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.11.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.11
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.12.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.12
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.13.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.13
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.14.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 0
+                  linkId: epic26.14
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.15.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 5
+                  linkId: epic26.15
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.16.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.16
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.17.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.17
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.18.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.18
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.19.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.19
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.20.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.20
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.21.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 5
+                  linkId: epic26.21
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.22.1
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 0
+                  linkId: epic26.22
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.23.2
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 1
+                  linkId: epic26.23
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.24.3
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 2
+                  linkId: epic26.24
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.25.4
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 3
+                  linkId: epic26.25
+                - answer:
+                  - valueCoding:
+                      system: https://stg.us.truenth.org/api/codings/assessment
+                      code: epic26.26.5
+                      extension:
+                        url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                        valueDecimal: 4
+                  linkId: epic26.26
               questionnaire:
                 display: EPIC 26 Short Form
-                reference: http://truenth-dev.cirg.washington.edu/api/questionnaires/EPIC_26
+                reference: https://stg.us.truenth.org/api/questionnaires/epic26
+            link:
+              href: https://stg.us.truenth.org/api/patient/10015/assessment/epic25
+              rel: self
+            resourceType: Bundle
+            total: 2
+            type: searchset
+            updated: '2016-03-14T20:47:26.282263Z'
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -1138,7 +1343,35 @@ def assessment_set(patient_id):
                                 description: Attachment value answer to a question
                               valueCoding:
                                 type: object
-                                description: Coding value answer to a question
+                                description: Coding value answer to a question, may include score as FHIR extension
+                                properties:
+                                  system:
+                                    description: Identity of the terminology system
+                                    type: string
+                                    format: uri
+                                  version:
+                                    description: Version of the system - if relevant
+                                    type: string
+                                  code:
+                                    description: Symbol in syntax defined by the system
+                                    type: string
+                                  display:
+                                    description: Representation defined by the system
+                                    type: string
+                                  userSelected:
+                                    description: If this coding was chosen directly by the user
+                                    type: boolean
+                                  extension:
+                                    description: Extension - Numerical value associated with the code
+                                    type: object
+                                    properties:
+                                      url:
+                                        description: Hardcoded reference to extension
+                                        type: string
+                                        format: uri
+                                      valueDecimal:
+                                        description: Numeric score value
+                                        type: number
                               valueQuantity:
                                 type: object
                                 description: Quantity value answer to a question
@@ -1149,156 +1382,222 @@ def assessment_set(patient_id):
                                 $ref: "#/definitions/group"
           example:
             resourceType: QuestionnaireResponse
-            authored: '2016-01-22T12:32:17Z'
+            authored: '2016-03-11T23:47:28Z'
             status: completed
             identifier:
-              value: '101.1'
+              value: '119.0'
               use: official
               label: cPRO survey session ID
             subject:
               display: patient demographics
-              reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              reference: https://stg.us.truenth.org/api/demographics/10015
             author:
               display: patient demographics
-              reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              reference: https://stg.us.truenth.org/api/demographics/10015
             source:
               display: patient demographics
-              reference: http://truenth-dev.cirg.washington.edu/api/demographics?patientId=10015
+              reference: https://stg.us.truenth.org/api/demographics/10015
             group:
               question:
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.0.4
-                linkid: EPIC_26.0
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.1.1
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.1
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.1.3
-                linkid: EPIC_26.1
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.2.1
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.2
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.2.1
-                linkid: EPIC_26.2
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.3.3
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 2
+                linkId: epic26.3
+              - answer: []
+                linkId: epic26.4
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.3.2
-                linkid: EPIC_26.3
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.5.4
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 3
+                linkId: epic26.5
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.4.0
-                linkid: EPIC_26.4
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.6.3
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 2
+                linkId: epic26.6
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.5.1
-                linkid: EPIC_26.5
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.7.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.7
+              - answer: []
+                linkId: epic26.8
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.6.2
-                linkid: EPIC_26.6
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.9.3
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 3
+                linkId: epic26.9
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.7.3
-                linkid: EPIC_26.7
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.10.5
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 4
+                linkId: epic26.10
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.8.1
-                linkid: EPIC_26.8
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.11.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.11
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.9.0
-                linkid: EPIC_26.9
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.12.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.12
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.10.1
-                linkid: EPIC_26.10
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.13.4
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 3
+                linkId: epic26.13
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.11.2
-                linkid: EPIC_26.11
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.14.1
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 0
+                linkId: epic26.14
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.12.3
-                linkid: EPIC_26.12
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.15.5
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 5
+                linkId: epic26.15
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.13.4
-                linkid: EPIC_26.13
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.16.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 2
+                linkId: epic26.16
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.14.3
-                linkid: EPIC_26.14
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.17.1
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.17
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.15.1
-                linkid: EPIC_26.15
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.18.4
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 4
+                linkId: epic26.18
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.16.0
-                linkid: EPIC_26.16
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.19.4
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 4
+                linkId: epic26.19
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.17.0
-                linkid: EPIC_26.17
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.20.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 2
+                linkId: epic26.20
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.18.2
-                linkid: EPIC_26.18
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.21.5
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 5
+                linkId: epic26.21
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.19.1
-                linkid: EPIC_26.19
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.22.1
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 0
+                linkId: epic26.22
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.20.3
-                linkid: EPIC_26.20
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.23.2
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 1
+                linkId: epic26.23
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.21.0
-                linkid: EPIC_26.21
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.24.3
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 2
+                linkId: epic26.24
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.22.1
-                linkid: EPIC_26.22
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.25.4
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 3
+                linkId: epic26.25
               - answer:
                 - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.23.2
-                linkid: EPIC_26.23
-              - answer:
-                - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.24.2
-                linkid: EPIC_26.24
-              - answer:
-                - valueCoding:
-                    system: http://truenth-dev.cirg.washington.edu/api/codings/assessment
-                    code: EPIC_26.25.2
-                linkid: EPIC_26.25
+                    system: https://stg.us.truenth.org/api/codings/assessment
+                    code: epic26.26.5
+                    extension:
+                      url: https://hl7.org/fhir/StructureDefinition/iso21090-CO-value
+                      valueDecimal: 4
+                linkId: epic26.26
             questionnaire:
               display: EPIC 26 Short Form
-              reference: http://truenth-dev.cirg.washington.edu/api/questionnaires/EPIC_26
+              reference: https://stg.us.truenth.org/api/questionnaires/epic26
     responses:
       401:
         description:
