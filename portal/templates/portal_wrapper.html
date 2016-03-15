@@ -58,22 +58,13 @@
             <a class="tnth-white tnth-nav-btn" href="{{PORTAL}}" title="Return to TrueNTH Home">
                 <div id="tnthHomeBtn"></div>
             </a>
-            <div class="tnth-btn-group">
-                <button type="button" class="btn tnth-white tnth-nav-btn tnth-dropdown-toggle" data-toggle="dropdown">
-                    <div id="tnthHelpBtn"></div>
-                </button>
-                <ul class="tnth-dropdown-menu pull-right" role="menu">
-                    <li class="tnth-disabled"><a href="#">Help</a></li>
-                    <li><a href="http://truenth.org" target="_blank">About TrueNTH</a></li>
-                </ul>
-            </div>
         </div>
     </div>
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn">
-                    MENU&nbsp;&nbsp; <img src="{{movember_profile}}" width="45px" height="45px" />
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not username %}tnth-navbar-no-profile{% endif %}">
+                    MENU <img src="{{movember_profile}}" width="45px" height="45px" />
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
             </div>

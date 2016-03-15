@@ -88,6 +88,14 @@
   border: 1px solid transparent;
   border-radius: 4px;
 }
+#tnthNavXs .tnth-navbar-toggle img {
+  margin-left: 8px;
+}
+#tnthNavXs .tnth-navbar-toggle.tnth-navbar-no-profile img {
+  visibility: hidden;
+  width: 1px;
+  margin-left: 0;
+}
 #tnthNavXs .tnth-navbar-toggle:hover,
 #tnthNavXs .tnth-navbar-toggle:active {
   cursor: pointer;
@@ -150,19 +158,6 @@
 #tnthHomeBtn:focus,
 #tnthHomeBtn:active {
   background-image: url('../img/fa_home_333333.png');
-}
-#tnthHelpBtn {
-  background-image: url('../img/fa_question_ffffff.png');
-  width: 38px;
-  height: 52px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-#tnthHelpBtn:hover,
-#tnthHelpBtn:focus,
-#tnthHelpBtn:active,
-.tnth-open #tnthHelpBtn {
-  background-image: url('../img/fa_question_333333.png');
 }
 /** Dropdown styles - based on Bootstrap dropdown **/
 .tnth-dropdown {
