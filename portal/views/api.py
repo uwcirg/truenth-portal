@@ -1167,7 +1167,7 @@ def assessment(patient_id, instrument_id):
                 display: EPIC 26 Short Form
                 reference: https://stg.us.truenth.org/api/questionnaires/epic26
             link:
-              href: https://stg.us.truenth.org/api/patient/10015/assessment/epic25
+              href: https://stg.us.truenth.org/api/patient/10015/assessment/epic26
               rel: self
             resourceType: Bundle
             total: 2
