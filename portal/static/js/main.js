@@ -78,4 +78,7 @@ $(document).ready(function() {
        $(this).parent().next().fadeIn("slow");
     });
 
+    // Reveal footer after load to avoid any flashes will above content loads
+    $("#homeFooter").show()
+
 });

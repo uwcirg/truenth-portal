@@ -75,9 +75,6 @@ a:active {
   font-weight: bold;
   padding: 6px 24px;
 }
-.feature-box .feature-bottom {
-  margin-top: 5em;
-}
 .feature-bottom {
   position: absolute;
   bottom: 0;
@@ -91,6 +88,7 @@ a:active {
   overflow: auto;
   padding: 1em 0;
   line-height: 1.2;
+  display: none;
 }
 .portal-well {
   margin: 1em 0 2em;
