@@ -159,19 +159,6 @@
 #tnthHomeBtn:active {
   background-image: url('../img/fa_home_333333.png');
 }
-#tnthHelpBtn {
-  background-image: url('../img/fa_question_ffffff.png');
-  width: 38px;
-  height: 52px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-#tnthHelpBtn:hover,
-#tnthHelpBtn:focus,
-#tnthHelpBtn:active,
-.tnth-open #tnthHelpBtn {
-  background-image: url('../img/fa_question_333333.png');
-}
 /** Dropdown styles - based on Bootstrap dropdown **/
 .tnth-dropdown {
   position: relative;
