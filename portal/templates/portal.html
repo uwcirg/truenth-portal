@@ -10,19 +10,47 @@
         </div>
     </div>
 
-    <!-- This should only appear if user has access to SR -->
+    {# This should only appear if user has access to SR #}
+    {% set intervention = interventions.sexual_recovery %}
+    {% if intervention.user_has_access(user) %}
     <div id="showUM" class="portal-box">
         <h4>Sexual Recovery</h4>
         <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
         <a class="btn feature-btn-primary" href="">Go to SR</a>
     </div>
-
+    {% endif %}
     <div id="moreContent">
         <h4>The TrueNTH Experience</h4>
         <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
         <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
     </div>
 
+
 </div>
 
+{% endblock %}
+
+{% block document_ready %}
+$(document).ready(function(){
+
+    $.ajax ({
+        type: "GET",
+        url: '/api/demographics'
+    }).done(function(data) {
+        console.log(data)
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    })
+
+    // GET and PUT user roles
+    $.ajax ({
+        type: "GET",
+        url: '/api/user/{{ user.id }}/roles'
+    }).done(function(data) {
+        console.log(data)
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    })
+
+})
 {% endblock %}
