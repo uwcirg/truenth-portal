@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block main %}
-{% from "flask_user/_macros.html" import render_field, back_btn %}
+{% from "flask_user/_macros.html" import render_field, render_checkbox_field, back_btn %}
 
 <div class="portal-well well">
 
@@ -26,21 +26,25 @@
 
         {{ render_field(form.application_role, tabindex=5) }}
 
-        {{ render_field(form.application_origins, tabindex=10) }}
+        {{ render_field(form.application_origins, tabindex=10,
+        helpText="The Application URL may contain one or more origins separated by a single space. Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.") }}
 
-        {{ render_field(form.callback_url, tabindex=20) }}
+        {{ render_field(form.callback_url, tabindex=20,
+        helpText="Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined." ) }}
 
         {% if form.intervention_or_default.name != 'default' %}
-            {{ render_field(form.intervention_or_default.card_url, tabindex=30) }}
+            {{ render_field(form.intervention_or_default.card_url, tabindex=30 ) }}
 
-            {{ render_field(form.intervention_or_default.card_html, tabindex=40) }}
+            {{ render_field(form.intervention_or_default.card_html, tabindex=40 ) }}
 
-            {{ render_field(form.intervention_or_default.public_access, tabindex=50) }}
+            {{ render_checkbox_field(form.intervention_or_default.public_access, tabindex=50, helpText="Turn off <b>Public Access</b> to control access to the application on a per user basis.  Only available for interventions assigned an offical application role.  If unchecked, a row for every user needing access must be added via the <b>interventions API</b>.") }}
         {% endif %}
 
-        <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;
-        <button id="confirmDel" type="button" class="btn btn-tnth-primary" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
-        <button type="submit" name="service_token" value="service_token" class="btn btn-tnth-primary">
+        <br />
+
+        <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
+        <button type="submit" name="service_token" value="service_token" class="btn btn-default">
         {% if service_token %}
             Update Service Token
         {% else %}
@@ -62,22 +66,7 @@
     </dd>
     {% endmacro %}
 
-    <br />
-    <p><strong>Application URL</strong><br />
-        The Application URL may contain one or more origins separated by a single space.  Required to include the origin of the client's OAuth authorization redirect_uri and CORS origin values for any in-browser API requests.
-    </p>
-    <p><strong>Callback URL</strong><br />
-        Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined.
-    </p>
-    <p><strong>Service Token</strong><br />
-        Use a Service Token to make authenticated, automated service calls.  This token can then be used in the <i>Authorization</i> request header in the form <b>Bearer &lt;token-value&gt;</b>, as per the OAuth2 protocol.  This token should be carefully guarded on a secure system and only transmitted via HTTPS.  Valid for 12 months.
-    </p>
-    <p><strong>Public Access</strong><br />
-    Turn off <b>Public Access</b> to control access to the application on a per
-    user basis.  Only available for interventions assigned an offical
-    application role.  If unchecked, a row for every user needing access must
-    be added via the <b>interventions API</b>.
-    </p>
+    <br /><br />
 
 </div>
 

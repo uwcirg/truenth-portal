@@ -35,16 +35,6 @@ $(document).ready(function(){
 
     $.ajax ({
         type: "GET",
-        url: '/api/demographics'
-    }).done(function(data) {
-        console.log(data)
-    }).fail(function() {
-        console.log("Problem retrieving data from server.")
-    })
-
-    // GET and PUT user roles
-    $.ajax ({
-        type: "GET",
         url: '/api/user/{{ user.id }}/roles'
     }).done(function(data) {
         console.log(data)
