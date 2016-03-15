@@ -1,0 +1,457 @@
+/* TrueNTH Shared services portal CSS
+ * Uses Bootstrap framework
+ */
+body {
+  margin: 0;
+  background-color: #FFF;
+  font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
+  color: #333;
+}
+a {
+  color: #497856;
+}
+a:hover,
+a:active {
+  color: #2a4531;
+}
+.portal-container {
+  background-image: url('../img/bg_canoe_opaque.jpg');
+  background-size: cover;
+  background-position: center top;
+}
+.tnth-headline {
+  margin-top: 0;
+}
+.feature-btn {
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  border: 2px solid #ccc;
+}
+.feature-btn-primary {
+  background-color: #fff;
+  color: #333;
+}
+.feature-btn-primary:hover,
+.feature-btn-primary:active {
+  color: #fff;
+  background-color: #000;
+}
+.feature-btn-secondary {
+  color: #fff;
+}
+.feature-btn-secondary:hover,
+.feature-btn-secondary:active {
+  color: #fff;
+  background-color: #000;
+}
+.feature-container {
+  position: relative;
+  margin: 0 -15px;
+}
+.feature-container > img {
+  width: 100%;
+  max-height: 1000px;
+}
+.feature-box {
+  position: absolute;
+  top: 5%;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  color: #fff;
+  padding: 0 0.5em;
+}
+.feature-box .logo img {
+  width: 140px;
+  margin-bottom: 60px;
+}
+.feature-box .headline {
+  font-size: 20px;
+  line-height: 1.1;
+}
+.feature-box .feature-btn-primary {
+  margin-top: 0.5em;
+  font-size: 18px;
+  font-weight: bold;
+  padding: 6px 24px;
+}
+.feature-box .feature-bottom {
+  margin-top: 5em;
+}
+.feature-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  color: #fff;
+  margin-bottom: 10px;
+}
+#homeFooter {
+  overflow: auto;
+  padding: 1em 0;
+  line-height: 1.2;
+}
+.portal-well {
+  margin: 1em 0 2em;
+  background-color: #fff;
+  background: #ffffff;
+  /* Fall-back for browsers that don't support rgba */
+  background: rgba(255, 255, 255, 0.8);
+}
+.portal-well form label {
+  font-weight: normal;
+}
+.btn-tnth-primary {
+  color: #fff;
+  background-color: #3d6548;
+  border-color: #33553d;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+}
+.btn-tnth-primary:hover,
+.btn-tnth-primary:focus,
+.btn-tnth-primary.active,
+.open > .dropdown-toggle.btn-tnth-primary {
+  color: #fff;
+  background-color: #2a4531;
+  border-color: #1c2f21;
+}
+.btn-tnth-back {
+  color: #777;
+  margin: -1em 0 1em -6px;
+}
+.mo-text-seperator-vertical {
+  height: 100%;
+  margin: 0 2em;
+}
+.mo-text-seperator-horizontal,
+.mo-text-seperator-vertical {
+  position: relative;
+  text-transform: uppercase;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  display: block;
+  padding: 0;
+}
+.mo-text-seperator-vertical:before {
+  left: 50%;
+  margin-left: -1px;
+  height: 100%;
+  border-width: 0 0 0 1px;
+}
+.mo-text-seperator-horizontal:before,
+.mo-text-seperator-vertical:before {
+  content: '';
+  display: block;
+  position: absolute;
+  border-style: solid;
+  border-color: #C4C6C7;
+}
+.mo-text-seperator-vertical > span {
+  height: 3em;
+  line-height: 3em;
+  width: 4em;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -1.5em;
+  margin-left: -2em;
+}
+.mo-text-seperator-horizontal > span,
+.mo-text-seperator-vertical > span {
+  background: #FFF;
+  display: inline-block;
+}
+/** Responsive sizes **/
+@media (max-width: 480px) {
+  .feature-box {
+    top: 4%;
+  }
+  .feature-box .logo img {
+    width: 120px;
+    margin-bottom: 60px;
+  }
+  .feature-bottom {
+    position: inherit;
+    padding: 10px 0;
+    background-color: #000;
+  }
+  .feature-bottom .feature-btn-secondary:hover,
+  .feature-bottom .feature-btn-secondary:active {
+    color: #000;
+    background-color: #fff;
+  }
+  #footerLockup {
+    max-height: 80px;
+  }
+}
+/** styles specific to profile **/
+#saveMsg {
+  margin: 1em 0;
+  display: inline-block;
+}
+.loading-indicator {
+  display: none;
+  position: absolute;
+  top: 200px;
+  left: 48%;
+  margin-left: -50px;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  z-index: 99999;
+  color: #444;
+}
+.loading {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=40);
+  -moz-opacity: 0.4;
+  -khtml-opacity: 0.4;
+  opacity: 0.4;
+}
+/** Responsive sizes **/
+@media (max-width: 380px) {
+  .feature-box .logo img {
+    margin-bottom: 20px;
+  }
+  .portal-well {
+    margin: 1em -15px 1em;
+    border-radius: 0;
+  }
+}
+@media (min-width: 768px) {
+  .feature-box {
+    top: 7%;
+    padding: 0 1em;
+  }
+  .feature-box .logo img {
+    width: 200px;
+    margin-bottom: 140px;
+  }
+  .feature-box .headline {
+    font-weight: bold;
+    font-size: 32px;
+  }
+  .feature-box .feature-btn-primary {
+    margin-top: 1em;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 6px 24px;
+  }
+  .feature-btn-secondary {
+    font-size: 18px;
+  }
+  .feature-bottom {
+    margin-bottom: 40px;
+  }
+  #saveMsg {
+    margin-left: 1em;
+  }
+}
+@media (min-width: 992px) {
+  .portal-well {
+    min-height: 300px;
+  }
+}
+@media (min-width: 1200px) {
+  .portal-well {
+    min-height: 400px;
+  }
+}
+/*** https://github.com/lipis/bootstrap-social ***/
+.btn-social {
+  position: relative;
+  padding-left: 44px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-social > :first-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  line-height: 34px;
+  font-size: 1.6em;
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.btn-social.btn-lg {
+  padding-left: 61px;
+}
+.btn-social.btn-lg > :first-child {
+  line-height: 45px;
+  width: 45px;
+  font-size: 1.8em;
+}
+.btn-social.btn-sm {
+  padding-left: 38px;
+}
+.btn-social.btn-sm > :first-child {
+  line-height: 28px;
+  width: 28px;
+  font-size: 1.4em;
+}
+.btn-social.btn-xs {
+  padding-left: 30px;
+}
+.btn-social.btn-xs > :first-child {
+  line-height: 20px;
+  width: 20px;
+  font-size: 1.2em;
+}
+.btn-social-icon {
+  position: relative;
+  padding-left: 44px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 34px;
+  width: 34px;
+  padding: 0;
+}
+.btn-social-icon > :first-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 32px;
+  line-height: 34px;
+  font-size: 1.6em;
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.btn-social-icon.btn-lg {
+  padding-left: 61px;
+}
+.btn-social-icon.btn-lg > :first-child {
+  line-height: 45px;
+  width: 45px;
+  font-size: 1.8em;
+}
+.btn-social-icon.btn-sm {
+  padding-left: 38px;
+}
+.btn-social-icon.btn-sm > :first-child {
+  line-height: 28px;
+  width: 28px;
+  font-size: 1.4em;
+}
+.btn-social-icon.btn-xs {
+  padding-left: 30px;
+}
+.btn-social-icon.btn-xs > :first-child {
+  line-height: 20px;
+  width: 20px;
+  font-size: 1.2em;
+}
+.btn-social-icon > :first-child {
+  border: none;
+  text-align: center;
+  width: 100% !important;
+}
+.btn-social-icon.btn-lg {
+  height: 45px;
+  width: 45px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-social-icon.btn-sm {
+  height: 30px;
+  width: 30px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-social-icon.btn-xs {
+  height: 22px;
+  width: 22px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn-facebook {
+  color: #fff;
+  background-color: #3b5998;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-facebook:hover,
+.btn-facebook:focus,
+.btn-facebook:active,
+.btn-facebook.active,
+.open > .dropdown-toggle.btn-facebook {
+  color: #fff;
+  background-color: #2d4373;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-facebook:active,
+.btn-facebook.active,
+.open > .dropdown-toggle.btn-facebook {
+  background-image: none;
+}
+.btn-facebook.disabled,
+.btn-facebook[disabled],
+fieldset[disabled] .btn-facebook,
+.btn-facebook.disabled:hover,
+.btn-facebook[disabled]:hover,
+fieldset[disabled] .btn-facebook:hover,
+.btn-facebook.disabled:focus,
+.btn-facebook[disabled]:focus,
+fieldset[disabled] .btn-facebook:focus,
+.btn-facebook.disabled:active,
+.btn-facebook[disabled]:active,
+fieldset[disabled] .btn-facebook:active,
+.btn-facebook.disabled.active,
+.btn-facebook[disabled].active,
+fieldset[disabled] .btn-facebook.active {
+  background-color: #3b5998;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-facebook .badge {
+  color: #3b5998;
+  background-color: #fff;
+}
+.btn-google {
+  color: #fff;
+  background-color: #dd4b39;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-google:hover,
+.btn-google:focus,
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  color: #fff;
+  background-color: #c23321;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-google:active,
+.btn-google.active,
+.open > .dropdown-toggle.btn-google {
+  background-image: none;
+}
+.btn-google.disabled,
+.btn-google[disabled],
+fieldset[disabled] .btn-google,
+.btn-google.disabled:hover,
+.btn-google[disabled]:hover,
+fieldset[disabled] .btn-google:hover,
+.btn-google.disabled:focus,
+.btn-google[disabled]:focus,
+fieldset[disabled] .btn-google:focus,
+.btn-google.disabled:active,
+.btn-google[disabled]:active,
+fieldset[disabled] .btn-google:active,
+.btn-google.disabled.active,
+.btn-google[disabled].active,
+fieldset[disabled] .btn-google.active {
+  background-color: #dd4b39;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+.btn-google .badge {
+  color: #dd4b39;
+  background-color: #fff;
+}

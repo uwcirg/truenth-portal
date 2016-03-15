@@ -3,101 +3,73 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, render_submit_field %}
 
-                <div class="well">
-                    <h3 class="tnth-headline">TrueNTH</h3>
-                    <ul>
-                        <li style="margin-bottom: 0.25em; font-size: 15px">is a revolutionary new program, funded by the Movember Foundation, that will significantly <strong>improve the physical and mental health of men</strong> diagnosed and living with prostate cancer.</li>
-                        <li style="margin-bottom: 0.25em; font-size: 15px">helps men and their families <strong>get their lives back on track</strong> following diagnosis and treatment.</li>
-                        <li style="font-size: 15px">helps you <strong>feel knowledgeable and confident</strong> on your journey.</li>
-                    </ul>
+<div class="well portal-well">
 
-                    <h4 class="sign-in">Sign in with:</h4>
+    <h3 class="tnth-headline">Log In to TrueNTH</h3>
 
-                    <div class="row">
-                        <div class="col-sm-4 col-md-3">
-                            <a href="{{ url_for('auth.login', provider_name='facebook') }}"
-                                class="btn btn-block btn-social btn-facebook">
-                                <i class="fa fa-facebook"></i>
-                                Facebook
-                            </a><br />
-                        </div>
-                        <div class="col-sm-4 col-md-3">
-                            <a href="{{ url_for('auth.login', provider_name='google') }}"
-                                class="btn btn-block btn-social btn-google">
-                                <i class="fa fa-google"></i>
-                                Google
-                            </a><br />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-8 col-md-6 text-center">
-                            <div class="or-holder"><div class="or-divider">or</div></div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-12 col-sm-6">
-                            <h4>Sign in with TrueNTH:</h4>
+    <div class="row">
 
-<form action="" method="POST" class="form" role="form">
-    {{ form.hidden_tag() }}
+        <div class="col-md-5">
 
-    {# Username or Email field #}
-    {% set field = form.username if user_manager.enable_username else form.email %}
-    <div class="form-group {% if field.errors %}has-error{% endif %}">
-        {# Label on left, "New here? Register." on right #}
-        <div class="row">
-            <div class="col-xs-6">
-                <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
-            </div>
-            <div class="col-xs-6 text-right">
-                {% if user_manager.enable_register and not user_manager.require_invitation %}
-                    <a href="{{ url_for('user.register') }}" tabindex='190'>
-                        {%trans%}New here? Register.{%endtrans%}</a>
-                {% endif %}
-            </div>
+            <p>Welcome back to TrueNTH.</p>
+
+            <p>Are you new to TrueNTH?
+                <a href="/user/register">
+                    Create a new account...</a></p>
+
+
         </div>
-        {{ field(class_='form-control', tabindex=110) }}
-        {% if field.errors %}
-            {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
+        <div class="col-md-7">
 
-    {# Password field #}
-    {% set field = form.password %}
-    <div class="form-group {% if field.errors %}has-error{% endif %}">
-        {# Label on left, "Forgot your Password?" on right #}
-        <div class="row">
-            <div class="col-xs-6">
-                <label for="{{ field.id }}" class="control-label">{{ field.label.text }}</label>
+            <p>Log in with:</p>
+
+            <div style="margin: 1em 0 1em 1em">
+                <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+                   class="btn btn-social btn-facebook">
+                    <i class="fa fa-facebook"></i> Facebook
+                </a><br /><br />
+                <a href="{{ url_for('auth.login', provider_name='google') }}"
+                   class="btn btn-social btn-google">
+                    <i class="fa fa-google"></i> Google
+                </a><br />
             </div>
-            <div class="col-xs-6 text-right">
-                {% if user_manager.enable_forgot_password %}
-                    <a href="{{ url_for('user.forgot_password') }}" tabindex='195'>
-                        {%trans%}Forgot your Password?{%endtrans%}</a>
-                {% endif %}
-            </div>
-        </div>
-        {{ field(class_='form-control', tabindex=120) }}
-        {% if field.errors %}
-            {% for e in field.errors %}
-                <p class="help-block">{{ e }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
 
-    {# Remember me #}
-    {% if user_manager.enable_remember_me %}
-    {{ render_checkbox_field(login_form.remember_me, tabindex=130) }}
-    {% endif %}
+            <p>Or a TrueNTH account:</p>
 
-    {# Submit button #}
-    {{ render_submit_field(form.submit, tabindex=180) }}
-</form>
+            <form action="" method="POST" class="form" role="form" style="margin-left: 1em">
+                {{ form.hidden_tag() }}
 
-                        </div>
+                {# Username or Email field #}
+                {% set field = form.username if user_manager.enable_username else form.email %}
+                {{ render_field(form.username, label="Username or email address", label_visible=false, tabindex=10) }}
+
+                {# Password field #}
+                {% set field = form.password %}
+                {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
+
+                <div class="row">
+                    <div class="col-xs-6">
+                        {# Remember me #}
+                        {% if user_manager.enable_remember_me %}
+                        {{ render_checkbox_field(login_form.remember_me, tabindex=130) }}
+                        {% endif %}
                     </div>
+                    {% if user_manager.enable_forgot_password %}
+                    <div class="col-xs-6">
+                        <a href="{{ url_for('user.forgot_password') }}" style="margin-top: 10px" class="pull-right">
+                            {%trans%}Forgot your Password?{%endtrans%}</a>
+                    </div>
+                    {% endif %}
                 </div>
+
+                {# Submit button #}
+                {{ render_submit_field(form.submit, tabindex=180) }}
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

@@ -129,6 +129,10 @@ def termsofuse():
     """terms of use view function"""
     return render_template('termsofuse.html')
 
+@portal.route('/about')
+def about():
+    """main TrueNTH about page"""
+    return render_template('about.html')
 
 @portal.route('/questions')
 def questions():

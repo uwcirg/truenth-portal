@@ -24,7 +24,7 @@
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthLogo">
-            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_truenth_alt3.png') }}" /></a>
+            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav.png') }}" /></a>
         </div>
         <div id="tnthTopLinks">
             <div class="tnth-btn-group">
@@ -66,7 +66,7 @@
                 <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not username %}tnth-navbar-no-profile{% endif %}">
                     MENU <img src="{{movember_profile}}" width="45px" height="45px" />
                 </div>
-                <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_truenth_alt3.png')}}" /></a>
+                <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
             </div>
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
@@ -74,8 +74,7 @@
                     {% if username %}
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     {% endif %}
-                    <li><a href="http://truenth.org" target="_blank">About</a></li>
-                    <li class="tnth-disabled"><a href="#">Help</a></li>
+                    <li><a href="http://truenth.org">About</a></li>
                     {% if user and user.has_roles('application_developer') %}
                     <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
                     {% endif %}

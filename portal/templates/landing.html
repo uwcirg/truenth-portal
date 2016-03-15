@@ -1,119 +1,24 @@
 {% extends "layout.html" %}
 {% block main %}
+<style>
+    #tnthNavWrapper {
+        display: none;
+    }
+    #mainDiv {
+        background: none;
+    }
+</style>
 
-<div class="well">
-
-    <div class="pull-right" style="margin: 0 0 2em 2em">
-        <p>{{ session.display_html|safe }}</p>
-        <!--<p><strong>Join TrueNTH now</strong></p>
-        <a href='/user/sign-in'
-           class="btn btn-block btn-lg btn-tnth-primary">
-            Register for TrueNTH
-        </a>
-        <br />-->
-        <p><strong>Already have an account?</strong></p>
-        <a href='/user/sign-in'
-           class="btn btn-block btn-tnth-primary">
-            Sign In
-        </a>
-        <!--<br />
-        <p><strong>text</strong></p>
-        <a href='/user/sign-in'
-           class="btn btn-block btn-lg btn-tnth-primary">
-            Explore with registering
-        </a>-->
+<div class="feature-container" id="featureContainer">
+    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive img-back" />
+    <div class="feature-box">
+        <div class="logo"><img src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></div>
+        <div class="headline">Online tools for navigating the prostate cancer journey.</div>
+        <a href="/user/register" class="btn feature-btn feature-btn-primary">Sign Up</a>
     </div>
-
-    <h3 class="tnth-headline">The TrueNTH Initiative</h3>
-
-    <p><em>[ Brief text here supplied by TrueNTH USA describing the initiative ]</em> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lobortis vehicula nisl fringilla faucibus. Vestibulum placerat iaculis arcu, ac pulvinar urna rhoncus quis.</p>
-
-    <p class="lead" style="margin-bottom: 0">The TrueNTH website is here to help you</p>
-    <p><em>[ Brief description of site features ]</em> Integer sed ante vitae turpis rutrum lacinia. Vivamus volutpat dignissim vestibulum. Nulla cursus nulla id massa ultricies dapibus. Cras malesuada enim quis turpis sollicitudin, nec cursus magna pretium.</p>
-
-    <!--
-    <ul>
-        <li style="margin-bottom: 0.25em; font-size: 15px">is a revolutionary new program, funded by the Movember Foundation, that will significantly <strong>improve the physical and mental health of men</strong> diagnosed and living with prostate cancer.</li>
-        <li style="margin-bottom: 0.25em; font-size: 15px">helps men and their families <strong>get their lives back on track</strong> following diagnosis and treatment.</li>
-        <li style="font-size: 15px">helps you <strong>feel knowledgeable and confident</strong> on your journey.</li>
-    </ul>
-    -->
-    <!--<ul>-->
-        <!--<li style="margin-bottom: 0.25em; font-size: 15px">About the TrueNTH initiative...</li>-->
-        <!--<li style="font-size: 15px">About the TrueNTH website</li>-->
-    <!--</ul>-->
-    <div id="chooseSignIn">
-
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-sm-4 col-md-3">
-                        <img src="{{ url_for('static', filename='img/man1.jpg') }}" style="max-width: 100%"/>
-                    </div>
-                    <div class="col-sm-8 col-md-9">
-                        <p class="lead">Already registered for TrueNTH?</p>
-                        <a href='/user/sign-in'
-                           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                            Sign in now
-                        </a>
-                    </div>
-                </div>
-                <hr />
-                <div class="row">
-                    <div class="col-sm-4 col-md-3">
-                        <img src="{{ url_for('static', filename='img/man2.jpg') }}" style="max-width: 100%"/>
-                    </div>
-                    <div class="col-sm-8 col-md-9">
-                        <p class="lead">New to TrueNTH?</p>
-                        <a href='/user/sign-in'
-                           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                            Register for TrueNTH<br />
-                            <small>You can save your information for future visits.</small>
-                        </a>
-                    </div>
-                </div>
-                <hr />
-                <div class="row">
-                    <div class="col-sm-4 col-md-3">
-                        <img src="{{ url_for('static', filename='img/man3.jpg') }}" style="max-width: 100%"/>
-                    </div>
-                    <div class="col-sm-8 col-md-9">
-                        <p class="lead">Just want to browse?</p>
-                        <a href='/questions'
-                           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-                            Explore TrueNTH without registering<br />
-                            <small>You can register and save information later.</small>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--
-        <a href='/questions'
-           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-            Tell Us About Your Situation Without Registering<br />
-            <small>So we can guide you to the best information.</small>
-        </a>
-        <div class="text-center">
-            <div class="or-holder"><div class="or-divider">or</div></div>
-        </div>
-        <a href='/questions_anon'
-           class="btn btn-block btn-tnth-primary btn-lg" style="white-space: normal">
-            Explore On Your Own Without Registering<br />
-            <small>Use this site without telling us about yourself. You'll see general information about prostate cancer.</small>
-        </a>
-        -->
-
-
-
-        <br /><br />
-        <p><strong>Our Privacy Policy</strong><br />
-        Unless you choose to register as a user during this session, we will not keep any personal information about your visit.  We will record that an anonymous user explored the TrueNTH website, and note the time and activities of your visit. <a href='/terms-of-use'>See our privacy policy here</a>.
-        </p>
-        <br />
-
+    <div class="feature-bottom">
+        <a href="" class="btn feature-btn feature-btn-secondary">Explore</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-secondary">Log In</a>
     </div>
-
 </div>
 
 {% endblock %}

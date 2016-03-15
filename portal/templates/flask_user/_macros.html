@@ -4,7 +4,7 @@
             {% if not label %}{% set label=field.label.text %}{% endif %}
             <label for="{{ field.id }}" class="control-label">{{ label|safe }}</label>
         {% endif %}
-        {{ field(class_='form-control', **kwargs) }}
+        {{ field(class_='form-control', placeholder=label, **kwargs) }}
         {% if field.errors %}
             {% for e in field.errors %}
                 <p class="help-block">{{ e }}</p>
@@ -72,5 +72,28 @@
     {% endif %}
     {% endif %}
 
+</div>
+{%- endmacro %}
+
+{% macro footer() -%}
+<div id="homeFooter">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <p><a href="{{PORTAL}}/about">About TrueNTH</a></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <p style="margin-top: 4px" class="text-muted"><small>PRIVACY POLICY Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
+            </div>
+            <div class="col-sm-6">
+                <div class="pull-right">
+                    <a href="http://us.movember.com" title="Movember"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 {%- endmacro %}

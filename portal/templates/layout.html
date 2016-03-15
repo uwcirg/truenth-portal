@@ -11,7 +11,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portal.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
     <script src="https://code.jquery.com/jquery-1.12.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -22,7 +22,7 @@
     <!-- topNav loads here -->
     <div id="mainNav">
     </div>
-    <div id="main-div" class="with-margins">
+    <div id="mainDiv">
     {# One-time system messages called Flash messages #}
     {% block flash_messages %}
         {%- with messages = get_flashed_messages(with_categories=true) -%}
@@ -37,54 +37,24 @@
         {%- endwith %}
     {% endblock %}
 
-        <div class="container">
-            <div class="row">
-
-                <!--
-                {% if current_user.roles %}
-                <div class="col-sm-3 hidden-xs">
-
-                    <div class="list-group tnth-nav-list">
-                        <a class="list-group-item" href="{{PORTAL}}/">Home</a>
-                        <a class="list-group-item" href="{{PORTAL}}/profile">My TrueNTH Profile</a>
-                        <a class="list-group-item" href="{{PORTAL}}/invite">Send an Invite</a>
-                        <a class="list-group-item" href="#">TrueBLOG</a>
-                        <a class="list-group-item" href="http://www.movember.com">Movember.com</a>
-                    </div>
-
-                    <br />
-
-                    {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
-                    <div class="list-group tnth-nav-list">
-                        {% if current_user.has_roles('admin') %}
-                        <a class="list-group-item" href="{{PORTAL}}/admin">User Administration</a>
-                        {% endif %}
-                        {% if current_user.has_roles('application_developer') %}
-                        <a class="list-group-item" href="{{PORTAL}}/clients">Client Applications</a>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                </div>
-                {% endif %}
-
-                <!--
-                {% if current_user.roles %}
-                                <div class="col-sm-9">
-                                {% else %}
-                                <div class="col-xs-12">
-                                {% endif %}
-                                -->
-
-
-                <div class="col-xs-12">
-
-                    {% block main %}
-                    {% endblock %}
-
-            </div>
+    {% if request.path=="/" %} <div class="container-fluid">
+    {% else %} <div class="portal-container"><div class="container">
+    {% endif %}
+    <div class="row">
+        <div class="col-xs-12">
+            {% block main %}
+            {% endblock %}
         </div>
-    </div> <!-- <div id="main-div" class="with-margins"> -->
+    </div>
+
+    {% if request.path=="/" %} </div>
+    {% else %} </div></div>
+    {% endif %}
+
+    {% from "flask_user/_macros.html" import footer %}
+    {{ footer() }}
+
+    </div> <!-- <div id="main-div"> -->
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
