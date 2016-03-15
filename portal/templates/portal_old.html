@@ -1,0 +1,275 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import left_nav %}
+<div class="hide-initial" id="allContent">
+    <div class="row">
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.decision_support_p3p %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Decision Support</h3>
+                <div class="int-sub">Which option is best for me?</div>
+                <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.self_management %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Self Management</h3>
+                <div class="int-sub">How do I cope with my symptoms?</div>
+                <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
+                <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.care_plan %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Care Plan</h3>
+                <div class="int-sub">How do I move forward after treatment?</div>
+                <p>You’ve been treated for prostate cancer, so what’s next? Develop a customized survivorship plan, to help remind you of your health needs as you move back to the care of your regular doctor.</p>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.community_of_wellness %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Community of Wellness</h3>
+                <div class="int-sub">How can I be healthy?</div>
+                <p>Health covers a broad range of topics, including exercise, diet, friends and social environments. Learn how to improve your overall health as you progress through your treatment.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }}<i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.sexual_recovery %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Sexual Recovery</h3>
+                <div class="int-sub">What about sex?</div>
+                <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }}<i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="well lead-well int-cards">
+                {% set intervention = interventions.social_support %}
+                {% if intervention.user_has_access(user) %}
+                <h3>Social Support Network</h3>
+                <div class="int-sub">Who can I talk with?</div>
+                <p>Find out how to connect with others who've experienced what you're going through. Building a strong support network leads to better outcomes.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="hide-initial" id="conditionalContent">
+
+    <div class="well">
+        <h3 class="tnth-headline">TrueNTH</h3>
+        <p data-ans-count="0" class="hide-initial">You have told us that you have not yet had a prostate cancer biopsy. You can browse through our information on prostate cancer:</p>
+        <p data-ans-count="1" class="hide-initial">You have told us that you do not yet know if you have prostate cancer, or you have been told you do not have prostate cancer.  You may wish to look at the options below:</p>
+        <p data-ans-count="2" class="hide-initial">You have told us that you have been diagnosed but have not yet started treatment. Would you like to:</p>
+        <p data-ans-count="3" class="hide-initial">You have told us that you have already begun treatment. Would you like to:</p>
+
+        <div class="row">
+            <div class="col-sm-12 col-md-6 hide-initial" id="p3p">
+                <div class="int-cards lead-well">
+                    {% set intervention = interventions.decision_support_p3p %}
+                    {% if intervention.user_has_access(user) %}
+                    <h3>Decision Support</h3>
+                    <div class="int-sub">Which option is best for me?</div>
+                    <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+                    <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6 hide-initial" id="sm">
+                <div class="int-cards lead-well">
+                    {% set intervention = interventions.self_management %}
+                    {% if intervention.user_has_access(user) %}
+                    <h3>Self Management</h3>
+                    <div class="int-sub">How do I cope with my symptoms?</div>
+                    <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
+                    <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-sm-12 col-md-6" id="infoPage">
+                <div class="int-cards lead-well">
+                    <h3>Information Page</h3>
+                    <div class="int-sub">Links and whatnot</div>
+                    <p>Generic links would either be here or be listed on a sub-page.</p>
+                    <a href="#" class="btn btn-primary btn-tnth-primary">Info Page <i class="fa fa-chevron-right"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12 other-interventions">
+
+                <h3>Other Interventions</h3>
+                <p><small>For demo use</small></p>
+
+                <div class="hide-initial" id="otherP3p">
+                    {% set intervention = interventions.decision_support_p3p %}
+                    {% if intervention.user_has_access(user) %}
+                    <h4>Decision Support</h4>
+                    <div class="int-sub">Which option is best for me?</div>
+                    <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+                    <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                    {% endif %}
+                </div>
+
+                <div class="hide-initial" id="otherSm">
+                    {% set intervention = interventions.self_management %}
+                    {% if intervention.user_has_access(user) %}
+                    <h4>Self Management</h4>
+                    <div class="int-sub">How do I cope with my symptoms?</div>
+                    <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated with prostate cancer.  Learn strategies to address those symptoms, specifically for men like you.</p>
+                    <p><a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a></p>
+                    {% endif %}
+                </div>
+
+                {% set intervention = interventions.care_plan %}
+                {% if intervention.user_has_access(user) %}
+                <h4>Care Plan</h4>
+                <div class="int-sub">How do I move forward after treatment?</div>
+                <p>You’ve been treated for prostate cancer, so what’s next? Develop a customized survivorship plan, to help remind you of your health needs as you move back to the care of your regular doctor.</p>
+                <a href="{{ intervention.card_url }}" class="btn btn-primary btn-tnth-primary">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></a>
+                {% endif %}
+
+                {% set intervention = interventions.community_of_wellness %}
+                {% if intervention.user_has_access(user) %}
+                <h4>Community of Wellness</h4>
+                <div class="int-sub">How can I be healthy?</div>
+                <p>Health covers a broad range of topics, including exercise, diet, friends and social environments. Learn how to improve your overall health as you progress through your treatment.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+
+                {% set intervention = interventions.sexual_recovery %}
+                {% if intervention.user_has_access(user) %}
+                <h4>Sexual Recovery</h4>
+                <div class="int-sub">What about sex?</div>
+                <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+
+                {% set intervention = interventions.social_support %}
+                {% if intervention.user_has_access(user) %}
+                <h4>Social Support Network</h4>
+                <div class="int-sub">Who can I talk with?</div>
+                <p>Find out how to connect with others who've experienced what you're going through. Building a strong support network leads to better outcomes.</p>
+                <p><button  data-toggle="popover" title="Not Yet Available" data-content="This intervention is not available in the demo." class="btn btn-tnth-primary demo-disabled">{{ intervention.card_html }} <i class="fa fa-chevron-right"></i></button></p>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function(){
+
+        var getQs = [ "biopsy", "pca_diag", "tx"];
+        var ansYes = 0;
+        var ansNo = 0;
+
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/{{ user.id }}/clinical'
+        }).done(function(data) {
+            $.each(data.entry, function(i,val){
+                if (val.content.valueQuantity.value == "true") {
+                    ansYes++
+                    $("#conditionalContent").show()
+                } else if (data.value == "false") {
+                    ansNo++
+                    $("#conditionalContent").show()
+                }
+            })
+            if (ansYes > 2) {
+                // If yes to all 3, then display self-mgmt
+                $("#sm").show()
+                $("#otherP3p").show()
+            } else if (ansYes > 0) {
+                // If yes is 1 or 2, then display p3p
+                $("#p3p").show()
+                $("#otherSm").show()
+            } else {
+                if (ansNo == 0) {
+                    // If all answers are unknown then display the old-school allContent
+                    $("#allContent").show()
+                } else if (ansNo == 3) {
+                    $("#otherP3p").show()
+                    $("#otherSm").show()
+                }
+            }
+            $("p[data-ans-count='"+ansYes+"']").show()
+            equalHeightBoxes("lead-well")
+        })
+
+
+        /**
+         $.each(getQs, function(i,val){
+
+            $.ajax ({
+                type: "GET",
+                url: '/api/patient/{{ user.id }}/clinical/'+val
+            }).done(function(data) {
+                console.log(i)
+                console.log(data)
+                // Temporary way of determining what to display based on question answers
+                if (data.value == "true") {
+                    ansYes++;
+                    $("#conditionalContent").show()
+                } else if (data.value == "false") {
+                    ansNo++;
+                    $("#conditionalContent").show()
+                }
+                // If last question, then decide what to display
+                if (i === 2) {
+                    console.log("count is:" +ansYes)
+                    //checkAnswers(ansYes)
+                    // If yes to more than 2, then display self management
+                    if (ansYes > 2) {
+                        $("#sm").show();
+                        $("#otherP3p").show();
+                    } else if (ansYes > 0) {
+                        // If yes is 1 or 2, then display p3p
+                        $("#p3p").show();
+                        $("#otherSm").show();
+                    } else {
+                        if (ansNo == 0) {
+                            // If all answers are unknown then display the old-school allContent
+                            $("#allContent").show();
+                        } else if (ansNo == 3) {
+                            $("#otherP3p").show();
+                            $("#otherSm").show();
+                        }
+                    }
+                    $("p[data-ans-count='"+ansYes+"']").show();
+                    equalHeightBoxes("lead-well");
+                }
+            }).fail(function() {
+                console.log("Problem retrieving data from server.")
+            });
+        })
+         **/
+    });
+</script>
+{% endblock %}
