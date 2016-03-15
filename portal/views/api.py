@@ -1600,6 +1600,9 @@ def assessment_set(patient_id):
     if not hasattr(request, 'json') or not request.json:
         return abort(400, 'Invalid request')
 
+    # Verify the current user has permission to edit given patient
+    current_user().check_role(permission='edit', other_id=patient_id)
+
     swag = swagger(current_app)
 
     draft4_schema = {
@@ -1636,7 +1639,7 @@ def assessment_set(patient_id):
     })
 
     questionnaire_response = QuestionnaireResponse(
-        user_id=current_user().id,
+        user_id=patient_id,
         document=request.json,
     )
 
