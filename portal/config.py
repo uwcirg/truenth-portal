@@ -27,7 +27,7 @@ class BaseConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
     TESTING = False
-    USER_APP_NAME = 'TrueNTH Central Services'  # used by email templates
+    USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
 
