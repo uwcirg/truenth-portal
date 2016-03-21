@@ -19,6 +19,14 @@
         <a class="btn feature-btn-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}
     {% endif %}
 
+    {% set intervention = interventions.decision_support_p3p %}
+    {% if intervention.user_has_access(user) %}
+    <div id="showUM" class="portal-box">
+        <h4>Decision Support (P3P)</h4>
+        <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+        <a class="btn feature-btn-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}
+    {% endif %}
+
     <div id="moreContent">
         <h4>The TrueNTH Experience</h4>
         <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
