@@ -137,7 +137,7 @@ def login(provider_name):
         if provider_name == 'facebook':
             # Additional request needed for FB profile image
             url = '?'.join(("https://graph.facebook.com/{0}/picture",
-                "redirect=false")).format(result.user.id)
+                "redirect=false&width=160")).format(result.user.id)
             response = result.provider.access(url)
             if response.status == 200:
                 image_url = response.data['data']['url']
