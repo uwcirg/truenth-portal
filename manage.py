@@ -9,6 +9,7 @@ from flask.ext.migrate import Migrate, MigrateCommand
 from portal.app import create_app
 from portal.config import ConfigServer
 from portal.extensions import db
+from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
@@ -32,9 +33,11 @@ def initdb():
 @manager.command
 def seed():
     """Seed database with required data"""
+    add_static_concepts()
     add_static_interventions()
     add_static_relationships()
     add_static_roles()
+    db.session.commit()
 
 
 if __name__ == '__main__':

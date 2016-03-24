@@ -30,6 +30,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
     configure_audit_log(app)
+    configure_version(app)
     return app
 
 
@@ -122,3 +123,10 @@ def configure_logging(app):
 
     #app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)
+
+
+def configure_version(app):
+    """Add version info for display in templates"""
+    location = os.path.dirname(os.path.dirname(__file__))
+    with open(os.path.join(location, 'VERSION'), 'r') as version:
+        app.config.version = version.readline()

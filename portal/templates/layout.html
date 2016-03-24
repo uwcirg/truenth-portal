@@ -18,10 +18,17 @@
     <script src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </head>
+
+{% set splashView = false %}
+{% if request.path=="/" or request.path=="/user/sign-in" %}
+    {% set splashView = true %}
+{% endif %}
+
 <body>
     <!-- topNav loads here -->
     <div id="mainNav">
     </div>
+    <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
     <div id="mainDiv">
     {# One-time system messages called Flash messages #}
     {% block flash_messages %}
@@ -37,24 +44,25 @@
         {%- endwith %}
     {% endblock %}
 
-    {% if request.path=="/" %} <div class="container-fluid">
-    {% else %} <div class="portal-container"><div class="container">
-    {% endif %}
-    <div class="row">
-        <div class="col-xs-12">
-            {% block main %}
-            {% endblock %}
+    <div class="container{% if splashView %}-fluid{% endif %}">
+        <div class="row">
+            <div class="col-xs-12">
+                {% block main %}
+                {% endblock %}
+            </div>
         </div>
     </div>
 
-    {% if request.path=="/" %} </div>
-    {% else %} </div></div>
+    {% from "flask_user/_macros.html" import footer %}
+    {% if splashView %}
+        {{ footer(splash_style=true) }}
+    {% else %}
+        {{ footer() }}
     {% endif %}
 
-    {% from "flask_user/_macros.html" import footer %}
-    {{ footer() }}
 
-    </div> <!-- <div id="main-div"> -->
+    </div> <!-- <div id="mainDiv"> -->
+    </div> <!-- <div id="mainHolder"> -->
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
@@ -64,13 +72,6 @@ $(document).ready(function(){
 
     $('[data-toggle="popover"]').popover();
 
-    equalHeightBoxes("lead-well");
-    $(window).resize(function() {
-        // Fire resize if browser window size changes. Delay by 200ms to avoid
-        // too many firings as user drags browser window
-        clearTimeout(this.id);
-        this.id = setTimeout(equalHeightBoxes("lead-well"), 200);
-    });
 });
 {% endblock %}
 </script>

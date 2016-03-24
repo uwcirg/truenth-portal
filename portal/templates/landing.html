@@ -9,16 +9,34 @@
     }
 </style>
 
-<div class="feature-container" id="featureContainer">
-    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive img-back" />
-    <div class="feature-box">
-        <div class="logo"><img src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></div>
-        <div class="headline">Online tools for navigating the prostate cancer journey.</div>
-        <a href="/user/register" class="btn feature-btn feature-btn-primary">Sign Up</a>
+<div id="fullSizeBox" class="box-min-400">
+    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
+
+    <div id="fullSizeContainer">
+
+        <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
+
+        <div id="wellContainer">
+
+            <div class="tnth-splash">
+
+                <div id="wellContent">
+
+                    <div class="headline">Tools for navigating the prostate cancer journey</div>
+                    <a href="/user/register" class="btn feature-btn feature-btn-primary">Register</a>
+
+                </div>
+                <div class="tnth-splash-bottom">
+                    <a href="/user/sign-in" class="tnth-splash-bottom-link">Login</a><span class="tnth-splash-bottom-link separator"></span><a href="" class="tnth-splash-bottom-link">Explore</a>
+                </div>
+
+            </div>
+
+        </div>
+
+
     </div>
-    <div class="feature-bottom">
-        <a href="" class="btn feature-btn feature-btn-secondary">Explore</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-secondary">Log In</a>
-    </div>
+
 </div>
 
 {% endblock %}

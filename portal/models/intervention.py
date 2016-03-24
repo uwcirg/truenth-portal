@@ -100,7 +100,7 @@ def add_static_interventions():
             if k in config_map:
                 intervention.card_url = current_app.config.get(config_map[k])
             db.session.add(intervention)
-    db.session.commit()
+
 
 def named_interventions():
     """Return a named indexable structure for ease of use in the templates"""

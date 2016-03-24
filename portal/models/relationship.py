@@ -47,4 +47,3 @@ def add_static_relationships():
         if not Relationship.query.filter_by(name=r).first():
             db.session.add(Relationship(name=r,
                                         description=STATIC_RELATIONSHIPS[r]))
-    db.session.commit()

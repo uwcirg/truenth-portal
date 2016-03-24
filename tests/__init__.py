@@ -18,6 +18,7 @@ from portal.models.auth import Client
 from portal.models.fhir import ValueQuantity, BIOPSY, PCaDIAG, TX
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
@@ -128,14 +129,28 @@ class TestCase(Base):
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=truthiness)
 
+    def add_concepts(self):
+        """Only tests needing concepts should load - VERY SLOW
+
+        The concept load includes pulling large JSON files, parsing
+        and numerous db lookups.  Only load in test if needed.
+
+        """
+        with SessionScope(db):
+            add_static_concepts()
+            db.session.commit()
+
     def setUp(self):
         """Reset all tables before testing."""
 
         db.create_all()
         with SessionScope(db):
+            # concepts take forever
+            # add directly if test needs them
             add_static_interventions()
             add_static_relationships()
             add_static_roles()
+            db.session.commit()
         self.init_data()
 
         self.app = self.__app.test_client()

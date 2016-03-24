@@ -2,11 +2,10 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-<div class="portal-well well">
 
     {{ back_btn('invite','Email Invite') }}
 
-    <h3 class="tnth-headline">Email Invite Sent</h3>
+    <h1 class="tnth-headline">Email Invite Sent</h1>
     <div class="form-group">
         <label for="recipients">To</label>
         <input type="text" class="form-control" name="recipients" id="recipients" size='79' value="{{ message.recipients }}" readonly>
@@ -24,7 +23,7 @@
         <input type="textarea" class="form-control" name="body" id="body" rows='8' cols='79' value="{{ message.body }}" readonly>
     </div>
 
-</div>
+
 
 {% endblock %}
 
