@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block main %}
 
-<div class="portal-well well">
 
-    <h3 class="tnth-headline">Central Services OAuth 2.0 Client Applications</h3>
+
+    <h1 class="tnth-headline">Central Services OAuth 2.0 Client Applications</h1>
 
     <div style="margin: 2em 1em 3em">
         <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">Create A New TrueNTH Client Application</a>
@@ -26,6 +26,6 @@
     {% else %}
     <p>You have not created an client applications.</p>
     {% endif %}
-</div>
+
 
 {% endblock %}

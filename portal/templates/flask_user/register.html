@@ -3,70 +3,51 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 
-<div class="well portal-well">
+<h3 class="tnth-headline">Register for TrueNTH</h3>
 
-    <h3 class="tnth-headline">Register for TrueNTH</h3>
+<p>Register using:</p>
 
-    <div class="row">
-        <div class="col-md-5">
+<div style="margin-left: 1em">
+    <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+       class="btn btn-social btn-facebook">
+        <i class="fa fa-facebook"></i>
+        Facebook
+    </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="{{ url_for('auth.login', provider_name='google') }}"
+       class="btn btn-social btn-google">
+        <i class="fa fa-google"></i>
+        Google
+    </a>
+</div>
 
-            <p>Do you have a Google or Facebook account? You can register with either of those or create a TrueNTH username and password. <i class="fa fa-question-circle"></i> </p>
+<p style="margin-top: 2em">Or create a TrueNTH account:</p>
+<form action="" method="POST" novalidate formnovalidate class="form" role="form" style="margin-left: 1em">
 
-            <p class="hidden-sm hidden-xs" style="margin-top: 3em"><small>Already have a TrueNTH account?
-                <a href="/user/sign-in">
-                Login in now...</a></small></p>
+    <div class="row" style="position: relative">
+        <div class="col-md-7">
+            {{ form.hidden_tag() }}
+
+            {# Username or Email #}
+            {% set field = form.username if user_manager.enable_username else form.email %}
+            {{ render_field(form.username, label="Username", label_visible=false, tabindex=220) }}
+
+
+            {% if user_manager.enable_email and user_manager.enable_username %}
+            {{ render_field(form.email, label="Email", label_visible=false, tabindex=220) }}
+            {% endif %}
+
+            {{ render_field(form.password, label="Password", label_visible=false, helpText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
+
+            {% if user_manager.enable_retype_password %}
+            {{ render_field(form.retype_password, label="Retype Password", label_visible=false, tabindex=240) }}
+            {% endif %}
+
 
         </div>
-        <div class="col-md-7">
-
-            <p>Register using:</p>
-
-            <div style="margin-left: 1em">
-                    <a href="{{ url_for('auth.login', provider_name='facebook') }}"
-                       class="btn btn-social btn-facebook">
-                        <i class="fa fa-facebook"></i>
-                        Facebook
-                    </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="{{ url_for('auth.login', provider_name='google') }}"
-                       class="btn btn-social btn-google">
-                        <i class="fa fa-google"></i>
-                        Google
-                    </a>
-                </div>
-
-            <p style="margin-top: 2em">Or create a TrueNTH account:</p>
-            <form action="" method="POST" novalidate formnovalidate class="form" role="form" style="margin-left: 1em">
-                {{ form.hidden_tag() }}
-
-                {# Username or Email #}
-                {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(form.username, tabindex=220) }}
-
-
-                {% if user_manager.enable_email and user_manager.enable_username %}
-                {{ render_field(form.email, tabindex=220) }}
-                {% endif %}
-
-                {{ render_field(form.password, tabindex=230) }}
-
-                {% if user_manager.enable_retype_password %}
-                {{ render_field(form.retype_password, tabindex=240) }}
-                {% endif %}
-
-                {{ render_submit_field(form.submit, "Register", tabindex=280) }}
-            </form>
-
-            <p class="hidden-md hidden-lg" style="margin-top: 2em"><small>Already have a TrueNTH account?
-                <a href="/user/sign-in">
-                    Login in now...</a></small></p>
-
+        <div class="col-md-5 pos-bottom-md">
+            {{ render_submit_field(form.submit, "Register", tabindex=280) }}
         </div>
     </div>
-
-
-
-
-
-</div>
+</form>
 
 {% endblock %}

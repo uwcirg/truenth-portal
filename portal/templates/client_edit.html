@@ -2,11 +2,10 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, back_btn %}
 
-<div class="portal-well well">
 
     {{ back_btn('clients','Client Applications') }}
 
-    <h3 class="tnth-headline">Central Services OAuth 2.0 Credentials</h3><br />
+    <h1 class="tnth-headline">Central Services OAuth 2.0 Credentials</h1>
 
     <p><strong>App ID:</strong><br />{{ client.client_id }}</p>
 
@@ -68,7 +67,6 @@
 
     <br /><br />
 
-</div>
 
 <script>
 $(document).ready(function(){
