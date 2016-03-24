@@ -1180,6 +1180,7 @@ def assessment(patient_id, instrument_id):
 
     """
 
+    current_user().check_role(permission='view', other_id=patient_id)
     questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).filter(
         QuestionnaireResponse.document[("questionnaire", "reference")].astext.endswith(instrument_id)
     ).order_by(QuestionnaireResponse.authored.desc())

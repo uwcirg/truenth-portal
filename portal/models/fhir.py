@@ -1,7 +1,10 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
-from ..extensions import db
+import json
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
+import urllib
+
+from ..extensions import db
 
 def as_fhir(obj):
     """For builtin types needing FHIR formatting help
@@ -64,7 +67,7 @@ class CodeableConcept(db.Model):
 
 
 """ TrueNTH Clinical Codes """
-TRUENTH_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes' 
+TRUENTH_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes'
 BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
                          display='biopsy')
 PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
@@ -181,6 +184,61 @@ class UserObservation(db.Model):
         return self
 
 
+class UserEthnicity(db.Model):
+    __tablename__ = 'user_ethnicities'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
+    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
+
+    codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for matching, existing UserEthnicity.
+        Populates self.id if found, adds to database first if not.
+
+        """
+        if self.id:
+            return self
+
+        match = self.query.filter_by(user_id=self.user_id,
+                codeable_concept_id=self.codeable_concept_id).first()
+        if not match:
+            db.session.add(self)
+        elif self is not match:
+            self = db.session.merge(match)
+        return self
+
+
+
+class UserRace(db.Model):
+    __tablename__ = 'user_races'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
+    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
+
+    codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
+
+    def add_if_not_found(self):
+        """Add self to database, or return existing
+
+        Queries for matching, existing UserRace.
+        Populates self.id if found, adds to database first if not.
+
+        """
+        if self.id:
+            return self
+
+        match = self.query.filter_by(user_id=self.user_id,
+                codeable_concept_id=self.codeable_concept_id).first()
+        if not match:
+            db.session.add(self)
+        elif self is not match:
+            self = db.session.merge(match)
+        return self
+
+
 class QuestionnaireResponse(db.Model):
 
     def default_status(context):
@@ -208,3 +266,44 @@ class QuestionnaireResponse(db.Model):
         db.DateTime,
         default=default_authored
     )
+
+
+def parse_concepts(elements, system):
+    "recursive function to build array of concepts from nested structure"
+    ccs = []
+    for element in elements:
+        ccs.append(CodeableConcept(code=element['code'],
+                                   display=element['display'],
+                                   system=system))
+        if 'concept' in element:
+            ccs += parse_concepts(element['concept'], system)
+    return ccs
+
+
+def fetch_HL7_V3_Namespace(valueSet):
+    """Pull and parse the published FHIR ethnicity namespace"""
+    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.json'.format(
+        valueSet=valueSet)
+    response = urllib.urlopen(src_url)
+    data = json.loads(response.read())
+    return parse_concepts(data['codeSystem']['concept'],
+                          system='http://hl7.org/fhir/v3/{}'.format(valueSet))
+
+
+def add_static_concepts():
+    """Seed database with default static concepts
+
+    Idempotent - run anytime to push any new concepts into existing dbs
+
+    """
+    concepts = fetch_HL7_V3_Namespace('Ethnicity')
+    for concept in concepts:
+        if not CodeableConcept.query.filter_by(code=concept.code,
+                                               system=concept.system).first():
+            db.session.add(concept)
+
+    concepts = fetch_HL7_V3_Namespace('Race')
+    for concept in concepts:
+        if not CodeableConcept.query.filter_by(code=concept.code,
+                                               system=concept.system).first():
+            db.session.add(concept)

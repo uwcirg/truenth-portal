@@ -1,9 +1,11 @@
 """User model """
+from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
 from flask import abort, request, session
 from flask.ext.user import UserMixin, _call_or_get
 from sqlalchemy import and_, UniqueConstraint
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 
@@ -17,6 +19,87 @@ from .role import Role, ROLE
 # http://hl7.org/fhir/v3/AdministrativeGender/
 gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
                     create_type=False)
+
+class Extension:
+    """Abstract base class for common user extension FHIR objects"""
+    __metaclass__ = ABCMeta
+
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
+    @abstractproperty
+    def children(self):
+        pass
+
+    def as_fhir(self):
+        codes = [{'system': c.system, 'code': c.code} for c in self.children]
+        return {'url': self.extension_url,
+                'valueCodeableConcept': {'coding': codes }
+               }
+
+    def apply_fhir(self):
+        assert self.extension['url'] == self.extension_url
+        # track current concepts - must remove any not requested
+        remove_if_not_requested = {e.code: e for e in self.children}
+
+        for coding in self.extension['valueCodeableConcept']['coding']:
+            try:
+                concept = CodeableConcept.query.filter_by(
+                    system=coding['system'], code=coding['code']).one()
+            except NoResultFound:
+                raise ValueError("Unknown code: {} for system{}".format(
+                                     coding['code'], coding['system']))
+            if concept.code in remove_if_not_requested:
+                # The concept existed before and is to be retained
+                remove_if_not_requested.pop(concept.code)
+            else:
+                # Otherwise, it's new; add it
+                self.children.append(concept)
+
+        # Remove the stale concepts that weren't requested again
+        for concept in remove_if_not_requested.values():
+            self.children.remove(concept)
+
+
+class UserEthnicityExtension(Extension):
+    extension_url =\
+       "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
+
+    @property
+    def children(self):
+        return self.user.ethnicities
+
+
+class UserRaceExtension(Extension):
+    extension_url =\
+       "http://hl7.org/fhir/StructureDefinition/us-core-race"
+
+    @property
+    def children(self):
+        return self.user.races
+
+
+user_extension_classes = (UserEthnicityExtension, UserRaceExtension)
+
+def user_extension_map(user, extension):
+    """Map the given extension to the User
+
+    FHIR uses extensions for elements beyond base set defined.  Lookup
+    an adapter to handle the given extension for the user.
+
+    @param user: the user to apply to or read the extension from
+    @param extension: a dictionary with at least a 'url' key defining
+        the extension.  Should include a 'valueCodeableConcept' structure
+        when being used in an apply context (i.e. direct FHIR data)
+    @returns adapter implementing apply_fhir and as_fhir methods
+    @raises ValueError if the extension isn't recognized
+
+    """
+    for kls in user_extension_classes:
+        if extension['url'] == kls.extension_url:
+            return kls(user, extension)
+    # still here implies an extension we don't know how to handle
+    raise ValueError("unknown extension: {}".format(extension.url))
 
 
 class User(db.Model, UserMixin):
@@ -41,6 +124,10 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
+    ethnicities = db.relationship(CodeableConcept, lazy='dynamic',
+            secondary="user_ethnicities")
+    races = db.relationship(CodeableConcept, lazy='dynamic',
+            secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
             secondary="user_observations", backref=db.backref('users'))
     roles = db.relationship('Role', secondary='user_roles',
@@ -211,6 +298,14 @@ class User(db.Model, UserMixin):
             d['telecom'].append({'system': 'phone', 'value': self.phone})
         if self.image_url:
             d['photo'].append({'url': self.image_url})
+        extensions = []
+        for kls in user_extension_classes:
+            instance = user_extension_map(self, {'url': kls.extension_url})
+            data = instance.as_fhir()
+            if data:
+                extensions.append(data)
+        if extensions:
+            d['extension'] = extensions
         return d
 
     def update_username(self, force=False):
@@ -263,6 +358,11 @@ class User(db.Model, UserMixin):
             for e in fhir['communication']:
                 if 'language' in e:
                     self.locale = CodeableConcept.from_fhir(e['language'])
+        if 'extension' in fhir:
+            # a number of elements live in extension - handle each in turn
+            for e in fhir['extension']:
+                instance = user_extension_map(self, e)
+                instance.apply_fhir()
         db.session.add(self)
 
     def check_role(self, permission, other_id):

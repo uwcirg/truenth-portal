@@ -62,4 +62,3 @@ def add_static_roles():
     for r in STATIC_ROLES:
         if not Role.query.filter_by(name=r).first():
             db.session.add(Role(name=r, description=STATIC_ROLES[r]))
-    db.session.commit()

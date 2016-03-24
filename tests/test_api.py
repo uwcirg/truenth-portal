@@ -76,6 +76,9 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
 
     def test_demographicsPUT(self):
+        # race / ethnicity require the SLOW addition of concepts to db
+        self.add_concepts()
+
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
@@ -91,7 +94,22 @@ class TestAPI(TestCase):
                 "telecom": [{
                     "system": "phone",
                     "value": "867-5309"
-                    }]}
+                    }],
+                "extension": [{
+                    "url":
+                    "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                    "valueCodeableConcept": {
+                        "coding": [{
+                            "system": "http://hl7.org/fhir/v3/Race",
+                            "code": "1096-7"}]}},
+                    {"url":
+                     "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                     "valueCodeableConcept": {
+                         "coding": [{
+                             "system": "http://hl7.org/fhir/v3/Ethnicity",
+                             "code": "2162-6"}]}}
+                ]
+               }
 
         self.login()
         rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
@@ -103,6 +121,13 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['gender']['coding'][0]['display'], gender)
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
+        self.assertEquals(2, len(fhir['extension']))
+
+        user = db.session.merge(self.test_user)
+        self.assertEquals(user.first_name, given)
+        self.assertEquals(user.last_name, family)
+        self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
+        self.assertEquals(['1096-7',], [c.code for c in user.races])
 
 
     def prep_db_for_clinical(self):
