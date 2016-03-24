@@ -66,14 +66,12 @@
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
-
 {% block document_ready %}
 $(document).ready(function(){
-
     $('[data-toggle="popover"]').popover();
-
 });
 {% endblock %}
 </script>
+{% if config.version %}<!--Shared services version: {{config.version}}-->{% endif %}
 </body>
 </html>
