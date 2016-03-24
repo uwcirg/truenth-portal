@@ -1,26 +1,24 @@
 {% extends "layout.html" %}
 {% block main %}
 
-<div class="portal-well well">
+<h1 class="tnth-headline">Email Invite</h1>
+<p>Send a TrueNTH email invite by filling in the form below.</p>
+<form action="/invite" method="post">
+    <div class="form-group">
+        <label for="recipients">To (separate multiple addresses with white space)</label>
+        <input type="text" class="form-control" name="recipients" id="recipients" size='79' placeholder="user@example.com">
+    </div>
+    <div class="form-group">
+        <label for="subject">Subject</label>
+        <input type="text" class="form-control" name="subject" id="subject" size='79' value="Invitation to try TrueNTH">
+    </div>
+    <div class="form-group">
+        <label for="body">Body</label>
+        <input type="textarea" class="form-control" name="body" id="body" rows='8' cols='79' value="TrueNTH Invitation">
+    </div>
+    <button type="submit" class="btn btn-tnth-primary">Send Invite</button>
+</form>
 
-    <h3 class="tnth-headline">Email Invite</h3>
-    <p>Send a TrueNTH email invite by filling in the form below.</p>
-    <form action="/invite" method="post">
-        <div class="form-group">
-            <label for="recipients">To (separate multiple addresses with white space)</label>
-            <input type="text" class="form-control" name="recipients" id="recipients" size='79' placeholder="user@example.com">
-        </div>
-        <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" class="form-control" name="subject" id="subject" size='79' value="Invitation to try TrueNTH">
-        </div>
-        <div class="form-group">
-            <label for="body">Body</label>
-            <input type="textarea" class="form-control" name="body" id="body" rows='8' cols='79' value="TrueNTH Invitation">
-        </div>
-        <button type="submit" class="btn btn-tnth-primary">Send Invite</button>
-    </form>
 
-</div>
 
 {% endblock %}

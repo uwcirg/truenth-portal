@@ -3,68 +3,63 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, render_submit_field %}
 
-<div class="well portal-well">
+<style>
+    #tnthNavWrapper {
+        display: none;
+    }
+    #mainDiv {
+        background: none;
+    }
+</style>
 
-    <h3 class="tnth-headline">Log In to TrueNTH</h3>
+<div id="fullSizeBox" class="box-min-500">
+    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
 
-    <div class="row">
+    <div id="fullSizeContainer">
 
-        <div class="col-md-5">
+        <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
 
-            <p>Welcome back to TrueNTH.</p>
+        <div id="wellContainer">
 
-            <p>Are you new to TrueNTH?
-                <a href="/user/register">
-                    Create a new account...</a></p>
+            <div class="tnth-well well">
 
+                <div id="wellContent">
 
-        </div>
-        <div class="col-md-7">
-
-            <p>Log in with:</p>
-
-            <div style="margin: 1em 0 1em 1em">
-                <a href="{{ url_for('auth.login', provider_name='facebook') }}"
-                   class="btn btn-social btn-facebook">
-                    <i class="fa fa-facebook"></i> Facebook
-                </a><br /><br />
-                <a href="{{ url_for('auth.login', provider_name='google') }}"
-                   class="btn btn-social btn-google">
-                    <i class="fa fa-google"></i> Google
-                </a><br />
-            </div>
-
-            <p>Or a TrueNTH account:</p>
-
-            <form action="" method="POST" class="form" role="form" style="margin-left: 1em">
-                {{ form.hidden_tag() }}
-
-                {# Username or Email field #}
-                {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(form.username, label="Username or email address", label_visible=false, tabindex=10) }}
-
-                {# Password field #}
-                {% set field = form.password %}
-                {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
-
-                <div class="row">
-                    <div class="col-xs-6">
-                        {# Remember me #}
-                        {% if user_manager.enable_remember_me %}
-                        {{ render_checkbox_field(login_form.remember_me, tabindex=130) }}
-                        {% endif %}
+                    <div class="btn-set">
+                        <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+                           class="btn btn-social btn-facebook btn-block">
+                            <i class="fa fa-facebook"></i> Log in with Facebook
+                        </a>
+                        <a href="{{ url_for('auth.login', provider_name='google') }}"
+                           class="btn btn-social btn-google btn-block">
+                            <i class="fa fa-google"></i> Log in with Google
+                        </a>
                     </div>
+
+                    <form action="" method="POST" class="form" role="form">
+                        {{ form.hidden_tag() }}
+
+                        {# Username or Email field #}
+                        {% set field = form.username if user_manager.enable_username else form.email %}
+                        {{ render_field(form.username, label="Username or email address", label_visible=false, tabindex=10) }}
+
+                        {# Password field #}
+                        {% set field = form.password %}
+                        {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
+
+                        {# Submit button #}
+                        {{ render_submit_field(form.submit, tabindex=180, label="Log In") }}
+                    </form>
+
                     {% if user_manager.enable_forgot_password %}
-                    <div class="col-xs-6">
-                        <a href="{{ url_for('user.forgot_password') }}" style="margin-top: 10px" class="pull-right">
-                            {%trans%}Forgot your Password?{%endtrans%}</a>
+                    <div style="margin-top: 1em">
+                        <a href="{{ url_for('user.forgot_password') }}">
+                            <small>{%trans%}Forgot your Password?{%endtrans%}</small></a>
                     </div>
                     {% endif %}
                 </div>
 
-                {# Submit button #}
-                {{ render_submit_field(form.submit, tabindex=180) }}
-            </form>
+            </div>
 
         </div>
 

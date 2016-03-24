@@ -2,198 +2,200 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-<div class="well portal-well">
+{% if current_user.has_role('admin') and request.environ.HTTP_REFERER.endswith("admin") %}
+{{ back_btn('admin','User List') }}
+{% endif %}
 
+<div id="loadingIndicator" class="loading-indicator">
+    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
+    <p class="lead">Saving...</p>
+</div>
 
-    {% if current_user.has_role('admin') and request.environ.HTTP_REFERER.endswith("admin") %}
-    {{ back_btn('admin','User List') }}
-    {% endif %}
+<h3 class="tnth-headline">
+{% if current_user.has_role('admin')%}
+Profile for {{ user.username }}
+{% else %}
+My TrueNTH Profile
+{% endif %}
+</h3>
 
-    <div id="loadingIndicator" class="loading-indicator">
-        <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
-        <p class="lead">Saving...</p>
-    </div>
+<form id="profileForm" class="form" role="form">
 
-    <div class="row">
-        <div class="col-md-5">
+<div class="row" style="position: relative;">
+    <div class="col-md-7">
 
-            <h3 class="tnth-headline">Profile for {{ user.username }}</h3>
-
-            <p id="profileIntro">Use the form to update any of your details.</p>
-
+        {% if user.image_url %}
+        <div class="profile-img hidden-xs">
+            <img src="{{ user.image_url }}" />
         </div>
-        <div class="col-md-7">
+        {% endif %}
 
-
-            <form id="profileForm" class="form" role="form">
-
-                <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
-                <label>Name</label>
-                <div class="row">
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <input required="required" data-error="First name is required" class="form-control" id="firstname" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
-                            <div class="help-block with-errors"></div>
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="form-group">
-                            <input required="required" data-error="Last name is required" class="form-control" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
-                            <div class="help-block with-errors"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" id="bdGroup">
-                    <label>Birth Date</label>
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
-                                <option value="">Month...</option>
-                                <option value="01">January</option>
-                                <option value="02">February</option>
-                                <option value="03">March</option>
-                                <option value="04">April</option>
-                                <option value="05">May</option>
-                                <option value="06">June</option>
-                                <option value="07">July</option>
-                                <option value="08">August</option>
-                                <option value="09">September</option>
-                                <option value="10">October</option>
-                                <option value="11">November</option>
-                                <option value="12">December</option>
-                            </select>
-                        </div>
-                        <div class="col-xs-4">
-                            <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="Date" type="text" maxlength="2" data-birthday="true" required />
-                        </div>
-                        <div class="col-xs-4">
-                            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="Year" type="text" maxlength="4" data-birthday="true" required />
-                        </div>
-                    </div>
-                    <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
-                </div>
+        <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
+        <label>Name</label>
+        <div class="row">
+            <div class="col-xs-6">
                 <div class="form-group">
-                    <label>Gender</label>
-                    <div>
-                        <label class="radio-inline">
-                            <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if user.gender == "male"}}/>
-                            Male
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if user.gender == "female"}}/>
-                            Female
-                        </label>
-                        <label class="radio-inline">
-                            <input type="radio" name="sex" id="sexO" value="undifferentiated" required {{ "checked" if user.gender == "undifferentiated"}}/>
-                            Other
-                        </label>
-                    </div>
-                </div>
-                <div class="form-group" id="emailGroup">
-                    <label for="email">Email address</label>
-                    <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email if user.email }}" data-customemail="true" required>
+                    <input required="required" data-error="First name is required" class="form-control" id="firstname" name="firstname" placeholder="First Name" value="{{ user.first_name if user.first_name }}" type="text" />
                     <div class="help-block with-errors"></div>
                 </div>
-                <div class="form-group">
-                    <label for="phone">Cell phone</label>
-                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
-                </div>
-
-                <div id="patientQuestions">
-                    <div class="form-group">
-                        <label>Have you had a prostate cancer biopsy?</label>
-                        <div>
-                            <label class="radio-inline">
-                                <input class="history-q" type="radio" name="biopsy" value="true" />
-                                Yes
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="biopsy" value="false" />
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Have you been diagnosed with prostate cancer?</label>
-                        <div>
-                            <label class="radio-inline">
-                                <input type="radio" name="pca_diag" value="true" />
-                                Yes
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="pca_diag" value="false" />
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Have you begun prostate cancer treatment?</label>
-                        <div>
-                            <label class="radio-inline">
-                                <input type="radio" name="tx" value="true" />
-                                Yes
-                            </label>
-                            <label class="radio-inline">
-                                <input type="radio" name="tx" value="false" />
-                                No
-                            </label>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-                    <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
-                    <span id="saveMsg" class="text-muted" style="display: none">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
-                </div>
-
-            </form>
-
-            <hr />
-
-            {% if current_user.has_role('admin') and not user.has_role('service') %}
-            <h3>User Roles for {{ user.username }}</h3>
-            <div id="userRoles">
-                <div class="form-group">
-                    <p>Editable by admins only.</p>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="admin"> Admin
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="anon"> Anon
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="application_developer"> Application Developer
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="partner"> Partner
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="patient"> Patient
-                        </label>
-                    </div>
-                </div>
-
             </div>
-            {% endif %}
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <input required="required" data-error="Last name is required" class="form-control" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
+                    <div class="help-block with-errors"></div>
+                </div>
+            </div>
+        </div>
 
+        <div class="form-group" id="bdGroup">
+            <label>Birth Date</label>
+            <div class="row">
+                <div class="col-xs-4">
+                    <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                        <option value="">Month...</option>
+                        <option value="01">January</option>
+                        <option value="02">February</option>
+                        <option value="03">March</option>
+                        <option value="04">April</option>
+                        <option value="05">May</option>
+                        <option value="06">June</option>
+                        <option value="07">July</option>
+                        <option value="08">August</option>
+                        <option value="09">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-xs-4">
+                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="Date" type="text" maxlength="2" data-birthday="true" required />
+                </div>
+                <div class="col-xs-4">
+                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="Year" type="text" maxlength="4" data-birthday="true" required />
+                </div>
+            </div>
+            <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+        </div>
+        <div class="form-group">
+            <label>Gender</label>
+            <div>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if user.gender == "male"}}/>
+                    Male
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if user.gender == "female"}}/>
+                    Female
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="sex" id="sexO" value="undifferentiated" required {{ "checked" if user.gender == "undifferentiated"}}/>
+                    Other
+                </label>
+            </div>
+        </div>
+        <div class="form-group" id="emailGroup">
+            <label for="email">Email address</label>
+            <input type="text" class="form-control" id="email" name="email" placeholder="Email" value="{{ user.email if user.email }}" data-customemail="true" required>
+            <div class="help-block with-errors"></div>
+        </div>
+        <div class="form-group">
+            <label for="phone">Cell phone</label>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
+        </div>
 
+    </div>
+    <div class="col-md-5 pos-bottom-md">
+
+        <div id="patientQuestions">
+            <div class="form-group">
+                <label>Have you had a prostate cancer biopsy?</label>
+                <div>
+                    <label class="radio-inline">
+                        <input class="history-q" type="radio" name="biopsy" value="true" />
+                        Yes
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="biopsy" value="false" />
+                        No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Have you been diagnosed with prostate cancer?</label>
+                <div>
+                    <label class="radio-inline">
+                        <input type="radio" name="pca_diag" value="true" />
+                        Yes
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="pca_diag" value="false" />
+                        No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Have you begun prostate cancer treatment?</label>
+                <div>
+                    <label class="radio-inline">
+                        <input type="radio" name="tx" value="true" />
+                        Yes
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="tx" value="false" />
+                        No
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <span id="saveMsg" class="text-muted" style="visibility: hidden">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
+
+        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
+
+    </div>
+</div>
+
+<hr />
+
+{% if current_user.has_role('admin') and not user.has_role('service') %}
+<h3>User Roles for {{ user.username }}</h3>
+<div id="userRoles">
+    <div class="form-group">
+        <p>Editable by admins only.</p>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="admin"> Admin
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="anon"> Anon
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="application_developer"> Application Developer
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="partner"> Partner
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="patient"> Patient
+            </label>
         </div>
     </div>
 
 </div>
+{% endif %}
+
+</form>
 
 {% endblock %}
 {% block document_ready %}
@@ -267,13 +269,13 @@ $(document).ready(function(){
     $('#profileForm').on('validated.bs.validator', function(e) {
         var validator = $(this).data('bs.validator');
         if (!validator.hasErrors()) {
-            $("#saveMsg").fadeIn("slow");
+            $("#saveMsg").css('visibility','visible')
         } else {
-            $("#saveMsg").hide();
+            $("#saveMsg").css('visibility','hidden')
         }
     });
     $('#profileForm input, #profileForm select').on('invalid.bs.validator', function() {
-        $("#saveMsg").hide();
+        $("#saveMsg").css('visibility','hidden')
     });
 
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
@@ -325,7 +327,7 @@ $(document).ready(function(){
             dataType: 'json',
             data: JSON.stringify(demoArray)
         }).done(function() {
-            $("#saveMsg").hide();
+            $("#saveMsg").css('visibility','hidden')
             setTimeout(function(){
                 $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
                 $("#profileForm").removeClass("loading");

@@ -1,56 +1,38 @@
 {% extends "layout.html" %}
 {% block main %}
 
-<div class="well portal-well">
-    <div id="showVersion" class="portal-box">
-        {{ config.version }}
-    </div>
-    <div class="feature-container" style="margin: 0 -20px" id="featureContainer">
-        <img src="{{ url_for('static', filename='img/band_forest.jpg') }}" class="img-responsive img-back" />
-        <div class="band-box">
-            <div class="headline">Online tools for navigating the prostate cancer journey</div>
-        </div>
-    </div>
-
-    {# This should only appear if user has access to SR #}
-    {% set intervention = interventions.sexual_recovery %}
-    {% if intervention.user_has_access(user) %}
-    <div id="showUM" class="portal-box">
-        <h4>Sexual Recovery</h4>
-        <p>Treatment can impact sexual function. Assess your particular needs and see specific strategies for both you and your partner to develop a new normal in your sex life.</p>
-        <a class="btn feature-btn-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}
-    {% endif %}
-
-    {% set intervention = interventions.decision_support_p3p %}
-    {% if intervention.user_has_access(user) %}
-    <div id="showP3P" class="portal-box">
-        <h4>Decision Support (P3P)</h4>
-        <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
-        <a class="btn feature-btn-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
-    {% endif %}
-
-    <div id="moreContent">
-        <h4>The TrueNTH Experience</h4>
-        <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
-        <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
-    </div>
-
-
+<div class="portal-item">
+    <h2 class="tnth-subhead">EXPLORE TrueNTH</h2>
+    <p>Discover the tools to guide you through the Cancer journey.</p>
+    <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/about">Learn More</a>
 </div>
 
-{% endblock %}
 
-{% block document_ready %}
-$(document).ready(function(){
+{# This should only appear if user has access to SR #}
+{% set intervention = interventions.sexual_recovery %}
+{% if intervention.user_has_access(user) %}
+<div class="portal-item">
+    <h2 class="tnth-subhead">Sexual Recovery</h2>
+    <p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>
+    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
+</div>
+{% endif %}
 
-    $.ajax ({
-        type: "GET",
-        url: '/api/user/{{ user.id }}/roles'
-    }).done(function(data) {
-        console.log(data)
-    }).fail(function() {
-        console.log("Problem retrieving data from server.")
-    })
+{% set intervention = interventions.decision_support_p3p %}
+{% if intervention.user_has_access(user) %}
+<div class="portal-item">
+    <h2 class="tnth-subhead">Sexual Recovery</h2>
+    <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
+    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
+</div>
+{% endif %}
 
-})
+<div class="img-with-text">
+    <img src="{{ url_for('static', filename='img/band_man1.jpg') }}" class="img-responsive" />
+    <div class="text-on-img text-bot">
+        <h2>LOREM IPSUM</h2>
+        <p>"Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."</p>
+    </div>
+</div>
+
 {% endblock %}
