@@ -2,7 +2,9 @@
 {% block main %}
 
 <div class="well portal-well">
-
+    <div id="showVersion" class="portal-box">
+        {{ config.version }}
+    </div>
     <div class="feature-container" style="margin: 0 -20px" id="featureContainer">
         <img src="{{ url_for('static', filename='img/band_forest.jpg') }}" class="img-responsive img-back" />
         <div class="band-box">
