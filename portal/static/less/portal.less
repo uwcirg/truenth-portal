@@ -189,11 +189,15 @@ a:hover, a:active {
   line-height: 1.2;
   display: none;
   text-align: left;
+  &.footer-separate {
+    margin-top: 30px;
+    border-top: 1px solid #ccc;
+    padding-top: 1em;
+  }
 }
-.footer-separate {
-  margin-top: 2em;
-  border-top: 1px solid #ccc;
-  padding-top: 1em;
+// Utility to move a block flush with footer
+.flush-with-footer {
+  //margin-bottom: 0;
 }
 
 .btn-tnth-primary {
@@ -435,9 +439,6 @@ a:hover, a:active {
   #homeFooter {
     max-width: 1400px;
     margin: 0 auto;
-    &.footer-separate {
-      margin-top: 2em;
-    }
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/
