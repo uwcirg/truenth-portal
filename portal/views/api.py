@@ -58,7 +58,7 @@ def me():
             id:
               type: integer
               format: int64
-              description: Central Services ID for user
+              description: TrueNTH ID for user
             username:
               type: string
               description: User's username
@@ -1667,7 +1667,7 @@ def assessment_set(patient_id):
 @api.route('/present-assessment/<instrument_id>')
 @oauth.require_oauth()
 def present_assessment(instrument_id):
-    """Request that central service present an assessment via the assessment engine
+    """Request that TrueNTH present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of administering the requested assessment
     ---
@@ -1736,7 +1736,8 @@ def present_assessment(instrument_id):
 def complete_assessment():
     """Return to the last intervention that requested an assessment be presented
 
-    Redirects to the URL passed to central services when present-assessment was last called (if valid) or central services home
+    Redirects to the URL passed to TrueNTH when present-assessment was last
+    called (if valid) or TrueNTH home
     ---
     operationId: complete_assessment
     tags:
@@ -1748,7 +1749,9 @@ def complete_assessment():
         description: successful operation
         headers:
           Location:
-            description: URL passed to central services when present-assessment was last called (if valid) or central services home
+            description:
+              URL passed to TrueNTH when present-assessment was last
+              called (if valid) or TrueNTH home
             type: string
             format: url
       401:
@@ -1775,7 +1778,7 @@ def auditlog_addevent():
     ---
     operationId: auditlog_addevent
     tags:
-      - Central Services
+      - TrueNTH
     produces:
       - application/json
     parameters:
@@ -1833,11 +1836,11 @@ def portal_wrapper_html(username):
 
     Get html for the portal site UI wrapper (top-level nav elements, etc)
     This is the unauthorized version, useful prior to logging in with
-    Central Services.  See `protected_portal_wrapper_html` for authorized
+    TrueNTH.  See `protected_portal_wrapper_html` for authorized
     version.
     ---
     tags:
-      - Central Services
+      - TrueNTH
     operationId: getPortalWrapperHTML
     produces:
       - text/html
@@ -1847,7 +1850,7 @@ def portal_wrapper_html(username):
         description:
           Location to direct login requests.  Typically an entry
           point on the intervention, to initiate OAuth dance with
-          Central Services.  Inclusion of this parameter affects
+          TrueNTH.  Inclusion of this parameter affects
           the apperance of a "login" option in the portal menu.
         required: false
         type: string
@@ -1924,11 +1927,11 @@ def protected_portal_wrapper_html():
 
     Get html for the portal site UI wrapper (top-level nav elements, etc)
     This is the authorized version, only useful after to logging in with
-    Central Services.  See `portal_wrapper_html` for the unauthorized
+    TrueNTH.  See `portal_wrapper_html` for the unauthorized
     version.
     ---
     tags:
-      - Central Services
+      - TrueNTH
     operationId: getProtectedPortalWrapperHTML
     produces:
       - text/html
