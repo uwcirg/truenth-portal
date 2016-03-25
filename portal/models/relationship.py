@@ -18,6 +18,9 @@ class Relationship(db.Model):
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.Text)
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "Relationship {0.name}".format(self)
 
 #Source definition for relationships, as dictionary {name: description,}
 STATIC_RELATIONSHIPS = IterableUserDict({

@@ -179,9 +179,9 @@ class TestAPI(TestCase):
         rv = self.app.post('/api/patient/%s/clinical' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
-
+        self.assert200(rv)
         fhir = json.loads(rv.data)
-        self.assertEquals(fhir['message'], "ok")
+        self.assertIn('28540-3', fhir['message'])
 
     def test_empty_clinical_get(self):
         """Access clinical on user w/o any clinical info"""

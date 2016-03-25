@@ -393,7 +393,7 @@ def client():
     if form.application_role.data != INTERVENTION.DEFAULT:
         selected = form.application_role.data
         intervention = Intervention.query.filter_by(name=selected).first()
-        auditable_event("New intervention {0} for {1}".format(
+        auditable_event("client {0} assuming role {1}".format(
             client.client_id, selected), user_id=user.id)
         intervention.client_id = client.client_id
         db.session.commit()

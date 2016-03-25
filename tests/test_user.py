@@ -5,7 +5,7 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import CodeableConcept, UserEthnicity
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
-
+from portal.models.user import UserRelationship
 
 class TestUser(TestCase):
     """User model tests"""
@@ -82,3 +82,11 @@ class TestUser(TestCase):
         found = [c.code for c in self.test_user.ethnicities]
         self.assertIn('2162-6', found)
         self.assertIn('2142-8', found)
+
+    def test_ur_format(self):
+        ur = UserRelationship(user_id=TEST_USER_ID, other_user_id=TEST_USER_ID,
+                              relationship_id=1)
+        db.session.add(ur)
+        db.session.commit()
+        ur_str = "test format {}".format(ur)
+        self.assertIn('Relationship', ur_str)

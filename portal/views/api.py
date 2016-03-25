@@ -182,7 +182,7 @@ def demographics_set(patient_id):
         abort(400, "Requires FHIR resourceType of 'Patient'")
     patient.update_from_fhir(request.json)
     db.session.commit()
-    auditable_event("Demographics set on user {0} from input {1}".format(
+    auditable_event("updated demographics on user {0} from input {1}".format(
         patient_id, json.dumps(request.json)), user_id=current_user().id)
     return jsonify(patient.as_fhir())
 
@@ -604,7 +604,7 @@ def clinical_set(patient_id):
     are persisted in the portal including {"name"(CodeableConcept),
     "valueQuantity", "status", "issued"} - others will be ignored.
 
-    Returns a json friendly message, i.e. {"message": "ok"}
+    Returns details of the change in the json 'message' field.
 
     Raises 401 if logged-in user lacks permission to edit requested
     patient.
@@ -644,7 +644,7 @@ def clinical_set(patient_id):
           properties:
             message:
               type: string
-              description: Result, typically "ok"
+              description: details of the change
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -657,9 +657,10 @@ def clinical_set(patient_id):
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
     code, result = patient.add_observation(request.json)
-    db.session.commit()
     if code != 200:
         abort(code, result)
+    auditable_event(result, user_id=current_user().id)
+    db.session.commit()
     return jsonify(message=result)
 
 
@@ -1657,7 +1658,8 @@ def assessment_set(patient_id):
 
     db.session.add(questionnaire_response)
     db.session.commit()
-
+    auditable_event("added {}".format(questionnaire_responses),
+                    user_id=current_user().id)
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
@@ -1987,7 +1989,7 @@ def account():
     user = User(username='Anonymous')
     db.session.add(user)
     db.session.commit()
-    auditable_event("New account {} generated".format(user.id),
+    auditable_event("new account {} generated".format(user.id),
                     user_id=current_user().id)
     return jsonify(user_id=user.id)
 
@@ -2181,6 +2183,8 @@ def delete_relationships(user_id):
         existing = UserRelationship.query.filter_by(**kwargs).first()
         if existing:
             db.session.delete(existing)
+            auditable_event("deleted {}".format(existing),
+                            user_id=current_user().id)
     db.session.commit()
 
     # Return user's updated relationship list
@@ -2270,7 +2274,10 @@ def set_relationships(user_id):
                   'other_user_id': r['with']}
         existing = UserRelationship.query.filter_by(**kwargs).first()
         if not existing:
-            db.session.add(UserRelationship(**kwargs))
+            user_relationship = UserRelationship(**kwargs)
+            db.session.add(user_relationship)
+            auditable_event("added {}".format(user_relationship),
+                            user_id=current_user().id)
     db.session.commit()
 
     # Return user's updated relationship list
@@ -2455,6 +2462,8 @@ def delete_roles(user_id):
             u_r = UserRoles.query.filter_by(user_id=user.id,
                                             role_id=requested_role.id).first()
             db.session.delete(u_r)
+            auditable_event("deleted {}".format(u_r),
+                            user_id=current_user().id)
     db.session.commit()
 
     # Return user's updated role list
@@ -2546,6 +2555,8 @@ def set_roles(user_id):
     for requested_role in matching_roles:
         if requested_role not in user.roles:
             user.roles.append(requested_role)
+            auditable_event("added {}".format(requested_role),
+                            user_id=current_user().id)
 
     if user not in db.session:
         db.session.add(user)
@@ -2572,6 +2583,9 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     patient.save_constrained_observation(codeable_concept=codeable_concept,
                                          value_quantity=truthiness)
     db.session.commit()
+    auditable_event("set {0} {1} on user {2}".format(
+        codeable_concept, truthiness, patient_id),
+        user_id=current_user().id)
     return jsonify(message='ok')
 
 
