@@ -178,7 +178,7 @@ class Observation(db.Model):
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
     observation_id = db.Column(db.ForeignKey('observations.id'))
 
     def add_if_not_found(self):
