@@ -82,6 +82,12 @@ def demographics(patient_id):
 
     Return defined patient demographics fields (eg first name, last name,
     DOB, email, cell phone), as a FHIR patient resource (in JSON)
+
+    For fields with values outside the defined FHIR patient resource
+    (http://www.hl7.org/fhir/patient.html), look in the 'extension'
+    list.  This includes 'race' and 'ethnicity'.  See example usage
+    (http://hl7.org/fhir/patient-example-us-extensions.json.html)
+
     ---
     tags:
       - Demographics
@@ -123,6 +129,11 @@ def demographics_set(patient_id):
 
     Submit a minimal FHIR doc in JSON format including the 'Patient'
     resource type, and any fields to set.
+
+    For fields outside the defined patient resource
+    (http://www.hl7.org/fhir/patient.html), include in the 'extension'
+    list.  This includes 'race' and 'ethnicity'.  See example usage
+    (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
     NB - as a side effect, if the username is still 'Anonymous', the given
     first and last names will be used to generate a unique username of the

@@ -22,7 +22,7 @@ class TestPortal(TestCase):
         """Interventions can customize the button text """
         client = self.add_test_client()
         intervention = Intervention.query.filter_by(
-            name=INTERVENTION.DECISION_SUPPORT_P3P).first()
+            name=INTERVENTION.SEXUAL_RECOVERY).first()
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
