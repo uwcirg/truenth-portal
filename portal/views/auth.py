@@ -41,7 +41,7 @@ def deauthorized():
     """Callback URL configured on facebook when user deauthorizes
 
     We receive POST data when a user deauthorizes the session
-    between Central Services and Facebook.  The POST includes
+    between TrueNTH and Facebook.  The POST includes
     a signed_request, decoded as seen below.
 
     Configuration set on Facebook Developer pages:
@@ -70,7 +70,7 @@ def deauthorized():
     data = json.loads(data)
     # Should probably remove all tokens obtained during this session
     # for now, just logging the event.
-    message = 'User {0} deauthorized Central Services from Facebook'.\
+    message = 'User {0} deauthorized TrueNTH from Facebook'.\
             format(data['user_id'])
     current_app.logger.info(message)
     return jsonify(message=message)
@@ -94,9 +94,9 @@ def next_after_login():
 
     When client applications request OAuth tokens, we sometimes need
     to postpone the action of authorizing the client while the user
-    logs in to Central Services.
+    logs in to TrueNTH.
 
-    After completing authentication with Central Services, this handles
+    After completing authentication with TrueNTH, this handles
     redirecting the browser to the appropriate target (either resume
     the client auth in process or the root).
 
@@ -219,13 +219,13 @@ def logout():
     user_id = user.id if user else None
 
     def delete_facebook_authorization(user_id):
-        """Remove OAuth authorization for Central Services on logout
+        """Remove OAuth authorization for TrueNTH on logout
 
-        If the user has ever authorized Central Services via Facebook,
+        If the user has ever authorized TrueNTH via Facebook,
         tell facebook to delete the authorization now (on logout).
 
         NB - this isn't standard OAuth behavior, users only expect to
-        authorize Central Services one time to use their Facebook
+        authorize TrueNTH one time to use their Facebook
         authentication.
 
         """
@@ -322,7 +322,7 @@ class ClientEditForm(Form):
 def client():
     """client registration
 
-    Central Services uses the OAuth 2.0 Authorization Code Grant flow
+    TrueNTH uses the OAuth 2.0 Authorization Code Grant flow
     (http://tools.ietf.org/html/rfc6749#section-4.1)
     to authorize all sensitive API access. As a prerequisite, any
     client (intervention) wishing to make authorized calls must first
@@ -356,7 +356,7 @@ def client():
             App ID:
               type: string
               description:
-                Identification unique to a Central Serivce application.
+                Identification unique to a TrueNTH application.
                 Pass as `client_id` in OAuth Authorization Code Grant
                 calls to obtain an authorization token
             App Secret:
@@ -393,7 +393,7 @@ def client():
     if form.application_role.data != INTERVENTION.DEFAULT:
         selected = form.application_role.data
         intervention = Intervention.query.filter_by(name=selected).first()
-        auditable_event("New intervention {0} for {1}".format(
+        auditable_event("client {0} assuming role {1}".format(
             client.client_id, selected), user_id=user.id)
         intervention.client_id = client.client_id
         db.session.commit()
@@ -405,7 +405,7 @@ def client():
 def client_edit(client_id):
     """client edit
 
-    View details and edit settings for a Central Services client (also
+    View details and edit settings for a TrueNTH client (also
     known as an Intervention or App).
     ---
     tags:
@@ -440,7 +440,7 @@ def client_edit(client_id):
             App ID:
               type: string
               description:
-                Identification unique to a Central Serivce application.
+                Identification unique to a TrueNTH application.
                 Pass as `client_id` in OAuth Authorization Code Grant
                 calls to obtain an authorization token
             App Secret:
@@ -557,7 +557,7 @@ def clients_list():
             App ID:
               type: string
               description:
-                Identification unique to a Central Serivce application.
+                Identification unique to a TrueNTH application.
                 Pass as `client_id` in OAuth Authorization Code Grant
                 calls to obtain an authorization token
             Site URL:
@@ -747,14 +747,14 @@ def access_token():
 @auth.route('/oauth/authorize', methods=('GET', 'POST'))
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
-    """Authorize the client to access Central Service resources
+    """Authorize the client to access TrueNTH resources
 
     For OAuth 2.0, the resource owner communicates their desire
     to grant the client (intervention) access to their data on
-    the server (Central Services).
+    the server (TrueNTH).
 
     For ease of use, this decision has been hardwired to "allow access"
-    on Central Services. Making a GET request to this endpoint is still
+    on TrueNTH. Making a GET request to this endpoint is still
     the required initial step in the OAuth 2.0 Authorization Code
     Grant (http://tools.ietf.org/html/rfc6749#section-4.1), likely
     handled by the OAuth 2.0 library used by the client.
@@ -806,7 +806,7 @@ def authorize(*args, **kwargs):
           token needed for API access, but the code to be
           exchanged for such an access token. In the
           event of an error, redirection will target /oauth/errors
-          of Central Services.
+          of TrueNTH.
 
     """
     # Interventions may include additional text to display as a way
@@ -821,7 +821,7 @@ def authorize(*args, **kwargs):
     if not user:
         # Entry point when intervetion is requesting OAuth token, but
         # the user has yet to authenticate via FB or otherwise.  Need
-        # to retain the request, and replay after Central Services login
+        # to retain the request, and replay after TrueNTH login
         # has completed.
         current_app.logger.debug('Postponing oauth client authorization' +
             ' till user authenticates with CS: %s', str(request.args))

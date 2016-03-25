@@ -30,8 +30,7 @@ STATIC_ROLES = IterableUserDict({
         'Anonymous role - exclusive to accounts generated prior to '
         'user authentication',
     'application_developer':
-        'Gives users permission to add/view/edit Central Services '
-        'applications',
+        'Gives users permission to add/view/edit TrueNTH applications',
     'content_manager':
         'Gives user permission to add/view/edit associated content '
         'managment systems',

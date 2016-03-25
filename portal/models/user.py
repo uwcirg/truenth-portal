@@ -162,8 +162,8 @@ class User(db.Model, UserMixin):
                 value_quantity_id=vq.id).add_if_not_found()
 
         UserObservation(user_id=self.id,
-                observation_id=observation.id).add_if_not_found()
-        return 200, "ok"
+                        observation_id=observation.id).add_if_not_found()
+        return 200, "added {} to user {}".format(observation, self.id)
 
     def add_relationship(self, other_user, relationship_name):
         # confirm it's not already defined
@@ -343,7 +343,7 @@ class User(db.Model, UserMixin):
             self.first_name = v_or_n(fhir['name']['given']) or self.first_name
             self.last_name = v_or_n(fhir['name']['family']) or self.last_name
             self.update_username()
-        if 'birthDate' in fhir:
+        if 'birthDate' in fhir and fhir['birthDate'].strip():
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
         if 'gender' in fhir:
@@ -469,6 +469,10 @@ class UserRoles(db.Model):
     __table_args__ = (UniqueConstraint('user_id', 'role_id',
         name='_user_role'),)
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "UserRole {0.user_id}:{0.role_id}".format(self)
+
 
 class UserRelationship(db.Model):
     """SQLAlchemy class for `user_relationships` table
@@ -495,3 +499,9 @@ class UserRelationship(db.Model):
 
     __table_args__ = (UniqueConstraint('user_id', 'other_user_id',
         'relationship_id', name='_user_relationship'),)
+
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "{0.relationship} between {0.user_id} and "\
+            "{0.other_user_id}".format(self)
+

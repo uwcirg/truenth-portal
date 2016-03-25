@@ -27,6 +27,10 @@ class CodeableConcept(db.Model):
     code = db.Column(db.String(80), nullable=False)
     display = db.Column(db.Text, nullable=False)
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "CodeableConcept {0.code}, {0.display}, {0.system}".format(self)
+
     @classmethod
     def from_fhir(cls, data):
         """Factory method to lookup or create instance from fhir"""
@@ -84,6 +88,13 @@ class ValueQuantity(db.Model):
     system = db.Column(db.String(255))
     code = db.Column(db.String(80))
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        components = ','.join([str(x) for x in
+                               self.value, self.units, self.system,
+                               self.code if x is not None])
+        return "ValueQuantity " + components
+
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         d = {}
@@ -124,6 +135,11 @@ class Observation(db.Model):
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "Observation {0.codeable_concept} {0.value_quantity} "\
+                "at {0.issued} with status {0.status} ".format(self)
+
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
@@ -162,7 +178,7 @@ class Observation(db.Model):
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
     observation_id = db.Column(db.ForeignKey('observations.id'))
 
     def add_if_not_found(self):
@@ -266,6 +282,11 @@ class QuestionnaireResponse(db.Model):
         db.DateTime,
         default=default_authored
     )
+
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "QuestionnaireResponse {0.id} for user {0.user_id} "\
+                "{0.status} {0.authored}".format(self)
 
 
 def parse_concepts(elements, system):
