@@ -172,8 +172,9 @@ a:active {
 .img-with-text.flush-with-footer {
   margin-bottom: -30px;
 }
-.img-with-text .full-width {
-  margin: 0 -15px;
+.img-with-text.full-width {
+  margin-left: -15px;
+  margin-right: -15px;
 }
 .text-on-img {
   position: absolute;
