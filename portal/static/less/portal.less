@@ -171,6 +171,12 @@ a:hover, a:active {
 
 .img-with-text {
   position: relative;
+  &.flush-with-footer {
+    margin-bottom: -30px;
+  }
+  .full-width {
+    margin: 0 -15px;
+  }
 }
 .text-on-img {
   position: absolute;
@@ -194,10 +200,6 @@ a:hover, a:active {
     border-top: 1px solid #ccc;
     padding-top: 1em;
   }
-}
-// Utility to move a block flush with footer
-.flush-with-footer {
-  //margin-bottom: 0;
 }
 
 .btn-tnth-primary {
