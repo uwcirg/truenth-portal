@@ -22,47 +22,52 @@
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
 <div id="tnthNavWrapper">
+
     <div id="tnthNavMain">
-        <div id="tnthLogo">
-            <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav.png') }}" /></a>
-        </div>
-        <div id="tnthTopLinks">
-            <div class="tnth-btn-group">
-                {% if username %}
-                <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                    Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
-                    <img src="{{movember_profile}}" width="50" height="50" />
-                </button>
-                <ul class="tnth-dropdown-menu" role="menu">
-                    <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
-                    <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
-                    {% if user and user.has_roles('application_developer') %}
-                    <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
-                    {% endif %}
-                    {% if user and user.has_roles('admin') %}
-                    <li><a href="{{PORTAL}}/admin">User Administration</a></li>
-                    {% endif %}
-                    {% if user %}
-                    <li><a href="{{PORTAL}}/invite">Send an Invite</a></li>
-                    {% endif %}
-                    <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
-                </ul>
-                {% elif login_url %}
-                <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                    Welcome
-                </button>
-                <ul class="tnth-dropdown-menu" role="menu">
-                    <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
-                </ul>
-                {% endif %}
+        <div id="tnthNavMainContainer">
+            <div id="tnthLogo">
+                <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav.png') }}" /></a>
             </div>
-            <!--
-            <a class="tnth-white tnth-nav-btn" href="{{PORTAL}}" title="Return to TrueNTH Home">
-                <div id="tnthHomeBtn"></div>
-            </a>
-            -->
+            <div id="tnthTopLinks">
+                <div class="tnth-btn-group">
+                    {% if username %}
+                    <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
+                        Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
+                        <img src="{{movember_profile}}" width="50" height="50" />
+                    </button>
+                    <ul class="tnth-dropdown-menu" role="menu">
+                        <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
+                        <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+                        {% if user and user.has_roles('application_developer') %}
+                        <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                        {% endif %}
+                        {% if user and user.has_roles('admin') %}
+                        <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                        {% endif %}
+                        {% if user %}
+                        <li><a href="{{PORTAL}}/invite">Send an Invite</a></li>
+                        {% endif %}
+                        <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
+                    </ul>
+                    {% elif login_url %}
+                    <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
+                        Welcome
+                    </button>
+                    <ul class="tnth-dropdown-menu" role="menu">
+                        <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+                <!--
+                <a class="tnth-white tnth-nav-btn" href="{{PORTAL}}" title="Return to TrueNTH Home">
+                    <div id="tnthHomeBtn"></div>
+                </a>
+                -->
+            </div>
         </div>
+
     </div>
+
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">

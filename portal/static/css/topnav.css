@@ -51,10 +51,15 @@
   max-width: 100%;
   background-color: #1A1919;
   background-image: url('../img/truenth_mtn_background3.jpg');
-  height: 74px;
+  height: 124px;
   background-size: cover;
   margin: 0;
-  padding: 5px 15px;
+  padding: 30px;
+}
+#tnthNavMainContainer {
+  max-width: 720px;
+  position: relative;
+  margin: 0 auto;
 }
 #tnthNavXs {
   display: none;
@@ -62,14 +67,13 @@
   width: 100%;
   background-color: #83885F;
   background-image: url('../img/truenth_mtn_background3.jpg');
-  background-size: auto 71px;
+  background-size: auto 81px;
   background-repeat: no-repeat;
-  padding: 5px 15px;
+  padding: 10px 15px;
   z-index: 1000;
-  border-width: 0 0 1px;
+  border: none;
   position: relative;
   min-height: 50px;
-  border: 1px solid transparent;
 }
 #tnthNavXs:after {
   clear: both;
@@ -292,8 +296,21 @@
     display: block;
   }
 }
+@media (min-width: 768px) {
+  #tnthTopLinks {
+    margin-right: -28px;
+  }
+}
+@media (min-width: 992px) {
+  #tnthNavMainContainer {
+    max-width: 940px;
+  }
+}
 @media (min-width: 1200px) {
-  #tnthLogo {
-    margin-left: 80px;
+  #tnthNavMainContainer {
+    max-width: none;
+  }
+  #tnthTopLinks {
+    margin-right: 0;
   }
 }

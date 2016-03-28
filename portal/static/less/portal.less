@@ -301,6 +301,10 @@ a:hover, a:active {
   opacity: 0.4;
 }
 
+/** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
+#mainNav {
+  height: 71px;
+}
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -313,7 +317,9 @@ a:hover, a:active {
   }
 }
 @media (min-width: 768px) {
-
+  #mainNav {
+    height: 124px;
+  }
   #fullSizeBox {
     background-image: none;
     min-height: auto;
