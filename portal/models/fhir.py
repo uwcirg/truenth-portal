@@ -5,6 +5,8 @@ from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import urllib
 
 from ..extensions import db
+from .lazy import lazyprop
+
 
 def as_fhir(obj):
     """For builtin types needing FHIR formatting help
@@ -72,12 +74,25 @@ class CodeableConcept(db.Model):
 
 """ TrueNTH Clinical Codes """
 TRUENTH_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes'
-BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
-                         display='biopsy')
-PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
-                          display='PCa diagnosis')
-TX = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='131',
-                          display='treatment begun')
+class ClinicalConstants(object):
+
+    @lazyprop
+    def BIOPSY(self):
+        return CodeableConcept.query.filter_by(
+            system=TRUENTH_CODE_SYSTEM, code='111').one()
+
+    @lazyprop
+    def PCaDIAG(self):
+        return CodeableConcept.query.filter_by(
+            system=TRUENTH_CODE_SYSTEM, code='121').one()
+
+    @lazyprop
+    def TX(self):
+        return CodeableConcept.query.filter_by(
+            system=TRUENTH_CODE_SYSTEM, code='131').one()
+
+
+CC = ClinicalConstants()
 
 
 class ValueQuantity(db.Model):
@@ -311,19 +326,26 @@ def fetch_HL7_V3_Namespace(valueSet):
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
 
-def add_static_concepts():
+def add_static_concepts(only_quick=False):
     """Seed database with default static concepts
 
     Idempotent - run anytime to push any new concepts into existing dbs
 
-    """
-    concepts = fetch_HL7_V3_Namespace('Ethnicity')
-    for concept in concepts:
-        if not CodeableConcept.query.filter_by(code=concept.code,
-                                               system=concept.system).first():
-            db.session.add(concept)
+    @param only_quick: For unit tests needing quick loads, set true
+        unless the test needs the slow to load race and ethnicity data.
 
-    concepts = fetch_HL7_V3_Namespace('Race')
+    """
+    BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
+                             display='biopsy')
+    PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
+                              display='PCa diagnosis')
+    TX = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='131',
+                         display='treatment begun')
+
+    concepts = [BIOPSY, PCaDIAG, TX]
+    if not only_quick:
+        concepts += fetch_HL7_V3_Namespace('Ethnicity')
+        concepts += fetch_HL7_V3_Namespace('Race')
     for concept in concepts:
         if not CodeableConcept.query.filter_by(code=concept.code,
                                                system=concept.system).first():

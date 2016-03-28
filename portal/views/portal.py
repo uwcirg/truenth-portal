@@ -10,7 +10,7 @@ from flask_swagger import swagger
 
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.fhir import BIOPSY, PCaDIAG, TX
+from ..models.fhir import CC
 from ..models.intervention import named_interventions
 from ..models.message import EmailInvite
 from ..models.role import ROLE
@@ -50,7 +50,7 @@ def home():
 
         # If the user hasn't already answered any upfront questions
         # ask them now - otherwise, off to the portal home..
-        for c in (BIOPSY, PCaDIAG, TX):
+        for c in (CC.BIOPSY, CC.PCaDIAG, CC.TX):
             if user.fetch_values_for_concept(c):
                 return render_template('portal.html', user=user,
                                        interventions=named_interventions())

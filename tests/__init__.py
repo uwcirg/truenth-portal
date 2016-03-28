@@ -15,7 +15,7 @@ from portal.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.auth import Client
-from portal.models.fhir import ValueQuantity, BIOPSY, PCaDIAG, TX
+from portal.models.fhir import CC, ValueQuantity
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import CodeableConcept, ValueQuantity
 from portal.models.fhir import add_static_concepts
@@ -125,7 +125,7 @@ class TestCase(Base):
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
         truthiness = ValueQuantity(value=True, units='boolean')
-        for cc in BIOPSY, PCaDIAG, TX:
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=truthiness)
 
@@ -137,7 +137,7 @@ class TestCase(Base):
 
         """
         with SessionScope(db):
-            add_static_concepts()
+            add_static_concepts(only_quick=False)
             db.session.commit()
 
     def setUp(self):
@@ -145,8 +145,9 @@ class TestCase(Base):
 
         db.create_all()
         with SessionScope(db):
-            # concepts take forever
-            # add directly if test needs them
+            # concepts take forever, only load the quick ones.
+            # add directly (via self.add_concepts()) if test needs them
+            add_static_concepts(only_quick=True)
             add_static_interventions()
             add_static_relationships()
             add_static_roles()

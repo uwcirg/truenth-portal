@@ -12,9 +12,8 @@ import jsonschema
 from ..audit import auditable_event
 
 from ..models.auth import validate_client_origin
-from ..models.fhir import CodeableConcept, ValueQuantity, Observation
+from ..models.fhir import CC, CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
-from ..models.fhir import BIOPSY, PCaDIAG, TX
 from ..models.intervention import Intervention, UserIntervention
 from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
@@ -316,7 +315,7 @@ def biopsy(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
-                                     codeable_concept=BIOPSY)
+                                     codeable_concept=CC.BIOPSY)
 
 
 @api.route('/patient/<int:patient_id>/clinical/pca_diag')
@@ -353,7 +352,7 @@ def pca_diag(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
-                                     codeable_concept=PCaDIAG)
+                                     codeable_concept=CC.PCaDIAG)
 
 
 @api.route('/patient/<int:patient_id>/clinical/tx')
@@ -390,7 +389,7 @@ def treatment(patient_id):
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
     return clinical_api_shortcut_get(patient_id=patient.id,
-                                     codeable_concept=TX)
+                                     codeable_concept=CC.TX)
 
 
 @api.route('/patient/<int:patient_id>/clinical/biopsy', methods=('POST', 'PUT'))
@@ -445,8 +444,9 @@ def biopsy_set(patient_id):
           to view requested patient
 
     """
+    x = CC.BIOPSY
     return clinical_api_shortcut_set(patient_id=patient_id,
-                                     codeable_concept=BIOPSY)
+                                     codeable_concept=CC.BIOPSY)
 
 
 @api.route('/patient/<int:patient_id>/clinical/pca_diag', methods=('POST', 'PUT'))
@@ -500,7 +500,7 @@ def pca_diag_set(patient_id):
 
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
-                                     codeable_concept=PCaDIAG)
+                                     codeable_concept=CC.PCaDIAG)
 
 
 @api.route('/patient/<int:patient_id>/clinical/tx', methods=('POST', 'PUT'))
@@ -553,7 +553,8 @@ def tx_set(patient_id):
           to view requested patient
 
     """
-    return clinical_api_shortcut_set(patient_id=patient_id, codeable_concept=TX)
+    return clinical_api_shortcut_set(patient_id=patient_id,
+                                     codeable_concept=CC.TX)
 
 
 @api.route('/patient/<int:patient_id>/clinical')
