@@ -40,10 +40,10 @@
     {% endfor %}
 {%- endmacro %}
 
-{% macro render_submit_field(field, label=None, tabindex=None) -%}
+{% macro render_submit_field(field, label=None, tabindex=None, btnSize=false) -%}
     {% if not label %}{% set label=field.label.text %}{% endif %}
     {#<button type="submit" class="form-control btn btn-tnth-primary">{{label}}</button>#}
-    <input type="submit" class="btn btn-default btn-tnth-primary" value="{{label}}"
+    <input type="submit" class="btn btn-default btn-tnth-primary {{ btnSize }}" value="{{label}}"
            {% if tabindex %}tabindex="{{ tabindex }}"{% endif %}
            >
 {%- endmacro %}
@@ -92,7 +92,7 @@
 >
     <div class="row">
         <div class="col-xs-6">
-            <p><a href="{{PORTAL}}/about">Contact</a> | <a href="{{PORTAL}}/about">About</a> | <a href="{{PORTAL}}/terms-of-use">Legal</a></p>
+            <p><small><a href="{{PORTAL}}/about">Contact</a> | <a href="{{PORTAL}}/about">About</a> | <a href="{{PORTAL}}/terms-of-use">Legal</a></small></p>
         </div>
         <div class="col-xs-6">
             <div class="pull-right">

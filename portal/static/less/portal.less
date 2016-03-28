@@ -4,39 +4,50 @@
  * = Font sizing =
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
- *
+**/
+@baseFontSize:    18px;
+@headlineSize:    24px;
+@subheadSize:     22px;
+@lgFontSize:      24px;
+@lgHeadlineSize:  32px;
+@lgsubheadSize:   29px;
+@smallerText:     14px;
+/**
  * = Colors =
- *
  **/
+@baseColor:       #333;
+@linkColor:       #57675B;
+@linkHover:       #2a4531;
+
 body {
   margin: 0;
   background-color: #FFF;
   font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
-  color: #333;
-  font-size: 18px;
+  color: @baseColor;
+  font-size: @baseFontSize;
 }
 a {
-  color: #497856;
+  color: @linkColor;
 }
 a:hover, a:active {
-  color: #2a4531;
+  color: @linkHover;
 }
 .btn {
-  font-size: 18px;
+  font-size: @baseFontSize;
 }
 // Or just set h1?
 .tnth-headline {
   text-transform: uppercase;
   margin: 30px 0 20px;
-  font-size: 24px;
+  font-size: @headlineSize;
 }
 // Or just set h2?
 .tnth-subhead {
-  font-size: 22px;
+  font-size: @subheadSize;
 }
 // Used for admin tables or other place where we don't need the large font size
 .smaller-text {
-  font-size: 14px;
+  font-size: @smallerText;
 }
 
 .feature-btn {
@@ -151,11 +162,16 @@ a:hover, a:active {
   }
 }
 .form-control {
-  font-size: 18px;
+  font-size: @baseFontSize;
   height: 39px;
 }
-.form-group .help-block {
-  font-size: 16px;
+.form-group {
+  .help-block {
+    font-size: 16px;
+  }
+  label {
+    font-weight: normal;
+  }
 }
 .profile-img {
   float: right;
@@ -171,6 +187,13 @@ a:hover, a:active {
 
 .img-with-text {
   position: relative;
+  &.flush-with-footer {
+    margin-bottom: -30px;
+  }
+  &.full-width {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
 }
 .text-on-img {
   position: absolute;
@@ -189,11 +212,11 @@ a:hover, a:active {
   line-height: 1.2;
   display: none;
   text-align: left;
-}
-.footer-separate {
-  margin-top: 2em;
-  border-top: 1px solid #ccc;
-  padding-top: 1em;
+  &.footer-separate {
+    margin-top: 30px;
+    border-top: 1px solid #ccc;
+    padding-top: 1em;
+  }
 }
 
 .btn-tnth-primary {
@@ -258,10 +281,6 @@ a:hover, a:active {
 }
 
 /** styles specific to profile **/
-#saveMsg {
-  margin: 1em 0;
-  display: inline-block;
-}
 .loading-indicator {
   display: none;
   position: absolute;
@@ -289,15 +308,11 @@ a:hover, a:active {
     max-height: 80px;
   }
   #homeFooter {
-    font-size: 14px;
+    font-size: @smallerText;
     padding-top: 0.5em;
   }
 }
 @media (min-width: 768px) {
-  #saveMsg {
-    margin-left: 1em;
-  }
-
 
   #fullSizeBox {
     background-image: none;
@@ -335,24 +350,24 @@ a:hover, a:active {
 
   /** Font sizes changes above 992 **/
   body {
-    font-size: 24px;
+    font-size: @lgFontSize;
   }
   .tnth-headline {
-    font-size: 32px;
+    font-size: @lgHeadlineSize;
   }
   .tnth-subhead {
-    font-size: 29px;
+    font-size: @lgsubheadSize;
   }
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   .reduce-font-sizes {
     body & {
-      font-size: 18px;
+      font-size: @baseFontSize;
     }
     .tnth-headline {
-      font-size: 24px;
+      font-size: @headlineSize;
     }
     .tnth-subhead {
-      font-size: 22px;
+      font-size: @subheadSize;
     }
   }
 
@@ -375,7 +390,7 @@ a:hover, a:active {
     }
   }
   .tnth-splash .headline {
-    font-size: 32px;
+    font-size: @lgHeadlineSize;
   }
   .pos-bottom-md {
     position: absolute;
@@ -384,6 +399,10 @@ a:hover, a:active {
     .btn {
       margin: 0 0 15px 15px;
     }
+  }
+
+  .form-group input[type=checkbox], .form-group  input[type=radio] {
+    margin-top: 9px;
   }
 }
 @media (min-width: 1200px) {
@@ -435,9 +454,6 @@ a:hover, a:active {
   #homeFooter {
     max-width: 1400px;
     margin: 0 auto;
-    &.footer-separate {
-      margin-top: 2em;
-    }
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/

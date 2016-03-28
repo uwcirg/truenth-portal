@@ -31,7 +31,7 @@ My TrueNTH Profile
         {% endif %}
 
         <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
-        <label>Name</label>
+        <label style="font-weight: normal">Name</label>
         <div class="row">
             <div class="col-xs-6">
                 <div class="form-group">
@@ -151,12 +151,13 @@ My TrueNTH Profile
 
         </div>
 
-        <span id="saveMsg" class="text-muted" style="visibility: hidden">You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</span>
-
+        <div class="visible-lg"><br /></div>
         <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
 
     </div>
 </div>
+
+    <div id="saveMsg" class="text-muted text-center" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></div>
 
 <hr />
 
@@ -266,17 +267,17 @@ $(document).ready(function(){
         disable: false
     });
 
-    $('#profileForm').on('validated.bs.validator', function(e) {
-        var validator = $(this).data('bs.validator');
-        if (!validator.hasErrors()) {
-            $("#saveMsg").css('visibility','visible')
-        } else {
-            $("#saveMsg").css('visibility','hidden')
-        }
-    });
-    $('#profileForm input, #profileForm select').on('invalid.bs.validator', function() {
-        $("#saveMsg").css('visibility','hidden')
-    });
+$('#profileForm').on('validated.bs.validator', function(e) {
+    var validator = $(this).data('bs.validator');
+    if (!validator.hasErrors()) {
+        $("#saveMsg").fadeIn("slow");
+    } else {
+        $("#saveMsg").hide();
+    }
+});
+$('#profileForm input, #profileForm select').on('invalid.bs.validator', function() {
+    $("#saveMsg").hide();
+});
 
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
     var currentBd = $("#birthday").val();
@@ -327,7 +328,7 @@ $(document).ready(function(){
             dataType: 'json',
             data: JSON.stringify(demoArray)
         }).done(function() {
-            $("#saveMsg").css('visibility','hidden')
+            $("#saveMsg").hide()
             setTimeout(function(){
                 $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
                 $("#profileForm").removeClass("loading");
