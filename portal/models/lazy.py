@@ -17,7 +17,7 @@ def lazyprop(fn):
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):
-            print "loading {}".format(attr_name)
+            #print "loading {}".format(attr_name)
             setattr(self, attr_name, fn(self))
         # at least for testing, we run into session errors
         # make sure it's accessible before returning or merge
