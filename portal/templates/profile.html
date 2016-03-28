@@ -15,7 +15,7 @@
 {% if current_user.has_role('admin')%}
 Profile for {{ user.username }}
 {% else %}
-My TrueNTH Profile
+My T<span style="text-transform: lowercase">rue</span>NTH Profile
 {% endif %}
 </h3>
 
@@ -100,12 +100,13 @@ My TrueNTH Profile
         </div>
         <div class="form-group">
             <label for="phone">Cell phone</label>
-            <input type="text" class="form-control" id="phone" name="phone" placeholder="Mobile phone" value="{{ user.phone if user.phone }}">
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Cell phone" value="{{ user.phone if user.phone }}">
         </div>
 
     </div>
     <div class="col-md-5 pos-bottom-md">
 
+        <!--
         <div id="patientQuestions">
             <div class="form-group">
                 <label>Have you had a prostate cancer biopsy?</label>
@@ -148,10 +149,10 @@ My TrueNTH Profile
                     </label>
                 </div>
             </div>
-
         </div>
-
         <div class="visible-lg"><br /></div>
+        -->
+
         <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
 
     </div>
@@ -342,6 +343,7 @@ $('#profileForm input, #profileForm select').on('invalid.bs.validator', function
     });
 });
 
+/** Remove patientQuestion functionality for now
 var getQs = [ "biopsy", "pca_diag", "tx"];
 $.each(getQs, function(i,val){
     $.ajax ({
@@ -356,7 +358,6 @@ $.each(getQs, function(i,val){
         console.log("Problem retrieving data from server.")
     });
 });
-
 $("#patientQuestions input").on("change", function(){
     var toCall = $(this).attr("name");
     var theVal = $(this).val();
@@ -373,7 +374,7 @@ $("#patientQuestions input").on("change", function(){
         alert("There was a problem saving your answers. Please try again.");
     });
 });
-
+**/
 // GET and PUT user roles
 $.ajax ({
     type: "GET",
