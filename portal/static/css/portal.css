@@ -120,7 +120,7 @@ a:active {
 .tnth-splash-bottom-link {
   color: #fff;
   padding: 8px;
-  font-size: 20px;
+  font-size: 18px;
 }
 .tnth-splash-bottom-link.separator {
   margin: 0 12px;
@@ -321,6 +321,9 @@ a:active {
     font-weight: bold;
     padding: 6px 24px;
     font-size: 22px;
+  }
+  .tnth-splash-bottom-link {
+    font-size: 24px;
   }
 }
 @media (min-width: 992px) {
