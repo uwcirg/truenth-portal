@@ -323,7 +323,7 @@ $('#profileForm input, #profileForm select').on('invalid.bs.validator', function
         ];
         /** Send the AJAX **/
         $.ajax ({
-            type: "POST",
+            type: "PUT",
             url: '/api/demographics/{{ user.id }}',
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
