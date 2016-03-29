@@ -16,8 +16,8 @@ from .fhir import Coding, CodeableConcept, ValueQuantity
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 
-# http://hl7.org/fhir/v3/AdministrativeGender/
-gender_types = ENUM('male', 'female', 'undifferentiated', name='genders',
+#https://www.hl7.org/fhir/valueset-administrative-gender.html
+gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
 class Extension:
@@ -277,10 +277,7 @@ class User(db.Model, UserMixin):
         if self.birthdate:
             d['birthDate'] = as_fhir(self.birthdate)
         if self.gender:
-            d['gender'] = {'coding': [{'system':
-                "http://hl7.org/fhir/v3/AdministrativeGender",
-                'code': self.gender[0].upper(),
-                'display': self.gender.capitalize()}]}
+            d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
         if self.locale:
             d['communication'] = [{"language": self.locale.as_fhir()}]
@@ -340,8 +337,8 @@ class User(db.Model, UserMixin):
         if 'birthDate' in fhir and fhir['birthDate'].strip():
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
-        if 'gender' in fhir:
-            self.gender = fhir['gender']['coding'][0]['display'].lower()
+        if 'gender' in fhir and fhir['gender']:
+            self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
             for e in fhir['telecom']:
                 if e['system'] == 'email':
