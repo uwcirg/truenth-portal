@@ -12,7 +12,7 @@ from flask.ext.login import current_user as flask_login_current_user
 from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
-from .fhir import CodeableConcept, ValueQuantity
+from .fhir import Coding, CodeableConcept, ValueQuantity
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 
@@ -44,7 +44,7 @@ class Extension:
 
         for coding in self.extension['valueCodeableConcept']['coding']:
             try:
-                concept = CodeableConcept.query.filter_by(
+                concept = Coding.query.filter_by(
                     system=coding['system'], code=coding['code']).one()
             except NoResultFound:
                 raise ValueError("Unknown code: {} for system{}".format(
@@ -124,9 +124,9 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
-    ethnicities = db.relationship(CodeableConcept, lazy='dynamic',
+    ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
-    races = db.relationship(CodeableConcept, lazy='dynamic',
+    races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
             secondary="user_observations", backref=db.backref('users'))
@@ -140,26 +140,20 @@ class User(db.Model, UserMixin):
         if not 'valueQuantity' in fhir:
             return 400, "missing required 'valueQuantity'"
 
-        # Only retaining first Codeable Concept at this time
-        if len(fhir['code']['coding']) > 1:
-            return 400, "can't handle multiple codeable concepts"
-        first_cc = fhir['code']['coding'][0]
-        cc = CodeableConcept(system=first_cc.get('system'),
-                code=first_cc.get('code'),
-                display=first_cc.get('display')).add_if_not_found()
+        cc = CodeableConcept.from_fhir(fhir['code']).add_if_not_found()
 
         v = fhir['valueQuantity']
         vq = ValueQuantity(value=v.get('value'),
                 units=v.get('units'),
                 system=v.get('system'),
-                code=v.get('code')).add_if_not_found()
+                code=v.get('code')).add_if_not_found(True)
 
         issued = fhir.get('issued') and\
                 parser.parse(fhir.get('issued')) or None
         observation = Observation(status=fhir.get('status'),
                 issued=issued,
                 codeable_concept_id=cc.id,
-                value_quantity_id=vq.id).add_if_not_found()
+                value_quantity_id=vq.id).add_if_not_found(True)
 
         UserObservation(user_id=self.id,
                         observation_id=observation.id).add_if_not_found()
@@ -462,9 +456,9 @@ def get_user(uid):
 class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'))
+        ondelete='CASCADE'), nullable=False)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id',
-        ondelete='CASCADE'))
+        ondelete='CASCADE'), nullable=False)
 
     __table_args__ = (UniqueConstraint('user_id', 'role_id',
         name='_user_role'),)
@@ -484,11 +478,11 @@ class UserRelationship(db.Model):
     __tablename__ = 'user_relationships'
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'))
+        ondelete='CASCADE'), nullable=False)
     other_user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
-        ondelete='CASCADE'))
+        ondelete='CASCADE'), nullable=False)
     relationship_id = db.Column(db.Integer(),
-        db.ForeignKey('relationships.id', ondelete='CASCADE'))
+        db.ForeignKey('relationships.id', ondelete='CASCADE'), nullable=False)
 
     user = db.relationship("User", backref='relationships',
                            foreign_keys=[user_id])

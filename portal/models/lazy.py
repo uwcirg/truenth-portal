@@ -1,4 +1,5 @@
 from sqlalchemy.orm.util import class_mapper
+from sqlalchemy.orm.exc import DetachedInstanceError
 
 from ..extensions import db
 
@@ -17,16 +18,19 @@ def lazyprop(fn):
     @property
     def _lazyprop(self):
         if not hasattr(self, attr_name):
-            #print "loading {}".format(attr_name)
             setattr(self, attr_name, fn(self))
-        # at least for testing, we run into session errors
-        # make sure it's accessible before returning or merge
-        # but only if it's an ORM instance
+
         attr = getattr(self, attr_name)
+
+        # ORM objects (especially in testing) are occasionally detached
         if _is_sql_wrapper(attr):
             try:
                 test = attr.id
-            except:
+            except DetachedInstanceError:
                 attr = db.session.merge(attr)
+                if attr.id:
+                    setattr(self, attr_name, attr)
+                else:
+                    setattr(self, attr_name, fn(self))
         return attr
     return _lazyprop

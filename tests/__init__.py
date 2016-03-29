@@ -124,7 +124,8 @@ class TestCase(Base):
 
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
-        truthiness = ValueQuantity(value=True, units='boolean')
+        truthiness = ValueQuantity(value=True,
+                                   units='boolean').add_if_not_found(True)
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=truthiness)
@@ -161,3 +162,8 @@ class TestCase(Base):
 
         db.session.remove()
         db.drop_all()
+
+        # lazyprops can't survive a db purge - reset via delattr
+        for attr in dir(CC):
+            if attr.startswith('_lazy'):
+                delattr(CC, attr)

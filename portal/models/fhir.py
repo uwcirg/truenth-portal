@@ -1,6 +1,7 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
 import json
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import urllib
 
@@ -22,25 +23,103 @@ def as_fhir(obj):
         return obj.strftime('%Y-%m-%d')
 
 
+class CodeableConceptCoding(db.Model):
+    """Link table joining CodeableConcept with n Codings"""
+
+    __tablename__ = 'codeable_concept_codings'
+    id = db.Column(db.Integer, primary_key=True)
+    codeable_concept_id = db.Column(db.ForeignKey(
+        'codeable_concepts.id'), nullable=False)
+    coding_id =  db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    # Maintain a unique relationship between each codeable concepts
+    # and the its of codings.  Therefore, a CodeableConcept always
+    # contains the superset of all codings given for the concept.
+    db.UniqueConstraint('codeable_concept_id', 'coding_id',
+                        name='unique_codeable_concept_coding')
+
+
 class CodeableConcept(db.Model):
     __tablename__ = 'codeable_concepts'
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.Text)
+    codings = db.relationship("Coding", secondary='codeable_concept_codings')
+
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        summary = "CodeableConcept {} [".format(
+            self.text if self.text else '')
+        summary += ','.join([str(coding) for coding in self.codings])
+        return summary + ']'
+
+    @classmethod
+    def from_fhir(cls, data):
+        cc = cls()
+        if 'text' in data:
+            cc.text = data['text']
+        for coding in data['coding']:
+            item = Coding.from_fhir(coding)
+            cc.codings.append(item)
+        return cc.add_if_not_found()
+
+    def as_fhir(self):
+        """Return self in JSON FHIR formatted string"""
+        d = {"coding": [coding.as_fhir() for coding in self.codings]}
+        if self.text:
+            d['text'] = self.text
+        return d
+
+    def add_if_not_found(self, commit_immediately=False):
+        """Add self to database, or return existing
+
+        Queries for similar, matching on the set of contained
+        codings alone.  Adds if no match is found.
+
+        @return: the new or matched CodeableConcept
+
+        """
+        # we're imposing a constraint, where any CodeableConcept pointing
+        # at a particular Coding will be the ONLY CodeableConcept for that
+        # particular Coding.
+        coding_ids = [c.id for c in self.codings]
+        assert coding_ids
+        found = CodeableConceptCoding.query.filter(
+            CodeableConceptCoding.coding_id.in_(coding_ids)).first()
+        if not found:
+            # First time for this (set) of codes, add new rows
+            db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
+        else:
+            # Build a union of all codings found, old and new
+            old = CodeableConcept.query.get(found.codeable_concept_id)
+            self.text = self.text if self.text else old.text
+            self.codings = list(set(old.codings).union(set(self.codings)))
+            self.id = found.codeable_concept_id
+        self = db.session.merge(self)
+        return self
+
+
+class Coding(db.Model):
+    __tablename__ = 'codings'
     id = db.Column(db.Integer, primary_key=True)
     system = db.Column(db.String(255), nullable=False)
     code = db.Column(db.String(80), nullable=False)
     display = db.Column(db.Text, nullable=False)
+    __table_args__ = (UniqueConstraint('system', 'code',
+        name='_system_code'),)
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "CodeableConcept {0.code}, {0.display}, {0.system}".format(self)
+        return "Coding {0.code}, {0.display}, {0.system}".format(self)
 
     @classmethod
     def from_fhir(cls, data):
         """Factory method to lookup or create instance from fhir"""
         cc = cls()
-        coding = data['coding'][0]
         for i in ("system", "code", "display"):
-            if i in coding:
-                cc.__setattr__(i, coding[i])
+            if i in data:
+                cc.__setattr__(i, data[i])
         return cc.add_if_not_found()
 
     def as_fhir(self):
@@ -49,7 +128,7 @@ class CodeableConcept(db.Model):
         for i in ("system", "code", "display"):
             if getattr(self, i):
                 d[i] = getattr(self, i)
-        return {"coding": [d,]}
+        return d
 
     def add_if_not_found(self):
         """Add self to database, or return existing
@@ -59,7 +138,6 @@ class CodeableConcept(db.Model):
         to database first if not.
 
         """
-        self = db.session.merge(self)
         if self.id:
             return self
 
@@ -78,18 +156,27 @@ class ClinicalConstants(object):
 
     @lazyprop
     def BIOPSY(self):
-        return CodeableConcept.query.filter_by(
+        coding = Coding.query.filter_by(
             system=TRUENTH_CODE_SYSTEM, code='111').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
     @lazyprop
     def PCaDIAG(self):
-        return CodeableConcept.query.filter_by(
+        coding = Coding.query.filter_by(
             system=TRUENTH_CODE_SYSTEM, code='121').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
     @lazyprop
     def TX(self):
-        return CodeableConcept.query.filter_by(
+        coding = Coding.query.filter_by(
             system=TRUENTH_CODE_SYSTEM, code='131').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
 
 CC = ClinicalConstants()
@@ -118,7 +205,7 @@ class ValueQuantity(db.Model):
                 d[i] = getattr(self, i)
         return {"valueQuantity": d}
 
-    def add_if_not_found(self):
+    def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
         Queries for similar, existing ValueQuantity (matches on
@@ -134,6 +221,8 @@ class ValueQuantity(db.Model):
                 units=self.units, system=self.system).first()
         if not match:
             db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
         elif self is not match:
             self = db.session.merge(match)
         return self
@@ -144,8 +233,10 @@ class Observation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     issued = db.Column(db.DateTime, default=datetime.now)
     status = db.Column(db.String(80))
-    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
-    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'))
+    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'),
+                                   nullable=False)
+    value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
+                                 nullable=False)
 
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
@@ -166,7 +257,7 @@ class Observation(db.Model):
         fhir.update(self.value_quantity.as_fhir())
         return fhir
 
-    def add_if_not_found(self):
+    def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
         Queries for matching, existing Observation.
@@ -185,6 +276,8 @@ class Observation(db.Model):
         match = self.query.filter_by(**match_dict).first()
         if not match:
             db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
         elif self is not match:
             self = db.session.merge(match)
         return self
@@ -193,8 +286,13 @@ class Observation(db.Model):
 class UserObservation(db.Model):
     __tablename__ = 'user_observations'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
-    observation_id = db.Column(db.ForeignKey('observations.id'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                       nullable=False)
+    observation_id = db.Column(db.ForeignKey('observations.id'),
+                              nullable=False)
+
+    __table_args__ = (UniqueConstraint('user_id', 'observation_id',
+        name='_user_observation'),)
 
     def add_if_not_found(self):
         """Add self to database, or return existing
@@ -218,57 +316,22 @@ class UserObservation(db.Model):
 class UserEthnicity(db.Model):
     __tablename__ = 'user_ethnicities'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
-    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                        nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
-
-    def add_if_not_found(self):
-        """Add self to database, or return existing
-
-        Queries for matching, existing UserEthnicity.
-        Populates self.id if found, adds to database first if not.
-
-        """
-        if self.id:
-            return self
-
-        match = self.query.filter_by(user_id=self.user_id,
-                codeable_concept_id=self.codeable_concept_id).first()
-        if not match:
-            db.session.add(self)
-        elif self is not match:
-            self = db.session.merge(match)
-        return self
-
-
+    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
+        name='_ethnicity_user_coding'),)
 
 class UserRace(db.Model):
     __tablename__ = 'user_races'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
-    codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                        nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
-
-    def add_if_not_found(self):
-        """Add self to database, or return existing
-
-        Queries for matching, existing UserRace.
-        Populates self.id if found, adds to database first if not.
-
-        """
-        if self.id:
-            return self
-
-        match = self.query.filter_by(user_id=self.user_id,
-                codeable_concept_id=self.codeable_concept_id).first()
-        if not match:
-            db.session.add(self)
-        elif self is not match:
-            self = db.session.merge(match)
-        return self
-
+    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
+        name='_race_user_coding'),)
 
 class QuestionnaireResponse(db.Model):
 
@@ -308,9 +371,9 @@ def parse_concepts(elements, system):
     "recursive function to build array of concepts from nested structure"
     ccs = []
     for element in elements:
-        ccs.append(CodeableConcept(code=element['code'],
-                                   display=element['display'],
-                                   system=system))
+        ccs.append(Coding(code=element['code'],
+                          display=element['display'],
+                          system=system))
         if 'concept' in element:
             ccs += parse_concepts(element['concept'], system)
     return ccs
@@ -335,11 +398,11 @@ def add_static_concepts(only_quick=False):
         unless the test needs the slow to load race and ethnicity data.
 
     """
-    BIOPSY = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='111',
+    BIOPSY = Coding(system=TRUENTH_CODE_SYSTEM, code='111',
                              display='biopsy')
-    PCaDIAG = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='121',
+    PCaDIAG = Coding(system=TRUENTH_CODE_SYSTEM, code='121',
                               display='PCa diagnosis')
-    TX = CodeableConcept(system=TRUENTH_CODE_SYSTEM, code='131',
+    TX = Coding(system=TRUENTH_CODE_SYSTEM, code='131',
                          display='treatment begun')
 
     concepts = [BIOPSY, PCaDIAG, TX]
@@ -347,6 +410,6 @@ def add_static_concepts(only_quick=False):
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')
     for concept in concepts:
-        if not CodeableConcept.query.filter_by(code=concept.code,
-                                               system=concept.system).first():
+        if not Coding.query.filter_by(code=concept.code,
+                                      system=concept.system).first():
             db.session.add(concept)

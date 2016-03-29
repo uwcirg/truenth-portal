@@ -3,7 +3,7 @@ from flask.ext.webtest import SessionScope
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
-from portal.models.fhir import CodeableConcept, UserEthnicity
+from portal.models.fhir import Coding, CodeableConcept, UserEthnicity
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship
 
@@ -36,13 +36,13 @@ class TestUser(TestCase):
         self.add_concepts()
 
         # Add two ethnicities directly - one in and one not in extension below
-        concepts = CodeableConcept.query.filter(CodeableConcept.code.in_(
+        concepts = Coding.query.filter(Coding.code.in_(
             ('2142-8', '2135-2'))).all()
         with SessionScope(db):
             db.session.add(UserEthnicity(user_id=TEST_USER_ID,
-                                         codeable_concept_id=concepts[0].id))
+                                         coding_id=concepts[0].id))
             db.session.add(UserEthnicity(user_id=TEST_USER_ID,
-                                         codeable_concept_id=concepts[1].id))
+                                         coding_id=concepts[1].id))
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(2, self.test_user.ethnicities.count())

@@ -6,7 +6,7 @@ from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 from portal.extensions import db
 from portal.models.intervention import Intervention, INTERVENTION
 from portal.models.fhir import Observation, UserObservation
-from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import ROLE, STATIC_ROLES
 from portal.models.user import User, UserRelationship
@@ -62,7 +62,7 @@ class TestAPI(TestCase):
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
-        self.assertEquals(new_user.locale.code, language)
+        self.assertEquals(new_user.locale.codings[0].code, language)
 
     def test_demographicsGET(self):
         self.login()
@@ -134,9 +134,10 @@ class TestAPI(TestCase):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
             observation = Observation()
-            observation.codeable_concept = CodeableConcept(
-                    system='SNOMED-CT', code='372278000',
+            coding = Coding(system='SNOMED-CT', code='372278000',
                     display='Gleason score')
+            cc = CodeableConcept(codings=[coding,])
+            observation.codeable_concept = cc
             observation.value_quantity = ValueQuantity(value=2)
             db.session.add(observation)
             db.session.flush()

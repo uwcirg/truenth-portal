@@ -444,7 +444,6 @@ def biopsy_set(patient_id):
           to view requested patient
 
     """
-    x = CC.BIOPSY
     return clinical_api_shortcut_set(patient_id=patient_id,
                                      codeable_concept=CC.BIOPSY)
 
