@@ -214,9 +214,12 @@ a:hover, a:active {
   display: none;
   text-align: left;
   &.footer-separate {
-    margin-top: 30px;
-    border-top: 1px solid #ccc;
-    padding-top: 1em;
+    padding-top: 0;
+    .footer-container {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
   }
 }
 
@@ -315,6 +318,15 @@ a:hover, a:active {
   #homeFooter {
     font-size: @smallerText;
     padding-top: 0.5em;
+  }
+  .text-on-img {
+    padding: 6px;
+    .tnth-subhead {
+      margin: 0;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 @media (min-width: 768px) {

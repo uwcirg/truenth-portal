@@ -197,6 +197,9 @@ a:active {
   text-align: left;
 }
 #homeFooter.footer-separate {
+  padding-top: 0;
+}
+#homeFooter.footer-separate .footer-container {
   margin-top: 30px;
   border-top: 1px solid #ccc;
   padding-top: 1em;
@@ -295,6 +298,15 @@ a:active {
   #homeFooter {
     font-size: 14px;
     padding-top: 0.5em;
+  }
+  .text-on-img {
+    padding: 6px;
+  }
+  .text-on-img .tnth-subhead {
+    margin: 0;
+  }
+  .text-on-img p:last-child {
+    margin-bottom: 0;
   }
 }
 @media (min-width: 768px) {
