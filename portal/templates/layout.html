@@ -25,9 +25,10 @@
 {% endif %}
 
 <body>
-    <!-- topNav loads here -->
+    {# portal_wrapper loads in mainNav here. Hide completely on splashView pages #}
     <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
     </div>
+
     <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
       <div id="mainDiv">
 
@@ -47,8 +48,8 @@
             {{ footer() }}
         {% endif %}
 
-      </div> <!-- <div id="mainDiv"> -->
-    </div> <!-- <div id="mainHolder"> -->
+      </div> {# <!-- <div id="mainDiv"> --> #}
+    </div> {# <!-- <div id="mainHolder"> --> #}
 
     {# One-time system messages called Flash messages #}
     {% block flash_messages %}

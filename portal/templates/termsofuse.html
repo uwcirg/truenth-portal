@@ -2,10 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-
   {{ back_btn(PORTAL,'Home') }}
-
-  <div class="reduce-font-sizes">
 
     <h1 class="tnth-headline">TrueNTH Terms of Use</h1>
     <p>
@@ -31,10 +28,5 @@
     <br />
     <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.version }}</div>
     {% endif %}
-
-  </div>
-
-
-
 
 {% endblock %}

@@ -83,13 +83,7 @@
 {%- endmacro %}
 
 {% macro footer(splash_style=false) -%}
-<div id="homeFooter"
-     {% if splash_style %}
-        class="container-fluid"
-     {% else %}
-        class="container footer-separate"
-     {% endif %}
->
+<div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
         <div class="col-xs-6">
             <p><small><a href="{{PORTAL}}/about">Contact</a> | <a href="{{PORTAL}}/about">About</a> | <a href="{{PORTAL}}/terms-of-use">Legal</a></small></p>

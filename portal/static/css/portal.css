@@ -26,7 +26,6 @@ a:active {
   font-size: 18px;
 }
 .tnth-headline {
-  text-transform: uppercase;
   margin: 30px 0 20px;
   font-size: 24px;
 }
@@ -102,6 +101,7 @@ a:active {
 .tnth-splash .headline {
   font-size: 20px;
   line-height: 1.1;
+  text-shadow: black 0px 0px 10px;
 }
 .tnth-splash .feature-btn-primary {
   margin-top: 0.5em;
@@ -121,6 +121,7 @@ a:active {
   color: #fff;
   padding: 8px;
   font-size: 18px;
+  text-shadow: black 0px 0px 10px;
 }
 .tnth-splash-bottom-link.separator {
   margin: 0 12px;
