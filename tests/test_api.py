@@ -87,11 +87,7 @@ class TestAPI(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "birthDate": dob,
-                "gender": {"coding": [{
-                    "code": "M",
-                    "display": gender,
-                    "system": "http://hl7.org/fhir/v3/AdministrativeGender"
-                    }]},
+                "gender": gender,
                 "telecom": [{
                     "system": "phone",
                     "value": "867-5309"
@@ -119,7 +115,7 @@ class TestAPI(TestCase):
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['birthDate'], dob)
-        self.assertEquals(fhir['gender']['coding'][0]['display'], gender)
+        self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
         self.assertEquals(2, len(fhir['extension']))
