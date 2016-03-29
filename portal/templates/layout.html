@@ -26,43 +26,66 @@
 
 <body>
     <!-- topNav loads here -->
-    <div id="mainNav">
+    <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
     </div>
     <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
-    <div id="mainDiv">
+      <div id="mainDiv">
+
+        <div class="container{% if splashView %}-fluid{% endif %}">
+            <div class="row">
+                <div class="col-xs-12">
+                    {% block main %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        {% from "flask_user/_macros.html" import footer %}
+        {% if splashView %}
+            {{ footer(splash_style=true) }}
+        {% else %}
+            {{ footer() }}
+        {% endif %}
+
+      </div> <!-- <div id="mainDiv"> -->
+    </div> <!-- <div id="mainHolder"> -->
+
     {# One-time system messages called Flash messages #}
     {% block flash_messages %}
         {%- with messages = get_flashed_messages(with_categories=true) -%}
             {% if messages %}
-                {% for category, message in messages %}
-                    {% if category=='error' %}
-                        {% set category='danger' %}
-                    {% endif %}
-                    <div class="alert alert-{{category}}">{{ message|safe }}</div>
-                {% endfor %}
+                {# Modal dialog for alerts #}
+                <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h2 class="modal-title">TrueNTH</h2>
+                      </div>
+                      <div class="modal-body">
+
+                        {% for category, message in messages %}
+                            {% if category=='error' %}
+                                {% set category='danger' %}
+                            {% endif %}
+                            <p class="text-{{category}}">{{ message|safe }}</p>
+                        {% endfor %}
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {# Modal dialog opens on page load because we went to display alert(s) #}
+                <script>
+                  $('#alertModal').modal('show')
+                </script>
             {% endif %}
         {%- endwith %}
     {% endblock %}
 
-    <div class="container{% if splashView %}-fluid{% endif %}">
-        <div class="row">
-            <div class="col-xs-12">
-                {% block main %}
-                {% endblock %}
-            </div>
-        </div>
-    </div>
-
-    {% from "flask_user/_macros.html" import footer %}
-    {% if splashView %}
-        {{ footer(splash_style=true) }}
-    {% else %}
-        {{ footer() }}
-    {% endif %}
-
-
-    </div> <!-- <div id="mainDiv"> -->
-    </div> <!-- <div id="mainHolder"> -->
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
