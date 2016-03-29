@@ -299,6 +299,15 @@ a:active {
     font-size: 14px;
     padding-top: 0.5em;
   }
+  .text-on-img {
+    padding: 6px;
+  }
+  .text-on-img .tnth-subhead {
+    margin: 0;
+  }
+  .text-on-img p:last-child {
+    margin-bottom: 0;
+  }
 }
 @media (min-width: 768px) {
   #mainNav {
