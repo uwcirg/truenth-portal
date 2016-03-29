@@ -1,0 +1,398 @@
+{
+  "author": {
+    "display": "patient demographics",
+    "reference": "https://stg.us.truenth.org/api/demographics/10015"
+  },
+  "authored": "2016-03-11T23:47:28Z",
+  "group": {
+    "question": [
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.1.1",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.1"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.2.1",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.2"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.3.3",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 2
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.3"
+      },
+      {
+        "answer": [],
+        "linkId": "epic26.4"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.5.4",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 3
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.5"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.6.3",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 2
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.6"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.7.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.7"
+      },
+      {
+        "answer": [],
+        "linkId": "epic26.8"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.9.3",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 3
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.9"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.10.5",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 4
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.10"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.11.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.11"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.12.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.12"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.13.4",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 3
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.13"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.14.1",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 0
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.14"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.15.5",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 5
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.15"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.16.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 2
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.16"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.17.1",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.17"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.18.4",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 4
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.18"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.19.4",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 4
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.19"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.20.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 2
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.20"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.21.5",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 5
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.21"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.22.1",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 0
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.22"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.23.2",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 1
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.23"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.24.3",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 2
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.24"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.25.4",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 3
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.25"
+      },
+      {
+        "answer": [
+          {
+            "valueCoding": {
+              "code": "epic26.26.5",
+              "extension": {
+                "url": "https://hl7.org/fhir/StructureDefinition/iso21090-CO-value",
+                "valueDecimal": 4
+              },
+              "system": "https://stg.us.truenth.org/api/codings/assessment"
+            }
+          }
+        ],
+        "linkId": "epic26.26"
+      }
+    ]
+  },
+  "identifier": {
+    "label": "cPRO survey session ID",
+    "use": "official",
+    "value": "119.0"
+  },
+  "questionnaire": {
+    "display": "EPIC 26 Short Form",
+    "reference": "https://stg.us.truenth.org/api/questionnaires/epic26"
+  },
+  "resourceType": "QuestionnaireResponse",
+  "source": {
+    "display": "patient demographics",
+    "reference": "https://stg.us.truenth.org/api/demographics/10015"
+  },
+  "status": "completed",
+  "subject": {
+    "display": "patient demographics",
+    "reference": "https://stg.us.truenth.org/api/demographics/10015"
+  }
+}

@@ -1,5 +1,6 @@
 """Unit test module for API"""
 import json
+import os
 from flask.ext.webtest import SessionScope
 from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 
@@ -504,3 +505,17 @@ class TestAPI(TestCase):
         ur = UserRelationship.query.filter_by(
             other_user_id=TEST_USER_ID).first()
         self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
+
+    def test_assessment_PUT(self):
+        with open(os.path.join(os.path.dirname(__file__),
+                               'assessment_example'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+
+        self.login()
+        rv = self.app.put('/api/patient/{}/assessment'.format(TEST_USER_ID),
+                         content_type='application/json',
+                         data=json.dumps(data))
+        self.assert200(rv)
+        response = rv.json
+        self.assertEquals(response['ok'], True)
+        self.assertEquals(response['valid'], True)
