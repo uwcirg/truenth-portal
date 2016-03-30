@@ -32,11 +32,14 @@
         helpText="Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined." ) }}
 
         {% if form.intervention_or_default.name != 'default' %}
-            {{ render_field(form.intervention_or_default.card_url, tabindex=30 ) }}
+            {{ render_field(form.intervention_or_default.card_url,
+            tabindex=30, helpText="Hyperlink back to the intervention, namely where specifically to point the user to.") }}
 
-            {{ render_field(form.intervention_or_default.card_html, tabindex=40 ) }}
+            {{ render_field(form.intervention_or_default.card_html,
+            tabindex=40, helpText="Text or HTML shown on the card for this intervention.") }}
 
-            {{ render_checkbox_field(form.intervention_or_default.public_access, tabindex=50, helpText="Turn off <b>Public Access</b> to control access to the application on a per user basis.  Only available for interventions assigned an offical application role.  If unchecked, a row for every user needing access must be added via the <b>interventions API</b>.") }}
+            {{ render_checkbox_field(form.intervention_or_default.public_access,
+            tabindex=50, helpText="Whether the card should be displayed to all users (checked), or only to those who have been granted access to the intervention via the interventions API (unchecked).") }}
         {% endif %}
 
         <br />
