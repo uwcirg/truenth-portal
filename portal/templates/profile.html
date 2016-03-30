@@ -22,7 +22,7 @@ My TrueNTH Profile
 <form id="profileForm" class="form" role="form">
 
 <div class="row" style="position: relative;">
-    <div class="col-md-8">
+    <div class="col-md-9">
 
         {% if user.image_url %}
         <div class="profile-img hidden-xs">
@@ -100,14 +100,17 @@ My TrueNTH Profile
         </div>
         <div class="form-group">
             <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-            <input type="text" class="form-control" id="phone" name="phone" placeholder="Cell phone (Optional)" value="{{ user.phone if user.phone }}">
-            <span id="helpBlock" class="help-block">Optional</span>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ user.phone if user.phone }}">
         </div>
 
+        <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+        <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
+
     </div>
-    <div class="col-md-4 pos-bottom-md">
 
         <!--
+        <div class="col-md-4 pos-bottom-md">
         <div id="patientQuestions">
             <div class="form-group">
                 <label>Have you had a prostate cancer biopsy?</label>
@@ -152,14 +155,10 @@ My TrueNTH Profile
             </div>
         </div>
         <div class="visible-lg"><br /></div>
+        </div>
         -->
-
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
-
-    </div>
 </div>
 
-    <div id="saveMsg" class="text-muted text-center" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></div>
 
 <hr />
 
@@ -204,6 +203,7 @@ My TrueNTH Profile
 {% block document_ready %}
 $(document).ready(function(){
 
+    /*** Field Validation ***/
     $('#profileForm').validator({
         custom: {
             birthday: function() {
@@ -241,8 +241,10 @@ $(document).ready(function(){
                 } else {
                     // If NaN then the values haven't been entered yet, so we
                     // validate as true until other fields are entered
-                    if (isNaN(d) || isNaN(y)) {
+                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
                         return true;
+                    } else if (isNaN(d)) {
+                        errorMsg = "Please enter a date.";
                     }
                     $("#bdError").html(errorMsg).show();
                     $("#birthday").val("");
@@ -268,18 +270,24 @@ $(document).ready(function(){
         },
         disable: false
     });
-
-$('#profileForm').on('validated.bs.validator', function(e) {
-    var validator = $(this).data('bs.validator');
-    if (!validator.hasErrors()) {
-        $("#saveMsg").fadeIn("slow");
-    } else {
-        $("#saveMsg").hide();
-    }
-});
-$('#profileForm input, #profileForm select').on('invalid.bs.validator', function() {
-    $("#saveMsg").hide();
-});
+    // If there's any change to form fields, the note that
+    $("#profileForm :input").change(function() {
+        $(this).closest('form').attr('data-changed', true)
+    });
+    $('#profileForm').on('validated.bs.validator', function(e) {
+        var validator = $(this).data('bs.validator');
+        // If the form has a change, then show save or error messages
+        if ($(this).data('changed')) {
+            if (!validator.hasErrors()) {
+                $("#saveMsg").fadeIn("slow")
+                $("#errorMsg").hide()
+            } else {
+                $("#saveMsg").hide()
+                $("#errorMsg").fadeIn("slow")
+            }
+        }
+    })
+    /*** End -- Field Validation ***/
 
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
     var currentBd = $("#birthday").val();
@@ -292,7 +300,7 @@ $('#profileForm input, #profileForm select').on('invalid.bs.validator', function
 
     // Submit the form here
     $("#updateProfile").on("click", function(event){
-        event.preventDefault();
+        event.preventDefault()
 
         $("#profileForm").addClass("loading");
         $("#loadingIndicator").show();
@@ -366,7 +374,7 @@ $("#patientQuestions input").on("change", function(){
         data: JSON.stringify({value: theVal})
     }).done(function() {
         // Allow user to save with button, even though these answers have already been submitted
-        $('#updateProfile').removeClass("disabled");
+        $('#updateProfile').removeClass("disabled")
     }).fail(function() {
         alert("There was a problem saving your answers. Please try again.");
     });
