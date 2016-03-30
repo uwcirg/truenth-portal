@@ -110,7 +110,7 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.now)
     email = db.Column(db.String(120), unique=True)
-    phone = db.Column(db.String(40), unique=True)
+    phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
