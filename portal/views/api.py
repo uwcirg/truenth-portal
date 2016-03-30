@@ -1883,11 +1883,7 @@ def portal_wrapper_html(username):
     if user:
         if user.image_url:
             movember_profile = user.image_url
-        if not username:
-            if user.first_name and user.last_name:
-                username = ' '.join((user.first_name, user.last_name))
-            else:
-                username = user.username
+        username = username if username else user.display_name
     else:
         user = None
 
@@ -1957,7 +1953,7 @@ def protected_portal_wrapper_html():
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
-        username=user.username,
+        username=user.display_name,
         user=user,
         movember_profile=movember_profile,
     )

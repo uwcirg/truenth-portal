@@ -134,6 +134,13 @@ class User(db.Model, UserMixin):
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
 
+    @property
+    def display_name(self):
+        if self.first_name and self.last_name:
+            return ' '.join((self.first_name, self.last_name))
+        else:
+            return self.username
+
     def add_observation(self, fhir):
         if not 'coding' in fhir['code']:
             return 400, "requires at least one CodeableConcept"
