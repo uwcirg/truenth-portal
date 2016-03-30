@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
+
+  <h3 class="tnth-headline">Contact TrueNTH</h3>
+
+  <p>Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna a liqua. Ut enim ad minim venom, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea comido consequat. Luis aute irure dolor in reprehenderit in voluptate relit esse cillim dolore eu fuggita nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit animé id est labour.</p>
+
+  <div class="row">
+    <div class="col-md-7">
+
+      [ form goes here ]
+
+    </div>
+
+  </div>
+
+  {% if config.version %}
+  <br />
+  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.version }}</div>
+  {% endif %}
+{% endblock %}

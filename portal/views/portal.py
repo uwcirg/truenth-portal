@@ -136,6 +136,11 @@ def about():
     """main TrueNTH about page"""
     return render_template('about.html')
 
+@portal.route('/contact')
+def contact():
+    """main TrueNTH contact page"""
+    return render_template('contact.html')
+
 @portal.route('/questions')
 def questions():
     """New user question view.  Creates anon user if none in session"""
