@@ -111,6 +111,9 @@ $ python manage.py runserver
 $ celery worker -A portal.celery_worker.celery --loglevel=info
 ```
 
+Alternatively, install an init script and configure.  See
+http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html
+
 ## DATABASE
 
 The value of `SQLALCHEMY_DATABASE_URI` defines which database engine
