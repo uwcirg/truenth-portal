@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block main %}
+<style>
+    #tnthNavWrapper {
+        display: none;
+    }
+    #mainDiv {
+        background: none;
+    }
+</style>
+
+<div id="fullSizeBox" class="box-min-400">
+    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
+
+    <div id="fullSizeContainer">
+
+        <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
+
+        <div id="wellContainer">
+
+            <div class="tnth-splash">
+
+                <div id="wellContent">
+
+                    <div class="headline">Uh-oh, there's been a problem.</div>
+                    <a href="/" class="btn feature-btn feature-btn-primary">Home</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

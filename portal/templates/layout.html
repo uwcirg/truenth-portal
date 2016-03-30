@@ -20,7 +20,7 @@
 </head>
 
 {% set splashView = false %}
-{% if request.path=="/" or request.path=="/user/sign-in" %}
+{% if request.path=="/" or request.path=="/user/sign-in" or request.path=="/error" %}
     {% set splashView = true %}
 {% endif %}
 
