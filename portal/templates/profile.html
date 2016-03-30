@@ -88,7 +88,7 @@ My TrueNTH Profile
                     Female
                 </label>
                 <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexO" value="undifferentiated" required {{ "checked" if user.gender == "undifferentiated"}}/>
+                    <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if user.gender == "other"}}/>
                     Other
                 </label>
             </div>
@@ -99,8 +99,9 @@ My TrueNTH Profile
             <div class="help-block with-errors"></div>
         </div>
         <div class="form-group">
-            <label for="phone">Cell phone</label>
-            <input type="text" class="form-control" id="phone" name="phone" placeholder="Cell phone" value="{{ user.phone if user.phone }}">
+            <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Cell phone (Optional)" value="{{ user.phone if user.phone }}">
+            <span id="helpBlock" class="help-block">Optional</span>
         </div>
 
     </div>
