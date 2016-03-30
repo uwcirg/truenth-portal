@@ -22,7 +22,7 @@ class TestPortal(TestCase):
         """Interventions can customize the button text """
         client = self.add_test_client()
         intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).first()
+            name=INTERVENTION.SEXUAL_RECOVERY).one()
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
@@ -30,14 +30,14 @@ class TestPortal(TestCase):
         self.login()
         rv = self.app.get('/home')
 
-        self.assertIn('Decision Support', rv.data)
+        self.assertIn('Custom Label', rv.data)
         self.assertIn(intervention.card_html, rv.data)
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
         client = self.add_test_client()
         intervention = Intervention.query.filter_by(
-            name=INTERVENTION.DECISION_SUPPORT_P3P).first()
+            name=INTERVENTION.SEXUAL_RECOVERY).one()
         client.intervention = intervention
         intervention.public_access = False
 
@@ -45,7 +45,7 @@ class TestPortal(TestCase):
         self.login()
         rv = self.app.get('/home')
 
-        self.assertNotIn('Decision Support', rv.data)
+        self.assertNotIn('Sexual Recovery', rv.data)
 
         # now give just the test user access
         ui = UserIntervention(user_id=TEST_USER_ID,
@@ -56,7 +56,7 @@ class TestPortal(TestCase):
             db.session.commit()
         rv = self.app.get('/home')
 
-        self.assertIn('Decision Support', rv.data)
+        self.assertIn('Sexual Recovery', rv.data)
 
     def test_admin_list(self):
         """Test admin view lists all users"""
