@@ -297,22 +297,18 @@ $('#profileForm input, #profileForm select').on('invalid.bs.validator', function
         $("#loadingIndicator").show();
 
         // Grab profile field values
-        var getBirthday = $("input[name=birthDate]").val();
-        var getFirstname = $("input[name=firstname]").val();
-        var getLastname = $("input[name=lastname]").val();
-        var getSex = $("input[name=sex]:checked").val();
-        var getEmail = $("input[name=email]").val();
-        var getPhone = $("input[name=phone]").val();
+        var getBirthday = $("input[name=birthDate]").val()
+        var getFirstname = $("input[name=firstname]").val()
+        var getLastname = $("input[name=lastname]").val()
+        var getSex = $("input[name=sex]:checked").val()
+        var getEmail = $("input[name=email]").val()
+        var getPhone = $("input[name=phone]").val()
 
         // Put form data into FHIR array
         var demoArray = {};
-        demoArray["resourceType"] = "Patient";
-        demoArray["birthDate"] = getBirthday;
-        demoArray["gender"] = {
-            "coding": [{
-                "display": getSex
-            }]
-        };
+        demoArray["resourceType"] = "Patient"
+        demoArray["birthDate"] = getBirthday
+        demoArray["gender"] = getSex
         demoArray["name"] = {
             "given": getFirstname,
             "family": getLastname
