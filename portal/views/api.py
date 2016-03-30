@@ -659,8 +659,8 @@ def clinical_set(patient_id):
     code, result = patient.add_observation(request.json)
     if code != 200:
         abort(code, result)
-    auditable_event(result, user_id=current_user().id)
     db.session.commit()
+    auditable_event(result, user_id=current_user().id)
     return jsonify(message=result)
 
 
@@ -2269,6 +2269,7 @@ def set_relationships(user_id):
         user.check_role('edit', other_id=r['user'])
 
     # Add any requested that don't exist
+    audit_data = []  # preserve till post commit
     for r in request.json['relationships']:
         rel_id = Relationship.query.with_entities(
             Relationship.id).filter_by(name=r['has the relationship']).first()
@@ -2279,10 +2280,11 @@ def set_relationships(user_id):
         if not existing:
             user_relationship = UserRelationship(**kwargs)
             db.session.add(user_relationship)
-            auditable_event("added {}".format(user_relationship),
-                            user_id=current_user().id)
+            audit_data.append(user_relationship)
     db.session.commit()
-
+    for ad in audit_data:
+        auditable_event("added {}".format(ad),
+                        user_id=current_user().id)
     # Return user's updated relationship list
     return relationships(user.id)
 
@@ -2464,9 +2466,9 @@ def delete_roles(user_id):
         if requested_role in user.roles:
             u_r = UserRoles.query.filter_by(user_id=user.id,
                                             role_id=requested_role.id).first()
-            db.session.delete(u_r)
             auditable_event("deleted {}".format(u_r),
                             user_id=current_user().id)
+            db.session.delete(u_r)
     db.session.commit()
 
     # Return user's updated role list
@@ -2558,8 +2560,8 @@ def set_roles(user_id):
     for requested_role in matching_roles:
         if requested_role not in user.roles:
             user.roles.append(requested_role)
-            auditable_event("added {}".format(requested_role),
-                            user_id=current_user().id)
+            auditable_event("added {} to user {}".format(
+                requested_role, user.id), user_id=current_user().id)
 
     if user not in db.session:
         db.session.add(user)
@@ -2587,8 +2589,7 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
                                          value_quantity=truthiness)
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
-        codeable_concept, truthiness, patient_id),
-        user_id=current_user().id)
+        codeable_concept, truthiness, patient_id), user_id=current_user().id)
     return jsonify(message='ok')
 
 

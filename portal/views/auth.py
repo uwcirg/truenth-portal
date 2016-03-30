@@ -387,7 +387,7 @@ def client():
     db.session.add(client)
     db.session.commit()
     auditable_event("added intervention/client {}".format(
-        client.client_id), user_id=user.id)
+        client), user_id=user.id)
 
     # if user selected a role besides the default, set it.
     if form.application_role.data != INTERVENTION.DEFAULT:
@@ -502,6 +502,7 @@ def client_edit(client_id):
         return render_template('client_edit.html', client=client, form=form,
                               service_token=client.lookup_service_token())
 
+    b4 = str(client)
     redirect_target = url_for('.clients_list')
     if request.form.get('delete'):
         auditable_event("deleted intervention/client {}".format(
@@ -518,18 +519,19 @@ def client_edit(client_id):
             db.session.delete(existing)
         service_user = user.add_service_account()
         token = create_service_token(client=client, user=service_user)
+        auditable_event("service token generated for client {}".format(
+            client.client_id), user_id=user.id)
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
-        b4 = str(client)
         form.populate_obj(client)
         set_client_intervention(client, form)
-        after = str(client)
-        if b4 != after:
-            auditable_event("edited intervention/client {}"
-                            " before: <{}> after: <{}>".format(
-                            client.client_id, b4, after), user_id=user.id)
 
     db.session.commit()
+    after = str(client)
+    if b4 != after:
+        auditable_event("edited intervention/client {}"
+                        " before: <{}> after: <{}>".format(
+                        client.client_id, b4, after), user_id=user.id)
     return redirect(redirect_target)
 
 
