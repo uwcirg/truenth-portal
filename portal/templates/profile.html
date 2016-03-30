@@ -2,7 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-{% if current_user.has_role('admin') and request.environ.HTTP_REFERER.endswith("admin") %}
+{% if current_user.has_role('admin') and HTTP_REFERER in request.environ and request.environ.HTTP_REFERER.endswith("admin") %}
 {{ back_btn('admin','User List') }}
 {% endif %}
 
