@@ -515,3 +515,18 @@ class TestAPI(TestCase):
         response = rv.json
         self.assertEquals(response['ok'], True)
         self.assertEquals(response['valid'], True)
+
+    def test_weight(self):
+        with open(os.path.join(os.path.dirname(__file__),
+                               'weight_example'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+
+        self.login()
+        rv = self.app.put('/api/patient/{}/clinical'.format(TEST_USER_ID),
+                         content_type='application/json',
+                         data=json.dumps(data))
+        self.assert200(rv)
+
+        obs = self.test_user.observations.one()  # only expect the one
+        self.assertEquals('185', obs.value_quantity.value)
+        self.assertEquals(3, len(obs.codeable_concept.codings))
