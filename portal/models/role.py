@@ -41,8 +41,10 @@ STATIC_ROLES = IterableUserDict({
         'Default role for all patients, may only view their own '
         'patient data',
     'service':
-        'Reserved for automated service accounts needing API access'
-        })
+        'Reserved for automated service accounts needing API access',
+    'test':
+        'Designates a testing user',
+})
 
 
 def enum(**items):
