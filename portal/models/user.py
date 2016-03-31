@@ -15,6 +15,7 @@ from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
+from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -124,6 +125,7 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
+    auth_providers = db.relationship('AuthProvider', lazy='dynamic')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     races = db.relationship(Coding, lazy='dynamic',
@@ -269,13 +271,32 @@ class User(db.Model, UserMixin):
         return fhir
 
     def as_fhir(self):
+        def identifiers():
+            """build and return list of idetifiers"""
+            ids = []
+            ids.append(
+                {'use': 'official',
+                 'system': '{system}/{provider}'.format(
+                     system=TRUENTH_IDENTITY_SYSTEM,
+                     provider='TrueNTH-identity'),
+                 'assigner': {'display': 'TrueNTH'},
+                 'label': 'Truenth identifier',
+                 'value': self.id})
+            ids.append(
+                {'use': 'secondary',
+                 'system': '{system}/{provider}'.format(
+                     system=TRUENTH_IDENTITY_SYSTEM,
+                     provider='TrueNTH-username'),
+                 'assigner': {'display': 'TrueNTH'},
+                 'label': 'Truenth username',
+                 'value': self.username})
+            for provider in self.auth_providers:
+                ids.append(provider.as_fhir())
+            return ids
+
         d = {}
         d['resourceType'] = "Patient"
-        d['identifier'] = []
-        d['identifier'].append({'label': 'Truenth identifier',
-                    'value': self.id})
-        d['identifier'].append({'label': 'Truenth username',
-                    'value': self.username})
+        d['identifier'] = identifiers()
         d['name'] = {}
         if self.first_name:
             d['name']['given'] = self.first_name

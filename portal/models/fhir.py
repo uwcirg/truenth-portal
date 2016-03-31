@@ -7,6 +7,7 @@ import urllib
 
 from ..extensions import db
 from .lazy import lazyprop
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
 def as_fhir(obj):
@@ -151,13 +152,12 @@ class Coding(db.Model):
 
 
 """ TrueNTH Clinical Codes """
-TRUENTH_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes'
 class ClinicalConstants(object):
 
     @lazyprop
     def BIOPSY(self):
         coding = Coding.query.filter_by(
-            system=TRUENTH_CODE_SYSTEM, code='111').one()
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -165,7 +165,7 @@ class ClinicalConstants(object):
     @lazyprop
     def PCaDIAG(self):
         coding = Coding.query.filter_by(
-            system=TRUENTH_CODE_SYSTEM, code='121').one()
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -173,7 +173,7 @@ class ClinicalConstants(object):
     @lazyprop
     def TX(self):
         coding = Coding.query.filter_by(
-            system=TRUENTH_CODE_SYSTEM, code='131').one()
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -398,11 +398,11 @@ def add_static_concepts(only_quick=False):
         unless the test needs the slow to load race and ethnicity data.
 
     """
-    BIOPSY = Coding(system=TRUENTH_CODE_SYSTEM, code='111',
+    BIOPSY = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111',
                              display='biopsy')
-    PCaDIAG = Coding(system=TRUENTH_CODE_SYSTEM, code='121',
+    PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
                               display='PCa diagnosis')
-    TX = Coding(system=TRUENTH_CODE_SYSTEM, code='131',
+    TX = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131',
                          display='treatment begun')
 
     concepts = [BIOPSY, PCaDIAG, TX]

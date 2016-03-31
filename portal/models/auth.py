@@ -13,6 +13,7 @@ from urlparse import urlparse
 from ..extensions import db, oauth
 from .relationship import RELATIONSHIP
 from .role import ROLE
+from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user
 
@@ -27,6 +28,17 @@ class AuthProvider(db.Model):
     provider_id = db.Column(db.String(40))
     user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
     user = db.relationship('User')
+
+    def as_fhir(self):
+        # produce a FHIR identifier entry for the provider
+        # helps interventions with support, i.e. user authentication used
+        d = {}
+        d['use'] = 'secondary'
+        d['system'] = '{system}/{provider}'.format(
+            system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider)
+        d['assigner'] = {'display': self.provider}
+        d['value'] = self.provider_id
+        return d
 
 
 class Client(db.Model):
