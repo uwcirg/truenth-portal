@@ -13,6 +13,7 @@ from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
+from portal.models.user import flag_test
 
 app = create_app()
 manager = Manager(app)
@@ -39,6 +40,10 @@ def seed():
     add_static_roles()
     db.session.commit()
 
+@manager.command
+def mark_test():
+    """Designate all current users as test users"""
+    flag_test()
 
 if __name__ == '__main__':
     manager.run()
