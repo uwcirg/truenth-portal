@@ -26,6 +26,16 @@ portal = Blueprint('portal', __name__)
 def utility_processor():
     return dict(split_string=split_string)
 
+def page_not_found(e):
+        return render_template('error.html'), 404
+
+def server_error(e):
+        return render_template('error.html'), 500
+
+@portal.route('/intentional-error')
+def intentional_error():
+    # useless method to test error handling
+    5/0
 
 @portal.route('/')
 def landing():

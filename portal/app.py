@@ -11,7 +11,7 @@ from .config import DefaultConfig
 from .extensions import babel, celery, db, mail, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
-from .views.portal import portal
+from .views.portal import portal, page_not_found, server_error
 
 
 DEFAULT_BLUEPRINTS = (api, auth, portal)
@@ -26,6 +26,7 @@ def create_app(config=None, app_name=None, blueprints=None):
 
     app = Flask(app_name, template_folder='templates')
     configure_app(app, config)
+    configure_error_handlers(app)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
@@ -40,6 +41,11 @@ def configure_app(app, config):
     app.config.from_pyfile('application.cfg', silent=False)
     if config:
         app.config.from_object(config)
+
+
+def configure_error_handlers(app):
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, server_error)
 
 
 def configure_extensions(app):
