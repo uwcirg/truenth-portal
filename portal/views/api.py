@@ -121,7 +121,7 @@ def demographics(patient_id):
     return jsonify(patient.as_fhir())
 
 
-@api.route('/demographics/<int:patient_id>', methods=('POST', 'PUT'))
+@api.route('/demographics/<int:patient_id>', methods=('PUT',))
 @oauth.require_oauth()
 def demographics_set(patient_id):
     """Update demographics via FHIR Resource Patient

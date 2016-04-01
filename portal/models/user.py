@@ -280,7 +280,6 @@ class User(db.Model, UserMixin):
                      system=TRUENTH_IDENTITY_SYSTEM,
                      provider='TrueNTH-identity'),
                  'assigner': {'display': 'TrueNTH'},
-                 'label': 'Truenth identifier',
                  'value': self.id})
             ids.append(
                 {'use': 'secondary',
@@ -288,7 +287,6 @@ class User(db.Model, UserMixin):
                      system=TRUENTH_IDENTITY_SYSTEM,
                      provider='TrueNTH-username'),
                  'assigner': {'display': 'TrueNTH'},
-                 'label': 'Truenth username',
                  'value': self.username})
             for provider in self.auth_providers:
                 ids.append(provider.as_fhir())
