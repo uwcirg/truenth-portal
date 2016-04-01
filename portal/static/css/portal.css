@@ -266,6 +266,37 @@ a:active {
   margin-top: -1.5em;
   margin-left: -2em;
 }
+.tnth-form .form-group > label {
+  font-size: 18px;
+  color: #777;
+}
+.form-with-floats .form-group > label {
+  font-size: 18px;
+  color: #aaa;
+  opacity: 0;
+}
+.form-with-floats .form-group > label.after-load {
+  transition: all 0.1s linear;
+  opacity: 1;
+}
+.form-with-floats .float-input-label {
+  position: relative;
+  margin-top: 30px;
+}
+.form-with-floats .float-input-label > label {
+  position: absolute;
+  top: 7px;
+  left: 13px;
+  opacity: 0;
+}
+.form-with-floats .float-input-label > label.after-load {
+  transition: all 0.1s linear;
+  opacity: 1;
+}
+.form-with-floats .float-input-label > label.show {
+  top: -24px;
+  left: 0;
+}
 /** styles specific to profile **/
 .loading-indicator {
   display: none;

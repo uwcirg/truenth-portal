@@ -284,6 +284,46 @@ a:hover, a:active {
   }
 }
 
+.tnth-form .form-group > label {
+  font-size: 18px;
+  color: #777;
+}
+
+.form-with-floats {
+  .form-group > label {
+    font-size:18px;
+    color: #aaa;
+    opacity: 0;
+    &.after-load {
+      transition: all 0.1s linear;
+      opacity: 1;
+    }
+  }
+  .float-input-label {
+    position:relative;
+    margin-top: 30px;
+    > label {
+      position:absolute;
+      top:7px;
+      left:13px;
+      opacity:0;
+      &.after-load {
+        transition: all 0.1s linear;
+        opacity: 1;
+      }
+      &.show {
+        top:-24px;
+        left: 0;
+      }
+    }
+    //.float-label.on {
+    //  color:#555;
+    //}
+
+  }
+}
+
+
 /** styles specific to profile **/
 .loading-indicator {
   display: none;

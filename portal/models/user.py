@@ -490,6 +490,16 @@ class UserRoles(db.Model):
         """Print friendly format for logging, etc."""
         return "UserRole {0.user_id}:{0.role_id}".format(self)
 
+def flag_test():
+    """Find all non-service users and flag as test"""
+
+    users = User.query.filter(
+        ~User.roles.any(Role.name.in_([ROLE.TEST, ROLE.SERVICE]))
+    )
+
+    for user in users:
+        add_role(user, ROLE.TEST)
+    db.session.commit()
 
 class UserRelationship(db.Model):
     """SQLAlchemy class for `user_relationships` table
