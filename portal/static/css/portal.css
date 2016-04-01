@@ -455,6 +455,12 @@ a:active {
     width: 120px;
     border-radius: 60px;
   }
+  .btn-set {
+    margin-bottom: 1em;
+  }
+  .btn-set .btn {
+    margin-bottom: 0.5em;
+  }
 }
 @media (min-width: 1400px) {
   html,
@@ -481,6 +487,12 @@ a:active {
   #homeFooter {
     max-width: 1400px;
     margin: 0 auto;
+  }
+  .btn-set {
+    margin-bottom: 1em;
+  }
+  .btn-set .btn {
+    margin-bottom: 0.5em;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/

@@ -157,10 +157,36 @@ def about():
     """main TrueNTH about page"""
     return render_template('about.html')
 
-@portal.route('/contact')
+@portal.route('/explore')
+def explore():
+    """Explore TrueNTH page"""
+    return render_template('explore.html')
+
+@portal.route('/contact', methods=('GET', 'POST'))
 def contact():
     """main TrueNTH contact page"""
-    return render_template('contact.html')
+    if request.method == 'GET':
+        return render_template('contact.html')
+
+    subject = request.form.get('subject')
+    body = request.form.get('body')
+    email = request.form.get('email')
+    ## TODO - Temporary recipient for testing. Need final address.
+    recipients = 'mark47@uw.edu'
+    email = EmailInvite(subject=subject, body=body,
+            recipients=recipients, sender=email)
+    email.send_message()
+    db.session.add(email)
+    db.session.commit()
+    return redirect(url_for('.contact_sent', message_id=email.id))
+
+@portal.route('/contact/<int:message_id>')
+def contact_sent(message_id):
+    """show invite sent"""
+    message = EmailInvite.query.get(message_id)
+    if not message:
+        abort(404, "Message not found")
+    return render_template('contact_sent.html', message=message)
 
 @portal.route('/questions')
 def questions():

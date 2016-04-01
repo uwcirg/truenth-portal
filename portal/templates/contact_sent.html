@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
+
+  <h3 class="tnth-headline">Contact TrueNTH</h3>
+
+  <p><em>Thank you for contacting us.</em></p>
+
+  <p>We will respond within 24-48 hours.</p>
+  <br/>
+  {{ back_btn('','TrueNTH Home') }}
+
+{% endblock %}
