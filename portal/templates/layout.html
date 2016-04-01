@@ -55,34 +55,46 @@
     {% block flash_messages %}
         {%- with messages = get_flashed_messages(with_categories=true) -%}
             {% if messages %}
-                {# Modal dialog for alerts #}
-                <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h2 class="modal-title">TrueNTH</h2>
-                      </div>
-                      <div class="modal-body">
 
-                        {% for category, message in messages %}
-                            {% if category=='error' %}
-                                {% set category='danger' %}
-                            {% endif %}
-                            <p class="text-{{category}}">{{ message|safe }}</p>
-                        {% endfor %}
+                {# Hack to prevent modal if it's only successful login #}
+                {% set showMessages = true %}
+                {% if messages|first|last == "You have signed in successfully." %}
+                    {% set showMessages = false %}
+                {% endif %}
 
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">Close</button>
+                {% if showMessages %}
+
+                    {# Modal dialog for alerts #}
+                    <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h2 class="modal-title">TrueNTH</h2>
+                          </div>
+                          <div class="modal-body">
+
+                            {% for category, message in messages %}
+                                {% if category=='error' %}
+                                    {% set category='danger' %}
+                                {% endif %}
+                                <p class="text-{{category}}">{{ message|safe }}</p>
+                            {% endfor %}
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                {# Modal dialog opens on page load because we went to display alert(s) #}
-                <script>
-                  $('#alertModal').modal('show')
-                </script>
+                    {# Modal dialog opens on page load because we went to display alert(s) #}
+                    <script>
+                      $('#alertModal').modal('show')
+                    </script>
+
+                {% endif %}
+
             {% endif %}
         {%- endwith %}
     {% endblock %}
