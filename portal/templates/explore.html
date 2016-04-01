@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+
+  {{ back_btn(PORTAL,'Home') }}
+
+    <h1 class="tnth-headline">TrueNTH</h1>
+
+    <h2 class="tnth-subhead">Welcome to TrueNTH</h2>
+
+    <p>A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers.</p>
+
+    <div style="margin: 1em 2em 1em">
+      <a style="margin-right: 2em" class="btn-lg btn-tnth-primary" href="/user/register">Register</a>
+      <a class="btn-lg btn-tnth-primary" href="/user/sign-in">Log In</a>
+    </div>
+
+
+    <p>Coming soon &hellip; discover tools designed to help those affected by prostate cancer.</p>
+
+    <ul>
+      <li>Explore values and preferences related to treatment decision making</li>
+      <li>Track symptoms and learn what you can do to improve them</li>
+      <li>Get advice on exercise, diet, sexual health, and wellbeing</li>
+      <li>Connect with others and navigate the prostate cancer journey together</li>
+    </ul>
+
+
+    <!--
+    <h2 class="tnth-subhead">How It Works</h2>
+    <p>Create a TrueNTH account [Register/login buttons]  Answer a few simple questions [simple screenshot]  Explore TrueNTH [laptop/tablet/phone]</p>
+    -->
+
+{% endblock %}
