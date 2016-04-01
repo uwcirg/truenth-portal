@@ -168,11 +168,11 @@ def contact():
     if request.method == 'GET':
         return render_template('contact.html')
 
-    subject = request.form.get('subject')
+    subject = "TrueNTH Production contact request: "+request.form.get('subject')
     body = "From: "+request.form.get('sendername')+"<br />Email: "+request.form.get('email')+"<br /><br />" + request.form.get('body')
     email = request.form.get('email')
-    ## TODO - Temporary recipient for testing. Need final address.
-    recipients = 'mark47@uw.edu'
+    ## Email address provided by Movember
+    recipients = 'help.truenthusa@movember.com'
     email = EmailInvite(subject=subject, body=body,
             recipients=recipients, sender=email)
     email.send_message()
