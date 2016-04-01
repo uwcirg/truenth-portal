@@ -159,8 +159,9 @@ def about():
 
 @portal.route('/explore')
 def explore():
+    user = current_user()
     """Explore TrueNTH page"""
-    return render_template('explore.html')
+    return render_template('explore.html', user=user)
 
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():

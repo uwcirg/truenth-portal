@@ -10,11 +10,12 @@
 
     <p>A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers.</p>
 
+    {% if not user.username %}
     <div style="margin: 1em 2em 1em">
       <a style="margin-right: 2em" class="btn-lg btn-tnth-primary" href="/user/register">Register</a>
       <a class="btn-lg btn-tnth-primary" href="/user/sign-in">Log In</a>
     </div>
-
+    {% endif %}
 
     <p>Coming soon &hellip; discover tools designed to help those affected by prostate cancer.</p>
 
