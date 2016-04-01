@@ -169,7 +169,7 @@ def contact():
         return render_template('contact.html')
 
     subject = request.form.get('subject')
-    body = request.form.get('body')
+    body = "From: "+request.form.get('sendername')+"<br />Email: "+request.form.get('email')+"<br /><br />" + request.form.get('body')
     email = request.form.get('email')
     ## TODO - Temporary recipient for testing. Need final address.
     recipients = 'mark47@uw.edu'
