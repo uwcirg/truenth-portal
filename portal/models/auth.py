@@ -297,8 +297,12 @@ def save_token(token, request, *args, **kwargs):
     for t in toks:
         db.session.delete(t)
 
-    # Override library default timeout of 1 hour
-    expires = datetime.utcnow() + timedelta(hours=4)
+    expires_in = token.get('expires_in')
+
+    # Override library default expiration of 1 hour, unless service token
+    if expires_in < 4*60*60:
+        expires_in = 4*60*60
+    expires = datetime.utcnow() + timedelta(seconds=expires_in)
 
     tok = Token(
         access_token=token['access_token'],
