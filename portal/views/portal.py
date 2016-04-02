@@ -180,7 +180,7 @@ def contact():
         subject=request.form.get('subject'))
     body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
         sendername=sendername, sender=sender, body=request.form.get('body'))
-    recipients = current_app.config['CONTACT_EMAIL']
+    recipients = current_app.config['CONTACT_SENDTO_EMAIL']
 
     user_id = user.id if user else None
     email = EmailInvite(subject=subject, body=body,
