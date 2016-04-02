@@ -9,7 +9,7 @@ from ..extensions import db, mail
 
 def log_message(message, app):
     """Configured to handle signals on email_dispatched - log the event"""
-    app.logger.debug("Message sent; To: {0} Subj: {1}".\
+    app.logger.info(u"Message sent; To: {0} Subj: {1}".\
             format(message.recipients, message.subject))
 
 

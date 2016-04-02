@@ -166,16 +166,25 @@ def explore():
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():
     """main TrueNTH contact page"""
+    user = current_user()
     if request.method == 'GET':
-        return render_template('contact.html')
+        sendername = user.display_name if user else ''
+        email = user.email if user else ''
+        return render_template('contact.html', sendername=sendername,
+                               email=email)
 
-    subject = "TrueNTH Production contact request: "+request.form.get('subject')
-    body = "From: "+request.form.get('sendername')+"<br />Email: "+request.form.get('email')+"<br /><br />" + request.form.get('body')
-    email = request.form.get('email')
-    ## Email address provided by Movember
-    recipients = 'help.truenthusa@movember.com'
+    sender = request.form.get('email')
+    sendername = request.form.get('sendername')
+    subject = u"{server} contact request: {subject}".format(
+        server=current_app.config['SERVER_NAME'],
+        subject=request.form.get('subject'))
+    body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
+        sendername=sendername, sender=sender, body=request.form.get('body'))
+    recipients = current_app.config['CONTACT_EMAIL']
+
+    user_id = user.id if user else None
     email = EmailInvite(subject=subject, body=body,
-            recipients=recipients, sender=email)
+            recipients=recipients, sender=sender, user_id=user_id)
     email.send_message()
     db.session.add(email)
     db.session.commit()
