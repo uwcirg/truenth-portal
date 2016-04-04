@@ -16,7 +16,6 @@ logger = get_task_logger(__name__)
 
 @celery.task
 def add(x, y):
-    logger.info("Running celery task add {0} + {1}".format(x, y))
     return x + y
 
 @celery.task
