@@ -84,8 +84,8 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
     ${GIT_WORK_TREE}/manage.py db upgrade
 fi
 
-# Any changes
-if [[ -n $(git diff $old_head $new_head) ]]; then
+# Restart apache if application is served by apache
+if [[ "${GIT_WORK_TREE}" == "/srv/www/"* && -n $(git diff $old_head $new_head) ]]; then
     if [[ $VERBOSE ]]; then
         echo "Restarting apache"
     fi
