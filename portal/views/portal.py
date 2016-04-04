@@ -27,7 +27,6 @@ def utility_processor():
     return dict(split_string=split_string)
 
 def page_not_found(e):
-    current_app.logger.debug('{}: {}'.format(e, request.url))
     return render_template('error.html'), 404
 
 def server_error(e):
