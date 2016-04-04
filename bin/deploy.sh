@@ -13,8 +13,8 @@ update_repo(){
 
 # Prevent reading virtualenv environmental variables multiple times
 activate_once(){
-    if [[ $(which python) != "$repo_path"* ]]; then
-        source $repo_path/bin/activate
+    if [[ $(which python) != "${GIT_WORK_TREE}"* ]]; then
+        source "${GIT_WORK_TREE}/bin/activate"
     fi
 }
 
@@ -51,17 +51,17 @@ update_repo
 new_head=$(git rev-parse origin/$branch)
 
 # New modules, or new seed data
-if [[ -n $(git diff $old_head $new_head $repo_path/setup.py) ]]; then
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) ]]; then
     activate_once
-    pip install -e $repo_path
+    pip install -e "${GIT_WORK_TREE}"
 
-    $repo_path/manage.py db seed
+    ${GIT_WORK_TREE}/manage.py db seed
 fi
 
 # DB Changes
-if [[ -n $(git diff $old_head $new_head $repo_path/migrations) ]]; then
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
     activate_once
-    $repo_path/manage.py db upgrade
+    ${GIT_WORK_TREE}/manage.py db upgrade
 fi
 
 # Any changes
