@@ -32,8 +32,7 @@ def page_not_found(e):
 
 def server_error(e):
     # NB - this is only hit if app.debug == False
-    current_app.logger.error('500: {} on {}'.format(e, request.url),
-                             exc_info=True)
+    # exception is automatically sent to log by framework
     return render_template('error.html'), 500
 
 @portal.route('/intentional-error')
