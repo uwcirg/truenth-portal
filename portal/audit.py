@@ -11,7 +11,11 @@ import sys
 import logging
 from flask import current_app
 
-AUDIT = 60  # special log level for auditable events
+# special log level for auditable events
+# initial goal was to isolate all auditable events to one log handler
+# revised to be a level less than ERROR, so auditable events aren't
+# considered errors for error mail handling (see SMTPHandler)
+AUDIT = (logging.WARN + logging.ERROR) / 2
 
 
 def auditable_event(message, user_id, other_user_id=None):

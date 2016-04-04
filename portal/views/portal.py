@@ -27,10 +27,12 @@ def utility_processor():
     return dict(split_string=split_string)
 
 def page_not_found(e):
-        return render_template('error.html'), 404
+    return render_template('error.html'), 404
 
 def server_error(e):
-        return render_template('error.html'), 500
+    # NB - this is only hit if app.debug == False
+    # exception is automatically sent to log by framework
+    return render_template('error.html'), 500
 
 @portal.route('/intentional-error')
 def intentional_error():
