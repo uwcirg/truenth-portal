@@ -66,5 +66,5 @@ fi
 
 # Any changes
 if [[ -n $(git diff $old_head $new_head) ]]; then
-    service apache2 restart
+    sudo service apache2 restart
 fi
