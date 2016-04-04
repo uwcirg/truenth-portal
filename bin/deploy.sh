@@ -7,8 +7,8 @@ usage() {
 }
 
 update_repo(){
-    git checkout $branch
-    git pull origin $branch
+    git checkout $BRANCH
+    git pull origin $BRANCH
 }
 
 # Prevent reading virtualenv environmental variables multiple times
@@ -19,13 +19,13 @@ activate_once(){
 }
 
 # Defaults
-branch="development"
+BRANCH="development"
 repo_path=$(git rev-parse --show-toplevel)
 
 while getopts ":b:p:" option; do
     case "${option}" in
         b)
-            branch=${OPTARG}
+            BRANCH=${OPTARG}
             ;;
         p)
             repo_path=${OPTARG}
@@ -45,10 +45,10 @@ fi
 GIT_WORK_TREE="$repo_path"
 GIT_DIR="${GIT_WORK_TREE}/.git"
 
-old_head=$(git rev-parse origin/$branch)
+old_head=$(git rev-parse origin/$BRANCH)
 
 update_repo
-new_head=$(git rev-parse origin/$branch)
+new_head=$(git rev-parse origin/$BRANCH)
 
 # New modules, or new seed data
 if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) ]]; then
