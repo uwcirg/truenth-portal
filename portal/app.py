@@ -127,6 +127,17 @@ def configure_logging(app):
     logger.setLevel(level)
     logger.addHandler(info_file_handler)
 
+    # Configure Error Emails for high level log messages, only in prod mode
+    ADMINS = app.config['ERROR_SENDTO_EMAIL']
+    if not app.debug:
+        mail_handler = handlers.SMTPHandler(
+            '127.0.0.1',
+            'server-error@example.com',
+            ADMINS,
+            '{} Log Message'.format(app.config['SERVER_NAME']))
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+
     #app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)
 
