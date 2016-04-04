@@ -1,8 +1,8 @@
 #!/bin/bash
 
 usage() {
-    echo "$0 - Simple script to make deployments of fresh code a one command operation"
-    echo "Usage: $0 [-v] [-b <branch>] [-p <path>]"
+    echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
+    echo "Usage: $0 [-v] [-b <branch>] [-p <path>]" >&2
     exit 1
 }
 
@@ -47,7 +47,7 @@ done
 shift $((OPTIND-1))
 
 if [ ! -d "$repo_path/.git" ]; then
-    echo 'Bad git repo path'
+    echo 'Error: Bad git repo path' >&2
     exit 1
 fi
 
