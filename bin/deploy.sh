@@ -60,7 +60,7 @@ update_repo
 new_head=$(git rev-parse origin/$BRANCH)
 
 # New modules, or new seed data
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) ]]; then
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -75,7 +75,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) ]]; then
 fi
 
 # DB Changes
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -86,7 +86,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
 fi
 
 # Restart apache if application is served by apache
-if [[ "${GIT_WORK_TREE}" == "/srv/www/"* && -n $(git diff $old_head $new_head) ]]; then
+if [[ "${GIT_WORK_TREE}" == "/srv/www/"* && -n $(git diff $old_head $new_head) && $? -eq 0 ]]; then
     if [[ $VERBOSE ]]; then
         echo "Restarting apache"
     fi
