@@ -71,7 +71,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) ]]; then
     if [[ $VERBOSE ]]; then
         echo "Seeding database"
     fi
-    ${GIT_WORK_TREE}/manage.py db seed
+    python "${GIT_WORK_TREE}/manage.py" db seed
 fi
 
 # DB Changes
@@ -81,7 +81,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
-    ${GIT_WORK_TREE}/manage.py db upgrade
+    python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
 
 # Restart apache if application is served by apache
