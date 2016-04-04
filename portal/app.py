@@ -132,7 +132,7 @@ def configure_logging(app):
     if not app.debug:
         mail_handler = handlers.SMTPHandler(
             '127.0.0.1',
-            'server-error@example.com',
+            app.config['MAIL_DEFAULT_SENDER'],
             ADMINS,
             '{} Log Message'.format(app.config['SERVER_NAME']))
         mail_handler.setLevel(logging.ERROR)
