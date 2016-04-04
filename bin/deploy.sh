@@ -51,8 +51,8 @@ if [ ! -d "$repo_path/.git" ]; then
     exit 1
 fi
 
-GIT_WORK_TREE="$repo_path"
-GIT_DIR="${GIT_WORK_TREE}/.git"
+export GIT_WORK_TREE="$repo_path"
+export GIT_DIR="${GIT_WORK_TREE}/.git"
 
 old_head=$(git rev-parse origin/$BRANCH)
 
