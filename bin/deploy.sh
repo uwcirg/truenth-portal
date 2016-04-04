@@ -81,6 +81,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) ]]; then
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
+    cd "${GIT_WORK_TREE}"
     python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
 
