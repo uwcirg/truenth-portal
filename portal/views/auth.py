@@ -659,7 +659,7 @@ def oauth_errors():
               description: Known details of error situation.
 
     """
-    current_app.logger.error(request.args.get('error'))
+    current_app.logger.warn(request.args.get('error'))
     return jsonify(error=request.args.get('error')), 400
 
 
