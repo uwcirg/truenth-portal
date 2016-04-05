@@ -59,7 +59,7 @@ old_head=$(git rev-parse origin/$BRANCH)
 update_repo
 new_head=$(git rev-parse origin/$BRANCH)
 
-# New modules, or new seed data
+# New modules
 if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ]]; then
     activate_once
 
@@ -67,6 +67,11 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 
         echo "Updating python dependancies"
     fi
     pip install -e "${GIT_WORK_TREE}"
+fi
+
+# New seed data
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ]]; then
+    activate_once
 
     if [[ $VERBOSE ]]; then
         echo "Seeding database"
