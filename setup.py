@@ -29,6 +29,9 @@ setup(
     packages=["portal"],
     include_package_data=True,
     zip_safe=False,
+    dependency_links=[
+        "git+https://github.com/pbugni/Flask-User.git#egg=Flask-User-0.6.8.1",
+    ],
     install_requires=[
         'Authomatic>=0.1.0',
         'celery',
@@ -41,7 +44,7 @@ setup(
         'Flask-Script',
         'Flask-Swagger',
         'Flask-Testing',
-        'Flask-User',
+        'Flask-User>=0.6.8.1',
         'Flask-WebTest',
         'jsonschema',
         'nose',

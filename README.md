@@ -68,7 +68,7 @@ project requirements change (i.e. new values in setup.py
 install_requires), but it's safe to run anytime to make sure.
 
 ```bash
-$ pip install -e .
+$ pip install --process-dependency-links -e .
 ```
 
 If new files in the `migrations/versions` directories showed up on the
