@@ -25,7 +25,7 @@ activate_once(){
 }
 
 # Defaults
-BRANCH="development"
+BRANCH="develop"
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
 while getopts ":b:p:v" option; do
