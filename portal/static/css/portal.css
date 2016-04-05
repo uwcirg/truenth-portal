@@ -92,6 +92,11 @@ a:active {
   margin-left: auto;
   margin-right: auto;
 }
+.tnth-well-close {
+  position: absolute;
+  top: 0;
+  right: 6px;
+}
 .tnth-splash {
   color: #fff;
   height: 100%;
