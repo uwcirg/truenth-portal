@@ -149,10 +149,10 @@ def profile_test(user_id):
     return render_template('profile_test.html', user=user)
 
 
-@portal.route('/terms-of-use')
-def termsofuse():
-    """terms of use view function"""
-    return render_template('termsofuse.html')
+@portal.route('/legal')
+def legal():
+    """ Legal/terms of use page"""
+    return render_template('legal.html')
 
 @portal.route('/about')
 def about():
