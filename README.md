@@ -29,7 +29,7 @@ $ git clone https://github.com/uwcirg/true_nth_usa_portal.git \
 This critical step enables isolation of the project from system python,
 making dependency maintenance easier and more stable.  It does require
 that you ```activate``` the virtual environment before you interact
-with python or the installer scripts.  The virtual enviornment can be
+with python or the installer scripts.  The virtual environment can be
 installed anywhere, using the nested 'env' pattern here.
 
 ```bash
