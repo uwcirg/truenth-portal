@@ -29,10 +29,11 @@ $ git clone https://github.com/uwcirg/true_nth_usa_portal.git \
 This critical step enables isolation of the project from system python,
 making dependency maintenance easier and more stable.  It does require
 that you ```activate``` the virtual environment before you interact
-with python or the installer scripts.
+with python or the installer scripts.  The virtual environment can be
+installed anywhere, using the nested 'env' pattern here.
 
 ```bash
-$ virtualenv $PROJECT_HOME
+$ virtualenv $PROJECT_HOME/env
 ```
 
 #### Activate the Virtual Environment
@@ -43,17 +44,7 @@ about missing dependencies.
 
 ```bash
 $ cd $PROJECT_HOME
-$ source bin/activate
-```
-
-#### Patch setuptools
-
-A one time workaround to a bootstrap upgrade problem with setuptools:
-
-```bash
-$ cd $PROJECT_HOME
-$ source bin/activate
-$ pip install -U setuptools
+$ source env/bin/activate
 ```
 
 ### Install the Lastest Package
