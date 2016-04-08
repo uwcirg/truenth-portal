@@ -4,6 +4,7 @@ import json
 import time
 from flask import current_app, Blueprint, jsonify, render_template, Response
 from flask import abort, redirect, request, session, url_for
+from flask import send_file
 from flask.ext.login import login_user
 from flask.ext.user import roles_required
 from flask_swagger import swagger
@@ -164,6 +165,10 @@ def explore():
     user = current_user()
     """Explore TrueNTH page"""
     return render_template('explore.html', user=user)
+
+@portal.route('/shareYourStory')
+def shareStory():
+    return redirect(url_for('static', filename='files/LivedExperienceVideo.pdf'))
 
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():
