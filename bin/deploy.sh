@@ -98,7 +98,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -e
 fi
 
 # Restart apache if application is served by apache
-if [[ "${GIT_WORK_TREE}" == "/srv/www/"* && -n $(git diff $old_head $new_head) && $? -eq 0 ]]; then
+if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
     if [[ $VERBOSE ]]; then
         echo "Restarting apache"
     fi
