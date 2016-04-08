@@ -97,6 +97,16 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -e
     python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
 
+# Celery Changes
+if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ]]; then
+    activate_once
+
+    if [[ $VERBOSE ]]; then
+        echo "Restarting celeryd"
+    fi
+    sudo service apache2 restart
+fi
+
 # Restart apache if application is served by apache
 if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
     if [[ $VERBOSE ]]; then
