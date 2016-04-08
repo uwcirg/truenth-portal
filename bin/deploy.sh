@@ -24,8 +24,6 @@ activate_once(){
     fi
 }
 
-# Defaults
-BRANCH="develop"
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
 while getopts ":b:p:v" option; do
@@ -53,6 +51,15 @@ fi
 
 export GIT_WORK_TREE="$repo_path"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
+
+if [[ -z $BRANCH ]]; then
+    BRANCH="develop"
+
+    # Use master branch on production
+    if [[ "${GIT_WORK_TREE}" == "/srv/www/us.truenth.org"* ]]; then
+        BRANCH="master"
+    fi
+fi
 
 old_head=$(git rev-parse origin/$BRANCH)
 
