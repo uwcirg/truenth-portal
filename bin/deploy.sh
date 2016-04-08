@@ -20,7 +20,7 @@ activate_once(){
         if [[ $VERBOSE ]]; then
             echo "Activating virtualenv"
         fi
-        source "${GIT_WORK_TREE}/bin/activate"
+        source "${GIT_WORK_TREE}/env/bin/activate"
     fi
 }
 
