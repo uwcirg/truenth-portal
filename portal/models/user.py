@@ -13,9 +13,11 @@ from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
+from .organization import Organization, MissingReference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from .telecom import Telecom
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -132,6 +134,8 @@ class User(db.Model, UserMixin):
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
             secondary="user_observations", backref=db.backref('users'))
+    organizations = db.relationship('Organization', lazy='dynamic',
+            secondary="user_organizations", backref=db.backref('users'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
@@ -292,6 +296,13 @@ class User(db.Model, UserMixin):
                 ids.append(provider.as_fhir())
             return ids
 
+        def careProviders():
+            """build and return list of careProviders (AKA clinics)"""
+            orgs = []
+            for o in self.organizations:
+                orgs.append({"reference": "/api/organization/{}".format(o.id)})
+            return orgs
+
         d = {}
         d['resourceType'] = "Patient"
         d['identifier'] = identifiers()
@@ -307,12 +318,9 @@ class User(db.Model, UserMixin):
         d['status'] = 'registered' if self.registered else 'unknown'
         if self.locale:
             d['communication'] = [{"language": self.locale.as_fhir()}]
-        d['telecom'] = []
+        telecom = Telecom(email=self.email, phone=self.phone)
+        d['telecom'] = telecom.as_fhir()
         d['photo'] = []
-        if self.email:
-            d['telecom'].append({'system': 'email', 'value': self.email})
-        if self.phone:
-            d['telecom'].append({'system': 'phone', 'value': self.phone})
         if self.image_url:
             d['photo'].append({'url': self.image_url})
         extensions = []
@@ -323,6 +331,7 @@ class User(db.Model, UserMixin):
                 extensions.append(data)
         if extensions:
             d['extension'] = extensions
+        d['careProvider'] = careProviders()
         return d
 
     def update_username(self, force=False):
@@ -366,11 +375,9 @@ class User(db.Model, UserMixin):
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
-            for e in fhir['telecom']:
-                if e['system'] == 'email':
-                    self.email = v_or_n(e['value'])
-                if e['system'] == 'phone':
-                    self.phone = v_or_n(e['value'])
+            telecom = Telecom.from_fhir(fhir['telecom'])
+            self.email = telecom.email
+            self.phone = telecom.phone
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
@@ -380,6 +387,13 @@ class User(db.Model, UserMixin):
             for e in fhir['extension']:
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
+        if 'careProvider' in fhir:
+            org = Organization.from_fhir_reference(fhir['careProvider'])
+            if not org:
+                raise MissingReference('careProvider {} not found'.format(
+                    fhir['careProvider']))
+            if org not in self.organizations:
+                self.organizations.append(org)
         db.session.add(self)
 
     def check_role(self, permission, other_id):

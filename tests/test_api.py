@@ -8,6 +8,7 @@ from portal.extensions import db
 from portal.models.intervention import Intervention, INTERVENTION
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
+from portal.models.organization import Organization
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import ROLE, STATIC_ROLES
 from portal.models.user import User, UserRelationship
@@ -80,6 +81,13 @@ class TestAPI(TestCase):
         # race / ethnicity require the SLOW addition of concepts to db
         self.add_concepts()
 
+        # clinic reference requires pre-existing organization
+        org = Organization(name='test org')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
@@ -105,7 +113,10 @@ class TestAPI(TestCase):
                          "coding": [{
                              "system": "http://hl7.org/fhir/v3/Ethnicity",
                              "code": "2162-6"}]}}
-                ]
+                ],
+                "careProvider": {
+                        "reference": "Organization/{}".format(1)#org.id)
+                      }
                }
 
         self.login()
@@ -119,13 +130,61 @@ class TestAPI(TestCase):
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
         self.assertEquals(2, len(fhir['extension']))
+        self.assertEquals(1, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
         self.assertEquals(user.first_name, given)
         self.assertEquals(user.last_name, family)
         self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
         self.assertEquals(['1096-7',], [c.code for c in user.races])
+        self.assertEquals(user.organizations.count(), 1)
+        self.assertEquals(user.organizations[0].name, 'test org')
 
+    def test_demographics_missing_ref(self):
+        # reference clinic must exist or expect a 400 
+        data = {"careProvider": {"reference": "Organization/1"},
+                "resourceType": "Patient",
+               }
+
+        self.login()
+        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert400(rv)
+        self.assertIn('reference', rv.data)
+        self.assertIn('not found', rv.data)
+
+    def test_demographics_duplicate_ref(self):
+        # adding duplicate careProvider
+
+        org = Organization(name='test org')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        org_id = org.id
+
+        # associate test org with test user
+        self.test_user.organizations.append(org)
+        with SessionScope(db):
+            db.session.add(self.test_user)
+            db.session.commit()
+
+        data = {"careProvider": {"reference": "Organization/{}".format(
+                org_id)},
+                "resourceType": "Patient",
+               }
+
+        self.login()
+        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+        self.assertEquals(user.organizations.count(), 1)
+        self.assertEquals(user.organizations[0].name, 'test org')
 
     def prep_db_for_clinical(self):
         # First push some clinical data into the db for the test user
@@ -504,7 +563,7 @@ class TestAPI(TestCase):
 
     def test_assessment_PUT(self):
         with open(os.path.join(os.path.dirname(__file__),
-                               'assessment_example'), 'r') as fhir_data:
+                               'assessment_example.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
         self.login()
@@ -518,7 +577,7 @@ class TestAPI(TestCase):
 
     def test_weight(self):
         with open(os.path.join(os.path.dirname(__file__),
-                               'weight_example'), 'r') as fhir_data:
+                               'weight_example.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
         self.login()
