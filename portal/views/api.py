@@ -15,6 +15,7 @@ from ..models.auth import validate_client_origin
 from ..models.fhir import CC, CodeableConcept, ValueQuantity, Observation
 from ..models.fhir import QuestionnaireResponse
 from ..models.intervention import Intervention, UserIntervention
+from ..models.organization import MissingReference
 from ..models.relationship import RELATIONSHIP, Relationship
 from ..models.role import ROLE, Role
 from ..models.user import current_user, get_user
@@ -134,6 +135,10 @@ def demographics_set(patient_id):
     list.  This includes 'race' and 'ethnicity'.  See example usage
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
+    To link a patient with a clinic, use the 'careProvider' entity.  The
+    clinic must already be a registered organization.  See the
+    [organization endpoints](/dist/#!/Organization).
+
     NB - as a side effect, if the username is still 'Anonymous', the given
     first and last names will be used to generate a unique username of the
     format "FirstName LastName N", where an integer N will only be included
@@ -179,7 +184,11 @@ def demographics_set(patient_id):
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
-    patient.update_from_fhir(request.json)
+    try:
+        patient.update_from_fhir(request.json)
+    except MissingReference, e:
+        current_app.logger.debug("Demographics PUT failed: {}".format(e))
+        abort(400, str(e))
     db.session.commit()
     auditable_event("updated demographics on user {0} from input {1}".format(
         patient_id, json.dumps(request.json)), user_id=current_user().id)

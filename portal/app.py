@@ -12,9 +12,10 @@ from .extensions import babel, celery, db, mail, oauth, user_manager
 from .views.api import api
 from .views.auth import auth
 from .views.portal import portal, page_not_found, server_error
+from .views.organization import org_api
 
 
-DEFAULT_BLUEPRINTS = (api, auth, portal)
+DEFAULT_BLUEPRINTS = (api, auth, portal, org_api)
 
 
 def create_app(config=None, app_name=None, blueprints=None):
