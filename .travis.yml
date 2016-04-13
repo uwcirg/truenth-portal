@@ -41,3 +41,4 @@ before_script:
  - celery worker -A portal.celery_worker.celery --loglevel=info
 services:
   - postgresql
+  - redis-server
