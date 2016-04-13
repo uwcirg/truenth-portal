@@ -27,6 +27,7 @@ before_install:
   - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo /etc/init.d/postgresql restart
   - sudo -u postgres createuser test_user
+  - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
   - psql --version
 
 install:
@@ -35,7 +36,7 @@ install:
 script: nosetests -v --attr '!travis_fail'
 before_script:
  - psql -c 'create database travis_ci_test;' -U postgres
- - psql -c 'create database portal_unit_tests;' -U postgres
+ - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
  - python manage.py initdb
  - python manage.py db stamp 24d8d4008534
  - celery worker --detach -A portal.celery_worker.celery --loglevel=info
