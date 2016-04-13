@@ -42,6 +42,7 @@ class DefaultConfig(BaseConfig):
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
+    SERVER_NAME = 'localhost'
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI =\
         'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
