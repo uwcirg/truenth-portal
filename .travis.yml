@@ -38,7 +38,7 @@ before_script:
  - psql -c 'create database portal_unit_tests;' -U postgres
  - python manage.py initdb
  - python manage.py db stamp 24d8d4008534
- - celery worker -A portal.celery_worker.celery --loglevel=info
+ - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 services:
   - postgresql
   - redis-server
