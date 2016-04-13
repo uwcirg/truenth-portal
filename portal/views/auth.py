@@ -5,7 +5,6 @@ import hashlib
 import hmac
 import json
 import requests
-from urlparse import urlparse, parse_qs
 from authomatic.adapters import WerkzeugAdapter
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
@@ -24,7 +23,7 @@ from ..models.intervention import Intervention, INTERVENTION
 from ..models.intervention import STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
-from ..models.user import current_user, get_user, User
+from ..models.user import current_user, User
 from ..extensions import authomatic, db, oauth
 from ..template_helpers import split_string
 
@@ -518,7 +517,7 @@ def client_edit(client_id):
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
-        token = create_service_token(client=client, user=service_user)
+        create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
             client.client_id), user_id=user.id)
         redirect_target = url_for('.client_edit', client_id=client.client_id)

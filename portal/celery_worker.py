@@ -11,6 +11,7 @@ Launch in the same virtual environment via
 
 """
 from .extensions import celery
+assert celery  # silence pyflake warning
 from .app import create_app
 
 app = create_app()

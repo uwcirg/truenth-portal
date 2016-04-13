@@ -35,7 +35,7 @@ class Telecom(object):
                     "FHIR contains multiple telecom entries for "\
                     "{system} ignoring {value}".format(**item))
             else:
-                setattr(telecom, attr, item['value'])
+                setattr(telecom, attr, value)
         return telecom
 
     def as_fhir(self):

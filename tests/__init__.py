@@ -16,8 +16,6 @@ from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.auth import Client
 from portal.models.fhir import CC, ValueQuantity
-from portal.models.fhir import Observation, UserObservation
-from portal.models.fhir import CodeableConcept, ValueQuantity
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.relationship import add_static_relationships

@@ -2,7 +2,6 @@
 import datetime
 from tests import TestCase, TEST_USER_ID
 from flask.ext.webtest import SessionScope
-import json
 
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token
@@ -27,6 +26,7 @@ class TestAuth(TestCase):
     def test_nouser_creates_anon(self):
         """A request for the questions page results in anon user"""
         rv = self.app.get('/questions')
+        self.assert200(rv)
         anon_user = User.query.filter_by(username='Anonymous').first()
         self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
 
@@ -139,7 +139,7 @@ class TestAuth(TestCase):
 
     def test_service_account_promotion(self):
         """Confirm we can not promote a service account """
-        client = self.add_test_client()
+        self.add_test_client()
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 

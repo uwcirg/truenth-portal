@@ -4,14 +4,12 @@ import json
 import time
 from flask import current_app, Blueprint, jsonify, render_template, Response
 from flask import abort, redirect, request, session, url_for
-from flask import send_file
 from flask.ext.login import login_user
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.fhir import CC
 from ..models.intervention import named_interventions
 from ..models.message import EmailInvite
 from ..models.role import ROLE

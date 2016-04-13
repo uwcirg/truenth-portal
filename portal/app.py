@@ -9,13 +9,27 @@ from flask.ext.webtest import get_scopefunc
 from .audit import configure_audit_log
 from .config import DefaultConfig
 from .extensions import babel, celery, db, mail, oauth, user_manager
-from .views.api import api
+from .views.assessment_engine import assessment_engine_api
 from .views.auth import auth
+from .views.clinical import clinical_api
+from .views.demographics import demographics_api
+from .views.intervention import intervention_api
 from .views.portal import portal, page_not_found, server_error
 from .views.organization import org_api
+from .views.truenth import truenth_api
+from .views.user import user_api
 
 
-DEFAULT_BLUEPRINTS = (api, auth, portal, org_api)
+DEFAULT_BLUEPRINTS = (
+    assessment_engine_api,
+    auth,
+    clinical_api,
+    demographics_api,
+    intervention_api,
+    org_api,
+    portal,
+    truenth_api,
+    user_api,)
 
 
 def create_app(config=None, app_name=None, blueprints=None):

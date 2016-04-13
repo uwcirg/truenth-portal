@@ -3,7 +3,6 @@ import base64
 import hashlib
 import hmac
 import json
-import requests
 import time
 from flask import abort, current_app
 from datetime import datetime, timedelta
@@ -12,7 +11,6 @@ from urlparse import urlparse
 
 from ..extensions import db, oauth
 from .relationship import RELATIONSHIP
-from .role import ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user

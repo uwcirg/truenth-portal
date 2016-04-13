@@ -3,8 +3,7 @@ from flask import current_app
 from UserDict import IterableUserDict
 from sqlalchemy.dialects.postgresql import ENUM
 
-from ..extensions import db, oauth
-from .auth import Client
+from ..extensions import db
 
 
 class Intervention(db.Model):

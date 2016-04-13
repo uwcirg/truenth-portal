@@ -26,6 +26,7 @@ def lazyprop(fn):
         if _is_sql_wrapper(attr):
             try:
                 test = attr.id
+                assert test
             except DetachedInstanceError:
                 attr = db.session.merge(attr)
                 if attr.id:
