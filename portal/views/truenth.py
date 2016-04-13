@@ -68,7 +68,7 @@ def auditlog_addevent():
 
 @truenth_api.route('/portal-wrapper-html/', methods=('OPTIONS',))
 @crossdomain(origin='*')
-def preflight_unprotected():
+def preflight_unprotected():  # pragma: no cover
     """CORS requires preflight headers
 
     For in browser CORS requests, first respond to an OPTIONS request
@@ -154,7 +154,7 @@ def portal_wrapper_html(username):
 
 @truenth_api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
 @crossdomain()
-def preflight():
+def preflight():  # pragma: no cover
     """CORS requires preflight headers
 
     For in browser CORS requests, first respond to an OPTIONS request

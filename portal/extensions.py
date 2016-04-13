@@ -55,7 +55,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
             """
             @wraps(eff)
-            def decorated(*args, **kwargs):
+            def decorated(*args, **kwargs):  # pragma: no cover
                 """decorate the 'eff' function"""
                 # TESTING backdoor
                 if self.app.config.get('TESTING'):

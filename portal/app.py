@@ -94,7 +94,7 @@ def configure_blueprints(app, blueprints):
         app.register_blueprint(blueprint)
 
 
-def configure_logging(app):
+def configure_logging(app):  # pragma: no cover
     """Configure logging."""
     if app.testing:
         # Skip test mode. Just check standard output.

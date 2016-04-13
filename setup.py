@@ -35,6 +35,7 @@ setup(
     install_requires=[
         'Authomatic>=0.1.0',
         'celery',
+        'coverage',
         'Flask>=0.10.1',
         'Flask-Babel',
         'Flask-Celery-Helper',

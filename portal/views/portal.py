@@ -28,13 +28,13 @@ def utility_processor():
 def page_not_found(e):
     return render_template('error.html'), 404
 
-def server_error(e):
+def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
     return render_template('error.html'), 500
 
 @portal.route('/intentional-error')
-def intentional_error():
+def intentional_error():  # pragma: no cover
     # useless method to test error handling
     5/0
 
@@ -337,24 +337,3 @@ def celery_result(task_id):
 def post_result(task_id):
     r = post_request.AsyncResult(task_id).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
-
-@portal.route("/react-demo")
-def react_demo():
-    return render_template('react-demo.html')
-
-@portal.route("/react-demo/api/comments", methods=('GET', 'POST'))
-def comments_handler():
-
-    with open('/tmp/comments.json', 'r') as file:
-        comments = json.loads(file.read())
-
-    if request.method == 'POST':
-        newComment = request.form.to_dict()
-        newComment['id'] = int(time.time() * 1000)
-        comments.append(newComment)
-
-        with open('/tmp/comments.json', 'w') as file:
-            file.write(json.dumps(comments, indent=4, separators=(',', ': ')))
-
-    return Response(json.dumps(comments), mimetype='application/json', headers={'Cache-Control': 'no-cache'})
-
