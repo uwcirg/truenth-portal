@@ -18,23 +18,18 @@ from flask import current_app
 AUDIT = (logging.WARN + logging.ERROR) / 2
 
 
-def auditable_event(message, user_id, other_user_id=None):
+def auditable_event(message, user_id):
     """Record auditable event
 
     message: The message to record, i.e. "log in via facebook"
     user_id: The authenticated user id performing the action
-    other_user_id: Optional for events performed on user other than
-                   authenticated
+
     """
-    if other_user_id:
-        text = "{0} performed on user {1}: {2}".format(user_id, other_user_id,
-                                                       message)
-    else:
-        text = "{0} performed: {1}".format(user_id, message)
+    text = "{0} performed: {1}".format(user_id, message)
     current_app.logger.log(AUDIT, text)
 
 
-def configure_audit_log(app):
+def configure_audit_log(app):  # pragma: no cover
     """Configure audit logging.
 
     The audit log is only active when running as a service (not during

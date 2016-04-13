@@ -31,7 +31,7 @@ class Extension:
         self.user, self.extension = user, extension
 
     @abstractproperty
-    def children(self):
+    def children(self):  # pragma: no cover
         pass
 
     def as_fhir(self):
@@ -504,7 +504,7 @@ class UserRoles(db.Model):
         """Print friendly format for logging, etc."""
         return "UserRole {0.user_id}:{0.role_id}".format(self)
 
-def flag_test():
+def flag_test():  # pragma: no test
     """Find all non-service users and flag as test"""
 
     users = User.query.filter(

@@ -67,7 +67,7 @@ def early_app_config_access():
     return _app_config
 
 
-class ConfigServer(Server):
+class ConfigServer(Server):  # pragma: no cover
     """Correctly read Flask configuration values when running Flask
 
     Flask-Script 2.0.5 does not read host and port specified in
