@@ -33,9 +33,8 @@ before_install:
 install:
   - pip install --process-dependency-links -e .
   - cp portal/application.cfg.travis portal/application.cfg
-script: nosetests -v --attr '!travis_fail'
+script: nosetests -v --with-cover --cover-package=portal
 before_script:
- - psql -c 'create database travis_ci_test;' -U postgres
  - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
  - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 services:
