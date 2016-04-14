@@ -1,8 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import pkg_resources
-import json
-import time
-from flask import current_app, Blueprint, jsonify, render_template, Response
+from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask.ext.login import login_user
 from flask.ext.user import roles_required
@@ -16,14 +14,9 @@ from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth
 from ..tasks import add, post_request
-from ..template_helpers import split_string
 
 portal = Blueprint('portal', __name__)
 
-
-@portal.context_processor
-def utility_processor():
-    return dict(split_string=split_string)
 
 def page_not_found(e):
     return render_template('error.html'), 404

@@ -3,7 +3,7 @@
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
     var _paq = _paq || [];
-    _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
+    _paq.push(["setDomains", {{ config.PIWIK_DOMAINS|safe }}]);
 
     {% if user %}
     _paq.push(["setUserId", "{{ user.id }}"]);

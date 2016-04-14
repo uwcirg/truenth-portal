@@ -6,14 +6,8 @@ from ..audit import auditable_event
 from ..extensions import oauth
 from .crossdomain import crossdomain
 from ..models.user import current_user
-from ..template_helpers import split_string
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
-
-
-@truenth_api.context_processor
-def utility_processor():
-    return dict(split_string=split_string)
 
 
 @truenth_api.route('/auditlog', methods=('POST',))
