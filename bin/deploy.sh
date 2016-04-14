@@ -73,7 +73,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 
     if [[ $VERBOSE ]]; then
         echo "Updating python dependancies"
     fi
-    pip install -e "${GIT_WORK_TREE}"
+    pip install --process-dependency-links -e "${GIT_WORK_TREE}"
 fi
 
 # New seed data
