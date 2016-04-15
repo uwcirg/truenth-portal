@@ -81,7 +81,9 @@ class Client(db.Model):
             # but in practice, this is too high of a bar (at least for
             # Liferay).  Only comparing by origin (scheme:hostname:port)
             # in validate_redirect_uri - so that's all we return
-            uris = []
+
+            # Whitelist any redirects to shared services
+            uris = ["https://%s" % current_app.config['SERVER_NAME'],]
             for uri in self._redirect_uris.split():
                 parsed = urlparse(uri)
                 uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
