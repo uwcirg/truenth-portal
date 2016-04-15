@@ -1,15 +1,14 @@
 """Unit test module for Assessment Engine API"""
 import json
-import os
+from flask_swagger import swagger
 from tests import TestCase, TEST_USER_ID
 
 
 class TestAssessmentEngine(TestCase):
 
     def test_assessment_PUT(self):
-        with open(os.path.join(os.path.dirname(__file__),
-                               'assessment_example.json'), 'r') as fhir_data:
-            data = json.load(fhir_data)
+        swagger_spec = swagger(self.app.application)
+        data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
         self.login()
         rv = self.app.put('/api/patient/{}/assessment'.format(TEST_USER_ID),
