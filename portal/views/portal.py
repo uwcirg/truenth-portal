@@ -166,8 +166,10 @@ def explore():
     """Explore TrueNTH page"""
     return render_template('explore.html', user=user)
 
+@portal.route('/share-your-story')
+@portal.route('/shareyourstory')
 @portal.route('/shareYourStory')
-def shareStory():
+def share_story():
     return redirect(url_for('static', filename='files/LivedExperienceVideo.pdf'))
 
 @portal.route('/contact', methods=('GET', 'POST'))
