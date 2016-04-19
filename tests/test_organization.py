@@ -27,10 +27,12 @@ class TestOrganization(TestCase):
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
-        org = Organization(name='fake parent reference')
+        parent = Organization(name='fake parent reference')
         with SessionScope(db):
-            db.session.add(org)
+            db.session.add(parent)
             db.session.commit()
+        parent = db.session.merge(parent)
+        parent_id = parent.id
 
         with open(os.path.join(
             os.path.dirname(__file__),
@@ -43,6 +45,14 @@ class TestOrganization(TestCase):
         self.assertEquals(org.name, data['name'])
         self.assertEquals(org.phone, "022-655 2320")
         self.assertEquals(org.partOf_id, 1)
+
+        # confirm we can store
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        self.assertTrue(org.id)
+        self.assertEquals(org.partOf_id, parent_id)
 
     def test_as_fhir(self):
         org = Organization(name='Homer\'s Hospital')
