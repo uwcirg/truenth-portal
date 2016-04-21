@@ -17,7 +17,7 @@ from portal.extensions import db
 from portal.models.auth import Client
 from portal.models.fhir import CC, ValueQuantity
 from portal.models.fhir import add_static_concepts
-from portal.models.intervention import add_static_interventions
+from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.user import User, UserRoles
@@ -161,7 +161,10 @@ class TestCase(Base):
         db.session.remove()
         db.drop_all()
 
-        # lazyprops can't survive a db purge - reset via delattr
+        # lazyprops can't survive a db purge - purge cached attributes
         for attr in dir(CC):
             if attr.startswith('_lazy'):
                 delattr(CC, attr)
+        for attr in dir(INTERVENTION):
+            if attr.startswith('_lazy'):
+                delattr(INTERVENTION, attr)

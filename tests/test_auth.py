@@ -69,7 +69,7 @@ class TestAuth(TestCase):
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com',
                          application_origins=client.application_origins,
-                         application_role=INTERVENTION.DEFAULT))
+                         application_role=INTERVENTION.DEFAULT.name))
         self.assertEquals(302, rv.status_code)
 
         client = Client.query.get('test_client')

@@ -2,7 +2,7 @@
 import json
 from tests import TestCase, TEST_USER_ID
 
-from portal.models.intervention import Intervention, INTERVENTION
+from portal.models.intervention import INTERVENTION
 
 
 class TestIntervention(TestCase):
@@ -19,9 +19,7 @@ class TestIntervention(TestCase):
 
     def test_intervention(self):
         client = self.add_test_client()
-        intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).first()
-        client.intervention = intervention
+        client.intervention = INTERVENTION.SEXUAL_RECOVERY
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 

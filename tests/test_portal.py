@@ -7,8 +7,7 @@ from swagger_spec_validator import validate_spec_url
 import tempfile
 
 from portal.extensions import db
-from portal.models.intervention import Intervention, INTERVENTION
-from portal.models.intervention import UserIntervention
+from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.role import ROLE
 from portal.models.user import User
 from portal.models.message import EmailInvite
@@ -21,8 +20,7 @@ class TestPortal(TestCase):
     def test_card_html(self):
         """Interventions can customize the button text """
         client = self.add_test_client()
-        intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).one()
+        intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
@@ -36,8 +34,7 @@ class TestPortal(TestCase):
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
         client = self.add_test_client()
-        intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).one()
+        intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         intervention.public_access = False
 

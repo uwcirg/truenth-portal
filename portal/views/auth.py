@@ -19,8 +19,7 @@ from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.intervention import Intervention, INTERVENTION
-from ..models.intervention import STATIC_INTERVENTIONS
+from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, User
@@ -289,11 +288,14 @@ class ClientEditForm(Form):
     def validate_application_role(form, field):
         """Custom validation to confirm only one app per role"""
         selected = field.data
-        # the default role isn't assigned or limited
-        if selected == INTERVENTION.DEFAULT:
+        if not selected or selected == 'None':
             return True
 
-        intervention = Intervention.query.filter_by(name=selected).first()
+        # the default role isn't assigned or limited
+        if selected == INTERVENTION.DEFAULT.name:
+            return True
+
+        intervention = getattr(INTERVENTION, selected)
 
         # if the selected intervention already has a client, make sure
         # it's the client being edited or raise a validation error
@@ -367,7 +369,7 @@ def client():
 
     """
     user = current_user()
-    form = ClientEditForm(application_role=INTERVENTION.DEFAULT)
+    form = ClientEditForm(application_role=INTERVENTION.DEFAULT.name)
     if not form.validate_on_submit():
         return render_template('client_add.html', form=form)
     client = Client(
@@ -383,9 +385,9 @@ def client():
         client), user_id=user.id)
 
     # if user selected a role besides the default, set it.
-    if form.application_role.data != INTERVENTION.DEFAULT:
+    if form.application_role.data != INTERVENTION.DEFAULT.name:
         selected = form.application_role.data
-        intervention = Intervention.query.filter_by(name=selected).first()
+        intervention = getattr(INTERVENTION, selected)
         auditable_event("client {0} assuming role {1}".format(
             client.client_id, selected), user_id=user.id)
         intervention.client_id = client.client_id
@@ -483,8 +485,8 @@ def client_edit(client_id):
             current_role.client_id = None
             auditable_event("client {0} releasing role {1}".format(
                 client.client_id, current_role.description), user_id=user.id)
-        if selected != INTERVENTION.DEFAULT:
-            intervention = Intervention.query.filter_by(name=selected).first()
+        if selected != INTERVENTION.DEFAULT.name:
+            intervention = getattr(INTERVENTION, selected)
             if intervention.client_id != client.client_id:
                 intervention.client_id = client.client_id
                 auditable_event("client {0} assuming role {1}".format(

@@ -5,7 +5,7 @@ from flask.ext.user import roles_required
 import json
 
 from ..audit import auditable_event
-from ..models.intervention import Intervention, UserIntervention
+from ..models.intervention import INTERVENTION, UserIntervention
 from ..models.user import current_user
 from ..models.role import ROLE
 from ..models.relationship import RELATIONSHIP
@@ -82,7 +82,7 @@ def intervention_set(intervention_name):
           the token isn't sponsored by the named intervention owner.
 
     """
-    intervention = Intervention.query.filter_by(name=intervention_name).first()
+    intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
         abort (404, 'no such intervention {}'.format(intervention_name))
 
