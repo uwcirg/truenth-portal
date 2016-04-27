@@ -5,12 +5,14 @@ from flask.ext.user import roles_required
 import json
 
 from ..audit import auditable_event
-from ..models.intervention import Intervention, UserIntervention
+from ..models.intervention import INTERVENTION, UserIntervention
 from ..models.user import current_user
 from ..models.role import ROLE
 from ..models.relationship import RELATIONSHIP
 from ..extensions import oauth
 from ..extensions import db
+from ..models.intervention_strategies import AccessStrategy
+
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
@@ -82,7 +84,7 @@ def intervention_set(intervention_name):
           the token isn't sponsored by the named intervention owner.
 
     """
-    intervention = Intervention.query.filter_by(name=intervention_name).first()
+    intervention = getattr(INTERVENTION, intervention_name)
     if not intervention:
         abort (404, 'no such intervention {}'.format(intervention_name))
 
@@ -109,4 +111,55 @@ def intervention_set(intervention_name):
     auditable_event("updated {0} using: {1}".format(
         intervention.description, json.dumps(request.json)),
         user_id=current_user().id)
+    return jsonify(message='ok')
+
+
+@intervention_api.route(
+    '/intervention/<string:intervention_name>/access_rule')
+@roles_required(ROLE.ADMIN)
+def intervention_rule_list(intervention_name):
+    """Return the list of intervention rules for named intervention
+
+    NB - not documenting in swagger at this time, intended for internal use
+    only.
+
+    """
+    intervention = getattr(INTERVENTION, intervention_name)
+    if not intervention:
+        abort (404, 'no such intervention {}'.format(intervention_name))
+    rules = [x.as_json() for x in intervention.access_strategies]
+    return jsonify(rules=rules)
+
+
+@intervention_api.route(
+    '/intervention/<string:intervention_name>/access_rule', methods=('POST',))
+@oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
+def intervention_rule_set(intervention_name):
+    """POST an access rule to the named intervention
+
+    Submit a JSON doc with the access strategy details to include
+    for the named intervention.
+
+    Only available as a service account API - the named intervention
+    must be associated with the service account sponsor.
+
+    NB - interventions have a global 'public_access' setting.  Only
+    when unset are access rules consulted.
+
+    NB - not documenting in swagger at this time, intended for internal use
+    only.
+
+    """
+    intervention = getattr(INTERVENTION, intervention_name)
+    if not intervention:
+        abort (404, 'no such intervention {}'.format(intervention_name))
+
+    if not request.json or 'function_details' not in request.json:
+        abort(400, "Requires JSON with well defined access strategy")
+    access_strategy = AccessStrategy.from_json(request.json)
+    intervention.access_strategies.append(access_strategy)
+    db.session.commit()
+    auditable_event("added {} to intervention {}".format(
+        access_strategy, intervention.description), user_id=current_user().id)
     return jsonify(message='ok')

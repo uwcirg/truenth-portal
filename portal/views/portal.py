@@ -2,14 +2,13 @@
 import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
-from flask import send_file
 from flask.ext.login import login_user
 from flask.ext.user import roles_required
 from flask_swagger import swagger
 
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.intervention import named_interventions
+from ..models.intervention import INTERVENTION
 from ..models.message import EmailInvite
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
@@ -55,12 +54,13 @@ def home():
 
         # If the user hasn't already answered any upfront questions
         # ask them now - otherwise, off to the portal home..
-        return render_template('portal.html', user=user, interventions=named_interventions())
+        return render_template('portal.html', user=user,
+                               interventions=INTERVENTION)
         # "questions" DISABLED FOR 4/1/16 LAUNCH 
         #for c in (CC.BIOPSY, CC.PCaDIAG, CC.TX):
         #    if user.fetch_values_for_concept(c):
         #        return render_template('portal.html', user=user,
-        #                               interventions=named_interventions())
+        #                               interventions=INTERVENTION)
         #return render_template('questions.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
@@ -224,7 +224,7 @@ def questions_anon():
         session['id'] = user.id
         login_user(user)
     return render_template('questions_anon.html', user=user,
-                           interventions=named_interventions())
+                           interventions=INTERVENTION)
 
 
 @portal.route('/spec')

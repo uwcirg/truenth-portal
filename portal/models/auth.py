@@ -63,10 +63,10 @@ class Client(db.Model):
         the default
 
         """
-        from .intervention import Intervention, INTERVENTION
+        from .intervention import INTERVENTION
         if self.intervention:
             return self.intervention
-        return Intervention.query.filter_by(name=INTERVENTION.DEFAULT).one()
+        return INTERVENTION.DEFAULT
 
     def __str__(self):
         """print details needed in audit logs"""
