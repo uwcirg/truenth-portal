@@ -160,6 +160,7 @@ class TestCase(Base):
 
         db.session.remove()
         db.drop_all()
+        db.engine.dispose()
 
         # lazyprops can't survive a db purge - purge cached attributes
         for attr in dir(CC):

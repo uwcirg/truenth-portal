@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import ENUM
 from ..extensions import db
 from .lazy import query_by_name
 
-
 class Intervention(db.Model):
     __tablename__ = 'interventions'
     id = db.Column(db.Integer, primary_key=True)
@@ -20,23 +19,20 @@ class Intervention(db.Model):
         primaryjoin="Client.client_id==Intervention.client_id",
         uselist=False, backref='Client')
 
-    @property
-    def access_strategies(self):
-        if not hasattr(self, '__access_strategies'):
-            return []
-        return self.__access_strategies
+    access_strategies = db.relationship(
+        'AccessStrategy', order_by="AccessStrategy.rank")
 
-    @access_strategies.setter
-    def _add_access_strategy(self, func):
-        """Add function to extend logic for access to this intervention
+    def fetch_strategies(self):
+        """Generator to return each registered strategy
 
-        Function signature should accept (intervention, user) and return
-        a boolean, true if user should be granted access, false otherwise.
+        Strategies need to be brought to life from their persisted
+        state.  This generator does so, and returns them in a call
+        ready fashion, ordered by the strategy's rank.
 
         """
-        if not hasattr(self, '__access_strategies'):
-            self.__access_strategies = []
-        self.__access_strategies.append(func)
+        for strat in self.access_strategies:
+            func = strat.instantiate()
+            yield func
 
     def user_has_access(self, user):
         """Determine if given user has access to intervention
@@ -46,8 +42,8 @@ class Intervention(db.Model):
         should have access to an intervention.  The first 'true' found
         provides access, otherwise 'false' will be returned.
 
-        1. call each strategy_function in intervention.access_strategies
-        2. check if the intervention has `public_access` set
+        1. check if the intervention has `public_access` set
+        2. call each strategy_function in intervention.access_strategies
         3. check for a UserIntervention row defining access for the given
            user on this intervention.
 
@@ -55,12 +51,13 @@ class Intervention(db.Model):
         False otherwise
 
         """
-        for func in self.access_strategies:
-            if func(self, user):
-                return True
-
         if self.public_access:
             return True
+
+        for func in self.fetch_strategies():
+            if func(intervention=self, user=user):
+                return True
+
         ui = UserIntervention.query.filter_by(
             user_id=user.id, intervention_id=self.id).first()
         if ui and ui.access != 'forbidden':
