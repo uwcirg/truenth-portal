@@ -298,10 +298,6 @@ def save_token(token, request, *args, **kwargs):
         db.session.delete(t)
 
     expires_in = token.get('expires_in')
-
-    # Override library default expiration of 1 hour, unless service token
-    if expires_in < 4*60*60:
-        expires_in = 4*60*60
     expires = datetime.utcnow() + timedelta(seconds=expires_in)
 
     tok = Token(
