@@ -1,12 +1,12 @@
 # true_nth_usa_portal
-Movember True NTH USA Central Services
+Movember TrueNTH USA Shared Services
 
 ## INSTALLATION
 
 Pick any path for installation
 
 ```bash
-$ export PROJECT_HOME=~/CentralServices
+$ export PROJECT_HOME=~/truenth_ss
 ```
 
 ### Prerequisites (done one time)
@@ -20,8 +20,7 @@ $ sudo apt-get install python-virtualenv libffi-dev redis-server
 #### Clone the Project
 
 ```bash
-$ git clone https://github.com/uwcirg/true_nth_usa_portal.git \
-    $PROJECT_HOME
+$ git clone https://github.com/uwcirg/true_nth_usa_portal.git $PROJECT_HOME
 ```
 
 #### Create a Virtual Environment
@@ -152,4 +151,22 @@ All test modules under the `tests` directory can be executed via `nosetests`
 
 ```bash
 $ nosetests
+```
+
+Alternatively, run a single modules worth of tests, telling nose to not
+supress standard out (vital for debugging) and to stop on first error:
+
+```bash
+$ nosetests -sx tests.test_intervention
+```
+
+## Documentation
+
+Docs are built seperately via sphinx.  Change to the docs directory and use
+the contained Makefile to build - then view in browser starting with the 
+`docs/build/html/index.html` file
+
+```bash
+$ cd docs
+$ make html
 ```

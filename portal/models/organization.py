@@ -6,7 +6,7 @@ and healthcare services which are used to describe hospitals and clinics.
 import re
 from sqlalchemy import UniqueConstraint
 
-from .address import Address
+import address
 from ..extensions import db
 from .fhir import CodeableConcept
 from .telecom import Telecom
@@ -19,13 +19,14 @@ class MissingReference(Exception):
 def parse_organization_id(reference_dict):
     """Organizations can refer to a parent organization as partOf
 
-    Parse the id from the given reference_dict.  Expected format:
-      "partOf": {
-        "reference": "Organization/001"
-      },
+    Parse the id from the given reference_dict.  Expected format::
 
-    @raise ValueError: if the format doesn't match
-    @return the parsed id
+        "partOf": {
+            "reference": "Organization/001"
+        },
+
+    :raise ValueError: if the format doesn't match
+    :return: the parsed id
 
     """
     pattern = re.compile('[Oo]rganization/(\d)+')
@@ -92,7 +93,7 @@ class Organization(db.Model):
             self.email = telecom.email
         if 'address' in data:
             for addr in data['address']:
-                self.addresses.append(Address.from_fhir(addr))
+                self.addresses.append(address.Address.from_fhir(addr))
         if 'type' in data:
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:

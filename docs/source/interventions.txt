@@ -1,0 +1,39 @@
+Interventions
+*************
+
+Any client can assume the role of an intervention.  By doing so, the client
+becomes the **official** implementation for said role.
+
+Controlling access to interventions deserves special mention.  On the
+`/client/<client_id>` page, one can set the value of 'public_accessible'.
+
+.. note::
+
+   With *public_accessible* set, the intervention will always be displayed.
+
+When 'public_accessible' is not set, two additional options exist for enabling
+said intervention.
+
+    1. To control per user, the service account associated with the intervention
+    should make use of the */api/intervention/<intervention_name>/* endpoint.
+
+    2. Alternatively, any number of *straegy* functions can be added to an
+    intervention, to give access to any subgroup of users as defined by the
+    strategy itself.  The available strategies are defined in the
+    `portal.models.intervention_strategies` module.  Use the
+    */api/intervention/<intervention_name>/access_rule* endpoint to view ori
+    modify.
+
+For example, to add a rule that enables the *care_plan* intervention for
+users registered with the `UCSF` clinic::
+
+    $ cat data
+    {'name': "UCSF Patients",
+     'function': 'limit_by_clinic',
+     'kwargs': [{'name': 'orgainzation_name',
+                 'value': 'UCSF'},]
+    }
+
+    $ curl -H 'Authorization: Bearer <valid-token>' \
+      -H 'Content-Type: application/json' -X POST -d @data \
+      https://stg.us.truenth.org/api/intervention/care_plan/access_rule

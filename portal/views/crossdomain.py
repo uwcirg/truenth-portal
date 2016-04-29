@@ -11,23 +11,23 @@ def crossdomain(origin=None, methods=None,
                 max_age=21600, automatic_options=True):
     """Decorator to add specified crossdomain headers to response
 
-    @param origin: '*' to allow all origins, otherwise a string with
+    :param origin: '*' to allow all origins, otherwise a string with
         a single origin or a list of origins that might
         access the resource.  If no origin is provided, use
         request.headers['Origin'], but ONLY if it validates.
-    @param methods: Optionally a list of methods that are allowed
+    :param methods: Optionally a list of methods that are allowed
         for this view. If not provided it will allow
         all methods that are implemented.
-    @param headers: Optionally a list of headers that are allowed
+    :param headers: Optionally a list of headers that are allowed
         for this request.
-    @param max_age: The number of seconds as integer or timedelta
+    :param max_age: The number of seconds as integer or timedelta
         object for which the preflighted request is valid.
-    @param automatic_options: If enabled the decorator will use the
+    :param automatic_options: If enabled the decorator will use the
         default Flask OPTIONS response and attach the headers there,
         otherwise the view function will be called to generate an
         appropriate response.
 
-    @raises: 401 if no origin is provided and the one in
+    :raises 401: if no origin is provided and the one in
         request.headers['Origin'] doesn't validate as one we know.
 
     """

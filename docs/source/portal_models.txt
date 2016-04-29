@@ -1,0 +1,39 @@
+Portal.Models
+=============
+.. automodule:: portal.models.address
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.auth
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.fhir
+    :members:
+
+.. automodule:: portal.models.lazy
+    :members:
+
+.. automodule:: portal.models.message
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.organization
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.relationship
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.role
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.telecom
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.user
+    :members:
+    :undoc-members:
