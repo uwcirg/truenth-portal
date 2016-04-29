@@ -321,7 +321,7 @@ def validate_client_origin(origin):
     For CORS, limit the requesting origin to the list we know about,
     namely any origins belonging to our OAuth clients.
 
-    @raises: 401 if we don't find a match.
+    :raises 401: if we don't find a match.
 
     """
     if not origin:

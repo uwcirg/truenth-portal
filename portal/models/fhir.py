@@ -394,7 +394,7 @@ def add_static_concepts(only_quick=False):
 
     Idempotent - run anytime to push any new concepts into existing dbs
 
-    @param only_quick: For unit tests needing quick loads, set true
+    :param only_quick: For unit tests needing quick loads, set true
         unless the test needs the slow to load race and ethnicity data.
 
     """

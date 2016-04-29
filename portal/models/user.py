@@ -90,12 +90,13 @@ def user_extension_map(user, extension):
     FHIR uses extensions for elements beyond base set defined.  Lookup
     an adapter to handle the given extension for the user.
 
-    @param user: the user to apply to or read the extension from
-    @param extension: a dictionary with at least a 'url' key defining
+    :param user: the user to apply to or read the extension from
+    :param extension: a dictionary with at least a 'url' key defining
         the extension.  Should include a 'valueCodeableConcept' structure
         when being used in an apply context (i.e. direct FHIR data)
-    @returns adapter implementing apply_fhir and as_fhir methods
-    @raises ValueError if the extension isn't recognized
+
+    :returns: adapter implementing apply_fhir and as_fhir methods
+    :raises ValueError: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:
@@ -337,8 +338,8 @@ class User(db.Model, UserMixin):
     def update_username(self, force=False):
         """Update username from self.first_name, self.last_name
 
-        @param force: Default behavior only updates if username is
-        currently 'Anonymous'.  Set force=True to override.
+        :param force: Default behavior only updates if username is
+            currently 'Anonymous'.  Set force=True to override.
 
         """
         if not force and self.username != 'Anonymous':
