@@ -2,7 +2,10 @@
 
 usage() {
     echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
-    echo "Usage: $0 [-v] [-b <branch>] [-p <path>]" >&2
+    echo "Usage: $0 [-v] [-f] [-b <branch>] [-p <path>]" >&2
+    echo -e "\nOptions: " >&2
+    echo -e "-v\n Be verbose" >&2
+    echo -e "-f\n Force all conditional deployment processes" >&2
     exit 1
 }
 
