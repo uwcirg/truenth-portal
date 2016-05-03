@@ -26,7 +26,7 @@ activate_once(){
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-while getopts ":b:p:v" option; do
+while getopts ":b:p:vf" option; do
     case "${option}" in
         b)
             BRANCH=${OPTARG}
@@ -36,6 +36,9 @@ while getopts ":b:p:v" option; do
             ;;
         v)
             VERBOSE=true
+            ;;
+        f)
+            FORCE=true
             ;;
         *)
             usage
@@ -66,8 +69,9 @@ old_head=$(git rev-parse origin/$BRANCH)
 update_repo
 new_head=$(git rev-parse origin/$BRANCH)
 
+
 # New modules
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -77,7 +81,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 
 fi
 
 # New seed data
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -87,7 +91,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq
 fi
 
 # DB Changes
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -98,7 +102,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -e
 fi
 
 # Celery Changes
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
