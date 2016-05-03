@@ -105,7 +105,7 @@ var assembleProfile = function(userId) {
         return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
     }).get();
     // Testing random code
-    ethnicityIDs.push({code: "2143-6", system: "http://hl7.org/fhir/v3/Ethnicity"});
+    //ethnicityIDs.push({code: "2143-6", system: "http://hl7.org/fhir/v3/Ethnicity"});
 
     // Put form data into FHIR array
     var demoArray = {};
