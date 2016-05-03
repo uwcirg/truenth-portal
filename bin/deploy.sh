@@ -90,7 +90,7 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.p
     if [[ $VERBOSE ]]; then
         echo "Seeding database"
     fi
-    python "${GIT_WORK_TREE}/manage.py" db seed
+    python "${GIT_WORK_TREE}/manage.py" seed
 fi
 
 # DB Changes
