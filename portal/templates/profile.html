@@ -99,6 +99,70 @@ My TrueNTH Profile
                 </label>
             </div>
         </div>
+
+        <div class="form-group" id="userEthnicity">
+            <label>Ethnicity</label>
+            <div style="margin-top: -10px">
+
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
+                    </label>
+                </div>
+                <!--
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" id="ethnicityOther" value="2131-1"> Other Ethnicity
+                        <input type="email" class="form-control" style="display: none" id="ethnicityOtherVal" placeholder="Enter ethnicity...">
+                    </label>
+                </div>
+                -->
+            </div>
+        </div>
+
+        <div class="form-group" id="userRace">
+            <label>Race</label>
+            <div style="margin-top: -10px">
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2028-9"> Asian
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2054-5"> Black or African American
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2106-3"> White
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" id="raceOther" value="2131-1"> Other Race
+                        <input type="email" class="form-control" style="display: none" id="raceOtherVal" placeholder="Enter race...">
+                    </label>
+                </div>
+
+            </div>
+        </div>
         <div class="form-group float-input-label" id="emailGroup">
             <label for="email">Email address</label>
             <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ user.email if user.email }}" data-customemail="true" required>
@@ -111,7 +175,7 @@ My TrueNTH Profile
 
         <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
         <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
+        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
 
     </div>
 
@@ -211,8 +275,11 @@ My TrueNTH Profile
 </form>
 
 {% endblock %}
+
 {% block document_ready %}
 $(document).ready(function(){
+
+    getDemo({{ user.id }});
 
     /*** Field Validation ***/
     $('#profileForm').validator({
@@ -312,51 +379,13 @@ $(document).ready(function(){
     // Submit the form here
     $("#updateProfile").on("click", function(event){
         event.preventDefault()
-
-        $("#profileForm").addClass("loading");
-        $("#loadingIndicator").show();
-
-        // Grab profile field values
-        var getBirthday = $("input[name=birthDate]").val()
-        var getFirstname = $("input[name=firstname]").val()
-        var getLastname = $("input[name=lastname]").val()
-        var getSex = $("input[name=sex]:checked").val()
-        var getEmail = $("input[name=email]").val()
-        var getPhone = $("input[name=phone]").val()
-
-        // Put form data into FHIR array
-        var demoArray = {};
-        demoArray["resourceType"] = "Patient"
-        demoArray["birthDate"] = getBirthday
-        demoArray["gender"] = getSex
-        demoArray["name"] = {
-            "given": getFirstname,
-            "family": getLastname
-        };
-        demoArray["telecom"] = [
-            { "system": "email", "value": getEmail },
-            { "system": "phone", "value": getPhone }
-        ];
-        /** Send the AJAX **/
-        $.ajax ({
-            type: "PUT",
-            url: '/api/demographics/{{ user.id }}',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(demoArray)
-        }).done(function() {
-            $("#saveMsg").hide()
-            setTimeout(function(){
-                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
-                $("#profileForm").removeClass("loading");
-                $("#loadingIndicator").fadeOut();
-            }, 1200);
-        }).fail(function() {
-            alert("There was a problem updating your profile. Please try again.");
-            $("#loadingIndicator").fadeOut();
-            $("#profileForm").removeClass("loading");
-        }); 
+        assembleProfile({{ user.id }});
     });
+
+    $("#raceOther").on("click",function() {
+        $("#raceOtherVal").fadeToggle();
+    });
+
 });
 
 /** Remove patientQuestion functionality for now
@@ -374,6 +403,7 @@ $.each(getQs, function(i,val){
         console.log("Problem retrieving data from server.")
     });
 });
+
 $("#patientQuestions input").on("change", function(){
     var toCall = $(this).attr("name");
     var theVal = $(this).val();

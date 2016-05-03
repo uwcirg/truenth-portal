@@ -22,6 +22,9 @@ a:hover,
 a:active {
   color: #2a4531;
 }
+.tnth-hide {
+  display: none;
+}
 .btn {
   font-size: 18px;
 }
