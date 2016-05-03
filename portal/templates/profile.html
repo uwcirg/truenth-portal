@@ -2,7 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-{% if current_user.has_role('admin') and HTTP_REFERER in request.environ and request.environ.HTTP_REFERER.endswith("admin") %}
+{% if current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
 {{ back_btn('admin','User List') }}
 {% endif %}
 
@@ -124,6 +124,11 @@ My TrueNTH Profile
                 -->
             </div>
         </div>
+        <div class="form-group tnth-hide" id="userEthnicityOther">
+            <label>Other Ethnicities:</label>
+            <ul></ul>
+        </div>
+
 
         <div class="form-group" id="userRace">
             <label>Race</label>
@@ -231,6 +236,37 @@ My TrueNTH Profile
 
 
 <hr />
+
+<h3>Organization</h3>
+<div id="userOrganization">
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="organization" value="5"> UCSF
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="organization" value="9"> UCSF Genitourinary Medical Oncology
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="organization" value="1"> UW Medicine
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="organization" value="10"> Urology Clinic at Harborview
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="organization" value="3"> Urology Clinic at UW
+            </label>
+        </div>
+    </div>
+</div>
 
 {% if current_user.has_role('admin') and not user.has_role('service') %}
 <h3>User Roles for {{ user.username }}</h3>

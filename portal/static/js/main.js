@@ -53,7 +53,9 @@ var getDemo = function(userId) {
             $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
             // Way to handle non-standard codes
             if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
-                console.log('other one');
+                $("#userEthnicityOther")
+                    .find("ul").append("<li>"+val.display+"</li>").end()
+                    .show();
             }
         });
         // Get Races
@@ -61,12 +63,28 @@ var getDemo = function(userId) {
             $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
             // Way to handle non-standard codes
             if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
-                console.log('other one');
+                $("#userRace").append("<div class='checkbox'><label><input type='checkbox' name='race' checked value='"+val.code+"'> "+val.display+"</label></div>");
             }
+        });
+        // Get Orgs
+        $.each(data.careProvider,function(i,val){
+            var orgID = val.reference.split("/").pop();
+            console.log(orgID);
+            $("#userOrganization input:checkbox[value="+orgID+"]").prop('checked', true);
         });
     }).fail(function() {
         console.log("Problem retrieving data from server.")
     });
+
+    $.ajax ({
+        type: "GET",
+        url: '/api/organization'
+    }).done(function(data) {
+        console.log(data);
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    });
+
 };
 
 // Used on profile page to submit user demo data
@@ -104,9 +122,13 @@ var assembleProfile = function(userId) {
     var raceIDs = $("#userRace input:checkbox:checked").map(function(){
         return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
     }).get();
+    var orgIDs = $("#userOrganization input:checkbox:checked").map(function(){
+        return { reference: "api/organization/"+$(this).val() };
+    }).get();
+    console.log(orgIDs);
     // Testing random code
     //ethnicityIDs.push({code: "2143-6", system: "http://hl7.org/fhir/v3/Ethnicity"});
-
+    //raceIDs.push({code: "1018-1", system: "http://hl7.org/fhir/v3/Race"});
     // Put form data into FHIR array
     var demoArray = {};
     demoArray["resourceType"] = "Patient";
@@ -132,6 +154,8 @@ var assembleProfile = function(userId) {
             }
         }
     ];
+    demoArray["careProvider"] = orgIDs;
+    console.log(demoArray);
     /** Send the AJAX **/
     putDemo(userId,demoArray);
 }
