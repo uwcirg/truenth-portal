@@ -26,10 +26,14 @@ class TestDemographics(TestCase):
 
         # clinic reference requires pre-existing organization
         org = Organization(name='test org')
+        org2 = Organization(name='another org')
         with SessionScope(db):
             db.session.add(org)
+            db.session.add(org2)
             db.session.commit()
         org = db.session.merge(org)
+        org2 = db.session.merge(org2)
+        org_id, org2_id = org.id, org2.id
 
         family = 'User'
         given = 'Test'
@@ -57,9 +61,10 @@ class TestDemographics(TestCase):
                              "system": "http://hl7.org/fhir/v3/Ethnicity",
                              "code": "2162-6"}]}}
                 ],
-                "careProvider": {
-                        "reference": "Organization/{}".format(1)#org.id)
-                      }
+                "careProvider": [
+                    {"reference": "Organization/{}".format(org_id)},
+                    {"reference": "api/organization/{}".format(org2_id)},
+                ]
                }
 
         self.login()
@@ -73,19 +78,20 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
         self.assertEquals(2, len(fhir['extension']))
-        self.assertEquals(1, len(fhir['careProvider']))
+        self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
         self.assertEquals(user.first_name, given)
         self.assertEquals(user.last_name, family)
         self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
         self.assertEquals(['1096-7',], [c.code for c in user.races])
-        self.assertEquals(user.organizations.count(), 1)
+        self.assertEquals(user.organizations.count(), 2)
         self.assertEquals(user.organizations[0].name, 'test org')
+        self.assertEquals(user.organizations[1].name, 'another org')
 
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400 
-        data = {"careProvider": {"reference": "Organization/1"},
+        data = {"careProvider": [{"reference": "Organization/1"}],
                 "resourceType": "Patient",
                }
 
@@ -114,8 +120,8 @@ class TestDemographics(TestCase):
             db.session.add(self.test_user)
             db.session.commit()
 
-        data = {"careProvider": {"reference": "Organization/{}".format(
-                org_id)},
+        data = {"careProvider": [{"reference": "Organization/{}".format(
+                org_id)}],
                 "resourceType": "Patient",
                }
 

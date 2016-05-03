@@ -389,12 +389,13 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
-            org = Organization.from_fhir_reference(fhir['careProvider'])
-            if not org:
-                raise MissingReference('careProvider {} not found'.format(
-                    fhir['careProvider']))
-            if org not in self.organizations:
-                self.organizations.append(org)
+            for item in fhir['careProvider']:
+                org = Organization.from_fhir_reference(item)
+                if not org:
+                    raise MissingReference('careProvider {} not found'.format(
+                        fhir['careProvider']))
+                if org not in self.organizations:
+                    self.organizations.append(org)
         db.session.add(self)
 
     def check_role(self, permission, other_id):
