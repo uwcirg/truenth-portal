@@ -35,9 +35,9 @@ class Extension:
         pass
 
     def as_fhir(self):
-        codes = [{'system': c.system, 'code': c.code} for c in self.children]
         return {'url': self.extension_url,
-                'valueCodeableConcept': {'coding': codes }
+                'valueCodeableConcept': {
+                    'coding': [c.as_fhir() for c in self.children]}
                }
 
     def apply_fhir(self):
