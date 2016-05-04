@@ -1,6 +1,7 @@
 """Organization related views module"""
 import datetime
 from flask import abort, current_app, Blueprint, jsonify, request
+from flask.ext.user import roles_required
 import json
 from sqlalchemy import exc
 
@@ -8,6 +9,7 @@ from ..audit import auditable_event
 from ..extensions import db, oauth
 from ..models.organization import Organization
 from ..models.reference import MissingReference
+from ..models.role import ROLE
 from ..models.user import current_user
 
 
@@ -89,6 +91,7 @@ def organization_get(organization_id):
 
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
 @oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
 def organization_delete(organization_id):
     """Delete the requested organization
 
@@ -126,11 +129,13 @@ def organization_delete(organization_id):
         message = "Cannot delete organization with related entities"
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
+    auditable_event("deleted {}".format(org), user_id=current_user().id)
     return jsonify(message='deleted organization {}'.format(org))
 
 
 @org_api.route('/organization', methods=('POST',))
 @oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
 def organization_post():
     """Add a new organization.  Updates should use PUT
 
@@ -196,6 +201,7 @@ def organization_post():
 
 @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
 @oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
 def organization_put(organization_id):
     """Update organization via FHIR Resource Organization. New should POST
 

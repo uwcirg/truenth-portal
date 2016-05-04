@@ -5,6 +5,7 @@ import os
 
 from portal.extensions import db
 from portal.models.organization import Organization
+from portal.models.role import ROLE
 from tests import TestCase
 
 
@@ -101,6 +102,7 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         org_id = org.id
 
+        self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         rv = self.app.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',
@@ -124,8 +126,25 @@ class TestOrganization(TestCase):
 
         # the 002-burgers-card org refers to another - should fail
         # prior to adding the parent (partOf) org
+        self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         rv = self.app.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert400(rv)
+
+    def test_organization_delete(self):
+        org1 = Organization(name='test 1')
+        org2 = Organization(name='test 2')
+        with SessionScope(db):
+            db.session.add(org1)
+            db.session.add(org2)
+            db.session.commit()
+            org2_id = org2.id
+
+        # use api to delete one and confirm the other remains
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+        rv = self.app.delete('/api/organization/{}'.format(org2_id))
+        self.assert200(rv)
+        self.assertEquals(Organization.query.one().name, 'test 1')
