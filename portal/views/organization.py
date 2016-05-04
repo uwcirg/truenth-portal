@@ -6,7 +6,8 @@ from sqlalchemy import exc
 
 from ..audit import auditable_event
 from ..extensions import db, oauth
-from ..models.organization import Organization, MissingReference
+from ..models.organization import Organization
+from ..models.reference import MissingReference
 from ..models.user import current_user
 
 

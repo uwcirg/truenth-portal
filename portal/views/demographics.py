@@ -4,7 +4,7 @@ from flask import current_app, request
 import json
 
 from ..audit import auditable_event
-from ..models.organization import MissingReference
+from ..models.reference import MissingReference
 from ..models.user import current_user, get_user
 from ..extensions import oauth
 from ..extensions import db

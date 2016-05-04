@@ -240,11 +240,16 @@ class Observation(db.Model):
 
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
+    performers = db.relationship('Performer', lazy='dynamic',
+                                 cascade="save-update",
+                                 secondary="observation_performers",
+                                 backref=db.backref('observations'))
 
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "Observation {0.codeable_concept} {0.value_quantity} "\
-                "at {0.issued} with status {0.status} ".format(self)
+                "at {0.issued} by {0.performers} with status {0.status} ".\
+                format(self)
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
@@ -255,6 +260,8 @@ class Observation(db.Model):
             fhir['status'] = self.status
         fhir['code'] = self.codeable_concept.as_fhir()
         fhir.update(self.value_quantity.as_fhir())
+        if self.performers:
+            fhir['performer'] = [p.as_fhir() for p in self.performers]
         return fhir
 
     def add_if_not_found(self, commit_immediately=False):

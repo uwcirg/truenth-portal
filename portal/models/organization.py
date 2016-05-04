@@ -3,42 +3,13 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
-import re
 from sqlalchemy import UniqueConstraint
 
 import address
 from ..extensions import db
 from .fhir import CodeableConcept
+import reference
 from .telecom import Telecom
-
-class MissingReference(Exception):
-    """Raised when organization references cannot be found"""
-    pass
-
-
-def parse_organization_id(reference_dict):
-    """Organizations can refer to a parent organization as partOf
-
-    Parse the id from the given reference_dict.  Expected format::
-
-        "partOf": {
-            "reference": "Organization/001"
-        },
-
-    :raise ValueError: if the format doesn't match
-    :return: the parsed id
-
-    """
-    pattern = re.compile('[Oo]rganization/(\d)+')
-
-    reference_text = reference_dict['reference']
-    match = pattern.search(reference_text)
-    try:
-        organization_id = int(match.groups()[0])
-    except:
-        raise ValueError('partOf reference not found: {}'.\
-                         format(str(reference_text)))
-    return organization_id
 
 
 class Organization(db.Model):
@@ -78,12 +49,6 @@ class Organization(db.Model):
         org = cls()
         return org.update_from_fhir(data)
 
-    @classmethod
-    def from_fhir_reference(cls, data):
-        """expects FHIR reference data - returns matching instance"""
-        org_id = parse_organization_id(data)
-        return cls.query.get(org_id)
-
     def update_from_fhir(self, data):
         if 'name' in data:
             self.name = data['name']
@@ -97,13 +62,7 @@ class Organization(db.Model):
         if 'type' in data:
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:
-            self.partOf_id = parse_organization_id(data['partOf'])
-            # Require the parent resource exists when named
-            with db.session.no_autoflush:
-                if not Organization.query.get(self.partOf_id):
-                    raise MissingReference(
-                        'Referenced Organization {} not found'.format(
-                        self.partOf_id))
+            self.partOf_id = reference.Reference.parse(data['partOf']).id
         return self
 
     def as_fhir(self):
@@ -120,8 +79,8 @@ class Organization(db.Model):
         if self.type:
             d['type'] = self.type.as_fhir()
         if self.partOf_id:
-            d['partOf'] = {'reference':
-                           'organization/{}'.format(self.partOf_id)}
+            d['partOf'] = reference.Reference.organization(
+                self.partOf_id).as_fhir()
         return d
 
 

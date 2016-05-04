@@ -10,6 +10,7 @@ options:
 
 from flask.ext.testing import TestCase as Base
 from flask.ext.webtest import SessionScope
+import json
 
 from portal.app import create_app
 from portal.config import TestConfig
@@ -18,6 +19,8 @@ from portal.models.auth import Client
 from portal.models.fhir import CC, ValueQuantity
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
+from portal.models.performer import Performer
+from portal.models.reference import Reference
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.user import User, UserRoles
@@ -124,9 +127,12 @@ class TestCase(Base):
         " Add clinical data to get beyond the landing page "
         truthiness = ValueQuantity(value=True,
                                    units='boolean').add_if_not_found(True)
+        performer = Performer(reference_txt=json.dumps(
+            Reference.patient(TEST_USER_ID).as_fhir()))
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
             self.test_user.save_constrained_observation(
-                codeable_concept=cc, value_quantity=truthiness)
+                codeable_concept=cc, value_quantity=truthiness,
+                performer=performer)
 
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW

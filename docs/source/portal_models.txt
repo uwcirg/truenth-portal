@@ -22,6 +22,14 @@ Portal.Models
     :members:
     :undoc-members:
 
+.. automodule:: portal.models.performer
+    :members:
+    :undoc-members:
+
+.. automodule:: portal.models.reference
+    :members:
+    :undoc-members:
+
 .. automodule:: portal.models.relationship
     :members:
     :undoc-members:
