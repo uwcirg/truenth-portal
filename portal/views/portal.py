@@ -39,11 +39,30 @@ def landing():
     return render_template('landing.html', user=None)
 
 
+@portal.route('/urologyuwmc')
+def specific_clinic_landing():
+    """Invited users start here to obtain a specific clinic assignment
+
+    Store the clinic in the session for association with the user once
+    registered and redirect to the standard landing page.
+
+    """
+    session['associate_clinic'] = "UCSF Urologic Surgical Oncology"
+    return redirect('/')
+
+
 @portal.route('/home')
 def home():
     """home page view function"""
     user = current_user()
     if user:
+        # authorized entry point - take care of pending actions
+        # 1. associate user with clinic if previously captured
+        if 'associate_clinic' in session:
+            user.add_organization(session['associate_clinic'])
+            db.session.commit()
+            del session['associate_clinic']
+
         # now logged in, redirect if next was previously stored
         if 'next' in session and session['next']:
             current_app.logger.debug("redirect to session[next]: %s",

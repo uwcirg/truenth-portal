@@ -14,6 +14,7 @@ from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .performer import Performer
+from .organization import Organization
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
@@ -148,6 +149,12 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    def add_organization(self, organization_name):
+        """Shortcut to add a clinic/organization by name"""
+        org = Organization.query.filter_by(name=organization_name).one()
+        if org not in self.organizations:
+            self.organizations.append(org)
 
     def add_observation(self, fhir, performer):
         if not 'coding' in fhir['code']:
