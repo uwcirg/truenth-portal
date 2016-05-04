@@ -16,14 +16,14 @@ class Reference(object):
     def organization(cls, organization_id):
         """Create a reference object from a known organization id"""
         instance = cls()
-        instance.organization_id = organization_id
+        instance.organization_id = int(organization_id)
         return instance
 
     @classmethod
     def patient(cls, patient_id):
         """Create a reference object from a known patient id"""
         instance = cls()
-        instance.patient_id = patient_id
+        instance.patient_id = int(patient_id)
         return instance
 
     @classmethod

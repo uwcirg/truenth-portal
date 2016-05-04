@@ -322,7 +322,7 @@ class User(db.Model, UserMixin):
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
             for o in self.organizations:
-                orgs.append(reference.Reference.organization(o).as_fhir())
+                orgs.append(reference.Reference.organization(o.id).as_fhir())
             return orgs
 
         d = {}
