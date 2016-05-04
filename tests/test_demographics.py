@@ -90,7 +90,7 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations[1].name, 'another org')
 
     def test_demographics_missing_ref(self):
-        # reference clinic must exist or expect a 400 
+        # reference clinic must exist or expect a 400
         data = {"careProvider": [{"reference": "Organization/1"}],
                 "resourceType": "Patient",
                }
@@ -101,7 +101,7 @@ class TestDemographics(TestCase):
                 data=json.dumps(data))
 
         self.assert400(rv)
-        self.assertIn('reference', rv.data)
+        self.assertIn('Reference', rv.data)
         self.assertIn('not found', rv.data)
 
     def test_demographics_duplicate_ref(self):

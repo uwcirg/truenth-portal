@@ -1,9 +1,12 @@
 """Clinical API view functions"""
 from flask import abort, Blueprint, jsonify
 from flask import request
+import json
 
 from ..audit import auditable_event
 from ..models.fhir import CC, ValueQuantity
+from ..models.performer import Performer
+from ..models.reference import Reference
 from ..models.user import current_user, get_user
 from ..extensions import oauth
 from ..extensions import db
@@ -233,7 +236,8 @@ def pca_diag_set(patient_id):
                                      codeable_concept=CC.PCaDIAG)
 
 
-@clinical_api.route('/patient/<int:patient_id>/clinical/tx', methods=('POST', 'PUT'))
+@clinical_api.route('/patient/<int:patient_id>/clinical/tx',
+                    methods=('POST', 'PUT'))
 @oauth.require_oauth()
 def tx_set(patient_id):
     """Simplified API for setting clinical treatment status w/o FHIR
@@ -334,9 +338,11 @@ def clinical_set(patient_id):
     Submit a minimal FHIR doc in JSON format including the 'Observation'
     resource type, and any fields to retain.  NB, only a subset
     are persisted in the portal including {"name"(CodeableConcept),
-    "valueQuantity", "status", "issued"} - others will be ignored.
+    "valueQuantity", "status", "issued", "performer"} - others will be ignored.
 
     Returns details of the change in the json 'message' field.
+
+    If *performer* isn't defined, the current user is assumed.
 
     Raises 401 if logged-in user lacks permission to edit requested
     patient.
@@ -388,7 +394,12 @@ def clinical_set(patient_id):
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
-    code, result = patient.add_observation(request.json)
+    if 'performer' not in request.json:
+        performer = Performer(reference_txt=json.dumps(
+            Reference.patient(current_user().id).as_fhir()))
+    else:
+        performer = None
+    code, result = patient.add_observation(request.json, performer)
     if code != 200:
         abort(code, result)
     db.session.commit()
@@ -401,6 +412,10 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
 
+    # For such a shortcut, we assume the current user is the "performer"
+    performer = Performer(reference_txt=json.dumps(Reference.patient(
+        current_user().id).as_fhir()))
+
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
     value = str(request.json['value']).lower()
@@ -409,7 +424,8 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
 
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
-                                         value_quantity=truthiness)
+                                         value_quantity=truthiness,
+                                         performer=performer)
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
         codeable_concept, truthiness, patient_id), user_id=current_user().id)

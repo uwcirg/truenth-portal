@@ -13,7 +13,8 @@ from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
-from .organization import Organization, MissingReference
+from .performer import Performer
+import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
@@ -148,11 +149,13 @@ class User(db.Model, UserMixin):
         else:
             return self.username
 
-    def add_observation(self, fhir):
+    def add_observation(self, fhir, performer):
         if not 'coding' in fhir['code']:
             return 400, "requires at least one CodeableConcept"
         if not 'valueQuantity' in fhir:
             return 400, "missing required 'valueQuantity'"
+        if not ('performer' in fhir or performer):
+            return 400, "missing required 'performer'"
 
         cc = CodeableConcept.from_fhir(fhir['code']).add_if_not_found()
 
@@ -168,7 +171,12 @@ class User(db.Model, UserMixin):
                 issued=issued,
                 codeable_concept_id=cc.id,
                 value_quantity_id=vq.id).add_if_not_found(True)
-
+        if performer:
+            observation.performers.append(performer)
+        if 'performer' in fhir:
+            for p in fhir['performer']:
+                performer = Performer.from_fhir(p)
+                observation.performers.append(performer)
         UserObservation(user_id=self.id,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
@@ -229,7 +237,8 @@ class User(db.Model, UserMixin):
         return [obs.value_quantity for obs in self.observations if\
                 obs.codeable_concept_id == codeable_concept.id]
 
-    def save_constrained_observation(self, codeable_concept, value_quantity):
+    def save_constrained_observation(self, codeable_concept, value_quantity,
+                                    performer):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -242,6 +251,7 @@ class User(db.Model, UserMixin):
         # User may not have persisted concept or value - CYA
         codeable_concept = codeable_concept.add_if_not_found()
         value_quantity = value_quantity.add_if_not_found()
+        performer = performer.add_if_not_found()
 
         existing = [obs for obs in self.observations if\
                     obs.codeable_concept_id == codeable_concept.id]
@@ -249,8 +259,11 @@ class User(db.Model, UserMixin):
 
         if existing:
             if existing[0].value_quantity_id == value_quantity.id:
-                # perfect match -- done
-                return
+                # perfect match -- update performer if necessary
+                if performer.id in [p.id for p in existing[0].performers]:
+                    return
+                else:
+                    existing[0].performers.append(performer)
             else:
                 # We don't want multiple observations for this concept
                 # with different values.  Delete old and add new
@@ -258,6 +271,7 @@ class User(db.Model, UserMixin):
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
                                   value_quantity_id=value_quantity.id)
+        observation.performers.append(performer)
         self.observations.append(observation.add_if_not_found())
 
     def clinical_history(self, requestURL=None):
@@ -301,7 +315,7 @@ class User(db.Model, UserMixin):
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
             for o in self.organizations:
-                orgs.append({"reference": "/api/organization/{}".format(o.id)})
+                orgs.append(reference.Reference.organization(o).as_fhir())
             return orgs
 
         d = {}
@@ -390,10 +404,7 @@ class User(db.Model, UserMixin):
                 instance.apply_fhir()
         if 'careProvider' in fhir:
             for item in fhir['careProvider']:
-                org = Organization.from_fhir_reference(item)
-                if not org:
-                    raise MissingReference('careProvider {} not found'.format(
-                        fhir['careProvider']))
+                org = reference.Reference.parse(item)
                 if org not in self.organizations:
                     self.organizations.append(org)
         db.session.add(self)

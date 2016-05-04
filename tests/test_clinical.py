@@ -7,6 +7,8 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
+from portal.models.performer import Performer
+from portal.models.reference import Reference
 from portal.models.user import User
 
 
@@ -21,6 +23,9 @@ class TestClinical(TestCase):
             cc = CodeableConcept(codings=[coding,])
             observation.codeable_concept = cc
             observation.value_quantity = ValueQuantity(value=2)
+            performer = Performer(reference_txt=json.dumps(
+                Reference.patient(TEST_USER_ID).as_fhir()))
+            observation.performers.append(performer)
             db.session.add(observation)
             db.session.flush()
             db.session.add(UserObservation(user_id=int(TEST_USER_ID),
@@ -39,6 +44,9 @@ class TestClinical(TestCase):
         self.assertEquals('2',
             clinical_data['entry'][0]['content']['valueQuantity']\
                     ['value'])
+        self.assertEquals(
+            json.dumps(Reference.patient(TEST_USER_ID).as_fhir()),
+            clinical_data['entry'][0]['content']['performer'][0])
 
     def test_clinicalPOST(self):
         data = {"resourceType": "Observation",
@@ -55,7 +63,8 @@ class TestClinical(TestCase):
                     "code": "g/dl"
                     },
                 "status": "final",
-                "issued": "2015-08-04T13:27:00+01:00"
+                "issued": "2015-08-04T13:27:00+01:00",
+                "performer": Reference.patient(TEST_USER_ID).as_fhir()
                 }
 
         self.login()
