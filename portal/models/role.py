@@ -40,6 +40,8 @@ STATIC_ROLES = IterableUserDict({
     'patient':
         'Default role for all patients, may only view their own '
         'patient data',
+    'provider':
+        'Health care provider at a TrueNTH-collaborating clinic',
     'service':
         'Reserved for automated service accounts needing API access',
     'test':
