@@ -308,7 +308,7 @@ a:active {
 /** styles specific to profile **/
 .loading-indicator {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 200px;
   left: 48%;
   margin-left: -50px;

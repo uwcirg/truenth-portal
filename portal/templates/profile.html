@@ -101,7 +101,7 @@ My TrueNTH Profile
         </div>
 
         <div class="form-group" id="userEthnicity">
-            <label>Ethnicity</label>
+            <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
             <div style="margin-top: -10px">
 
                 <div class="radio">
@@ -114,24 +114,12 @@ My TrueNTH Profile
                         <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
                     </label>
                 </div>
-                <!--
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" id="ethnicityOther" value="2131-1"> Other Ethnicity
-                        <input type="email" class="form-control" style="display: none" id="ethnicityOtherVal" placeholder="Enter ethnicity...">
-                    </label>
-                </div>
-                -->
             </div>
-        </div>
-        <div class="form-group tnth-hide" id="userEthnicityOther">
-            <label>Other Ethnicities:</label>
-            <ul></ul>
         </div>
 
 
         <div class="form-group" id="userRace">
-            <label>Race</label>
+            <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
             <div style="margin-top: -10px">
 
                 <div class="checkbox">
@@ -161,8 +149,7 @@ My TrueNTH Profile
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="race" id="raceOther" value="2131-1"> Other Race
-                        <input type="email" class="form-control" style="display: none" id="raceOtherVal" placeholder="Enter race...">
+                        <input type="checkbox" name="race" value="2131-1"> Other
                     </label>
                 </div>
 
@@ -176,6 +163,23 @@ My TrueNTH Profile
         <div class="form-group float-input-label">
             <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
             <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ user.phone if user.phone }}">
+        </div>
+
+
+        <div class="form-group" id="userOrgs">
+            <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
+            <div style="margin-left: 10px">
+
+                <legend style="margin: 0  0 4px">UCSF</legend>
+                <input class="tnth-hide" type="checkbox" name="organization" value="5"/>
+                <div class="form-group" id="clinics5">
+                </div>
+                <legend style="margin: 0  0 4px">UW Medicine</legend>
+                <input class="tnth-hide" type="checkbox" name="organization" value="1"/>
+                <div class="form-group" id="clinics1">
+                </div>
+
+            </div>
         </div>
 
         <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
@@ -237,37 +241,6 @@ My TrueNTH Profile
 
 <hr />
 
-<h3>Organization</h3>
-<div id="userOrganization">
-    <div class="form-group">
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="organization" value="5"> UCSF
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="organization" value="9"> UCSF Genitourinary Medical Oncology
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="organization" value="1"> UW Medicine
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="organization" value="10"> Urology Clinic at Harborview
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="organization" value="3"> Urology Clinic at UW
-            </label>
-        </div>
-    </div>
-</div>
-
 {% if current_user.has_role('admin') and not user.has_role('service') %}
 <h3>User Roles for {{ user.username }}</h3>
 <div id="userRoles">
@@ -315,7 +288,7 @@ My TrueNTH Profile
 {% block document_ready %}
 $(document).ready(function(){
 
-    getDemo({{ user.id }});
+    getOrgs({{ user.id }});
 
     /*** Field Validation ***/
     $('#profileForm').validator({
@@ -416,10 +389,6 @@ $(document).ready(function(){
     $("#updateProfile").on("click", function(event){
         event.preventDefault()
         assembleProfile({{ user.id }});
-    });
-
-    $("#raceOther").on("click",function() {
-        $("#raceOtherVal").fadeToggle();
     });
 
 });
