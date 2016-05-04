@@ -2,7 +2,10 @@
 
 usage() {
     echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
-    echo "Usage: $0 [-v] [-b <branch>] [-p <path>]" >&2
+    echo "Usage: $0 [-v] [-f] [-b <branch>] [-p <path>]" >&2
+    echo -e "\nOptions: " >&2
+    echo -e "-v\n Be verbose" >&2
+    echo -e "-f\n Force all conditional deployment processes" >&2
     exit 1
 }
 
@@ -26,7 +29,7 @@ activate_once(){
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-while getopts ":b:p:v" option; do
+while getopts ":b:p:vf" option; do
     case "${option}" in
         b)
             BRANCH=${OPTARG}
@@ -36,6 +39,9 @@ while getopts ":b:p:v" option; do
             ;;
         v)
             VERBOSE=true
+            ;;
+        f)
+            FORCE=true
             ;;
         *)
             usage
@@ -66,8 +72,9 @@ old_head=$(git rev-parse origin/$BRANCH)
 update_repo
 new_head=$(git rev-parse origin/$BRANCH)
 
+
 # New modules
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -77,17 +84,17 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 
 fi
 
 # New seed data
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
         echo "Seeding database"
     fi
-    python "${GIT_WORK_TREE}/manage.py" db seed
+    python "${GIT_WORK_TREE}/manage.py" seed
 fi
 
 # DB Changes
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -98,7 +105,7 @@ if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -e
 fi
 
 # Celery Changes
-if [[ -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
