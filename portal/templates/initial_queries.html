@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+
+  {{ back_btn(PORTAL,'Home') }}
+
+  <h3 class="tnth-headline">About TrueNTH</h3>
+
+  <p>TrueNTH represents the journey men and their loved ones travel during and after a prostate cancer diagnosis, treatment, and recovery.</p>
+
+  <p>TrueNTH provides tools and strategies in multiple categories, including treatment decision making, sexual health, symptom management, exercise, diet, and connects with other men and caregivers traveling the same path. Our website provides innovative programs designed by leading experts from across the country.</p>
+
+  <p>TrueNTH is funded by the <a href="https://us.movember.com/">Movember Foundation</a>, an international non-profit seeking to improve men’s health.</p>
+
+  {% if config.version %}
+  <br />
+  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.version }}</div>
+  {% endif %}
+{% endblock %}

@@ -36,6 +36,8 @@ def landing():
     """landing page view function"""
     if current_user():
         return redirect('home')
+    # for time being, set initial_queries in session on entry
+    session['initial_queries'] = True
     return render_template('landing.html', user=None)
 
 
@@ -51,6 +53,14 @@ def specific_clinic_landing():
     return redirect('/')
 
 
+@portal.route('/initial-queries', methods=('GET', 'POST'))
+def initial_queries():
+    if request.method == 'GET':
+        return render_template('initial_queries.html', user=current_user())
+    del session['initial_queries']
+    return redirect('/')
+
+
 @portal.route('/home')
 def home():
     """home page view function"""
@@ -62,6 +72,11 @@ def home():
             user.add_organization(session['associate_clinic'])
             db.session.commit()
             del session['associate_clinic']
+
+        # present intial questions if not already obtained
+        # TODO: logic to determine if all necessary queries have been answered
+        if 'initial_queries' in session:
+            return redirect(url_for('portal.initial_queries'))
 
         # now logged in, redirect if next was previously stored
         if 'next' in session and session['next']:
