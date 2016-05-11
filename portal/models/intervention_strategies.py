@@ -42,7 +42,7 @@ def allow_if_not_in_intervention(intervention_name):
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
     def user_not_in_intervention(intervention, user):
-        if not exclusive_intervention.user_has_access(user) 
+        if not exclusive_intervention.user_has_access(user):
             return True
     return user_not_in_intervention
 
