@@ -20,6 +20,7 @@ import sys
 from ..extensions import db
 from .fhir import CC
 from .organization import Organization
+from .intervention import INTERVENTION
 
 
 ###
@@ -34,6 +35,16 @@ def limit_by_clinic(organization_name):
         if organization in user.organizations:
             return True
     return user_registered_with_clinic
+
+def allow_if_not_in_intervention(intervention_name):
+    """Returns function implementing strategy API checking that user does not belong to named intervention"""
+
+    exclusive_intervention = getattr(INTERVENTION, intervention_name)
+
+    def user_not_in_intervention(intervention, user):
+        if not exclusive_intervention.user_has_access(user) 
+            return True
+    return user_not_in_intervention
 
 def diagnosis_w_o_tx():
     """Returns function implementing strategy API checks for PCa and no TX"""
