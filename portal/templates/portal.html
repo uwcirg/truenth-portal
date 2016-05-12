@@ -8,7 +8,8 @@
 </div>
 
 
-{# This should only appear if user has access to SR #}
+{# TODO: iterate over all interventions instead of the below #}
+
 {% set intervention = interventions.sexual_recovery %}
 {% if intervention.user_has_access(user) %}
 <div class="portal-item">
@@ -16,26 +17,24 @@
     <p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>
     <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
 </div>
-{% else %}
+{% endif %}
 
-    {% set intervention = interventions.decision_support_p3p %}
-    {% if intervention.user_has_access(user) %}
+{% set intervention = interventions.decision_support_p3p %}
+{% if intervention.user_has_access(user) %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Decision Support (P3P)</h2>
     <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
     <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
 </div>
-    {% endif %}
+{% endif %}
 
-    {% set intervention = interventions.self_management %}
-    {% if intervention.user_has_access(user) %}
+{% set intervention = interventions.self_management %}
+{% if intervention.user_has_access(user) %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Self Management</h2>
     <p>Assess the severity of your symptoms, and the extent to which they bother you, in a variety of areas common to men who have been treated for prostate cancer. Learn strategies to address those symptoms, specifically for men like you.</p>
     <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
 </div>
-    {% endif %}
-
 {% endif %}
 
 <div class="img-with-text flush-with-footer full-width">
