@@ -478,7 +478,7 @@ def roles(user_id):
 
 @user_api.route('/user/<int:user_id>/roles', methods=('DELETE',))
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@roles_required(ROLE.ADMIN)
 def delete_roles(user_id):
     """Delete roles for user, returns simple JSON defining user roles
 
@@ -569,7 +569,6 @@ def delete_roles(user_id):
 
 @user_api.route('/user/<int:user_id>/roles', methods=('PUT',))
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
 
