@@ -30,7 +30,6 @@ from .intervention import INTERVENTION
 
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
-    import pdb; pdb.set_trace()
     current_app.logger.debug(
         "{func_name} returning {result} for {user} on intervention "\
         "{intervention}".format(**kwargs))

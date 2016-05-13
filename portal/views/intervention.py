@@ -134,7 +134,7 @@ def intervention_rule_list(intervention_name):
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule', methods=('POST',))
 @oauth.require_oauth()
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def intervention_rule_set(intervention_name):
     """POST an access rule to the named intervention
 
