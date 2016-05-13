@@ -150,9 +150,14 @@
 }(jQuery);
 
 // Run dropdown
-$('.tnth-dropdown-toggle').dropdown()
+$('.tnth-dropdown-toggle').dropdown();
 
 // Simple show/hide for XS menu
 $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
+});
+
+$(function() {
+  // Remove display: none from dropdown links (hiding prevents flash onload)
+  $("#tnthNavbarXs, #tnthTopLinks").removeAttr("style");
 });

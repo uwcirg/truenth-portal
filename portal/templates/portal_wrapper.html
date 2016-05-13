@@ -31,14 +31,14 @@
             <div id="tnthLogo">
                 <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
             </div>
-            <div id="tnthTopLinks">
+            <div id="tnthTopLinks" style="display: none">
                 <div class="tnth-btn-group">
                     {% if username %}
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
                         Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                     </button>
-                    <ul class="tnth-dropdown-menu" role="menu">
+                    <ul class="tnth-dropdown-menu">
                         <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
                         <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                         <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
@@ -72,7 +72,7 @@
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
             </div>
-            <div id="tnthNavbarXs">
+            <div id="tnthNavbarXs" style="display:none;">
                 <ul class="tnth-navbar-xs">
                     <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
                     {% if username %}

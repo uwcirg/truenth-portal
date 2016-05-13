@@ -18,6 +18,7 @@
 @baseColor:       #333;
 @linkColor:       #57675B;
 @linkHover:       #2a4531;
+@btnColor:        #79815D;
 
 body {
   margin: 0;
@@ -31,6 +32,9 @@ a {
 }
 a:hover, a:active {
   color: @linkHover;
+}
+.tnth-hide {
+  display: none;
 }
 .btn {
   font-size: @baseFontSize;
@@ -230,8 +234,8 @@ a:hover, a:active {
 
 .btn-tnth-primary {
   color: #fff;
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: @btnColor;
+  border-color: @btnColor;
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
   &:hover,
@@ -332,7 +336,7 @@ a:hover, a:active {
 /** styles specific to profile **/
 .loading-indicator {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 200px;
   left: 48%;
   margin-left: -50px;
