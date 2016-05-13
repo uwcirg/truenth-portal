@@ -11,8 +11,8 @@ Controlling access to interventions deserves special mention.  On the
 
    With *public_accessible* set, the intervention will always be displayed.
 
-When 'public_accessible' is not set, two additional options exist for enabling
-said intervention.
+When 'public_accessible' is **not** set, two additional options exist for
+enabling said intervention.
 
     1. To control per user, the service account associated with the intervention
     should make use of the */api/intervention/<intervention_name>/* endpoint.
@@ -24,14 +24,22 @@ said intervention.
     */api/intervention/<intervention_name>/access_rule* endpoint to view ori
     modify.
 
+.. note::
+
+   All of the checks above function as a short-circuited **or**.  That is,
+   the first check that evaluates as True grants the user access to the
+   intervention.
+
 For example, to add a rule that enables the *care_plan* intervention for
 users registered with the `UCSF` clinic::
 
     $ cat data
-    {'name': "UCSF Patients",
-     'function': 'limit_by_clinic',
-     'kwargs': [{'name': 'orgainzation_name',
-                 'value': 'UCSF'},]
+    {"name": "UCSF Patients",
+     "function_details": {
+       "function": "limit_by_clinic",
+       "kwargs': [{"name": "orgainzation_name",
+                 "value": "UCSF"},]
+      }
     }
 
     $ curl -H 'Authorization: Bearer <valid-token>' \
