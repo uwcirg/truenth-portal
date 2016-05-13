@@ -13,6 +13,7 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
+from flask import current_app
 import json
 from sqlalchemy.dialects.postgresql import JSONB
 import sys
@@ -27,12 +28,21 @@ from .intervention import INTERVENTION
 ## functions implementing the 'access_strategy' API
 #
 
+def _log(**kwargs):
+    """Wrapper to log all the access lookup results within"""
+    import pdb; pdb.set_trace()
+    current_app.logger.debug(
+        "{func_name} returning {result} for {user} on intervention "\
+        "{intervention}".format(**kwargs))
+
 def limit_by_clinic(organization_name):
     """Returns function implenting strategy API checking for named org"""
     organization = Organization.query.filter_by(name=organization_name).one()
 
     def user_registered_with_clinic(intervention, user):
         if organization in user.organizations:
+            _log(result=True, func_name='limit_by_clinic', user=user,
+                 intervention=intervention.name)
             return True
     return user_registered_with_clinic
 
@@ -43,6 +53,8 @@ def allow_if_not_in_intervention(intervention_name):
 
     def user_not_in_intervention(intervention, user):
         if not exclusive_intervention.user_has_access(user):
+            _log(result=True, func_name='user_not_in_intervention', user=user,
+                 intervention=intervention.name)
             return True
     return user_not_in_intervention
 
@@ -58,6 +70,8 @@ def diagnosis_w_o_tx():
                     # TODO: look for a procedure indicating treatement.
                     # if procedure indicating treatment:
                         # return False
+                    _log(result=True, func_name='diag_no_tx', user=user,
+                         intervention=intervention.name)
                     return True
     return diag_no_tx
 
