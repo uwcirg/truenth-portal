@@ -8,12 +8,12 @@
 <p>Register using:</p>
 
 <div style="margin-left: 1em">
-    <a href="{{ url_for('auth.login', provider_name='facebook') }}"
+    <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
        class="btn btn-social btn-facebook">
         <i class="fa fa-facebook"></i>
         Facebook
     </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="{{ url_for('auth.login', provider_name='google') }}"
+    <a href="{{ url_for('auth.login', provider_name='google', next=request.args.get('next')) }}"
        class="btn btn-social btn-google">
         <i class="fa fa-google"></i>
         Google
