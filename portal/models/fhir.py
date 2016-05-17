@@ -1,5 +1,6 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
+import dateutil
 import json
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
@@ -22,6 +23,28 @@ def as_fhir(obj):
         return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
     if isinstance(obj, date):
         return obj.strftime('%Y-%m-%d')
+
+
+class FHIR_datetime(object):
+    """Utility class/namespace for working with FHIR datetimes"""
+
+    @staticmethod
+    def as_fhir(obj):
+        return as_fhir(obj)
+
+    @staticmethod
+    def parse(data):
+        """Parse input string to generate a UTC datetime instance"""
+        dt = dateutil.parser.parse(data)
+        if dt.tzinfo:
+            # Convert to UTC if necessary
+            pass
+        return dt
+
+    @staticmethod
+    def now():
+        """Generates a FHIR compliant datetime string for current moment"""
+        return datetime.datetime.utcnow().isoformat()+'Z'
 
 
 class CodeableConceptCoding(db.Model):
@@ -237,7 +260,9 @@ class Observation(db.Model):
                                    nullable=False)
     value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
                                  nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
 
+    audit = db.relationship('Audit', cascade="save-update")
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
     performers = db.relationship('Performer', lazy='dynamic',
@@ -254,6 +279,7 @@ class Observation(db.Model):
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
+        fhir['meta'] = self.audit.as_fhir()
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
         if self.status:

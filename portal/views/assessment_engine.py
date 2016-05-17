@@ -7,7 +7,7 @@ import jsonschema
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
-from ..models.fhir import QuestionnaireResponse
+from ..models.fhir import FHIR_datetime, QuestionnaireResponse
 from ..models.user import current_user
 from ..extensions import oauth
 from ..extensions import db
@@ -561,7 +561,7 @@ def assessment(patient_id, instrument_id):
 
     bundle = {
         'resourceType':'Bundle',
-        'updated':datetime.datetime.utcnow().isoformat()+'Z',
+        'updated':FHIR_datetime.now(),
         'total':len(documents),
         'type': 'searchset',
         'link': {
