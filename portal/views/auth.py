@@ -59,7 +59,7 @@ def deauthorized():
     sig = base64_url_decode(encoded_sig)
     data = base64_url_decode(payload)
 
-    secret = current_app.config['CONSUMER_SECRET']
+    secret = current_app.config['FB_CONSUMER_SECRET']
     expected_sig = hmac.new(secret, msg=payload,
             digestmod=hashlib.sha256).digest()
     if expected_sig != sig:
