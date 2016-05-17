@@ -158,6 +158,8 @@ $('.tnth-navbar-toggle').click(function(){
 });
 
 $(function() {
-  // Remove display: none from dropdown links (hiding prevents flash onload)
-  $("#tnthNavbarXs, #tnthTopLinks").removeAttr("style");
+  // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
+  $("img.tnth-topnav-wordmark").load(function(){
+    $("#tnthNavWrapper").removeAttr("style");
+  });
 });

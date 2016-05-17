@@ -24,14 +24,14 @@
 </script>
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
-<div id="tnthNavWrapper">
+<div id="tnthNavWrapper" style="display: none;">
 
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
             <div id="tnthLogo">
-                <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
+                <a href="{{PORTAL}}"><img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
             </div>
-            <div id="tnthTopLinks" style="display: none">
+            <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if username %}
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
@@ -72,7 +72,7 @@
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
             </div>
-            <div id="tnthNavbarXs" style="display:none;">
+            <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
                     <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
                     {% if username %}
