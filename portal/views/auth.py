@@ -104,12 +104,18 @@ def next_after_login():
 
     """
     # If client auth was pushed aside, resume now
-    if 'pending_authorize_args' in session:
+    if current_user() and 'pending_authorize_args' in session:
         args = session['pending_authorize_args']
         current_app.logger.debug("redirecting to interrupted " +
             "client authorization: %s", str(args))
         del session['pending_authorize_args']
         return redirect(url_for('auth.authorize', **args))
+    elif current_user() and 'next' in session:
+        next_url = session['next']
+        del session['next']
+        current_app.logger.debug(
+            "redirecting to session['next'] %s", next_url)
+        return redirect(next_url)
     else:
         return redirect('/')
 
@@ -146,12 +152,21 @@ def login(provider_name):
     if provider_name == 'TESTING' and current_app.config['TESTING']:
         return testing_backdoor(request.args.get('user_id'))
 
+    if request.args.get('next'):
+        session['next'] = request.args.get('next')
+        current_app.logger.debug('retaining next url %s',
+                                 session['next'])
+        # The existance of any args (including 'next') breaks the authomatic
+        # login flow.  Clear out before passing on
+        from werkzeug.datastructures import ImmutableMultiDict
+        request.args = ImmutableMultiDict()
+
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
     result = authomatic.login(adapter, provider_name)
 
     if current_user():
-        return redirect('/')
+        return next_after_login()
     if result:
         if result.error:
             current_app.logger.error(result.error.message)
