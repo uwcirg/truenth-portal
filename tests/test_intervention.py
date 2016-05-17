@@ -4,12 +4,11 @@ import json
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.fhir import CC, ValueQuantity
 from portal.models.intervention import INTERVENTION
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.organization import Organization
-from portal.models.performer import Performer
-from portal.models.reference import Reference
 from portal.models.role import ROLE
 
 class TestIntervention(TestCase):
@@ -104,11 +103,9 @@ class TestIntervention(TestCase):
 
         # Bless the test user with PCa diagnosis (but no TX)
         truthiness = ValueQuantity(value='true', units='boolean')
-        performer = Performer(reference_txt=json.dumps(
-            Reference.patient(TEST_USER_ID).as_fhir()))
         user.save_constrained_observation(
             codeable_concept=CC.PCaDIAG, value_quantity=truthiness,
-            performer=performer)
+            audit=Audit(user_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
