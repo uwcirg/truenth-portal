@@ -201,6 +201,17 @@ class ClinicalConstants(object):
         assert coding in cc.codings
         return cc
 
+    @lazyprop
+    def TRUE_VALUE(self):
+        value_quantity = ValueQuantity(
+            value='true', units='boolean').add_if_not_found(True)
+        return value_quantity
+
+    @lazyprop
+    def FALSE_VALUE(self):
+        value_quantity = ValueQuantity(
+            value='false', units='boolean').add_if_not_found(True)
+        return value_quantity
 
 CC = ClinicalConstants()
 
