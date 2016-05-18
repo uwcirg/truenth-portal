@@ -33,6 +33,12 @@ class TestProcedure(TestCase):
             db.session.add(procedure)
             db.session.commit()
 
+    def test_procedureGET_404(self):
+        self.prep_db_for_procedure()
+        self.login()
+        rv = self.app.get('/api/patient/666/procedure')
+        self.assert404(rv)
+
     def test_procedureGET(self):
         self.prep_db_for_procedure()
         self.login()

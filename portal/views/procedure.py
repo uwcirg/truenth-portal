@@ -42,8 +42,10 @@ def procedure(patient_id):
           to view requested patient
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
+    if not patient:
+        abort(404)
+    current_user().check_role(permission='view', other_id=patient_id)
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
