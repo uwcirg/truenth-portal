@@ -1,10 +1,14 @@
 """Unit test module for Clinical API"""
-import json
+from datetime import datetime, timedelta
+from dateutil import parser
+from flask import current_app
 from flask.ext.webtest import SessionScope
+import json
 import os
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
 from portal.models.performer import Performer
@@ -17,7 +21,8 @@ class TestClinical(TestCase):
     def prep_db_for_clinical(self):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
-            observation = Observation()
+            audit = Audit(user_id=TEST_USER_ID)
+            observation = Observation(audit=audit)
             coding = Coding(system='SNOMED-CT', code='372278000',
                     display='Gleason score')
             cc = CodeableConcept(codings=[coding,])
@@ -47,6 +52,17 @@ class TestClinical(TestCase):
         self.assertEquals(
             json.dumps(Reference.patient(TEST_USER_ID).as_fhir()),
             clinical_data['entry'][0]['content']['performer'][0])
+        self.assertEquals(
+            Reference.patient(TEST_USER_ID).as_fhir(),
+            clinical_data['entry'][0]['content']['meta']['by'])
+        found = parser.parse(
+                clinical_data['entry'][0]['content']['meta']['lastUpdated'])
+        found = found.replace(tzinfo=None)
+        self.assertAlmostEquals(datetime.utcnow(), found,
+                                delta= timedelta(seconds=2))
+        self.assertEquals(
+            current_app.config.version,
+            clinical_data['entry'][0]['content']['meta']['version'])
 
     def test_clinicalPOST(self):
         data = {"resourceType": "Observation",

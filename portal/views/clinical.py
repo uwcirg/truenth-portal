@@ -1,12 +1,10 @@
 """Clinical API view functions"""
 from flask import abort, Blueprint, jsonify
 from flask import request
-import json
 
 from ..audit import auditable_event
+from ..models.audit import Audit
 from ..models.fhir import CC, ValueQuantity
-from ..models.performer import Performer
-from ..models.reference import Reference
 from ..models.user import current_user, get_user
 from ..extensions import oauth
 from ..extensions import db
@@ -394,12 +392,8 @@ def clinical_set(patient_id):
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
-    if 'performer' not in request.json:
-        performer = Performer(reference_txt=json.dumps(
-            Reference.patient(current_user().id).as_fhir()))
-    else:
-        performer = None
-    code, result = patient.add_observation(request.json, performer)
+    audit = Audit(user_id=current_user().id)
+    code, result = patient.add_observation(request.json, audit)
     if code != 200:
         abort(code, result)
     db.session.commit()
@@ -412,9 +406,6 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
 
-    # For such a shortcut, we assume the current user is the "performer"
-    performer = Performer(reference_txt=json.dumps(Reference.patient(
-        current_user().id).as_fhir()))
 
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
@@ -425,7 +416,7 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
                                          value_quantity=truthiness,
-                                         performer=performer)
+                                         audit=Audit(user_id=current_user().id))
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
         codeable_concept, truthiness, patient_id), user_id=current_user().id)

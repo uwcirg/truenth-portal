@@ -5,11 +5,16 @@ Maintain a log exclusively used for recording auditable events.
 Any action deemed an auditable event should make a call to
 auditable_event()
 
+Audit data is also persisted in the database *audit* table.
+
 """
 import os
 import sys
 import logging
 from flask import current_app
+
+from extensions import db
+import portal.models.audit
 
 # special log level for auditable events
 # initial goal was to isolate all auditable events to one log handler
@@ -27,6 +32,11 @@ def auditable_event(message, user_id):
     """
     text = "{0} performed: {1}".format(user_id, message)
     current_app.logger.log(AUDIT, text)
+
+    with db.session.no_autoflush:
+        db.session.add(portal.models.audit.Audit(
+            user_id=user_id, comment=message))
+        db.session.commit()
 
 
 def configure_audit_log(app):  # pragma: no cover
