@@ -1096,24 +1096,11 @@ def present_assessment(instrument_id):
         description: if missing valid OAuth token or bad `next` parameter
 
     """
-    AE_intervention = Intervention.query.filter_by(name='assessment_engine').one()
-
     # Todo: replace with proper models
     instruments = current_app.config['INSTRUMENTS']
-    clients_instruments = current_app.config['CLIENTS_INSTRUMENTS']
 
     if not instrument_id or not instrument_id in instruments:
         abort(404, "No matching assessment found: %s" % instrument_id)
-
-    for client_id, instruments in clients_instruments.items():
-        if instrument_id in instruments and client_id == AE_intervention.client_id:
-            assessment_url = "%s/surveys/new_session?project=%s" % (
-                AE_intervention.client.redirect_uris.pop(),
-                instrument_id
-            )
-            break
-    else:
-        abort(404, "No assessment available: %s" % instrument_id)
 
     assessment_url = "%s/surveys/new_session?project=%s" % (
         INTERVENTION.ASSESSMENT_ENGINE.card_url,
