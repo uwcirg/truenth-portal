@@ -8,6 +8,7 @@ import jsonschema
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.fhir import FHIR_datetime, QuestionnaireResponse
+from ..models.intervention import Intervention, INTERVENTION
 from ..models.user import current_user
 from ..extensions import oauth
 from ..extensions import db
@@ -1097,18 +1098,14 @@ def present_assessment(instrument_id):
     """
     # Todo: replace with proper models
     instruments = current_app.config['INSTRUMENTS']
-    clients_instruments = current_app.config['CLIENTS_INSTRUMENTS']
 
     if not instrument_id or not instrument_id in instruments:
         abort(404, "No matching assessment found: %s" % instrument_id)
 
-    for client_id, instrument_urls in clients_instruments.items():
-        if instrument_id in instrument_urls:
-            assessment_url = instrument_urls[instrument_id]
-            break
-    else:
-        abort(404, "No assessment available: %s" % instrument_id)
-
+    assessment_url = "%s/surveys/new_session?project=%s" % (
+        INTERVENTION.ASSESSMENT_ENGINE.card_url,
+        instrument_id
+    )
 
     if 'next' in request.args:
         next_url = request.args.get('next')

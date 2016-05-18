@@ -88,6 +88,7 @@ class UserIntervention(db.Model):
 
 
 STATIC_INTERVENTIONS = IterableUserDict({
+    'assessment_engine': 'Assessment Engine',
     'care_plan': 'Care Plan',
     'community_of_wellness': 'Community of Wellness',
     'decision_support_p3p': 'Decision Support P3P',
