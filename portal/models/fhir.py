@@ -290,7 +290,8 @@ class Observation(db.Model):
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
-        fhir['meta'] = self.audit.as_fhir()
+        if self.audit:
+            fhir['meta'] = self.audit.as_fhir()
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
