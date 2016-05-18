@@ -54,7 +54,7 @@ var loader = function(show) {
     }
 }
 
-var getOrgs = function(userId) {
+var getOrgs = function(userId,onProfile) {
 
     loader(true);
 
@@ -73,39 +73,45 @@ var getOrgs = function(userId) {
                $("#clinics"+getParent).append(clinic);
            }
         });
-        getDemo(userId)
+        getDemo(userId,onProfile);
     }).fail(function() {
         console.log("Problem retrieving data from server.");
         loader();
     });
 };
 
-var getDemo = function(userId) {
+var getDemo = function(userId,onProfile) {
     $.ajax ({
         type: "GET",
         url: '/api/demographics/'+userId
     }).done(function(data) {
-        console.log(data);
-        // Get ethnicity
-        $.each(data.extension[0].valueCodeableConcept.coding,function(i,val){
-            $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes - output but hide, for submitting on update
-            if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
-                $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
-            }
-        });
-        // Get Races
-        $.each(data.extension[1].valueCodeableConcept.coding,function(i,val){
-            $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes
-            if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
-                // If there is any non-standard, then check the "other" in the UI
-                $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
-                // Add hidden list of non-standard for form submission
-                $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
-                //$("#raceOtherVal").fadeToggle();
-            }
-        });
+
+        if (onProfile) {
+            // Get ethnicity
+            $.each(data.extension[0].valueCodeableConcept.coding,function(i,val){
+                $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
+                // Way to handle non-standard codes - output but hide, for submitting on update
+                if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
+                    $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
+                }
+            });
+            // Get Races
+            $.each(data.extension[1].valueCodeableConcept.coding,function(i,val){
+                $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
+                // Way to handle non-standard codes
+                if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
+                    // If there is any non-standard, then check the "other" in the UI
+                    $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
+                    // Add hidden list of non-standard for form submission
+                    $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
+                    //$("#raceOtherVal").fadeToggle();
+                }
+            });
+        } else {
+            // For now we assume we're on initial_queries
+            $("#terms").fadeIn();
+        }
+
         // Get Orgs
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
@@ -167,7 +173,6 @@ var assembleProfile = function(userId) {
     var parentId;
     $.each($("#userOrgs input:checkbox:checked"),function(i,v){
         if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
-            console.log('egg');
             orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
             parentId = $(this).attr("data-parent-id");
         }
@@ -206,6 +211,35 @@ var assembleProfile = function(userId) {
     putDemo(userId,demoArray);
 }
 
+
+var assembleOrgs = function(userId) {
+
+    // Check any parent orgs
+    $.each($("#userOrgs input:checkbox:checked"),function(i,v){
+        if ($(this).attr("data-parent-id")) {
+            $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
+        }
+    });
+
+    var orgIDs = $("#userOrgs input:checkbox:checked").map(function(){
+        return { reference: "api/organization/"+$(this).val() };
+    }).get();
+
+    var parentId;
+    $.each($("#userOrgs input:checkbox:checked"),function(i,v){
+        if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
+            orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
+            parentId = $(this).attr("data-parent-id");
+        }
+    });
+    var demoArray = {};
+    demoArray["resourceType"] = "Patient";
+    demoArray["careProvider"] = orgIDs;
+    //console.log(demoArray);
+    /** Send the AJAX **/
+    putDemo(userId,demoArray);
+}
+
 $(document).ready(function() {
     var initial_xhr = $.ajax({
         url: PORTAL_NAV_PAGE,
@@ -225,22 +259,6 @@ $(document).ready(function() {
     })
     .always(function() {
         // alert( "complete" );
-    });
-
-    //$("#btnBrowse").on("click", function(){
-    //    $("#choosePath").fadeOut("fast", function(){
-    //        $("#chooseBrowse").fadeIn();
-    //    });
-    //});
-    $("#btnAnon").on("click", function(){
-        $("#choosePath").fadeOut("fast", function(){
-            $("#chooseAnon").fadeIn();
-        });
-    });
-
-    $("[data-ans=no]").on("click", function(){
-       $(this).addClass("active");
-       $(this).parent().next().fadeIn("slow");
     });
 
     // Reveal footer after load to avoid any flashes will above content loads

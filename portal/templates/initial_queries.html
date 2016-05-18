@@ -2,19 +2,283 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-  {{ back_btn(PORTAL,'Home') }}
-  <form action='initial-queries' method='POST'><input type='submit'
-  value='Continue'/></form>
-  <h3 class="tnth-headline">About TrueNTH</h3>
 
-  <p>TrueNTH represents the journey men and their loved ones travel during and after a prostate cancer diagnosis, treatment, and recovery.</p>
 
-  <p>TrueNTH provides tools and strategies in multiple categories, including treatment decision making, sexual health, symptom management, exercise, diet, and connects with other men and caregivers traveling the same path. Our website provides innovative programs designed by leading experts from across the country.</p>
+  <h3 class="tnth-headline">About You</h3>
 
-  <p>TrueNTH is funded by the <a href="https://us.movember.com/">Movember Foundation</a>, an international non-profit seeking to improve men’s health.</p>
+  <p>Thanks for signing up for TrueNTH. Please finish your registration by telling us about yourself.</p>
+  <hr />
 
-  {% if config.version %}
-  <br />
-  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.version }}</div>
-  {% endif %}
+  <form class="form tnth-form" action='initial-queries' method='POST'>
+
+    <p>First, tell us who you are:</p>
+    <div class="form-group" id="userRoles">
+      <div class="radio">
+        <label>
+          <input type="radio" name="user_type" value="patient"> I'm a man who is concerned about prostate cancer for myself
+        </label>
+      </div>
+      <div class="radio">
+        <label>
+          <input type="radio" name="user_type" value="partner"> I'm a caregiver, spouse or partner who wants to learn more about prostate cancer
+        </label>
+      </div>
+    </div>
+
+
+    <div class="hide-initial" id="patientQ">
+
+      <div id="patBiopsy" data-topic="biopsy" class="tnth-hide pat-q">
+        <br />
+        <p>Have you had a prostate cancer biopsy?</p>
+        <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="biopsy" value="true"> Yes
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="biopsy" value="false"> No
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="patDiag" data-topic="pca_diag" class="tnth-hide pat-q">
+        <br />
+        <p>Have you been diagnosed with prostate cancer?</p>
+        <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_diag" value="true"> Yes
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_diag" value="false"> No
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
+        <br />
+        <p>Have you begun prostate cancer treatment?</p>
+        <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="tx" value="true"> Yes
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="tx" value="false"> No
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="clinics" class="tnth-hide">
+
+      <h3 class="tnth-headline">Your Clinic</h3>
+
+      <p>Which clinic (or clinics) are you a part of?</p>
+
+      <div class="form-group" id="userOrgs">
+        <div style="margin-left: 10px">
+
+          <legend style="margin: 0  0 4px">UCSF</legend>
+          <input class="tnth-hide" type="checkbox" name="organization" value="5"/>
+          <div class="form-group" id="clinics5">
+          </div>
+          <legend style="margin: 0  0 4px">UW Medicine</legend>
+          <input class="tnth-hide" type="checkbox" name="organization" value="1"/>
+          <div class="form-group" id="clinics1">
+          </div>
+          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+        </div>
+
+        <div id="saveOrgs" class="btn btn-tnth-primary">Save My Clinics</div>
+      </div>
+
+    </div>
+
+    <div id="terms" class="tnth-hide">
+
+      <h3 class="tnth-headline">Terms of Use</h3>
+
+      <p>OK, please review the terms of use for TrueNTH:</p>
+
+      <div class="well" style="margin-left: 2em">
+        <p class="text-muted">[Terms of use present as scrolling textbox or trigger modal via "Review" button. Need to decide what happens if user does not agree.]</p>
+
+        <div id="termsAgree" class="btn btn-tnth-primary">I Agree</div>
+      </div>
+    </div>
+    <br />
+    <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
+    <br />
+    <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
+  </form>
+
+
 {% endblock %}
+{% block document_ready %}
+$(document).ready(function(){
+
+  getOrgs({{ user.id }});
+
+  /** Get demo, clinical and observations and fill existing answers **/
+  $.ajax ({
+    type: "GET",
+    url: '/api/demographics/{{ user.id }}'
+  }).done(function(data) {
+    console.log(data);
+  });
+
+  // Get clinicial observations and fill in any answers
+  $.ajax ({
+    type: "GET",
+    url: '/api/patient/{{ user.id }}/clinical'
+  }).done(function(data) {
+    $.each(data.entry, function(i,val){
+      var clinicalItem = val.content.code.coding[0].display;
+      if (clinicalItem == "PCa diagnosis") {
+        clinicalItem = "pca_diag";
+      } else if (clinicalItem == "treatment begun") {
+        clinicalItem = "tx";
+      }
+      $('div[data-topic='+clinicalItem+']').fadeIn();
+      var clinicalValue = val.content.valueQuantity.value;
+      var $radios = $('input:radio[name='+clinicalItem+']');
+      if($radios.is(':checked') === false) {
+        $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+      }
+      // Display clinics if any value is false or if all are answered
+      if (clinicalValue == "false" || i == 2) {
+        $("#clinics").fadeIn();
+      }
+    })
+  }).fail(function() {
+    console.log("Problem retrieving data from server.")
+  });
+
+  $.ajax ({
+    type: "GET",
+    url: '/api/user/{{ user.id }}/roles'
+  }).done(function(data) {
+    console.log(data);
+    $.each(data.roles, function(i,val){
+      var userRole = val.name;
+      var $radios = $('input:radio[name=user_type]');
+      if($radios.is(':checked') === false) {
+        $radios.filter('[value='+userRole+']').prop('checked', true);
+
+      }
+      if (userRole == "patient") {
+        $("#patBiopsy").fadeIn();
+        $("#clinics").hide();
+        // TODO - temporary privileging of patient if they have both roles. Should really have one or the other
+        return false;
+      } else if (userRole == "partner") {
+        $("#clinics").fadeIn();
+        $("#patBiopsy").hide();
+      }
+    })
+  }).fail(function() {
+    console.log("Problem retrieving data from server.")
+  });
+
+  $("#userRoles input:radio").on("click",function(){
+    var roles = [];
+    var theVal = $(this).val();
+    roles.push({name: theVal});
+    var toSend = {"roles": roles};
+    $.ajax ({
+      type: "PUT",
+      url: '/api/user/{{ user.id }}/roles',
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json',
+      data: JSON.stringify(toSend)
+    }).done(function() {
+      if (theVal == "patient") {
+        $("#patBiopsy").fadeIn();
+        $("#clinics").hide();
+      } else {
+        // If partner, they skip questions, fadeIn Clinics
+        $("#clinics").fadeIn();
+        $("#patBiopsy").hide();
+      }
+    }).fail(function() {
+      console.log("Problem updating role on server.")
+    });
+
+    // TODO - Add delete function if user needs to change answer
+
+  });
+
+  var sendAjax = function(toCall, theVal) {
+    $.ajax ({
+      type: "POST",
+      url: '/api/patient/{{ user.id }}/clinical/'+toCall,
+      contentType: "application/json; charset=utf-8",
+      dataType: 'json',
+      data: JSON.stringify({value: theVal})
+    }).done(function() {
+
+    }).fail(function() {
+      alert("There was a problem saving your answers. Please try again.");
+    });
+  };
+
+  $(".pat-q input:radio").on("click",function(){
+    var thisItem = $(this);
+    var toCall = thisItem.attr("name")
+    // Get value from div - either true or false
+    var theVal = thisItem.val();
+    sendAjax(toCall,theVal);
+    if (theVal == "true") {
+      thisItem.parents(".pat-q").next().fadeIn();
+      if (toCall == "tx") {
+        $("#clinics").fadeIn();
+      }
+    } else {
+      if (toCall == "biopsy") {
+        sendAjax("pca_diag","false");
+        sendAjax("tx","false");
+      } else if (toCall == "pca_diag") {
+        sendAjax("tx","false");
+      }
+      $("#clinics").fadeIn();
+    }
+
+  });
+
+  // Handling "none of the above" clinic choice
+  $("#clinics").on("click", ".clinic", function(){
+    if ($(this).prop('checked')){
+      if ($(this).attr("id") !== "noOrgs") {
+        $("#noOrgs").attr('checked',false);
+      } else {
+        $("input[name='organization']:not(#noOrgs)").attr('checked',false);
+      }
+    }
+  });
+
+  $("#saveOrgs").on("click",function(){
+    assembleOrgs({{ user.id }});
+    $("#terms").fadeIn();
+  });
+
+  $("#termsAgree").on("click",function(){
+    $("#continueText").fadeIn();
+    $("#updateProfile").removeAttr("disabled");
+  });
+
+});
+{% endblock %}
+
+
