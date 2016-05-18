@@ -61,17 +61,18 @@ def diagnosis_w_o_tx():
     """Returns function implementing strategy API checks for PCa and no TX"""
 
     def diag_no_tx(intervention, user):
-        """Returns true if user has a PCa diagnosis and no indication of TX"""
-        for obs in user.observations:
-            if obs.codeable_concept_id == CC.PCaDIAG.id:
-                if obs.value_quantity.units == 'boolean' and\
-                   obs.value_quantity.value == 'true':
-                    # TODO: look for a procedure indicating treatement.
-                    # if procedure indicating treatment:
-                        # return False
-                    _log(result=True, func_name='diag_no_tx', user=user,
-                         intervention=intervention.name)
-                    return True
+        """Returns true if user has a PCa diagnosis and no TX"""
+        pca = [o for o in user.observations if o.codeable_concept_id ==
+               CC.PCaDIAG.id]
+        tx = [o for o in user.observations if o.codeable_concept_id ==
+              CC.TX.id]
+        has_pca = pca and pca[0].value_quantity == CC.TRUE_VALUE
+        in_tx = tx and tx[0].value_quantity == CC.TRUE_VALUE
+
+        if has_pca and not in_tx:
+            _log(result=True, func_name='diag_no_tx', user=user,
+                 intervention=intervention.name)
+            return True
     return diag_no_tx
 
 

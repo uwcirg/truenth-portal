@@ -16,7 +16,7 @@ from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.auth import Client
-from portal.models.fhir import CC, ValueQuantity
+from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.relationship import add_static_relationships
@@ -123,11 +123,9 @@ class TestCase(Base):
 
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
-        truthiness = ValueQuantity(value=True,
-                                   units='boolean').add_if_not_found(True)
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
             self.test_user.save_constrained_observation(
-                codeable_concept=cc, value_quantity=truthiness,
+                codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID))
 
     def add_concepts(self):
