@@ -8,7 +8,7 @@ import jsonschema
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.fhir import QuestionnaireResponse
-from ..models.intervention import Intervention, STATIC_INTERVENTIONS
+from ..models.intervention import Intervention, INTERVENTION
 from ..models.user import current_user
 from ..extensions import oauth
 from ..extensions import db
@@ -1115,6 +1115,10 @@ def present_assessment(instrument_id):
     else:
         abort(404, "No assessment available: %s" % instrument_id)
 
+    assessment_url = "%s/surveys/new_session?project=%s" % (
+        INTERVENTION.ASSESSMENT_ENGINE.card_url,
+        instrument_id
+    )
 
     if 'next' in request.args:
         next_url = request.args.get('next')
