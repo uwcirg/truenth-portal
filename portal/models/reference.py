@@ -44,7 +44,7 @@ class Reference(object):
         if 'reference' in reference_dict:
             reference_text = reference_dict['reference']
         elif 'Reference' in reference_dict:
-            reference_text = reference_dict['reference']
+            reference_text = reference_dict['Reference']
         else:
             raise ValueError('[R|r]eference key not found in reference {}'.\
                     format(reference_dict))

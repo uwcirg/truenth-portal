@@ -9,7 +9,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
 from flask.ext.login import current_user as flask_login_current_user
 
-from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
@@ -139,6 +138,8 @@ class User(db.Model, UserMixin):
             secondary="user_observations", backref=db.backref('users'))
     organizations = db.relationship('Organization', lazy='dynamic',
             secondary="user_organizations", backref=db.backref('users'))
+    procedures = db.relationship('Procedure', lazy='dynamic',
+            backref=db.backref('user'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
@@ -156,13 +157,11 @@ class User(db.Model, UserMixin):
         if org not in self.organizations:
             self.organizations.append(org)
 
-    def add_observation(self, fhir, performer):
+    def add_observation(self, fhir, audit):
         if not 'coding' in fhir['code']:
             return 400, "requires at least one CodeableConcept"
         if not 'valueQuantity' in fhir:
             return 400, "missing required 'valueQuantity'"
-        if not ('performer' in fhir or performer):
-            return 400, "missing required 'performer'"
 
         cc = CodeableConcept.from_fhir(fhir['code']).add_if_not_found()
 
@@ -174,12 +173,12 @@ class User(db.Model, UserMixin):
 
         issued = fhir.get('issued') and\
                 parser.parse(fhir.get('issued')) or None
-        observation = Observation(status=fhir.get('status'),
-                issued=issued,
-                codeable_concept_id=cc.id,
-                value_quantity_id=vq.id).add_if_not_found(True)
-        if performer:
-            observation.performers.append(performer)
+        observation = Observation(
+            audit=audit,
+            status=fhir.get('status'),
+            issued=issued,
+            codeable_concept_id=cc.id,
+            value_quantity_id=vq.id).add_if_not_found(True)
         if 'performer' in fhir:
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
@@ -233,7 +232,6 @@ class User(db.Model, UserMixin):
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE)
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
-        auditable_event("Service account created by", user_id=self.id)
         return service_user
 
     def fetch_values_for_concept(self, codeable_concept):
@@ -245,7 +243,7 @@ class User(db.Model, UserMixin):
                 obs.codeable_concept_id == codeable_concept.id]
 
     def save_constrained_observation(self, codeable_concept, value_quantity,
-                                    performer):
+                                    audit):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -258,7 +256,6 @@ class User(db.Model, UserMixin):
         # User may not have persisted concept or value - CYA
         codeable_concept = codeable_concept.add_if_not_found()
         value_quantity = value_quantity.add_if_not_found()
-        performer = performer.add_if_not_found()
 
         existing = [obs for obs in self.observations if\
                     obs.codeable_concept_id == codeable_concept.id]
@@ -266,23 +263,21 @@ class User(db.Model, UserMixin):
 
         if existing:
             if existing[0].value_quantity_id == value_quantity.id:
-                # perfect match -- update performer if necessary
-                if performer.id in [p.id for p in existing[0].performers]:
-                    return
-                else:
-                    existing[0].performers.append(performer)
+                # perfect match -- update audit info
+                existing[0].audit = audit
+                return
             else:
                 # We don't want multiple observations for this concept
                 # with different values.  Delete old and add new
                 self.observations.remove(existing[0])
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
-                                  value_quantity_id=value_quantity.id)
-        observation.performers.append(performer)
+                                  value_quantity_id=value_quantity.id,
+                                  audit=audit)
         self.observations.append(observation.add_if_not_found())
 
     def clinical_history(self, requestURL=None):
-        now = datetime.now()
+        now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Clinical History",
                 "link": [{"rel": "self", "href": requestURL},],
@@ -294,6 +289,21 @@ class User(db.Model, UserMixin):
                     "updated": as_fhir(now),
                     "author": [{"name": "Truenth Portal"},],
                     "content": ob.as_fhir()})
+        return fhir
+
+    def procedure_history(self, requestURL=None):
+        now = datetime.utcnow()
+        fhir = {"resourceType": "Bundle",
+                "title": "Procedure History",
+                "link": [{"rel": "self", "href": requestURL},],
+                "updated": as_fhir(now),
+                "entry": []}
+
+        for proc in self.procedures:
+            fhir['entry'].append({"title": "Patient Procedures",
+                                  "updated": as_fhir(now),
+                                  "author": [{"name": "Truenth Portal"},],
+                                  "content": proc.as_fhir()})
         return fhir
 
     def as_fhir(self):
