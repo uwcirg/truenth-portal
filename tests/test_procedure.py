@@ -29,6 +29,7 @@ class TestProcedure(TestCase):
             procedure.code = code
             procedure.user = self.test_user
             procedure.start_time = datetime.utcnow()
+            procedure.end_time = datetime.utcnow()
             db.session.add(procedure)
             db.session.commit()
 
@@ -50,7 +51,7 @@ class TestProcedure(TestCase):
         self.assertAlmostEquals(
             datetime.utcnow(), last_updated, delta=timedelta(seconds=2))
         start_time = FHIR_datetime.parse(
-            data['entry'][0]['content']['performedDateTime'])
+            data['entry'][0]['content']['performedPeriod']['start'])
         self.assertAlmostEquals(
             datetime.utcnow(), start_time, delta=timedelta(seconds=2))
         self.assertEquals(
