@@ -170,6 +170,10 @@ def protected_portal_wrapper_html():
     This is the authorized version, only useful after to logging in with
     TrueNTH.  See `portal_wrapper_html` for the unauthorized
     version.
+
+    As this API is designed to be used client side, it requires a valid request
+    **Origin** header even if called server side.
+
     ---
     tags:
       - TrueNTH
@@ -185,6 +189,10 @@ def protected_portal_wrapper_html():
         description: if missing valid OAuth token
 
     """
+    current_app.logger.debug(
+        "protected_portal_wrapper_html Origin '%s' Auth '%s'",
+        request.headers.get('Origin'),
+        request.headers.get('Authorization'));
     movember_profile = ''.join((
         '//',
         current_app.config['SERVER_NAME'],
