@@ -194,6 +194,14 @@ class ClinicalConstants(object):
         return cc
 
     @lazyprop
+    def PCaMETASTASIZE(self):
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
     def TX(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131').one()
@@ -447,10 +455,12 @@ def add_static_concepts(only_quick=False):
                              display='biopsy')
     PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
                               display='PCa diagnosis')
+    PCaMETASTASIZE = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
+                              display='PCa metastasize diagnosis')
     TX = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131',
                          display='treatment begun')
 
-    concepts = [BIOPSY, PCaDIAG, TX]
+    concepts = [BIOPSY, PCaDIAG, PCaMETASTASIZE, TX]
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')

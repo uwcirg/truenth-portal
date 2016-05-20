@@ -162,8 +162,8 @@ class TestClinical(TestCase):
         # Can we get it back in FHIR?
         rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
-        coding = data['entry'][0]['content']['code']['coding'][0] 
-        vq = data['entry'][0]['content']['valueQuantity'] 
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
 
         self.assertEquals(coding['code'], '121')
         self.assertEquals(coding['display'], 'PCa diagnosis')
@@ -173,6 +173,34 @@ class TestClinical(TestCase):
 
         # Access the direct pca_diag value
         rv = self.app.get('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        self.assertEquals(data['value'], 'true')
+
+    def test_clinical_pca_metastasize(self):
+        """Shortcut API - just PCa metastasize diagnosis w/o FHIR overhead"""
+        self.login()
+        rv = self.app.post(
+            '/api/patient/%s/clinical/pca_metastasize' % TEST_USER_ID,
+            content_type='application/json', data=json.dumps({'value': True}))
+        self.assert200(rv)
+        result = json.loads(rv.data)
+        self.assertEquals(result['message'], 'ok')
+
+        # Can we get it back in FHIR?
+        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        data = json.loads(rv.data)
+        coding = data['entry'][0]['content']['code']['coding'][0]
+        vq = data['entry'][0]['content']['valueQuantity']
+
+        self.assertEquals(coding['code'], '141')
+        self.assertEquals(coding['display'], 'PCa metastasize diagnosis')
+        self.assertEquals(coding['system'],
+                          'http://us.truenth.org/clinical-codes')
+        self.assertEquals(vq['value'], 'true')
+
+        # Access the direct pca_metastasize value
+        rv = self.app.get(
+            '/api/patient/%s/clinical/pca_metastasize' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 

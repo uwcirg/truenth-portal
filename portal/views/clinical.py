@@ -85,6 +85,43 @@ def pca_diag(patient_id):
                                      codeable_concept=CC.PCaDIAG)
 
 
+@clinical_api.route('/patient/<int:patient_id>/clinical/pca_metastasize')
+@oauth.require_oauth()
+def pca_metastasize(patient_id):
+    """Simplified API for getting clinical PCaMETASTASIZE status w/o FHIR
+
+    Returns 'true', 'false' or 'unknown' for the patient's clinical
+    PCaMETASTASIZE diagnosis value in JSON, i.e. '{"value": true}'
+    ---
+    tags:
+      - Clinical
+    operationId: getPCaMetastasize
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns 'true', 'false' or 'unknown' for the patient's clinical
+          PCaMETASTASIZE diagnosis value in JSON
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
+    return clinical_api_shortcut_get(patient_id=patient.id,
+                                     codeable_concept=CC.PCaMETASTASIZE)
+
+
 @clinical_api.route('/patient/<int:patient_id>/clinical/tx')
 @oauth.require_oauth()
 def treatment(patient_id):
@@ -232,6 +269,61 @@ def pca_diag_set(patient_id):
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
                                      codeable_concept=CC.PCaDIAG)
+
+
+@clinical_api.route('/patient/<int:patient_id>/clinical/pca_metastasize',
+                    methods=('POST', 'PUT'))
+@oauth.require_oauth()
+def pca_metastasize_set(patient_id):
+    """Simplified API for setting clinical PCa metastasize status w/o FHIR
+
+    Requires simple JSON doc to set PCaMETASTASIZE diagnosis: '{"value": true}'
+
+    Raises 401 if logged-in user lacks permission to edit requested
+    patient.
+
+    ---
+    operationId: setPCaMetastasize
+    tags:
+      - Clinical
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: PCaMetastasize
+          required:
+            - value
+          properties:
+            value:
+              type: boolean
+              description: the patient's PCaMETASTASIZE diagnosis
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    return clinical_api_shortcut_set(patient_id=patient_id,
+                                     codeable_concept=CC.PCaMETASTASIZE)
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical/tx',
