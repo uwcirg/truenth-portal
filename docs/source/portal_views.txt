@@ -13,5 +13,8 @@ Portal.Views
 .. automodule:: portal.views.crossdomain
     :members:
 
+.. automodule:: portal.views.patients
+    :members:
+
 .. automodule:: portal.views.portal
     :members:

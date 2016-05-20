@@ -40,44 +40,37 @@ class TestCase(Base):
 
     def init_data(self):
         """Push minimal test data in test database"""
-        test_user_id = self.add_user(username=TEST_USERNAME,
+        test_user = self.add_user(username=TEST_USERNAME,
                 first_name=FIRST_NAME, last_name=LAST_NAME,
                 image_url=IMAGE_URL)
-        if test_user_id != TEST_USER_ID:
+        if test_user.id != TEST_USER_ID:
             print "apparent cruft from last run (test_user_id: %d)"\
-                    % test_user_id
+                    % test_user.id
             print "try again..."
             self.tearDown()
             self.setUp()
         else:
-            self.test_user = User.query.get(TEST_USER_ID)
+            self.test_user = test_user
 
     def add_user(self, username, first_name="", last_name="", image_url=None):
-        """Create a user with default role
-
-        Returns the newly created user id
-
-        """
+        """Create a user and add to test db, and return it"""
         test_user = User(username=username, first_name=first_name,
                 last_name=last_name, image_url=image_url)
-
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
+        return db.session.merge(test_user)
 
-        test_user = db.session.merge(test_user)
-        self.promote_user(user_id=test_user.id,
-                role_name=ROLE.PATIENT)
-        test_user = db.session.merge(test_user)
-        return test_user.id
-
-    def promote_user(self, user_id=TEST_USER_ID, role_name=None):
+    def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""
+        if not user:
+            user = self.test_user
+        user = db.session.merge(user)
         assert (role_name)
         role_id = db.session.query(Role.id).\
                 filter(Role.name==role_name).first()[0]
         with SessionScope(db):
-            db.session.add(UserRoles(user_id=user_id, role_id=role_id))
+            db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
     def login(self, user_id=TEST_USER_ID):

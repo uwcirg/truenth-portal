@@ -122,7 +122,6 @@ def admin():
 
 @portal.route('/invite', methods=('GET', 'POST'))
 @oauth.require_oauth()
-@roles_required(ROLE.PATIENT)
 def invite():
     """invite other users"""
     if request.method == 'GET':
@@ -143,7 +142,6 @@ def invite():
 
 @portal.route('/invite/<int:message_id>')
 @oauth.require_oauth()
-@roles_required(ROLE.PATIENT)
 def invite_sent(message_id):
     """show invite sent"""
     message = EmailInvite.query.get(message_id)

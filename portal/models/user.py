@@ -436,12 +436,20 @@ class User(db.Model, UserMixin):
         returns true if permission should be granted, otherwise raise a 401
 
         """
+        assert(permission in ('view', 'edit'))  # limit vocab for now
         if self.id == other_id:
             return True
         for role in self.roles:
             if role.name in (ROLE.ADMIN, ROLE.SERVICE):
+                # Admin and service accounts have carte blanche
                 return True
-        # TODO: address permission details, etc.
+            if role.name == ROLE.PROVIDER:
+                # Providers get carte blanche on members of the
+                # same organization
+                user_orgs = set(self.organizations)
+                others_orgs = set(User.query.get(other_id).organizations)
+                if user_orgs.intersection(others_orgs):
+                    return True
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):

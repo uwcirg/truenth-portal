@@ -13,8 +13,8 @@ class TestTrueNTH(TestCase):
     def test_portal_wrapper_wo_name(self):
         "w/o a users first, last name, username should appear"
         username = 'test2'
-        uid = self.add_user(username=username, first_name=None)
-        self.login(user_id=uid)
+        user = self.add_user(username=username, first_name=None)
+        self.login(user_id=user.id)
         rv = self.app.get('/api/portal-wrapper-html/')
 
         self.assertEquals(rv.status_code, 200)

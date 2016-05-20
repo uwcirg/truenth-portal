@@ -14,6 +14,7 @@ from .views.auth import auth
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
 from .views.intervention import intervention_api
+from .views.patients import patients
 from .views.procedure import procedure_api
 from .views.portal import portal, page_not_found, server_error
 from .views.organization import org_api
@@ -28,6 +29,7 @@ DEFAULT_BLUEPRINTS = (
     demographics_api,
     intervention_api,
     org_api,
+    patients,
     procedure_api,
     portal,
     truenth_api,

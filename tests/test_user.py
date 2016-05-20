@@ -1,10 +1,12 @@
 """Unit test module for user model and views"""
 from flask.ext.webtest import SessionScope
+from werkzeug.exceptions import Unauthorized
 import json
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.fhir import Coding, UserEthnicity
+from portal.models.organization import Organization
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
@@ -127,13 +129,41 @@ class TestUser(TestCase):
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale.codings[0].code, language)
 
+    def test_user_by_organization(self):
+        # generate a handful of users in different orgs
+        org_evens = Organization(name='odds')
+        org_odds = Organization(name='odds')
+        with SessionScope(db):
+            map(db.session.add,(org_evens, org_odds))
+
+            for i in range(5):
+                user = self.add_user(username='test user {}'.format(i))
+                if i % 2:
+                    user.organizations.append(org_odds)
+                else:
+                    user.organizations.append(org_evens)
+                db.session.add(user)
+
+            db.session.commit()
+        org_evens, org_odds = map(db.session.merge, (org_evens, org_odds))
+
+        evens = org_evens.users
+        odds = org_odds.users
+        self.assertEqual(3, len(evens))
+        self.assertEqual(2, len(odds))
+        self.assertTrue(all([int(o.username[-1:]) % 2 for o in odds]))
+
     def test_default_role(self):
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.PROVIDER)
         self.login()
         rv = self.app.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
-        self.assertEquals(len(result_roles['roles']), 1)
-        self.assertEquals(result_roles['roles'][0]['name'], ROLE.PATIENT)
+        self.assertEquals(len(result_roles['roles']), 2)
+        received = [r['name'] for r in result_roles['roles']]
+        self.assertTrue(ROLE.PATIENT in received)
+        self.assertTrue(ROLE.PROVIDER in received)
 
     def test_unauth_role(self):
         self.login()
@@ -181,9 +211,9 @@ class TestUser(TestCase):
 
         self.assertEquals(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 3)
+        self.assertEquals(len(doc['roles']), 2)
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles),  3)
+        self.assertEquals(len(user.roles),  2)
 
     def test_roles_delete(self):
         self.promote_user(role_name=ROLE.ADMIN)
@@ -221,6 +251,34 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
 
+    def test_user_check_roles(self):
+        org = Organization(name='members only')
+        user = self.test_user
+        user.organizations.append(org)
+        self.promote_user(user, ROLE.PROVIDER)
+        u2 = self.add_user(username='u2')
+        member_of = self.add_user(username='member_of')
+        member_of.organizations.append(org)
+        with SessionScope(db):
+            db.session.commit()
+        user, org, u2, member_of = map(
+            db.session.merge, (user, org, u2, member_of))
+
+        kwargs = {'permission': 'view', 'other_id': user.id}
+        self.assertTrue(user.check_role(**kwargs))
+
+        kwargs = {'permission': 'edit', 'other_id': u2.id}
+        self.assertRaises(Unauthorized, user.check_role, **kwargs)
+
+        kwargs = {'permission': 'view', 'other_id': u2.id}
+        self.assertRaises(Unauthorized, user.check_role, **kwargs)
+
+        kwargs = {'permission': 'edit', 'other_id': member_of.id}
+        self.assertTrue(user.check_role(**kwargs))
+
+        kwargs = {'permission': 'view', 'other_id': member_of.id}
+        self.assertTrue(user.check_role(**kwargs))
+
     def test_all_relationships(self):
         # obtain list of all relationships
         rv = self.app.get('/api/relationships')
@@ -232,9 +290,9 @@ class TestUser(TestCase):
         partner = Relationship.query.filter_by(name='partner').first()
         rel = UserRelationship(user_id=TEST_USER_ID,
                                relationship_id=partner.id,
-                               other_user_id=other_user)
+                               other_user_id=other_user.id)
         sponsor = Relationship.query.filter_by(name='sponsor').first()
-        rel2 = UserRelationship(user_id=other_user,
+        rel2 = UserRelationship(user_id=other_user.id,
                                relationship_id=sponsor.id,
                                other_user_id=TEST_USER_ID)
         with SessionScope(db):
@@ -254,7 +312,7 @@ class TestUser(TestCase):
         other_user = self.add_user(username='other')
         data = {'relationships':[{'user': TEST_USER_ID,
                                   'has the relationship': 'partner',
-                                  'with': other_user},]
+                                  'with': other_user.id},]
                }
         self.login()
         rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
@@ -262,7 +320,8 @@ class TestUser(TestCase):
                          data=json.dumps(data))
         self.assert200(rv)
 
-        ur = UserRelationship.query.filter_by(other_user_id=other_user).first()
+        ur = UserRelationship.query.filter_by(
+            other_user_id=other_user.id).first()
         self.assertEquals(ur.relationship.name, RELATIONSHIP.PARTNER)
 
     def test_delete_relationships(self):

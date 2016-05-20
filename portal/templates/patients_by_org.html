@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<h1 class="tnth-headline">Patients</h1>
+
+<p id="profileIntro">Select any user to view details or make changes.</p>
+
+{% for org in patients_by_org.keys() %}
+<h2>Patients in Organization {{ org }} </h2>
+<div class="table-responsive smaller-text">
+    <table class="table table-striped table-bordered table-hover table-condensed">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in patients_by_org[org] %}
+            <tr>
+                <td><a href="{{ url_for('portal.profile', user_id=user.id) }}">{{ user.username }}</a></td>
+                <td>{{ user.first_name if user.first_name }}</td>
+                <td>{{ user.last_name if user.last_name }}</td>
+                <td>{{ user.email if user.email }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+
+
+{% endblock %}
