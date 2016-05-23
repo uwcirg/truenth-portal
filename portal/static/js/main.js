@@ -66,6 +66,8 @@ var fillContent = {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "treatment begun") {
                 clinicalItem = "tx";
+            } else if (clinicalItem == "PCa metastasize diagnosis") {
+                clinicalItem = "pca_metastasize";
             }
             $('div[data-topic='+clinicalItem+']').fadeIn();
             var clinicalValue = val.content.valueQuantity.value;
@@ -74,7 +76,7 @@ var fillContent = {
                 $radios.filter('[value='+clinicalValue+']').prop('checked', true);
             }
             // Display clinics if any value is false or if all are answered
-            if (clinicalValue == "false" || i == 2) {
+            if (clinicalValue == "false" || i == 3) {
                 $("#clinics").fadeIn();
             }
         })
@@ -292,11 +294,8 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            console.log(data);
-
         }).fail(function() {
             console.log("Problem updating role on server.");
-
         });
     },
     "getRoles": function(userId,isProfile) {
@@ -318,7 +317,7 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            console.log(data);
+
         }).fail(function() {
             console.log("Problem updating role on server.");
 

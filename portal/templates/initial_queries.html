@@ -76,7 +76,7 @@
     </div>
 
 
-    <div class="hide-initial" id="patientQ">
+    <div class="tnth-hide" id="patientQ">
 
       <div id="patBiopsy" data-topic="biopsy" class="pat-q">
         <br />
@@ -112,6 +112,23 @@
         </div>
       </div>
 
+      <div id="patMeta" data-topic="pca_metastasize" class="tnth-hide pat-q">
+        <br />
+        <p>Is the prostate cancer only within the prostate?</p>
+        <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_metastasize" value="true"> Yes
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_metastasize" value="false"> No (the cancer is in other parts of my body, too)
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
         <br />
         <p>Have you begun prostate cancer treatment?</p>
@@ -135,7 +152,7 @@
 
       <h3 class="tnth-headline">Your Clinic</h3>
 
-      <p>Which clinic (or clinics) are you a part of?</p>
+      <p>Where are you receiving your care?</p>
 
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
@@ -218,7 +235,7 @@ $(document).ready(function(){
     // Get value from div - either true or false
     var toSend = thisItem.val();
     tnthAjax.putClinical({{user.id}},toCall,toSend);
-    if (toSend == "true") {
+    if (toSend == "true" || toCall ==  "pca_metastasize") {
       thisItem.parents(".pat-q").next().fadeIn();
       if (toCall == "tx") {
         $("#clinics").fadeIn();
@@ -226,8 +243,10 @@ $(document).ready(function(){
     } else {
       if (toCall == "biopsy") {
         tnthAjax.putClinical({{user.id}},"pca_diag","false");
+        tnthAjax.putClinical({{user.id}},"pca_metastasize","false");
         tnthAjax.putClinical({{user.id}},"tx","false");
       } else if (toCall == "pca_diag") {
+        tnthAjax.putClinical({{user.id}},"pca_metastasize","false");
         tnthAjax.putClinical({{user.id}},"tx","false");
       }
       $("#clinics").fadeIn();
