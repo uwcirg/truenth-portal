@@ -247,37 +247,37 @@ My TrueNTH Profile
         <p>Editable by admins only.</p>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="admin"> Admin
+                <input type="checkbox" name="user_type" value="admin"> Admin
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="anon"> Anon
+                <input type="checkbox" name="user_type" value="anon"> Anon
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="application_developer"> Application Developer
+                <input type="checkbox" name="user_type" value="application_developer"> Application Developer
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="partner"> Partner
+                <input type="checkbox" name="user_type" value="partner"> Partner
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="patient"> Patient
+                <input type="checkbox" name="user_type" value="patient"> Patient
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="provider"> Provider
+                <input type="checkbox" name="user_type" value="provider"> Provider
             </label>
         </div>
         <div class="checkbox">
             <label>
-                <input type="checkbox" value="test"> Test
+                <input type="checkbox" name="user_type" value="test"> Test
             </label>
         </div>
     </div>
@@ -292,7 +292,7 @@ My TrueNTH Profile
 {% block document_ready %}
 $(document).ready(function(){
 
-    getOrgs({{ user.id }},true);
+    tnthAjax.getOrgs({{ user.id }});
 
     /*** Field Validation ***/
     $('#profileForm').validator({
@@ -392,7 +392,7 @@ $(document).ready(function(){
     // Submit the form here
     $("#updateProfile").on("click", function(event){
         event.preventDefault()
-        assembleProfile({{ user.id }});
+        assembleContent.demo({{ user.id }},true);
     });
 
 });
@@ -430,36 +430,19 @@ $("#patientQuestions input").on("change", function(){
     });
 });
 **/
-// GET and PUT user roles
-$.ajax ({
-    type: "GET",
-    url: '/api/user/{{ user.id }}/roles'
-}).done(function(data) {
-    $.each(data.roles,function(i,val){
-        $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
-    })
-}).fail(function() {
-    console.log("Problem retrieving data from server.")
-});
 
+/** Get and Put roles **/
+tnthAjax.getRoles({{ user.id }}, true);
 $("#userRoles input:checkbox").on("click",function(){
     var roles = []
     roles.push({name: $(this).val()})
     var toSend = {"roles": roles}
     // If role is checked, type is PUT, otherwise DELETE
-    var ajaxType = "DELETE"
     if ($(this).prop('checked')) {
-        ajaxType = "PUT"
+        tnthAjax.putRoles({{user.id}},toSend);
+    } else {
+        tnthAjax.deleteRoles({{user.id}},toSend);
     }
-    $.ajax ({
-        type: ajaxType,
-        url: '/api/user/{{ user.id }}/roles',
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json',
-        data: JSON.stringify(toSend)
-    }).done(function(data) {
-    }).fail(function() {
-        console.log("Problem updating role on server.")
-    })
-})
+});
+
 {% endblock %}

@@ -156,10 +156,3 @@ $('.tnth-dropdown-toggle').dropdown();
 $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
-
-$(function() {
-  // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
-  $("img.tnth-topnav-wordmark").load(function(){
-    $("#tnthNavWrapper").removeAttr("style");
-  });
-});
