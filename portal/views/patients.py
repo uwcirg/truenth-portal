@@ -21,7 +21,8 @@ def patients_root():
     user = current_user()
     patients_by_org = {}
     for org in user.organizations:
-        patients_by_org[org.name] = org.users
+        patients_by_org[org.name] = [user for user in org.users if
+                                     user.has_role(ROLE.PATIENT)]
 
     return render_template(
         'patients_by_org.html', patients_by_org=patients_by_org)
