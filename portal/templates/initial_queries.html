@@ -156,15 +156,7 @@
 
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
-
-          <legend style="margin: 0  0 4px">UCSF</legend>
-          <input class="tnth-hide" type="checkbox" name="organization" value="5"/>
-          <div class="form-group" id="clinics5">
-          </div>
-          <legend style="margin: 0  0 4px">UW Medicine</legend>
-          <input class="tnth-hide" type="checkbox" name="organization" value="1"/>
-          <div class="form-group" id="clinics1">
-          </div>
+          <div id="fillOrgs"></div>
           <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
 
@@ -194,6 +186,10 @@
 
 {% endblock %}
 {% block document_ready %}
+
+// Check if there's a session variable for associated clinic
+var preselectClinic = "{{ session.get('associate_clinic_id') }}";
+
 $(document).ready(function(){
 
   /** 1st - get all current info **/
@@ -253,20 +249,8 @@ $(document).ready(function(){
     }
   });
 
-  // Handling "none of the above" clinic choice
-  $("#clinics").on("click", ".clinic", function(){
-    if ($(this).prop('checked')){
-      if ($(this).attr("id") !== "noOrgs") {
-        $("#noOrgs").attr('checked',false);
-      } else {
-        $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-      }
-    }
-  });
   /**
   $("#clinics").on("change", ".clinic", function() {
-    console.log($(this).val());
-    console.log($(this).is(":checked"));
     //assembleContent.orgs2({{ user.id }}, $(this).val(), $(this).is(":checked"));
   });
   **/

@@ -30,7 +30,7 @@ function xhr_function(){
         // Note: setRequestHeader requires its 'this' to be the xhr object,
         // which is what 'this' is here when executed.
         setRequestHeader.call(this, name, value);
-    }
+    };
     // pass it on to jQuery
     return xhr;
 }
@@ -56,7 +56,7 @@ var loader = function(show) {
         $("#loadingIndicator").fadeOut();
         $("#profileForm").removeClass("loading");
     }
-}
+};
 
 var fillContent = {
     "clinical": function(data) {
@@ -117,6 +117,10 @@ var fillContent = {
             var orgID = val.reference.split("/").pop();
             $("body").find("#userOrgs input.clinic:checkbox[value="+orgID+"]").prop('checked', true);
         });
+        // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
+        if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
+            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
+        }
     },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){
@@ -247,7 +251,7 @@ var assembleContent = {
         demoArray["careProvider"] = orgIDs;
         tnthAjax.putDemo(userId, demoArray);
     }
-}
+};
 
 var tnthAjax = {
     "getOrgs": function(userId) {
@@ -256,16 +260,39 @@ var tnthAjax = {
             type: "GET",
             url: '/api/organization'
         }).done(function(data) {
+            var clinicArray = [];
             $.each(data.entry,function(i,val){
                 if (val.partOf) {
+                    // Child clinic
                     var getParent = val.partOf.reference.split("/").pop();
-                    var clinic = '<div class="checkbox"><label>' +
-                        '<input class="clinic" type="checkbox" name="organization" value="'+
-                        val.id +'" data-parent-id="'+getParent+'" />'+
-                        val.name +
-                        '</label></div>';
-                    $("#clinics"+getParent).append(clinic);
+                    jQuery.map(clinicArray, function(obj) {
+                        if(obj.id === parseInt(getParent))
+                            obj.children.push({
+                                "id": val.id,
+                                "name": val.name
+                            });
+                    });
+                } else {
+                    // Parent clinic
+                    clinicArray.push({
+                        id: val.id,
+                        name: val.name,
+                        children: []
+                    });
                 }
+            });
+            $.each(clinicArray, function(i,val) {
+                // Fill in parent clinic
+                $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' value='"+val.id+"' />");
+                // Fill in each child clinic
+                $.each(val.children, function(n,subval) {
+                    var childClinic = '<div class="checkbox"><label>' +
+                        '<input class="clinic" type="checkbox" name="organization" value="'+
+                        subval.id +'" data-parent-id="'+val.id+'" />'+
+                        subval.name +
+                        '</label></div>';
+                   $("#fillOrgs").append(childClinic);
+                });
             });
             tnthAjax.getDemo(userId);
         }).fail(function() {
@@ -324,7 +351,6 @@ var tnthAjax = {
         });
     },
     "deleteRoles": function(userId,toSend) {
-        console.log('deleting')
         $.ajax ({
             type: "DELETE",
             url: '/api/user/'+userId+'/roles',
@@ -386,5 +412,16 @@ $(document).ready(function() {
 
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
+
+    // Handling "none of the above" clinic choice
+    $("#userOrgs").on("click", ".clinic", function(){
+        if ($(this).prop('checked')){
+            if ($(this).attr("id") !== "noOrgs") {
+                $("#noOrgs").attr('checked',false);
+            } else {
+                $("input[name='organization']:not(#noOrgs)").attr('checked',false);
+            }
+        }
+    });
 
 });
