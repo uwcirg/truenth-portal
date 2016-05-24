@@ -1,0 +1,42 @@
+Organizations
+*************
+
+Organizations are used to name clinics and parent organizations.  Use
+the `/api/organization` endpoint to view the list of organizations in the
+system.
+
+Add new organizations via **POST** to `/api/organization` with a JSON
+document defining the organization compliant with the `FHIR Organization
+<https://www.hl7.org/fhir/organization.html>`_ resource.
+
+.. warning::
+
+   The parent organization must exist in the system before a child
+   can name it in the **partOf** reference.
+
+To enable use of the `/clinic/<shortcut_alias>` endpoint, to pre-select
+clinics for new users, an **identifier** must be included in the FHIR resource.
+
+For example, after looking up the correct ID, a PUT of the following document
+adds a shortcut alias to the UCSF organization.
+
+.. note::
+
+   For the shortcut alias to function, the added identifier must have
+   a **system** value of `http://us.truenth.org/identity-codes/shortcut-alias`
+
+PUT to /api/organization/5 ::
+
+    $ cat data
+    {
+      "resourceType": "Organization",
+      "identifier": [
+          { "system": "http://us.truenth.org/identity-codes/shortcut-alias",
+            "value": "ucsfurology"
+          }
+      ],
+    }
+
+    $ curl -H 'Authorization: Bearer <valid-token>' \
+      -H 'Content-Type: application/json' -X PUT -d @data \
+      https://stg.us.truenth.org/api/organization/5

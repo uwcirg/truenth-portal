@@ -15,6 +15,9 @@ Portal.Models
 .. automodule:: portal.models.fhir
     :members:
 
+.. automodule:: portal.models.identifier
+    :members:
+
 .. automodule:: portal.models.lazy
     :members:
 

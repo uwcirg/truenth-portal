@@ -4,6 +4,8 @@ import json
 import os
 
 from portal.extensions import db
+from portal.system_uri import SHORTCUT_ALIAS
+from portal.models.identifier import Identifier
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from tests import TestCase
@@ -148,3 +150,47 @@ class TestOrganization(TestCase):
         rv = self.app.delete('/api/organization/{}'.format(org2_id))
         self.assert200(rv)
         self.assertEquals(Organization.query.one().name, 'test 1')
+
+    def test_organization_identifiers(self):
+        alias = Identifier(
+            use='official', system='http://www.zorgkaartnederland.nl/',
+            value='my official alias', assigner='Organization/1')
+        shortcut = Identifier(
+            use='secondary', system=SHORTCUT_ALIAS, value='ucsf')
+
+        org = Organization(name='test')
+        org.identifiers.append(alias)
+        org.identifiers.append(shortcut)
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        self.assertEquals(org.identifiers.count(), 2)
+
+    def test_organization_identifiers_update(self):
+        with open(os.path.join(
+            os.path.dirname(__file__),
+            'organization-example-gastro.json'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+        rv = self.app.post('/api/organization',
+                           content_type='application/json',
+                           data=json.dumps(data))
+        self.assert200(rv)
+
+        # the gastro file contains a single identifier - add
+        # a second one and PUT, expecting we get two total
+
+        alias = Identifier(system=SHORTCUT_ALIAS, value='foobar',
+                           use='secondary')
+        data['identifier'].append(alias.as_fhir())
+        org = Organization.query.one()  # only expect the one we just POSTed
+        rv = self.app.put('/api/organization/{}'.format(org.id),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert200(rv)
+
+        # obtain the org from the db, check the identifiers
+        org = Organization.query.one()
+        self.assertEquals(2, org.identifiers.count())

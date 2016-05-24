@@ -8,6 +8,7 @@ from sqlalchemy import UniqueConstraint
 import address
 from ..extensions import db
 from .fhir import CodeableConcept
+from .identifier import Identifier
 import reference
 from .telecom import Telecom
 
@@ -35,6 +36,8 @@ class Organization(db.Model):
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
+    identifiers = db.relationship('Identifier', lazy='dynamic',
+            secondary="organization_identifiers")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __str__(self):
@@ -63,6 +66,11 @@ class Organization(db.Model):
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:
             self.partOf_id = reference.Reference.parse(data['partOf']).id
+        if 'identifier' in data:
+            for id in data['identifier']:
+                identifier = Identifier.from_fhir(id).add_if_not_found()
+                if identifier not in self.identifiers:
+                    self.identifiers.append(identifier)
         return self
 
     def as_fhir(self):
@@ -81,6 +89,10 @@ class Organization(db.Model):
         if self.partOf_id:
             d['partOf'] = reference.Reference.organization(
                 self.partOf_id).as_fhir()
+        if self.identifiers:
+            d['identifiers'] = []
+        for id in self.identifiers:
+            d['identifiers'].append(id.as_fhir())
         return d
 
 
@@ -107,4 +119,17 @@ class OrganizationAddress(db.Model):
         'addresses.id', ondelete='cascade'), nullable=False)
 
     __table_args__ = (UniqueConstraint('organization_id', 'address_id',
-        name='_observation_address'),)
+        name='_organization_address'),)
+
+
+class OrganizationIdentifier(db.Model):
+    """link table for organization : n identifiers"""
+    __tablename__ = 'organization_identifiers'
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.ForeignKey(
+        'organizations.id', ondelete='cascade'), nullable=False)
+    identifier_id = db.Column(db.ForeignKey(
+        'identifiers.id', ondelete='cascade'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('organization_id', 'identifier_id',
+        name='_organization_identifier'),)
