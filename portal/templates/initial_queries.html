@@ -112,18 +112,18 @@
         </div>
       </div>
 
-      <div id="patMeta" data-topic="pca_metastasize" class="tnth-hide pat-q">
+      <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
         <br />
         <p>Is the prostate cancer only within the prostate?</p>
         <div class="form-group">
           <div class="radio">
             <label>
-              <input type="radio" name="pca_metastasize" value="true"> Yes
+              <input type="radio" name="pca_localized" value="true"> Yes
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="pca_metastasize" value="false"> No (the cancer is in other parts of my body, too)
+              <input type="radio" name="pca_localized" value="false"> No (the cancer is in other parts of my body, too)
             </label>
           </div>
         </div>
@@ -231,7 +231,7 @@ $(document).ready(function(){
     // Get value from div - either true or false
     var toSend = thisItem.val();
     tnthAjax.putClinical({{user.id}},toCall,toSend);
-    if (toSend == "true" || toCall ==  "pca_metastasize") {
+    if (toSend == "true" || toCall ==  "pca_localized") {
       thisItem.parents(".pat-q").next().fadeIn();
       if (toCall == "tx") {
         $("#clinics").fadeIn();
@@ -239,10 +239,10 @@ $(document).ready(function(){
     } else {
       if (toCall == "biopsy") {
         tnthAjax.putClinical({{user.id}},"pca_diag","false");
-        tnthAjax.putClinical({{user.id}},"pca_metastasize","false");
+        tnthAjax.putClinical({{user.id}},"pca_localized","false");
         tnthAjax.putClinical({{user.id}},"tx","false");
       } else if (toCall == "pca_diag") {
-        tnthAjax.putClinical({{user.id}},"pca_metastasize","false");
+        tnthAjax.putClinical({{user.id}},"pca_localized","false");
         tnthAjax.putClinical({{user.id}},"tx","false");
       }
       $("#clinics").fadeIn();

@@ -45,3 +45,34 @@ users registered with the `UCSF` clinic::
     $ curl -H 'Authorization: Bearer <valid-token>' \
       -H 'Content-Type: application/json' -X POST -d @data \
       https://stg.us.truenth.org/api/intervention/care_plan/access_rule
+
+Sometimes it is necessary to combine multiple strategies into a logical
+**AND** operation.  To do so, use the `combine_strategies` function,
+passing the respective set of `strategy_n` and `strategy_n_kwargs` as so::
+
+    {
+        "name": "not in sr AND in clinc uw",
+        "function_details": {
+            "function": "combine_strategies",
+            "name": "not in sr AND in clinc uw",
+            "kwargs": [{
+                "name": "strategy_1",
+                "value": "allow_if_not_in_intervention"
+            }, {
+                "name": "strategy_1_kwargs",
+                "value": [{
+                    "name": "intervention_name",
+                    "value": "sexual_recovery"
+                }]
+            }, {
+                "name": "strategy_2",
+                "value": "limit_by_clinic"
+            }, {
+                "name": "strategy_2_kwargs",
+                "value": [{
+                    "name": "organization_name",
+                    "value": "UW"
+                }]
+            }]
+        }
+    }

@@ -66,8 +66,8 @@ var fillContent = {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "treatment begun") {
                 clinicalItem = "tx";
-            } else if (clinicalItem == "PCa metastasize diagnosis") {
-                clinicalItem = "pca_metastasize";
+            } else if (clinicalItem == "PCa localized diagnosis") {
+                clinicalItem = "pca_localized";
             }
             $('div[data-topic='+clinicalItem+']').fadeIn();
             var clinicalValue = val.content.valueQuantity.value;

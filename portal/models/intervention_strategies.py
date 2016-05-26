@@ -19,9 +19,10 @@ from sqlalchemy.dialects.postgresql import JSONB
 import sys
 
 from ..extensions import db
-from .fhir import CC
+from .fhir import CC, Coding, CodeableConcept
 from .organization import Organization
 from .intervention import INTERVENTION
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
 ###
@@ -30,9 +31,10 @@ from .intervention import INTERVENTION
 
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
+    msg = kwargs.get('message', '')  # optional
     current_app.logger.debug(
         "{func_name} returning {result} for {user} on intervention "\
-        "{intervention}".format(**kwargs))
+        "{intervention}".format(**kwargs) + msg)
 
 def limit_by_clinic(organization_name):
     """Returns function implenting strategy API checking for named org"""
@@ -43,6 +45,7 @@ def limit_by_clinic(organization_name):
             _log(result=True, func_name='limit_by_clinic', user=user,
                  intervention=intervention.name)
             return True
+
     return user_registered_with_clinic
 
 def allow_if_not_in_intervention(intervention_name):
@@ -51,29 +54,86 @@ def allow_if_not_in_intervention(intervention_name):
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
     def user_not_in_intervention(intervention, user):
+        import pdb; pdb.set_trace()
         if not exclusive_intervention.user_has_access(user):
             _log(result=True, func_name='user_not_in_intervention', user=user,
                  intervention=intervention.name)
             return True
+
     return user_not_in_intervention
 
-def diagnosis_w_o_tx():
-    """Returns function implementing strategy API checks for PCa and no TX"""
+def observation_check(display, boolean_value):
+    """Returns strategy function for a particular observation and logic value
 
-    def diag_no_tx(intervention, user):
-        """Returns true if user has a PCa diagnosis and no TX"""
-        pca = [o for o in user.observations if o.codeable_concept_id ==
-               CC.PCaDIAG.id]
-        tx = [o for o in user.observations if o.codeable_concept_id ==
-              CC.TX.id]
-        has_pca = pca and pca[0].value_quantity == CC.TRUE_VALUE
-        in_tx = tx and tx[0].value_quantity == CC.TRUE_VALUE
+    :param display: observation coding.display from TRUENTH_CLINICAL_CODE_SYSTEM
+    :param boolean_value: ValueQuantity boolean true or false expected
 
-        if has_pca and not in_tx:
+    """
+    coding = Coding.query.filter_by(
+        system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
+    cc_id = CodeableConcept.query.filter(
+        CodeableConcept.codings.contains(coding)).one().id
+    if boolean_value == 'true':
+        vq = CC.TRUE_VALUE
+    elif boolean_value == 'false':
+        vq = CC.FALSE_VALUE
+    else:
+        raise ValueError("boolean_value must be 'true' or 'false'")
+
+    def user_has_matching_observation(intervention, user):
+        obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
+        if obs and obs[0].value_quantity == vq:
             _log(result=True, func_name='diag_no_tx', user=user,
-                 intervention=intervention.name)
+                 intervention=intervention.name,
+                 message='{}:{}'.format(coding.display, vq.value))
             return True
-    return diag_no_tx
+
+    return user_has_matching_observation
+
+
+def combine_strategies(**kwargs):
+    """Make multiple strategies into a single statement
+
+    The nature of the access lookup returns True for the first
+    success in the list of strategies for an intervention.  Use
+    this method to chain multiple strategies together into a logical **and**
+    fashion rather than the built in locical **or**.
+
+    NB - kwargs must have keys such as 'strategy_n', 'strategy_n_kwargs'
+    for every 'n' strategies being combined, starting at 1.  Set arbitrary
+    limit of 6 strategies for time being.
+
+    """
+    strats = []
+    arbitrary_limit = 7
+    if 'strategy_{}'.format(arbitrary_limit) in kwargs:
+        raise ValueError("only supporting %d combined strategies",
+                         arbitrary_limit-1)
+    for i in range(1, arbitrary_limit):
+        if 'strategy_{}'.format(i) not in kwargs:
+            break
+
+        func_name = kwargs['strategy_{}'.format(i)]
+
+        func_kwargs = {}
+        for argset in kwargs['strategy_{}_kwargs'.format(i)]:
+            func_kwargs[argset['name']] = argset['value']
+
+        func = getattr(sys.modules[__name__], func_name)
+        strats.append(func(**func_kwargs))
+
+    def call_combined(intervention, user):
+        for strategy in strats:
+            if not strategy(intervention, user):
+                _log(result=False, func_name='combine_strategies', user=user,
+                    intervention=intervention.name)
+                return
+        # still here?  effective AND passed as all returned true
+        _log(result=False, func_name='combine_strategies', user=user,
+            intervention=intervention.name)
+        return True
+
+    return call_combined
 
 
 class AccessStrategy(db.Model):
