@@ -240,13 +240,13 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        uw = Organization(name='UW')
+        uw = Organization(name='UW Medicine (University of Washington)')
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
             db.session.commit()
         user, uw = map(db.session.merge, (user, uw))
 
-        d = {'name': 'not in sr AND in clinc uw',
+        d = {'name': 'not in SR _and_ in clinc UW',
              'function': 'combine_strategies',
              'kwargs': [
                  {'name': 'strategy_1',
@@ -266,7 +266,6 @@ class TestIntervention(TestCase):
                 name=d['name'],
                 intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            print json.dumps(strat.as_json())
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -292,3 +291,73 @@ class TestIntervention(TestCase):
 
         # first strat true, second false.  AND should be false
         self.assertFalse(ds_p3p.user_has_access(user))
+
+    def test_p3p_conditions(self):
+        # Test the list of conditions expected for p3p
+        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+        ds_p3p.public_access = False
+        user = self.test_user
+        uw = Organization(name='UW Medicine (University of Washington)')
+        user.organizations.append(uw)
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False
+        with SessionScope(db):
+            db.session.commit()
+        user, uw = map(db.session.merge, (user, uw))
+
+        d = {'name': 'not in SR _and_ in clinc UW _and_ not started TX '\
+             '_and_ has PCaLocalized',
+             'function': 'combine_strategies',
+             'kwargs': [
+                 # Not in SR
+                 {'name': 'strategy_1',
+                  'value': 'allow_if_not_in_intervention'},
+                 {'name': 'strategy_1_kwargs',
+                  'value': [{'name': 'intervention_name',
+                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 # In Clinic UW
+                 {'name': 'strategy_2',
+                  'value': 'limit_by_clinic'},
+                 {'name': 'strategy_2_kwargs',
+                  'value': [{'name': 'organization_name',
+                             'value': uw.name}]},
+                 # Not Started TX
+                 {'name': 'strategy_3',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_3_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.TX.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'false'}]},
+                 # Has Localized PCa
+                 {'name': 'strategy_4',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_4_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.PCaLocalized.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'true'}]},
+                 ]
+            }
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name=d['name'],
+                intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
+                function_details=json.dumps(d))
+            #print json.dumps(strat.as_json())
+            db.session.add(strat)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # only first two strats true so far, therfore, should be False
+        self.assertFalse(ds_p3p.user_has_access(user))
+
+        user.save_constrained_observation(
+            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        user.save_constrained_observation(
+            codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # All conditions now met, should have access
+        self.assertTrue(ds_p3p.user_has_access(user))

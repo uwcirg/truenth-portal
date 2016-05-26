@@ -16,6 +16,7 @@ the parameters given to the closures.
 from flask import current_app
 import json
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm.exc import NoResultFound
 import sys
 
 from ..extensions import db
@@ -38,7 +39,12 @@ def _log(**kwargs):
 
 def limit_by_clinic(organization_name):
     """Returns function implenting strategy API checking for named org"""
-    organization = Organization.query.filter_by(name=organization_name).one()
+    try:
+        organization = Organization.query.filter_by(
+            name=organization_name).one()
+    except NoResultFound:
+        raise ValueError("organization name '{}' not found".format(
+            organization_name))
 
     def user_registered_with_clinic(intervention, user):
         if organization in user.organizations:
@@ -68,8 +74,11 @@ def observation_check(display, boolean_value):
     :param boolean_value: ValueQuantity boolean true or false expected
 
     """
-    coding = Coding.query.filter_by(
-        system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
+    try:
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
+    except NoResultFound:
+        raise ValueError("coding.display '{}' not found".format(display))
     cc_id = CodeableConcept.query.filter(
         CodeableConcept.codings.contains(coding)).one().id
     if boolean_value == 'true':
