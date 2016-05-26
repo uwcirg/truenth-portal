@@ -16,7 +16,7 @@ class TestUI(TestCase, LiveServerTestCase):
         super(TestUI, self).setUp()
 
         self.driver = webdriver.Firefox()
-        self.driver.implicitly_wait(30)
+        self.driver.implicitly_wait(60)
         self.driver.root_uri = self.get_server_url()
 
     def tearDown(self):
