@@ -16,7 +16,7 @@ services:
   - redis-server
 
 before_install:
-  - sudo /etc/init.d/postgresql stop
+  - sudo service postgresql stop
   - sudo apt-get -y remove --purge postgresql-9.1
   - sudo apt-get -y remove --purge postgresql-9.2
   - sudo apt-get -y remove --purge postgresql-9.3
@@ -27,7 +27,7 @@ before_install:
   - sudo apt-get -y install postgresql-9.5
   - sudo sh -c 'echo "local all postgres trust" > /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
-  - sudo /etc/init.d/postgresql restart
+  - sudo service postgresql restart 9.5
   - sudo -u postgres createuser test_user
   - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
   - psql --version
