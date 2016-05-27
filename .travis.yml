@@ -29,13 +29,13 @@ before_install:
   - sudo service postgresql restart 9.5
   - sudo -u postgres createuser test_user
   - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
+  - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
 
 install:
   - pip install --process-dependency-links -e .
   - cp portal/application.cfg.travis portal/application.cfg
 
 before_script:
- - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
  - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 
 script:
