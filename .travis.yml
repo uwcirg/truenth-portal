@@ -6,10 +6,10 @@ python:
 addons:
   apt:
     sources:
-    - precise-pgdg-9.5
+      - precise-pgdg-9.5
     packages:
-    - postgresql-9.5
-    - postgresql-contrib-9.5
+      - postgresql-9.5
+      - postgresql-contrib-9.5
   postgresql: "9.5"
 services:
   - postgresql
@@ -36,7 +36,7 @@ install:
   - cp portal/application.cfg.travis portal/application.cfg
 
 before_script:
- - celery worker --detach -A portal.celery_worker.celery --loglevel=info
+  - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 
 script:
   - nosetests -v --with-cover --cover-package=portal
