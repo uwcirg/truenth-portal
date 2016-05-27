@@ -21,6 +21,7 @@ services:
 env:
   global:
     - DISPLAY=":99.0"
+    - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
 
 before_install:
   - sudo service postgresql stop
@@ -34,9 +35,8 @@ before_install:
   - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sed -i 's|port = 5433|port = 5432|' /etc/postgresql/9.5/main/postgresql.conf
   - sudo service postgresql restart 9.5
-  - sudo -u postgres createuser test_user
-  - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
-  - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
+
+  - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
 install:
   - pip install --process-dependency-links -e .
