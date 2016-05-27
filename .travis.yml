@@ -29,7 +29,6 @@ before_install:
   - sudo service postgresql restart 9.5
   - sudo -u postgres createuser test_user
   - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
-  - psql --version
 
 install:
   - pip install --process-dependency-links -e .
