@@ -1,4 +1,5 @@
 """Unit test module for Selenium testing"""
+import os
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -15,7 +16,26 @@ class TestUI(TestCase, LiveServerTestCase):
 
         super(TestUI, self).setUp()
 
-        self.driver = webdriver.Firefox()
+        if "SAUCE_USERNAME" in os.environ and "SAUCE_ACCESS_KEY" in os.environ:
+
+            capabilities = {
+                "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
+                "build": os.environ["TRAVIS_BUILD_NUMBER"],
+                "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
+            }
+            url = "http://{username}:{access_key}@localhost:4445/wd/hub".format(
+                username=os.environ["SAUCE_USERNAME"],
+                access_key=os.environ["SAUCE_ACCESS_KEY"],
+            )
+
+            self.driver = webdriver.Remote(
+                desired_capabilities=capabilities,
+                command_executor=url
+            )
+
+        else:
+            self.driver = webdriver.Firefox()
+
         self.driver.implicitly_wait(60)
         self.driver.root_uri = self.get_server_url()
 
