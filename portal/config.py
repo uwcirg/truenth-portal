@@ -44,8 +44,11 @@ class TestConfig(BaseConfig):
     TESTING = True
     SERVER_NAME = 'localhost'
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_DATABASE_URI =\
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
         'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+    )
+
     WTF_CSRF_ENABLED = False
 
 
