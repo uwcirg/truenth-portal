@@ -18,11 +18,19 @@ class TestUI(TestCase, LiveServerTestCase):
 
         if "SAUCE_USERNAME" in os.environ and "SAUCE_ACCESS_KEY" in os.environ:
 
+            platform = {
+                "browserName": "firefox",
+                "platform": "Windows 10",
+                "version": "46.0",
+            }
+
             capabilities = {
                 "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
                 "build": os.environ["TRAVIS_BUILD_NUMBER"],
                 "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
             }
+            capabilities.update(platform)
+
             url = "http://{username}:{access_key}@localhost:4445/wd/hub".format(
                 username=os.environ["SAUCE_USERNAME"],
                 access_key=os.environ["SAUCE_ACCESS_KEY"],
