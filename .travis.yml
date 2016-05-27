@@ -22,9 +22,7 @@ before_install:
   - sudo apt-get -y remove --purge postgresql-9.3
   - sudo apt-get -y remove --purge postgresql-9.4
   - sudo apt-get -y autoremove
-  - sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 7FCC7D46ACCC4CF8
-  - sudo apt-get update
-  - sudo apt-get -y install postgresql-9.5
+
   - sudo sh -c 'echo "local all postgres trust" > /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sed -i 's|port = 5433|port = 5432|' /etc/postgresql/9.5/main/postgresql.conf
