@@ -329,6 +329,9 @@ a:active {
 #mainNav {
   height: 71px;
 }
+#tnthNavWrapper {
+  display: none;
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {

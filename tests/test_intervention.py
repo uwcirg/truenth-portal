@@ -81,16 +81,19 @@ class TestIntervention(TestCase):
         self.assertTrue(cp.user_has_access(user))
 
     def test_diag_stategy(self):
-        """Test strategy for diagnosis without treatment"""
+        """Test strategy for diagnosis"""
         # Add access strategies to the care plan intervention
         cp = INTERVENTION.CARE_PLAN
         cp.public_access = False  # turn off public access to force strategy
         cp_id = cp.id
 
         with SessionScope(db):
-            d = {'function': 'diagnosis_w_o_tx', 'kwargs': []}
+            d = {'function': 'observation_check',
+                 'kwargs': [{'name': 'display', 'value':
+                             CC.PCaDIAG.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'true'}]}
             strat = AccessStrategy(
-                name="test strategy",
+                name="has PCa diagnosis",
                 intervention_id = cp_id,
                 function_details=json.dumps(d))
             db.session.add(strat)
@@ -98,13 +101,43 @@ class TestIntervention(TestCase):
         cp = INTERVENTION.CARE_PLAN
         user = db.session.merge(self.test_user)
 
-        # Prior to associating user with any orgs, shouldn't have access
+        # Prior to PCa dx, user shouldn't have access
         self.assertFalse(cp.user_has_access(user))
 
-        # Bless the test user with PCa diagnosis (but no TX)
+        # Bless the test user with PCa diagnosis
         user.save_constrained_observation(
             codeable_concept=CC.PCaDIAG, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        self.assertTrue(cp.user_has_access(user))
+
+    def test_no_tx(self):
+        """Test strategy for not starting treatment"""
+        # Add access strategies to the care plan intervention
+        cp = INTERVENTION.CARE_PLAN
+        cp.public_access = False  # turn off public access to force strategy
+        cp_id = cp.id
+
+        with SessionScope(db):
+            d = {'function': 'observation_check',
+                 'kwargs': [{'name': 'display', 'value':
+                             CC.TX.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'false'}]}
+            strat = AccessStrategy(
+                name="has not stared treatment",
+                intervention_id = cp_id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        cp = INTERVENTION.CARE_PLAN
+        user = db.session.merge(self.test_user)
+
+        # Prior to declaring TX, user shouldn't have access
+        self.assertFalse(cp.user_has_access(user))
+
         user.save_constrained_observation(
             codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))
@@ -112,6 +145,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
+        # Declaring they started TX, should grant access
         self.assertTrue(cp.user_has_access(user))
 
         # Say user starts treatment, should lose access
@@ -167,8 +201,9 @@ class TestIntervention(TestCase):
         d = {'name': 'unit test example',
              'description': 'a lovely way to test',
              'function_details': {
-                 'function': 'diagnosis_w_o_tx',
-                 'kwargs': []
+                 'function': 'allow_if_not_in_intervention',
+                 'kwargs': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
         acc_strat = AccessStrategy.from_json(d)
@@ -182,8 +217,9 @@ class TestIntervention(TestCase):
         self.login()
         d = {'name': 'unit test example',
              'function_details': {
-                 'function': 'diagnosis_w_o_tx',
-                 'kwargs': []
+                 'function': 'allow_if_not_in_intervention',
+                 'kwargs': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
         rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
@@ -197,3 +233,131 @@ class TestIntervention(TestCase):
         data = json.loads(rv.data)
         self.assertEqual(len(data['rules']), 1)
         self.assertEqual(d, data['rules'][0])
+
+    def test_and_strats(self):
+        # Create a logical 'and' with multiple strategies
+
+        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+        ds_p3p.public_access = False
+        user = self.test_user
+        uw = Organization(name='UW Medicine (University of Washington)')
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False
+        with SessionScope(db):
+            db.session.commit()
+        user, uw = map(db.session.merge, (user, uw))
+
+        d = {'name': 'not in SR _and_ in clinc UW',
+             'function': 'combine_strategies',
+             'kwargs': [
+                 {'name': 'strategy_1',
+                  'value': 'allow_if_not_in_intervention'},
+                 {'name': 'strategy_1_kwargs',
+                  'value': [{'name': 'intervention_name',
+                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 {'name': 'strategy_2',
+                  'value': 'limit_by_clinic'},
+                 {'name': 'strategy_2_kwargs',
+                  'value': [{'name': 'organization_name',
+                             'value': uw.name}]}
+                 ]
+            }
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name=d['name'],
+                intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # first strat true, second false.  therfore, should be False
+        self.assertFalse(ds_p3p.user_has_access(user))
+
+        user.organizations.append(uw)
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        # first strat true, second true.  therfore, should be True
+        self.assertTrue(ds_p3p.user_has_access(user))
+
+        ui = UserIntervention(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id,
+            access='granted')
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # first strat true, second false.  AND should be false
+        self.assertFalse(ds_p3p.user_has_access(user))
+
+    def test_p3p_conditions(self):
+        # Test the list of conditions expected for p3p
+        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+        ds_p3p.public_access = False
+        user = self.test_user
+        uw = Organization(name='UW Medicine (University of Washington)')
+        user.organizations.append(uw)
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False
+        with SessionScope(db):
+            db.session.commit()
+        user, uw = map(db.session.merge, (user, uw))
+
+        d = {'name': 'not in SR _and_ in clinc UW _and_ not started TX '\
+             '_and_ has PCaLocalized',
+             'function': 'combine_strategies',
+             'kwargs': [
+                 # Not in SR
+                 {'name': 'strategy_1',
+                  'value': 'allow_if_not_in_intervention'},
+                 {'name': 'strategy_1_kwargs',
+                  'value': [{'name': 'intervention_name',
+                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 # In Clinic UW
+                 {'name': 'strategy_2',
+                  'value': 'limit_by_clinic'},
+                 {'name': 'strategy_2_kwargs',
+                  'value': [{'name': 'organization_name',
+                             'value': uw.name}]},
+                 # Not Started TX
+                 {'name': 'strategy_3',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_3_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.TX.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'false'}]},
+                 # Has Localized PCa
+                 {'name': 'strategy_4',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_4_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.PCaLocalized.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'true'}]},
+                 ]
+            }
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name=d['name'],
+                intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
+                function_details=json.dumps(d))
+            #print json.dumps(strat.as_json())
+            db.session.add(strat)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # only first two strats true so far, therfore, should be False
+        self.assertFalse(ds_p3p.user_has_access(user))
+
+        user.save_constrained_observation(
+            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        user.save_constrained_observation(
+            codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # All conditions now met, should have access
+        self.assertTrue(ds_p3p.user_has_access(user))

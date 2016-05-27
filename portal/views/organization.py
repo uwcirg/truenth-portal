@@ -39,7 +39,7 @@ def organization_list():
           to view requested patient
 
     """
-    query = Organization.query.order_by(Organization.name)
+    query = Organization.query.order_by(Organization.id)
     orgs = [o.as_fhir() for o in query]
 
     bundle = {
@@ -135,7 +135,7 @@ def organization_delete(organization_id):
 
 @org_api.route('/organization', methods=('POST',))
 @oauth.require_oauth()
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def organization_post():
     """Add a new organization.  Updates should use PUT
 
@@ -144,6 +144,10 @@ def organization_post():
     Submit JSON format [Organization
     Resource](https://www.hl7.org/fhir/organization.html) to add an
     organization.
+
+    Include an **identifier** with system of
+    http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
+    alias for the organization, useful at `/clinic/<alias>`.
 
     A resource mentioned as partOf the given organization must exist as a
     prerequisit or a 400 will result.
@@ -201,13 +205,17 @@ def organization_post():
 
 @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
 @oauth.require_oauth()
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def organization_put(organization_id):
     """Update organization via FHIR Resource Organization. New should POST
 
     Submit JSON format [Organization
     Resource](https://www.hl7.org/fhir/organization.html) to update an existing
     organization.
+
+    Include an **identifier** with system of
+    http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
+    alias for the organization, useful at `/clinic/<alias>`.
 
     A resource mentioned as partOf the given organization must exist as a
     prerequisit or a 400 will result.

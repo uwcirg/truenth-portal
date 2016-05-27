@@ -2,16 +2,33 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-
+  <div id="loadingIndicator" class="loading-indicator">
+    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
+  </div>
 
   <h3 class="tnth-headline">About You</h3>
 
   <p>Thanks for signing up for TrueNTH. Please finish your registration by telling us about yourself.</p>
   <hr />
 
-  <form class="form tnth-form" action='initial-queries' method='POST'>
+  <form class="form tnth-form" id="queriesForm" action='initial-queries' method='POST'>
 
     <p>First, tell us who you are:</p>
+
+    <div class="row" id="nameBox">
+      <div class="col-xs-6">
+        <div class="form-group float-input-label">
+          <input class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" type="text" />
+          <div class="help-block with-errors"></div>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="form-group float-input-label">
+          <input class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" type="text" />
+          <div class="help-block with-errors"></div>
+        </div>
+      </div>
+    </div>
     <div class="form-group" id="userRoles">
       <div class="radio">
         <label>
@@ -26,9 +43,42 @@
     </div>
 
 
-    <div class="hide-initial" id="patientQ">
+    <input type="hidden" name="birthDate" id="birthday" value="">
 
-      <div id="patBiopsy" data-topic="biopsy" class="tnth-hide pat-q">
+    <div class="form-group tnth-hide" id="bdGroup">
+      <label>Birth Date</label>
+      <div class="row">
+        <div class="col-xs-4">
+          <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+            <option value="">Month...</option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="col-xs-4">
+          <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+        </div>
+        <div class="col-xs-4">
+          <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+        </div>
+      </div>
+      <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+    </div>
+
+
+    <div class="tnth-hide" id="patientQ">
+
+      <div id="patBiopsy" data-topic="biopsy" class="pat-q">
         <br />
         <p>Have you had a prostate cancer biopsy?</p>
         <div class="form-group">
@@ -62,6 +112,23 @@
         </div>
       </div>
 
+      <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
+        <br />
+        <p>Is the prostate cancer only within the prostate?</p>
+        <div class="form-group">
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_localized" value="true"> Yes
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" name="pca_localized" value="false"> No (the cancer is in other parts of my body, too)
+            </label>
+          </div>
+        </div>
+      </div>
+
       <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
         <br />
         <p>Have you begun prostate cancer treatment?</p>
@@ -85,19 +152,11 @@
 
       <h3 class="tnth-headline">Your Clinic</h3>
 
-      <p>Which clinic (or clinics) are you a part of?</p>
+      <p>Where are you receiving your care?</p>
 
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
-
-          <legend style="margin: 0  0 4px">UCSF</legend>
-          <input class="tnth-hide" type="checkbox" name="organization" value="5"/>
-          <div class="form-group" id="clinics5">
-          </div>
-          <legend style="margin: 0  0 4px">UW Medicine</legend>
-          <input class="tnth-hide" type="checkbox" name="organization" value="1"/>
-          <div class="form-group" id="clinics1">
-          </div>
+          <div id="fillOrgs"></div>
           <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
 
@@ -127,149 +186,77 @@
 
 {% endblock %}
 {% block document_ready %}
+
+// Check if there's a session variable for associated clinic
+var preselectClinic = "{{ session.get('associate_clinic_id') }}";
+
 $(document).ready(function(){
 
-  getOrgs({{ user.id }});
+  /** 1st - get all current info **/
+  tnthAjax.getRoles({{ user.id }});
+  tnthAjax.getOrgs({{ user.id }});
+  tnthAjax.getClinical({{ user.id }});
 
-  /** Get demo, clinical and observations and fill existing answers **/
-  $.ajax ({
-    type: "GET",
-    url: '/api/demographics/{{ user.id }}'
-  }).done(function(data) {
-    console.log(data);
+  /** 2nd - submit changes and update UI **/
+  $("#queriesForm input").on("blur",function(){
+    assembleContent.demo({{ user.id }});
   });
-
-  // Get clinicial observations and fill in any answers
-  $.ajax ({
-    type: "GET",
-    url: '/api/patient/{{ user.id }}/clinical'
-  }).done(function(data) {
-    $.each(data.entry, function(i,val){
-      var clinicalItem = val.content.code.coding[0].display;
-      if (clinicalItem == "PCa diagnosis") {
-        clinicalItem = "pca_diag";
-      } else if (clinicalItem == "treatment begun") {
-        clinicalItem = "tx";
-      }
-      $('div[data-topic='+clinicalItem+']').fadeIn();
-      var clinicalValue = val.content.valueQuantity.value;
-      var $radios = $('input:radio[name='+clinicalItem+']');
-      if($radios.is(':checked') === false) {
-        $radios.filter('[value='+clinicalValue+']').prop('checked', true);
-      }
-      // Display clinics if any value is false or if all are answered
-      if (clinicalValue == "false" || i == 2) {
-        $("#clinics").fadeIn();
-      }
-    })
-  }).fail(function() {
-    console.log("Problem retrieving data from server.")
-  });
-
-  $.ajax ({
-    type: "GET",
-    url: '/api/user/{{ user.id }}/roles'
-  }).done(function(data) {
-    console.log(data);
-    $.each(data.roles, function(i,val){
-      var userRole = val.name;
-      var $radios = $('input:radio[name=user_type]');
-      if($radios.is(':checked') === false) {
-        $radios.filter('[value='+userRole+']').prop('checked', true);
-
-      }
-      if (userRole == "patient") {
-        $("#patBiopsy").fadeIn();
-        $("#clinics").hide();
-        // TODO - temporary privileging of patient if they have both roles. Should really have one or the other
-        return false;
-      } else if (userRole == "partner") {
-        $("#clinics").fadeIn();
-        $("#patBiopsy").hide();
-      }
-    })
-  }).fail(function() {
-    console.log("Problem retrieving data from server.")
-  });
-
   $("#userRoles input:radio").on("click",function(){
-    var roles = [];
-    var theVal = $(this).val();
-    roles.push({name: theVal});
-    var toSend = {"roles": roles};
-    $.ajax ({
-      type: "PUT",
-      url: '/api/user/{{ user.id }}/roles',
-      contentType: "application/json; charset=utf-8",
-      dataType: 'json',
-      data: JSON.stringify(toSend)
-    }).done(function() {
-      if (theVal == "patient") {
-        $("#patBiopsy").fadeIn();
-        $("#clinics").hide();
+    $.each($("#userRoles input:radio"), function() {
+      var roles = [];
+      var theVal = $(this).val();
+      roles.push({name: theVal});
+      var toSend = {"roles": roles};
+      if ($(this).is(":checked")) {
+        tnthAjax.putRoles({{user.id}},toSend);
+        if (theVal == "patient") {
+          $("#patientQ").fadeIn();
+          $("#bdGroup").fadeIn();
+          $("#clinics").hide();
+        } else {
+          // If partner, they skip questions, fadeIn Clinics
+          $("#clinics").fadeIn();
+          $("#patientQ").hide();
+          $("#bdGroup").hide();
+        }
       } else {
-        // If partner, they skip questions, fadeIn Clinics
-        $("#clinics").fadeIn();
-        $("#patBiopsy").hide();
+        tnthAjax.deleteRoles({{user.id}},toSend);
       }
-    }).fail(function() {
-      console.log("Problem updating role on server.")
     });
-
-    // TODO - Add delete function if user needs to change answer
-
   });
-
-  var sendAjax = function(toCall, theVal) {
-    $.ajax ({
-      type: "POST",
-      url: '/api/patient/{{ user.id }}/clinical/'+toCall,
-      contentType: "application/json; charset=utf-8",
-      dataType: 'json',
-      data: JSON.stringify({value: theVal})
-    }).done(function() {
-
-    }).fail(function() {
-      alert("There was a problem saving your answers. Please try again.");
-    });
-  };
 
   $(".pat-q input:radio").on("click",function(){
     var thisItem = $(this);
     var toCall = thisItem.attr("name")
     // Get value from div - either true or false
-    var theVal = thisItem.val();
-    sendAjax(toCall,theVal);
-    if (theVal == "true") {
+    var toSend = thisItem.val();
+    tnthAjax.putClinical({{user.id}},toCall,toSend);
+    if (toSend == "true" || toCall ==  "pca_localized") {
       thisItem.parents(".pat-q").next().fadeIn();
       if (toCall == "tx") {
         $("#clinics").fadeIn();
       }
     } else {
       if (toCall == "biopsy") {
-        sendAjax("pca_diag","false");
-        sendAjax("tx","false");
+        tnthAjax.putClinical({{user.id}},"pca_diag","false");
+        tnthAjax.putClinical({{user.id}},"pca_localized","false");
+        tnthAjax.putClinical({{user.id}},"tx","false");
       } else if (toCall == "pca_diag") {
-        sendAjax("tx","false");
+        tnthAjax.putClinical({{user.id}},"pca_localized","false");
+        tnthAjax.putClinical({{user.id}},"tx","false");
       }
       $("#clinics").fadeIn();
     }
-
   });
 
-  // Handling "none of the above" clinic choice
-  $("#clinics").on("click", ".clinic", function(){
-    if ($(this).prop('checked')){
-      if ($(this).attr("id") !== "noOrgs") {
-        $("#noOrgs").attr('checked',false);
-      } else {
-        $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-      }
-    }
+  /**
+  $("#clinics").on("change", ".clinic", function() {
+    //assembleContent.orgs2({{ user.id }}, $(this).val(), $(this).is(":checked"));
   });
+  **/
 
   $("#saveOrgs").on("click",function(){
-    assembleOrgs({{ user.id }});
+    assembleContent.orgs({{ user.id }});
     $("#terms").fadeIn();
   });
 

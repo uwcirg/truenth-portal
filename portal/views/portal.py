@@ -8,11 +8,14 @@ from flask_swagger import swagger
 
 from ..audit import auditable_event
 from .crossdomain import crossdomain
+from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
 from ..models.message import EmailInvite
+from ..models.organization import OrganizationIdentifier
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth
+from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
 portal = Blueprint('portal', __name__)
@@ -41,15 +44,27 @@ def landing():
     return render_template('landing.html', user=None)
 
 
-@portal.route('/urologyuwmc')
-def specific_clinic_landing():
+@portal.route('/clinic/<string:clinic_alias>')
+def specific_clinic_landing(clinic_alias):
     """Invited users start here to obtain a specific clinic assignment
 
     Store the clinic in the session for association with the user once
     registered and redirect to the standard landing page.
 
     """
-    session['associate_clinic'] = "UCSF Urologic Surgical Oncology"
+    # Shortcut aliases are registered with the organization as identifiers.
+    # Confirm the requested alias exists or 404
+    identifier = Identifier.query.filter_by(system=SHORTCUT_ALIAS,
+                                            value=clinic_alias).first()
+    if not identifier:
+        current_app.logger.debug("Clinic alias not found: %s", clinic_alias)
+        abort(404)
+
+    # Expecting exactly one organization for this alias, save ID in session
+    results = OrganizationIdentifier.query.filter_by(
+        identifier_id=identifier.id).one()
+    session['associate_clinic_id'] = results.organization_id
+
     return redirect('/')
 
 
@@ -67,12 +82,6 @@ def home():
     user = current_user()
     if user:
         # authorized entry point - take care of pending actions
-        # 1. associate user with clinic if previously captured
-        if 'associate_clinic' in session:
-            user.add_organization(session['associate_clinic'])
-            db.session.commit()
-            del session['associate_clinic']
-
         # present intial questions if not already obtained
         # TODO: logic to determine if all necessary queries have been answered
         if 'initial_queries' in session:

@@ -176,11 +176,11 @@ class TestClinical(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
-    def test_clinical_pca_metastasize(self):
-        """Shortcut API - just PCa metastasize diagnosis w/o FHIR overhead"""
+    def test_clinical_pca_localized(self):
+        """Shortcut API - just PCa localized diagnosis w/o FHIR overhead"""
         self.login()
         rv = self.app.post(
-            '/api/patient/%s/clinical/pca_metastasize' % TEST_USER_ID,
+            '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID,
             content_type='application/json', data=json.dumps({'value': True}))
         self.assert200(rv)
         result = json.loads(rv.data)
@@ -193,14 +193,14 @@ class TestClinical(TestCase):
         vq = data['entry'][0]['content']['valueQuantity']
 
         self.assertEquals(coding['code'], '141')
-        self.assertEquals(coding['display'], 'PCa metastasize diagnosis')
+        self.assertEquals(coding['display'], 'PCa localized diagnosis')
         self.assertEquals(coding['system'],
                           'http://us.truenth.org/clinical-codes')
         self.assertEquals(vq['value'], 'true')
 
-        # Access the direct pca_metastasize value
+        # Access the direct pca_localized value
         rv = self.app.get(
-            '/api/patient/%s/clinical/pca_metastasize' % TEST_USER_ID)
+            '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
