@@ -42,7 +42,8 @@ class DefaultConfig(BaseConfig):
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
-    SERVER_NAME = 'localhost'
+    SERVER_NAME = 'localhost:5005'
+    LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'SQLALCHEMY_DATABASE_URI',
