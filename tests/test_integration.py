@@ -23,13 +23,15 @@ class TestUI(TestCase, LiveServerTestCase):
                 "platform": "Windows 10",
                 "version": "46.0",
             }
-
             capabilities = {
                 "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
+            }
+            metadata = {
                 "build": os.environ["TRAVIS_BUILD_NUMBER"],
                 "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
             }
             capabilities.update(platform)
+            capabilities.update(metadata)
 
             url = "http://{username}:{access_key}@localhost:4445/wd/hub".format(
                 username=os.environ["SAUCE_USERNAME"],
