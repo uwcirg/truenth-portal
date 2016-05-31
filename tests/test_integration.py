@@ -27,6 +27,7 @@ class TestUI(TestCase, LiveServerTestCase):
                 "tunnel-identifier": os.environ["TRAVIS_JOB_NUMBER"],
             }
             metadata = {
+                "name": self.id(),
                 "build": os.environ["TRAVIS_BUILD_NUMBER"],
                 "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
             }
