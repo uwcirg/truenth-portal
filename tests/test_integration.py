@@ -28,8 +28,14 @@ class TestUI(TestCase, LiveServerTestCase):
             }
             metadata = {
                 "name": self.id(),
-                "build": os.environ["TRAVIS_BUILD_NUMBER"],
-                "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
+                "build": "#%s %s" % (
+                    os.environ["TRAVIS_BUILD_NUMBER"],
+                    os.environ["TRAVIS_BRANCH"],
+                ),
+                "tags": [
+                    "py" + os.environ["TRAVIS_PYTHON_VERSION"],
+                    "CI",
+                ],
                 "passed": False,
             }
             capabilities.update(platform)
