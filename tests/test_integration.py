@@ -30,6 +30,7 @@ class TestUI(TestCase, LiveServerTestCase):
                 "name": self.id(),
                 "build": os.environ["TRAVIS_BUILD_NUMBER"],
                 "tags": [os.environ["TRAVIS_PYTHON_VERSION"], "CI"],
+                "passed": False,
             }
             capabilities.update(platform)
             capabilities.update(metadata)
@@ -52,6 +53,15 @@ class TestUI(TestCase, LiveServerTestCase):
 
     def tearDown(self):
         """Clean db session, drop all tables."""
+
+        # Update job result metadata on Sauce Labs, if available
+        if (
+            not self._resultForDoCleanups.failures and
+            not self._resultForDoCleanups.errors and
+            "SAUCE_USERNAME" in os.environ and
+            "SAUCE_ACCESS_KEY" in os.environ
+        ):
+            self.driver.execute_script("sauce:job-result=passed")
 
         self.driver.quit()
 
