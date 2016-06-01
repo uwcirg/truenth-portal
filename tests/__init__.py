@@ -85,7 +85,7 @@ class TestCase(Base):
         return self.app.get('/login/TESTING?user_id={0}'.format(user_id),
                 follow_redirects=True)
 
-    def add_test_client(self):
+    def add_client(self):
         """Prep db with a test client for test user"""
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         client_id = 'test_client'

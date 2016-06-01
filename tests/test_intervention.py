@@ -24,7 +24,7 @@ class TestIntervention(TestCase):
         self.assert401(rv)
 
     def test_intervention(self):
-        client = self.add_test_client()
+        client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
