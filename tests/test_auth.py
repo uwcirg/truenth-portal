@@ -64,7 +64,7 @@ class TestAuth(TestCase):
 
     def test_client_edit(self):
         """Test editing a client application"""
-        client = self.add_test_client()
+        client = self.add_client()
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com',
@@ -96,7 +96,7 @@ class TestAuth(TestCase):
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
-        client = self.add_test_client()
+        client = self.add_client()
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='badprotocol.com',
@@ -108,7 +108,7 @@ class TestAuth(TestCase):
 
     def test_service_account_creation(self):
         """Confirm we can create a service account and token"""
-        client = self.add_test_client()
+        client = self.add_client()
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 
@@ -139,7 +139,7 @@ class TestAuth(TestCase):
 
     def test_service_account_promotion(self):
         """Confirm we can not promote a service account """
-        self.add_test_client()
+        self.add_client()
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 

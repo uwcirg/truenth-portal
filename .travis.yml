@@ -11,9 +11,17 @@ addons:
       - postgresql-9.5
       - postgresql-contrib-9.5
   postgresql: "9.5"
+  sauce_connect:
+    username: "ivan-c"
+    access_key:
+      secure: "eWlWfq6YOwnHN/FhhqISsTuiu94uxY1nP/9ourSX8LBr+olNDh9zIv9ZEtCypHtEgwKy59N//i5iOa /Ewu5YkpcxREr8IwjYjQtiRwX0UvraQlFU23Uci80a3OiFVmO4P3vzi8adyCj7z1uVXiZOvhOjoasjKLpzIy9c+93 +J8NFZ+KfxAUCcG+XWPmKjHbUtilzliLhcdi0tQHXTSPVsBohpDo5o1RCOZpNYmGDE0l+0W3n4tAnUIsGxxkajLI1 iMhUKsqS1SiLV4NwbdMnJEXlb/YOdRY4SyNPF6THEXUcMkN2vZszG3hXqyOaNTkuk+ryPizUIGiYAQsJNpAfI7ejx YqAQiZTcK/TqBui2vzrAJFYDYKGCey4Rbm+kuXM2YD4+q0wX4N9aofF3oYJpWj/Hdvpo4PKG6VT8+xgu45lqsLYQb 5Zlj3X6LIeIxE7BbfGOTCAxOXCdhjxp6YL4O6Cc0WGC94Yg+W35Wn+HoM6mK6887jywrX4Evg2UXfRnDuQ6o7WXOn zP7ye0dC0LdLIOW2BAtoJa5LIF1Y5yqmy5UFpC2i5+VIfKkiUA/ViS6cOwl8lyun3PkrA29Os2/BhJLLe9FoURs4n NsVoxljQG6JKwXCzoXCoIOe8Ov/rpYupPh11EYI26pNm1FTHzcs8RxQDilduTVIBSqo3Dzs="
 services:
   - postgresql
   - redis-server
+env:
+  global:
+    - DISPLAY=":99.0"
+    - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
 
 before_install:
   - sudo service postgresql stop
@@ -27,9 +35,8 @@ before_install:
   - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sed -i 's|port = 5433|port = 5432|' /etc/postgresql/9.5/main/postgresql.conf
   - sudo service postgresql restart 9.5
-  - sudo -u postgres createuser test_user
-  - sudo -u postgres psql -c "ALTER USER test_user WITH PASSWORD '4tests_only'"
-  - psql -c 'create database portal_unit_tests owner test_user;' -U postgres
+
+  - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
 install:
   - pip install --process-dependency-links -e .
@@ -37,6 +44,9 @@ install:
 
 before_script:
   - celery worker --detach -A portal.celery_worker.celery --loglevel=info
+
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
 
 script:
   - nosetests -v --with-cover --cover-package=portal

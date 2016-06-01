@@ -19,7 +19,7 @@ class TestPortal(TestCase):
 
     def test_card_html(self):
         """Interventions can customize the button text """
-        client = self.add_test_client()
+        client = self.add_client()
         intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         intervention.card_html = "Custom Label"
@@ -33,7 +33,7 @@ class TestPortal(TestCase):
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
-        client = self.add_test_client()
+        client = self.add_client()
         intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         intervention.public_access = False
