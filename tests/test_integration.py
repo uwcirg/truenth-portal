@@ -14,8 +14,6 @@ class TestUI(TestCase, LiveServerTestCase):
     def setUp(self):
         """Reset all tables before testing."""
 
-        super(TestUI, self).setUp()
-
         if "SAUCE_USERNAME" in os.environ and "SAUCE_ACCESS_KEY" in os.environ:
 
             platform = {
@@ -56,6 +54,8 @@ class TestUI(TestCase, LiveServerTestCase):
 
         self.driver.implicitly_wait(60)
         self.driver.root_uri = self.get_server_url()
+
+        super(TestUI, self).setUp()
 
     def tearDown(self):
         """Clean db session, drop all tables."""
