@@ -321,18 +321,19 @@ def validate_client_origin(origin):
     For CORS, limit the requesting origin to the list we know about,
     namely any origins belonging to our OAuth clients.
 
-    :raises 401: if we don't find a match.
+    :raises Unauthorized: if we don't find a match.
 
     """
     if not origin:
-        current_app.logger.error("Can't validate missing origin")
-        abort(401)
+        current_app.logger.warning("Can't validate missing origin")
+        abort(401, "Can't validate missing origin")
 
     for client in Client.query.all():
         if client.validate_redirect_uri(origin):
             return True
-    current_app.logger.error("Failed to validate origin: %s", origin)
-    abort(401)
+    current_app.logger.warning("Failed to validate origin: %s", origin)
+    abort(401, "Failed to validate origin %s" % origin)
+
 
 class Mock(object):
     pass
