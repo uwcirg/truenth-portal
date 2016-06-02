@@ -393,6 +393,13 @@ class User(db.Model, UserMixin):
                     n += 1
 
     def update_from_fhir(self, fhir):
+        """Update the user's demographics from the given FHIR
+
+        If a field is defined, it is the final definition for the respective
+        field, resulting in a deletion of existing values in said field
+        that are not included.
+
+        """
         def v_or_n(value):
             """Return None unless the value contains data"""
             return value.rstrip() or None
@@ -420,10 +427,16 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
+            remove_if_not_requested = {org.id: org for org in
+                                       self.organizations}
             for item in fhir['careProvider']:
                 org = reference.Reference.parse(item)
+                if org.id in remove_if_not_requested:
+                    remove_if_not_requested.pop(org.id)
                 if org not in self.organizations:
                     self.organizations.append(org)
+            for org in remove_if_not_requested.values():
+                self.organizations.remove(org)
         db.session.add(self)
 
     def check_role(self, permission, other_id):

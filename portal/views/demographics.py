@@ -70,6 +70,11 @@ def demographics_set(patient_id):
     Submit a minimal FHIR doc in JSON format including the 'Patient'
     resource type, and any fields to set.
 
+    If a field is provided, it must define the entire set of the respective
+    field.  For example, if **clinic** is included, and only mentions one
+    of two clinics previously associated with the user, only the one provided
+    will be retained.
+
     For fields outside the defined patient resource
     (http://www.hl7.org/fhir/patient.html), include in the 'extension'
     list.  This includes 'race' and 'ethnicity'.  See example usage

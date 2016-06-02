@@ -141,3 +141,44 @@ class TestDemographics(TestCase):
         user = db.session.merge(self.test_user)
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, 'test org')
+
+    def test_demographics_delete_ref(self):
+        # existing careProvider should get removed
+
+        org = Organization(name='test org')
+        org2 = Organization(name='two')
+        org3 = Organization(name='three')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.add(org2)
+            db.session.add(org3)
+            db.session.commit()
+        org = db.session.merge(org)
+        org2 = db.session.merge(org2)
+        org3 = db.session.merge(org3)
+        org_id = org.id
+
+        # associate test orgs 2 and 3 with test user
+        self.test_user.organizations.append(org3)
+        self.test_user.organizations.append(org2)
+        with SessionScope(db):
+            db.session.add(self.test_user)
+            db.session.commit()
+
+        # now push only the first org in via the api
+        data = {"careProvider": [{"reference": "Organization/{}".format(
+                org_id)}],
+                "resourceType": "Patient",
+               }
+
+        self.login()
+        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+
+        # confirm only the one sent via API is intact.
+        self.assertEquals(user.organizations.count(), 1)
+        self.assertEquals(user.organizations[0].name, 'test org')
