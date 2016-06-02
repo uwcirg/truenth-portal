@@ -71,7 +71,7 @@ def demographics_set(patient_id):
     resource type, and any fields to set.
 
     If a field is provided, it must define the entire set of the respective
-    field.  For example, if **clinic** is included, and only mentions one
+    field.  For example, if **careProvider** is included, and only mentions one
     of two clinics previously associated with the user, only the one provided
     will be retained.
 
