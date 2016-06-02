@@ -52,6 +52,8 @@ class TestUI(TestCase, LiveServerTestCase):
         else:
             self.driver = webdriver.Firefox()
 
+        self.addCleanup(self.driver.quit)
+
         self.driver.implicitly_wait(60)
         self.driver.root_uri = self.get_server_url()
 
@@ -68,8 +70,6 @@ class TestUI(TestCase, LiveServerTestCase):
             "SAUCE_ACCESS_KEY" in os.environ
         ):
             self.driver.execute_script("sauce:job-result=passed")
-
-        self.driver.quit()
 
         super(TestUI, self).tearDown()
 
