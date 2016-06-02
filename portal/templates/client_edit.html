@@ -14,7 +14,7 @@
     <p><strong>Service Token:</strong><br />
     {% if service_token %}
         {{ service_token.access_token }}
-        {{ service_token.expires_in }}
+        (expires {{ service_token.expires.strftime('%b %d, %Y') }})
     {% else %}
         <span class="text-muted">Not yet created</span>
     {% endif %}

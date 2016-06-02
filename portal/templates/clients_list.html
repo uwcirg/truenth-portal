@@ -20,6 +20,12 @@
                 {% endif %}
 
                 <a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a>
+                {% if client.lookup_service_token() %}
+                    <br /> Service Token:
+                    {{ client.lookup_service_token().access_token }}
+                    (expires {{
+                    client.lookup_service_token().expires.strftime('%b %d, %Y') }})
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
