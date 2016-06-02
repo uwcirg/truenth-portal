@@ -33,9 +33,9 @@
             </div>
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
-                    {% if username %}
+                    {% if user %}
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                        Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
+                        Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                     </button>
                     <ul class="tnth-dropdown-menu">
@@ -70,7 +70,7 @@
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not username %}tnth-navbar-no-profile{% endif %}">
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">
                     MENU <img src="{{movember_profile}}" width="45" height="45" />
                 </div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
@@ -78,7 +78,7 @@
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
                     <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
-                    {% if username %}
+                    {% if user %}
                     <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
                     {% endif %}
                     <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
@@ -88,7 +88,7 @@
                     {% if user and user.has_roles('admin') %}
                     <li><a href="{{PORTAL}}/admin">User Administration</a></li>
                     {% endif %}
-                    {% if username %}
+                    {% if user %}
                     <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
                     {% endif %}
                 </ul>
