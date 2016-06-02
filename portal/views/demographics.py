@@ -57,6 +57,8 @@ def demographics(patient_id):
         patient = get_user(patient_id)
     else:
         patient = current_user()
+    if not patient:
+        abort(404, "Patient {} not found!".format(patient_id))
     return jsonify(patient.as_fhir())
 
 
@@ -119,6 +121,8 @@ def demographics_set(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
+    if not patient:
+        abort(404, "Patient {} not found!".format(patient_id))
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")

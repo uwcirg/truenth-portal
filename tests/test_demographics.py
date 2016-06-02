@@ -5,6 +5,7 @@ import json
 
 from portal.extensions import db
 from portal.models.organization import Organization
+from portal.models.role import ROLE
 
 
 class TestDemographics(TestCase):
@@ -19,6 +20,12 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['name']['family'], LAST_NAME)
         self.assertEquals(fhir['name']['given'], FIRST_NAME)
         self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
+
+    def test_demographics404(self):
+        self.login()
+        self.promote_user(role_name=ROLE.ADMIN)
+        rv = self.app.get('/api/demographics/666')
+        self.assert404(rv)
 
     def test_demographicsPUT(self):
         # race / ethnicity require the SLOW addition of concepts to db
