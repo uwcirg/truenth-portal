@@ -30,6 +30,37 @@ class TestUser(TestCase):
         self.assertNotEquals(try_me.username, 'Anonymous')
         self.assertNotEquals(dup.username, try_me.username)
 
+    def test_unique_email(self):
+        self.login()
+
+        # bad email param should raise 400
+        rv = self.app.get('/api/unique_email?email=h2@1')
+        self.assert400(rv)
+
+        email = 'john@example.com'
+        request = '/api/unique_email?email={}'.format(email)
+        rv = self.app.get(request)
+        self.assert200(rv)
+        results = rv.json
+        self.assertEqual(results['unique'], True)
+
+        # should still be unique if it's the current user's email
+        self.test_user.email = email
+        with SessionScope(db):
+            db.session.commit()
+        rv = self.app.get(request)
+        self.assert200(rv)
+        results = rv.json
+        self.assertEqual(results['unique'], True)
+
+        # but a second user should see false
+        second = self.add_user(username='second')
+        self.login(second.id)
+        rv = self.app.get(request)
+        self.assert200(rv)
+        results = rv.json
+        self.assertEqual(results['unique'], False)
+
     def test_ethnicities(self):
         """Apply a few ethnicities via FHIR
 

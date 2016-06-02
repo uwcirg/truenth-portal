@@ -659,3 +659,58 @@ def set_roles(user_id):
     results = [{'name': r.name, 'description': r.description}
             for r in user.roles]
     return jsonify(roles=results)
+
+
+@user_api.route('/unique_email')
+@oauth.require_oauth()
+def unique_email():
+    """Confirm a given email is unique
+
+    For upfront validation of email addresses, determine if the given
+    email is unique - i.e. unknown to the system.  If it is known, but
+    belongs to the authenticated user, it will still be considered unique.
+
+    Returns json unique=True or unique=False
+    ---
+    tags:
+      - User
+    operationId: unique_email
+    produces:
+      - application/json
+    parameters:
+      - name: email
+        in: query
+        description:
+          email to validate
+        required: true
+        type: string
+    responses:
+      200:
+        description:
+          Returns JSON describing unique=True or unique=False
+        schema:
+          id: unique_result
+          required:
+            - unique
+          properties:
+            unique:
+              type: boolean
+              description: result of unique check
+      400:
+        description: if email param is poorly defined
+      401:
+        description: if missing valid OAuth token
+
+    """
+    email = request.args.get('email')
+    if not email or '@' not in email or len(email) < 6:
+        abort(400, "requires a valid email address")
+    match = User.query.filter_by(email=email)
+    assert(match.count() < 2)  # db unique constraint - can't happen, right?
+    if match.count() == 1:
+        # If the user is the authenticated user, it still counts as unique
+        user = current_user()
+        result = match.one()
+        if user.id != result.id:
+            return jsonify(unique=False)
+    return jsonify(unique=True)
