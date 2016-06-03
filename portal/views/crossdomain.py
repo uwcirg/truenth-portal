@@ -14,7 +14,9 @@ def crossdomain(origin=None, methods=None,
     :param origin: '*' to allow all origins, otherwise a string with
         a single origin or a list of origins that might
         access the resource.  If no origin is provided, use
-        request.headers['Origin'], but ONLY if it validates.
+        request.headers['Origin'], but ONLY if it validates.  If
+        no origin is provided and the request doesn't include an
+        **Origin** header, no CORS headers will be added.
     :param methods: Optionally a list of methods that are allowed
         for this view. If not provided it will allow
         all methods that are implemented.
@@ -53,7 +55,8 @@ def crossdomain(origin=None, methods=None,
         use_origin = None
         if 'Origin' in request.headers:
             use_origin = request.headers['Origin']
-        validate_client_origin(use_origin)
+        if use_origin:
+            validate_client_origin(use_origin)
         return use_origin
 
     def get_max_age():
@@ -68,13 +71,14 @@ def crossdomain(origin=None, methods=None,
             else:
                 resp = make_response(f(*args, **kwargs))
 
-            h = resp.headers
-
-            h['Access-Control-Allow-Credentials'] = 'true'
-            h['Access-Control-Allow-Origin'] = get_origin()
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = get_max_age()
-            h['Access-Control-Allow-Headers'] = get_headers()
+            origin = get_origin()
+            if origin:
+                h = resp.headers
+                h['Access-Control-Allow-Credentials'] = 'true'
+                h['Access-Control-Allow-Origin'] = origin
+                h['Access-Control-Allow-Methods'] = get_methods()
+                h['Access-Control-Max-Age'] = get_max_age()
+                h['Access-Control-Allow-Headers'] = get_headers()
             return resp
 
         f.provide_automatic_options = False

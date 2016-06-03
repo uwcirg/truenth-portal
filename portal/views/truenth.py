@@ -62,15 +62,15 @@ def auditlog_addevent():
     return jsonify(message='ok')
 
 
-@truenth_api.route('/portal-wrapper-html')
+@truenth_api.route('/portal-wrapper-html', methods=('GET', 'OPTIONS'))
+@crossdomain()
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
     Get html for the portal site UI wrapper (top-level nav elements, etc)
 
-    This endpoint does not include any CORS headers, and should therefore
-    only be used server side.  See `/protected-protected_portal_wrapper_html`
-    as a client-side alternative.
+    CORS headers will only be included when the request includes well defined
+    Origin header.
 
     ---
     tags:
@@ -104,6 +104,10 @@ def portal_wrapper_html():
           registered as a client app or intervention
 
     """
+    # handle CORS pre-flight - all work done in crossdomain decorator
+    if request.method == 'OPTIONS':
+        return
+
     # Unlike all other oauth protected resources, we manually check
     # if it's a valid oauth request as this resource is also available prior
     # to logging in.
@@ -114,7 +118,7 @@ def portal_wrapper_html():
         user = current_user()
 
     login_url = request.args.get('login_url')
-    if user and login_url:
+    if login_url and not user:
         try:
             validate_client_origin(login_url)
         except Unauthorized:
@@ -144,66 +148,20 @@ def portal_wrapper_html():
     )
     return make_response(html)
 
-
-@truenth_api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
+### Depricated rewrites follow
+@truenth_api.route('/portal-wrapper-html/', defaults={'username': None},
+                   methods=('GET', 'OPTIONS'))
+@truenth_api.route('/portal-wrapper-html/<username>',
+                   methods=('GET', 'OPTIONS'))
 @crossdomain()
-def preflight():  # pragma: no cover
-    """CORS requires preflight headers
+def depricated_portal_wrapper_html(username):
+    current_app.logger.warning("use of depricated API %s from referer %s",
+                               request.url, request.headers.get('Referer'))
+    return portal_wrapper_html()
 
-    For in browser CORS requests, first respond to an OPTIONS request
-    including the necessary Access-Control headers.
-
-    Requires separate route for OPTIONS to avoid authorization tangles.
-
-    """
-    pass  # all work for OPTIONS done in crossdomain decorator
-
-
-@truenth_api.route('/protected-portal-wrapper-html', methods=('GET',))
-#@oauth.require_oauth()
+@truenth_api.route('/protected-portal-wrapper-html', methods=('GET', 'OPTIONS'))
 @crossdomain()
 def protected_portal_wrapper_html():
-    """Returns portal wrapper for insertion at top of interventions
-
-    Get html for the portal site UI wrapper (top-level nav elements, etc)
-
-    This endpoint is identical to `/portal-wrapper-html` with the addition
-    of CORS (Cross-origin resource sharing), authorizing cross origin
-    requests from known domains.
-
-    As this API is designed to be used client side, it requires a valid request
-    **Origin** header even if called server side, as required by CORS.
-
-    ---
-    tags:
-      - TrueNTH
-    operationId: getProtectedPortalWrapperHTML
-    parameters:
-      - name: login_url
-        in: query
-        description:
-          Location to direct login requests.  Typically an entry
-          point on the intervention, to initiate OAuth dance with
-          TrueNTH.  Inclusion of this parameter affects
-          the apperance of a "login" option in the portal menu, but
-          only if there is NOT a user already logged in.  Login origin
-          is required to be known as one of the current registered
-          application domains..
-        required: false
-        type: string
-    produces:
-      - text/html
-    responses:
-      200:
-        description:
-          html for direct insertion near the top of the intervention's
-          page.
-      401:
-        description: if missing valid OAuth token
-      403:
-        description:
-          if a login_url is provided with an origin other than one
-          registered as a client app or intervention
-
-    """
+    current_app.logger.warning("use of depricated API %s from referer %s",
+                               request.url, request.headers.get('Referer'))
     return portal_wrapper_html()
