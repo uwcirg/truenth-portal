@@ -1,5 +1,5 @@
 """Unit test module for Selenium testing"""
-import os, xvfbwrapper
+import os, unittest, xvfbwrapper
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -8,6 +8,13 @@ from tests import TestCase
 from pages import LoginPage
 
 
+@unittest.skipUnless(
+    (
+        "SAUCE_USERNAME" in os.environ or
+        xvfbwrapper.Xvfb().xvfb_exists()
+    ),
+    "Xvfb not installed"
+)
 class TestUI(TestCase, LiveServerTestCase):
     """Test class for UI integration/workflow testing"""
 
