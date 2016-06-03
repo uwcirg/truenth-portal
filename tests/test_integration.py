@@ -50,11 +50,10 @@ class TestUI(TestCase, LiveServerTestCase):
             )
 
         else:
-            self.driver = webdriver.Firefox()
+            self.driver = webdriver.Firefox(timeout=60)
 
         self.addCleanup(self.driver.quit)
 
-        self.driver.implicitly_wait(60)
         self.driver.root_uri = self.get_server_url()
 
         super(TestUI, self).setUp()
