@@ -1,10 +1,12 @@
 """TrueNTH API view functions"""
 from flask import Blueprint, jsonify, make_response
 from flask import current_app, render_template, request, url_for
+from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..extensions import oauth
 from .crossdomain import crossdomain
+from ..models.auth import validate_client_origin
 from ..models.user import current_user
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
@@ -60,29 +62,16 @@ def auditlog_addevent():
     return jsonify(message='ok')
 
 
-@truenth_api.route('/portal-wrapper-html/', methods=('OPTIONS',))
-@crossdomain(origin='*')
-def preflight_unprotected():  # pragma: no cover
-    """CORS requires preflight headers
-
-    For in browser CORS requests, first respond to an OPTIONS request
-    including the necessary Access-Control headers.
-
-    Requires separate route for OPTIONS to avoid authorization tangles.
-
-    """
-    pass  # all work for OPTIONS done in crossdomain decorator
-
-
-@truenth_api.route('/portal-wrapper-html/', defaults={'username': None})
-@truenth_api.route('/portal-wrapper-html/<username>')
-def portal_wrapper_html(username):
+@truenth_api.route('/portal-wrapper-html', methods=('GET', 'OPTIONS'))
+@crossdomain()
+def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
     Get html for the portal site UI wrapper (top-level nav elements, etc)
-    This is the unauthorized version, useful prior to logging in with
-    TrueNTH.  See `protected_portal_wrapper_html` for authorized
-    version.
+
+    CORS headers will only be included when the request includes well defined
+    Origin header.
+
     ---
     tags:
       - TrueNTH
@@ -93,17 +82,12 @@ def portal_wrapper_html(username):
       - name: login_url
         in: query
         description:
-          Location to direct login requests.  Typically an entry
+          URL on intervention to direct login requests.  Typically an entry
           point on the intervention, to initiate OAuth dance with
           TrueNTH.  Inclusion of this parameter affects
-          the apperance of a "login" option in the portal menu.
+          the apperance of a "login" option in the portal menu, but only
+          displayed if the user has not logged in.
         required: false
-        type: string
-      - name: username
-        in: path
-        description:
-          Optional username, used to personalize the header.
-        required: true
         type: string
     responses:
       200:
@@ -114,100 +98,70 @@ def portal_wrapper_html(username):
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
-
-
-    """
-    movember_profile = ''.join((
-        '//',
-        current_app.config['SERVER_NAME'],
-        url_for('static', filename='img/movember_profile_thumb.png'),
-    ))
-
-    # workarounds till we can call protected_portal_wrapper from portal
-    user = current_user()
-    if user:
-        if user.image_url:
-            movember_profile = user.image_url
-        username = username if username else user.display_name
-    else:
-        user = None
-
-    html = render_template(
-        'portal_wrapper.html',
-        PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
-        username=username,
-        user=user,
-        movember_profile=movember_profile,
-        login_url=request.args.get('login_url')
-    )
-    resp = make_response(html)
-    resp.headers.add('Access-Control-Allow-Origin', '*')
-    resp.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
-    return resp
-
-
-@truenth_api.route('/protected-portal-wrapper-html', methods=('OPTIONS',))
-@crossdomain()
-def preflight():  # pragma: no cover
-    """CORS requires preflight headers
-
-    For in browser CORS requests, first respond to an OPTIONS request
-    including the necessary Access-Control headers.
-
-    Requires separate route for OPTIONS to avoid authorization tangles.
-
-    """
-    pass  # all work for OPTIONS done in crossdomain decorator
-
-
-@truenth_api.route('/protected-portal-wrapper-html', methods=('GET',))
-@oauth.require_oauth()
-@crossdomain()
-def protected_portal_wrapper_html():
-    """Returns portal wrapper for insertion at top of interventions
-
-    Get html for the portal site UI wrapper (top-level nav elements, etc)
-    This is the authorized version, only useful after to logging in with
-    TrueNTH.  See `portal_wrapper_html` for the unauthorized
-    version.
-
-    As this API is designed to be used client side, it requires a valid request
-    **Origin** header even if called server side.
-
-    ---
-    tags:
-      - TrueNTH
-    operationId: getProtectedPortalWrapperHTML
-    produces:
-      - text/html
-    responses:
-      200:
+      403:
         description:
-          html for direct insertion near the top of the intervention's
-          page.
-      401:
-        description: if missing valid OAuth token
+          if a login_url is provided with an origin other than one
+          registered as a client app or intervention
 
     """
-    current_app.logger.debug(
-        "protected_portal_wrapper_html Origin '%s' Auth '%s'",
-        request.headers.get('Origin'),
-        request.headers.get('Authorization'));
-    movember_profile = ''.join((
-        '//',
-        current_app.config['SERVER_NAME'],
-        url_for('static', filename='img/movember_profile_thumb.png'),
-    ))
+    # handle CORS pre-flight - all work done in crossdomain decorator
+    if request.method == 'OPTIONS':
+        return
 
-    user = current_user()
-    if user.image_url:
-        movember_profile = user.image_url
+    # Unlike all other oauth protected resources, we manually check
+    # if it's a valid oauth request as this resource is also available prior
+    # to logging in.
+    valid, req = oauth.verify_request(['email'])
+    if valid:
+        user = req.user
+    else:
+        user = current_user()
+
+    login_url = request.args.get('login_url')
+    if login_url and not user:
+        try:
+            validate_client_origin(login_url)
+        except Unauthorized:
+            current_app.logger.warning(
+                "invalid origin on login_url `%s` from referer `%s`",
+                login_url, request.headers.get('Referer'))
+            return make_response("login_url lacks a valid origin: {}".format(
+                login_url)), 403
+    else:
+        login_url = None
+
+    if user and user.image_url:
+            movember_profile = user.image_url
+    else:
+        movember_profile = ''.join((
+            '//',
+            current_app.config['SERVER_NAME'],
+            url_for('static', filename='img/movember_profile_thumb.png'),
+        ))
 
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
-        username=user.display_name,
         user=user,
         movember_profile=movember_profile,
+        login_url=login_url
     )
     return make_response(html)
+
+### Depricated rewrites follow
+@truenth_api.route('/portal-wrapper-html/', defaults={'username': None},
+                   methods=('GET', 'OPTIONS'))
+@truenth_api.route('/portal-wrapper-html/<username>',
+                   methods=('GET', 'OPTIONS'))
+@crossdomain()
+def depricated_portal_wrapper_html(username):
+    current_app.logger.warning("use of depricated API %s from referer %s",
+                               request.url, request.headers.get('Referer'))
+    return portal_wrapper_html()
+
+@truenth_api.route('/protected-portal-wrapper-html', methods=('GET', 'OPTIONS'))
+@crossdomain()
+def protected_portal_wrapper_html():
+    current_app.logger.warning("use of depricated API %s from referer %s",
+                               request.url, request.headers.get('Referer'))
+    return portal_wrapper_html()
