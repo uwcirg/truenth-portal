@@ -1,5 +1,5 @@
 """Unit test module for Selenium testing"""
-import os
+import os, xvfbwrapper
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -50,9 +50,14 @@ class TestUI(TestCase, LiveServerTestCase):
             )
 
         else:
-            self.driver = webdriver.Firefox()
+            self.xvfb = xvfbwrapper.Xvfb()
+            self.addCleanup(self.xvfb.stop)
+            self.xvfb.start()
 
-        self.driver.implicitly_wait(60)
+            self.driver = webdriver.Firefox(timeout=60)
+
+        self.addCleanup(self.driver.quit)
+
         self.driver.root_uri = self.get_server_url()
 
         super(TestUI, self).setUp()
@@ -68,8 +73,6 @@ class TestUI(TestCase, LiveServerTestCase):
             "SAUCE_ACCESS_KEY" in os.environ
         ):
             self.driver.execute_script("sauce:job-result=passed")
-
-        self.driver.quit()
 
         super(TestUI, self).tearDown()
 
