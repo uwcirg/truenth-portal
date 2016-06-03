@@ -60,6 +60,7 @@ setup(
         'sphinx_rtd_theme',
         'swagger_spec_validator',
         'validators',
+        'xvfbwrapper',
     ],
     test_suite='tests',
     classifiers=[

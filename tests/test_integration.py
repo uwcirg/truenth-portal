@@ -1,5 +1,5 @@
 """Unit test module for Selenium testing"""
-import os
+import os, xvfbwrapper
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -50,6 +50,10 @@ class TestUI(TestCase, LiveServerTestCase):
             )
 
         else:
+            self.xvfb = xvfbwrapper.Xvfb()
+            self.addCleanup(self.xvfb.stop)
+            self.xvfb.start()
+
             self.driver = webdriver.Firefox(timeout=60)
 
         self.addCleanup(self.driver.quit)
