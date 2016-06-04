@@ -1,5 +1,5 @@
 """Unit test module for Selenium testing"""
-import os, unittest, xvfbwrapper
+import os, sys, unittest, xvfbwrapper
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -74,10 +74,11 @@ class TestUI(TestCase, LiveServerTestCase):
 
         # Update job result metadata on Sauce Labs, if available
         if (
-            not self._resultForDoCleanups.failures and
-            not self._resultForDoCleanups.errors and
             "SAUCE_USERNAME" in os.environ and
-            "SAUCE_ACCESS_KEY" in os.environ
+            "SAUCE_ACCESS_KEY" in os.environ and
+
+            # No exception being handled - test completed successfully
+            sys.exc_info() == (None, None, None)
         ):
             self.driver.execute_script("sauce:job-result=passed")
 
