@@ -1,7 +1,6 @@
 """User API view functions"""
 from flask import abort, Blueprint, jsonify
 from flask import request
-from flask.ext.user import roles_required
 
 from ..audit import auditable_event
 from ..models.role import ROLE, Role
@@ -156,18 +155,26 @@ def relationships(user_id):
         description:
           Returns the list of relationships that user belongs to.
         schema:
-          id: relationships
+          id: user_relationships
           required:
-            - name
-            - description
+            - user
+            - has the relationship
+            - with
           properties:
-            name:
+            user:
+              type: integer
+              format: int64
+              description: id of user acting as subject
+            has the relationship:
               type: string
               description:
-                relationship name, a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the relationship.
+                The string defining the name of each relationship the user
+                should belong to.  Must exist as an available relationship
+                in the system.
+            with:
+              type: integer
+              format: int64
+              description: id of user acting as part of predicate
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -192,104 +199,16 @@ def relationships(user_id):
     return jsonify(relationships=results)
 
 
-@user_api.route('/user/<int:user_id>/relationships', methods=('DELETE',))
-@oauth.require_oauth()
-def delete_relationships(user_id):
-    """Delete relationships for user, returns JSON defining user relationships
-
-    Used to delete relationship assignments for a user.
-
-    Returns a list of all relationships user belongs to after change.
-    ---
-    tags:
-      - User
-    operationId: deleterelationships
-    produces:
-      - application/json
-    parameters:
-      - name: user_id
-        in: path
-        description: TrueNTH user ID
-        required: true
-        type: integer
-        format: int64
-      - in: body
-        name: body
-        schema:
-          id: relationships
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description:
-                The string defining the name of each relationship the user should
-                belong to.  Must exist as an available relationship in the system.
-    responses:
-      200:
-        description:
-          Returns a list of all relationships user belongs to after change.
-        schema:
-          id: user_relationships
-          required:
-            - name
-            - description
-          properties:
-            name:
-              type: string
-              description:
-                relationship name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the relationship.
-      400:
-        description: if the request incudes an unknown relationship.
-      401:
-        description:
-          if missing valid OAuth token or if the authorized user lacks
-          permission to view requested user_id
-
-    """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-
-    if not request.json or 'relationships' not in request.json:
-        abort(400, "Requires relationship list in JSON")
-    # First confirm all the data is valid and the user has permission
-    known_relationships = [r.name for r in Relationship.query]
-    for r in request.json['relationships']:
-        if not r['has the relationship'] in known_relationships:
-            abort(404, "Unknown relationship '{}' can't be deleted".format(
-                r['has the relationship']))
-        # require edit on subject user only
-        user.check_role('edit', other_id=r['user'])
-
-    # Delete any requested that exist
-    for r in request.json['relationships']:
-        rel_id = Relationship.query.with_entities(
-            Relationship.id).filter_by(name=r['has the relationship']).first()
-        kwargs = {'user_id': r['user'],
-                  'relationship_id': rel_id[0],
-                  'other_user_id': r['with']}
-        existing = UserRelationship.query.filter_by(**kwargs).first()
-        if existing:
-            db.session.delete(existing)
-            auditable_event("deleted {}".format(existing),
-                            user_id=current_user().id)
-    db.session.commit()
-
-    # Return user's updated relationship list
-    return relationships(user.id)
-
-
 @user_api.route('/user/<int:user_id>/relationships', methods=('PUT',))
 @oauth.require_oauth()
 def set_relationships(user_id):
     """Set relationships for user, returns JSON defining user relationships
 
-    Used to set relationship assignments for a user.
+    Used to set relationship assignments for a user, both in a subject
+    and predicate role.  The provided list of relationships will be definitive,
+    resulting in deletion of previously existing relationships omitted from
+    the given list (again where user_id is acting as the relationship
+    subject or part of predicate).
 
     Returns a list of all relationships user belongs to after change.
     ---
@@ -308,15 +227,26 @@ def set_relationships(user_id):
       - in: body
         name: body
         schema:
-          id: relationships
+          id: user_relationships
           required:
-            - name
+            - user
+            - has the relationship
+            - with
           properties:
-            name:
+            user:
+              type: integer
+              format: int64
+              description: id of user acting as subject
+            has the relationship:
               type: string
               description:
-                The string defining the name of each relationship the user should
-                belong to.  Must exist as an available relationship in the system.
+                The string defining the name of each relationship the user
+                should belong to.  Must exist as an available relationship
+                in the system.
+            with:
+              type: integer
+              format: int64
+              description: id of user acting as part of predicate
     responses:
       200:
         description:
@@ -324,16 +254,24 @@ def set_relationships(user_id):
         schema:
           id: user_relationships
           required:
-            - name
-            - description
+            - user
+            - has the relationship
+            - with
           properties:
-            name:
+            user:
+              type: integer
+              format: int64
+              description: id of user acting as subject
+            has the relationship:
               type: string
               description:
-                relationship name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the relationship.
+                The string defining the name of each relationship the user
+                should belong to.  Must exist as an available relationship
+                in the system.
+            with:
+              type: integer
+              format: int64
+              description: id of user acting as part of predicate
       400:
         description: if the request incudes an unknown relationship.
       401:
@@ -355,11 +293,20 @@ def set_relationships(user_id):
         if not r['has the relationship'] in system_relationships:
             abort(404, "Unknown relationship '{}' can't be added".format(
                 r['has the relationship']))
-        # require edit on subject user only
-        user.check_role('edit', other_id=r['user'])
+        if r['user'] == r['with']:
+            abort(400, "Relationship must be between two different users")
+        if not user_id in (r['user'], r['with']):
+            abort(401, "Path user must be part of relationship")
 
-    # Add any requested that don't exist
-    audit_data = []  # preserve till post commit
+    subjects = [ur for ur in user.relationships]
+    predicates = [ur for ur in
+                  UserRelationship.query.filter_by(other_user_id=user.id)]
+    remove_if_not_requested = {ur.id: ur for ur in subjects + predicates}
+
+    # Add any requested that don't exist, track what isn't mentioned for
+    # deltion.
+    audit_adds = []  # preserve till post commit
+    audit_dels = []  # preserve till post commit
     for r in request.json['relationships']:
         rel_id = Relationship.query.with_entities(
             Relationship.id).filter_by(name=r['has the relationship']).first()
@@ -370,10 +317,20 @@ def set_relationships(user_id):
         if not existing:
             user_relationship = UserRelationship(**kwargs)
             db.session.add(user_relationship)
-            audit_data.append(user_relationship)
+            audit_adds.append(user_relationship)
+        else:
+            remove_if_not_requested.pop(existing.id)
+
+    for ur in remove_if_not_requested.values():
+        audit_dels.append(''.format(ur))
+        db.session.delete(ur)
+
     db.session.commit()
-    for ad in audit_data:
+    for ad in audit_adds:
         auditable_event("added {}".format(ad),
+                        user_id=current_user().id)
+    for ad in audit_dels:
+        auditable_event("deleted {}".format(ad),
                         user_id=current_user().id)
     # Return user's updated relationship list
     return relationships(user.id)
@@ -476,104 +433,14 @@ def roles(user_id):
     return jsonify(roles=results)
 
 
-@user_api.route('/user/<int:user_id>/roles', methods=('DELETE',))
-@oauth.require_oauth()
-def delete_roles(user_id):
-    """Delete roles for user, returns simple JSON defining user roles
-
-    Used to delete role assignments for a user.  Include any roles
-    the user should no longer be a member of.  Duplicates will be ignored.
-
-    Only the 'name' field of the roles is referenced.  Must match
-    current roles in the system.
-
-    Returns a list of all roles user belongs to after change.
-    ---
-    tags:
-      - User
-    operationId: delete_roles
-    produces:
-      - application/json
-    parameters:
-      - name: user_id
-        in: path
-        description: TrueNTH user ID
-        required: true
-        type: integer
-        format: int64
-      - in: body
-        name: body
-        schema:
-          id: roles
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description:
-                The string defining the name of each role the user should
-                no longer belong to.  Must exist as an available role in the
-                system.
-    responses:
-      200:
-        description:
-          Returns a list of all roles user belongs to after change.
-        schema:
-          id: user_roles
-          required:
-            - name
-            - description
-          properties:
-            name:
-              type: string
-              description:
-                Role name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the role.
-      400:
-        description: if the request incudes an unknown role.
-      401:
-        description:
-          if missing valid OAuth token or if the authorized user lacks
-          permission to view requested user_id
-
-    """
-    user = current_user()
-    if user.id != user_id:
-        current_user().check_role(permission='edit', other_id=user_id)
-        user = get_user(user_id)
-
-    if not request.json or 'roles' not in request.json:
-        abort(400, "Requires role list")
-    requested_roles = [r['name'] for r in request.json['roles']]
-    matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
-    if len(matching_roles) != len(requested_roles):
-        abort(404, "One or more roles requested not available")
-    # Delete any requested already set on user
-    for requested_role in matching_roles:
-        if requested_role in user.roles:
-            u_r = UserRoles.query.filter_by(user_id=user.id,
-                                            role_id=requested_role.id).first()
-            auditable_event("deleted {}".format(u_r),
-                            user_id=current_user().id)
-            db.session.delete(u_r)
-    db.session.commit()
-
-    # Return user's updated role list
-    results = [{'name': r.name, 'description': r.description}
-            for r in user.roles]
-    return jsonify(roles=results)
-
-
 @user_api.route('/user/<int:user_id>/roles', methods=('PUT',))
 @oauth.require_oauth()
 def set_roles(user_id):
     """Set roles for user, returns simple JSON defining user roles
 
-    Used to set role assignments for a user.  Include any roles
-    the user should become a member of.  Duplicates will be ignored.  Use
-    the DELETE method to remove one or more roles.
+    Used to set role assignments for a user.  Include all roles
+    the user should be a member of.  If user previously belonged to
+    roles not included, the missing roles will be deleted from the user.
 
     Only the 'name' field of the roles is referenced.  Must match
     current roles in the system.
@@ -626,13 +493,17 @@ def set_roles(user_id):
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
-          permission to view requested user_id
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
 
     """
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
+    if not user:
+        abort(404, "user_id {} not found".format(user_id))
 
     # Don't allow promotion of service accounts
     if user.has_role(ROLE.SERVICE):
@@ -640,6 +511,7 @@ def set_roles(user_id):
 
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
+    remove_if_not_requested = {role.id: role for role in user.roles}
     requested_roles = [r['name'] for r in request.json['roles']]
     matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
     if len(matching_roles) != len(requested_roles):
@@ -650,6 +522,13 @@ def set_roles(user_id):
             user.roles.append(requested_role)
             auditable_event("added {} to user {}".format(
                 requested_role, user.id), user_id=current_user().id)
+        else:
+            remove_if_not_requested.pop(requested_role.id)
+
+    for stale_role in remove_if_not_requested.values():
+        user.roles.remove(stale_role)
+        auditable_event("deleted {} from user {}".format(
+            stale_role, user.id), user_id=current_user().id)
 
     if user not in db.session:
         db.session.add(user)

@@ -199,8 +199,7 @@ class TestUser(TestCase):
     def test_unauth_role(self):
         self.login()
         rv = self.app.get('/api/user/66/roles')
-
-        self.assertEquals(rv.status_code, 401)
+        self.assert401(rv)
 
     def test_all_roles(self):
         self.login()
@@ -242,19 +241,23 @@ class TestUser(TestCase):
 
         self.assertEquals(rv.status_code, 200)
         doc = json.loads(rv.data)
-        self.assertEquals(len(doc['roles']), 2)
+        self.assertEquals(len(doc['roles']), 1)
+        self.assertEquals(doc['roles'][0]['name'], data['roles'][0]['name'])
         user = User.query.get(TEST_USER_ID)
-        self.assertEquals(len(user.roles),  2)
+        self.assertEquals(len(user.roles),  1)
 
     def test_roles_delete(self):
+        "delete via PUT of less than all current roles"
+        self.promote_user(role_name=ROLE.PATIENT)
         self.promote_user(role_name=ROLE.ADMIN)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         data = {"roles": [
-                {"name": ROLE.PATIENT},
+                {"name": ROLE.ADMIN},
+                {"name": ROLE.APPLICATION_DEVELOPER},
                 ]}
 
         self.login()
-        rv = self.app.delete('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -316,7 +319,7 @@ class TestUser(TestCase):
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
-    def create_test_relationships(self):
+    def create_fake_relationships(self):
         other_user = self.add_user(username='other')
         partner = Relationship.query.filter_by(name='partner').first()
         rel = UserRelationship(user_id=TEST_USER_ID,
@@ -333,7 +336,7 @@ class TestUser(TestCase):
 
     def test_subject_relationships(self):
         # make sure we get relationships for both subject and predicate
-        self.create_test_relationships()
+        self.create_fake_relationships()
         self.login()
         rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
@@ -355,48 +358,54 @@ class TestUser(TestCase):
             other_user_id=other_user.id).first()
         self.assertEquals(ur.relationship.name, RELATIONSHIP.PARTNER)
 
-    def test_delete_relationships(self):
-        self.create_test_relationships()
-        other_user = User.query.filter_by(username='other').first()
-        data = {'relationships':[{'user': TEST_USER_ID,
-                                  'has the relationship': 'partner',
-                                  'with': other_user.id},]
-               }
+    def test_put_relationships(self):
+        """PUT defines the whole list for a user - deletes unnamed existing"""
+        # fake relationships creates 1 as subj and another as predicate
+        self.create_fake_relationships()
+        self.test_user = db.session.merge(self.test_user)
+
+        # self.test_user.relationships only includes subject relations
+        self.assertEquals(len(self.test_user.relationships), 1)
+
         self.login()
-        rv = self.app.delete('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        self.assert200(rv)
+        data = rv.json
+
+        # includes subj and predicate relations
+        self.assertEquals(len(data['relationships']), 2)
+
+        # Now, just PUT the subject one of the two
+        data['relationships'] = [r for r in data['relationships'] if
+                                 r['user'] == self.test_user.id]
+        self.assertEquals(len(data['relationships']), 1)
+        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
+        self.assertEquals(len(rv.json['relationships']), 1)
+        self.assertEquals(len(self.test_user.relationships), 1)
 
-        # shouldn't find the deleted
-        ur = UserRelationship.query.filter_by(
-            other_user_id=other_user.id).first()
-        self.assertFalse(ur)
-
-        # but the other one should
-        ur = UserRelationship.query.filter_by(
-            other_user_id=TEST_USER_ID).first()
-        self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
-
-    def test_delete_relationships_wo_perms(self):
-        self.create_test_relationships()
+    def test_delete_relationships(self):
+        "delete now done by PUTting less than all relationships"
+        self.create_fake_relationships()
         other_user = User.query.filter_by(username='other').first()
         data = {'relationships':[{'user': other_user.id,
                                   'has the relationship': 'sponsor',
                                   'with': TEST_USER_ID},]
                }
         self.login()
-        rv = self.app.delete('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
-        self.assert401(rv)
+        self.assert200(rv)
 
-        # should find both relationships intact
+        # shouldn't find the deleted (the one not PUT above)
         ur = UserRelationship.query.filter_by(
             other_user_id=other_user.id).first()
-        self.assertEquals(ur.user_id, TEST_USER_ID)
+        self.assertFalse(ur)
 
+        # but the one PUT should remain
         ur = UserRelationship.query.filter_by(
             other_user_id=TEST_USER_ID).first()
         self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
-
