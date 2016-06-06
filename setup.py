@@ -11,7 +11,6 @@ to install:
 from setuptools import setup
 
 project = "portal"
-version_file = open('VERSION')
 
 # maintain long_description as a single long line.
 # workaround for a bug in pkg_info._get_metadata('PKG-INFO')
@@ -21,13 +20,14 @@ long_description =\
 
 setup(
     name=project,
-    version=version_file.read().strip(),
     url='https://github.com/uwcirg/true_nth_usa_portal_demo',
     description='TrueNTH Central Services',
     long_description=long_description,
     author='University of Washington',
     packages=["portal"],
     include_package_data=True,
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     zip_safe=False,
     dependency_links=[
         "git+https://github.com/pbugni/Flask-User.git#egg=Flask-User-0.6.8.1",
