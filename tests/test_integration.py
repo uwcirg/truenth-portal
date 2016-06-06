@@ -1,5 +1,5 @@
 """Unit test module for Selenium testing"""
-import os, xvfbwrapper
+import os, sys, unittest, xvfbwrapper
 from selenium import webdriver
 
 from flask.ext.testing import LiveServerTestCase
@@ -8,6 +8,13 @@ from tests import TestCase
 from pages import LoginPage
 
 
+@unittest.skipUnless(
+    (
+        "SAUCE_USERNAME" in os.environ or
+        xvfbwrapper.Xvfb().xvfb_exists()
+    ),
+    "Xvfb not installed"
+)
 class TestUI(TestCase, LiveServerTestCase):
     """Test class for UI integration/workflow testing"""
 
@@ -67,10 +74,11 @@ class TestUI(TestCase, LiveServerTestCase):
 
         # Update job result metadata on Sauce Labs, if available
         if (
-            not self._resultForDoCleanups.failures and
-            not self._resultForDoCleanups.errors and
             "SAUCE_USERNAME" in os.environ and
-            "SAUCE_ACCESS_KEY" in os.environ
+            "SAUCE_ACCESS_KEY" in os.environ and
+
+            # No exception being handled - test completed successfully
+            sys.exc_info() == (None, None, None)
         ):
             self.driver.execute_script("sauce:job-result=passed")
 
