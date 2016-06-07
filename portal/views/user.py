@@ -541,7 +541,6 @@ def set_roles(user_id):
 
 
 @user_api.route('/unique_email')
-@oauth.require_oauth()
 def unique_email():
     """Confirm a given email is unique
 
@@ -588,8 +587,16 @@ def unique_email():
     assert(match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
         # If the user is the authenticated user, it still counts as unique
-        user = current_user()
+
+        # Note the extra oauth verify step, so this method can also
+        # be used by unauth'd users (say during registration).
+        valid, req = oauth.verify_request(['email'])
+        if valid:
+            user = req.user
+        else:
+            user = current_user()
+
         result = match.one()
-        if user.id != result.id:
+        if not user or user.id != result.id:
             return jsonify(unique=False)
     return jsonify(unique=True)
