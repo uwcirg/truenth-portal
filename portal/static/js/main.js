@@ -69,14 +69,14 @@ var fillContent = {
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
             }
-            $('div[data-topic='+clinicalItem+']').fadeIn();
+            $('div[data-topic='+clinicalItem+']').fadeIn().next().fadeIn();
             var clinicalValue = val.content.valueQuantity.value;
             var $radios = $('input:radio[name='+clinicalItem+']');
             if($radios.is(':checked') === false) {
                 $radios.filter('[value='+clinicalValue+']').prop('checked', true);
             }
-            // Display clinics if any value is false or if all are answered
-            if (clinicalValue == "false" || i == 3) {
+            // Display clinics if any value is false (except localized) or if all are answered
+            if ((clinicalValue == "false" && clinicalItem != "pca_localized") || i == 3) {
                 $("#clinics").fadeIn();
             }
         })
@@ -121,6 +121,9 @@ var fillContent = {
         if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
             $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
         }
+        if ($('#userOrgs input.clinic:checked').size()) {
+            $("#terms").fadeIn();
+        }
     },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){
@@ -150,38 +153,13 @@ var fillContent = {
 
 var assembleContent = {
     "demo": function(userId,onProfile) {
-        var m = parseInt($("#month").val());
-        var d = parseInt($("#date").val());
-        var y = parseInt($("#year").val());
-        // If all three have been entered, run check
-        var goodDate = false;
-        if (m && d && y) {
-            var today = new Date();
-            // Check to see if this is a real date
-            var date = new Date(y,m-1,d);
-            if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                goodDate = true;
-                // Only allow if birthdate is before today
-                if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    goodDate = false;
-                    errorMsg = "Your birthdate must be in the past.";
-                }
-            }
-        }
-        if (y.toString().length < 3) {
-            goodDate = false;
-        }
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["name"] = {
             "given": $("input[name=firstname]").val(),
             "family": $("input[name=lastname]").val()
         };
-        // After tests display errors if necessary
-        if (goodDate) {
-            $("#birthday").val(y+"-"+m+"-"+d);
-            demoArray["birthDate"] = $("input[name=birthDate]").val();
-        }
+        demoArray["birthDate"] = $("input[name=birthDate]").val();
         if (onProfile) {
             $.each($("#userOrgs input:checkbox:checked"),function(i,v){
                 if ($(this).attr("data-parent-id")) {
@@ -239,16 +217,10 @@ var assembleContent = {
             return { reference: "api/organization/"+$(this).val() };
         }).get();
 
-        var parentId;
-        $.each($("#userOrgs input:checkbox:checked"),function(i,v){
-            if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
-                orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
-                parentId = $(this).attr("data-parent-id");
-            }
-        });
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
+        console.log(demoArray);
         tnthAjax.putDemo(userId, demoArray);
     }
 };
@@ -422,6 +394,73 @@ $(document).ready(function() {
                 $("input[name='organization']:not(#noOrgs)").attr('checked',false);
             }
         }
+    });
+
+    // To validate a form, add class to <form> and validate by ID.
+    $('form.to-validate').validator({
+        custom: {
+            birthday: function() {
+                var m = parseInt($("#month").val());
+                var d = parseInt($("#date").val());
+                var y = parseInt($("#year").val());
+                // If all three have been entered, run check
+                var goodDate = false;
+                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
+                if (m && d && y) {
+                    var today = new Date();
+                    // Check to see if this is a real date
+                    var date = new Date(y,m-1,d);
+                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+                        goodDate = true;
+                        // Only allow if birthdate is before today
+                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                            goodDate = false;
+                            errorMsg = "Your birthdate must be in the past.";
+                        }
+                    }
+                    if (y.toString().length < 3) {
+                        goodDate = false;
+                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
+                    }
+                    // After tests display errors if necessary
+                    if (goodDate) {
+                        $("#bdError").hide();
+                        // Set date if YYYY-MM-DD
+                        $("#birthday").val(y+"-"+m+"-"+d);
+                    } else {
+                        $("#bdError").html(errorMsg).show();
+                        $("#birthday").val("");
+                    }
+                } else {
+                    // If NaN then the values haven't been entered yet, so we
+                    // validate as true until other fields are entered
+                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                        return true;
+                    } else if (isNaN(d)) {
+                        errorMsg = "Please enter a date.";
+                    }
+                    $("#bdError").html(errorMsg).show();
+                    $("#birthday").val("");
+                }
+                if (goodDate) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+            customemail: function($el) {
+                if ($el.val() == "") {
+                    return false;
+                }
+                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return emailReg.test( $el.val() );
+            }
+        },
+        errors: {
+            birthday: "Sorry, this isn't a valid date. Please try again.",
+            customemail: "This isn't a valid e-mail address, please double-check."
+        },
+        disable: false
     });
 
 });
