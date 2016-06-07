@@ -62,7 +62,7 @@ def auditlog_addevent():
     return jsonify(message='ok')
 
 
-@truenth_api.route('/portal-wrapper-html', methods=('GET', 'OPTIONS'))
+@truenth_api.route('/portal-wrapper-html/', methods=('GET', 'OPTIONS'))
 @crossdomain()
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
@@ -104,10 +104,6 @@ def portal_wrapper_html():
           registered as a client app or intervention
 
     """
-    # handle CORS pre-flight - all work done in crossdomain decorator
-    if request.method == 'OPTIONS':
-        return
-
     # Unlike all other oauth protected resources, we manually check
     # if it's a valid oauth request as this resource is also available prior
     # to logging in.
@@ -149,8 +145,6 @@ def portal_wrapper_html():
     return make_response(html)
 
 ### Depricated rewrites follow
-@truenth_api.route('/portal-wrapper-html/', defaults={'username': None},
-                   methods=('GET', 'OPTIONS'))
 @truenth_api.route('/portal-wrapper-html/<username>',
                    methods=('GET', 'OPTIONS'))
 @crossdomain()
