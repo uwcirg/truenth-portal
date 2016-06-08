@@ -18,7 +18,7 @@ My TrueNTH Profile
 {% endif %}
 </h3>
 
-<form id="profileForm" class="form tnth-form" role="form">
+<form id="profileForm" class="form tnth-form to-validate" role="form">
 
 <div class="row" style="position: relative;">
     <div class="col-md-9">
@@ -79,7 +79,7 @@ My TrueNTH Profile
                     <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
                 </div>
             </div>
-            <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+            <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
         </div>
         <div class="form-group">
             <label>Gender</label>
@@ -157,7 +157,7 @@ My TrueNTH Profile
         <div class="form-group float-input-label" id="emailGroup">
             <label for="email">Email address</label>
             <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ user.email if user.email }}" data-customemail="true" required>
-            <div class="help-block with-errors"></div>
+            <div class="help-block with-errors" id="erroremail"></div>
         </div>
         <div class="form-group float-input-label">
             <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
@@ -230,6 +230,7 @@ My TrueNTH Profile
 </div>
 
 
+{% if current_user.has_role('admin') and not user.has_role('service') %}
 <hr />
 
 <h3>User Roles for {{ user.username }}</h3>
@@ -274,6 +275,7 @@ My TrueNTH Profile
     </div>
 
 </div>
+{% endif %}
 
 </form>
 
@@ -285,72 +287,7 @@ $(document).ready(function(){
     tnthAjax.getOrgs({{ user.id }});
 
     /*** Field Validation ***/
-    $('#profileForm').validator({
-        custom: {
-            birthday: function() {
-                var m = parseInt($("#month").val());
-                var d = parseInt($("#date").val());
-                var y = parseInt($("#year").val());
-                // If all three have been entered, run check
-                var goodDate = false;
-                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
-                if (m && d && y) {
-                    var today = new Date();
-                    // Check to see if this is a real date
-                    var date = new Date(y,m-1,d);
-                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                        goodDate = true;
-                        // Only allow if birthdate is before today
-                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                            goodDate = false;
-                            errorMsg = "Your birthdate must be in the past.";
-                        }
-                    }
-                    if (y.toString().length < 3) {
-                        goodDate = false;
-                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
-                    }
-                    // After tests display errors if necessary
-                    if (goodDate) {
-                        $("#bdError").hide();
-                        // Set date if YYYY-MM-DD
-                        $("#birthday").val(y+"-"+m+"-"+d);
-                    } else {
-                        $("#bdError").html(errorMsg).show();
-                        $("#birthday").val("");
-                    }
-                } else {
-                    // If NaN then the values haven't been entered yet, so we
-                    // validate as true until other fields are entered
-                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                        return true;
-                    } else if (isNaN(d)) {
-                        errorMsg = "Please enter a date.";
-                    }
-                    $("#bdError").html(errorMsg).show();
-                    $("#birthday").val("");
-                }
-                if (goodDate) {
-                    return true;
-                } else {
-                    return false;
-                }
 
-            },
-            customemail: function($el) {
-                if ($el.val() == "") {
-                    return false;
-                }
-                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return emailReg.test( $el.val() );
-            }
-        },
-        errors: {
-            birthday: "Sorry, this isn't a valid date. Please try again.",
-            customemail: "This isn't a valid e-mail address, please double-check."
-        },
-        disable: false
-    });
     // If there's any change to form fields, the note that
     $("#profileForm :input").change(function() {
         $(this).closest('form').attr('data-changed', true)

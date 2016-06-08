@@ -220,7 +220,6 @@ var assembleContent = {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
-        console.log(demoArray);
         tnthAjax.putDemo(userId, demoArray);
     }
 };
@@ -424,11 +423,11 @@ $(document).ready(function() {
                     }
                     // After tests display errors if necessary
                     if (goodDate) {
-                        $("#bdError").hide();
+                        $("#errorbirthday").hide();
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
                     } else {
-                        $("#bdError").html(errorMsg).show();
+                        $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");
                     }
                 } else {
@@ -439,7 +438,7 @@ $(document).ready(function() {
                     } else if (isNaN(d)) {
                         errorMsg = "Please enter a date.";
                     }
-                    $("#bdError").html(errorMsg).show();
+                    $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
                 }
                 if (goodDate) {
@@ -453,6 +452,21 @@ $(document).ready(function() {
                     return false;
                 }
                 var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                // If this is a valid address, then use unique_email to check whether it's already in use
+                if (emailReg.test($el.val())) {
+                    $.ajax ({
+                        type: "GET",
+                        url: '/api/unique_email?email='+$el.val()
+                    }).done(function(data) {
+                        if (data.unique) {
+                            $("erroremail").parents(".form-group").removeClass('has-error');
+                        } else {
+                            $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
+                        }
+                    }).fail(function() {
+                        console.log("Problem retrieving data from server.")
+                    });
+                }
                 return emailReg.test( $el.val() );
             }
         },
@@ -461,6 +475,6 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    });
+    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input and change)
 
 });

@@ -79,7 +79,7 @@ My TrueNTH Profile
                     <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
                 </div>
             </div>
-            <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+            <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
         </div>
         <div class="form-group">
             <label>Gender</label>
@@ -266,11 +266,11 @@ $(".float-input-label > input").bind("checkval",function(){
                     }
                     // After tests display errors if necessary
                     if (goodDate) {
-                        $("#bdError").hide();
+                        $("#errorbirthday").hide();
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
                     } else {
-                        $("#bdError").html(errorMsg).show();
+                        $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");
                     }
                 } else {
@@ -281,7 +281,7 @@ $(".float-input-label > input").bind("checkval",function(){
                     } else if (isNaN(d)) {
                         errorMsg = "Please enter a date.";
                     }
-                    $("#bdError").html(errorMsg).show();
+                    $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
                 }
                 if (goodDate) {

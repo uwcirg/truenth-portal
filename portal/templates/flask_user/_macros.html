@@ -5,15 +5,17 @@
             <label for="{{ field.id }}" class="control-label">{{ label|safe }}</label>
         {% endif %}
         {{ field(class_='form-control', placeholder=label, **kwargs) }}
-        {% if field.errors %}
-            {% for e in field.errors %}
-                <span class="help-block">{{ e }}</span>
-            {% endfor %}
-        {% else %}
-            {% if helpText %}
-            <span class="help-block">{{ helpText|safe }}</span>
+        <div class="help-block with-errors" id="error{{ field.id }}">
+            {% if field.errors %}
+                {% for e in field.errors %}
+                    <span>{{ e }}</span>
+                {% endfor %}
+            {% else %}
+                {% if helpText %}
+                    <span>{{ helpText|safe }}</span>
+                {% endif %}
             {% endif %}
-        {% endif %}
+        </div>
     </div>
 {%- endmacro %}
  

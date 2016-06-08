@@ -21,7 +21,7 @@
 </div>
 
 <p style="margin-top: 2em">Or create a TrueNTH account:</p>
-<form action="" method="POST" novalidate formnovalidate class="form" role="form" style="margin-left: 1em">
+<form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
 
     <div class="row">
         <div class="col-md-7">
@@ -31,9 +31,8 @@
             {% set field = form.username if user_manager.enable_username else form.email %}
             {{ render_field(form.username, label="Username", label_visible=false, tabindex=220) }}
 
-
             {% if user_manager.enable_email and user_manager.enable_username %}
-            {{ render_field(form.email, label="Email", label_visible=false, tabindex=220) }}
+            {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true") }}
             {% endif %}
 
             {{ render_field(form.password, label="Password", label_visible=false, helpText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
@@ -50,3 +49,13 @@
 </form>
 
 {% endblock %}
+{% block document_ready %}
+
+$(document).ready(function(){
+
+
+
+});
+
+{% endblock %}
+
