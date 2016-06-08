@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+
+<div id="loadingIndicator" class="loading-indicator">
+    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
+</div>
+
+<h3 class="tnth-headline">
+Acquire Core Data
+</h3>
+
+<form id="profileForm" class="form tnth-form" role="form" method="POST">
+
+<div class="row" style="position: relative;">
+    <div class="col-md-9">
+        {% if 'ethnicity' in require %}
+        <div class="form-group" id="userEthnicity">
+            <label>Ethnicity <span class="text-muted smaller-text"></span></label>
+            <div style="margin-top: -10px">
+
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'race' in require %}
+        <div class="form-group" id="userRace">
+            <label>Race <span class="text-muted smaller-text"></span></label>
+            <div style="margin-top: -10px">
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2028-9"> Asian
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2054-5"> Black or African American
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2106-3"> White
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2131-1"> Other
+                    </label>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+        {% if 'procedure' in require %}
+        <div class="form-group" id="userProcedure">
+            <label>Procedures<span class="text-muted smaller-text"></span></label>
+            <div style="margin-top: -10px">
+
+                <div class="checkbox">
+                    <label>
+                        <input type="radio" name="procedure"
+                        display="Active surveillance" value="424313000">
+                        Active surveillance
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="radio" name="procedure"
+                        display="Radical prostatectomy" value="26294005">
+                        Radical prostatectomy
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="radio" name="procedure"
+                        display="Brachytherapy" value="228748004">
+                        Brachytherapy
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+</div>
+
+
+<hr />
+        <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+        <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
+
+
+</form>
+
+{% endblock %}
+
+{% block document_ready %}
+$(document).ready(function(){
+
+    // If there's any change to form fields, then note that
+    $("#profileForm :input").change(function() {
+        $(this).closest('form').attr('data-changed', true)
+    });
+    $('#profileForm').on('validated.bs.validator', function(e) {
+        var validator = $(this).data('bs.validator');
+        // If the form has a change, then show save or error messages
+        if ($(this).data('changed')) {
+            if (!validator.hasErrors()) {
+                $("#saveMsg").fadeIn("slow")
+                $("#errorMsg").hide()
+            } else {
+                $("#saveMsg").hide()
+                $("#errorMsg").fadeIn("slow")
+            }
+        }
+    })
+    /*** End -- Field Validation ***/
+
+    // Submit the form here
+    $("#updateProfile").on("click", function(event){
+        event.preventDefault();
+        {% if 'race' in require %}
+        assembleCoredataContent.race({{ user.id }});
+        {% endif %}
+        {% if 'ethnicity' in require %}
+        assembleCoredataContent.ethnicity({{ user.id }});
+        {% endif %}
+        {% if 'procedure' in require %}
+        assembleCoredataContent.proc({{ user.id }});
+        {% endif %}
+        window.location.replace("{{ return_address }}");
+    });
+
+});
+
+{% endblock %}

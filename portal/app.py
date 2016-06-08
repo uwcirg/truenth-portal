@@ -11,6 +11,7 @@ from .config import DefaultConfig
 from .extensions import babel, celery, db, mail, oauth, user_manager
 from .views.assessment_engine import assessment_engine_api
 from .views.auth import auth
+from .views.coredata import coredata_api
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
 from .views.intervention import intervention_api
@@ -25,6 +26,7 @@ from .views.user import user_api
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
     auth,
+    coredata_api,
     clinical_api,
     demographics_api,
     intervention_api,
