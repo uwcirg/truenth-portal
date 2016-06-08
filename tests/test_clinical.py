@@ -61,7 +61,7 @@ class TestClinical(TestCase):
         self.assertAlmostEquals(datetime.utcnow(), found,
                                 delta= timedelta(seconds=2))
         self.assertEquals(
-            current_app.config.version,
+            current_app.config.metadata.version,
             clinical_data['entry'][0]['content']['meta']['version'])
 
     def test_clinicalPOST(self):

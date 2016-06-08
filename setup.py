@@ -51,6 +51,7 @@ setup(
         'nose',
         'oauthlib',
         'page_objects',
+        'pkginfo',
         'psycopg2',
         'python-dateutil',
         'recommonmark',

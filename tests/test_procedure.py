@@ -61,7 +61,7 @@ class TestProcedure(TestCase):
         self.assertAlmostEquals(
             datetime.utcnow(), start_time, delta=timedelta(seconds=2))
         self.assertEquals(
-            current_app.config.version,
+            current_app.config.metadata.version,
             data['entry'][0]['content']['meta']['version'])
 
     def test_procedure_from_fhir(self):

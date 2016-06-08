@@ -2,6 +2,7 @@
 from logging import handlers
 import logging
 import os
+import pkginfo
 import sys
 from flask import Flask
 from flask.ext.webtest import get_scopefunc
@@ -50,7 +51,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
     configure_audit_log(app)
-    configure_version(app)
+    configure_metadata(app)
     return app
 
 
@@ -161,8 +162,8 @@ def configure_logging(app):  # pragma: no cover
     #    app.config['LOG_LEVEL'], level)
 
 
-def configure_version(app):
-    """Add version info for display in templates"""
-    location = os.path.dirname(os.path.dirname(__file__))
-    with open(os.path.join(location, 'VERSION'), 'r') as version:
-        app.config.version = version.readline()
+def configure_metadata(app):
+    """Add distribution metadata for display in templates"""
+
+    metadata = pkginfo.Installed(app.name)
+    app.config.metadata = metadata
