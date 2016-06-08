@@ -224,6 +224,55 @@ var assembleContent = {
     }
 };
 
+var assembleCoredataContent = {
+    "ethnicity": function(userId) {
+        var demoArray = {};
+        demoArray["resourceType"] = "Patient";
+        // Grab profile field values - looks for regular and hidden, can be checkbox or radio
+        var ethnicityIDs = $("#userEthnicity input:checked").map(function(){
+            return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
+        }).get();
+        demoArray["extension"] = [
+            { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                "valueCodeableConcept": {
+                    "coding": ethnicityIDs
+                }
+            }
+        ];
+        tnthAjax.putDemo(userId,demoArray);
+    },
+    "race": function(userId) {
+        var demoArray = {};
+        demoArray["resourceType"] = "Patient";
+        // Look for race checkboxes, can be hidden
+        var raceIDs = $("#userRace input:checkbox:checked").map(function(){
+            return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
+        }).get();
+        demoArray["extension"] = [
+            { "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                "valueCodeableConcept": {
+                    "coding": raceIDs
+                }
+            }
+        ];
+        tnthAjax.putDemo(userId,demoArray);
+    },
+    "proc": function(userId) {
+        var procArray = {};
+        procArray["resourceType"] = "Procedure";
+
+        var procID = $("#userProcedure input:checked").map(function(){
+            return { code: $(this).val(), display: $(this).attr("display"),
+                system: "http://snomed.info/sct" };
+        }).get();
+
+        procArray["subject"] = {"reference": "Patient/" + userId };
+        procArray["code"] = {"coding": procID};
+        procArray["performedDateTime"] = "2013-04-01";  // TODO: from datepicker
+        tnthAjax.postProc(userId,procArray);
+    }
+};
+
 var tnthAjax = {
     "getOrgs": function(userId) {
         loader(true);
@@ -293,7 +342,19 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
         }).fail(function() {
-            console.log("Problem updating role on server.");
+            console.log("Problem updating demographics on server.");
+        });
+    },
+    "postProc": function(userId,toSend) {
+        $.ajax ({
+            type: "POST",
+            url: '/api/procedure',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: JSON.stringify(toSend)
+        }).done(function(data) {
+        }).fail(function() {
+            console.log("Problem updating procedure on server.");
         });
     },
     "getRoles": function(userId,isProfile) {

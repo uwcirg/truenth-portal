@@ -1,6 +1,7 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
 import dateutil
+from flask import current_app
 import json
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
@@ -106,7 +107,8 @@ class CodeableConcept(db.Model):
         # at a particular Coding will be the ONLY CodeableConcept for that
         # particular Coding.
         coding_ids = [c.id for c in self.codings]
-        assert coding_ids
+        if not coding_ids:
+            current_app.logger.error("no coding_ids found for {}".format(self))
         found = CodeableConceptCoding.query.filter(
             CodeableConceptCoding.coding_id.in_(coding_ids)).first()
         if not found:
