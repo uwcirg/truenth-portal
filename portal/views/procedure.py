@@ -104,6 +104,7 @@ def post_procedure():
     """
     # patient_id must first be parsed from the JSON subject field
     # standard role check is below after parse
+
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Procedure':
         abort(400, "Requires FHIR resourceType of 'Procedure'")
