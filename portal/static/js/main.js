@@ -459,7 +459,7 @@ $(document).ready(function() {
                         url: '/api/unique_email?email='+$el.val()
                     }).done(function(data) {
                         if (data.unique) {
-                            $("erroremail").parents(".form-group").removeClass('has-error');
+                            $("#erroremail").html('').parents(".form-group").removeClass('has-error');
                         } else {
                             $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
                         }
