@@ -281,20 +281,21 @@ def spec():
     Point Swagger-UI to this view for rendering
 
     """
-    # pylint: disable=E1102, W0212
-    pkg_info = pkg_resources.require("portal")[0]
-    pkg_dict = dict([x.split(':', 1) for x in
-                    pkg_info._get_metadata('PKG-INFO')])
     swag = swagger(current_app)
-    swag['info']['version'] = pkg_dict['Version']
-    swag['info']['title'] = pkg_dict['Summary']
-    swag['info']['description'] = pkg_dict['Description']
-    swag['info']['termsOfService'] = 'http://cirg.washington.edu'
-    contact = {'name': "Clinical Informatics Research Group",
-               'email': "mcjustin@uw.edu",
-               'url': 'http://cirg.washington.edu'}
-    swag['info']['contact'] = contact
-    swag['schemes'] = ['http', 'https']
+    swag.update({
+        "info": {
+            "version": current_app.config.metadata.version,
+            "title": current_app.config.metadata.summary,
+            "description": current_app.config.metadata.description,
+            "termsOfService": "http://cirg.washington.edu",
+            "contact":{
+                "name": "Clinical Informatics Research Group",
+                "email": "mcjustin@uw.edu",
+                "url": "http://cirg.washington.edu",
+            },
+        },
+        "schemes":("http", "https"),
+    })
 
     # Fix swagger docs for paths with duplicate operationIds
 

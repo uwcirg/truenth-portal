@@ -9,7 +9,7 @@ from .reference import Reference
 
 
 def lookup_version():
-    return current_app.config.version
+    return current_app.config.metadata.version
 
 
 class Audit(db.Model):
