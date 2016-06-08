@@ -2,7 +2,7 @@
 import os, sys, unittest, xvfbwrapper
 from selenium import webdriver
 
-from flask.ext.testing import LiveServerTestCase
+from flask_testing import LiveServerTestCase
 
 from tests import TestCase
 from pages import LoginPage

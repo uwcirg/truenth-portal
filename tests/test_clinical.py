@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from dateutil import parser
 from flask import current_app
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 import json
 import os
 from tests import TestCase, TEST_USER_ID

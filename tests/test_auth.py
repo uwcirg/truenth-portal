@@ -1,7 +1,7 @@
 """Unit test module for auth"""
 import datetime
 from tests import TestCase, TEST_USER_ID
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token

@@ -8,9 +8,9 @@ import requests
 from authomatic.adapters import WerkzeugAdapter
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
-from flask.ext.login import login_user, logout_user
-from flask.ext.user import roles_required
-from flask.ext.user.signals import user_logged_in, user_registered
+from flask_login import login_user, logout_user
+from flask_user import roles_required
+from flask_user.signals import user_logged_in, user_registered
 from flask_wtf import Form
 from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField

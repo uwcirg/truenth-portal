@@ -1,7 +1,7 @@
 """Intervention API view functions"""
 from flask import abort, Blueprint, jsonify
 from flask import request
-from flask.ext.user import roles_required
+from flask_user import roles_required
 import json
 
 from ..audit import auditable_event

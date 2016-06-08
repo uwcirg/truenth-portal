@@ -3,11 +3,11 @@ from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
 from flask import abort, request, session
-from flask.ext.user import UserMixin, _call_or_get
+from flask_user import UserMixin, _call_or_get
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
-from flask.ext.login import current_user as flask_login_current_user
+from flask_login import current_user as flask_login_current_user
 
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation

@@ -1,5 +1,5 @@
 """Unit test module for user model and views"""
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 from werkzeug.exceptions import Unauthorized
 import json
 from tests import TestCase, TEST_USER_ID

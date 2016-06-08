@@ -1,6 +1,6 @@
 """Unit test module for fhir model"""
 from datetime import datetime
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db

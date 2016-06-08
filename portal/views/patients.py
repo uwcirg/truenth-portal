@@ -1,6 +1,6 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 from flask import Blueprint, render_template
-from flask.ext.user import roles_required
+from flask_user import roles_required
 
 from ..models.role import ROLE
 from ..models.user import current_user

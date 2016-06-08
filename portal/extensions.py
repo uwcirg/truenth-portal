@@ -11,12 +11,12 @@ additional configuration of most objects defined herein.
 
 
 # SQLAlchemy provides the database object relational mapping (ORM)
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 # Flask-User
-from flask.ext.user import UserManager, SQLAlchemyAdapter
+from flask_user import UserManager, SQLAlchemyAdapter
 from .models.user import User
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
@@ -24,7 +24,7 @@ user_manager = UserManager(db_adapter)
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
 from flask import abort, request
-from flask.ext.login import login_user
+from flask_login import login_user
 from flask_oauthlib.provider import OAuth2Provider
 from .models.user import current_user
 
@@ -125,14 +125,14 @@ authomatic = Authomatic(
 
 
 # Flask-Mail is used for email communication
-from flask.ext.mail import Mail
+from flask_mail import Mail
 mail = Mail()
 
 
 # Celery (Distributed Task Queue) is used for any asynchronous tasks
-from flask.ext.celery import Celery
+from flask_celery import Celery
 celery = Celery()
 
 # Bable is used for i18n
-from flask.ext.babel import Babel
+from flask_babel import Babel
 babel = Babel()

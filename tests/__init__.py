@@ -8,8 +8,8 @@ options:
 
 """
 
-from flask.ext.testing import TestCase as Base
-from flask.ext.webtest import SessionScope
+from flask_testing import TestCase as Base
+from flask_webtest import SessionScope
 
 from portal.app import create_app
 from portal.config import TestConfig

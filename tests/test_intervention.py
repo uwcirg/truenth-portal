@@ -1,5 +1,5 @@
 """Unit test module for Intervention API"""
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
 

@@ -3,8 +3,8 @@
 python manage.py --help
 
 """
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
 from portal.config import ConfigServer

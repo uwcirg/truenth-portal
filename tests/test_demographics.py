@@ -1,5 +1,5 @@
 """Unit test module for Demographics API"""
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 import json
 

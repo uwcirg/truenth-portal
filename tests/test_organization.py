@@ -1,5 +1,5 @@
 """Unit test module for organization model"""
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 import json
 import os
 

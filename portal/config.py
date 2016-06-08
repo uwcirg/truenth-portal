@@ -1,6 +1,6 @@
 """Configuration"""
 import os
-from flask.ext.script import Server
+from flask_script import Server
 from flask import Config
 
 

@@ -1,7 +1,7 @@
 """Organization related views module"""
 import datetime
 from flask import abort, current_app, Blueprint, jsonify, request
-from flask.ext.user import roles_required
+from flask_user import roles_required
 import json
 from sqlalchemy import exc
 

@@ -5,7 +5,7 @@ import os
 import pkginfo
 import sys
 from flask import Flask
-from flask.ext.webtest import get_scopefunc
+from flask_webtest import get_scopefunc
 
 from .audit import configure_audit_log
 from .config import DefaultConfig

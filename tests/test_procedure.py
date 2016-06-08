@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 import dateutil
 from flask import current_app
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 import json
 import os
 from sqlalchemy.orm.exc import NoResultFound

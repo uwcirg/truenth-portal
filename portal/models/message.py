@@ -1,8 +1,8 @@
 """Model classes for message data"""
 from datetime import datetime
 from flask import current_app
-from flask.ext.mail import Message
-from flask.ext.mail import email_dispatched
+from flask_mail import Message
+from flask_mail import email_dispatched
 
 from ..extensions import db, mail
 
