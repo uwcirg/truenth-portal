@@ -286,27 +286,6 @@ $(document).ready(function(){
 
     tnthAjax.getOrgs({{ user.id }});
 
-    /*** Field Validation ***/
-
-    // If there's any change to form fields, the note that
-    $("#profileForm :input").change(function() {
-        $(this).closest('form').attr('data-changed', true)
-    });
-    $('#profileForm').on('validated.bs.validator', function(e) {
-        var validator = $(this).data('bs.validator');
-        // If the form has a change, then show save or error messages
-        if ($(this).data('changed')) {
-            if (!validator.hasErrors()) {
-                $("#saveMsg").fadeIn("slow")
-                $("#errorMsg").hide()
-            } else {
-                $("#saveMsg").hide()
-                $("#errorMsg").fadeIn("slow")
-            }
-        }
-    })
-    /*** End -- Field Validation ***/
-
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
     var currentBd = $("#birthday").val();
     if (currentBd) {
@@ -315,6 +294,17 @@ $(document).ready(function(){
         $("#month").val(bdArray[1]);
         $("#date").val(bdArray[2]);
     }
+
+    // When there's a change, check validation and if good, assembleContent
+    $('#profileForm').on('validated.bs.validator', function(e) {
+        var validator = $(this).data('bs.validator');
+        if (!validator.hasErrors()) {
+            assembleContent.demo({{ user.id }},true);
+            $("#errorMsg").hide()
+        } else {
+            $("#errorMsg").fadeIn("slow")
+        }
+    });
 
     // Submit the form here
     $("#updateProfile").on("click", function(event){
@@ -365,7 +355,6 @@ $("#userRoles input:checkbox").on("click",function(){
     var roles = $("#userRoles input:checkbox:checked").map(function(){
         return { name: $(this).val() };
     }).get();
-    console.log(roles);
     var toSend = {"roles": roles}
     tnthAjax.putRoles({{user.id}},toSend);
 
