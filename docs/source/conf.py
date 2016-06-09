@@ -18,6 +18,7 @@ import pkginfo
 
 metadata = pkginfo.Installed("portal")
 
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -56,9 +57,11 @@ source_suffix = ['.txt', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'TrueNTH Shared Services'
-copyright = u'2016, CIRG, University of Washington'
-author = u'CIRG, University of Washington'
+project = metadata.summary
+project_slug = project.replace(" ","")
+
+copyright = u'2016, %s' % metadata.author
+author = metadata.author
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -214,7 +217,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'TrueNTHSharedServicesdoc'
+htmlhelp_basename = project_slug
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -235,10 +238,13 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'TrueNTHSharedServices.tex', u'TrueNTH Shared Services Documentation',
-     u'CIRG, University of Washington', 'manual'),
-]
+latex_documents = [(
+    master_doc,
+    '%s.tex' % project_slug,
+    u'%s Documentation' % project,
+    author,
+    'manual'
+)]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
@@ -266,7 +272,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'truenthsharedservices', u'TrueNTH Shared Services Documentation',
+    (master_doc, project_slug.lower(), u'%s Documentation' % project,
      [author], 1)
 ]
 
@@ -279,11 +285,15 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'TrueNTHSharedServices', u'TrueNTH Shared Services Documentation',
-     author, 'TrueNTHSharedServices', 'One line description of project.',
-     'Miscellaneous'),
-]
+texinfo_documents = [(
+    master_doc,
+    project_slug,
+    u'%s Documentation' % project,
+    author,
+    project_slug,
+    'One line description of project.',
+    'Miscellaneous'
+)]
 
 # Documents to append as an appendix to all manuals.
 #texinfo_appendices = []
