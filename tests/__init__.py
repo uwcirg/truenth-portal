@@ -116,7 +116,7 @@ class TestCase(Base):
 
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
-        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized:
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID))
