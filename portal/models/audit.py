@@ -26,6 +26,10 @@ class Audit(db.Model):
     version = db.Column(db.Text, default=lookup_version, nullable=False)
     comment = db.Column(db.Text)
 
+    def __str__(self):
+        return "Audit user {0.user_id} at {0.timestamp} {0.comment}".\
+                format(self)
+
     def as_fhir(self):
         """Typically included as *meta* data in containing FHIR resource"""
         d = {}
