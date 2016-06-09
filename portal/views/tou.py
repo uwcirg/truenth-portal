@@ -31,7 +31,7 @@ def get_tou(user_id):
     responses:
       200:
         description:
-          Returns ToU{'accepted': true|false} for requested user.
+          Returns 'accepted' True or False for requested user.
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
