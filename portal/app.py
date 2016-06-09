@@ -20,6 +20,7 @@ from .views.patients import patients
 from .views.procedure import procedure_api
 from .views.portal import portal, page_not_found, server_error
 from .views.organization import org_api
+from .views.tou import tou_api
 from .views.truenth import truenth_api
 from .views.user import user_api
 
@@ -36,6 +37,7 @@ DEFAULT_BLUEPRINTS = (
     procedure_api,
     portal,
     truenth_api,
+    tou_api,
     user_api,)
 
 
