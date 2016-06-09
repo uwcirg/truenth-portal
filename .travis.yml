@@ -38,6 +38,8 @@ before_install:
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
+  - pip install --upgrade pip
+
 install:
   - pip install --process-dependency-links -e .
   - cp portal/application.cfg.travis portal/application.cfg
