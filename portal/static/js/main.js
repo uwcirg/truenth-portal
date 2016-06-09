@@ -517,7 +517,7 @@ $(document).ready(function() {
                 if (emailReg.test($el.val())) {
                     $.ajax ({
                         type: "GET",
-                        url: '/api/unique_email?email='+$el.val()
+                        url: '/api/unique_email?email='+encodeURIComponent($el.val())
                     }).done(function(data) {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');

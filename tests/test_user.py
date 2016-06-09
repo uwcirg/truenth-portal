@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 from werkzeug.exceptions import Unauthorized
 import json
+import urllib
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
@@ -37,8 +38,8 @@ class TestUser(TestCase):
         rv = self.app.get('/api/unique_email?email=h2@1')
         self.assert400(rv)
 
-        email = 'john@example.com'
-        request = '/api/unique_email?email={}'.format(email)
+        email = 'john+test@example.com'
+        request = '/api/unique_email?email={}'.format(urllib.quote(email))
         rv = self.app.get(request)
         self.assert200(rv)
         results = rv.json

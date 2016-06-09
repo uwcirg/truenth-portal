@@ -6,7 +6,7 @@ from ..audit import auditable_event
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
-from ..models.user import User, UserRelationship, UserRoles
+from ..models.user import User, UserRelationship
 from ..extensions import oauth
 from ..extensions import db
 
