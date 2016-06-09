@@ -1,5 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-import pkg_resources
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -99,7 +98,7 @@ def home():
         # ask them now - otherwise, off to the portal home..
         return render_template('portal.html', user=user,
                                interventions=INTERVENTION)
-        # "questions" DISABLED FOR 4/1/16 LAUNCH 
+        # "questions" DISABLED FOR 4/1/16 LAUNCH
         #for c in (CC.BIOPSY, CC.PCaDIAG, CC.TX):
         #    if user.fetch_values_for_concept(c):
         #        return render_template('portal.html', user=user,
