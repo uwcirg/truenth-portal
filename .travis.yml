@@ -3,6 +3,7 @@ language: python
 python:
   - "2.7"
 
+cache: pip
 addons:
   apt:
     sources:
@@ -20,15 +21,11 @@ services:
   - redis-server
 env:
   global:
-    - DISPLAY=":99.0"
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
 
 before_install:
   - sudo service postgresql stop
-  - sudo apt-get -y remove --purge postgresql-9.1
-  - sudo apt-get -y remove --purge postgresql-9.2
-  - sudo apt-get -y remove --purge postgresql-9.3
-  - sudo apt-get -y remove --purge postgresql-9.4
+  - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
   - sudo apt-get -y autoremove
 
   - sudo sh -c 'echo "local all postgres trust" > /etc/postgresql/9.5/main/pg_hba.conf'
@@ -38,15 +35,14 @@ before_install:
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
+  - pip install --upgrade pip
+
 install:
   - pip install --process-dependency-links -e .
   - cp portal/application.cfg.travis portal/application.cfg
 
 before_script:
   - celery worker --detach -A portal.celery_worker.celery --loglevel=info
-
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
 
 script:
   - nosetests -v --with-cover --cover-package=portal
