@@ -12,8 +12,8 @@
 
   <p>TrueNTH is funded by the <a href="https://us.movember.com/">Movember Foundation</a>, an international non-profit seeking to improve men’s health.</p>
 
-  {% if config.version %}
+  {% if config.metadata.version %}
   <br />
-  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.version }}</div>
+  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
   {% endif %}
 {% endblock %}
