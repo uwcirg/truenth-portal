@@ -25,10 +25,12 @@ class TestPortal(TestCase):
         intervention.card_html = "Custom Label"
 
         self.add_required_clinical_data()
+        self.bless_with_basics()
         self.login()
         rv = self.app.get('/home')
 
         self.assertIn('Custom Label', rv.data)
+        intervention = db.session.merge(intervention)
         self.assertIn(intervention.card_html, rv.data)
 
     def test_public_access(self):
@@ -39,12 +41,14 @@ class TestPortal(TestCase):
         intervention.public_access = False
 
         self.add_required_clinical_data()
+        self.bless_with_basics()
         self.login()
         rv = self.app.get('/home')
 
         self.assertNotIn('Sexual Recovery', rv.data)
 
         # now give just the test user access
+        intervention = db.session.merge(intervention)
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id,
                               access="granted")
