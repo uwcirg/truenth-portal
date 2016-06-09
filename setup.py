@@ -15,15 +15,16 @@ project = "portal"
 # maintain long_description as a single long line.
 # workaround for a bug in pkg_info._get_metadata("PKG-INFO")
 long_description =\
-"""Alpha version of the TrueNTH Central Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
+"""Alpha version of the TrueNTH Shared Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
 """
 
 setup(
     name=project,
-    url="https://github.com/uwcirg/true_nth_usa_portal_demo",
-    description="TrueNTH Central Services",
+    url="https://github.com/uwcirg/true_nth_usa_portal",
+    description="TrueNTH Shared Services",
     long_description=long_description,
-    author="University of Washington",
+    author="CIRG, University of Washington",
+    author_email="truenth-dev@uw.edu",
     classifiers=(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
@@ -34,6 +35,8 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Medical Science Apps",
     ),
+    license = "BSD",
+    platforms = "any",
 
     include_package_data=True,
     use_scm_version=True,
