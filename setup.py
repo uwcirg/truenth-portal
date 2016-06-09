@@ -24,14 +24,25 @@ setup(
     description="TrueNTH Central Services",
     long_description=long_description,
     author="University of Washington",
-    packages=["portal"],
+    classifiers=(
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Healthcare Industry",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
+        "Topic :: Scientific/Engineering :: Medical Science Apps",
+    ),
+
     include_package_data=True,
     use_scm_version=True,
-    setup_requires=("setuptools_scm"),
     zip_safe=False,
     dependency_links=(
         "git+https://github.com/pbugni/Flask-User.git#egg=Flask-User-0.6.8.1",
     ),
+    packages=["portal"],
+    setup_requires=("setuptools_scm"),
     install_requires=(
         "Authomatic>=0.1.0",
         "celery",
@@ -64,14 +75,4 @@ setup(
         "xvfbwrapper",
     ),
     test_suite="tests",
-    classifiers=(
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Healthcare Industry",
-        "License :: OSI Approved :: BSD License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python",
-        "Topic :: Scientific/Engineering :: Bio-Informatics",
-        "Topic :: Scientific/Engineering :: Medical Science Apps",
-    ),
 )
