@@ -133,3 +133,10 @@ class OrganizationIdentifier(db.Model):
 
     __table_args__ = (UniqueConstraint('organization_id', 'identifier_id',
         name='_organization_identifier'),)
+
+
+def add_static_organization():
+    """Insert special `none of the above` org at index 0"""
+    existing = Organization.query.get(0)
+    if not existing:
+        db.session.add(Organization(id=0, name='none of the above'))

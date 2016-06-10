@@ -70,26 +70,38 @@ class CoredataPoint(object):
 
 class DobData(CoredataPoint):
     def hasdata(self, user):
-        return user.birthdate is not None
+        # DOB is only required for patient and partner
+        roles = (r.name for r in user.roles)
+        if ROLE.PATIENT in roles or ROLE.PARTNER in roles: 
+            return user.birthdate is not None
+        else:
+            # If they haven't set a role, we don't know if we care yet
+            return len(user.roles) > 0
 
 
 class RoleData(CoredataPoint):
     def hasdata(self, user):
+        """Does user have at least one role?"""
         if len(user.roles) > 0:
             return True
 
 
 class OrgData(CoredataPoint):
     def hasdata(self, user):
+        """Does user have at least one org?
+
+        Special "none of the above" org still counts.
+        """
         if user.organizations.count() > 0:
             return True
 
 
 class ClinicalData(CoredataPoint):
     def hasdata(self, user):
-        """don't need clinical data from partners"""
-        if ROLE.PARTNER in (r.name for r in user.roles) :
-            return True
+        """only need clinical data from patients"""
+        if ROLE.PATIENT not in (r.name for r in user.roles) :
+            # If they haven't set a role, we don't know if we care yet
+            return len(user.roles) > 0
 
         required = {item: False for item in (
             CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized)}
