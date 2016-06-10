@@ -60,8 +60,8 @@ master_doc = 'index'
 project = metadata.summary
 project_slug = project.replace(" ","")
 
-copyright = u'2016, %s' % metadata.author
 author = metadata.author
+copyright = u'2016, %s' % author
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -217,7 +217,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = project_slug
+htmlhelp_basename = '%sdoc' % project_slug
 
 # -- Options for LaTeX output ---------------------------------------------
 
