@@ -1,9 +1,9 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import Blueprint, render_template
+from flask import abort, Blueprint, render_template
 from flask_user import roles_required
 
 from ..models.role import ROLE
-from ..models.user import current_user
+from ..models.user import current_user, get_user
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -26,3 +26,17 @@ def patients_root():
 
     return render_template(
         'patients_by_org.html', patients_by_org=patients_by_org)
+
+
+@patients.route('/patient_profile/<int:patient_id>')
+@oauth.require_oauth()
+@roles_required(ROLE.PROVIDER)
+def patient_profile(patient_id):
+    """individual patient view function, intended for providers"""
+    user = current_user()
+    user.check_role("edit", other_id=patient_id)
+    patient = get_user(patient_id)
+    if not patient:
+        abort(404, "Patient {} Not Found".format(patient_id))
+
+    return render_template('patient_profile.html', patient=patient)

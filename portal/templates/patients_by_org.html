@@ -20,7 +20,7 @@
         <tbody>
         {% for user in patients_by_org[org] %}
             <tr>
-                <td><a href="{{ url_for('portal.profile', user_id=user.id) }}">{{ user.username }}</a></td>
+                <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.username }}</a></td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
