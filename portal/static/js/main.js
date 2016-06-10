@@ -216,7 +216,9 @@ var assembleContent = {
         var orgIDs = $("#userOrgs input:checkbox:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
         }).get();
-
+        if (typeof orgIDs === 'undefined'){
+            orgIDs = [0]  // special value for `none of the above`
+        }
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
@@ -342,7 +344,7 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
         }).fail(function() {
-            console.log("Problem updating demographics on server.");
+            console.log("Problem updating demographics on server." + JSON.stringify(toSend));
         });
     },
     "postProc": function(userId,toSend) {

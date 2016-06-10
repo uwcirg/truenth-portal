@@ -11,6 +11,7 @@ from portal.config import ConfigServer
 from portal.extensions import db
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
+from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import flag_test
@@ -36,6 +37,7 @@ def seed():
     """Seed database with required data"""
     add_static_concepts()
     add_static_interventions()
+    add_static_organization()
     add_static_relationships()
     add_static_roles()
     db.session.commit()

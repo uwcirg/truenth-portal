@@ -10,6 +10,7 @@ from flask_webtest import get_scopefunc
 from .audit import configure_audit_log
 from .config import DefaultConfig
 from .extensions import babel, celery, db, mail, oauth, user_manager
+from .models.coredata import configure_coredata
 from .views.assessment_engine import assessment_engine_api
 from .views.auth import auth
 from .views.coredata import coredata_api
@@ -56,6 +57,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_logging(app)
     configure_audit_log(app)
     configure_metadata(app)
+    configure_coredata(app)
     return app
 
 

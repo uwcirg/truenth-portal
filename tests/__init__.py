@@ -7,7 +7,7 @@ options:
     nosetests --help
 
 """
-
+from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
 
@@ -19,8 +19,10 @@ from portal.models.auth import Client
 from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
+from portal.models.organization import Organization, add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
+from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
 
 TEST_USER_ID = 1
@@ -116,10 +118,25 @@ class TestCase(Base):
 
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
-        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized:
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID))
+
+    def bless_with_basics(self):
+        """Bless test user with basic requirements for coredata"""
+        self.test_user.birthdate = datetime.utcnow()
+
+        # Register with a clinic
+        org = Organization(name='fake urology clinic')
+        self.test_user.organizations.append(org)
+
+        # Agree to Terms of Use
+        audit = Audit(user_id=TEST_USER_ID)
+        tou = ToU(audit=audit, text="filler text")
+        with SessionScope(db):
+            db.session.add(tou)
+            db.session.commit()
 
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW
@@ -141,6 +158,7 @@ class TestCase(Base):
             # add directly (via self.add_concepts()) if test needs them
             add_static_concepts(only_quick=True)
             add_static_interventions()
+            add_static_organization()
             add_static_relationships()
             add_static_roles()
             db.session.commit()

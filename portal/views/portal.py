@@ -7,6 +7,7 @@ from flask_swagger import swagger
 
 from ..audit import auditable_event
 from .crossdomain import crossdomain
+from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
 from ..models.message import EmailInvite
@@ -38,8 +39,6 @@ def landing():
     """landing page view function"""
     if current_user():
         return redirect('home')
-    # for time being, set initial_queries in session on entry
-    session['initial_queries'] = True
     return render_template('landing.html', user=None)
 
 
@@ -82,8 +81,7 @@ def home():
     if user:
         # authorized entry point - take care of pending actions
         # present intial questions if not already obtained
-        # TODO: logic to determine if all necessary queries have been answered
-        if 'initial_queries' in session:
+        if not Coredata().initial_obtained(user):
             return redirect(url_for('portal.initial_queries'))
 
         # now logged in, redirect if next was previously stored

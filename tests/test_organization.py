@@ -88,7 +88,7 @@ class TestOrganization(TestCase):
         self.assert200(rv)
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEquals(len(bundle['entry']), 2)
+        self.assertEquals(len(bundle['entry']), 3)  # 2 + 'none of the above'
 
     def test_organization_put(self):
         with open(os.path.join(
@@ -149,7 +149,12 @@ class TestOrganization(TestCase):
         self.login()
         rv = self.app.delete('/api/organization/{}'.format(org2_id))
         self.assert200(rv)
-        self.assertEquals(Organization.query.one().name, 'test 1')
+        # should leave the `none of the above` and test 1
+        self.assertEquals(Organization.query.count(), 2)
+        orgs = Organization.query.all()
+        names =  [o.name for o in orgs]
+        self.assertTrue('none of the above' in names)
+        self.assertTrue('test 1' in names)
 
     def test_organization_identifiers(self):
         alias = Identifier(
@@ -174,23 +179,25 @@ class TestOrganization(TestCase):
             data = json.load(fhir_data)
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
+        org = Organization.query.one()  # only expect the 'none of the above'
         rv = self.app.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert200(rv)
+        self.assertEquals(Organization.query.count(), 2)
 
         # the gastro file contains a single identifier - add
         # a second one and PUT, expecting we get two total
 
         alias = Identifier(system=SHORTCUT_ALIAS, value='foobar',
                            use='secondary')
+        org = Organization.query.filter_by(name='Gastroenterology').one()
         data['identifier'].append(alias.as_fhir())
-        org = Organization.query.one()  # only expect the one we just POSTed
         rv = self.app.put('/api/organization/{}'.format(org.id),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
 
         # obtain the org from the db, check the identifiers
-        org = Organization.query.one()
+        org = Organization.query.filter_by(name='Gastroenterology').one()
         self.assertEquals(2, org.identifiers.count())
