@@ -70,7 +70,6 @@ def specific_clinic_landing(clinic_alias):
 def initial_queries():
     if request.method == 'GET':
         return render_template('initial_queries.html', user=current_user())
-    del session['initial_queries']
     return redirect('/')
 
 
