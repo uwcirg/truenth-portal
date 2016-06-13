@@ -45,7 +45,7 @@ class FHIR_datetime(object):
     @staticmethod
     def now():
         """Generates a FHIR compliant datetime string for current moment"""
-        return datetime.datetime.utcnow().isoformat()+'Z'
+        return datetime.utcnow().isoformat()+'Z'
 
 
 class CodeableConceptCoding(db.Model):
