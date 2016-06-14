@@ -38,6 +38,18 @@ a:active {
 .smaller-text {
   font-size: 14px;
 }
+.smaller-text .form-control {
+  font-size: 14px;
+  height: 28px;
+}
+.smaller-text .btn {
+  font-size: 14px;
+}
+.table-title {
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 23.94px;
+}
 .feature-btn {
   transition: all 0.2s ease-in-out 0s;
   -webkit-transition: all 0.2s ease-in-out 0s;
@@ -399,16 +411,6 @@ a:active {
   .tnth-subhead {
     font-size: 29px;
   }
-  /** Unless explicitly wrapped in reduce-font-sizes class **/
-  body .reduce-font-sizes {
-    font-size: 18px;
-  }
-  .reduce-font-sizes .tnth-headline {
-    font-size: 24px;
-  }
-  .reduce-font-sizes .tnth-subhead {
-    font-size: 22px;
-  }
   #fullSizeContainer {
     padding: 30px 0;
   }
@@ -441,6 +443,20 @@ a:active {
   .form-group input[type=checkbox],
   .form-group input[type=radio] {
     margin-top: 9px;
+  }
+  /** Unless explicitly wrapped in reduce-font-sizes class **/
+  body .reduce-font-sizes {
+    font-size: 18px;
+  }
+  .reduce-font-sizes .tnth-headline {
+    font-size: 24px;
+  }
+  .reduce-font-sizes .tnth-subhead {
+    font-size: 22px;
+  }
+  .reduce-font-sizes .form-group input[type=checkbox],
+  .reduce-font-sizes .form-group input[type=radio] {
+    margin-top: 4px;
   }
 }
 @media (min-width: 1200px) {

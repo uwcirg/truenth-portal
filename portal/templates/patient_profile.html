@@ -8,270 +8,276 @@
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
 
-<h3 class="tnth-headline">
-Patient {{ patient.username }}
-</h3>
 
-<form id="profileForm" class="form tnth-form to-validate" role="form">
+<div class="reduce-font-sizes">
 
-<div class="row" style="position: relative;">
-    <div class="col-md-9">
+    <h3 class="tnth-headline">
+        Patient #{{ patient.id}} - {{ patient.username }}
+    </h3>
 
-        {% if patient.image_url %}
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="profile-img hidden-xs">
-                    <img src="{{ patient.image_url }}" />
+    <form id="profileForm" class="form tnth-form to-validate" role="form">
+
+        <div class="row" style="position: relative;">
+            <div class="col-md-9">
+
+                {% if patient.image_url %}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="profile-img hidden-xs">
+                            <img src="{{ patient.image_url }}" />
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <input type="hidden" name="birthDate" id="birthday" value="{{ patient.birthdate if patient.birthdate }}">
+                <div class="form-group" style="margin-bottom: 0">
+                    <label>Name</label>
+                </div>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="form-group float-input-label">
+                            <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ patient.first_name if patient.first_name }}" type="text" />
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-group float-input-label">
+                            <input required="required" data-error="Last name is required" class="form-control float-text" name="lastname" placeholder="Last Name" value="{{ patient.last_name if patient.last_name }}" type="text" />
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="bdGroup">
+                    <label>Birth Date</label>
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                                <option value="">Month...</option>
+                                <option value="01">January</option>
+                                <option value="02">February</option>
+                                <option value="03">March</option>
+                                <option value="04">April</option>
+                                <option value="05">May</option>
+                                <option value="06">June</option>
+                                <option value="07">July</option>
+                                <option value="08">August</option>
+                                <option value="09">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+                        </div>
+                        <div class="col-xs-4">
+                            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+                        </div>
+                    </div>
+                    <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <div style="margin-top: -10px">
+                        <label class="radio-inline">
+                            <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if patient.gender == "male"}}/>
+                            Male
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if patient.gender == "female"}}/>
+                            Female
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if patient.gender == "other"}}/>
+                            Other
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="userEthnicity">
+                    <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
+                    <div style="margin-top: -10px">
+
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group" id="userRace">
+                    <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
+                    <div style="margin-top: -10px">
+
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="2028-9"> Asian
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="2054-5"> Black or African American
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="2106-3"> White
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="race" value="2131-1"> Other
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group float-input-label" id="emailGroup">
+                    <label for="email">Email address</label>
+                    <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ patient.email if patient.email }}" data-customemail="true" required>
+                    <div class="help-block with-errors" id="erroremail"></div>
+                </div>
+                <div class="form-group float-input-label">
+                    <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ patient.phone if patient.phone }}">
+                </div>
+
+
+                <div class="form-group" id="userOrgs">
+                    <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
+                    <div style="margin-left: 10px">
+                        <div id="fillOrgs"></div>
+                        <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+                    </div>
+                </div>
+
+                <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+                <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+                <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
+
+            </div>
+
+            <!--
+            <div class="col-md-4 pos-bottom-md">
+            <div id="patientQuestions">
+                <div class="form-group">
+                    <label>Have you had a prostate cancer biopsy?</label>
+                    <div>
+                        <label class="radio-inline">
+                            <input class="history-q" type="radio" name="biopsy" value="true" />
+                            Yes
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="biopsy" value="false" />
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Have you been diagnosed with prostate cancer?</label>
+                    <div>
+                        <label class="radio-inline">
+                            <input type="radio" name="pca_diag" value="true" />
+                            Yes
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="pca_diag" value="false" />
+                            No
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Have you begun prostate cancer treatment?</label>
+                    <div>
+                        <label class="radio-inline">
+                            <input type="radio" name="tx" value="true" />
+                            Yes
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="tx" value="false" />
+                            No
+                        </label>
+                    </div>
                 </div>
             </div>
+            <div class="visible-lg"><br /></div>
+            </div>
+            -->
+        </div>
+
+
+        {% if current_user.has_role('admin') and not patient.has_role('service') %}
+        <hr />
+
+        <h3>User Roles for {{ patient.username }}</h3>
+        <div id="userRoles">
+            <div class="form-group">
+                <p>Editable by admins only.</p>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="admin"> Admin
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="anon"> Anon
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="application_developer"> Application Developer
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="partner"> Partner
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="patient"> Patient
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="provider"> Provider
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="user_type" value="test"> Test
+                    </label>
+                </div>
+            </div>
+
         </div>
         {% endif %}
 
-        <input type="hidden" name="birthDate" id="birthday" value="{{ patient.birthdate if patient.birthdate }}">
-        <div class="form-group" style="margin-bottom: 0">
-            <label>Name</label>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <div class="form-group float-input-label">
-                    <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ patient.first_name if patient.first_name }}" type="text" />
-                    <div class="help-block with-errors"></div>
-                </div>
-            </div>
-            <div class="col-xs-6">
-                <div class="form-group float-input-label">
-                    <input required="required" data-error="Last name is required" class="form-control float-text" name="lastname" placeholder="Last Name" value="{{ patient.last_name if patient.last_name }}" type="text" />
-                    <div class="help-block with-errors"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group" id="bdGroup">
-            <label>Birth Date</label>
-            <div class="row">
-                <div class="col-xs-4">
-                    <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
-                        <option value="">Month...</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="col-xs-4">
-                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-                </div>
-                <div class="col-xs-4">
-                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
-                </div>
-            </div>
-            <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
-        </div>
-        <div class="form-group">
-            <label>Gender</label>
-            <div style="margin-top: -10px">
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if patient.gender == "male"}}/>
-                    Male
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if patient.gender == "female"}}/>
-                    Female
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if patient.gender == "other"}}/>
-                    Other
-                </label>
-            </div>
-        </div>
-
-        <div class="form-group" id="userEthnicity">
-            <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
-            <div style="margin-top: -10px">
-
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
-                    </label>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="form-group" id="userRace">
-            <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
-            <div style="margin-top: -10px">
-
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="2028-9"> Asian
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="2054-5"> Black or African American
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="2106-3"> White
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="race" value="2131-1"> Other
-                    </label>
-                </div>
-
-            </div>
-        </div>
-        <div class="form-group float-input-label" id="emailGroup">
-            <label for="email">Email address</label>
-            <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ patient.email if patient.email }}" data-customemail="true" required>
-            <div class="help-block with-errors" id="erroremail"></div>
-        </div>
-        <div class="form-group float-input-label">
-            <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-            <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ patient.phone if patient.phone }}">
-        </div>
-
-
-        <div class="form-group" id="userOrgs">
-            <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
-            <div style="margin-left: 10px">
-                <div id="fillOrgs"></div>
-                <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
-            </div>
-        </div>
-
-        <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-        <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
-
-    </div>
-
-        <!--
-        <div class="col-md-4 pos-bottom-md">
-        <div id="patientQuestions">
-            <div class="form-group">
-                <label>Have you had a prostate cancer biopsy?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input class="history-q" type="radio" name="biopsy" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="biopsy" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you been diagnosed with prostate cancer?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you begun prostate cancer treatment?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="visible-lg"><br /></div>
-        </div>
-        -->
-</div>
-
-
-{% if current_user.has_role('admin') and not patient.has_role('service') %}
-<hr />
-
-<h3>User Roles for {{ patient.username }}</h3>
-<div id="userRoles">
-    <div class="form-group">
-        <p>Editable by admins only.</p>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="admin"> Admin
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="anon"> Anon
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="application_developer"> Application Developer
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="partner"> Partner
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="patient"> Patient
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="provider"> Provider
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="test"> Test
-            </label>
-        </div>
-    </div>
+    </form>
 
 </div>
-{% endif %}
 
-</form>
 
 {% endblock %}
 

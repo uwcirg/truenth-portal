@@ -1,25 +1,30 @@
 {% extends "layout.html" %}
 {% block main %}
 
-<h1 class="tnth-headline">Patients</h1>
+<div class="reduce-font-sizes">
 
-<p id="profileIntro">Select any user to view details or make changes.</p>
+<h3 class="tnth-headline">Patients</h3>
+<p>Select any user to view details or make changes.</p>
+<hr />
 
+{% set orgCount = 1 %}
 {% for org in patients_by_org.keys() %}
-<h2>Patients in Organization {{ org }} </h2>
 <div class="table-responsive smaller-text">
-    <table class="table table-striped table-bordered table-hover table-condensed">
+    <div id="toolbar{{ orgCount }}" class="table-title">{{ org }} Patients</div>
+    <table data-classes="table table-hover table-condensed table-striped" data-toggle="table" data-sort-name="username" data-sort-order="desc" data-search="true" data-pagination="true" data-page-size="50" data-toolbar="#toolbar{{orgCount}}">
         <thead>
             <tr>
-                <th>Username</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
+                <th data-field="userid" data-sortable="true">ID</th>
+                <th data-field="username" data-sortable="true">Username</th>
+                <th data-field="firstname" data-sortable="true">First Name</th>
+                <th data-field="lastname" data-sortable="true">Last Name</th>
+                <th data-field="email" data-sortable="true">Email</th>
             </tr>
         </thead>
         <tbody>
         {% for user in patients_by_org[org] %}
             <tr>
+                <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.id }}</a></td>
                 <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.username }}</a></td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
@@ -29,7 +34,12 @@
         </tbody>
     </table>
 </div>
+{% if orgCount < patients_by_org.keys()|length %}
+<hr />
+{% endif %}
+{% set orgCount = orgCount + 1 %}
 {% endfor %}
 
+</div>
 
 {% endblock %}
