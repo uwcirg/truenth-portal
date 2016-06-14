@@ -61,6 +61,12 @@ install_requires), but it's safe to run anytime to make sure.
 $ pip install --process-dependency-links -e .
 ```
 
+If you would like to contribute to this project or run the test suite run `pip` as follows. This will install the default dependencies and all of the dependencies required for running the test suite and contributing.
+
+```bash
+$ pip install --process-dependency-links -e .[dev]
+```
+
 If new files in the `migrations/versions` directories showed up on the
 pull, a database upgrade as detailed below also needs to be run.
 

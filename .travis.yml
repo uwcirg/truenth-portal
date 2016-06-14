@@ -38,7 +38,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install --process-dependency-links -e .
+  - pip install --process-dependency-links -e .[dev]
   - cp portal/application.cfg.travis portal/application.cfg
 
 before_script:
