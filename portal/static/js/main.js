@@ -420,6 +420,19 @@ var tnthAjax = {
         }).fail(function() {
             alert("There was a problem saving your answers. Please try again.");
         });
+    },
+    "postTerms": function(toSend) {
+        $.ajax ({
+            type: "POST",
+            url: '/api/tou/accepted',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: JSON.stringify(toSend)
+        }).done(function() {
+            console.log('terms stored');
+        }).fail(function() {
+            alert("There was a problem saving your answers. Please try again.");
+        });
     }
 };
 

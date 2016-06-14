@@ -168,9 +168,10 @@
       <p>OK, please review the terms of use for TrueNTH:</p>
 
       <div class="well" style="margin-left: 2em">
+
         <p class="text-muted">[Terms of use present as scrolling textbox or trigger modal via "Review" button. Need to decide what happens if user does not agree.]</p>
 
-        <div id="termsAgree" class="btn btn-tnth-primary">I Agree</div>
+        <div id="termsAgree" class="btn btn-tnth-primary" data-terms="Temporary terms - I hereby agree to TrueNTH">I Agree</div>
       </div>
     </div>
     <br />
@@ -254,6 +255,10 @@ $(document).ready(function(){
   });
 
   $("#termsAgree").on("click",function(){
+    var theTerms = {};
+    // Temporary terms for testing
+    theTerms["text"] = $(this).attr('data-terms');
+    tnthAjax.postTerms(theTerms);
     $("#continueText").fadeIn();
     $("#updateProfile").removeAttr("disabled");
   });
