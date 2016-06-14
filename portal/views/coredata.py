@@ -35,6 +35,9 @@ def acquire():
     required, another call to `/patient/<patient_id>/procedure` will return
     any new procedure data acquired as well as existing.
 
+    NB: providing multiple values for the `require` parameter is supported,
+    with the parameter repeated as in `?require=first&require=second`
+
     ---
     tags:
       - Coredata
