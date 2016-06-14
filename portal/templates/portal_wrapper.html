@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
+<script type="text/javascript">
+    var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
+</script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
     var _paq = _paq || [];

@@ -72,6 +72,10 @@ def portal_wrapper_html():
     CORS headers will only be included when the request includes well defined
     Origin header.
 
+    To assist in logic decisions on client pages, the javascript variable
+    `truenth_authenticated` of type boolean included in the response will
+    accurately describe the user's athenticated status.
+
     ---
     tags:
       - TrueNTH
