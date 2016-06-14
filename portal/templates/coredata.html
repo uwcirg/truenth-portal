@@ -102,13 +102,11 @@ Acquire Core Data
             </div>
         </div>
         {% endif %}
+    </div>
 </div>
 
-
-<hr />
-        <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-        <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
+<br />
+<button id="updateData" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
 
 
 </form>
@@ -118,37 +116,26 @@ Acquire Core Data
 {% block document_ready %}
 $(document).ready(function(){
 
-    // If there's any change to form fields, then note that
-    $("#profileForm :input").change(function() {
-        $(this).closest('form').attr('data-changed', true)
-    });
-    $('#profileForm').on('validated.bs.validator', function(e) {
-        var validator = $(this).data('bs.validator');
-        // If the form has a change, then show save or error messages
-        if ($(this).data('changed')) {
-            if (!validator.hasErrors()) {
-                $("#saveMsg").fadeIn("slow")
-                $("#errorMsg").hide()
-            } else {
-                $("#saveMsg").hide()
-                $("#errorMsg").fadeIn("slow")
-            }
-        }
-    })
-    /*** End -- Field Validation ***/
+    {% if ('race' in require) or if ('ethnicity' in require) %}
+    tnthAjax.getDemo({{ user.id }});
+    {% endif %}
+    {% if 'procedure' in require %}
+    tnthAjax.getProc({{ user.id }});
+    {% endif %}
 
-    // Submit the form here
-    $("#updateProfile").on("click", function(event){
-        event.preventDefault();
-        {% if 'race' in require %}
-        assembleCoredataContent.race({{ user.id }});
-        {% endif %}
-        {% if 'ethnicity' in require %}
-        assembleCoredataContent.ethnicity({{ user.id }});
+    // If there's any change to an input, assembleContent
+    $("#profileForm").on("change", "input", function() {
+        {% if ('race' in require) or if ('ethnicity' in require) %}
+        assembleContent.coreData({{ user.id }});
         {% endif %}
         {% if 'procedure' in require %}
-        assembleCoredataContent.proc({{ user.id }});
+        assembleContent.coreDataProc({{ user.id }});
         {% endif %}
+    });
+
+    // Save button, doesn't actually save
+    $("#updateData").on("click", function(event){
+        event.preventDefault();
         window.location.replace("{{ return_address }}");
     });
 

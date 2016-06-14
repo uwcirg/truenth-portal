@@ -125,6 +125,13 @@ var fillContent = {
             $("#terms").fadeIn();
         }
     },
+    "procedures": function(data) {
+        // TODO - add date? should procedures be checkbox or radio
+        $.each(data.entry,function(i,val){
+            var procID = val.content.code.coding[0].code;
+            $("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
+        });
+    },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){
             var userRole = val.name;
@@ -223,51 +230,44 @@ var assembleContent = {
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
         tnthAjax.putDemo(userId, demoArray);
-    }
-};
-
-var assembleCoredataContent = {
-    "ethnicity": function(userId) {
+    },
+    "coreData": function(userId) {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
-        // Grab profile field values - looks for regular and hidden, can be checkbox or radio
-        var ethnicityIDs = $("#userEthnicity input:checked").map(function(){
-            return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
-        }).get();
-        demoArray["extension"] = [
-            { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
-                "valueCodeableConcept": {
-                    "coding": ethnicityIDs
+        demoArray["extension"] = [];
+        if ($("#userEthnicity").length) {
+            var ethnicityIDs = $("#userEthnicity input:checked").map(function(){
+                return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
+            }).get();
+            demoArray["extension"].push(
+                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                    "valueCodeableConcept": {
+                        "coding": ethnicityIDs
+                    }
                 }
-            }
-        ];
+            );
+        }
+        if ($("#userRace").length) {
+            var raceIDs = $("#userRace input:checkbox:checked").map(function(){
+                return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
+            }).get();
+            demoArray["extension"].push(
+                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                    "valueCodeableConcept": {
+                        "coding": raceIDs
+                    }
+                }
+            );
+        }
         tnthAjax.putDemo(userId,demoArray);
     },
-    "race": function(userId) {
-        var demoArray = {};
-        demoArray["resourceType"] = "Patient";
-        // Look for race checkboxes, can be hidden
-        var raceIDs = $("#userRace input:checkbox:checked").map(function(){
-            return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
-        }).get();
-        demoArray["extension"] = [
-            { "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
-                "valueCodeableConcept": {
-                    "coding": raceIDs
-                }
-            }
-        ];
-        tnthAjax.putDemo(userId,demoArray);
-    },
-    "proc": function(userId) {
+    "coreDataProcedure": function(userId) {
         var procArray = {};
         procArray["resourceType"] = "Procedure";
-
         var procID = $("#userProcedure input:checked").map(function(){
             return { code: $(this).val(), display: $(this).attr("display"),
                 system: "http://snomed.info/sct" };
         }).get();
-
         procArray["subject"] = {"reference": "Patient/" + userId };
         procArray["code"] = {"coding": procID};
         procArray["performedDateTime"] = "2013-04-01";  // TODO: from datepicker
@@ -329,6 +329,7 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.orgs(data);
             fillContent.demo(data);
+            fillContent.procedures(data);
             loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");
@@ -345,6 +346,18 @@ var tnthAjax = {
         }).done(function(data) {
         }).fail(function() {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
+        });
+    },
+    "getProc": function(userId) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/'+userId+'/procedure'
+        }).done(function(data) {
+            fillContent.procedures(data);
+            loader();
+        }).fail(function() {
+            console.log("Problem retrieving data from server.");
+            loader();
         });
     },
     "postProc": function(userId,toSend) {
