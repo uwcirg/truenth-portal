@@ -52,6 +52,8 @@ def intervention_set(intervention_name):
           required:
             - user_id
             - access
+            - card_html
+            - provider_html
           properties:
             user_id:
               type: string
@@ -65,8 +67,14 @@ def intervention_set(intervention_name):
             card_html:
               type: string
               description:
-                Custom text for display on intervention card for the
+                Custom HTML for display on intervention card for the
                 referenced user
+            provider_html:
+              type: string
+              description:
+                Custom HTML for display in patient list for care providers,
+                as seen on the /patients view, specific to the referenced
+                user..
     responses:
       200:
         description: successful operation
@@ -106,7 +114,8 @@ def intervention_set(intervention_name):
                               intervention_id=intervention.id)
         db.session.add(ui)
     ui.access = request.json.get('access')
-    ui.card_html = request.json.get('card_html', None)
+    ui.card_html = request.json.get('card_html')
+    ui.provider_html = request.json.get('provider_html')
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(
         intervention.description, json.dumps(request.json)),
