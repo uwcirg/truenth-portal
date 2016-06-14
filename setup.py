@@ -69,7 +69,6 @@ setup(
         "redis",
         "sphinx",
         "sphinx_rtd_theme",
-        "swagger_spec_validator",
         "validators==0.10.1",
     ),
     extras_require = {
@@ -78,6 +77,7 @@ setup(
             "nose",
             "page_objects",
             "selenium",
+            "swagger_spec_validator",
             "xvfbwrapper",
         ),
     },
