@@ -33,6 +33,27 @@ class TestPortal(TestCase):
         intervention = db.session.merge(intervention)
         self.assertIn(intervention.card_html, rv.data)
 
+    def test_provider_html(self):
+        """Interventions can customize the provider text """
+        client = self.add_client()
+        intervention = INTERVENTION.sexual_recovery
+        client.intervention = intervention
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id)
+        ui.provider_html = "Custom text for <i>provider</i>"
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.bless_with_basics()
+        self.login()
+        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.PATIENT)
+        rv = self.app.get('/patients/')
+
+        ui = db.session.merge(ui)
+        self.assertIn(ui.provider_html, rv.data)
+
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
         client = self.add_client()

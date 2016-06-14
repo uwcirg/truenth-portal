@@ -19,6 +19,7 @@
                 <th data-field="firstname" data-sortable="true">First Name</th>
                 <th data-field="lastname" data-sortable="true">Last Name</th>
                 <th data-field="email" data-sortable="true">Email</th>
+                <th data-field="provider_html" data-sortable="false">Custom</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +30,7 @@
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
+                <td>{{ user.provider_html() | safe }}</td>
             </tr>
         {% endfor %}
         </tbody>
