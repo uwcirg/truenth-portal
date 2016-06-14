@@ -305,7 +305,9 @@ var tnthAjax = {
             });
             $.each(clinicArray, function(i,val) {
                 // Fill in parent clinic
-                $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' value='"+val.id+"' />");
+                if (val.name != "none of the above") {
+                    $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' value='"+val.id+"' />");
+                }
                 // Fill in each child clinic
                 $.each(val.children, function(n,subval) {
                     var childClinic = '<div class="checkbox"><label>' +
