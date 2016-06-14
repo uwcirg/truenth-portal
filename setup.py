@@ -74,7 +74,7 @@ setup(
         "sphinx",
         "sphinx_rtd_theme",
         "swagger_spec_validator",
-        "validators",
+        "validators==0.10.1",
         "xvfbwrapper",
     ),
     test_suite="tests",
