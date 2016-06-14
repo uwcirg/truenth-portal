@@ -83,6 +83,7 @@ class UserIntervention(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     access = db.Column('access', access_types, default='forbidden')
     card_html = db.Column(db.Text)
+    provider_html = db.Column(db.Text)
     user_id = db.Column(db.ForeignKey('users.id'))
     intervention_id = db.Column(db.ForeignKey('interventions.id'))
 
