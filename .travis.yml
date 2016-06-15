@@ -2,6 +2,8 @@ sudo: true
 language: python
 python:
   - "2.7"
+  - "3.5"
+  - "pypy"
 
 cache: pip
 addons:
@@ -22,6 +24,11 @@ services:
 env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
+
+matrix:
+  allow_failures:
+    - python: "3.5"
+    - python: "pypy"
 
 before_install:
   - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
