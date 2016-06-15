@@ -31,7 +31,11 @@ matrix:
     - python: "pypy"
 
 before_install:
+  # Set tox env from TravisCI environmental variable
   - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
+
+  # Install postgresql 9.5 - remove when support as addon
+  # See https://github.com/travis-ci/travis-ci/issues/4264
   - sudo service postgresql stop
   - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
   - sudo apt-get -y autoremove
