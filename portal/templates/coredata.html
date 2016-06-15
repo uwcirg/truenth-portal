@@ -116,7 +116,7 @@ Acquire Core Data
 {% block document_ready %}
 $(document).ready(function(){
 
-    {% if ('race' in require) or if ('ethnicity' in require) %}
+    {% if ('race' in require) or ('ethnicity' in require) %}
     tnthAjax.getDemo({{ user.id }});
     {% endif %}
     {% if 'procedure' in require %}
@@ -125,7 +125,7 @@ $(document).ready(function(){
 
     // If there's any change to an input, assembleContent
     $("#profileForm").on("change", "input", function() {
-        {% if ('race' in require) or if ('ethnicity' in require) %}
+        {% if ('race' in require) or ('ethnicity' in require) %}
         assembleContent.coreData({{ user.id }});
         {% endif %}
         {% if 'procedure' in require %}
