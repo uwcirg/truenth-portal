@@ -31,11 +31,19 @@ class TestIntervention(TestCase):
 
         data = {'user_id': TEST_USER_ID,
                 'access': "granted",
-                'card_html': "unique HTML set via API"}
+                'card_html': "unique HTML set via API",
+                'provider_html': "unique HTML for /patients view"
+               }
         rv = self.app.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
+
+        ui = UserIntervention.query.one()
+        self.assertEquals(ui.user_id, data['user_id'])
+        self.assertEquals(ui.access, data['access'])
+        self.assertEquals(ui.card_html, data['card_html'])
+        self.assertEquals(ui.provider_html, data['provider_html'])
 
     def test_multi_strategy(self):
         """Add strategy to limit users to any of several clinics"""

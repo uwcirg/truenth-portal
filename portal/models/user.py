@@ -12,6 +12,7 @@ from flask_login import current_user as flask_login_current_user
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
+from .intervention import UserIntervention
 from .performer import Performer
 from .organization import Organization
 import reference
@@ -467,6 +468,25 @@ class User(db.Model, UserMixin):
 
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
+
+    def provider_html(self):
+        """Helper used from templates to display any custom provider text
+
+        Interventions can add personalized HTML for care providers
+        to consume on the /patients list.  Look up any values for this user
+        on all interventions.
+
+        """
+        uis = UserIntervention.query.filter(and_(
+            UserIntervention.user_id == self.id,
+            UserIntervention.provider_html != None))
+        if uis.count() == 0:
+            return ""
+        if uis.count() == 1:
+            return uis[0].provider_html
+        else:
+            return '<div>' + '</div><div>'.join(
+                [ui.provider_html for ui in uis]) + '</div>'
 
 
 def add_authomatic_user(authomatic_user, image_url):
