@@ -24,6 +24,7 @@ env:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
 
 before_install:
+  - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
   - sudo service postgresql stop
   - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
   - sudo apt-get -y autoremove
@@ -45,4 +46,4 @@ before_script:
   - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 
 script:
-  - nosetests -v --with-cover --cover-package=portal
+  - tox
