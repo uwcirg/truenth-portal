@@ -10,7 +10,7 @@ from .crossdomain import crossdomain
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import INTERVENTION
-from ..models.message import EmailInvite
+from ..models.message import EmailMessage
 from ..models.organization import OrganizationIdentifier
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
@@ -136,7 +136,7 @@ def invite():
     body = request.form.get('body')
     recipients = request.form.get('recipients')
     user = current_user()
-    email = EmailInvite(subject=subject, body=body,
+    email = EmailMessage(subject=subject, body=body,
             recipients=recipients, sender=user.email,
             user_id=user.id)
     email.send_message()
@@ -149,7 +149,7 @@ def invite():
 @oauth.require_oauth()
 def invite_sent(message_id):
     """show invite sent"""
-    message = EmailInvite.query.get(message_id)
+    message = EmailMessage.query.get(message_id)
     if not message:
         abort(404, "Message not found")
     current_user().check_role('view', other_id=message.user_id)
@@ -221,7 +221,7 @@ def contact():
     recipients = current_app.config['CONTACT_SENDTO_EMAIL']
 
     user_id = user.id if user else None
-    email = EmailInvite(subject=subject, body=body,
+    email = EmailMessage(subject=subject, body=body,
             recipients=recipients, sender=sender, user_id=user_id)
     email.send_message()
     db.session.add(email)
@@ -231,7 +231,7 @@ def contact():
 @portal.route('/contact/<int:message_id>')
 def contact_sent(message_id):
     """show invite sent"""
-    message = EmailInvite.query.get(message_id)
+    message = EmailMessage.query.get(message_id)
     if not message:
         abort(404, "Message not found")
     return render_template('contact_sent.html', message=message)
