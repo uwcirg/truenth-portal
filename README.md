@@ -166,10 +166,23 @@ supress standard out (vital for debugging) and to stop on first error:
 $ nosetests -sx tests.test_intervention
 ```
 
+The test suite can also be run on different python interpreters (currently Python 2.7, 3.5 and PyPy), if available, using the tox test automation framework:
+
+```bash
+$ tox
+```
+
+Tox will pass any options after -- to the test runner, nose, eg:
+
+```bash
+$ tox -- -sx tests.test_intervention
+```
+
+
 ## Documentation
 
 Docs are built seperately via sphinx.  Change to the docs directory and use
-the contained Makefile to build - then view in browser starting with the 
+the contained Makefile to build - then view in browser starting with the
 `docs/build/html/index.html` file
 
 ```bash
