@@ -200,7 +200,7 @@ class TestUser(TestCase):
     def test_unauth_role(self):
         self.login()
         rv = self.app.get('/api/user/66/roles')
-        self.assert401(rv)
+        self.assert404(rv)
 
     def test_all_roles(self):
         self.login()

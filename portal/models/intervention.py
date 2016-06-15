@@ -87,6 +87,13 @@ class UserIntervention(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'))
     intervention_id = db.Column(db.ForeignKey('interventions.id'))
 
+    def as_json(self):
+        d = {'user_id': self.user_id}
+        for field in ('access', 'card_html', 'provider_html'):
+            if getattr(self, field):
+                d[field] = getattr(self, field)
+        return d
+
 
 STATIC_INTERVENTIONS = IterableUserDict({
     'assessment_engine': 'Assessment Engine',

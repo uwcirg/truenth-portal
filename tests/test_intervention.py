@@ -369,3 +369,33 @@ class TestIntervention(TestCase):
 
         # All conditions now met, should have access
         self.assertTrue(ds_p3p.user_has_access(user))
+
+    def test_get_empty_user_intervention(self):
+        # Get on user w/o user_intervention
+        self.login()
+        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+            i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json.keys()), 1)
+        self.assertEquals(rv.json['user_id'], TEST_USER_ID)
+
+    def test_get_user_intervention(self):
+        intervention_id = INTERVENTION.SEXUAL_RECOVERY.id
+        ui = UserIntervention(intervention_id=intervention_id,
+                              user_id=TEST_USER_ID,
+                              access='granted',
+                              card_html='custom ch',
+                              provider_html='custom ph')
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.login()
+        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+            i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json.keys()), 4)
+        self.assertEquals(rv.json['user_id'], TEST_USER_ID)
+        self.assertEquals(rv.json['access'], 'granted')
+        self.assertEquals(rv.json['card_html'], "custom ch")
+        self.assertEquals(rv.json['provider_html'], "custom ph")

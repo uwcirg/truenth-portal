@@ -447,12 +447,16 @@ class User(db.Model, UserMixin):
         otherwise, must be self or have a relationship granting permission
         to "verb" the other user.
 
-        returns true if permission should be granted, otherwise raise a 401
+        returns true if permission should be granted, raises 404 if the
+        other_id can't be found, otherwise raise a 401
 
         """
         assert(permission in ('view', 'edit'))  # limit vocab for now
         if self.id == other_id:
             return True
+        other = User.query.get(other_id)
+        if not other:
+            abort(404, "User not found {}".format(other_id))
         for role in self.roles:
             if role.name in (ROLE.ADMIN, ROLE.SERVICE):
                 # Admin and service accounts have carte blanche

@@ -17,24 +17,103 @@ from ..models.intervention_strategies import AccessStrategy
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')
 
 
+@intervention_api.route(
+    '/intervention/<string:intervention_name>/user/<int:user_id>')
+@oauth.require_oauth()
+def user_intervention_get(intervention_name, user_id):
+    """Get settings for named user and intervention
+
+    Returns JSON defining current settings for the given intervention
+    and user_id, with only defined fields returned.
+
+    ---
+    operationId: user_intervention_get
+    tags:
+      - Intervention
+    produces:
+      - application/json
+    parameters:
+      - name: intervention_name
+        in: path
+        description: TrueNTH intervention_name
+        required: true
+        type: string
+      - name: user_id
+        in: path
+        description: TrueNTH user identification
+        required: true
+        type: string
+    responses:
+      200:
+        description: user intervention settings
+        schema:
+          id: intervention_access
+          required:
+            - user_id
+            - access
+            - card_html
+            - provider_html
+          properties:
+            user_id:
+              type: string
+              description:
+                Truenth user identifier referring to whom the request applies
+            access:
+              type: string
+              enum:
+                - forbidden
+                - granted
+            card_html:
+              type: string
+              description:
+                Custom HTML for display on intervention card for the
+                referenced user
+            provider_html:
+              type: string
+              description:
+                Custom HTML for display in patient list for care providers,
+                as seen on the /patients view, specific to the referenced
+                user..
+      401:
+        description:
+          if missing valid OAuth SERVICE token or the service user owning
+          the token isn't sponsored by the named intervention owner.
+      404:
+        description:
+          if either the intervention name or the user_id given can't be found
+
+    """
+    intervention = getattr(INTERVENTION, intervention_name)
+    if not intervention:
+        abort (404, 'no such intervention {}'.format(intervention_name))
+    current_user().check_role(permission='edit', other_id=user_id)
+
+    ui = UserIntervention.query.filter_by(
+        user_id=user_id, intervention_id=intervention.id).first()
+    if not ui:
+        ui = UserIntervention(user_id=user_id)
+    return jsonify(ui.as_json())
+
+
 @intervention_api.route('/intervention/<string:intervention_name>',
                         methods=('PUT',))
 @oauth.require_oauth()
 @roles_required(ROLE.SERVICE)
-def intervention_set(intervention_name):
+def user_intervention_set(intervention_name):
     """Update user access to the named intervention
 
-    Submit a JSON doc with the user_id and access {granted|forbidden}
-    for the named intervention.
+    Submit a JSON doc with the user_id and other fields to set.  Keep
+    in mind the PUT defines the whole resource for the user_id on the
+    named intervention, calling GET first may be advisable.
 
     Only available as a service account API - the named intervention
     must be associated with the service account sponsor.
 
-    NB - interventions have a global 'public_access' setting.  Only
-    when unset are individual accounts consulted.
+    NB - for `access`, interventions have a global 'public_access' setting.
+    Only when public_access is unset are individual accounts consulted.
 
     ---
-    operationId: setInterventionAccess
+    operationId: user_intervention_set
     tags:
       - Intervention
     produces:
@@ -101,9 +180,8 @@ def intervention_set(intervention_name):
         relationship_name=RELATIONSHIP.SPONSOR, other_user=current_user())):
         abort(401, "Service account sponsored by intervention owner required")
 
-    if not request.json or 'user_id' not in request.json or\
-            "access" not in request.json:
-        abort(400, "Requires JSON defining at least user_id and access")
+    if not request.json or 'user_id' not in request.json:
+        abort(400, "Requires JSON defining at least user_id")
     user_id = request.json.get('user_id')
     current_user().check_role(permission='edit', other_id=user_id)
 
