@@ -136,7 +136,7 @@ $(document).ready(function(){
     // Save button, doesn't actually save
     $("#updateData").on("click", function(event){
         event.preventDefault();
-        window.location.replace("{{ return_address }}");
+        window.location.replace("{{ return_address | safe }}");
     });
 
 });
