@@ -78,6 +78,7 @@ setup(
             "page_objects",
             "selenium",
             "swagger_spec_validator",
+            "tox",
             "xvfbwrapper",
         ),
     },

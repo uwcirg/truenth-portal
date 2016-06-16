@@ -2,6 +2,8 @@ sudo: true
 language: python
 python:
   - "2.7"
+  - "3.5"
+  - "pypy"
 
 cache: pip
 addons:
@@ -23,7 +25,17 @@ env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
 
+matrix:
+  allow_failures:
+    - python: "3.5"
+    - python: "pypy"
+
 before_install:
+  # Set tox env from TravisCI environmental variable
+  - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
+
+  # Install postgresql 9.5 - remove when support as addon
+  # See https://github.com/travis-ci/travis-ci/issues/4264
   - sudo service postgresql stop
   - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
   - sudo apt-get -y autoremove
@@ -45,4 +57,4 @@ before_script:
   - celery worker --detach -A portal.celery_worker.celery --loglevel=info
 
 script:
-  - nosetests -v --with-cover --cover-package=portal
+  - tox
