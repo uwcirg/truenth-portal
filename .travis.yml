@@ -32,6 +32,8 @@ matrix:
   include:
     - python: "2.7"
       env: TOXENV=docs
+    - python: "2.7"
+      env: TOXENV=ui
 
 before_install:
   # Set tox env from TravisCI environmental variable
