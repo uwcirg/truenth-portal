@@ -133,6 +133,8 @@ class User(db.Model, UserMixin):
     auth_providers = db.relationship('AuthProvider', lazy='dynamic')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
+    groups = db.relationship('Group', secondary='user_groups',
+            backref=db.backref('users', lazy='dynamic'))
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',

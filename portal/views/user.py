@@ -3,6 +3,7 @@ from flask import abort, Blueprint, jsonify
 from flask import request
 
 from ..audit import auditable_event
+from ..models.group import Group
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
@@ -86,6 +87,162 @@ def account():
     return jsonify(user_id=user.id)
 
 
+@user_api.route('/user/<int:user_id>/groups')
+@oauth.require_oauth()
+def user_groups(user_id):
+    """Returns simple JSON defining user's groups
+
+    Returns the list of groups the requested user belongs to.
+    ---
+    tags:
+      - User
+      - Group
+    operationId: user_groups
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the list of groups the requested user belongs to.
+        schema:
+          id: groups
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Group name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the group.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if not user:
+        abort(404, "User {} not found".format(user_id))
+
+    return jsonify(groups=[g.as_json() for g in user.groups])
+
+
+@user_api.route('/user/<int:user_id>/groups', methods=('PUT',))
+@oauth.require_oauth()
+def set_user_groups(user_id):
+    """Set groups for user, returns simple JSON defining user groups
+
+    Used to set group assignments for a user.  Include all groups
+    the user should be a member of.  If user previously belonged to
+    groups not included, the missing groups will be deleted from the user.
+
+    Only the 'name' field of the groups is referenced.  Must match
+    current groups in the system.
+
+    Returns a list of all groups user belongs to after change.
+    ---
+    tags:
+      - User
+      - Group
+    operationId: set_user_groups
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: groups
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description:
+                The string defining the name of each group the user should
+                belong to.  Must exist as an available group in the system.
+    responses:
+      200:
+        description:
+          Returns a list of all groups user belongs to after change.
+        schema:
+          id: user_groups
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Group name, always a lower case string with no white space.
+            description:
+              type: string
+              description: Plain text describing the group.
+      400:
+        description: if the request incudes an unknown group.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if not user:
+        abort(404, "user_id {} not found".format(user_id))
+
+    if not request.json or 'groups' not in request.json:
+        abort(400, "Requires 'groups' list")
+
+    remove_if_not_requested = {group.id: group for group in user.groups}
+    requested_groups = [r['name'] for r in request.json['groups']]
+    matching_groups = Group.query.filter(Group.name.in_(requested_groups)).all()
+    if len(matching_groups) != len(requested_groups):
+        abort(400, "One or more groups requested not available")
+    # Add any requested not already set on user
+    for requested_group in matching_groups:
+        if requested_group not in user.groups:
+            user.groups.append(requested_group)
+            auditable_event("added {} to user {}".format(
+                requested_group, user.id), user_id=current_user().id)
+        else:
+            remove_if_not_requested.pop(requested_group.id)
+
+    for stale_group in remove_if_not_requested.values():
+        user.groups.remove(stale_group)
+        auditable_event("deleted {} from user {}".format(
+            stale_group, user.id), user_id=current_user().id)
+
+    if user not in db.session:
+        db.session.add(user)
+    db.session.commit()
+
+    # Return user's updated group list
+    return jsonify(groups=[g.as_json() for g in user.groups])
+
+
 @user_api.route('/relationships')
 @oauth.require_oauth()
 def system_relationships():
@@ -153,7 +310,7 @@ def relationships(user_id):
     responses:
       200:
         description:
-          Returns the list of relationships that user belongs to.
+          Returns the list of relationships the requested user belongs to.
         schema:
           id: user_relationships
           required:
@@ -383,9 +540,7 @@ def system_roles():
 def roles(user_id):
     """Returns simple JSON defining user roles
 
-    Returns a list of all known roles.  Users belong to one or more
-    roles used to control authorization.  Returns the list of roles that user
-    belongs to.
+    Returns the list of roles the requested user belongs to.
     ---
     tags:
       - User
@@ -402,9 +557,7 @@ def roles(user_id):
     responses:
       200:
         description:
-          Returns a list of all known roles.  Users belong to one or more
-          roles used to control authorization.  Returns the list of roles that
-          user belongs to.
+          Returns the list of roles the requested user belongs to.
         schema:
           id: roles
           required:
@@ -515,7 +668,7 @@ def set_roles(user_id):
     requested_roles = [r['name'] for r in request.json['roles']]
     matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
     if len(matching_roles) != len(requested_roles):
-        abort(404, "One or more roles requested not available")
+        abort(400, "One or more roles requested not available")
     # Add any requested not already set on user
     for requested_role in matching_roles:
         if requested_role not in user.roles:
