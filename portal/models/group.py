@@ -1,8 +1,9 @@
 """Group module
 
 Groups are intented to cluster users together for logical reasons,
-such as a list of users for whom patient notifications apply.  Groups
-should not be used to grant or restrict access - see `Role`.
+such as a list of users for whom patient notifications apply.
+
+Groups should not be used to grant or restrict access - see `Role`.
 
 """
 import re

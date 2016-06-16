@@ -6,7 +6,7 @@ import json
 from portal.extensions import db
 from portal.models.group import Group
 from portal.models.role import ROLE
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 
 
 class TestGroup(TestCase):
@@ -68,3 +68,44 @@ class TestGroup(TestCase):
         grp2 = Group.query.filter_by(name='test').one()
         self.assertEquals(grp2.name, grp.name)
         self.assertEquals(grp2.description, grp.description)
+
+    def test_user_no_groups(self):
+        self.login()
+        rv = self.app.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['groups']), 0)
+
+    def test_user_groups(self):
+        grp1 = Group(name='test_1')
+        grp2 = Group(name='test_2')
+        self.test_user.groups.append(grp1)
+        self.test_user.groups.append(grp2)
+        with SessionScope(db):
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        self.login()
+        rv = self.app.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['groups']), 2)
+
+    def test_put_user_groups(self):
+        grp1 = Group(name='test1')
+        grp2 = Group(name='test2')
+        self.test_user.groups.append(grp1)
+        with SessionScope(db):
+            db.session.add(grp2)
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+
+        # initially grp 1 is the only for the user
+        self.assertEqual(self.test_user.groups[0].name, 'test1')
+        grp2 = db.session.merge(grp2)
+
+        # put only the 2nd group, should end up being the only one for the user
+        self.login()
+        rv = self.app.put('/api/user/{}/groups'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps({'groups': [grp2.as_json()]}))
+        self.assert200(rv)
+        self.assertEqual(len(self.test_user.groups), 1)
+        self.assertEqual(self.test_user.groups[0].name, 'test2')
