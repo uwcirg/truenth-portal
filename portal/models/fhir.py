@@ -237,8 +237,8 @@ class ValueQuantity(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         components = ','.join([str(x) for x in
-                               self.value, self.units, self.system,
-                               self.code if x is not None])
+                               (self.value, self.units, self.system,
+                               self.code) if x is not None])
         return "ValueQuantity " + components
 
     def as_fhir(self):
