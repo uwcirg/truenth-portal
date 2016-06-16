@@ -5,7 +5,10 @@ such as a list of users for whom patient notifications apply.  Groups
 should not be used to grant or restrict access - see `Role`.
 
 """
+import re
 from sqlalchemy import UniqueConstraint
+from werkzeug.exceptions import BadRequest
+
 from ..extensions import db
 
 
@@ -18,6 +21,30 @@ class Group(db.Model):
 
     def __str__(self):
         return "Group {}".format(self.name)
+
+    def as_json(self):
+        return {'name': self.name, 'description': self.description}
+
+    @classmethod
+    def from_json(cls, data):
+        instance = cls()
+        instance.name = cls.validate_name(data['name'])
+        instance.description = data['description']
+        return instance
+
+    @staticmethod
+    def validate_name(name):
+        """Only accept lowercase letters and underscores in name
+
+        :returns: the name if valid
+        :raises BadRequest: on error
+
+        """
+        if re.match(r'^[a-z][a-z_]*$', name):
+            return name
+        raise BadRequest(
+            "Group name may only contain lowercase letters and underscores")
+
 
 
 class UserGroup(db.Model):
