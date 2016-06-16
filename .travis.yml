@@ -29,6 +29,9 @@ matrix:
   allow_failures:
     - python: "3.5"
     - python: "pypy"
+  include:
+    - python: "2.7"
+      env: TOXENV=docs
 
 before_install:
   # Set tox env from TravisCI environmental variable
