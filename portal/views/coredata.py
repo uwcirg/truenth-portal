@@ -24,9 +24,9 @@ def acquire():
     """Redirection target to acquire coredata from the user
 
     Clients (interventions) that require core data not yet entered
-    by a patient, may redirect the patients user agent to this endpoint
+    by a patient, may redirect the patient's user agent to this endpoint
     including one or more 'require' parameters for the data point(s)
-    to obtain.  Call `GET /api/coredata/options` for available options.
+    to obtain.  `GET /api/coredata/options` returns available options.
 
     The user-agent will be redirected back to the client's site using
     the given 'next' parameter value, required to be urlencoded.  Any
@@ -38,7 +38,8 @@ def acquire():
     any new procedure data acquired as well as existing.
 
     NB: providing multiple values for the `require` parameter is supported,
-    with the parameter repeated as in `?require=first&require=second`
+    with the parameter repeated as in `?require=first&require=second` (Note,
+    the ampersand should **not** be quoted)
 
     ---
     tags:
