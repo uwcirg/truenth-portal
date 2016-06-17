@@ -70,7 +70,7 @@ def specific_clinic_landing(clinic_alias):
 def initial_queries():
     if request.method == 'GET':
         return render_template('initial_queries.html', user=current_user())
-    return redirect('/')
+    return redirect('home')
 
 
 @portal.route('/home')
@@ -91,16 +91,11 @@ def home():
             del session['next']
             return redirect(next_url)
 
-        # If the user hasn't already answered any upfront questions
-        # ask them now - otherwise, off to the portal home..
+        # default view depends on role
+        if user.has_role(ROLE.PROVIDER):
+            return redirect(url_for('patients.patients_root'))
         return render_template('portal.html', user=user,
                                interventions=INTERVENTION)
-        # "questions" DISABLED FOR 4/1/16 LAUNCH
-        #for c in (CC.BIOPSY, CC.PCaDIAG, CC.TX):
-        #    if user.fetch_values_for_concept(c):
-        #        return render_template('portal.html', user=user,
-        #                               interventions=INTERVENTION)
-        #return render_template('questions.html', user=user)
 
     # 'next' is optionally added as a query parameter during login
     # steps, as the redirection target after login concludes.
