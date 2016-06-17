@@ -6,8 +6,10 @@ from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
+from portal.models.group import Group
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
+from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 
@@ -399,3 +401,35 @@ class TestIntervention(TestCase):
         self.assertEquals(rv.json['access'], 'granted')
         self.assertEquals(rv.json['card_html'], "custom ch")
         self.assertEquals(rv.json['provider_html'], "custom ph")
+
+    def test_communicate(self):
+        email_group = Group(name='test_email')
+        foo = self.add_user(username='foo')
+        boo = self.add_user(username='boo')
+        foo.email = 'foo@example.com'
+        boo.email = 'boo@example.com'
+
+        with SessionScope(db):
+            map(db.session.add, (foo, boo))
+            db.session.commit()
+        foo, boo = map(db.session.merge, (foo, boo))
+        foo.groups.append(email_group)
+        boo.groups.append(email_group)
+        data = {'protocol': 'email',
+                'group_name': 'test_email',
+                'subject': "Just a test, ignore",
+                'message':
+                    'Review results at <a href="http://www.example.com">here</a>'
+               }
+        self.login()
+        rv = self.app.post('/api/intervention/{}/communicate'.format(
+                INTERVENTION.DECISION_SUPPORT_P3P.name),
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert200(rv)
+        self.assertEquals(rv.json['message'], 'sent')
+
+        message = EmailMessage.query.one()
+        set1 = set((foo.email, boo.email))
+        set2 = set(message.recipients.split())
+        self.assertEquals(set1, set2)

@@ -33,3 +33,7 @@ class EmailMessage(db.Model):
                 recipients=self.recipients.split())
         message.html = self.body
         mail.send(message)
+
+    def __str__(self):
+        return "EmailMessage subj:{} sent_at:{}".format(self.subject,
+                                                        self.sent_at)

@@ -1,15 +1,16 @@
 """Intervention API view functions"""
 from flask import abort, Blueprint, jsonify
-from flask import request
+from flask import current_app, request
 from flask_user import roles_required
 import json
 
 from ..audit import auditable_event
+from ..models.group import Group, UserGroup
 from ..models.intervention import INTERVENTION, UserIntervention
 from ..models.message import EmailMessage
-from ..models.user import current_user
-from ..models.role import Role, ROLE
+from ..models.user import current_user, User
 from ..models.relationship import RELATIONSHIP
+from ..models.role import ROLE
 from ..extensions import oauth
 from ..extensions import db
 from ..models.intervention_strategies import AccessStrategy
@@ -256,18 +257,14 @@ def intervention_rule_set(intervention_name):
 @intervention_api.route(
     '/intervention/<string:intervention_name>/communicate', methods=('POST',))
 @oauth.require_oauth()
-@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def intervention_communicate(intervention_name):
     """POST a message or trigger communication as detailed
 
     Submit JSON describing communication details, such as the group
     of users to contact, sending protocol and message
 
-    Only available as a service account API - the named intervention
-    must be associated with the service account sponsor.
-
     ---
-    operationId: interventionCommunicate
+    operationId: intervention_communicate
     tags:
       - Intervention
     produces:
@@ -283,16 +280,16 @@ def intervention_communicate(intervention_name):
         schema:
           id: message_details
           required:
-            - role_name
+            - group_name
             - protocol
             - subject
             - message
           properties:
-            role_name:
+            group_name:
               type: string
               description:
-                Truenth role name referring to whom to include as recipients.
-                See `/api/roles` for options.
+                Truenth group name referring to whom to include as recipients.
+                See `/api/group/` for options.
             protocol:
               type: string
               enum:
@@ -314,7 +311,7 @@ def intervention_communicate(intervention_name):
           properties:
             message:
               type: string
-              description: Result, typically "ok"
+              description: Result, typically "sent"
       401:
         description:
           if missing valid OAuth SERVICE token or the service user owning
@@ -330,9 +327,9 @@ def intervention_communicate(intervention_name):
     if not request.json:
         abort(400, "Requires JSON detailing communication")
 
-    role = Role.query.filter_by(name=request.json.get('role_name')).first()
-    if not role:
-        abort(400, "JSON requires a valid `role_name`")
+    group = Group.query.filter_by(name=request.json.get('group_name')).first()
+    if not group:
+        abort(400, "JSON requires a valid `group_name`")
 
     if 'email' != request.json.get('protocol'):
         abort(400, "Only protocol of email is supported at this time")
@@ -343,8 +340,8 @@ def intervention_communicate(intervention_name):
               "`subject` is required and limited to 78 characters in length")
 
     recipients = [
-        u.email for u in User.query.join(UserRoles).filter(
-            UserRoles.role_id==role.id)]
+        u.email for u in User.query.join(UserGroup).filter(
+            UserGroup.group_id==group.id)]
     if not recipients:
         abort(400, "no recipients found")
 
@@ -352,9 +349,10 @@ def intervention_communicate(intervention_name):
     email = EmailMessage(subject=subject, body=request.json.get('message'),
             recipients=' '.join(recipients), sender=sender,
             user_id=current_user().id)
+    email.send_message()
 
     db.session.add(email)
     db.session.commit()
     auditable_event("intervention {} sent {}".format(
         intervention.description, email), user_id=current_user().id)
-    return jsonify(message='ok')
+    return jsonify(message='sent')
