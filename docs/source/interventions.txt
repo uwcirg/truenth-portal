@@ -1,28 +1,42 @@
 Interventions
 *************
 
+.. contents::
+   :depth: 3
+   :local:
+
+Roles
+=====
+
 Any client can assume the role of an intervention.  By doing so, the client
 becomes the **official** implementation for said role.
 
+Access
+======
+
 Controlling access to interventions deserves special mention.  On the
-`/client/<client_id>` page, one can set the value of 'public_accessible'.
+``/client/<client_id>`` page, the application developer may view and
+alter the value of **public_accessible**.
 
 .. note::
 
-   With *public_accessible* set, the intervention will always be displayed.
+   With **public_accessible** set, the intervention will always be displayed.
 
-When 'public_accessible' is **not** set, two additional options exist for
+When **public_accessible** is *not* set, two additional options exist for
 enabling said intervention.
 
     1. To control per user, the service account associated with the intervention
-    should make use of the */api/intervention/<intervention_name>/* endpoint.
+    should make use of the ``/api/intervention/<intervention_name>/`` `endpoint
+    <https://stg.us.truenth.org/dist/#!/Intervention/user_intervention_set>`_.
 
     2. Alternatively, any number of *straegy* functions can be added to an
     intervention, to give access to any subgroup of users as defined by the
     strategy itself.  The available strategies are defined in the
-    `portal.models.intervention_strategies` module.  Use the
-    */api/intervention/<intervention_name>/access_rule* endpoint to view ori
-    modify.
+    ``portal.models.intervention_strategies`` module, such as the `allow_if_not_in_intervention
+    <portal_models.html#portal.models.intervention_strategies.allow_if_not_in_intervention>`_
+    strategy.  Use the
+    ``/api/intervention/<intervention_name>/access_rule`` `endpoint
+    <portal_views.html#portal.views.intervention.intervention_rule_set>`_ to view or modify.
 
 .. note::
 
@@ -47,7 +61,7 @@ users registered with the `UCSF` clinic::
       https://stg.us.truenth.org/api/intervention/care_plan/access_rule
 
 Sometimes it is necessary to combine multiple strategies into a logical
-**AND** operation.  To do so, use the `combine_strategies` function,
+**AND** operation.  To do so, use the ``combine_strategies`` function,
 passing the respective set of `strategy_n` and `strategy_n_kwargs` as so::
 
     {
@@ -129,3 +143,15 @@ The full list of strategies used for DECISION_SUPPORT_P3P::
         }]
       }
     }
+
+Communication
+=============
+
+Communicate from an intervention to any group of TrueNTH users via the
+``/api/intervention/<intervention_name>/communicate`` `endpoint
+<https://stg.us.truenth.org/dist/#!/Intervention/intervention_communicate>`_.
+
+The `groups API <https://stg.us.truenth.org/dist/#!/Group>`_ is used to
+view existing and create new groups.  Add existing users via the
+``/api/user/<user_id>/groups`` `endpoint
+<https://stg.us.truenth.org/dist/#!/Group/set_user_groups>`_.

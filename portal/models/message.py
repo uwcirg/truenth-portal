@@ -16,8 +16,8 @@ def log_message(message, app):
 email_dispatched.connect(log_message)
 
 
-class EmailInvite(db.Model):
-    __tablename__ = 'email_invites'
+class EmailMessage(db.Model):
+    __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255), nullable=False)
     recipients = db.Column(db.Text, nullable=False)
@@ -33,3 +33,7 @@ class EmailInvite(db.Model):
                 recipients=self.recipients.split())
         message.html = self.body
         mail.send(message)
+
+    def __str__(self):
+        return "EmailMessage subj:{} sent_at:{}".format(self.subject,
+                                                        self.sent_at)
