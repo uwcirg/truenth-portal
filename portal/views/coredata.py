@@ -1,5 +1,7 @@
 from flask import abort, current_app, jsonify, url_for
 from flask import Blueprint, render_template, request
+from urllib import urlencode
+from urlparse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
@@ -94,5 +96,23 @@ def acquire():
             abort(400, "Unknown value for require '{}' -- see {}".format(
                 r, url_for('coredata_api.options', _external=True)))
 
+    def clean_return_address(return_address):
+        """ Clean up the return address encoding if necessary
+
+        URL encoding is necessary on contained parameters or it'll break the JS
+        redirect in the template.  For example, if the return address contains
+        an unquoted double quote, the JS function call to
+        window.location.replace sees a different set of arguments
+
+        :returns: the cleaned URL
+        """
+        url = return_address
+        parsed = urlparse(return_address)
+        qs = parse_qsl(parsed.query)
+        if qs:
+            url = "{0.scheme}://{0.netloc}{0.path}?".format(parsed) +\
+                    urlencode(qs)
+        return url
+
     return render_template("coredata.html", user=current_user(),
-        require=require, return_address=return_address)
+        require=require, return_address=clean_return_address(return_address))
