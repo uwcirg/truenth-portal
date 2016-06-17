@@ -252,6 +252,7 @@ def system_relationships():
     ---
     tags:
       - User
+      - Relationship
     operationId: system_relationships
     produces:
       - application/json
@@ -297,6 +298,7 @@ def relationships(user_id):
     ---
     tags:
       - User
+      - Relationship
     operationId: getrelationships
     parameters:
       - name: user_id
@@ -371,6 +373,7 @@ def set_relationships(user_id):
     ---
     tags:
       - User
+      - Relationship
     operationId: setrelationships
     produces:
       - application/json
@@ -503,6 +506,7 @@ def system_roles():
     ---
     tags:
       - User
+      - Role
     operationId: system_roles
     produces:
       - application/json
@@ -544,6 +548,7 @@ def roles(user_id):
     ---
     tags:
       - User
+      - Role
     operationId: getRoles
     parameters:
       - name: user_id
@@ -602,6 +607,7 @@ def set_roles(user_id):
     ---
     tags:
       - User
+      - Role
     operationId: setRoles
     produces:
       - application/json
