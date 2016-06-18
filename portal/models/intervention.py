@@ -22,6 +22,24 @@ class Intervention(db.Model):
     access_strategies = db.relationship(
         'AccessStrategy', order_by="AccessStrategy.rank")
 
+    def get_card_html(self, user):
+        """Return card_html, possibly specialized for the user
+
+        Interventions have a card_html field for intervention wide
+        customization.  Further customization is avaliable per user by setting
+        the UserIntervention.card_html value for the respective user and
+        intervention (set via the ``/api/intervention/<intervention_name>``
+        endpoint)
+
+        :returns: the best card_html for the user/intervention.
+
+        """
+        ui = UserIntervention.query.filter_by(user_id=user.id,
+                                              intervention_id=self.id).first()
+        if ui and ui.card_html:
+            return ui.card_html
+        return self.card_html
+
     def fetch_strategies(self):
         """Generator to return each registered strategy
 

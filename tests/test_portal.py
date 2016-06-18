@@ -33,6 +33,28 @@ class TestPortal(TestCase):
         intervention = db.session.merge(intervention)
         self.assertIn(intervention.card_html, rv.data)
 
+    def test_user_card_html(self):
+        """Interventions can further customize per user"""
+        client = self.add_client()
+        intervention = INTERVENTION.sexual_recovery
+        client.intervention = intervention
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id)
+        ui.card_html = "Custom User Label"
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.add_required_clinical_data()
+        self.bless_with_basics()
+        user = db.session.merge(self.test_user)
+        self.login()
+        rv = self.app.get('/home')
+
+        self.assertIn('Custom User Label', rv.data)
+        intervention = db.session.merge(intervention)
+        self.assertIn(intervention.get_card_html(user), rv.data)
+
     def test_provider_html(self):
         """Interventions can customize the provider text """
         client = self.add_client()
