@@ -95,7 +95,7 @@ def group_by_name(group_name):
 
 
 @group_api.route('/', methods=('POST',))
-@roles_required(ROLE.ADMIN)
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
 def add_group():
     """Add new group
 
