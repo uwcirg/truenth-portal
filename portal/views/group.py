@@ -161,3 +161,76 @@ def add_group():
     db.session.commit()
     auditable_event("{g} added".format(g=g), user_id=current_user().id)
     return jsonify(message="ok")
+
+
+@group_api.route('/<string:group_name>', methods=('PUT',))
+@oauth.require_oauth()
+@roles_required([ROLE.ADMIN, ROLE.SERVICE])
+def edit_group(group_name):
+    """Edit an existing group
+
+    PUT simple JSON defining changes to an existing group.
+
+    ---
+    tags:
+      - Group
+    operationId: edit_group
+    produces:
+      - application/json
+    parameters:
+      - name: group_name
+        in: path
+        description: Group name
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          id: group_definition
+          description: Group details including name and description
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+              description:
+                Group name, limited to lower case letters and underscores.
+            description:
+              type: string
+              description:
+                Plain text detailing the groups use or members.
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description:
+          if input isn't valid or if matching group name already exists
+      401:
+        description: if missing valid OAuth token
+      404:
+        description: if group by group_name can't be found
+
+    """
+    g = Group.query.filter_by(name=group_name).first()
+    if not g:
+        abort(404, "Group {n} not found".format(n=group_name))
+
+    if not (request.json and 'name' in request.json and 'description' in
+            request.json):
+        abort(400,
+              "Requires valid JSON including a group name and description")
+
+    g.name = Group.validate_name(request.json['name'])
+    g.description = request.json['description']
+    db.session.commit()
+    auditable_event("{g} updated".format(g=g), user_id=current_user().id)
+    return jsonify(message="ok")

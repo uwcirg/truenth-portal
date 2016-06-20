@@ -69,6 +69,26 @@ class TestGroup(TestCase):
         self.assertEquals(grp2.name, grp.name)
         self.assertEquals(grp2.description, grp.description)
 
+    def test_group_edit(self):
+        grp = Group(name='test_grp_name', description='test group')
+        with SessionScope(db):
+            db.session.add(grp)
+            db.session.commit()
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        improved_grp = Group(name='changed_name', description='Updated')
+        rv = self.app.put('/api/group/{}'.format('test_grp_name'),
+                          content_type='application/json',
+                          data=json.dumps(improved_grp.as_json()))
+        self.assert200(rv)
+
+        # Pull the posted group
+        grp2 = Group.query.one()
+        self.assertEquals(grp2.name, improved_grp.name)
+        self.assertEquals(grp2.description, improved_grp.description)
+
     def test_user_no_groups(self):
         self.login()
         rv = self.app.get('/api/user/{}/groups'.format(TEST_USER_ID))
