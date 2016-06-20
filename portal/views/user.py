@@ -170,15 +170,18 @@ def set_user_groups(user_id):
       - in: body
         name: body
         schema:
-          id: groups
-          required:
-            - name
+          id: nested_groups
           properties:
-            name:
-              type: string
-              description:
-                The string defining the name of each group the user should
-                belong to.  Must exist as an available group in the system.
+            groups:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description:
+                      The string defining the name of each group the user should
+                      belong to.  Must exist as an available group in the system.
     responses:
       200:
         description:
