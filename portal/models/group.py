@@ -41,7 +41,7 @@ class Group(db.Model):
         :raises BadRequest: on error
 
         """
-        if re.match(r'^[a-z][a-z_]*$', name):
+        if re.match(r'^[a-z][a-z0-9_]*$', name):
             return name
         raise BadRequest(
             "Group name may only contain lowercase letters and underscores")
