@@ -176,6 +176,8 @@ def set_user_groups(user_id):
               type: array
               items:
                 type: object
+                required:
+                  - name
                 properties:
                   name:
                     type: string
