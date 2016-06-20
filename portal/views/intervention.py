@@ -205,6 +205,7 @@ def user_intervention_set(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule')
+@oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
 def intervention_rule_list(intervention_name):
     """Return the list of intervention rules for named intervention

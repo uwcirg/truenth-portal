@@ -328,6 +328,7 @@ class ClientEditForm(Form):
 
 
 @auth.route('/client', methods=('GET', 'POST'))
+@oauth.require_oauth()
 @roles_required(ROLE.APPLICATION_DEVELOPER)
 def client():
     """client registration
@@ -411,6 +412,7 @@ def client():
 
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
+@oauth.require_oauth()
 @roles_required(ROLE.APPLICATION_DEVELOPER)
 def client_edit(client_id):
     """client edit
@@ -547,6 +549,7 @@ def client_edit(client_id):
 
 
 @auth.route('/clients')
+@oauth.require_oauth()
 @roles_required(ROLE.APPLICATION_DEVELOPER)
 def clients_list():
     """clients list
