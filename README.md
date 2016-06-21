@@ -122,7 +122,7 @@ managed and run.
 #### Upgrade
 
 Anytime a database (might) need an upgrade, run the manage script with
-the `db upgrade` arguments.
+the `db upgrade` arguments (or run the [deployment script](#install-the-lastest-package-and-dependencies))
 
 This is idempotent process, meaning it's safe to run again on a database
 that already received the upgrade.
