@@ -114,6 +114,16 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/t
     sudo service apache2 restart
 fi
 
+# Code changes - update package metadata
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}) && $? -eq 0 ) ]]; then
+    activate_once
+
+    if [[ $VERBOSE ]]; then
+        echo "Updating package metadata"
+    fi
+    python "${GIT_WORK_TREE}/setup.py" egg_info
+fi
+
 # Restart apache if application is served by apache
 if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
     if [[ $VERBOSE ]]; then
