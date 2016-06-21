@@ -46,29 +46,27 @@ $ cd $PROJECT_HOME
 $ source env/bin/activate
 ```
 
-### Install the Lastest Package
+### Install the Lastest Package (and Dependencies)
+
+To update your Shared Services installation run the `deploy.sh` script as described below.
+
+This script will:
+* Update the project with the latest code
+* Install any dependencies, if necessary
+* Perform any database migrations, if necessary
+* Seed any new data to the database, if necessary
+* Restart apache, if served by apache
 
 ```bash
 $ cd $PROJECT_HOME
-$ git pull
+$ ./bin/deploy.sh
 ```
 
-Technically, the following `pip` step only needs to be re-run when the
-project requirements change (i.e. new values in setup.py
-install_requires), but it's safe to run anytime to make sure.
+To see all available options run:
 
 ```bash
-$ pip install --process-dependency-links -e .
+$ ./bin/deploy.sh -h
 ```
-
-If you would like to contribute to this project or run the test suite run `pip` as follows. This will install the default dependencies and all of the dependencies required for running the test suite and contributing.
-
-```bash
-$ pip install --process-dependency-links -e .[dev]
-```
-
-If new files in the `migrations/versions` directories showed up on the
-pull, a database upgrade as detailed below also needs to be run.
 
 ## CONFIGURE
 
