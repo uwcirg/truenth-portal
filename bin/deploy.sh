@@ -13,7 +13,12 @@ update_repo(){
     if [[ $VERBOSE ]]; then
         echo "Updating repository"
     fi
-    git checkout $BRANCH
+    branch_name=$(git symbolic-ref -q HEAD)
+
+    if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
+        git checkout $BRANCH
+    fi
+
     git pull origin $BRANCH
 }
 
