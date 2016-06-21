@@ -1,14 +1,16 @@
 """Intervention API view functions"""
 from flask import abort, Blueprint, jsonify
-from flask import request
+from flask import current_app, request
 from flask_user import roles_required
 import json
 
 from ..audit import auditable_event
+from ..models.group import Group, UserGroup
 from ..models.intervention import INTERVENTION, UserIntervention
-from ..models.user import current_user
-from ..models.role import ROLE
+from ..models.message import EmailMessage
+from ..models.user import current_user, User
 from ..models.relationship import RELATIONSHIP
+from ..models.role import ROLE
 from ..extensions import oauth
 from ..extensions import db
 from ..models.intervention_strategies import AccessStrategy
@@ -203,6 +205,7 @@ def user_intervention_set(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule')
+@oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
 def intervention_rule_list(intervention_name):
     """Return the list of intervention rules for named intervention
@@ -250,3 +253,107 @@ def intervention_rule_set(intervention_name):
     auditable_event("added {} to intervention {}".format(
         access_strategy, intervention.description), user_id=current_user().id)
     return jsonify(message='ok')
+
+
+@intervention_api.route(
+    '/intervention/<string:intervention_name>/communicate', methods=('POST',))
+@oauth.require_oauth()
+def intervention_communicate(intervention_name):
+    """POST a message or trigger communication as detailed
+
+    Submit JSON describing communication details, such as the group
+    of users to contact, sending protocol and message
+
+    ---
+    operationId: intervention_communicate
+    tags:
+      - Intervention
+    produces:
+      - application/json
+    parameters:
+      - name: intervention_name
+        in: path
+        description: TrueNTH intervention_name
+        required: true
+        type: string
+      - in: body
+        name: body
+        schema:
+          id: message_details
+          required:
+            - group_name
+            - protocol
+            - subject
+            - message
+          properties:
+            group_name:
+              type: string
+              description:
+                Truenth group name referring to whom to include as recipients.
+                See `/api/group/` for options.
+            protocol:
+              type: string
+              enum:
+                - email
+            subject:
+              type: string
+              description:
+                Text subject of message, limited to 78 characters in length.
+            message:
+              type: string
+              description: Text or HTML to transmit as the message body.
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "sent"
+      401:
+        description:
+          if missing valid OAuth SERVICE token or the service user owning
+          the token isn't sponsored by the named intervention owner.
+      404:
+        description: if the named intervention doesn't exist
+
+    """
+    intervention = getattr(INTERVENTION, intervention_name)
+    if not intervention:
+        abort (404, 'no such intervention {}'.format(intervention_name))
+
+    if not request.json:
+        abort(400, "Requires JSON detailing communication")
+
+    group = Group.query.filter_by(name=request.json.get('group_name')).first()
+    if not group:
+        abort(400, "JSON requires a valid `group_name`")
+
+    if 'email' != request.json.get('protocol'):
+        abort(400, "Only protocol of email is supported at this time")
+
+    subject = request.json.get('subject')
+    if not subject or  len(subject) > 78:
+        abort(400,
+              "`subject` is required and limited to 78 characters in length")
+
+    recipients = [
+        u.email for u in User.query.join(UserGroup).filter(
+            UserGroup.group_id==group.id)]
+    if not recipients:
+        abort(400, "no recipients found")
+
+    sender = current_app.config['MAIL_DEFAULT_SENDER']
+    email = EmailMessage(subject=subject, body=request.json.get('message'),
+            recipients=' '.join(recipients), sender=sender,
+            user_id=current_user().id)
+    email.send_message()
+
+    db.session.add(email)
+    db.session.commit()
+    auditable_event("intervention {} sent {}".format(
+        intervention.description, email), user_id=current_user().id)
+    return jsonify(message='sent')

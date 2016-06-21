@@ -72,7 +72,9 @@ class DobData(CoredataPoint):
     def hasdata(self, user):
         # DOB is only required for patient and partner
         roles = (r.name for r in user.roles)
-        if ROLE.PATIENT in roles or ROLE.PARTNER in roles: 
+        if ROLE.PROVIDER in roles:
+            return True
+        elif ROLE.PATIENT in roles or ROLE.PARTNER in roles:
             return user.birthdate is not None
         else:
             # If they haven't set a role, we don't know if we care yet
@@ -92,6 +94,8 @@ class OrgData(CoredataPoint):
 
         Special "none of the above" org still counts.
         """
+        if user.has_role(ROLE.PROVIDER):
+            return True
         if user.organizations.count() > 0:
             return True
 

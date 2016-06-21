@@ -16,6 +16,7 @@ from .views.auth import auth
 from .views.coredata import coredata_api
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
+from .views.group import group_api
 from .views.intervention import intervention_api
 from .views.patients import patients
 from .views.procedure import procedure_api
@@ -32,6 +33,7 @@ DEFAULT_BLUEPRINTS = (
     coredata_api,
     clinical_api,
     demographics_api,
+    group_api,
     intervention_api,
     org_api,
     patients,

@@ -18,6 +18,12 @@ Portal.Models
 .. automodule:: portal.models.identifier
     :members:
 
+.. automodule:: portal.models.intervention
+    :members:
+
+.. automodule:: portal.models.intervention_strategies
+    :members:
+
 .. automodule:: portal.models.lazy
     :members:
 

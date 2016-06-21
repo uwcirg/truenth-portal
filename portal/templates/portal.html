@@ -15,7 +15,7 @@
 <div class="portal-item">
     <h2 class="tnth-subhead">Sexual Recovery</h2>
     <p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
+    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.get_card_html(user) }}</a>
 </div>
 {% endif %}
 

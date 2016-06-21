@@ -1,5 +1,7 @@
 from flask import abort, current_app, jsonify, url_for
 from flask import Blueprint, render_template, request
+from urllib import urlencode
+from urlparse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
@@ -22,9 +24,9 @@ def acquire():
     """Redirection target to acquire coredata from the user
 
     Clients (interventions) that require core data not yet entered
-    by a patient, may redirect the patients user agent to this endpoint
+    by a patient, may redirect the patient's user agent to this endpoint
     including one or more 'require' parameters for the data point(s)
-    to obtain.  Call `GET /api/coredata/options` for available options.
+    to obtain.  `GET /api/coredata/options` returns available options.
 
     The user-agent will be redirected back to the client's site using
     the given 'next' parameter value, required to be urlencoded.  Any
@@ -36,7 +38,8 @@ def acquire():
     any new procedure data acquired as well as existing.
 
     NB: providing multiple values for the `require` parameter is supported,
-    with the parameter repeated as in `?require=first&require=second`
+    with the parameter repeated as in `?require=first&require=second` (Note,
+    the ampersand should **not** be quoted)
 
     ---
     tags:
@@ -94,5 +97,23 @@ def acquire():
             abort(400, "Unknown value for require '{}' -- see {}".format(
                 r, url_for('coredata_api.options', _external=True)))
 
+    def clean_return_address(return_address):
+        """ Clean up the return address encoding if necessary
+
+        URL encoding is necessary on contained parameters or it'll break the JS
+        redirect in the template.  For example, if the return address contains
+        an unquoted double quote, the JS function call to
+        window.location.replace sees a different set of arguments
+
+        :returns: the cleaned URL
+        """
+        url = return_address
+        parsed = urlparse(return_address)
+        qs = parse_qsl(parsed.query)
+        if qs:
+            url = "{0.scheme}://{0.netloc}{0.path}?".format(parsed) +\
+                    urlencode(qs)
+        return url
+
     return render_template("coredata.html", user=current_user(),
-        require=require, return_address=return_address)
+        require=require, return_address=clean_return_address(return_address))

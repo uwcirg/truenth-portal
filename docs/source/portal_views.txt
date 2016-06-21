@@ -13,6 +13,9 @@ Portal.Views
 .. automodule:: portal.views.crossdomain
     :members:
 
+.. automodule:: portal.views.intervention
+    :members: intervention_rule_list, intervention_rule_set
+
 .. automodule:: portal.views.patients
     :members:
 

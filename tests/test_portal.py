@@ -10,7 +10,7 @@ from portal.extensions import db
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.role import ROLE
 from portal.models.user import User
-from portal.models.message import EmailInvite
+from portal.models.message import EmailMessage
 from tests import TestCase, TEST_USER_ID
 
 
@@ -32,6 +32,28 @@ class TestPortal(TestCase):
         self.assertIn('Custom Label', rv.data)
         intervention = db.session.merge(intervention)
         self.assertIn(intervention.card_html, rv.data)
+
+    def test_user_card_html(self):
+        """Interventions can further customize per user"""
+        client = self.add_client()
+        intervention = INTERVENTION.sexual_recovery
+        client.intervention = intervention
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id)
+        ui.card_html = "Custom User Label"
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.add_required_clinical_data()
+        self.bless_with_basics()
+        user = db.session.merge(self.test_user)
+        self.login()
+        rv = self.app.get('/home')
+
+        self.assertIn('Custom User Label', rv.data)
+        intervention = db.session.merge(intervention)
+        self.assertIn(intervention.get_card_html(user), rv.data)
 
     def test_provider_html(self):
         """Interventions can customize the provider text """
@@ -114,7 +136,7 @@ class TestPortal(TestCase):
         """Email invites - test view for sent messages"""
         sent_at = datetime.strptime("2000/01/01 12:31:00",
                 "%Y/%m/%d %H:%M:%S")
-        message = EmailInvite(subject='a subject', user_id=TEST_USER_ID,
+        message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
                 body='Welcome to testing', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")
