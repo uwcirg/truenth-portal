@@ -70,7 +70,7 @@ before_install:
   - pip install --upgrade pip
 
 install:
-  - pip install --process-dependency-links -e .[dev]
+  - pip install tox
   - cp portal/application.cfg.travis portal/application.cfg
 
 before_script:
