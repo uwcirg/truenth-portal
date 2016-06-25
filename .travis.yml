@@ -29,7 +29,14 @@ matrix:
     - python: "2.7"
       env: TOXENV=docs
     - python: "2.7"
-      env: TOXENV=ui
+      env:
+        - TOXENV=ui
+
+        # _SAUCE_USERNAME
+        - secure: "Hc5NUBDw0sUdXVTn0s8NqcmabMYZiMrpq3x5+Nytze4JKRxk0kmhyt IurC/C3A6bDM622ZFVtTCAs8k4Cg4GBfuGrdC/EaVaolw7trhWY9TUEuwWSPlmdTs ChPDQpGxXngxEA7ij2D6BOUR97l3UrXtMQ24syVHJl8MiLoZelNKSnQCs8yeNMw+j iLTvCyAXTl4hfoUiRidVxUlCTcSgJ4xajBDPEgAIm82Oo4qnCz7PSt/9GSG7cC5qH +KllMGbn/a8kTM+kJxiWA1QLQ7+DNo0TiYX1dMyZQPhPE/8H7EfLLvIuEAAvKNg3Y VxfpZYNDOKadP28HjSUqexbh75KBt8KZGweymLKPK/bt8zwAtWufEqW2iESlOfURz jKZ451oaBmCEpaFbbsxc6lnGQxnKB4/YTx6jClXTjii2dqUUw/lUIYgFXfnRYoyfo HGrl+AzZiVV4knJfQFHNT7rZoKfzgqzLUlkMYQu9sLKzfSb4ZT3MSFUnATfHmczmC 9JnX0aCtSj6V6ab6+PovFyFHRKhmn/zVAxUq0hFVdqZQj7A6nIU+vx8fpa42BRjA9 muaz3MwYIr5dAAlF1wPh3XRWx0mRW6YK4WYQ3HaV1nol9wGAnnTM0l949CN0u3IS6 WorfdmGuccFT0DT39qNyu5tnJ2W2hab7Dg2fJ+oabhEQ="
+
+        # _SAUCE_ACCESS_KEY
+        - secure: "jj5q57S8VzAHlNUlSrKtRdoCbFKFig75CFA8AxAQ0lyoMi9VOzwoNQ S3A50I0OYONhqiMWOeyxaBX+eS6y50kYoholJ8yy2DEzaYAJKGGrCh/S6YsGqBo9w jqODynf8c9uDeq4uyNqm3xrOuOBhYUWlmzczILkegw9cvBmKjMM8KK0OxwoEZlQC+ XqZMtUj0oxjiqyK5BiSDBt1TM8pLbZDUup0JTXzuxrRKjZnmw/LtMRqE5P64JeM7d 7qvcYwFrAMydUZSCIO9hguRjmL+kX2cl7Z0lTk5fAtcsroeDy63ClA2v/I90D4Bq2 v90jujU38P7ukJFLR4ji8HRKTllIJ1ouYoR4gzrWLQt7vXL7tHfByaCf4jFOqRaSd dEzj7xn4dXA/CbmbsNQSb+vFMVJMdND3RQDNYXcnGe/jlrn01UdHkouVui0SGtdl2 CHd8GfynkWhlw8XnZ6YZwdM8TVkYrFJPyD2hh7RyOzjytQb6gGdPVbztfEbgAjwXe af9/+Hi/aNdTlvF+KOZYr1Jkf5L2XTUxQhsNt+M2VMLzX03VOivlXZbRKC72b+hGv q93ENiMOt4uhT4d74KuTeXU19QelUWD5tYUiWEsIFvzz/g1+xVShU4DcNLKRIoYZY 1H4w95+QFRBZ9oXHRO7auua4QneIsFBq1ghQ/E7jfVOs="
       addons:
         apt:
           sources:
@@ -38,16 +45,16 @@ matrix:
             - postgresql-9.5
             - postgresql-contrib-9.5
         postgresql: "9.5"
-        sauce_connect:
-          username: "ivan-c"
-          access_key:
-            secure: "eWlWfq6YOwnHN/FhhqISsTuiu94uxY1nP/9ourSX8LBr+olNDh9zIv9ZEtCypHtEgwKy59N//i5iOa /Ewu5YkpcxREr8IwjYjQtiRwX0UvraQlFU23Uci80a3OiFVmO4P3vzi8adyCj7z1uVXiZOvhOjoasjKLpzIy9c+93 +J8NFZ+KfxAUCcG+XWPmKjHbUtilzliLhcdi0tQHXTSPVsBohpDo5o1RCOZpNYmGDE0l+0W3n4tAnUIsGxxkajLI1 iMhUKsqS1SiLV4NwbdMnJEXlb/YOdRY4SyNPF6THEXUcMkN2vZszG3hXqyOaNTkuk+ryPizUIGiYAQsJNpAfI7ejx YqAQiZTcK/TqBui2vzrAJFYDYKGCey4Rbm+kuXM2YD4+q0wX4N9aofF3oYJpWj/Hdvpo4PKG6VT8+xgu45lqsLYQb 5Zlj3X6LIeIxE7BbfGOTCAxOXCdhjxp6YL4O6Cc0WGC94Yg+W35Wn+HoM6mK6887jywrX4Evg2UXfRnDuQ6o7WXOn zP7ye0dC0LdLIOW2BAtoJa5LIF1Y5yqmy5UFpC2i5+VIfKkiUA/ViS6cOwl8lyun3PkrA29Os2/BhJLLe9FoURs4n NsVoxljQG6JKwXCzoXCoIOe8Ov/rpYupPh11EYI26pNm1FTHzcs8RxQDilduTVIBSqo3Dzs="
+        sauce_connect: true
 
 before_install:
   # Set tox env from TravisCI environmental variable
   - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
 
-  # Install postgresql 9.5 - remove when support as addon
+  # Allow environmental variables set in TravisCI to override .travis.yml defaults
+  - if [[ ! -v SAUCE_USERNAME ]]; then export SAUCE_USERNAME=$_SAUCE_USERNAME;fi
+  - if [[ ! -v SAUCE_ACCESS_KEY ]]; then export SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY;fi
+
   # See https://github.com/travis-ci/travis-ci/issues/4264
   - sudo service postgresql stop
   - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
