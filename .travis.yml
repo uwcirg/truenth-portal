@@ -73,8 +73,5 @@ install:
   - pip install tox
   - cp portal/application.cfg.travis portal/application.cfg
 
-before_script:
-  - celery worker --detach -A portal.celery_worker.celery --loglevel=info
-
 script:
   - tox
