@@ -19,6 +19,15 @@
 </div>
 {% endif %}
 
+{% set intervention = interventions.care_plan %}
+{% if intervention.user_has_access(user) %}
+<div class="portal-item">
+    <h2 class="tnth-subhead">Care Plan</h2>
+    <p>Organization and support for the many details of life as a prostate cancer survivor</p>
+    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.get_card_html(user) }}</a>
+</div>
+{% endif %}
+
 {% set intervention = interventions.decision_support_p3p %}
 {% if intervention.user_has_access(user) %}
 <div class="portal-item">
