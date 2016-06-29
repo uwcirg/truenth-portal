@@ -27,7 +27,7 @@ enabling said intervention.
 
     1. To control per user, the service account associated with the intervention
     should make use of the ``/api/intervention/<intervention_name>/`` `endpoint
-    <https://stg.us.truenth.org/dist/#!/Intervention/user_intervention_set>`_.
+    <https://stg.us.truenth.org/dist/#!/Intervention/user_intervention_set>`__.
 
     2. Alternatively, any number of *straegy* functions can be added to an
     intervention, to give access to any subgroup of users as defined by the
@@ -36,7 +36,7 @@ enabling said intervention.
     <portal_models.html#portal.models.intervention_strategies.allow_if_not_in_intervention>`_
     strategy.  Use the
     ``/api/intervention/<intervention_name>/access_rule`` `endpoint
-    <portal_views.html#portal.views.intervention.intervention_rule_set>`_ to view or modify.
+    <portal_views.html#portal.views.intervention.intervention_rule_set>`__ to view or modify.
 
 .. note::
 
@@ -149,7 +149,7 @@ Communication
 
 Communicate from an intervention to any group of TrueNTH users via the
 ``/api/intervention/<intervention_name>/communicate`` `endpoint
-<https://stg.us.truenth.org/dist/#!/Intervention/intervention_communicate>`_.
+<https://stg.us.truenth.org/dist/#!/Intervention/intervention_communicate>`__.
 
 The `groups API <https://stg.us.truenth.org/dist/#!/Group>`_ is used to
 view existing and create new groups.  Add existing users via the
