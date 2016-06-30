@@ -38,7 +38,8 @@ class Reference(object):
 
         :returns: the referenced object - instantiated from the db
         :raises ValueError: if the text format can't be parsed
-        :raises :py:exc:`.MissingReference`: if the referenced object can not be found
+
+        :raises :py:exc:`portal.models.reference.MissingReference`: if the referenced object can not be found
 
         """
         if 'reference' in reference_dict:
