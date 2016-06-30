@@ -94,6 +94,8 @@ exclude_patterns = []
 #default_role = None
 
 nitpick_ignore = [
+     # Todo: find/fix
+     ('py:class', 'Enum'),
 ]
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
