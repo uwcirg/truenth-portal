@@ -48,6 +48,7 @@ setup(
     setup_requires=("setuptools_scm"),
     install_requires=(
         "Authomatic>=0.1.0",
+        "bcrypt!=3.0.0",
         "celery",
         "Flask>=0.10.1",
         "Flask-Babel",
