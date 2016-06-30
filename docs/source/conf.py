@@ -93,6 +93,9 @@ exclude_patterns = []
 # documents.
 #default_role = None
 
+nitpick_ignore = [
+]
+
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #add_function_parentheses = True
 
