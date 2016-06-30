@@ -16,8 +16,9 @@ import sys
 import os
 import pkginfo
 
-metadata = pkginfo.Installed("portal")
-
+metadata = pkginfo.Develop(
+    os.path.join(os.path.dirname(__file__), '../..')
+)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the

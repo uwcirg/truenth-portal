@@ -172,6 +172,5 @@ def configure_logging(app):  # pragma: no cover
 
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
-
-    metadata = pkginfo.Installed(app.name)
+    metadata = pkginfo.Develop(os.path.join(app.root_path, ".."))
     app.config.metadata = metadata
