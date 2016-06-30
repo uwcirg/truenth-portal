@@ -316,4 +316,5 @@ texinfo_documents = [(
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7', None),
+    'werkzeug': ('http://werkzeug.pocoo.org/docs/latest', None),
 }

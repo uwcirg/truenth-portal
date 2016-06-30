@@ -29,7 +29,7 @@ def crossdomain(origin=None, methods=None,
         otherwise the view function will be called to generate an
         appropriate response.
 
-    :raises 401: if no origin is provided and the one in
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if no origin is provided and the one in
         request.headers['Origin'] doesn't validate as one we know.
 
     """
