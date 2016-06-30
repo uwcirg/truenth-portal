@@ -98,7 +98,8 @@ def user_extension_map(user, extension):
         when being used in an apply context (i.e. direct FHIR data)
 
     :returns: adapter implementing apply_fhir and as_fhir methods
-    :raises ValueError: if the extension isn't recognized
+
+    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:
