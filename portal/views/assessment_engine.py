@@ -18,7 +18,12 @@ assessment_engine_api = Blueprint('assessment_engine_api', __name__,
 
 
 @assessment_engine_api.route(
-    '/patient/<int:patient_id>/assessment/<string:instrument_id>')
+    '/patient/<int:patient_id>/assessment',
+    defaults={'instrument_id': None},
+)
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment/<string:instrument_id>'
+)
 @oauth.require_oauth()
 def assessment(patient_id, instrument_id):
     """Return a patient's responses to a questionnaire
@@ -555,9 +560,15 @@ def assessment(patient_id, instrument_id):
     """
 
     current_user().check_role(permission='view', other_id=patient_id)
-    questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).filter(
-        QuestionnaireResponse.document[("questionnaire", "reference")].astext.endswith(instrument_id)
-    ).order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
+
+    if instrument_id is not None:
+        questionnaire_responses = questionnaire_responses.filter(
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id)
+        )
+
     documents = [qnr.document for qnr in questionnaire_responses]
 
     bundle = {
