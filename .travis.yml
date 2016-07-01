@@ -20,6 +20,7 @@ services:
 env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
+    - LOG_FOLDER='/tmp/shared_service_log'
 
 matrix:
   allow_failures:
