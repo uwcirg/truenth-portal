@@ -71,6 +71,7 @@ def early_app_config_access():
     """
     root_path = os.path.join(os.path.dirname(__file__), "..")
     _app_config = Config(root_path=root_path)
+    _app_config.from_object(BaseConfig)
     _app_config.from_pyfile(os.path.join(\
             os.path.dirname(__file__), 'application.cfg'))
     return _app_config
