@@ -457,6 +457,10 @@ class User(db.Model, UserMixin):
         assert(permission in ('view', 'edit'))  # limit vocab for now
         if self.id == other_id:
             return True
+        try:
+            int(other_id)
+        except TypeError:
+            abort(400, "Non Integer value for User ID: {}".format(other_id))
         other = User.query.get(other_id)
         if not other:
             abort(404, "User not found {}".format(other_id))

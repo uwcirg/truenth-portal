@@ -161,7 +161,7 @@ def login(provider_name):
         return next_after_login()
     if result:
         if result.error:
-            current_app.logger.error(result.error.message)
+            current_app.logger.info(result.error.message)
             # Work around for w/ Safari and cookies set to current site only
             # forcing a reload brings the local cookies back into view
             # (they're missing with such a setting on returning from
