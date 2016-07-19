@@ -61,7 +61,7 @@ six==1.10.0
 snowballstemmer==1.2.1
 Sphinx==1.4.4
 sphinx-rtd-theme==0.1.10a0
-SQLAlchemy==1.1.0b1
+SQLAlchemy==1.1.0b2
 swagger-spec-validator==2.0.2
 tox==2.3.1
 validators==0.10.1
