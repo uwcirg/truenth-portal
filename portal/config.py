@@ -12,7 +12,10 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
-    LOG_FOLDER = os.path.join('/var/log', __package__)
+    LOG_FOLDER = os.environ.get(
+        'LOG_FOLDER',
+        os.path.join('/var/log', __package__)
+    )
     LOG_LEVEL = 'DEBUG'
 
     MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
@@ -33,12 +36,15 @@ class BaseConfig(object):
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
+    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
+    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
+    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
+    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
     SQLALCHEMY_ECHO = False
-
 
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
@@ -67,8 +73,11 @@ def early_app_config_access():
     """
     root_path = os.path.join(os.path.dirname(__file__), "..")
     _app_config = Config(root_path=root_path)
-    _app_config.from_pyfile(os.path.join(\
-            os.path.dirname(__file__), 'application.cfg'))
+    _app_config.from_object(BaseConfig)
+    _app_config.from_pyfile(
+        os.path.join(os.path.dirname(__file__), 'application.cfg'),
+        silent=True,
+    )
     return _app_config
 
 
