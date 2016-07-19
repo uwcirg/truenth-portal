@@ -36,10 +36,10 @@ class BaseConfig(object):
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
-    FB_CONSUMER_KEY = ''
-    FB_CONSUMER_SECRET = ''
-    GOOGLE_CONSUMER_KEY = ''
-    GOOGLE_CONSUMER_SECRET = ''
+    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
+    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
+    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
+    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
