@@ -4,7 +4,7 @@ amqp==1.4.9
 anyjson==0.3.3
 Authomatic==0.1.0.post1
 Babel==2.3.4
-bcrypt==2.0.0
+bcrypt==3.1.0
 beautifulsoup4==4.4.1
 billiard==3.3.0.23
 blinker==1.4
