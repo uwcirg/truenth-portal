@@ -176,6 +176,11 @@ Tox will pass any options after -- to the test runner, nose, eg:
 $ tox -- -sx tests.test_intervention
 ```
 
+## Dependency Management
+
+Project dependencies are hardcoded to specific versions (see `requirements.txt`) known to be compatible with Shared Services to prevent dependency updates from breaking existing code.
+
+If pyup.io integration is enabled the service will create pull requests when individual dependencies are updated, allowing the project to track the latest dependencies. These pull requests should be merged without need for review, assuming they pass continuous integration.
 
 ## Documentation
 
@@ -187,3 +192,4 @@ the contained Makefile to build - then view in browser starting with the
 $ cd docs
 $ make html
 ```
+
