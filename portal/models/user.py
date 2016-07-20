@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort, request, session
+from flask import abort
 from flask_user import UserMixin, _call_or_get
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
@@ -553,6 +553,8 @@ def current_user():
 
     returns current user object, or None if not logged in (local or remote)
     """
+    from flask import request, session
+
     uid = None
     if 'id' in session:
         # Locally logged in
