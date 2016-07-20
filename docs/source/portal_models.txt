@@ -7,10 +7,12 @@ Portal.Models
 .. automodule:: portal.models.audit
     :members:
     :undoc-members:
+    :exclude-members: current_app
 
 .. automodule:: portal.models.auth
     :members:
     :undoc-members:
+    :exclude-members: current_app
 
 .. automodule:: portal.models.fhir
     :members:
@@ -30,6 +32,7 @@ Portal.Models
 .. automodule:: portal.models.message
     :members:
     :undoc-members:
+    :exclude-members: current_app
 
 .. automodule:: portal.models.organization
     :members:
@@ -57,6 +60,7 @@ Portal.Models
 .. automodule:: portal.models.telecom
     :members:
     :undoc-members:
+    :exclude-members: current_app
 
 .. automodule:: portal.models.user
     :members:
