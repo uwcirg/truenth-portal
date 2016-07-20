@@ -130,6 +130,11 @@ var fillContent = {
         $.each(data.entry,function(i,val){
             var procID = val.content.code.coding[0].code;
             $("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
+
+            // TODO for each of these, add a div representing a procedure.
+            var proceduresHtml = $("body").find("#userProcedures").html();
+            proceduresHtml += "<div>procedure ID " + procID + "</div>"; 
+            $("body").find("#userProcedures").html(proceduresHtml);
         });
     },
     "roles": function(data,isProfile) {
