@@ -374,6 +374,16 @@ var tnthAjax = {
             console.log("Problem updating procedure on server.");
         });
     },
+    "deleteProc": function(procedureId) {
+        $.ajax ({
+            type: "DELETE",
+            url: '/api/procedure/'+procedureId,
+            contentType: "application/json; charset=utf-8",
+        }).done(function(data) {
+        }).fail(function() {
+            console.log("Problem deleting procedure on server.");
+        });
+    },
     "getRoles": function(userId,isProfile) {
         $.ajax ({
             type: "GET",
