@@ -20,6 +20,10 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['name']['family'], LAST_NAME)
         self.assertEquals(fhir['name']['given'], FIRST_NAME)
         self.assertEquals(fhir['photo'][0]['url'], IMAGE_URL)
+        # confirm default timezone appears
+        tz = [ext for ext in fhir['extension'] if
+              ext['url'].endswith('timezone')]
+        self.assertEquals('UTC', tz[0]['timezone'])
 
     def test_demographics404(self):
         self.login()
@@ -84,7 +88,7 @@ class TestDemographics(TestCase):
         self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
-        self.assertEquals(2, len(fhir['extension']))
+        self.assertEquals(3, len(fhir['extension']))  # timezone added
         self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
