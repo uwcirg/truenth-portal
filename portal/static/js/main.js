@@ -128,13 +128,14 @@ var fillContent = {
     "procedures": function(data) {
         // TODO - add date? should procedures be checkbox or radio
         $.each(data.entry,function(i,val){
-            var procID = val.content.code.coding[0].code;
-            $("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
+            var procID = val.resource.id;
+            //var procID = val.content.code.coding[0].code;
+            //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
             // TODO for each of these, add a div representing a procedure.
             var proceduresHtml = $("body").find("#userProcedures").html();
-            proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val) + "</div>"; 
-            //proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val.content) + "</div>"; 
+            //proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val) + "</div>"; 
+            proceduresHtml += "<div>procedure id " + procID + " has resource.code.coding[0].display =" + resource.code.coding[0].display + "</div>"; 
             //proceduresHtml += "<div>procedure ID " + procID + "</div>"; 
             $("body").find("#userProcedures").html(proceduresHtml);
         });
