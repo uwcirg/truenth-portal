@@ -73,8 +73,9 @@ def configure_app(app, config):
 
 
 def configure_error_handlers(app):
-    app.register_error_handler(404, page_not_found)
-    app.register_error_handler(500, server_error)
+    if not app.debug:
+        app.register_error_handler(404, page_not_found)
+        app.register_error_handler(500, server_error)
 
 
 def configure_extensions(app):
