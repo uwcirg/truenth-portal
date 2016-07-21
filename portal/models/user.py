@@ -304,10 +304,7 @@ class User(db.Model, UserMixin):
                 "entry": []}
 
         for proc in self.procedures:
-            fhir['entry'].append({"title": "Patient Procedures",
-                                  "updated": as_fhir(now),
-                                  "author": [{"name": "Truenth Portal"},],
-                                  "content": proc.as_fhir()})
+            fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
     def as_fhir(self):

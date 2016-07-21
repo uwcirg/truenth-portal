@@ -46,23 +46,23 @@ class TestProcedure(TestCase):
 
         data = json.loads(rv.data)
         self.assertEquals('367336001',
-            data['entry'][0]['content']['code']['coding'][0]['code'])
+            data['entry'][0]['resource']['code']['coding'][0]['code'])
         self.assertEquals('Chemotherapy',
-            data['entry'][0]['content']['code']['coding'][0]['display'])
+            data['entry'][0]['resource']['code']['coding'][0]['display'])
         self.assertEquals(
             Reference.patient(TEST_USER_ID).as_fhir(),
-            data['entry'][0]['content']['meta']['by'])
+            data['entry'][0]['resource']['meta']['by'])
         last_updated = FHIR_datetime.parse(
-            data['entry'][0]['content']['meta']['lastUpdated'])
+            data['entry'][0]['resource']['meta']['lastUpdated'])
         self.assertAlmostEquals(
             datetime.utcnow(), last_updated, delta=timedelta(seconds=2))
         start_time = FHIR_datetime.parse(
-            data['entry'][0]['content']['performedPeriod']['start'])
+            data['entry'][0]['resource']['performedPeriod']['start'])
         self.assertAlmostEquals(
             datetime.utcnow(), start_time, delta=timedelta(seconds=2))
         self.assertEquals(
             current_app.config.metadata.version,
-            data['entry'][0]['content']['meta']['version'])
+            data['entry'][0]['resource']['meta']['version'])
 
     def test_procedure_from_fhir(self):
         with open(os.path.join(os.path.dirname(__file__),

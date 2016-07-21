@@ -47,6 +47,8 @@ class Procedure(db.Model):
     def as_fhir(self):
         """produces FHIR representation of procedure in JSON format"""
         d = {}
+        d['resourceType'] = 'Procedure'
+        d['id'] = self.id
         d['meta'] = self.audit.as_fhir()
         d['subject'] = Reference.patient(self.user_id).as_fhir()
         d['code'] = self.code.as_fhir()
