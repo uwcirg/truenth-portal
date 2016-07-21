@@ -11,7 +11,7 @@ blinker==1.4
 celery==3.1.23
 cffi==1.7.0
 click==6.6
-CommonMark==0.7.0
+CommonMark==0.7.1
 coverage==4.1
 decorator==4.0.10
 docutils==0.12
