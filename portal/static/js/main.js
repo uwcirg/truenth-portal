@@ -135,7 +135,7 @@ var fillContent = {
             // TODO for each of these, add a div representing a procedure.
             var proceduresHtml = $("body").find("#userProcedures").html();
             //proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val) + "</div>"; 
-            proceduresHtml += "<div>procedure id " + procID + " has resource.code.coding[0].display =" + resource.code.coding[0].display + "</div>"; 
+            proceduresHtml += "<div>procedure id " + procID + " has val.resource.code.coding[0].display =" + val.resource.code.coding[0].display + "</div>"; 
             //proceduresHtml += "<div>procedure ID " + procID + "</div>"; 
             $("body").find("#userProcedures").html(proceduresHtml);
         });
