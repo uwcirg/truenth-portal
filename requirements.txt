@@ -68,7 +68,7 @@ validators==0.10.3
 virtualenv==15.0.2
 waitress==0.9.0
 WebOb==1.6.1
-WebTest==2.0.21
+WebTest==2.0.23
 Werkzeug==0.11.10
 WTForms==2.1
 xvfbwrapper==0.2.8
