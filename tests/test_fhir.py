@@ -110,12 +110,6 @@ class TestFHIR(TestCase):
         self.assertIn(str(qr.user_id), qr_str)
         self.assertIn(str(qr.status), qr_str)
 
-    def test_tz_info(self):
-        now = FHIR_datetime.now()
-        parsed = parser.parse(now)
-        # confirm it's in utc
-        self.assertEquals(tz.tzutc(), parsed.tzinfo)
-
     def test_tz_aware_conversion(self):
         eastern = pytz.timezone('US/Eastern')
         aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
