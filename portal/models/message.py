@@ -22,7 +22,7 @@ class EmailMessage(db.Model):
     subject = db.Column(db.String(255), nullable=False)
     recipients = db.Column(db.Text, nullable=False)
     sender = db.Column(db.String(255), nullable=False)
-    sent_at = db.Column(db.DateTime, default=datetime.now)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
         ondelete='CASCADE'))

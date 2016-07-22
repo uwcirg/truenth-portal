@@ -4,6 +4,7 @@ from datetime import datetime
 from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
+import pytz
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
@@ -20,6 +21,7 @@ from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from .telecom import Telecom
+
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -84,7 +86,37 @@ class UserRaceExtension(Extension):
         return self.user.races
 
 
-user_extension_classes = (UserEthnicityExtension, UserRaceExtension)
+class UserTimezone(Extension):
+    extension_url =\
+       "http://hl7.org/fhir/StructureDefinition/user-timezone"
+
+    def as_fhir(self):
+        timezone = self.user.timezone
+        if not timezone or timezone == 'None':
+            timezone = 'UTC'
+        return {'url': self.extension_url,
+                'timezone': timezone}
+
+    def apply_fhir(self):
+        assert self.extension['url'] == self.extension_url
+        if not 'timezone' in self.extension:
+            abort(400, "Extension missing 'timezone' field")
+        timezone = self.extension['timezone']
+
+        # Confirm it's a recognized timezone
+        try:
+            pytz.timezone(timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            abort(400, "Unknown Timezone: '{}'".format(timezone))
+        self.user.timezone = timezone
+
+    @property
+    def children(self):
+        raise NotImplementedError
+
+
+user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
+                          UserTimezone)
 
 def user_extension_map(user, extension):
     """Map the given extension to the User
@@ -115,7 +147,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), default="Anonymous")
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    registered = db.Column(db.DateTime, default=datetime.now)
+    registered = db.Column(db.DateTime, default=datetime.utcnow)
     email = db.Column(db.String(120), unique=True)
     phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)

@@ -11,7 +11,7 @@ from portal.models.organization import Organization
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
-from portal.models.user import UserRelationship
+from portal.models.user import UserRelationship, UserTimezone
 
 class TestUser(TestCase):
     """User model and view tests"""
@@ -119,6 +119,27 @@ class TestUser(TestCase):
         found = [c.code for c in self.test_user.ethnicities]
         self.assertIn('2162-6', found)
         self.assertIn('2142-8', found)
+
+    def test_user_timezone(self):
+        self.assertEquals(self.test_user.timezone, 'UTC')
+        self.login()
+        # Set to bogus, confirm exception
+        data = {"resourceType": "Patient",
+                "extension": [{"url": UserTimezone.extension_url,
+                               "timezone": "bogus"}]}
+        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert400(rv)
+
+        # Valid setting should work
+        data['extension'][0]['timezone'] = 'US/Eastern'
+        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert200(rv)
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.timezone, 'US/Eastern')
 
     def test_ur_format(self):
         ur = UserRelationship(user_id=TEST_USER_ID, other_user_id=TEST_USER_ID,
