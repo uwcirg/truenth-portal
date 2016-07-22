@@ -113,15 +113,15 @@ class TestFHIR(TestCase):
     def test_tz_info(self):
         now = FHIR_datetime.now()
         parsed = parser.parse(now)
-        self.assertEquals('UTC', parsed.tzinfo.tzname(now))
+        # confirm it's in utc
+        self.assertEquals(tz.tzutc(), parsed.tzinfo)
 
     def test_tz_aware_conversion(self):
         eastern = pytz.timezone('US/Eastern')
         aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
         parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
-        utc = tz.tzutc()
-        converted = aware.astimezone(utc)
         self.assertEquals(aware, parsed)
+        self.assertEquals(pytz.utc, parsed.tzinfo)
 
     def test_tz_unaware_conversion(self):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
