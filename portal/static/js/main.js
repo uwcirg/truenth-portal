@@ -329,6 +329,7 @@ var tnthAjax = {
                 });
             });
             tnthAjax.getDemo(userId);
+            //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures 
         }).fail(function() {
             console.log("Problem retrieving data from server.");
             loader();
@@ -341,7 +342,6 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.orgs(data);
             fillContent.demo(data);
-            fillContent.procedures(data);
             loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");
