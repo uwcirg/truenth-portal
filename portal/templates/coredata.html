@@ -12,6 +12,7 @@ The TrueNTH system asks these questions in order to give you information that be
 
 <div class="row" style="position: relative;">
     <div class="col-md-9">
+{% if ('race' in require) or ('ethnicity' in require) %}
 <form id="profileForm" class="form tnth-form" role="form" method="POST">
         {% if 'ethnicity' in require %}
         <div class="form-group" id="userEthnicity">
@@ -74,6 +75,7 @@ The TrueNTH system asks these questions in order to give you information that be
 <br />
 <button id="updateData" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
 </form>
+        {% endif %}
 
         {% if 'procedure' in require %}
         <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
