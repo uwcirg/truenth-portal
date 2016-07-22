@@ -622,7 +622,7 @@ var tnthDates = {
                 dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
                 dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, '');
             }
-            if (userSetLang == 'es_MX' || userSetLang == 'en_AU') {
+            if (userSetLang != undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
                 convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
             } else {
                 convertDate = dateFormatArray[1]+"/"+dateFormatArray[2]+"/"+yearToPass;
@@ -643,7 +643,7 @@ var tnthDates = {
             } else {
                 yearToPass = dateFormatArray[2];
             }
-            if (userSetLang == 'es_MX' || userSetLang == 'en_AU') {
+            if (userSetLang != undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
                 convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
             } else {
                 convertDate = yearToPass+"-"+dateFormatArray[0]+"-"+dateFormatArray[1]
@@ -763,10 +763,10 @@ var tnthDates = {
             "July", "August", "September", "October", "November", "December"
         ]
         // If user's language is Spanish then use dd/mm/yyyy format and changes words
-        if (userSetLang == 'es_MX') {
+        if (userSetLang != undefined && userSetLang == 'es_MX') {
             monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio", "agosto","septiembre","octubre","noviembre","diciembre"];
             returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear()
-        } else if(userSetLang == "en_AU") {
+        } else if(userSetLang != undefined && userSetLang == "en_AU") {
             returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear()
         } else {
             returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear()
