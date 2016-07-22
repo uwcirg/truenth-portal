@@ -1,3 +1,27 @@
+    $.fn.extend({
+        // Special type of select question - passes two values - the answer from
+        // the select plus an associated date from a separate input
+        eventInput: function(settings) {
+            $(this).on("click", function() {
+                var selectVal = $(this).attr('data-name');
+                var selectDate = $(this).attr('data-date');
+                // Only post if value and date have been chosen
+                if (selectVal !== undefined && selectDate !== undefined) {
+/**
+TODO
+                  $.ajaxAnswer(this.name,     // question
+                        "",    // option - blank
+                        selectDate, // date passed to state field
+                        "", // text - blank
+                        settings.page_id,
+                        selectVal); // answer passed to value
+*/
+                }
+                return false;
+            });
+        },
+    }); // $.fn.extend({
+
     $(document).ready(function() {
 
         var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
@@ -24,6 +48,7 @@
             }
         }
 
+        $.fn.extend({
         // Special type of select question - passes two values - the answer from
         // the select plus an associated date from a separate input
         eventInput: function(settings) {
@@ -45,6 +70,7 @@ TODO
                 return false;
             });
         },
+        }); // $.fn.extend({
 
         // Update submit button when select changes
         $("select[id^='1494']").on('change', function() {
