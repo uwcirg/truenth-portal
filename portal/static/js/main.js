@@ -137,7 +137,8 @@ var fillContent = {
             //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
             var proceduresHtml = $("body").find("#userProcedures").html();
-            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toISOString() + "</div>"; 
+            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toLocaleDateString() + "</div>"; 
+            //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toISOString() + "</div>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toDateString() + "</div>"; 
             proceduresHtml += "<button type='button' id='editProc" + procID + "'>Edit</button>"; 
             proceduresHtml += "<button type='button' id='deleteProc" + procID + "'>Delete</button>"; 
