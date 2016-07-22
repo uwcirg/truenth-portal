@@ -132,11 +132,12 @@ var fillContent = {
             var procID = val.resource.id;
             var displayText = val.resource.code.coding[0].display; 
             var performedDateTime = val.resource.performedDateTime;
+            var performedDate = new Date(performedDateTime);
             //var procID = val.content.code.coding[0].code;
             //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
             var proceduresHtml = $("body").find("#userProcedures").html();
-            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDateTime + "</div>"; 
+            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toDateString() + "</div>"; 
             proceduresHtml += "<button type='button' id='editProc" + procID + "'>Edit</button>"; 
             proceduresHtml += "<button type='button' id='deleteProc" + procID + "'>Delete</button>"; 
             $("body").find("#userProcedures").html(proceduresHtml);
