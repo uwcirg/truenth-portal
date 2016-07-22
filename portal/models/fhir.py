@@ -3,6 +3,7 @@ from datetime import date, datetime
 import dateutil
 from flask import current_app
 import json
+import pytz
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import urllib
@@ -21,6 +22,10 @@ def as_fhir(obj):
     if hasattr(obj, 'as_fhir'):
         return obj.as_fhir()
     if isinstance(obj, datetime):
+        # Make SURE we only communicate unaware or UTC timezones
+        tz = getattr(obj, 'tzinfo', None)
+        if tz and tz != pytz.utc:
+            current_app.logger.error("Datetime export of NON-UTC timezone")
         return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
     if isinstance(obj, date):
         return obj.strftime('%Y-%m-%d')
@@ -39,7 +44,8 @@ class FHIR_datetime(object):
         dt = dateutil.parser.parse(data)
         if dt.tzinfo:
             # Convert to UTC if necessary
-            pass
+            if dt.tzinfo != pytz.utc:
+                dt = dt.astimezone(pytz.utc)
         return dt
 
     @staticmethod
@@ -275,7 +281,7 @@ class ValueQuantity(db.Model):
 class Observation(db.Model):
     __tablename__ = 'observations'
     id = db.Column(db.Integer, primary_key=True)
-    issued = db.Column(db.DateTime, default=datetime.now)
+    issued = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(80))
     codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'),
                                    nullable=False)
@@ -394,7 +400,8 @@ class QuestionnaireResponse(db.Model):
         return context.current_parameters['document']['status']
 
     def default_authored(context):
-        return context.current_parameters['document']['authored']
+        return FHIR_datetime.parse(
+            context.current_parameters['document']['authored'])
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
