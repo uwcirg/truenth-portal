@@ -89,7 +89,7 @@ TODO
             var dateFormatted;
             // Change dates to YYYY-MM-DD
             if (passedDate && passedDate != '') {
-                dateFormatted = cproDates.changeFormat(passedDate);
+                dateFormatted = tnthDates.changeFormat(passedDate);
             }
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
             checkSubmit("button[id^='tnthproc-submit']");
