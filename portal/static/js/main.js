@@ -126,6 +126,8 @@ var fillContent = {
         }
     },
     "procedures": function(data) {
+        var proceduresHtml = $("body").find("#userProcedures").html();
+        proceduresHtml += '<ul id="eventList1494">'; 
         if (data.entry.length == 0) 
             $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
         $.each(data.entry,function(i,val){
@@ -136,14 +138,14 @@ var fillContent = {
             //var procID = val.content.code.coding[0].code;
             //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
-            var proceduresHtml = $("body").find("#userProcedures").html();
-            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toLocaleDateString() + "</div>"; 
+            proceduresHtml = $("body").find("#userProcedures").html();
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this procedure?<br /><br /><a href='#' class='btn-delete btn btn-primary'>Yes</a> &nbsp;&nbsp;&nbsp; <a class='btn btn-default cancel-delete'>No</a>' rel='popover-confirm'><i class='fa fa-times'></i> Delete</a></li>"; 
+            //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toLocaleDateString() + "</div>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toISOString() + "</div>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toDateString() + "</div>"; 
-            proceduresHtml += "<button type='button' id='editProc" + procID + "'>Edit</button>"; 
-            proceduresHtml += "<button type='button' id='deleteProc" + procID + "'>Delete</button>"; 
-            $("body").find("#userProcedures").html(proceduresHtml);
         });
+        proceduresHtml += '</ul>'; 
+        $("body").find("#userProcedures").html(proceduresHtml);
     },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){

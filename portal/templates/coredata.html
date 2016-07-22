@@ -74,6 +74,7 @@ The TrueNTH system asks these questions in order to give you information that be
         {% endif %}
 
         {% if 'procedure' in require %}
+        <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
         <label>Which of the following prostate cancer treatments have you had, if any?<span class="text-muted smaller-text"></span></label>
         <div id="userProcedures">Your procedures:<br/>
         </div>
