@@ -126,17 +126,19 @@ var fillContent = {
         }
     },
     "procedures": function(data) {
-        // TODO - add date? should procedures be checkbox or radio
+        if (data.entry.length == 0) 
+            $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
         $.each(data.entry,function(i,val){
             var procID = val.resource.id;
+            var displayText = val.resource.code.coding[0].display; 
+            var performedDateTime = val.resource.performedDateTime;
             //var procID = val.content.code.coding[0].code;
             //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
-            // TODO for each of these, add a div representing a procedure.
             var proceduresHtml = $("body").find("#userProcedures").html();
             //proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val) + "</div>"; 
-            proceduresHtml += "<div>procedure id " + procID + " has val.resource.code.coding[0].display =" + val.resource.code.coding[0].display + "</div>"; 
-            //proceduresHtml += "<div>procedure ID " + procID + "</div>"; 
+            proceduresHtml += "<div id='proc" + procID + ">" + val.resource.code.coding[0].display + ", performed " + performedDateTime + "</div>"; 
+            proceduresHtml += "<button type='button' id='deleteProc" + procID + ">Delete</button>"; 
             $("body").find("#userProcedures").html(proceduresHtml);
         });
     },
