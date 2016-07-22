@@ -1,4 +1,3 @@
-<script type="text/javascript">
     $(document).ready(function() {
 
         var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
@@ -121,5 +120,3 @@
         });
 
     });
-</script>
-
