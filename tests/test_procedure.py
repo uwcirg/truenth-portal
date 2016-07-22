@@ -5,6 +5,7 @@ from flask import current_app
 from flask_webtest import SessionScope
 import json
 import os
+import pytz
 from sqlalchemy.orm.exc import NoResultFound
 from tests import TestCase, TEST_USER_ID
 
@@ -90,6 +91,34 @@ class TestProcedure(TestCase):
         self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
         self.assertEquals(proc.user_id, 1)
         self.assertEquals(proc.end_time, datetime(2011, 6, 27))
+
+    def test_timezone_procedure_POST(self):
+        with open(os.path.join(os.path.dirname(__file__),
+                               'procedure2-example.json'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+
+        # confirm we correctly convert a timezone aware datetime
+        # to unaware but converted to UTC time
+        start_time ="2013-01-28T13:31:00+01:00"
+        end_time = "2013-01-28T14:27:00+01:00"
+        data['performedPeriod']['start'] = start_time
+        data['performedPeriod']['end'] = end_time
+
+        self.login()
+        rv = self.app.post(
+            '/api/procedure', content_type='application/json',
+            data=json.dumps(data))
+
+        results = json.loads(rv.data)
+        proc_id = results['procedure_id']
+        proc = Procedure.query.get(proc_id)
+
+        self.assertEquals(proc.start_time.tzinfo, None)
+        self.assertEquals(proc.end_time.tzinfo, None)
+        st = dateutil.parser.parse(start_time)
+        st = st.astimezone(pytz.utc)
+        st = st.replace(tzinfo=None)
+        self.assertEquals(proc.start_time, st)
 
     def test_procedureDELETE(self):
         self.prep_db_for_procedure()

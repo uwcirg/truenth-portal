@@ -147,7 +147,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), default="Anonymous")
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    registered = db.Column(db.DateTime, default=datetime.now)
+    registered = db.Column(db.DateTime, default=datetime.utcnow)
     email = db.Column(db.String(120), unique=True)
     phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
