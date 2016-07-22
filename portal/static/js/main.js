@@ -137,8 +137,8 @@ var fillContent = {
 
             var proceduresHtml = $("body").find("#userProcedures").html();
             //proceduresHtml += "<div>procedure val.content =" + JSON.stringify(val) + "</div>"; 
-            proceduresHtml += "<div id='proc" + procID + ">" + val.resource.code.coding[0].display + ", performed " + performedDateTime + "</div>"; 
-            proceduresHtml += "<button type='button' id='deleteProc" + procID + ">Delete</button>"; 
+            proceduresHtml += "<div id='proc" + procID + ">" + displayText + ", performed " + performedDateTime + "</div>"; 
+            proceduresHtml += "<button type='button' id='deleteProc" + procID + "'>Delete</button>"; 
             $("body").find("#userProcedures").html(proceduresHtml);
         });
     },
