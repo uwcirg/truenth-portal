@@ -157,3 +157,5 @@ $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
 
+var userSetLang = 'en_US';
+
