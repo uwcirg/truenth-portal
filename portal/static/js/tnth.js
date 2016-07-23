@@ -157,5 +157,4 @@ $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
 
-var userSetLang = 'en_US';
-
+var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js

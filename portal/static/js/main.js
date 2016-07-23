@@ -1,5 +1,7 @@
 /*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
 
+var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+
 function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
