@@ -103,9 +103,9 @@ The TrueNTH system asks these questions in order to give you information that be
 {% endblock %}
 
 {% block document_ready %}
-$(document).ready(function(){
-
     var subjectId = {{ user.id }};
+
+$(document).ready(function(){
 
     {% if ('race' in require) or ('ethnicity' in require) %}
     tnthAjax.getDemo({{ user.id }});
