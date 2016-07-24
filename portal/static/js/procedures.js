@@ -9,7 +9,8 @@
                 if (selectVal !== undefined && selectDate !== undefined) {
                     alert('eventInput, selectVal and selectDate defined; postProc is next');
                     var procArray = {};
-                    var procID = { "code": selectVal, "display": "dummy",
+                    var selectFriendly = $("selectProc option:selected").text();
+                    var procID = { "code": selectVal, "display": selectFriendly,
                             system: "http://snomed.info/sct" };
                     /**var procID = $("#userProcedure input:checked").map(function(){
                         return { code: selectVal, display: 'dummy',
