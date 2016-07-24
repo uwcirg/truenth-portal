@@ -634,8 +634,8 @@ var tnthDates = {
             // If patient manuals enters two digit year, then add 19 or 20 to year.
             // TODO - this is susceptible to Y2K for 2100s. Be better to force
             // user to type 4 digits.
+            var currentTime = new Date();
             if (dateFormatArray[2].length == 2) {
-                var currentTime = new Date();
                 var shortYear = currentTime.getFullYear().toString().substr(2,2);
                 if (dateFormatArray[2] > shortYear) {
                     yearToPass = '19'+dateFormatArray[2];
@@ -650,6 +650,11 @@ var tnthDates = {
             } else {
                 convertDate = yearToPass+"-"+dateFormatArray[0]+"-"+dateFormatArray[1]
             }
+            // add T according to timezone
+            var tzOffset = currentTime.getTimezoneOffset();//minutes
+            tzOffset /= 60;//hours
+            if (tzOffset < 10) tzOffset = "0" + tzOffset;
+            convertDate += "T" + tzOffset + ":00:00";
         }
         return convertDate
     },
