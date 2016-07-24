@@ -7,9 +7,14 @@
                 var selectDate = $(this).attr('data-date');
                 // Only post if value and date have been chosen
                 if (selectVal !== undefined && selectDate !== undefined) {
-                    alert('eventInput, selectVal and selectDate defined; cpro would ajaxAnswer next');
+                    alert('eventInput, selectVal and selectDate defined; postProc is next');
+                    var procArray = {};
+                    procArray["resourceType"] = "Procedure";
+                    procArray["subject"] = {"reference": "Patient/" + subjectId };
+                    procArray["code"] = {"coding": selectVal};
+                    procArray["performedDateTime"] = selectDate;
+                    tnthAjax.postProc(userId,procArray);
 /**
-TODO
                   $.ajaxAnswer(this.name,     // question
                         "",    // option - blank
                         selectDate, // date passed to state field
@@ -137,11 +142,12 @@ TODO
                     $('#eventListtnthproc').prepend("<p id='noEvents' style='margin-top: 8px'><em>You haven't added any procedures.</em></p>");
                 }
             });
+            alert('DELETE api call would be next...');
             // Post delete to server
-            $.post(appRoot + controller + "/deleteAnswer.json", {
+            /**$.post(appRoot + controller + "/deleteAnswer.json", {
                 "data[Answer][id]" : answerId,
                 "data[AppController][AppController_id]" : acidValue
-            }, "json");
+            }, "json");*/
             return false;
         });
 
