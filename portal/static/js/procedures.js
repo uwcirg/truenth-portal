@@ -7,9 +7,8 @@
                 var selectDate = $(this).attr('data-date');
                 // Only post if value and date have been chosen
                 if (selectVal !== undefined && selectDate !== undefined) {
-                    alert('eventInput, selectVal and selectDate defined; postProc is next');
                     var procArray = {};
-                    var selectFriendly = $("tnthproc option:selected").text();
+                    var selectFriendly = $("#tnthproc option:selected").text();
                     var procID = { "code": selectVal, "display": selectFriendly,
                             system: "http://snomed.info/sct" };
                     /**var procID = $("#userProcedure input:checked").map(function(){
