@@ -608,7 +608,7 @@ var tnthDates = {
      * If language is es_MX or en_AU then uses dd/mm/yyyy format
      *
      * Examples:
-     * changeFormat("04/29/2016") returns "2016-04-29"
+     * changeFormat("04/29/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
      * changeFormat("2016-04-29",true) returns "04/29/2016"
      * changeFormat("2016-04-29",true,true) returns "4/29/2016"
      ***/

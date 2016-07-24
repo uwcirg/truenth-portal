@@ -11,23 +11,11 @@
                     var selectFriendly = $("#tnthproc option:selected").text();
                     var procID = [{ "code": selectVal, "display": selectFriendly,
                             system: "http://snomed.info/sct" }];
-                    /**var procID = $("#userProcedure input:checked").map(function(){
-                        return { code: selectVal, display: 'dummy',
-                            system: "http://snomed.info/sct" };
-                    }).get();*/
                     procArray["resourceType"] = "Procedure";
                     procArray["subject"] = {"reference": "Patient/" + subjectId };
                     procArray["code"] = {"coding": procID};
                     procArray["performedDateTime"] = selectDate;
                     tnthAjax.postProc(subjectId,procArray);
-/**
-                  $.ajaxAnswer(this.name,     // question
-                        "",    // option - blank
-                        selectDate, // date passed to state field
-                        "", // text - blank
-                        settings.page_id,
-                        selectVal); // answer passed to value
-*/
                 }
                 return false;
             });
