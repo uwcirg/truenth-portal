@@ -9,9 +9,15 @@
                 if (selectVal !== undefined && selectDate !== undefined) {
                     alert('eventInput, selectVal and selectDate defined; postProc is next');
                     var procArray = {};
+                    var procID = { "code": selectVal, "display": "dummy",
+                            system: "http://snomed.info/sct" };
+                    /**var procID = $("#userProcedure input:checked").map(function(){
+                        return { code: selectVal, display: 'dummy',
+                            system: "http://snomed.info/sct" };
+                    }).get();*/
                     procArray["resourceType"] = "Procedure";
                     procArray["subject"] = {"reference": "Patient/" + subjectId };
-                    procArray["code"] = {"coding": selectVal};
+                    procArray["code"] = {"coding": procID};
                     procArray["performedDateTime"] = selectDate;
                     tnthAjax.postProc(subjectId,procArray);
 /**
