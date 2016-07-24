@@ -140,7 +140,7 @@ var fillContent = {
             //var procID = val.content.code.coding[0].code;
             //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
 
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this procedure?<br /><br /><a href='#' class='btn-delete btn btn-primary'>Yes</a> &nbsp;&nbsp;&nbsp; <a class='btn btn-default cancel-delete'>No</a>' rel='popover-confirm'><i class='fa fa-times'></i> Delete</a></li>"; 
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this procedure?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover-confirm'><i class='fa fa-times'></i> Delete</a></li>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toLocaleDateString() + "</div>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toISOString() + "</div>"; 
             //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toDateString() + "</div>"; 
