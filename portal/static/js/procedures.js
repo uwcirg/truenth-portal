@@ -13,7 +13,7 @@
                     procArray["subject"] = {"reference": "Patient/" + subjectId };
                     procArray["code"] = {"coding": selectVal};
                     procArray["performedDateTime"] = selectDate;
-                    tnthAjax.postProc(userId,procArray);
+                    tnthAjax.postProc(subjectId,procArray);
 /**
                   $.ajaxAnswer(this.name,     // question
                         "",    // option - blank
