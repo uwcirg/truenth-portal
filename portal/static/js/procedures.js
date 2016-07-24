@@ -9,8 +9,8 @@
                 if (selectVal !== undefined && selectDate !== undefined) {
                     var procArray = {};
                     var selectFriendly = $("#tnthproc option:selected").text();
-                    var procID = { "code": selectVal, "display": selectFriendly,
-                            system: "http://snomed.info/sct" };
+                    var procID = [{ "code": selectVal, "display": selectFriendly,
+                            system: "http://snomed.info/sct" }];
                     /**var procID = $("#userProcedure input:checked").map(function(){
                         return { code: selectVal, display: 'dummy',
                             system: "http://snomed.info/sct" };
