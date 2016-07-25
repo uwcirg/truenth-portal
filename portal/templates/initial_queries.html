@@ -43,6 +43,7 @@
     </div>
 
     <div class="tnth-hide" id="bdGroup">
+      <hr />
       <p>When is your birthday?</p>
       <input type="hidden" name="birthDate" id="birthday" value="">
       <div class="form-group">
@@ -77,7 +78,7 @@
     </div>
 
     <div class="tnth-hide" id="patientQ">
-
+      <hr />
       <div id="patBiopsy" data-topic="biopsy" class="tnth-hide pat-q">
         <br />
         <p>Have you had a prostate cancer biopsy?</p>
@@ -149,7 +150,7 @@
     </div>
 
     <div id="clinics" class="tnth-hide">
-
+      <hr />
       <h3 class="tnth-headline">Your Clinic</h3>
 
       <p>Where are you receiving your care?</p>
@@ -272,6 +273,11 @@ $(document).ready(function(){
     tnthAjax.postTerms(theTerms);
     $("#continueText").fadeIn();
     $("#updateProfile").removeAttr("disabled");
+  });
+
+  $('#queriesForm').validator().on('submit', function (e) {
+    if (e.isDefaultPrevented()) {
+      alert("There's a problem with your submission. Please check your answers, then try again.");
   });
 
 });
