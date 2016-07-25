@@ -91,6 +91,8 @@ var fillContent = {
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
+            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
+            $("#patBiopsy").fadeIn();
         }
         // TODO - add email and phone for profile page use
         // Only on profile page
@@ -154,7 +156,7 @@ var fillContent = {
             // Handle profile differently than initial_queries
             if (isProfile) {
                 $.each(data.roles,function(i,val){
-                    $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
+                    $("#rolesGroup input:checkbox[value="+val.name+"]").prop('checked', true);
                 });
             } else {
                 var $radios = $('input[name=user_type]');
@@ -162,7 +164,8 @@ var fillContent = {
                     $radios.filter('[value='+userRole+']').prop('checked', true);
                 }
                 if (userRole == "patient") {
-                    $("#patientQ, #bdGroup").fadeIn();
+                    $("#bdGroup").fadeIn();
+                    $("#patientQ").fadeIn();
                     $("#clinics").hide();
                     return false;
                 } else if (userRole == "partner") {
@@ -543,6 +546,8 @@ $(document).ready(function() {
                         $("#errorbirthday").hide();
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
+                        // If we are on initial-queries, then we'll want to display the patientQ div
+                        $("#patientQ, #patBiopsy").fadeIn();
                     } else {
                         $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");

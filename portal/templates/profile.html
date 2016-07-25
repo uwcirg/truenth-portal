@@ -234,7 +234,7 @@ My TrueNTH Profile
 <hr />
 
 <h3>User Roles for {{ user.username }}</h3>
-<div id="userRoles">
+<div id="rolesGroup">
     <div class="form-group">
         <p>Editable by admins only.</p>
         <div class="checkbox">
@@ -355,9 +355,9 @@ $("#patientQuestions input").on("change", function(){
 
 /** Get and Put roles **/
 tnthAjax.getRoles({{ user.id }}, true);
-$("#userRoles input:checkbox").on("click",function(){
+$("#rolesGroup input:checkbox").on("click",function(){
 
-    var roles = $("#userRoles input:checkbox:checked").map(function(){
+    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
         return { name: $(this).val() };
     }).get();
     var toSend = {"roles": roles}

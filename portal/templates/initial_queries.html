@@ -15,7 +15,7 @@
 
     <p>First, tell us who you are:</p>
 
-    <div class="row" id="nameBox">
+    <div class="row" id="nameGroup">
       <div class="col-xs-6">
         <div class="form-group float-input-label">
           <input class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" type="text" required="required" data-error="First name is required"  />
@@ -29,7 +29,7 @@
         </div>
       </div>
     </div>
-    <div class="form-group" id="userRoles">
+    <div class="form-group" id="rolesGroup">
       <div class="radio">
         <label>
           <input type="radio" name="user_type" value="patient"> I'm a man who is concerned about prostate cancer for myself
@@ -42,41 +42,43 @@
       </div>
     </div>
 
-    <input type="hidden" name="birthDate" id="birthday" value="">
-    <div class="form-group tnth-hide" id="bdGroup">
-      <label>Birth Date</label>
-      <div class="row">
-        <div class="col-xs-4">
-          <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
-            <option value="">Month...</option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
-            <option value="09">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
+    <div class="tnth-hide" id="bdGroup">
+      <p>When is your birthday?</p>
+      <input type="hidden" name="birthDate" id="birthday" value="">
+      <div class="form-group">
+        <label>Birth Date</label>
+        <div class="row">
+          <div class="col-xs-4">
+            <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+              <option value="">Month...</option>
+              <option value="01">January</option>
+              <option value="02">February</option>
+              <option value="03">March</option>
+              <option value="04">April</option>
+              <option value="05">May</option>
+              <option value="06">June</option>
+              <option value="07">July</option>
+              <option value="08">August</option>
+              <option value="09">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="col-xs-4">
+            <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+          </div>
+          <div class="col-xs-4">
+            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+          </div>
         </div>
-        <div class="col-xs-4">
-          <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-        </div>
-        <div class="col-xs-4">
-          <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
-        </div>
+        <span id="errorbirthday" class="help-block tnth-hide">A block of help text that breaks onto a new line and may extend beyond one line.</span>
       </div>
-      <span id="errorbirthday" class="help-block tnth-hide">A block of help text that breaks onto a new line and may extend beyond one line.</span>
     </div>
-
 
     <div class="tnth-hide" id="patientQ">
 
-      <div id="patBiopsy" data-topic="biopsy" class="pat-q">
+      <div id="patBiopsy" data-topic="biopsy" class="tnth-hide pat-q">
         <br />
         <p>Have you had a prostate cancer biopsy?</p>
         <div class="form-group">
@@ -198,18 +200,27 @@ $(document).ready(function(){
   $("#queriesForm input").on("blur",function(){
     assembleContent.demo({{ user.id }});
   });
-  $("#userRoles input:radio").on("click",function(){
+  $("#rolesGroup input:radio").on("click",function(){
     var roles = [];
     var theVal = $(this).val();
     roles.push({name: theVal});
     var toSend = {"roles": roles};
     tnthAjax.putRoles({{user.id}},toSend);
     if (theVal == "patient") {
-      $("#patientQ").fadeIn();
+      // If patient, then we always show bdGroup
       $("#bdGroup").fadeIn();
-      $('html, body').animate({
-        scrollTop: $('#bdGroup').offset().top
-      }, 500);
+      // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
+      if ($("#year").val() != "") {
+        $("#year").blur();
+        $('html, body').animate({
+          scrollTop: $('#patientQ').offset().top
+        }, 500);
+      } else {
+        $('html, body').animate({
+          scrollTop: $('#bdGroup').offset().top
+        }, 500);
+      }
+
       $("#clinics").hide();
     } else {
       // If partner, they skip questions, fadeIn Clinics
