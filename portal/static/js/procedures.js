@@ -24,7 +24,7 @@
 
     $(document).ready(function() {
 
-        var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+        //var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
         // Options for datepicker - prevent future dates, no default
         $('.event-element input.datep').each(function(){
             $(this).datepicker({
@@ -85,7 +85,7 @@
                 $("#eventListtnthproc").animate({opacity: 0}, function() {
                     // Hide the #noEvents text (if showing)
                     $("#noEvents").hide();
-                    $(this).html(eventLoading).css('opacity',1);
+                    //$(this).html(eventLoading).css('opacity',1);
                     // Clear the inputs
                     $("select[id^='tnthproc']").val('');
                     $("input[id^='tnthproc-value']").val('');
