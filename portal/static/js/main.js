@@ -128,7 +128,7 @@ var fillContent = {
         }
     },
     "proceduresContent": function(data) {
-        var proceduresHtml = $("body").find("#userProcedures").html();
+        var proceduresHtml = 'Your procedures:<br/>'; 
         proceduresHtml += '<ul id="eventListtnthproc">'; 
         if (data.entry.length == 0) 
             $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
