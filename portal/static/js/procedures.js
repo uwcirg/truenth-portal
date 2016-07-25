@@ -128,8 +128,7 @@
         });
         // Need to attach delete functionality to body b/c section gets reloaded
         $("body").on('click', ".btn-delete", function() {
-            // Get ID for this answer
-            var answerId = $(this).parents('li').attr('data-id');
+            var procId = $(this).parents('li').attr('data-id');
             // Remove from list
             $(this).parents('li').fadeOut('slow', function(){
                 $(this).remove();
@@ -138,7 +137,7 @@
                     $('#eventListtnthproc').prepend("<p id='noEvents' style='margin-top: 8px'><em>You haven't added any procedures.</em></p>");
                 }
             });
-            alert('DELETE api call would be next...');
+            tnthAjax.deleteProc(procId);
             // Post delete to server
             /**$.post(appRoot + controller + "/deleteAnswer.json", {
                 "data[Answer][id]" : answerId,
