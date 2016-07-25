@@ -127,9 +127,9 @@ var fillContent = {
             $("#terms").fadeIn();
         }
     },
-    "procedures": function(data) {
+    "proceduresContent": function(data) {
         var proceduresHtml = $("body").find("#userProcedures").html();
-        proceduresHtml += '<ul id="eventList1494">'; 
+        proceduresHtml += '<ul id="eventListtnthproc">'; 
         if (data.entry.length == 0) 
             $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
         $.each(data.entry,function(i,val){
@@ -371,7 +371,7 @@ var tnthAjax = {
             type: "GET",
             url: '/api/patient/'+userId+'/procedure'
         }).done(function(data) {
-            fillContent.procedures(data);
+            fillContent.proceduresContent(data);
             loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");

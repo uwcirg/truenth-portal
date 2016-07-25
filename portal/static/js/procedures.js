@@ -95,8 +95,10 @@
                         "data-name": "",                        "data-date": "",
                         "data-date-read": ""
                     });
+                    //TODO GET procedures and repopulate list here (mind the latest ID, as this does?)
+                    tnthAjax.getProc(subjectId);
                     // Since we need answer ID from server for delete, reload the eventList
-                    $("#eventListtnthproc").load("489 #eventListtnthproc  > *", function(){
+                    /**$("#eventListtnthproc").load("489 #eventListtnthproc  > *", function(){
                         // Popover needs to be called again here b/c of element load
                         $("[rel=popover-confirm]").popover({
                             trigger: 'click',
@@ -104,7 +106,7 @@
                             html: true
                         });
                         // Grab most recent event on load to highlight new entries on reload
-                        var mostRecentId = 11891;
+                        var mostRecentId = 11891;// populate at page load
                         // Add a "new" icon to ones that were created via ajax submit
                         $("#eventListtnthproc li").each(function() {
                             var eventId = $(this).attr('data-id');
@@ -114,7 +116,7 @@
                         });
                         // Fade in the eventList with opacity
                         $("#eventListtnthproc").animate({opacity: 1});
-                    });
+                    });*/
                 });
             }
         });
