@@ -1,3 +1,8 @@
+<style>
+#tnthNavWrapper {
+    visibility: hidden; /** initially hide wrapper during load to avoid flashes of unstyled content **/
+}
+</style>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
 <script type="text/javascript">
@@ -37,8 +42,9 @@
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if user %}
+                    <span style="color: #fff">Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %} &nbsp;&nbsp;</span>
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                        Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                        <i class="fa fa-bars"></i> MENU
                         <img src="{{movember_profile}}" width="50" height="50" />
                     </button>
                     <ul class="tnth-dropdown-menu">
