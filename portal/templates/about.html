@@ -17,3 +17,24 @@
   <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
   {% endif %}
 {% endblock %}
+
+{% block document_ready %}
+
+/*** Test of grabbing Liferay content - FIXME - CORS issues ***/
+$(document).ready(function(){
+  $.ajax ({
+    type: "GET",
+    // Returns HTML?
+    url: 'https://stg-cms.us.truenth.org/widget/web/guest/home/-/56_INSTANCE_Qt5ELGG09KAi'
+    // Returns XML?
+    //url: 'https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478'
+  }).done(function(data) {
+    // Output what we retrieve to console for testing
+    console.log(data);
+  }).fail(function() {
+    console.log("Problem retrieving data from server.");
+  });
+});
+
+{% endblock %}
+
