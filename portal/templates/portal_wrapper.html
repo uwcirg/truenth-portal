@@ -42,10 +42,11 @@
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if user %}
-                    <span style="color: #fff">Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %} &nbsp;&nbsp;</span>
+
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-bars"></i> MENU
+                        Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
+                        &nbsp;&nbsp; MENU <i class="fa fa-bars"></i>
                     </button>
                     <ul class="tnth-dropdown-menu">
                         <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
