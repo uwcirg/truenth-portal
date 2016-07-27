@@ -45,6 +45,19 @@ a:active {
 .smaller-text .btn {
   font-size: 14px;
 }
+.admin-table .search .form-control {
+  height: 34px;
+}
+.table.rowlink td:not(.rowlink-skip),
+.table .rowlink td:not(.rowlink-skip) {
+  cursor: pointer;
+}
+.table.rowlink td:not(.rowlink-skip) a,
+.table .rowlink td:not(.rowlink-skip) a {
+  color: inherit;
+  font: inherit;
+  text-decoration: inherit;
+}
 .table-title {
   font-weight: bold;
   font-size: 18px;

@@ -840,4 +840,24 @@ var tnthDates = {
         }
         return toReturn
     }
-}
+};
+
+/***
+ * Bootstrap datatables functions
+ * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
+ ****/
+
+var tnthTables = {
+    /***
+     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksSorter": function(a,b) {
+        a = $(a).text();
+        b = $(b).text();
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
+    }
+};

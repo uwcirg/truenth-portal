@@ -117,7 +117,7 @@ def admin():
     users = User.query.all()
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users)
+    return render_template('admin.html', users=users, wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))

@@ -59,6 +59,26 @@ a:hover, a:active {
     font-size: @smallerText;
   }
 }
+.admin-table {
+  .table-info {
+
+  }
+  .search .form-control {
+    height: 34px;
+  }
+}
+// For table rowlinks
+.table.rowlink,
+.table .rowlink {
+  td:not(.rowlink-skip) {
+    cursor: pointer;
+    a {
+      color: inherit;
+      font: inherit;
+      text-decoration: inherit;
+    }
+  }
+}
 .table-title {
   font-weight: bold;
   font-size: @baseFontSize;
