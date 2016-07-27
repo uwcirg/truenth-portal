@@ -134,31 +134,31 @@ var fillContent = {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
             return false;
         }
-        // If we're adding in-page, then identify the latest so we can add an icon showing that it is in
-        if (newEntry) {
-            var latestId = data.entry[data.entry.length - 1].resource["id"];
-        }
+
         // sort from newest to oldest
         data.entry.sort(function(a,b){
             return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
         });
         var proceduresHtml = '<ul id="eventListtnthproc">';
 
+        // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
+        var highestId = 0;
         $.each(data.entry,function(i,val){
             var procID = val.resource.id;
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(performedDateTime);
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
-            if (newEntry) {
-                if (latestId == procID) {
-                    proceduresHtml += "&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>";
-                }
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a></li>";
+            if (procID > highestId) {
+                highestId = procID;
             }
-            proceduresHtml += "</li>";
         });
         proceduresHtml += '</ul>';
         $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+        // If newEntry, then add icon to what we just added
+        if (newEntry) {
+            $("body").find("li[data-id='" + highestId + "']").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
+        }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
             placement: 'right',
