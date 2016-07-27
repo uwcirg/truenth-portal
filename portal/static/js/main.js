@@ -129,26 +129,41 @@ var fillContent = {
             $("#terms").fadeIn();
         }
     },
-    "proceduresContent": function(data) {
-        var proceduresHtml = 'Your procedures:<br/>'; 
-        proceduresHtml += '<ul id="eventListtnthproc">'; 
-        if (data.entry.length == 0) 
-            $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
+    "proceduresContent": function(data,newEntry) {
+        if (data.entry.length == 0) {
+            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
+            return false;
+        }
+        // If we're adding in-page, then identify the latest so we can add an icon showing that it is in
+        if (newEntry) {
+            var latestId = data.entry[data.entry.length - 1].resource["id"];
+        }
+        // sort from newest to oldest
+        data.entry.sort(function(a,b){
+            return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
+        });
+        var proceduresHtml = '<ul id="eventListtnthproc">';
+
         $.each(data.entry,function(i,val){
             var procID = val.resource.id;
-            var displayText = val.resource.code.coding[0].display; 
+            var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(performedDateTime);
-            //var procID = val.content.code.coding[0].code;
-            //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
-
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this procedure?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover-confirm'><i class='fa fa-times'></i> Delete</a></li>"; 
-            //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toLocaleDateString() + "</div>"; 
-            //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toISOString() + "</div>"; 
-            //proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDate.toDateString() + "</div>"; 
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
+            if (newEntry) {
+                if (latestId == procID) {
+                    proceduresHtml += "&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>";
+                }
+            }
+            proceduresHtml += "</li>";
         });
-        proceduresHtml += '</ul>'; 
-        $("body").find("#userProcedures").html(proceduresHtml);
+        proceduresHtml += '</ul>';
+        $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+        $('[data-toggle="popover"]').popover({
+            trigger: 'click',
+            placement: 'right',
+            html: true
+        });
     },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){
@@ -279,18 +294,6 @@ var assembleContent = {
             );
         }
         tnthAjax.putDemo(userId,demoArray);
-    },
-    "coreDataProcedure": function(userId) {
-        var procArray = {};
-        procArray["resourceType"] = "Procedure";
-        var procID = $("#userProcedure input:checked").map(function(){
-            return { code: $(this).val(), display: $(this).attr("display"),
-                system: "http://snomed.info/sct" };
-        }).get();
-        procArray["subject"] = {"reference": "Patient/" + userId };
-        procArray["code"] = {"coding": procID};
-        procArray["performedDateTime"] = "2013-04-01";  // TODO: from datepicker
-        tnthAjax.postProc(userId,procArray);
     }
 };
 
@@ -369,16 +372,14 @@ var tnthAjax = {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
         });
     },
-    "getProc": function(userId) {
+    "getProc": function(userId,newEntry) {
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/procedure'
         }).done(function(data) {
-            fillContent.proceduresContent(data);
-            loader();
+            fillContent.proceduresContent(data,newEntry);
         }).fail(function() {
             console.log("Problem retrieving data from server.");
-            loader();
         });
     },
     "postProc": function(userId,toSend) {
