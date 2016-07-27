@@ -22,7 +22,7 @@ portal = Blueprint('portal', __name__)
 
 
 def page_not_found(e):
-    return render_template('error.html'), 404
+    return render_template('error.html', no_nav="true"), 404
 
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
@@ -39,7 +39,7 @@ def landing():
     """landing page view function"""
     if current_user():
         return redirect('home')
-    return render_template('landing.html', user=None)
+    return render_template('landing.html', user=None, no_nav="true")
 
 
 @portal.route('/clinic/<string:clinic_alias>')

@@ -28,7 +28,7 @@
 
 {# sets container to full-width #}
 {% set splashView = false %}
-{% if request.path=="/" or request.path=="/user/sign-in" or request.path=="/error" %}
+{% if request.path=="/user/sign-in" or no_nav=="true" %}
     {% set splashView = true %}
 {% endif %}
 
