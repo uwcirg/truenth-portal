@@ -183,10 +183,10 @@ def legal():
     contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
     #encoding = contentXml.content
     #contentXml.encoding = encoding
-    contentXmlText = contentXml.text
+    #contentXmlText = contentXml.text
 #123 chars before what we need
 #28 chars at the end that we don't need
-    content = contentXmlText
+    #content = contentXmlText
     #content = contentXmlText[123:-28]
 
     #contentXmlString = StringIO(contentXml)
@@ -198,7 +198,7 @@ def legal():
     #    content += s.text 
     #cdata = tree.Element('![CDATA[')
     #return render_template('legal.html', content=cdata.text)
-    return render_template('legal.html', content=content)
+    return render_template('legal.html', content=contentXml)
 
 @portal.route('/about')
 def about():
