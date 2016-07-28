@@ -180,7 +180,8 @@ def profile_test(user_id):
 def legal():
     """ Legal/terms of use page"""
     contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
-    tree = etree.fromstring(contentXml)
+    tree = etree.parse(StringIO(contentXml))
+    #tree = etree.fromstring(contentXml)
     content = "";
     for s in tree.xpath("//static-content"):
         content += s.text 
