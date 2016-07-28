@@ -1,5 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
+import xml.etree.ElementTree
+#from lxml import etree
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -179,7 +181,10 @@ def profile_test(user_id):
 def legal():
     """ Legal/terms of use page"""
     content = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
-    return render_template('legal.html', content=content)
+    tree = ElementTree.parse(content)
+    cdata = tree.Element('![CDATA[')
+    return render_template('legal.html', content=cdata.text)
+#    return render_template('legal.html', content=content)
 
 @portal.route('/about')
 def about():
