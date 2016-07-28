@@ -1,6 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
-from lxml import etree
+#from lxml import etree
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
