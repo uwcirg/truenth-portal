@@ -181,8 +181,8 @@ def profile_test(user_id):
 def legal():
     """ Legal/terms of use page"""
     contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
-    encoding = contentXml.content
-    contentXml.encoding = encoding
+    #encoding = contentXml.content
+    #contentXml.encoding = encoding
     contentXmlText = contentXml.text
 #123 chars before what we need
 #28 chars at the end that we don't need
