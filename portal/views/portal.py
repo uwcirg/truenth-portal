@@ -186,7 +186,9 @@ def legal():
     contentXmlText = contentXml.text
 #123 chars before what we need
 #28 chars at the end that we don't need
-    content = contentXmlText[123:-28]
+    content = contentXmlText[2:-2]
+    #content = contentXmlText[123:-28]
+
     #contentXmlString = StringIO(contentXml)
     #tree = etree.parse(contentXmlString)
     #tree = etree.parse(StringIO(contentXml))
