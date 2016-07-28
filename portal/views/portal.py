@@ -183,7 +183,6 @@ def legal():
     contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
     contentXmlText = contentXml.text
 #123 chars before what we need
-#<?xml version="1.0"?> <root available-locales="en_US" default-locale="en_US"> <static-content language-id="en_US"><![CDATA[© 2016 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.<br /> Usage of this site is governed by the study consent form, signed at the time of your enrollment in the study and approved by the local institutional ethics review board. Privacy will be maintained in accordance with that agreement.<br /> The Movember Foundation may change the General Terms for the TrueNTH website from time to time without notice, so please check back regularly.]]></static-content> </root>
 #28 chars at the end that we don't need
     content = contentXmlText[123:-28]
     #contentXmlString = StringIO(contentXml)
