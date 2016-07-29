@@ -187,7 +187,7 @@ def legal():
 #123 chars before what we need
 #28 chars at the end that we don't need
     #content = contentXmlText
-    #content = contentXmlText[123:-28]
+    content = contentXmlText[123:-28]
 
     #contentXmlString = StringIO(contentXml)
     #tree = etree.parse(contentXmlString)
@@ -198,7 +198,7 @@ def legal():
     #    content += s.text 
     #cdata = tree.Element('![CDATA[')
     #return render_template('legal.html', content=cdata.text)
-    return render_template('legal.html', content=contentXmlText)
+    return render_template('legal.html', content=content)
 
 @portal.route('/about')
 def about():
