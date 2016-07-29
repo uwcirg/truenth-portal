@@ -13,7 +13,7 @@
   // =========================
 
   var backdrop = '.tnth-dropdown-backdrop'
-  var toggle   = '[data-toggle="dropdown"]'
+  var toggle   = '[data-toggle="tnth-dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.tnth-dropdown', this.toggle)
   }
