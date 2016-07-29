@@ -29,7 +29,7 @@
     box-sizing: border-box;
   }
 }
-.tnth-white, .tnth-white:visited {
+.tnth-white {
   color: #ECF7E5;
   background-color: transparent;
   border-color: transparent;
@@ -37,9 +37,13 @@
   -webkit-transition: all 0.2s ease-in-out 0s;
   text-shadow: none;
   background-image: none;
-  &:hover, &:active {
+  &:hover, &:active, .tnth-open & {
     background-color: #fff;
     color: #333;
+  }
+  &:visited {
+    color: #ECF7E5;
+    background-color: transparent;
   }
 }
 #tnthNavMain {
