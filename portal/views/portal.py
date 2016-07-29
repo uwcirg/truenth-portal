@@ -203,7 +203,13 @@ def legal():
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    return render_template('about.html')
+    about_tnthXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43522', verify=False)
+    about_tnthXmlText = about_tnthXml.text
+    about_tnth = about_tnthXmlText[123:-28]
+    about_moXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43532', verify=False)
+    about_moXmlText = about_moXml.text
+    about_mo = about_moXmlText[123:-28]
+    return render_template('about.html', about_tnth=about_tnth, about_mo=about_mo)
 
 @portal.route('/explore')
 def explore():
