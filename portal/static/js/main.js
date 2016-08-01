@@ -496,7 +496,7 @@ $(document).ready(function() {
         //showSearch();
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
-        alert("Error loading nav elements from " + PORTAL_HOSTNAME);
+        console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
     })
     .always(function() {
         // alert( "complete" );
