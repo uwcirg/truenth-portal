@@ -71,8 +71,11 @@ def specific_clinic_landing(clinic_alias):
 
 @portal.route('/initial-queries', methods=('GET', 'POST'))
 def initial_queries():
+    termsXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43682', verify=False)
+    termsXmlText = termsXml.text
+    terms = termsXmlText[123:-28]
     if request.method == 'GET':
-        return render_template('initial_queries.html', user=current_user())
+        return render_template('initial_queries.html', user=current_user(), terms=terms)
     return redirect('home')
 
 

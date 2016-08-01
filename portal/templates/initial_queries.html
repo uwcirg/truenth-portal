@@ -6,9 +6,37 @@
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
   </div>
 
+
+  <div id="topTerms">
+
+    <h3 class="tnth-headline">Terms of Use</h3>
+
+    <p>Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools:</p>
+
+    <div class="well" style="margin-left: 2em">
+
+      <div id="termsText">
+        {{ terms|safe }}
+      </div>
+
+      <div id="termsExpand" class="tnth-hide">
+        <a href=""><i class="fa fa-plus"></i> View TrueNTH Terms</a>
+      </div>
+
+      <div>
+        <label id="agreeLabel" data-terms="Temporary terms - I hereby agree to TrueNTH" data-agree="false">
+          <i class="fa fa-square-o fa-lg"></i> <span>Check here to agree to these terms</span>
+        </label>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="aboutForm" class="tnth-hide">
+
   <h3 class="tnth-headline">About You</h3>
 
-  <p>Thanks for signing up for TrueNTH. Please finish your registration by telling us about yourself.</p>
+  <p>Thanks! Now, please finish your registration by telling us about yourself.</p>
   <hr />
 
   <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
@@ -158,31 +186,20 @@
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
           <div id="fillOrgs"></div>
-          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">I'm not receiving care at any of the above clinics</label></div>
         </div>
       </div>
 
     </div>
 
-    <div id="terms" class="tnth-hide">
 
-      <h3 class="tnth-headline">Terms of Use</h3>
-
-      <p>OK, please review the terms of use for TrueNTH:</p>
-
-      <div class="well" style="margin-left: 2em">
-
-        <p class="text-muted">[Terms of use present as scrolling textbox or trigger modal via "Review" button. Need to decide what happens if user does not agree.]</p>
-
-        <div id="termsAgree" class="btn btn-tnth-primary" data-terms="Temporary terms - I hereby agree to TrueNTH">I Agree</div>
-      </div>
-    </div>
     <br />
     <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
     <br />
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
   </form>
 
+  </div>
 
 {% endblock %}
 {% block document_ready %}
@@ -261,10 +278,8 @@ $(document).ready(function(){
 
   $("#userOrgs").on("change", "input", function() {
     assembleContent.orgs({{ user.id }});
-    $("#terms").fadeIn();
-    $('html, body').animate({
-      scrollTop: $('#terms').offset().top
-    }, 2000);
+    $("#continueText").fadeIn();
+    $("#updateProfile").removeAttr("disabled");
   });
 
   $("#termsAgree").on("click",function(){
@@ -275,6 +290,28 @@ $(document).ready(function(){
     $("#continueText").fadeIn();
     $("#updateProfile").removeAttr("disabled");
   });
+
+$("#agreeLabel").on("click",function(){
+  if ($(this).attr("data-agree") == "false") {
+    var theTerms = {};
+    // Temporary terms for testing
+    theTerms["text"] = $(this).attr('data-terms');
+    tnthAjax.postTerms(theTerms);
+    $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
+      .find("span").text("Yes, I agree");
+    $("#aboutForm").fadeIn();
+    $('html, body').animate({
+      scrollTop: $('#aboutForm').offset().top
+    }, 1000);
+    $(this).attr("data-agree","true");
+  } else {
+    $(this).find("i").removeClass("fa-cehck-square-o").addClass("fa-square-o").end()
+      .find("span").text("Check here to agree to these terms");
+    $("#aboutForm").fadeOut();
+    $(this).attr("data-agree","false");
+  }
+});
+
 
   $('#queriesForm').validator().on('submit', function (e) {
     if (e.isDefaultPrevented()) {
