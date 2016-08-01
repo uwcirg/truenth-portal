@@ -19,8 +19,10 @@
         Google
     </a>
 </div>
-
-<p style="margin-top: 2em">Or create a TrueNTH account:</p>
+<div style="margin-top: 0.5em">
+    <a class="small-text" href="#" data-toggle="modal" data-target="#accountModal">Learn more about using Facebook or Google to sign up for TrueNTH.</a>
+</div>
+<p style="margin-top: 1.5em">Or create a TrueNTH account:</p>
 <form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
 
     <div class="row">
@@ -47,6 +49,31 @@
 
     </div>
 </form>
+
+<div class="modal fade" id="accountModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title" id="myModalLabel">About Using Google or Facebook for TrueNTH</h3>
+            </div>
+            <div class="modal-body">
+
+                {# TODO - move to CMS. example - fb_google_info|safe #}
+
+                <p>We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Google of Facebook provide a few additional benefits to you:</p>
+                <ul>
+                    <li>A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button.</li>
+                    <li>TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image.</li>
+                    <li>Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-tnth-primary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 {% block document_ready %}
