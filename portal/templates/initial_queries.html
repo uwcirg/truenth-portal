@@ -254,6 +254,7 @@ $(document).ready(function(){
         tnthAjax.putClinical({{user.id}},"pca_localized","false");
         tnthAjax.putClinical({{user.id}},"tx","false");
       }
+      thisItem.parents(".pat-q").nextAll().fadeOut();
       $("#clinics").fadeIn();
     }
   });
