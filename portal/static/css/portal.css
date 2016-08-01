@@ -45,6 +45,9 @@ a:active {
 .smaller-text .btn {
   font-size: 14px;
 }
+.small-text {
+  font-size: 16.8px;
+}
 .admin-table .search .form-control {
   height: 34px;
 }

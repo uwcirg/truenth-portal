@@ -10,6 +10,8 @@
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
 
+{{ back_btn(PORTAL,'Home') }}
+
 <h3 class="tnth-headline">
 {% if current_user.has_role('admin')%}
 Profile for {{ user.username }}
@@ -175,7 +177,13 @@ My TrueNTH Profile
 
         <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
         <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
+
+        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
+
+        <br /><br />
+        <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+
+
 
     </div>
 
@@ -315,6 +323,7 @@ $(document).ready(function(){
     $("#updateProfile").on("click", function(event){
         event.preventDefault()
         assembleContent.demo({{ user.id }},true);
+        $("#confirmMsg").fadeIn();
     });
 
 });
