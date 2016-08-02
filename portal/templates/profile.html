@@ -2,15 +2,15 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-{% if current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
-{{ back_btn('admin','User List') }}
-{% endif %}
-
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
 
+{% if current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+{{ back_btn('admin','User List') }}
+{% else %}
 {{ back_btn(PORTAL,'Home') }}
+{% endif %}
 
 <h3 class="tnth-headline">
 {% if current_user.has_role('admin')%}
@@ -175,6 +175,55 @@ My TrueNTH Profile
             </div>
         </div>
 
+        {% if current_user.has_role('admin') and not user.has_role('service') %}
+        <p>User Roles for {{ user.username }}</p>
+        <p class="small-text text-muted">Editable by admins only.</small></p>
+        <div class="form-group" id="rolesGroup" style="margin-left: 10px">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="admin"> Admin
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="anon"> Anon
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="content_manager"> Content Manager
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="application_developer"> Application Developer
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="partner"> Partner
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="patient"> Patient
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="provider"> Provider
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="test"> Test
+                </label>
+            </div>
+        </div>
+
+        {% endif %}
+
+
         <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
         <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
 
@@ -182,8 +231,6 @@ My TrueNTH Profile
 
         <br /><br />
         <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
-
-
 
     </div>
 
@@ -237,58 +284,6 @@ My TrueNTH Profile
         -->
 </div>
 
-
-{% if current_user.has_role('admin') and not user.has_role('service') %}
-<hr />
-
-<h3>User Roles for {{ user.username }}</h3>
-<div id="rolesGroup">
-    <div class="form-group">
-        <p>Editable by admins only.</p>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="admin"> Admin
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="anon"> Anon
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="application_developer"> Application Developer
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="partner"> Partner
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="patient"> Patient
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="provider"> Provider
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="content_manager"> Content Manager
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" name="user_type" value="test"> Test
-            </label>
-        </div>
-    </div>
-
-</div>
-{% endif %}
 
 </form>
 
