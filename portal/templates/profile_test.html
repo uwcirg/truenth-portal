@@ -169,7 +169,7 @@ My TrueNTH Profile
 
 {% if current_user.has_role('admin') and not user.has_role('service') %}
 <h3>User Roles for {{ user.username }}</h3>
-<div id="userRoles">
+<div id="rolesGroup">
     <div class="form-group">
         <p>Editable by admins only.</p>
         <div class="checkbox">
@@ -421,13 +421,13 @@ $.ajax ({
     url: '/api/user/{{ user.id }}/roles'
 }).done(function(data) {
     $.each(data.roles,function(i,val){
-        $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
+        $("#rolesGroup input:checkbox[value="+val.name+"]").prop('checked', true);
     })
 }).fail(function() {
     console.log("Problem retrieving data from server.")
 });
 
-$("#userRoles input:checkbox").on("click",function(){
+$("#rolesGroup input:checkbox").on("click",function(){
     var roles = []
     roles.push({name: $(this).val()})
     var toSend = {"roles": roles}

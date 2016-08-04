@@ -4,33 +4,61 @@
 <div class="reduce-font-sizes">
 
 <h3 class="tnth-headline">Patients</h3>
+
+{% if patients_by_org|length > 1 %}
+<div class="small">
+    <p>Skip to:</p>
+    <ul>
+        {% set orgCountLink = 1 %}
+        {% for org in patients_by_org.keys() %}
+        <li><a href="#location{{orgCountLink}}">{{ org }}</a></li>
+        {% set orgCountLink = orgCountLink + 1 %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 <p>Select any user to view details or make changes.</p>
 <hr />
 
 {% set orgCount = 1 %}
 {% for org in patients_by_org.keys() %}
-<div class="table-responsive smaller-text">
-    <div id="toolbar{{ orgCount }}" class="table-title">{{ org }} Patients</div>
-    <table data-classes="table table-hover table-condensed table-striped" data-toggle="table" data-sort-name="username" data-sort-order="desc" data-search="true" data-pagination="true" data-page-size="50" data-toolbar="#toolbar{{orgCount}}">
+<div class="admin-table table-responsive smaller-text">
+    <h4 id="location{{orgCount}}">{{ org }} Patients</h4>
+    <div id="adminTableToolbar{{ orgCount }}" class="admin-toolbar"><span id="tableCount{{orgCount}}"></span></div>
+    <table id="adminTable{{orgCount}}"
+           data-table-id="{{orgCount}}"
+           class="tnth-admin-table"
+           data-classes="table table-hover table-condensed table-striped"
+           data-toggle="table"
+           data-sort-name="userid"
+           data-sort-order="desc"
+           data-search="true"
+           data-pagination="true"
+           data-page-size="50"
+           data-page-list="[25,50,100,ALL]"
+           data-toolbar="#adminTableToolbar{{orgCount}}"
+           data-show-toggle="true"
+           data-show-columns="true">
         <thead>
             <tr>
-                <th data-field="userid" data-sortable="true">ID</th>
+                <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">ID</th>
                 <th data-field="username" data-sortable="true">Username</th>
                 <th data-field="firstname" data-sortable="true">First Name</th>
                 <th data-field="lastname" data-sortable="true">Last Name</th>
                 <th data-field="email" data-sortable="true">Email</th>
-                <th data-field="provider_html" data-sortable="false">Custom</th>
+                <th data-field="provider_html" data-sortable="true">Reports</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody data-link="row" class="rowlink">
         {% for user in patients_by_org[org] %}
             <tr>
                 <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.id }}</a></td>
-                <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.username }}</a></td>
+                <td>{{ user.username }}</td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
-                <td>{{ user.provider_html() | safe }}</td>
+                <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -45,3 +73,15 @@
 </div>
 
 {% endblock %}
+{% block document_ready %}
+
+$(".tnth-admin-table").bootstrapTable({
+    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+        var thisId = $(this).attr("tableId");
+        var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
+        $("#tableCount"+thisId).html(rowInfo);
+        return rowInfo;
+    }
+});
+{% endblock %}
+

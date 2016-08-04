@@ -5,29 +5,29 @@
 {{ back_btn(PORTAL,'Home') }}
 
 <h3 class="tnth-headline">Contact TrueNTH</h3>
-
+<p>You can use form below or write the TrueNTH team directly at <a href="mailto:us.truenth.org+contact@gmail.com">us.truenth.org+contact@gmail.com</a>.</p>
 <div class="row">
   <div class="col-md-7">
 
     <form id="profileForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
       <div class="form-group">
-        <label for="sendername">Your Name</label>
+        <label for="sendername">Name</label>
         <input type="text" class="form-control" name="sendername"
           id="sendername" data-error="Please enter your name"
-          placeholder="Name" value="{{ sendername }}" required>
+          placeholder="Your Name" value="{{ sendername }}" required>
         <div class="help-block with-errors"></div>
       </div>
       <div class="form-group">
-        <label for="email">Your Email</label>
+        <label for="email">Email</label>
         <input type="email" class="form-control" name="email"
-          id="email" placeholder="Email" value="{{ email }}"
+          id="email" placeholder="Your Email" value="{{ email }}"
           data-error="This isn't a valid e-mail address, please double-check."
           required>
         <div class="help-block with-errors"></div>
       </div>
       <div class="form-group">
         <label for="subject">Subject</label>
-        <input type="text" class="form-control" name="subject" id="subject" placeholder="Your subject">
+        <input type="text" class="form-control" name="subject" id="subject" placeholder="What's this about?">
       </div>
       <div class="form-group">
         <label for="body">Text</label>

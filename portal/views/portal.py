@@ -1,4 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+import requests
+#from cStringIO import StringIO 
+#from lxml import etree
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -22,7 +25,7 @@ portal = Blueprint('portal', __name__)
 
 
 def page_not_found(e):
-    return render_template('error.html'), 404
+    return render_template('error.html', no_nav="true"), 404
 
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
@@ -39,7 +42,7 @@ def landing():
     """landing page view function"""
     if current_user():
         return redirect('home')
-    return render_template('landing.html', user=None)
+    return render_template('landing.html', user=None, no_nav="true")
 
 
 @portal.route('/clinic/<string:clinic_alias>')
@@ -68,8 +71,11 @@ def specific_clinic_landing(clinic_alias):
 
 @portal.route('/initial-queries', methods=('GET', 'POST'))
 def initial_queries():
+    termsXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43682', verify=False)
+    termsXmlText = termsXml.text
+    terms = termsXmlText[123:-28]
     if request.method == 'GET':
-        return render_template('initial_queries.html', user=current_user())
+        return render_template('initial_queries.html', user=current_user(), terms=terms)
     return redirect('home')
 
 
@@ -117,7 +123,7 @@ def admin():
     users = User.query.all()
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users)
+    return render_template('admin.html', users=users, wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
@@ -177,12 +183,36 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    return render_template('legal.html')
+    contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
+    #encoding = contentXml.content
+    #contentXml.encoding = encoding
+    contentXmlText = contentXml.text
+#123 chars before what we need
+#28 chars at the end that we don't need
+    #content = contentXmlText
+    content = contentXmlText[123:-28]
+
+    #contentXmlString = StringIO(contentXml)
+    #tree = etree.parse(contentXmlString)
+    #tree = etree.parse(StringIO(contentXml))
+    #tree = etree.fromstring(contentXmlText)
+    #content = "";
+    #for s in tree.xpath("//static-content"):
+    #    content += s.text 
+    #cdata = tree.Element('![CDATA[')
+    #return render_template('legal.html', content=cdata.text)
+    return render_template('legal.html', content=content)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    return render_template('about.html')
+    about_tnthXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43522', verify=False)
+    about_tnthXmlText = about_tnthXml.text
+    about_tnth = about_tnthXmlText[123:-28]
+    about_moXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43532', verify=False)
+    about_moXmlText = about_moXml.text
+    about_mo = about_moXmlText[123:-28]
+    return render_template('about.html', about_tnth=about_tnth, about_mo=about_mo)
 
 @portal.route('/explore')
 def explore():

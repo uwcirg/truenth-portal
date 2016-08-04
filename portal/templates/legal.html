@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
@@ -6,11 +7,7 @@
 
     <h1 class="tnth-headline">TrueNTH</h1>
 
-    <p>&copy; 2016 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</p>
-
-    <p>Usage of this site is governed by the study consent form, signed at the time of your enrollment in the study and approved by the local institutional ethics review board. Privacy will be maintained in accordance with that agreement.</p>
-
-    <p>The Movember Foundation may change the General Terms for the TrueNTH website from time to time without notice, so please check back regularly.</p>
+<p>{{ content|safe }}</p>
 
     <!--
     <p>

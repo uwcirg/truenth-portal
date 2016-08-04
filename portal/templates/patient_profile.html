@@ -170,9 +170,57 @@
                     </div>
                 </div>
 
+                {% if current_user.has_role('admin') and not patient.has_role('service') %}
+                <p>User Roles for {{ patient.username }}</p>
+                <p class="small-text text-muted">Editable by admins only.</small></p>
+                <div class="form-group" id="rolesGroup" style="margin-left: 10px">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="admin"> Admin
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="anon"> Anon
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="application_developer"> Application Developer
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="content_manager"> Content Manager
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="partner"> Partner
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="patient"> Patient
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="provider"> Provider
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="user_type" value="test"> Test
+                        </label>
+                    </div>
+                </div>
+                {% endif %}
+
                 <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
                 <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-                <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button> <span id="confirmMsg" class="text-muted tnth-hide smaller-text">&nbsp;&nbsp;<em>Saved</em></span>
+                <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
+                <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
 
             </div>
 
@@ -227,54 +275,11 @@
         </div>
 
 
-        {% if current_user.has_role('admin') and not patient.has_role('service') %}
-        <hr />
 
-        <h3>User Roles for {{ patient.username }}</h3>
-        <div id="userRoles">
-            <div class="form-group">
-                <p>Editable by admins only.</p>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="admin"> Admin
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="anon"> Anon
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="application_developer"> Application Developer
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="partner"> Partner
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="patient"> Patient
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="provider"> Provider
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="user_type" value="test"> Test
-                    </label>
-                </div>
-            </div>
-
-        </div>
-        {% endif %}
 
     </form>
+    <br />
+    {{ back_btn('patients','Patients List') }}
 
 </div>
 
@@ -310,6 +315,7 @@ $(document).ready(function(){
     $("#updateProfile").on("click", function(event){
         event.preventDefault()
         assembleContent.demo({{ patient.id }},true);
+        $("#confirmMsg").fadeIn();
     });
 
 });
@@ -350,9 +356,9 @@ $("#patientQuestions input").on("change", function(){
 
 /** Get and Put roles **/
 tnthAjax.getRoles({{ patient.id }}, true);
-$("#userRoles input:checkbox").on("click",function(){
+$("#rolesGroup input:checkbox").on("click",function(){
 
-    var roles = $("#userRoles input:checkbox:checked").map(function(){
+    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
         return { name: $(this).val() };
     }).get();
     var toSend = {"roles": roles}

@@ -29,8 +29,7 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.tnth-white,
-.tnth-white:visited {
+.tnth-white {
   color: #ECF7E5;
   background-color: transparent;
   border-color: transparent;
@@ -40,11 +39,14 @@
   background-image: none;
 }
 .tnth-white:hover,
-.tnth-white:visited:hover,
 .tnth-white:active,
-.tnth-white:visited:active {
+.tnth-open .tnth-white {
   background-color: #fff;
   color: #333;
+}
+.tnth-white:visited {
+  color: #ECF7E5;
+  background-color: transparent;
 }
 #tnthNavMain {
   width: 100%;

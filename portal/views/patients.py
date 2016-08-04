@@ -25,7 +25,7 @@ def patients_root():
                                      user.has_role(ROLE.PATIENT)]
 
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org)
+        'patients_by_org.html', patients_by_org=patients_by_org, wide_container="true")
 
 
 @patients.route('/patient_profile/<int:patient_id>')

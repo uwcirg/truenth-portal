@@ -1,5 +1,7 @@
 /*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
 
+var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+
 function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
     // Switch back to auto for small screen or to recalculate on larger
@@ -89,6 +91,8 @@ var fillContent = {
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
+            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
+            $("#patBiopsy").fadeIn();
         }
         // TODO - add email and phone for profile page use
         // Only on profile page
@@ -125,21 +129,40 @@ var fillContent = {
             $("#terms").fadeIn();
         }
     },
-    "procedures": function(data) {
-        if (data.entry.length == 0) 
-            $("body").find("#userProcedures").html("You haven't entered any procedures yet.");
+    "proceduresContent": function(data,newEntry) {
+        if (data.entry.length == 0) {
+            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
+            return false;
+        }
+
+        // sort from newest to oldest
+        data.entry.sort(function(a,b){
+            return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
+        });
+        var proceduresHtml = '<ul id="eventListtnthproc">';
+
+        // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
+        var highestId = 0;
         $.each(data.entry,function(i,val){
             var procID = val.resource.id;
-            var displayText = val.resource.code.coding[0].display; 
+            var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
-            //var procID = val.content.code.coding[0].code;
-            //$("body").find("#userProcedure input[value="+procID+"]").prop('checked', true);
-
-            var proceduresHtml = $("body").find("#userProcedures").html();
-            proceduresHtml += "<div id='proc" + procID + "'>" + displayText + ", performed " + performedDateTime + "</div>"; 
-            proceduresHtml += "<button type='button' id='editProc" + procID + "'>Edit</button>"; 
-            proceduresHtml += "<button type='button' id='deleteProc" + procID + "'>Delete</button>"; 
-            $("body").find("#userProcedures").html(proceduresHtml);
+            var performedDate = new Date(performedDateTime);
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a></li>";
+            if (procID > highestId) {
+                highestId = procID;
+            }
+        });
+        proceduresHtml += '</ul>';
+        $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+        // If newEntry, then add icon to what we just added
+        if (newEntry) {
+            $("body").find("li[data-id='" + highestId + "']").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
+        }
+        $('[data-toggle="popover"]').popover({
+            trigger: 'click',
+            placement: 'right',
+            html: true
         });
     },
     "roles": function(data,isProfile) {
@@ -148,7 +171,7 @@ var fillContent = {
             // Handle profile differently than initial_queries
             if (isProfile) {
                 $.each(data.roles,function(i,val){
-                    $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
+                    $("#rolesGroup input:checkbox[value="+val.name+"]").prop('checked', true);
                 });
             } else {
                 var $radios = $('input[name=user_type]');
@@ -156,7 +179,8 @@ var fillContent = {
                     $radios.filter('[value='+userRole+']').prop('checked', true);
                 }
                 if (userRole == "patient") {
-                    $("#patientQ, #bdGroup").fadeIn();
+                    $("#bdGroup").fadeIn();
+                    $("#patientQ").fadeIn();
                     $("#clinics").hide();
                     return false;
                 } else if (userRole == "partner") {
@@ -270,18 +294,6 @@ var assembleContent = {
             );
         }
         tnthAjax.putDemo(userId,demoArray);
-    },
-    "coreDataProcedure": function(userId) {
-        var procArray = {};
-        procArray["resourceType"] = "Procedure";
-        var procID = $("#userProcedure input:checked").map(function(){
-            return { code: $(this).val(), display: $(this).attr("display"),
-                system: "http://snomed.info/sct" };
-        }).get();
-        procArray["subject"] = {"reference": "Patient/" + userId };
-        procArray["code"] = {"coding": procID};
-        procArray["performedDateTime"] = "2013-04-01";  // TODO: from datepicker
-        tnthAjax.postProc(userId,procArray);
     }
 };
 
@@ -329,6 +341,7 @@ var tnthAjax = {
                 });
             });
             tnthAjax.getDemo(userId);
+            //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures 
         }).fail(function() {
             console.log("Problem retrieving data from server.");
             loader();
@@ -341,7 +354,6 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.orgs(data);
             fillContent.demo(data);
-            fillContent.procedures(data);
             loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");
@@ -360,16 +372,14 @@ var tnthAjax = {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
         });
     },
-    "getProc": function(userId) {
+    "getProc": function(userId,newEntry) {
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/procedure'
         }).done(function(data) {
-            fillContent.procedures(data);
-            loader();
+            fillContent.proceduresContent(data,newEntry);
         }).fail(function() {
             console.log("Problem retrieving data from server.");
-            loader();
         });
     },
     "postProc": function(userId,toSend) {
@@ -486,7 +496,7 @@ $(document).ready(function() {
         //showSearch();
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
-        alert("Error loading nav elements from " + PORTAL_HOSTNAME);
+        console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
     })
     .always(function() {
         // alert( "complete" );
@@ -537,6 +547,8 @@ $(document).ready(function() {
                         $("#errorbirthday").hide();
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
+                        // If we are on initial-queries, then we'll want to display the patientQ div
+                        $("#patientQ, #patBiopsy").fadeIn();
                     } else {
                         $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");
@@ -589,3 +601,264 @@ $(document).ready(function() {
     }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input and change)
 
 });
+
+
+var tnthDates = {
+    /***
+     * changeFormat - changes date format, particularly for submitting to server
+     * @param currentDate - date to change
+     * @param reverse - use to switch from yyyy-mm-dd to mm/dd/yyyy
+     * @param shorten - removes padding from zeroes (only in reverse)
+     * @returns - a date as a string
+     *
+     * If language is es_MX or en_AU then uses dd/mm/yyyy format
+     *
+     * Examples:
+     * changeFormat("04/29/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
+     * changeFormat("2016-04-29",true) returns "04/29/2016"
+     * changeFormat("2016-04-29",true,true) returns "4/29/2016"
+     ***/
+    "changeFormat": function(currentDate,reverse,shorten) {
+        if (currentDate == null || currentDate == "") {
+            return null;
+        }
+        var yearToPass, convertDate, dateFormatArray;
+        if (reverse) {
+            dateFormatArray = currentDate.split("-");
+            yearToPass = dateFormatArray[0];
+            if (shorten) {
+                dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
+                dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, '');
+            }
+            if (userSetLang !== undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
+                convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
+            } else {
+                convertDate = dateFormatArray[1]+"/"+dateFormatArray[2]+"/"+yearToPass;
+            }
+        } else {
+            dateFormatArray = currentDate.split("/");
+            // If patient manuals enters two digit year, then add 19 or 20 to year.
+            // TODO - this is susceptible to Y2K for 2100s. Be better to force
+            // user to type 4 digits.
+            var currentTime = new Date();
+            if (dateFormatArray[2].length == 2) {
+                var shortYear = currentTime.getFullYear().toString().substr(2,2);
+                if (dateFormatArray[2] > shortYear) {
+                    yearToPass = '19'+dateFormatArray[2];
+                } else {
+                    yearToPass = '20'+dateFormatArray[2];
+                }
+            } else {
+                yearToPass = dateFormatArray[2];
+            }
+            if (userSetLang !== undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
+                convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
+            } else {
+                convertDate = yearToPass+"-"+dateFormatArray[0]+"-"+dateFormatArray[1]
+            }
+            // add T according to timezone
+            var tzOffset = currentTime.getTimezoneOffset();//minutes
+            tzOffset /= 60;//hours
+            if (tzOffset < 10) tzOffset = "0" + tzOffset;
+            convertDate += "T" + tzOffset + ":00:00";
+        }
+        return convertDate
+    },
+    /***
+     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a mm/dd/yyyy (optional time) format. Used with mPOWEr
+     * @param date - the date to be converted
+     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800
+     * @param padZero - if true, will add padded zero to month and date
+     * @param keepTime - if true, will output the time as part of the date
+     * @param blankText - pass a value to display if date is null
+     * @returns date as a string with optional time
+     *
+     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "2/24/2016 3:28pm"
+     */
+    "parseDate": function(date,noReplace,padZero,keepTime,blankText) {
+        if(date == null) {
+            if (blankText) {
+                return blankText;
+            } else {
+                return "";
+            }
+        }
+        // Put date in proper javascript format
+        if (noReplace == null) {
+            date = date.replace(" ", "T");
+        }
+        // Need to reformat dates b/c of date format issues in Safari (and others?)
+        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+        var a = date.split(/[^0-9]/);
+        var toConvert;
+        if (a[3]) {
+            toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
+        } else {
+            toConvert=new Date (a[0],a[1]-1,a[2]);
+        }
+
+        // Switch date to mm/dd/yyyy
+        //var toConvert = new Date(Date.parse(date));
+        var month = toConvert.getMonth() + 1;
+        var day = toConvert.getDate();
+        if (padZero) {
+            if (month <= 9)
+                month = '0' + month;
+            if (day <= 9)
+                day = '0' + day;
+        }
+        if (keepTime) {
+            var amPm = "am";
+            var hour = a[3];
+            if (a[3] > 11) {
+                amPm = "pm";
+                if (a[3] > 12) {
+                    hour = (a[3]-12);
+                }
+            }
+            return month + "/" + day + "/" + toConvert.getFullYear()+" "+hour+":"+a[4]+amPm;
+        } else {
+            return month + "/" + day + "/" + toConvert.getFullYear();
+        }
+    },
+    /***
+     * parseForSorting - changes date to a YYYYMMDDHHMMSS string for sorting (note that this is a string rather than a number)
+     * @param date - the date to be converted
+     * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800. Adding T indicates UTC time
+     * @returns date as a string used by system for sorting
+     *
+     * parseDate("2016-02-24T15:28:09-0800",true) returns "201600224152809"
+     */
+    "parseForSorting": function(date,noReplace) {
+        if (date == null) {
+            return ""
+        }
+        // Put date in proper javascript format
+        if (noReplace == null) {
+            date = date.replace(" ", "T");
+        }
+        // Need to reformat dates b/c of date format issues in Safari (and others?)
+        // http://stackoverflow.com/questions/6427204/date-parsing-in-javascript-is-different-between-safari-and-chrome
+        var a = date.split(/[^0-9]/);
+        var toConvert=new Date (a[0],a[1]-1,a[2],a[3],a[4],a[5]);
+        // Switch date to mm/dd/yyyy
+        //var toConvert = new Date(Date.parse(date));
+        var month = toConvert.getMonth() + 1;
+        var day = toConvert.getDate();
+        if (month <= 9)
+            month = '0' + month;
+        if (day <= 9)
+            day = '0' + day;
+        return toConvert.getFullYear() + month + day + a[3] + a[4] + a[5]
+
+    },
+    /***
+     * spellDate - spells out date in a format based on language/local. Currently not in use.
+     * @param passDate - date to use. If empty, defaults to today.
+     * @param ymdFormat - false by default. false = mm/dd/yyyy. true = yyyy-mm-dd
+     * @returns spelled out date, localized
+     */
+    "spellDate": function(passDate,ymdFormat) {
+        var todayDate = new Date();
+        if (passDate) {
+            // ymdFormat is true, we are assuming it's being received as YYYY-MM-DD
+            if (ymdFormat) {
+                todayDate = passDate.split("-");
+                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
+            } else {
+                // Otherwide mm/dd/yyyy
+                todayDate = passDate.split("/");
+                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
+            }
+        }
+        var returnDate;
+        var monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ]
+        // If user's language is Spanish then use dd/mm/yyyy format and changes words
+        if (userSetLang !== undefined && userSetLang == 'es_MX') {
+            monthNames = ["enero","febrero","marzo","abril","mayo","junio","julio", "agosto","septiembre","octubre","noviembre","diciembre"];
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" de "+monthNames[todayDate.getMonth()]+" de "+todayDate.getFullYear()
+        } else if(userSetLang !== undefined && userSetLang == "en_AU") {
+            returnDate = ('0' + todayDate.getDate()).slice(-2)+" "+monthNames[todayDate.getMonth()]+" "+todayDate.getFullYear()
+        } else {
+            returnDate = monthNames[todayDate.getMonth()]+" "+('0' + todayDate.getDate()).slice(-2)+", "+todayDate.getFullYear()
+        }
+        return returnDate
+    },
+    /***
+     * Calculates number of days between two dates. Used in mPOWEr for surgery/discharge
+     * @param startDate - required. Assumes YYYY-MM-DD. This is typically the date of surgery or discharge
+     * @param dateToCalc - optional. If empty, then assumes today's date
+     * @returns number of days
+     */
+    "getDateDiff": function(startDate,dateToCalc) {
+        var a = startDate.split(/[^0-9]/);
+        var dateTime = new Date(a[0], a[1]-1, a[2]).getTime();
+        var d;
+        if (dateToCalc) {
+            var c = dateToCalc.split(/[^0-9]/);
+            d = new Date(c[0], c[1]-1, c[2]).getTime()
+        } else {
+            // If no baseDate, then use today to find the number of days between dateToCalc and today
+            d = new Date().getTime()
+        }
+        // Round down to floor so we don't add an extra day if session is 12+ hours into the day
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
+    },
+    "getAge": function (birthDate, otherDate) {
+        birthDate = new Date(birthDate);
+        // Use today's date to calc, unless otherwise specified
+        var secondDate = new Date();
+        if (otherDate) {
+            secondDate = new Date(otherDate);
+        }
+        var years = (secondDate.getFullYear() - birthDate.getFullYear());
+
+        if (secondDate.getMonth() < birthDate.getMonth() ||
+            secondDate.getMonth() == birthDate.getMonth() && secondDate.getDate() < birthDate.getDate()) {
+            years--;
+        }
+        return years;
+    },
+    /***
+     * Simple function to add "days" label to a number of days. Not localized, used for mPOWEr
+     * @param dateVal - required. Often derived via getDateDiff
+     * @returns {string}
+     */
+    "addDays": function(dateVal) {
+        var toReturn = "N/A";
+        if (dateVal && typeof dateVal != undefined) {
+            if (dateVal == 1) {
+                toReturn = "1 day";
+            } else if (dateVal < 0) {
+                toReturn = "--";
+            } else {
+                toReturn = dateVal + " days";
+            }
+        } else if (dateVal === 0) {
+            toReturn = "Today";
+        }
+        return toReturn
+    }
+};
+
+/***
+ * Bootstrap datatables functions
+ * Uses http://bootstrap-table.wenzhixin.net.cn/documentation/
+ ****/
+
+var tnthTables = {
+    /***
+     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksSorter": function(a,b) {
+        a = $(a).text();
+        b = $(b).text();
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
+    }
+};

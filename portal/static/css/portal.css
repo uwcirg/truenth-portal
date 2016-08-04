@@ -45,6 +45,22 @@ a:active {
 .smaller-text .btn {
   font-size: 14px;
 }
+.small-text {
+  font-size: 16.8px;
+}
+.admin-table .search .form-control {
+  height: 34px;
+}
+.table.rowlink td:not(.rowlink-skip),
+.table .rowlink td:not(.rowlink-skip) {
+  cursor: pointer;
+}
+.table.rowlink td:not(.rowlink-skip) a,
+.table .rowlink td:not(.rowlink-skip) a {
+  color: inherit;
+  font: inherit;
+  text-decoration: inherit;
+}
 .table-title {
   font-weight: bold;
   font-size: 18px;
@@ -122,6 +138,7 @@ a:active {
   font-size: 20px;
   line-height: 1.1;
   text-shadow: black 0px 0px 10px;
+  margin: -1em 0 1em;
 }
 .tnth-splash .feature-btn-primary {
   margin-top: 0.5em;
@@ -389,6 +406,7 @@ a:active {
   .tnth-splash .headline {
     font-weight: bold;
     font-size: 28px;
+    margin-bottom: 1em;
   }
   .tnth-splash .feature-btn-primary {
     margin-top: 1em;
@@ -473,7 +491,7 @@ a:active {
     padding: 60px;
   }
   .tnth-splash .headline {
-    margin: 2em 0;
+    margin: -1em 0 1.5em;
   }
   .profile-img {
     margin-top: -100px;

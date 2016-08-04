@@ -59,6 +59,33 @@ a:hover, a:active {
     font-size: @smallerText;
   }
 }
+.small-text {
+  font-size: @smallerText * 1.2;
+}
+.loading {
+  .opacity(0.3);
+}
+
+.admin-table {
+  .table-info {
+
+  }
+  .search .form-control {
+    height: 34px;
+  }
+}
+// For table rowlinks
+.table.rowlink,
+.table .rowlink {
+  td:not(.rowlink-skip) {
+    cursor: pointer;
+    a {
+      color: inherit;
+      font: inherit;
+      text-decoration: inherit;
+    }
+  }
+}
 .table-title {
   font-weight: bold;
   font-size: @baseFontSize;
@@ -135,6 +162,7 @@ a:hover, a:active {
     font-size: 20px;
     line-height: 1.1;
     text-shadow: black 0px 0px 10px;
+    margin: -1em 0 1em;
   }
   .feature-btn-primary {
     margin-top: 0.5em;
@@ -420,6 +448,7 @@ a:hover, a:active {
     .headline {
       font-weight: bold;
       font-size: 28px;
+      margin-bottom: 1em;
     }
     .feature-btn-primary {
       margin-top: 1em;
@@ -509,7 +538,7 @@ a:hover, a:active {
     padding: 60px;
   }
   .tnth-splash .headline {
-    margin: 2em 0;
+    margin: -1em 0 1.5em;
   }
   .profile-img {
     margin-top: -100px;

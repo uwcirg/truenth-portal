@@ -17,16 +17,25 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
 
-    <!-- Latest compiled and minified JavaScript -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}"></script>
 </head>
 
+{# sets container to full-width #}
 {% set splashView = false %}
-{% if request.path=="/" or request.path=="/user/sign-in" or request.path=="/error" %}
+{% if request.path=="/user/sign-in" or no_nav=="true" %}
     {% set splashView = true %}
+{% endif %}
+
+{# sets columns of main container to col-xs-12 #}
+{% set wideContainer = false %}
+{% if wide_container and wide_container=="true" %}
+    {% set wideContainer = true %}
 {% endif %}
 
 <body>
@@ -39,7 +48,7 @@
 
         <div class="container{% if splashView %}-fluid{% endif %}">
             <div class="row">
-                <div class="col-xs-12 col-lg-10 col-lg-offset-1">
+                <div class="col-xs-12 {% if not wideContainer %}col-lg-10 col-lg-offset-1{% endif %}">
                     {% block main %}
                     {% endblock %}
                 </div>
