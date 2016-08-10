@@ -542,6 +542,10 @@ $(document).ready(function() {
                         goodDate = false;
                         errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
                     }
+                    if (y < 1900) {
+                        goodDate = false;
+                        errorMsg = "Year of birth must be after 1900.";
+                    }
                     // After tests display errors if necessary
                     if (goodDate) {
                         $("#errorbirthday").hide();

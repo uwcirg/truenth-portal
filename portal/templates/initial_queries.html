@@ -24,7 +24,7 @@
       </div>
 
       <div>
-        <label id="agreeLabel" data-terms="Temporary terms - I hereby agree to TrueNTH" data-agree="false">
+        <label id="agreeLabel" data-agree="false">
           <i class="fa fa-square-o fa-lg"></i> <span>Check here to agree to these terms</span>
         </label>
       </div>
@@ -282,21 +282,15 @@ $(document).ready(function(){
     $("#updateProfile").removeAttr("disabled");
   });
 
-  $("#termsAgree").on("click",function(){
-    var theTerms = {};
-    // Temporary terms for testing
-    theTerms["text"] = $(this).attr('data-terms');
-    tnthAjax.postTerms(theTerms);
-    $("#continueText").fadeIn();
-    $("#updateProfile").removeAttr("disabled");
-  });
-
 $("#agreeLabel").on("click",function(){
   if ($(this).attr("data-agree") == "false") {
     var theTerms = {};
-    // Temporary terms for testing
-    theTerms["text"] = $(this).attr('data-terms');
+    //theTerms["text"] = $(this).attr('data-terms');
+    // Grab the current text of the Terms of Use
+    theTerms["text"] = $("#termsText").text();
+    // Post terms agreement via API
     tnthAjax.postTerms(theTerms);
+    // Update UI
     $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
       .find("span").text("Yes, I agree");
     $("#aboutForm").fadeIn();
