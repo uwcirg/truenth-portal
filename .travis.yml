@@ -62,7 +62,8 @@ before_install:
   - sudo apt-get -y autoremove
 
   - sudo sh -c 'echo "local all postgres trust" > /etc/postgresql/9.5/main/pg_hba.conf'
-  - sudo sh -c 'echo -n "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
+  - sudo sh -c 'echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
+  - sudo sh -c 'echo "host all all ::1/128 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
   - sudo sed -i 's|port = 5433|port = 5432|' /etc/postgresql/9.5/main/postgresql.conf
   - sudo service postgresql restart 9.5
 
