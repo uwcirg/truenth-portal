@@ -32,6 +32,21 @@ def server_error(e):  # pragma: no cover
     # exception is automatically sent to log by framework
     return render_template('error.html'), 500
 
+@portal.before_app_request
+def debug_request_dump():
+    if current_app.config.get("DEBUG_DUMP_HEADERS"):
+        current_app.logger.debug(
+            "{0.remote_addr} {0.method} {0.path} {0.headers}".format(request))
+    if current_app.config.get("DEBUG_DUMP_REQUEST"):
+        output = "{0.remote_addr} {0.method} {0.path}"
+        if request.data:
+            output += " {0.data}"
+        if request.args:
+            output += " {0.args}"
+        if request.form:
+            output += " {0.form}"
+        current_app.logger.debug(output.format(request))
+
 @portal.route('/intentional-error')
 def intentional_error():  # pragma: no cover
     # useless method to test error handling
