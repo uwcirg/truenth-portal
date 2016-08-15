@@ -3,6 +3,7 @@ from flask import abort, Blueprint, jsonify
 from flask import current_app, request
 from flask_user import roles_required
 import json
+from sqlalchemy.exc import IntegrityError
 
 from ..audit import auditable_event
 from ..models.group import Group, UserGroup
@@ -211,7 +212,7 @@ def intervention_rule_list(intervention_name):
     """Return the list of intervention rules for named intervention
 
     NB - not documenting in swagger at this time, intended for internal use
-    only.
+    only.  See ``http://truenth-shared-services.readthedocs.io/en/latest/interventions.html#access``
 
     """
     intervention = getattr(INTERVENTION, intervention_name)
@@ -238,7 +239,7 @@ def intervention_rule_set(intervention_name):
     when unset are access rules consulted.
 
     NB - not documenting in swagger at this time, intended for internal use
-    only.
+    only.  See ``http://truenth-shared-services.readthedocs.io/en/latest/interventions.html#access``
 
     """
     intervention = getattr(INTERVENTION, intervention_name)
@@ -249,7 +250,12 @@ def intervention_rule_set(intervention_name):
         abort(400, "Requires JSON with well defined access strategy")
     access_strategy = AccessStrategy.from_json(request.json)
     intervention.access_strategies.append(access_strategy)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        abort(400, "`rank` values must be unique per intervention")
+
     auditable_event("added {} to intervention {}".format(
         access_strategy, intervention.description), user_id=current_user().id)
     return jsonify(message='ok')

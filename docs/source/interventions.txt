@@ -44,6 +44,13 @@ enabling said intervention.
    the first check that evaluates as True grants the user access to the
    intervention.
 
+.. note::
+
+   An optional **rank** setting (unique integer value sorted in ascending
+   order) may be included to control the order of evaluation when multiple
+   strategies are in use.  Strategies with a rank value will be evaluated
+   before those without a set rank.
+
 For example, to add a rule that enables the *care_plan* intervention for
 users registered with the `UCSF` clinic::
 

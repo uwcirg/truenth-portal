@@ -244,6 +244,36 @@ class TestIntervention(TestCase):
         self.assertEqual(len(data['rules']), 1)
         self.assertEqual(d, data['rules'][0])
 
+    def test_strat_dup_rank(self):
+        """Rank must be unique"""
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+        d = {'name': 'unit test example',
+             'rank': 1,
+             'function_details': {
+                 'function': 'allow_if_not_in_intervention',
+                 'kwargs': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SELF_MANAGEMENT.name}]
+             }
+            }
+        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+                content_type='application/json',
+                data=json.dumps(d))
+        self.assert200(rv)
+        d = {'name': 'unit test same rank example',
+             'rank': 1,
+             'description': 'should not take with same rank',
+             'function_details': {
+                 'function': 'allow_if_not_in_intervention',
+                 'kwargs': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SELF_MANAGEMENT.name}]
+             }
+            }
+        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+                content_type='application/json',
+                data=json.dumps(d))
+        self.assert400(rv)
+
     def test_and_strats(self):
         # Create a logical 'and' with multiple strategies
 

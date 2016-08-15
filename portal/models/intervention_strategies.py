@@ -15,6 +15,7 @@ the parameters given to the closures.
 """
 from flask import current_app
 import json
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound
 import sys
@@ -160,6 +161,9 @@ class AccessStrategy(db.Model):
     intervention_id = db.Column(db.ForeignKey('interventions.id'))
     rank = db.Column(db.Integer)
     function_details = db.Column(JSONB, nullable=False)
+
+    __table_args__ = (UniqueConstraint('intervention_id', 'rank',
+                                       name='rank_per_intervention'),)
 
     def __str__(self):
         """Log friendly string format"""
