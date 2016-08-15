@@ -550,7 +550,7 @@ def client_edit(client_id):
 
 @auth.route('/clients')
 @oauth.require_oauth()
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN])
 def clients_list():
     """clients list
 
@@ -585,7 +585,10 @@ def clients_list():
 
     """
     user = current_user()
-    clients = Client.query.filter_by(user_id=user.id).all()
+    if user.has_role(ROLE.ADMIN):
+        clients = Client.query.all()
+    else:
+        clients = Client.query.filter_by(user_id=user.id).all()
     return render_template('clients_list.html', clients=clients)
 
 

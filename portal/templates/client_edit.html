@@ -46,13 +46,18 @@
 
         <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;&nbsp;&nbsp;&nbsp;
         <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
-        <button type="submit" name="service_token" value="service_token" class="btn btn-default">
-        {% if service_token %}
-            Update Service Token
-        {% else %}
-            Create Service Token
+
+        {# By design, only the application owner can create or update tokens #}
+        {% if current_user.id == client.user_id %}
+            <button type="submit" name="service_token" value="service_token"
+              class="btn btn-default">
+                {% if service_token %}
+                    Update Service Token
+                {% else %}
+                    Create Service Token
+                {% endif %}
+            </button>
         {% endif %}
-        </button>
     </form>
 
     {% macro render_field(field) %}

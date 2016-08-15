@@ -9,7 +9,12 @@
         <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">Create A New TrueNTH Client Application</a>
     </div>
 
-    <h4>Your Current Applications</h4>
+    {% if current_user.has_role('admin')%}
+        <h4>Current Applications</h4>
+    {% else %}
+        <h4>Your Current Applications</h4>
+    {% endif %}
+
     {% if clients %}
     <ul>
         {% for client in clients %}
@@ -25,6 +30,12 @@
                     {{ client.lookup_service_token().access_token }}
                     (expires {{
                     client.lookup_service_token().expires.strftime('%b %d, %Y') }})
+                {% endif %}
+
+                {% if current_user.has_role('admin')%}
+                    <br /> Created By:
+                    {{ client.user.first_name }}
+                    {{ client.user.last_name }}
                 {% endif %}
             </li>
         {% endfor %}
