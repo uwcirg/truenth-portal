@@ -488,7 +488,7 @@ class User(db.Model, UserMixin):
             return True
         try:
             int(other_id)
-        except TypeError:
+        except ValueError:
             abort(400, "Non Integer value for User ID: {}".format(other_id))
         other = User.query.get(other_id)
         if not other:
