@@ -39,20 +39,7 @@ def organization_list():
           to view requested patient
 
     """
-    query = Organization.query.order_by(Organization.id)
-    orgs = [o.as_fhir() for o in query]
-
-    bundle = {
-        'resourceType':'Bundle',
-        'updated':datetime.datetime.utcnow().isoformat()+'Z',
-        'total':len(orgs),
-        'type': 'searchset',
-        'link': {
-            'rel':'self',
-            'href':request.url,
-        },
-        'entry':orgs,
-    }
+    bundle = Organization.generate_bundle()
     return jsonify(bundle)
 
 

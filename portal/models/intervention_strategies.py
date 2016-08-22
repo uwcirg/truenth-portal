@@ -200,6 +200,13 @@ class AccessStrategy(db.Model):
             d['description'] = self.description
         return d
 
+    def as_bundle_element(self):
+        """Return a FHIR like dict intended for a bundle element"""
+        d = self.as_json()
+        d['resourceType'] = 'AccessStrategy'
+        d['id'] = self.id
+        return d
+
     def instantiate(self):
         """Bring the serialized access strategy function to life
 

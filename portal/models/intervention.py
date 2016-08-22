@@ -188,6 +188,12 @@ class _NamedInterventions(object):
         value = self.__dict__[attr.lower()].__call__(self)
         return value
 
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
 
 """INTERVENTION behaves like a static accessor for all interventions.
 

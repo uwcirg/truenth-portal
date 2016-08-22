@@ -4,10 +4,11 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from sqlalchemy import UniqueConstraint
+from flask import url_for
 
 import address
 from ..extensions import db
-from .fhir import CodeableConcept
+from .fhir import CodeableConcept, FHIR_datetime
 from .identifier import Identifier
 import reference
 from .telecom import Telecom
@@ -94,6 +95,27 @@ class Organization(db.Model):
         for id in self.identifiers:
             d['identifiers'].append(id.as_fhir())
         return d
+
+    @classmethod
+    def generate_bundle(cls):
+        """Generate a FHIR bundle of existing orgs ordered by ID"""
+
+        query = Organization.query.order_by(Organization.id)
+        orgs = [o.as_fhir() for o in query]
+
+        bundle = {
+            'resourceType':'Bundle',
+            'updated':FHIR_datetime.now(),
+            'total':len(orgs),
+            'type': 'searchset',
+            'link': {
+                'rel':'self',
+                'href':url_for(
+                    'org_api.organization_list', _external=True),
+            },
+            'entry':orgs,
+        }
+        return bundle
 
 
 class UserOrganization(db.Model):

@@ -15,6 +15,7 @@ from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import flag_test
+from portal.persistence import SitePersistence
 
 app = create_app()
 manager = Manager(app)
@@ -41,6 +42,25 @@ def seed():
     add_static_relationships()
     add_static_roles()
     db.session.commit()
+
+    # import site export file if found
+    SitePersistence().import_()
+
+
+@manager.command
+def export_site():
+    """Generate JSON file containing dynamic site config
+
+    Portions of site configuration live in the database, such as
+    Organizations and Access Strategies.  Generate a single export
+    file for migration of this data to other instances of the service.
+
+    NB the seed command imports the data file if found, along with
+    other static data.
+
+    """
+    SitePersistence().export()
+
 
 @manager.command
 def mark_test():
