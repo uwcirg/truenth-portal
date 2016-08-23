@@ -1,4 +1,7 @@
 sudo: true
+# See https://github.com/travis-ci/travis-ci/issues/4264
+# When implementation on container-based infrastructure is finished remove "sudo: true"
+dist: trusty
 language: python
 python:
   - "2.7"
@@ -7,12 +10,6 @@ python:
 
 cache: pip
 addons:
-  apt:
-    sources:
-      - precise-pgdg-9.5
-    packages:
-      - postgresql-9.5
-      - postgresql-contrib-9.5
   postgresql: "9.5"
 services:
   - postgresql
@@ -39,12 +36,6 @@ matrix:
         # _SAUCE_ACCESS_KEY
         - secure: "jj5q57S8VzAHlNUlSrKtRdoCbFKFig75CFA8AxAQ0lyoMi9VOzwoNQ S3A50I0OYONhqiMWOeyxaBX+eS6y50kYoholJ8yy2DEzaYAJKGGrCh/S6YsGqBo9w jqODynf8c9uDeq4uyNqm3xrOuOBhYUWlmzczILkegw9cvBmKjMM8KK0OxwoEZlQC+ XqZMtUj0oxjiqyK5BiSDBt1TM8pLbZDUup0JTXzuxrRKjZnmw/LtMRqE5P64JeM7d 7qvcYwFrAMydUZSCIO9hguRjmL+kX2cl7Z0lTk5fAtcsroeDy63ClA2v/I90D4Bq2 v90jujU38P7ukJFLR4ji8HRKTllIJ1ouYoR4gzrWLQt7vXL7tHfByaCf4jFOqRaSd dEzj7xn4dXA/CbmbsNQSb+vFMVJMdND3RQDNYXcnGe/jlrn01UdHkouVui0SGtdl2 CHd8GfynkWhlw8XnZ6YZwdM8TVkYrFJPyD2hh7RyOzjytQb6gGdPVbztfEbgAjwXe af9/+Hi/aNdTlvF+KOZYr1Jkf5L2XTUxQhsNt+M2VMLzX03VOivlXZbRKC72b+hGv q93ENiMOt4uhT4d74KuTeXU19QelUWD5tYUiWEsIFvzz/g1+xVShU4DcNLKRIoYZY 1H4w95+QFRBZ9oXHRO7auua4QneIsFBq1ghQ/E7jfVOs="
       addons:
-        apt:
-          sources:
-            - precise-pgdg-9.5
-          packages:
-            - postgresql-9.5
-            - postgresql-contrib-9.5
         postgresql: "9.5"
         sauce_connect: true
 
@@ -56,16 +47,6 @@ before_install:
   - if [[ ! -v SAUCE_USERNAME ]]; then export SAUCE_USERNAME=$_SAUCE_USERNAME;fi
   - if [[ ! -v SAUCE_ACCESS_KEY ]]; then export SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY;fi
 
-  # See https://github.com/travis-ci/travis-ci/issues/4264
-  - sudo service postgresql stop
-  - sudo apt-get -y remove --purge postgresql-9.1 postgresql-9.2 postgresql-9.3 postgresql-9.4
-  - sudo apt-get -y autoremove
-
-  - sudo sh -c 'echo "local all postgres trust" > /etc/postgresql/9.5/main/pg_hba.conf'
-  - sudo sh -c 'echo "host all all 127.0.0.1/32 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
-  - sudo sh -c 'echo "host all all ::1/128 trust" >> /etc/postgresql/9.5/main/pg_hba.conf'
-  - sudo sed -i 's|port = 5433|port = 5432|' /etc/postgresql/9.5/main/postgresql.conf
-  - sudo service postgresql restart 9.5
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
