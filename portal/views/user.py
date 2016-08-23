@@ -710,7 +710,8 @@ def unique_email():
 
     For upfront validation of email addresses, determine if the given
     email is unique - i.e. unknown to the system.  If it is known, but
-    belongs to the authenticated user, it will still be considered unique.
+    belongs to the authenticated user (or user_id if provided), it will
+    still be considered unique.
 
     Returns json unique=True or unique=False
     ---
@@ -725,6 +726,13 @@ def unique_email():
         description:
           email to validate
         required: true
+        type: string
+      - name: user_id
+        in: query
+        description:
+          optional user_id, defaults to current user, necessary for admins
+          editing other users.
+        required: false
         type: string
     responses:
       200:
@@ -750,17 +758,23 @@ def unique_email():
     match = User.query.filter_by(email=email)
     assert(match.count() < 2)  # db unique constraint - can't happen, right?
     if match.count() == 1:
-        # If the user is the authenticated user, it still counts as unique
+        # If the user is the authenticated user or provided user_id,
+        # it still counts as unique
 
-        # Note the extra oauth verify step, so this method can also
-        # be used by unauth'd users (say during registration).
-        valid, req = oauth.verify_request(['email'])
-        if valid:
-            user = req.user
+        user_id = request.args.get('user_id')
+        if not user_id:
+            # Note the extra oauth verify step, so this method can also
+            # be used by unauth'd users (say during registration).
+            valid, req = oauth.verify_request(['email'])
+            if valid:
+                user_id = req.user.id
+            else:
+                user = current_user()
+                user_id = user.id if user else None
         else:
-            user = current_user()
+            user_id = int(user_id)
 
         result = match.one()
-        if not user or user.id != result.id:
+        if user_id != result.id:
             return jsonify(unique=False)
     return jsonify(unique=True)

@@ -62,6 +62,15 @@ class TestUser(TestCase):
         results = rv.json
         self.assertEqual(results['unique'], False)
 
+        # admins can test for other users
+        request = '/api/unique_email?email={}&user_id={}'.format(
+            urllib.quote(email), TEST_USER_ID)
+        self.promote_user(second, ROLE.ADMIN)
+        rv = self.app.get(request)
+        self.assert200(rv)
+        results = rv.json
+        self.assertEqual(results['unique'], True)
+
     def test_ethnicities(self):
         """Apply a few ethnicities via FHIR
 
