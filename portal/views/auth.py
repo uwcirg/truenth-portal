@@ -14,11 +14,13 @@ from flask_user.signals import user_logged_in, user_registered
 from flask_wtf import Form
 from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField
+from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
+from ..models.auth import validate_client_origin
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
@@ -277,13 +279,22 @@ class InterventionEditForm(Form):
     """Intervention portion of client edits - part of ClientEditForm"""
     public_access = BooleanField('Public Access', default=True)
     card_html = TextField('Card HTML')
-    card_url = TextField('Card URL')
+    link_label = TextField('Link Label')
+    link_url = TextField('Link URL')
+    status_text = TextField('Status Text')
 
     def __init__(self, *args, **kwargs):
         """As a nested form, CSRF is handled by the parent"""
         kwargs['csrf_enabled'] = False
         super(InterventionEditForm, self).__init__(*args, **kwargs)
 
+    def validate_link_url(form, field):
+        """Custom validation to allow null and known origins only"""
+        if len(field.data.strip()):
+            try:
+                validate_client_origin(field.data)
+            except Unauthorized:
+                raise validators.ValidationError("Invalid URL (unknown origin)")
 
 class ClientEditForm(Form):
     """wtform class for validation during client edits"""

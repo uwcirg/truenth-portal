@@ -29,7 +29,7 @@ enabling said intervention.
     should make use of the ``/api/intervention/<intervention_name>/`` `endpoint
     <https://stg.us.truenth.org/dist/#!/Intervention/user_intervention_set>`__.
 
-    2. Alternatively, any number of *straegy* functions can be added to an
+    2. Alternatively, any number of *strategy* functions can be added to an
     intervention, to give access to any subgroup of users as defined by the
     strategy itself.  The available strategies are defined in the
     ``portal.models.intervention_strategies`` module, such as the `allow_if_not_in_intervention
@@ -42,7 +42,7 @@ enabling said intervention.
 
    All of the checks above function as a short-circuited **or**.  That is,
    the first check that evaluates as True grants the user access to the
-   intervention.
+   intervention. See combine_strategies_ for a workaround.
 
 .. note::
 
@@ -66,6 +66,8 @@ users registered with the `UCSF` clinic::
     $ curl -H 'Authorization: Bearer <valid-token>' \
       -H 'Content-Type: application/json' -X POST -d @data \
       https://stg.us.truenth.org/api/intervention/care_plan/access_rule
+
+.. _combine_strategies:
 
 Sometimes it is necessary to combine multiple strategies into a logical
 **AND** operation.  To do so, use the ``combine_strategies`` function,
@@ -101,7 +103,7 @@ passing the respective set of `strategy_n` and `strategy_n_kwargs` as so::
 The full list of strategies used for DECISION_SUPPORT_P3P::
 
     {
-      "name": "not in SR _and_ in clinc UW _and_ not started TX _and_ has PCaLocalized",
+      "name": "Decision Support P3P criteria",
       "function_details": {
         "function": "combine_strategies",
         "name": "not in SR _and_ in clinc UW _and_ not started TX _and_ has PCaLocalized",

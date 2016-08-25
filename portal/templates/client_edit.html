@@ -32,14 +32,27 @@
         helpText="Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined." ) }}
 
         {% if form.intervention_or_default.name != 'default' %}
-            {{ render_field(form.intervention_or_default.card_url,
-            tabindex=30, helpText="Hyperlink back to the intervention, namely where specifically to point the user to.") }}
+            <p>The following settings control intervention display parameters
+            site wide (settings can be overridden per user via the
+            interventions API)</p>
 
             {{ render_field(form.intervention_or_default.card_html,
-            tabindex=40, helpText="Text or HTML shown on the card for this intervention.") }}
+            tabindex=30, helpText="Text or HTML shown on the card for this
+            intervention, other than the button / link settings that follow.") }}
+
+            {{ render_field(form.intervention_or_default.link_label,
+            tabindex=40, helpText="Label for the UI widget users click
+            on to access this intervention.") }}
+
+            {{ render_field(form.intervention_or_default.link_url,
+            tabindex=50, helpText="Hyperlink back to the intervention, namely where specifically to point the user to.") }}
+
+            {{ render_field(form.intervention_or_default.status_text,
+            tabindex=60, helpText="Additional status text for user
+            notification.") }}
 
             {{ render_checkbox_field(form.intervention_or_default.public_access,
-            tabindex=50, helpText="Whether the card should be displayed to all users (checked), or only to those who have been granted access to the intervention via the interventions API (unchecked).") }}
+            tabindex=70, helpText="Whether the card should be displayed to all users (checked), or only to those who have been granted access to the intervention via the interventions API (unchecked).") }}
         {% endif %}
 
         <br />

@@ -7,53 +7,26 @@
     <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
 </div>
 
+{# present each intervention named below in turn if configured so for user #}
+{% for intervention in (
+    interventions.sexual_recovery,
+    interventions.care_plan,
+    interventions.decision_support_p3p,
+    interventions.self_management)
+%}
+    {% set display = intervention.display_for_user(user) %}
+    {% if display.access %}
+        <div class="portal-item">
+            <h2 class="tnth-subhead">{{ intervention.description }}</h2>
+            {{ display.card_html | safe }}
+            {# TODO: disable link if display.link_url is None #}
+            <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                {{ display.link_label }}
+            </a>
+        </div>
+    {% endif %}
+{% endfor %}
 
-{# TODO: iterate over all interventions instead of the below #}
-
-{% set intervention = interventions.sexual_recovery %}
-{% if intervention.user_has_access(user) %}
-<div class="portal-item">
-    <h2 class="tnth-subhead">Sexual Recovery</h2>
-    <p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.get_card_html(user) }}</a>
-</div>
-{% endif %}
-
-{% set intervention = interventions.care_plan %}
-{% if intervention.user_has_access(user) %}
-<div class="portal-item">
-    <h2 class="tnth-subhead">Care Plan</h2>
-    <p>Organization and support for the many details of life as a prostate cancer survivor</p>
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.get_card_html(user) }}</a>
-</div>
-{% endif %}
-
-{% set intervention = interventions.decision_support_p3p %}
-{% if intervention.user_has_access(user) %}
-<div class="portal-item">
-    <h2 class="tnth-subhead">Decision Support tool</h2>
-    <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>
-    <!--
-    Temporarily hide the get_card text -- considering handling it separate from the button
-    <p class="intervention-text">{{ intervention.get_card_html(user) }}</p>
-    -->
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">Go to Decision Support</a>
-
-</div>
-{% endif %}
-
-{% set intervention = interventions.self_management %}
-{% if intervention.user_has_access(user) %}
-<div class="portal-item">
-    <h2 class="tnth-subhead">Symptom Tracker tool</h2>
-    <p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>
-    <!--
-    Temporarily hide the get_card text -- considering handling it separate from the button
-    {{ intervention.get_card_html(user) }}
-    -->
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">Go to Symptom Tracker</a>
-</div>
-{% endif %}
 
 <div class="img-with-text flush-with-footer full-width">
     <img src="{{ url_for('static', filename='img/band_man1.jpg') }}" class="img-responsive" />

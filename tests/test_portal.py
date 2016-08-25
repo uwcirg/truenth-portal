@@ -40,7 +40,9 @@ class TestPortal(TestCase):
         client.intervention = intervention
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id)
-        ui.card_html = "Custom User Label"
+        ui.card_html = "<b>Bold Card Text</b>"
+        ui.link_label = "Custom User Label"
+        ui.link_url = 'http://example.com/?test=param1'
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
@@ -51,9 +53,12 @@ class TestPortal(TestCase):
         self.login()
         rv = self.app.get('/home')
 
-        self.assertIn('Custom User Label', rv.data)
+        ui = db.session.merge(ui)
+        self.assertIn(ui.card_html, rv.data)
+        self.assertIn(ui.link_label, rv.data)
+        self.assertIn(ui.link_url, rv.data)
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.get_card_html(user), rv.data)
+        self.assertIn(intervention.display_for_user(user).link_label, rv.data)
 
     def test_provider_html(self):
         """Interventions can customize the provider text """

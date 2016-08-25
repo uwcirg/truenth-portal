@@ -28,14 +28,19 @@ class TestIntervention(TestCase):
     def test_intervention(self):
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY
+        client.application_origins = 'http://safe.com'
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
         data = {'user_id': TEST_USER_ID,
                 'access': "granted",
                 'card_html': "unique HTML set via API",
+                'link_label': 'link magic',
+                'link_url': 'http://safe.com',
+                'status_text': 'status example',
                 'provider_html': "unique HTML for /patients view"
                }
+
         rv = self.app.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -45,7 +50,26 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.user_id, data['user_id'])
         self.assertEquals(ui.access, data['access'])
         self.assertEquals(ui.card_html, data['card_html'])
+        self.assertEquals(ui.link_label, data['link_label'])
+        self.assertEquals(ui.link_url, data['link_url'])
+        self.assertEquals(ui.status_text, data['status_text'])
         self.assertEquals(ui.provider_html, data['provider_html'])
+
+    def test_intervention_validation(self):
+        client = self.add_client()
+        client.intervention = INTERVENTION.SEXUAL_RECOVERY
+        client.application_origins = 'http://safe.com'
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        data = {'user_id': TEST_USER_ID,
+                'link_url': 'http://un-safe.com',
+               }
+
+        rv = self.app.put('/api/intervention/sexual_recovery',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
 
     def test_multi_strategy(self):
         """Add strategy to limit users to any of several clinics"""
@@ -80,7 +104,7 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to associating user with any orgs, shouldn't have access
-        self.assertFalse(cp.user_has_access(user))
+        self.assertFalse(cp.display_for_user(user).access)
 
         # Add association and test again
         user.organizations.append(org3)
@@ -88,7 +112,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertTrue(cp.user_has_access(user))
+        self.assertTrue(cp.display_for_user(user).access)
 
     def test_diag_stategy(self):
         """Test strategy for diagnosis"""
@@ -112,7 +136,7 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to PCa dx, user shouldn't have access
-        self.assertFalse(cp.user_has_access(user))
+        self.assertFalse(cp.display_for_user(user).access)
 
         # Bless the test user with PCa diagnosis
         user.save_constrained_observation(
@@ -122,7 +146,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertTrue(cp.user_has_access(user))
+        self.assertTrue(cp.display_for_user(user).access)
 
     def test_no_tx(self):
         """Test strategy for not starting treatment"""
@@ -146,7 +170,7 @@ class TestIntervention(TestCase):
         user = db.session.merge(self.test_user)
 
         # Prior to declaring TX, user shouldn't have access
-        self.assertFalse(cp.user_has_access(user))
+        self.assertFalse(cp.display_for_user(user).access)
 
         user.save_constrained_observation(
             codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
@@ -156,7 +180,7 @@ class TestIntervention(TestCase):
         user, cp = map(db.session.merge, (user, cp))
 
         # Declaring they started TX, should grant access
-        self.assertTrue(cp.user_has_access(user))
+        self.assertTrue(cp.display_for_user(user).access)
 
         # Say user starts treatment, should lose access
         user.save_constrained_observation(
@@ -166,7 +190,7 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        self.assertFalse(cp.user_has_access(user))
+        self.assertFalse(cp.display_for_user(user).access)
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -191,8 +215,8 @@ class TestIntervention(TestCase):
 
         # Prior to associating user w/ decision support, the strategy
         # should give access to p3p
-        self.assertTrue(ds_p3p.user_has_access(user))
-        self.assertFalse(ds_wc.user_has_access(user))
+        self.assertTrue(ds_p3p.display_for_user(user).access)
+        self.assertFalse(ds_wc.display_for_user(user).access)
 
         # Add user to wisercare, confirm it's the only w/ access
 
@@ -203,8 +227,8 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ds_p3p, ds_wc = map(db.session.merge, (user, ds_p3p, ds_wc))
 
-        self.assertFalse(ds_p3p.user_has_access(user))
-        self.assertTrue(ds_wc.user_has_access(user))
+        self.assertFalse(ds_p3p.display_for_user(user).access)
+        self.assertTrue(ds_wc.display_for_user(user).access)
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
@@ -311,14 +335,14 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # first strat true, second false.  therfore, should be False
-        self.assertFalse(ds_p3p.user_has_access(user))
+        self.assertFalse(ds_p3p.display_for_user(user).access)
 
         user.organizations.append(uw)
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
         # first strat true, second true.  therfore, should be True
-        self.assertTrue(ds_p3p.user_has_access(user))
+        self.assertTrue(ds_p3p.display_for_user(user).access)
 
         ui = UserIntervention(
             user_id=user.id,
@@ -330,7 +354,7 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # first strat true, second false.  AND should be false
-        self.assertFalse(ds_p3p.user_has_access(user))
+        self.assertFalse(ds_p3p.display_for_user(user).access)
 
     def test_p3p_conditions(self):
         # Test the list of conditions expected for p3p
@@ -387,7 +411,7 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # only first two strats true so far, therfore, should be False
-        self.assertFalse(ds_p3p.user_has_access(user))
+        self.assertFalse(ds_p3p.display_for_user(user).access)
 
         user.save_constrained_observation(
             codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
@@ -400,7 +424,7 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # All conditions now met, should have access
-        self.assertTrue(ds_p3p.user_has_access(user))
+        self.assertTrue(ds_p3p.display_for_user(user).access)
 
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
@@ -417,6 +441,9 @@ class TestIntervention(TestCase):
                               user_id=TEST_USER_ID,
                               access='granted',
                               card_html='custom ch',
+                              link_label='link magic',
+                              link_url='http://example.com',
+                              status_text='status example',
                               provider_html='custom ph')
         with SessionScope(db):
             db.session.add(ui)
@@ -426,11 +453,15 @@ class TestIntervention(TestCase):
         rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(len(rv.json.keys()), 4)
+        self.assertEquals(len(rv.json.keys()), 7)
         self.assertEquals(rv.json['user_id'], TEST_USER_ID)
         self.assertEquals(rv.json['access'], 'granted')
         self.assertEquals(rv.json['card_html'], "custom ch")
+        self.assertEquals(rv.json['link_label'], "link magic")
+        self.assertEquals(rv.json['link_url'], "http://example.com")
+        self.assertEquals(rv.json['status_text'], "status example")
         self.assertEquals(rv.json['provider_html'], "custom ph")
+
 
     def test_communicate(self):
         email_group = Group(name='test_email')

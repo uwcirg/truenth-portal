@@ -4,8 +4,10 @@ from flask import current_app, request
 from flask_user import roles_required
 import json
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..models.auth import validate_client_origin
 from ..models.group import Group, UserGroup
 from ..models.intervention import INTERVENTION, UserIntervention
 from ..models.message import EmailMessage
@@ -53,9 +55,6 @@ def user_intervention_get(intervention_name, user_id):
           id: intervention_access
           required:
             - user_id
-            - access
-            - card_html
-            - provider_html
           properties:
             user_id:
               type: string
@@ -71,6 +70,21 @@ def user_intervention_get(intervention_name, user_id):
               description:
                 Custom HTML for display on intervention card for the
                 referenced user
+            link_label:
+              type: string
+              description:
+                Custom text for display on the button or link within the card
+                for the referenced user
+            link_url:
+              type: string
+              description:
+                Custom URL to use as the target for the button or link within
+                the card for the referenced user
+            status_text:
+              type: string
+              description:
+                Custom text to display in the status column for the referenced
+                user
             provider_html:
               type: string
               description:
@@ -133,9 +147,6 @@ def user_intervention_set(intervention_name):
           id: intervention_access
           required:
             - user_id
-            - access
-            - card_html
-            - provider_html
           properties:
             user_id:
               type: string
@@ -151,12 +162,29 @@ def user_intervention_set(intervention_name):
               description:
                 Custom HTML for display on intervention card for the
                 referenced user
+            link_label:
+              type: string
+              description:
+                Custom text for display on the button or link within the card
+                for the referenced user
+            link_url:
+              type: string
+              description:
+                Custom URL to use as the target for the button or link within
+                the card for the referenced user.  The origin must validate
+                to be within the list of known domains, including the
+                application URL for this intervention
+            status_text:
+              type: string
+              description:
+                Custom text to display in the status column for the referenced
+                user
             provider_html:
               type: string
               description:
                 Custom HTML for display in patient list for care providers,
                 as seen on the /patients view, specific to the referenced
-                user..
+                user
     responses:
       200:
         description: successful operation
@@ -194,8 +222,17 @@ def user_intervention_set(intervention_name):
         ui = UserIntervention(user_id=user_id,
                               intervention_id=intervention.id)
         db.session.add(ui)
+    link = request.json.get('link_url')
+    if link:
+        try:
+            validate_client_origin(link)
+        except Unauthorized:
+            abort(400, "link_url ill formed or origin not recognized")
+        ui.link_url = link
     ui.access = request.json.get('access')
     ui.card_html = request.json.get('card_html')
+    ui.link_label = request.json.get('link_label')
+    ui.status_text = request.json.get('status_text')
     ui.provider_html = request.json.get('provider_html')
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(

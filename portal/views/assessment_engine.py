@@ -1114,7 +1114,7 @@ def present_assessment(instrument_id):
         abort(404, "No matching assessment found: %s" % instrument_id)
 
     assessment_url = "%s/surveys/new_session?project=%s" % (
-        INTERVENTION.ASSESSMENT_ENGINE.card_url,
+        INTERVENTION.ASSESSMENT_ENGINE.link_url,
         instrument_id
     )
 
