@@ -9,7 +9,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.group import Group, UserGroup
-from ..models.intervention import INTERVENTION, UserIntervention
+from ..models.intervention import access_types, INTERVENTION, UserIntervention
 from ..models.message import EmailMessage
 from ..models.user import current_user, User
 from ..models.relationship import RELATIONSHIP
@@ -230,6 +230,8 @@ def user_intervention_set(intervention_name):
             abort(400, "link_url ill formed or origin not recognized")
         ui.link_url = link
     ui.access = request.json.get('access')
+    if ui.access and ui.access not in access_types:
+        abort(400, "`access` value must be one of {}".format(access_types))
     ui.card_html = request.json.get('card_html')
     ui.link_label = request.json.get('link_label')
     ui.status_text = request.json.get('status_text')

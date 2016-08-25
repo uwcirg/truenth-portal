@@ -55,6 +55,21 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.status_text, data['status_text'])
         self.assertEquals(ui.provider_html, data['provider_html'])
 
+    def test_intervention_bad_access(self):
+        client = self.add_client()
+        client.intervention = INTERVENTION.SEXUAL_RECOVERY
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+
+        data = {'user_id': TEST_USER_ID,
+                'access': 'enabled',
+               }
+
+        rv = self.app.put('/api/intervention/sexual_recovery',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
+
     def test_intervention_validation(self):
         client = self.add_client()
         client.intervention = INTERVENTION.SEXUAL_RECOVERY

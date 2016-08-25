@@ -8,16 +8,17 @@ from .lazy import query_by_name
 class DisplayDetails(object):
     """Simple abstraction to communicate display details to front end
 
-    An intervention may be enabled, hidden or disabled.  Furthermore,
-    the text displayed and where the links point to might be configured
-    per user for any intervention.
+    To provide a custom experience, intevention access can be set at
+    several levels.  For a user, access is either available or not, and when
+    available, the link controls may be intentionally disabled for a reason the
+    intervention should note in the status_text field.
 
     Attributes::
-        access: {enabled, disabled or hidden}
+        access: {True, False}
         card_html: Text to display on the card
         link_label: Text used to label the button or hyperlink
-        link_url: URL for the button or link
-        status_text: Text to inform user status, or why it's disabled
+        link_url: URL for the button or link - link to be disabled when null
+        status_text: Text to inform user of status, or why it's disabled
 
     """
     def __init__(self, access, intervention, user_intervention):
@@ -115,14 +116,14 @@ class Intervention(db.Model):
                 "status_text: {0.status_text}".format(self))
 
 
-access_types = ENUM('forbidden', 'granted', name='access',
-                    create_type=False)
+access_types = ('forbidden', 'granted')
+access_types_enum = ENUM(*access_types, name='access', create_type=False)
 
 
 class UserIntervention(db.Model):
     __tablename__ = 'user_interventions'
     id = db.Column(db.Integer, primary_key=True)
-    access = db.Column('access', access_types, default='forbidden')
+    access = db.Column('access', access_types_enum, default='forbidden')
     card_html = db.Column(db.Text)
     provider_html = db.Column(db.Text)
     link_label = db.Column(db.Text)
