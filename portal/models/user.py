@@ -164,6 +164,7 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
 
     auth_providers = db.relationship('AuthProvider', lazy='dynamic')
+    consents = db.relationship('UserConsent', lazy='dynamic')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',

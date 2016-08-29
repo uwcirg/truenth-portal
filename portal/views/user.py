@@ -3,11 +3,13 @@ from flask import abort, Blueprint, jsonify
 from flask import request
 
 from ..audit import auditable_event
+from ..models.audit import Audit
 from ..models.group import Group
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
 from ..models.user import User, UserRelationship
+from ..models.user_consent import UserConsent
 from ..extensions import oauth
 from ..extensions import db
 
@@ -85,6 +87,183 @@ def account():
     auditable_event("new account {} generated".format(user.id),
                     user_id=current_user().id)
     return jsonify(user_id=user.id)
+
+
+@user_api.route('/user/<int:user_id>/consent')
+@oauth.require_oauth()
+def user_consents(user_id):
+    """Returns simple JSON listing user's consent agreements
+
+    Returns the list of consent agreements between the requested user
+    and the respective organizations.
+
+    ---
+    tags:
+      - User
+      - Consent
+      - Organization
+    operationId: user_consents
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the list of consent agreements for the requested user.
+        schema:
+          id: consents
+          properties:
+            consent_agreements:
+              type: array
+              items:
+                type: object
+                required:
+                  - user_id
+                  - organization_id
+                  - signed
+                  - expires
+                  - agreement_url
+                properties:
+                  user_id:
+                    type: string
+                    description:
+                      User identifier defining with whom the consent agreement
+                      applies
+                  organization_id:
+                    type: string
+                    description:
+                      Organization identifier defining with whom the consent
+                      agreement applies
+                  signed:
+                    type: string
+                    format: date-time
+                    description:
+                      Original UTC date-time from the moment the agreement was
+                      signed or put in place by some other workflow
+                  expires:
+                    type: string
+                    format: date-time
+                    description:
+                      UTC date-time for when the agreement expires, typically 5
+                      years from the original signing date
+                  agreement_url:
+                    type: string
+                    description: URL pointing to agreement text
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+    if not user:
+        abort(404, "User {} not found".format(user_id))
+
+    return jsonify(consent_agreements=[c.as_json() for c in user.consents])
+
+
+@user_api.route('/user/<int:user_id>/consent', methods=('POST',))
+@oauth.require_oauth()
+def set_user_consents(user_id):
+    """Add a consent agreement for the user with named organization
+
+    Used to add a consent agreements between a user and an organization.
+    Assumed to have just been agreed to.  Include 'expires' if
+    necessary, defaults to now and five years from now (both in UTC).
+
+    ---
+    tags:
+      - User
+      - Consent
+      - Organization
+    operationId: post_user_consent
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: consent_agreement
+          required:
+            - user_id
+            - organization_id
+            - agreement_url
+          properties:
+            user_id:
+              type: string
+              description:
+                User identifier defining with whom the consent agreement
+                applies
+            organization_id:
+              type: string
+              description:
+                Organization identifier defining with whom the consent
+                agreement applies
+            expires:
+              type: string
+              format: date-time
+              description:
+                UTC date-time for when the agreement expires, defaults to
+                utcnow plus 5 years
+            agreement_url:
+              type: string
+              description: URL pointing to agreement text
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request incudes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if not user:
+        abort(404, "user_id {} not found".format(user_id))
+    try:
+        consent = UserConsent.from_json(request.json)
+        if request.json.get('expires'):
+            consent.expires = request.json.get('expires')
+    except ValueError as e:
+        abort(400, str(e))
+
+    audit = Audit(user_id=current_user().id,
+                  comment="Adding consent agreement")
+    consent.audit = audit
+    db.session.add(consent)
+    db.session.commit()
+
+    return jsonify(message="ok")
 
 
 @user_api.route('/user/<int:user_id>/groups')
