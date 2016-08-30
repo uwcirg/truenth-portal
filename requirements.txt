@@ -64,7 +64,7 @@ sphinx-rtd-theme==0.1.9
 SQLAlchemy==1.1.0b3
 swagger-spec-validator==2.0.2
 tox==2.3.1
-validators==0.10.1 # pin until require_tld supported again
+validators==0.11.0 # pin until require_tld supported again
 virtualenv==15.0.3
 waitress==0.9.0
 WebOb==1.6.1
