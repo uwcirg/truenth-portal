@@ -18,6 +18,11 @@ class AuthomaticMock(object):
 class TestAuth(TestCase):
     """Auth API tests"""
 
+    def test_require_tld(self):
+        """we need the require_tld arg in validators.url for localhost"""
+        import validators
+        self.assertTrue(validators.url('http://localhost', require_tld=False))
+
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
         rv = self.app.get('/logout')
