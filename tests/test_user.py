@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 from werkzeug.exceptions import Unauthorized
 import json
+import re
 import urllib
 from tests import TestCase, TEST_USER_ID
 
@@ -15,21 +16,6 @@ from portal.models.user import UserRelationship, UserTimezone
 
 class TestUser(TestCase):
     """User model and view tests"""
-
-    def test_unique_username(self):
-        dup = User(username='with number 1')
-        try_me = User(username='Anonymous', first_name='with',
-                      last_name='number')
-        with SessionScope(db):
-            db.session.add(dup)
-            db.session.add(try_me)
-            db.session.commit()
-        dup = db.session.merge(dup)
-        try_me = db.session.merge(try_me)
-
-        try_me.update_username()
-        self.assertNotEquals(try_me.username, 'Anonymous')
-        self.assertNotEquals(dup.username, try_me.username)
 
     def test_unique_email(self):
         self.login()
@@ -55,7 +41,7 @@ class TestUser(TestCase):
         self.assertEqual(results['unique'], True)
 
         # but a second user should see false
-        second = self.add_user(username='second')
+        second = self.add_user(username='second@foo.com')
         self.login(second.id)
         rv = self.app.get(request)
         self.assert200(rv)
@@ -182,7 +168,7 @@ class TestUser(TestCase):
         new_user = User.query.get(user_id)
         self.assertEquals(new_user.first_name, given)
         self.assertEquals(new_user.last_name, family)
-        self.assertEquals(new_user.username, "{0} {1}".format(given, family))
+        self.assertEquals(new_user.username, None)
         self.assertEquals(len(new_user.roles), 0)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
         rv = self.app.put('/api/user/{}/roles'.format(user_id),
@@ -199,7 +185,7 @@ class TestUser(TestCase):
             map(db.session.add,(org_evens, org_odds))
 
             for i in range(5):
-                user = self.add_user(username='test user {}'.format(i))
+                user = self.add_user(username='test_user{}@foo.com'.format(i))
                 if i % 2:
                     user.organizations.append(org_odds)
                 else:
@@ -213,7 +199,9 @@ class TestUser(TestCase):
         odds = org_odds.users
         self.assertEqual(3, len(evens))
         self.assertEqual(2, len(odds))
-        self.assertTrue(all([int(o.username[-1:]) % 2 for o in odds]))
+        pattern = re.compile(r'test_user(\d+)@foo.com')
+        self.assertTrue(
+            all([int(pattern.match(o.username).groups()[0]) % 2 for o in odds]))
 
     def test_default_role(self):
         self.promote_user(role_name=ROLE.PATIENT)
@@ -321,8 +309,8 @@ class TestUser(TestCase):
         user = self.test_user
         user.organizations.append(org)
         self.promote_user(user, ROLE.PROVIDER)
-        u2 = self.add_user(username='u2')
-        member_of = self.add_user(username='member_of')
+        u2 = self.add_user(username='u2@foo.com')
+        member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
         with SessionScope(db):
             db.session.commit()
@@ -351,7 +339,7 @@ class TestUser(TestCase):
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
     def create_fake_relationships(self):
-        other_user = self.add_user(username='other')
+        other_user = self.add_user(username='other@foo.com')
         partner = Relationship.query.filter_by(name='partner').first()
         rel = UserRelationship(user_id=TEST_USER_ID,
                                relationship_id=partner.id,
@@ -374,7 +362,7 @@ class TestUser(TestCase):
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
     def test_set_relationships(self):
-        other_user = self.add_user(username='other')
+        other_user = self.add_user(username='other@foo.com')
         data = {'relationships':[{'user': TEST_USER_ID,
                                   'has the relationship': 'partner',
                                   'with': other_user.id},]
@@ -420,7 +408,7 @@ class TestUser(TestCase):
     def test_delete_relationships(self):
         "delete now done by PUTting less than all relationships"
         self.create_fake_relationships()
-        other_user = User.query.filter_by(username='other').first()
+        other_user = User.query.filter_by(username='other@foo.com').first()
         data = {'relationships':[{'user': other_user.id,
                                   'has the relationship': 'sponsor',
                                   'with': TEST_USER_ID},]

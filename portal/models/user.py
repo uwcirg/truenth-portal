@@ -5,6 +5,7 @@ from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
 import pytz
+from sqlalchemy.orm import synonym
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
@@ -144,7 +145,6 @@ def user_extension_map(user, extension):
 class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), default="Anonymous")
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.utcnow)
@@ -157,6 +157,11 @@ class User(db.Model, UserMixin):
             server_default='1')
     locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
+
+    # We use email like many traditional systems use username.
+    # Create a synonym to simplify integration with other libraries (i.e.
+    # flask-user).  Effectively makes the attribute email avail as username
+    username = synonym('email')
 
     # Only used for local accounts
     password = db.Column(db.String(255))
@@ -400,32 +405,6 @@ class User(db.Model, UserMixin):
         d['careProvider'] = careProviders()
         return d
 
-    def update_username(self, force=False):
-        """Update username from self.first_name, self.last_name
-
-        :param force: Default behavior only updates if username is
-            currently 'Anonymous'.  Set force=True to override.
-
-        """
-        if not force and self.username != 'Anonymous':
-            return
-        # Find a unique username
-        similar = User.query.filter(and_(User.username.like('{0} {1}%'.format(
-            self.first_name, self.last_name)), User.id != self.id))
-        if not similar.count():
-            self.username = '{0} {1}'.format(self.first_name, self.last_name)
-        else:
-            n = similar.count()
-            while True:
-                # start with the len and keep incrementing till we don't match
-                attempt = '{0} {1} {2}'.format(
-                    self.first_name, self.last_name, n)
-                if attempt not in [sim.username for sim in similar]:
-                    self.username = attempt
-                    break
-                else:
-                    n += 1
-
     def update_from_fhir(self, fhir):
         """Update the user's demographics from the given FHIR
 
@@ -441,7 +420,6 @@ class User(db.Model, UserMixin):
         if 'name' in fhir:
             self.first_name = v_or_n(fhir['name']['given']) or self.first_name
             self.last_name = v_or_n(fhir['name']['family']) or self.last_name
-            self.update_username()
         if 'birthDate' in fhir and fhir['birthDate'].strip():
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
@@ -532,7 +510,7 @@ class User(db.Model, UserMixin):
 
 def add_authomatic_user(authomatic_user, image_url):
     """Given the result from an external IdP, create a new user"""
-    user = User(username=authomatic_user.name,
+    user = User(
             first_name=authomatic_user.first_name,
             last_name=authomatic_user.last_name,
             birthdate=authomatic_user.birth_date,
@@ -553,7 +531,7 @@ def add_anon_user():
     a real user at a later time in the session.
 
     """
-    user = User(username='Anonymous')
+    user = User()
     db.session.add(user)
     add_role(user, ROLE.ANON)
     return user

@@ -43,10 +43,10 @@ def me():
               description: TrueNTH ID for user
             username:
               type: string
-              description: User's username
+              description: User's username - which will always match the email
             email:
               type: string
-              description: User's preferred email address
+              description: User's preferred email address, same as username
       401:
         description: if missing valid OAuth token
 
@@ -81,7 +81,7 @@ def account():
           if missing valid OAuth token or if the authorized user lacks
           permission to view requested user_id
     """
-    user = User(username='Anonymous')
+    user = User()
     db.session.add(user)
     db.session.commit()
     auditable_event("new account {} generated".format(user.id),

@@ -10,6 +10,7 @@ options:
 from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
+from sqlalchemy.exc import IntegrityError
 
 from portal.app import create_app
 from portal.config import TestConfig
@@ -26,7 +27,7 @@ from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
 
 TEST_USER_ID = 1
-TEST_USERNAME = 'testy'
+TEST_USERNAME = 'testy@example.com'
 FIRST_NAME = 'First'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
@@ -42,9 +43,15 @@ class TestCase(Base):
 
     def init_data(self):
         """Push minimal test data in test database"""
-        test_user = self.add_user(username=TEST_USERNAME,
-                first_name=FIRST_NAME, last_name=LAST_NAME,
-                image_url=IMAGE_URL)
+        try:
+            test_user = self.add_user(username=TEST_USERNAME,
+                    first_name=FIRST_NAME, last_name=LAST_NAME,
+                    image_url=IMAGE_URL)
+        except IntegrityError:
+            db.session.rollback()
+            test_user = User.query.filter_by(username=TEST_USERNAME).one()
+            print "found existing test_user at {}".format(test_user.id)
+
         if test_user.id != TEST_USER_ID:
             print "apparent cruft from last run (test_user_id: %d)"\
                     % test_user.id

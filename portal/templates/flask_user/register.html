@@ -31,7 +31,7 @@
 
             {# Username or Email #}
             {% set field = form.username if user_manager.enable_username else form.email %}
-            {{ render_field(form.username, label="Username", label_visible=false, tabindex=220, required="required", data_error="Username is required." ) }}
+            {{ render_field(field, label="Email address", label_visible=false, tabindex=220, required="required", data_error="Email address is required." ) }}
 
             {% if user_manager.enable_email and user_manager.enable_username %}
             {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true" ) }}
