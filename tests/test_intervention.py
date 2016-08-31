@@ -480,14 +480,8 @@ class TestIntervention(TestCase):
 
     def test_communicate(self):
         email_group = Group(name='test_email')
-        foo = self.add_user(username='foo')
-        boo = self.add_user(username='boo')
-        foo.email = 'foo@example.com'
-        boo.email = 'boo@example.com'
-
-        with SessionScope(db):
-            map(db.session.add, (foo, boo))
-            db.session.commit()
+        foo = self.add_user(username='foo@example.com')
+        boo = self.add_user(username='boo@example.com')
         foo, boo = map(db.session.merge, (foo, boo))
         foo.groups.append(email_group)
         boo.groups.append(email_group)

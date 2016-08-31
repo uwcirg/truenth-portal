@@ -32,19 +32,19 @@ class TestAuth(TestCase):
         """A request for the questions page results in anon user"""
         rv = self.app.get('/questions')
         self.assert200(rv)
-        anon_user = User.query.filter_by(username='Anonymous').first()
+        anon_user = User.query.filter_by(username=None).first()
         self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
 
     def test_local_user_add(self):
         """Add a local user via flask_user forms"""
-        data = {'username': 'OneTestUser',
+        data = {
                 'password': 'one2Three',
                 'retype_password': 'one2Three',
                 'email': 'otu@example.com',
                }
         rv = self.app.post('/user/register', data=data)
         self.assertEquals(rv.status_code, 302)
-        new_user = User.query.filter_by(username=data['username']).first()
+        new_user = User.query.filter_by(username=data['email']).first()
         self.assertEquals(new_user.active, True)
 
     def test_client_add(self):

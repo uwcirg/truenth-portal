@@ -84,11 +84,6 @@ def demographics_set(patient_id):
     clinic must already be a registered organization.  See the
     [organization endpoints](/dist/#!/Organization).
 
-    NB - as a side effect, if the username is still 'Anonymous', the given
-    first and last names will be used to generate a unique username of the
-    format "FirstName LastName N", where an integer N will only be included
-    if another matching username exists.
-
     ---
     operationId: setPatientDemographics
     tags:

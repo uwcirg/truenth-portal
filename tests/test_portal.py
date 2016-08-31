@@ -110,8 +110,8 @@ class TestPortal(TestCase):
     def test_admin_list(self):
         """Test admin view lists all users"""
         # Generate a few users with a smattering of roles
-        u1 = self.add_user(username='u1')
-        u2 = self.add_user(username='u2')
+        u1 = self.add_user(username='u1@foo.bar')
+        u2 = self.add_user(username='u2@bar.foo')
         self.promote_user(u1, role_name=ROLE.ADMIN)
         self.promote_user(u2, role_name=ROLE.APPLICATION_DEVELOPER)
 
