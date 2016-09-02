@@ -25,7 +25,7 @@ Flask-OAuthlib==0.9.3
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.1
 flask-swagger==0.2.12
-Flask-Testing==0.5.0
+Flask-Testing==0.6.0
 -e git+https://github.com/pbugni/Flask-User.git#egg=Flask-User-0.6.8.1
 Flask-WebTest==0.0.7
 Flask-WTF==0.12
