@@ -287,9 +287,11 @@
 {% endblock %}
 
 {% block document_ready %}
+
+var patientId = {{ patient.id }};
 $(document).ready(function(){
 
-    tnthAjax.getOrgs({{ patient.id }});
+    tnthAjax.getOrgs(patientId);
 
     // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
     var currentBd = $("#birthday").val();

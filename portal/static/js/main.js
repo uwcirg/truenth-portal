@@ -579,11 +579,16 @@ $(document).ready(function() {
                     return false;
                 }
                 var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                // Add user_id to api call (used on patient_profile page so that staff can edit)
+                var addUserId = "";
+                if (typeof(patientId) !== "undefined") {
+                    addUserId = "&user_id="+patientId;
+                }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test($el.val())) {
                     $.ajax ({
                         type: "GET",
-                        url: '/api/unique_email?email='+encodeURIComponent($el.val())
+                        url: '/api/unique_email?email='+encodeURIComponent($el.val())+addUserId
                     }).done(function(data) {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
