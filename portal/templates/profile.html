@@ -290,6 +290,7 @@ My TrueNTH Profile
 {% endblock %}
 
 {% block document_ready %}
+var patientId = {{ user.id }};
 $(document).ready(function(){
 
     tnthAjax.getOrgs({{ user.id }});
