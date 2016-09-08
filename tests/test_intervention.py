@@ -102,19 +102,22 @@ class TestIntervention(TestCase):
             map(db.session.add, (org1, org2, org3))
             db.session.commit()
 
-            for i in range(1,4):
-                d = {'function': 'limit_by_clinic',
-                     'kwargs': [ {'name': 'organization_name',
-                                  'value': 'org{}'.format(i)}, ]
-                    }
-                strat = AccessStrategy(
-                    name="member of org{}".format(i),
-                    intervention_id = cp_id,
-                    rank=i,
-                    function_details=json.dumps(d))
-                db.session.add(strat)
-            db.session.commit()
         org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
+        d = {'function': 'limit_by_clinic_list',
+             'kwargs': [{'name': 'org_list',
+                         'value': [o.name for o in (org1, org2, org3)]},
+                        {'name': 'combinator',
+                         'value': 'any'}]
+            }
+        strat = AccessStrategy(
+            name="member of org list",
+            intervention_id = cp_id,
+            function_details=json.dumps(d))
+
+        with SessionScope(db):
+            db.session.add(strat)
+            db.session.commit()
+
         cp = INTERVENTION.CARE_PLAN
         user = db.session.merge(self.test_user)
 
@@ -126,7 +129,6 @@ class TestIntervention(TestCase):
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
-
         self.assertTrue(cp.display_for_user(user).access)
 
     def test_diag_stategy(self):
@@ -336,10 +338,10 @@ class TestIntervention(TestCase):
                   'value': [{'name': 'intervention_name',
                              'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
                  {'name': 'strategy_2',
-                  'value': 'limit_by_clinic'},
+                  'value': 'limit_by_clinic_list'},
                  {'name': 'strategy_2_kwargs',
-                  'value': [{'name': 'organization_name',
-                             'value': uw.name}]}
+                  'value': [{'name': 'org_list',
+                             'value': [uw.name,]}]}
                  ]
             }
         with SessionScope(db):
@@ -378,37 +380,57 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
+        ucsf = Organization(name='UCSF Medical Center')
         uw = Organization(name='UW Medicine (University of Washington)')
+        user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
             db.session.commit()
-        user, uw = map(db.session.merge, (user, uw))
+        ucsf, user, uw = map(db.session.merge, (ucsf, user, uw))
 
-        d = {'name': 'not in SR _and_ in clinc UW _and_ not started TX '\
-             '_and_ has PCaLocalized',
-             'function': 'combine_strategies',
+        # Full logic from story #127433167
+        description = ("[strategy_1: (user NOT IN sexual_recovery)] "
+            "AND [strategy_2 <a nested combined strategy>: "
+            "((user NOT IN list of clinics (including UCSF)) OR "
+            "(user IN list of clinics including UCSF and UW))] "
+            "AND [strategy_3: (user has NOT started TX)] "
+            "AND [strategy_4: (user does NOT have PCaMETASTASIZE)]")
+
+        d = {'function': 'combine_strategies',
              'kwargs': [
-                 # Not in SR
+                 # Not in SR (strat 1)
                  {'name': 'strategy_1',
                   'value': 'allow_if_not_in_intervention'},
                  {'name': 'strategy_1_kwargs',
                   'value': [{'name': 'intervention_name',
                              'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
-                 # In Clinic UW
+                 # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
                  {'name': 'strategy_2',
-                  'value': 'limit_by_clinic'},
+                  'value': 'combine_strategies'},
                  {'name': 'strategy_2_kwargs',
-                  'value': [{'name': 'organization_name',
-                             'value': uw.name}]},
-                 # Not Started TX
+                  'value': [
+                      {'name': 'combinator',
+                       'value': 'any'},  # makes this combination an 'OR'
+                      {'name': 'strategy_1',
+                       'value': 'not_in_clinic_list'},
+                      {'name': 'strategy_1_kwargs',
+                       'value': [{'name': 'org_list',
+                                  'value': [ucsf.name,],}]},
+                      {'name': 'strategy_2',
+                       'value': 'limit_by_clinic_list'},
+                      {'name': 'strategy_2_kwargs',
+                       'value': [{'name': 'org_list',
+                                  'value': [uw.name, ucsf.name]}]},
+                  ]},
+                 # Not Started TX (strat 3)
                  {'name': 'strategy_3',
                   'value': 'observation_check'},
                  {'name': 'strategy_3_kwargs',
                   'value': [{'name': 'display',
                              'value': CC.TX.codings[0].display},
                             {'name': 'boolean_value', 'value': 'false'}]},
-                 # Has Localized PCa
+                 # Has Localized PCa (strat 4)
                  {'name': 'strategy_4',
                   'value': 'observation_check'},
                  {'name': 'strategy_4_kwargs',
@@ -419,10 +441,11 @@ class TestIntervention(TestCase):
             }
         with SessionScope(db):
             strat = AccessStrategy(
-                name=d['name'],
-                intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
+                name='P3P Access Conditions',
+                description=description,
+                intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            #print json.dumps(strat.as_json())
+            print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -441,6 +464,14 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
 
         # All conditions now met, should have access
+        self.assertTrue(ds_p3p.display_for_user(user).access)
+
+        # Remove all clinics, should still have access
+        user.organizations = []
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        self.assertEquals(user.organizations.count(), 0)
         self.assertTrue(ds_p3p.display_for_user(user).access)
 
     def test_get_empty_user_intervention(self):

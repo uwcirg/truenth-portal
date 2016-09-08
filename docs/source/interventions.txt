@@ -57,9 +57,9 @@ users registered with the `UCSF` clinic::
     $ cat data
     {"name": "UCSF Patients",
      "function_details": {
-       "function": "limit_by_clinic",
-       "kwargs': [{"name": "orgainzation_name",
-                 "value": "UCSF"},]
+       "function": "limit_by_clinic_list",
+       "kwargs': [{"name": "org_list",
+                 "value": ["UCSF",]},]
       }
     }
 
@@ -89,12 +89,12 @@ passing the respective set of `strategy_n` and `strategy_n_kwargs` as so::
           }]
         }, {
           "name": "strategy_2",
-          "value": "limit_by_clinic"
+          "value": "limit_by_clinic_list"
         }, {
           "name": "strategy_2_kwargs",
           "value": [{
-            "name": "organization_name",
-            "value": "UW Medicine (University of Washington)"
+            "name": "org_list",
+            "value": ["UW Medicine (University of Washington)",]
           }]
         }]
       }
@@ -103,55 +103,104 @@ passing the respective set of `strategy_n` and `strategy_n_kwargs` as so::
 The full list of strategies used for DECISION_SUPPORT_P3P::
 
     {
-      "name": "Decision Support P3P criteria",
+      "name": "P3P Access Conditions", 
+      "description": "[strategy_1: (user NOT IN sexual_recovery)] AND [strategy_2 <a nested combined strategy>: ((user NOT IN list of clinics (including UCSF)) OR (user IN list of clinics including UCSF and UW))] AND [strategy_3: (user has NOT started TX)] AND [strategy_4: (user does NOT have PCaMETASTASIZE)]", 
       "function_details": {
-        "function": "combine_strategies",
-        "name": "not in SR _and_ in clinc UW _and_ not started TX _and_ has PCaLocalized",
-        "kwargs": [{
-          "name": "strategy_1",
-          "value": "allow_if_not_in_intervention"
-        }, {
-          "name": "strategy_1_kwargs",
-          "value": [{
-            "name": "intervention_name",
-            "value": "sexual_recovery"
-          }]
-        }, {
-          "name": "strategy_2",
-          "value": "limit_by_clinic"
-        }, {
-          "name": "strategy_2_kwargs",
-          "value": [{
-            "name": "organization_name",
-            "value": "UW Medicine (University of Washington)"
-          }]
-        }, {
-          "name": "strategy_3",
-          "value": "observation_check"
-        }, {
-          "name": "strategy_3_kwargs",
-          "value": [{
-            "name": "display",
-            "value": "treatment begun"
-          }, {
-            "name": "boolean_value",
-            "value": "false"
-          }]
-        }, {
-          "name": "strategy_4",
-          "value": "observation_check"
-        }, {
-          "name": "strategy_4_kwargs",
-          "value": [{
-            "name": "display",
-            "value": "PCa localized diagnosis"
-          }, {
-            "name": "boolean_value",
-            "value": "true"
-          }]
-        }]
+        "function": "combine_strategies", 
+        "kwargs": [
+          {
+            "name": "strategy_1", 
+            "value": "allow_if_not_in_intervention"
+          }, 
+          {
+            "name": "strategy_1_kwargs", 
+            "value": [
+              {
+                "name": "intervention_name", 
+                "value": "sexual_recovery"
+              }
+            ]
+          }, 
+          {
+            "name": "strategy_2", 
+            "value": "combine_strategies"
+          }, 
+          {
+            "name": "strategy_2_kwargs", 
+            "value": [
+              {
+                "name": "combinator", 
+                "value": "any"
+              }, 
+              {
+                "name": "strategy_1", 
+                "value": "not_in_clinic_list"
+              }, 
+              {
+                "name": "strategy_1_kwargs", 
+                "value": [
+                  {
+                    "name": "org_list", 
+                    "value": [
+                      "UCSF Medical Center"
+                    ]
+                  }
+                ]
+              }, 
+              {
+                "name": "strategy_2", 
+                "value": "limit_by_clinic_list"
+              }, 
+              {
+                "name": "strategy_2_kwargs", 
+                "value": [
+                  {
+                    "name": "org_list", 
+                    "value": [
+                      "UW Medicine (University of Washington)", 
+                      "UCSF Medical Center"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }, 
+          {
+            "name": "strategy_3", 
+            "value": "observation_check"
+          }, 
+          {
+            "name": "strategy_3_kwargs", 
+            "value": [
+              {
+                "name": "display", 
+                "value": "treatment begun"
+              }, 
+              {
+                "name": "boolean_value", 
+                "value": "false"
+              }
+            ]
+          }, 
+          {
+            "name": "strategy_4", 
+            "value": "observation_check"
+          }, 
+          {
+            "name": "strategy_4_kwargs", 
+            "value": [
+              {
+                "name": "display", 
+                "value": "PCa localized diagnosis"
+              }, 
+              {
+                "name": "boolean_value", 
+                "value": "true"
+              }
+            ]
+          }
+        ]
       }
-    }
 
 Communication
 =============
