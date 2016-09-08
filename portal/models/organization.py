@@ -54,6 +54,8 @@ class Organization(db.Model):
         return org.update_from_fhir(data)
 
     def update_from_fhir(self, data):
+        if 'id' in data:
+            self.id = data['id']
         if 'name' in data:
             self.name = data['name']
         if 'telecom' in data:
@@ -91,9 +93,9 @@ class Organization(db.Model):
             d['partOf'] = reference.Reference.organization(
                 self.partOf_id).as_fhir()
         if self.identifiers:
-            d['identifiers'] = []
+            d['identifier'] = []
         for id in self.identifiers:
-            d['identifiers'].append(id.as_fhir())
+            d['identifier'].append(id.as_fhir())
         return d
 
     @classmethod

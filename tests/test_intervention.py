@@ -281,7 +281,9 @@ class TestIntervention(TestCase):
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEqual(len(data['rules']), 1)
-        self.assertEqual(d, data['rules'][0])
+        self.assertEqual(d['name'], data['rules'][0]['name'])
+        self.assertEqual(d['function_details'],
+                         data['rules'][0]['function_details'])
 
     def test_strat_dup_rank(self):
         """Rank must be unique"""

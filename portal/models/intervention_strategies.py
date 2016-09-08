@@ -80,8 +80,12 @@ def observation_check(display, boolean_value):
             system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
     except NoResultFound:
         raise ValueError("coding.display '{}' not found".format(display))
-    cc_id = CodeableConcept.query.filter(
-        CodeableConcept.codings.contains(coding)).one().id
+    try:
+        cc_id = CodeableConcept.query.filter(
+            CodeableConcept.codings.contains(coding)).one().id
+    except NoResultFound:
+        raise ValueError("codeable_concept'{}' not found".format(coding))
+
     if boolean_value == 'true':
         vq = CC.TRUE_VALUE
     elif boolean_value == 'false':
@@ -175,6 +179,8 @@ class AccessStrategy(db.Model):
         obj = cls()
         try:
             obj.name = data['name']
+            if 'id' in data:
+                obj.id = data['id']
             if 'description' in data:
                 obj.description = data['description']
             if 'rank' in data:
@@ -184,27 +190,22 @@ class AccessStrategy(db.Model):
             # validate the given details by attempting to instantiate
             obj.instantiate()
         except Exception, e:
-            raise ValueError("well defined AccessStrategy includes at "
-                             "a minimum 'name' and 'function_details': {}".\
-                            format(e))
-
+            raise ValueError("AccessStrategy instantiation error: {}".format(
+                e))
         return obj
 
     def as_json(self):
         """Return self in JSON friendly dictionary"""
         d = {"name": self.name,
-             "function_details": json.loads(self.function_details)}
+             "function_details": json.loads(self.function_details),
+             "resourceType": 'AccessStrategy'
+            }
+        if self.id:
+            d['id'] = self.id
         if self.rank:
             d['rank'] = self.rank
         if self.description:
             d['description'] = self.description
-        return d
-
-    def as_bundle_element(self):
-        """Return a FHIR like dict intended for a bundle element"""
-        d = self.as_json()
-        d['resourceType'] = 'AccessStrategy'
-        d['id'] = self.id
         return d
 
     def instantiate(self):

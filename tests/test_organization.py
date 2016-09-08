@@ -42,7 +42,10 @@ class TestOrganization(TestCase):
             'organization-example-f002-burgers-card.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
+        # remove the id from the file - doesn't play well with ours
+        data.pop('id')
         org = Organization.from_fhir(data)
+
         self.assertEquals(org.addresses[0].line1,
                           data['address'][0]['line'][0])
         self.assertEquals(org.name, data['name'])
@@ -95,6 +98,9 @@ class TestOrganization(TestCase):
             os.path.dirname(__file__),
             'organization-example-f001-burgers.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
+
+        # remove the id from the file - doesn't play well with ours
+        data.pop('id')
 
         # Shove a nearly empty org in the db and then update via the api
         org = Organization(name='test')

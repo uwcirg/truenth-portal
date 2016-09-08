@@ -15,7 +15,7 @@ from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import flag_test
-from portal.persistence import SitePersistence
+from portal.site_persistence import SitePersistence
 
 app = create_app()
 manager = Manager(app)
