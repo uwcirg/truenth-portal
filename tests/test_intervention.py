@@ -445,7 +445,7 @@ class TestIntervention(TestCase):
                 description=description,
                 intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            print json.dumps(strat.as_json(), indent=2)
+            #print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))

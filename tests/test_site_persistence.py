@@ -25,7 +25,7 @@ class TestSitePersistence(TestCase):
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
-        self.assertEquals(Organization.query.count(), 6)
+        self.assertEquals(Organization.query.count(), 5)
         npis = []
         for org in Organization.query:
             npis += [id.value for id in org.identifiers if id.system ==
@@ -34,9 +34,15 @@ class TestSitePersistence(TestCase):
         self.assertTrue('1164512851' in npis)  # UCSF
 
     def testP3Pstrategy(self):
-
+        # Prior to meeting conditions in strategy, user shouldn't have access
+        # (provided we turn off public access)
+        INTERVENTION.DECISION_SUPPORT_P3P.public_access = False
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False # part of strat.
         user = self.add_user(username=TEST_USERNAME)
-        user.add_organization('UW Medicine (University of Washington)')
+        self.assertFalse(
+            INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
+
+        # Fulfill conditions
         user.save_constrained_observation(
             codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))
@@ -48,6 +54,5 @@ class TestSitePersistence(TestCase):
         user = db.session.merge(user)
 
         # P3P strategy should now be in view for test user
-        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
-        self.assertTrue(ds_p3p.display_for_user(user).access)
-
+        self.assertTrue(
+            INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)

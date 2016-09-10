@@ -17,13 +17,13 @@ from flask import current_app
 import json
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .organization import Organization
-from .intervention import INTERVENTION
+from .intervention import Intervention, INTERVENTION
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
@@ -53,6 +53,8 @@ def limit_by_clinic_list(org_list, combinator='all'):
             orgs.append(organization)
         except NoResultFound:
             raise ValueError("organization '{}' not found".format(org))
+        except MultipleResultsFound:
+            raise ValueError("multiple matches for org name {}".format(org))
     required = set(orgs)
     if combinator not in ('any', 'all'):
         raise ValueError("unknown value {} for combinator, must be any or all")
@@ -84,6 +86,9 @@ def not_in_clinic_list(org_list):
             orgs.append(organization)
         except NoResultFound:
             raise ValueError("organization '{}' not found".format(org))
+        except MultipleResultsFound:
+            raise ValueError("more than one organization named '{}'"
+                             "found".format(org))
     dont_want = set(orgs)
 
     def user_not_registered_with_clinics(intervention, user):
@@ -246,6 +251,9 @@ class AccessStrategy(db.Model):
             obj.name = data['name']
             if 'id' in data:
                 obj.id = data['id']
+            if 'intervention_name' in data:
+                obj.intervention_id = Intervention.query.filter_by(
+                    name=data['intervention_name']).one().id
             if 'description' in data:
                 obj.description = data['description']
             if 'rank' in data:
@@ -265,6 +273,8 @@ class AccessStrategy(db.Model):
              "function_details": json.loads(self.function_details),
              "resourceType": 'AccessStrategy'
             }
+        d['intervention_name'] = Intervention.query.get(
+            self.intervention_id).name
         if self.id:
             d['id'] = self.id
         if self.rank:

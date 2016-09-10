@@ -18,6 +18,7 @@ env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
+    - PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
 
 matrix:
   allow_failures:
