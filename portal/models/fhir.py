@@ -185,6 +185,12 @@ class Coding(db.Model):
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
 
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
     @lazyprop
     def BIOPSY(self):
         coding = Coding.query.filter_by(
@@ -477,3 +483,7 @@ def add_static_concepts(only_quick=False):
         if not Coding.query.filter_by(code=concept.code,
                                       system=concept.system).first():
             db.session.add(concept)
+
+    for clinical_concepts in CC:
+        if not clinical_concepts in db.session():
+            db.session.add(clinical_concepts)

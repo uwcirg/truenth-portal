@@ -4,10 +4,11 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from sqlalchemy import UniqueConstraint
+from flask import url_for
 
 import address
 from ..extensions import db
-from .fhir import CodeableConcept
+from .fhir import CodeableConcept, FHIR_datetime
 from .identifier import Identifier
 import reference
 from .telecom import Telecom
@@ -28,7 +29,7 @@ class Organization(db.Model):
     __tablename__ = 'organizations'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
-    email = db.Column(db.String(120), unique=True)
+    email = db.Column(db.String(120))
     phone = db.Column(db.String(40))
     type_id = db.Column(db.ForeignKey('codeable_concepts.id',
                                       ondelete='cascade'))
@@ -53,6 +54,8 @@ class Organization(db.Model):
         return org.update_from_fhir(data)
 
     def update_from_fhir(self, data):
+        if 'id' in data:
+            self.id = data['id']
         if 'name' in data:
             self.name = data['name']
         if 'telecom' in data:
@@ -90,10 +93,31 @@ class Organization(db.Model):
             d['partOf'] = reference.Reference.organization(
                 self.partOf_id).as_fhir()
         if self.identifiers:
-            d['identifiers'] = []
+            d['identifier'] = []
         for id in self.identifiers:
-            d['identifiers'].append(id.as_fhir())
+            d['identifier'].append(id.as_fhir())
         return d
+
+    @classmethod
+    def generate_bundle(cls):
+        """Generate a FHIR bundle of existing orgs ordered by ID"""
+
+        query = Organization.query.order_by(Organization.id)
+        orgs = [o.as_fhir() for o in query]
+
+        bundle = {
+            'resourceType':'Bundle',
+            'updated':FHIR_datetime.now(),
+            'total':len(orgs),
+            'type': 'searchset',
+            'link': {
+                'rel':'self',
+                'href':url_for(
+                    'org_api.organization_list', _external=True),
+            },
+            'entry':orgs,
+        }
+        return bundle
 
 
 class UserOrganization(db.Model):

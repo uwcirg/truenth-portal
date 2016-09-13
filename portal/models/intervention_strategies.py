@@ -17,13 +17,13 @@ from flask import current_app
 import json
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .organization import Organization
-from .intervention import INTERVENTION
+from .intervention import Intervention, INTERVENTION
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
@@ -38,22 +38,67 @@ def _log(**kwargs):
         "{func_name} returning {result} for {user} on intervention "\
         "{intervention}".format(**kwargs) + msg)
 
-def limit_by_clinic(organization_name):
-    """Returns function implenting strategy API checking for named org"""
-    try:
-        organization = Organization.query.filter_by(
-            name=organization_name).one()
-    except NoResultFound:
-        raise ValueError("organization name '{}' not found".format(
-            organization_name))
+def limit_by_clinic_list(org_list, combinator='all'):
+    """Requires user is associated with {any,all} clinics in the list
 
-    def user_registered_with_clinic(intervention, user):
-        if organization in user.organizations:
-            _log(result=True, func_name='limit_by_clinic', user=user,
+    Value of combinator determines if the user must be in 'any' or 'all' of the
+    clinics in the given list.
+
+    """
+    orgs = []
+    for org in org_list:
+        try:
+            organization = Organization.query.filter_by(
+                name=org).one()
+            orgs.append(organization)
+        except NoResultFound:
+            raise ValueError("organization '{}' not found".format(org))
+        except MultipleResultsFound:
+            raise ValueError("multiple matches for org name {}".format(org))
+    required = set(orgs)
+    if combinator not in ('any', 'all'):
+        raise ValueError("unknown value {} for combinator, must be any or all")
+
+    def user_registered_with_all_clinics(intervention, user):
+        has = set(user.organizations)
+        if required.intersection(has) == required:
+            _log(result=True, func_name='limit_by_clinic_list', user=user,
                  intervention=intervention.name)
             return True
 
-    return user_registered_with_clinic
+    def user_registered_with_any_clinics(intervention, user):
+        has = set(user.organizations)
+        if not required.isdisjoint(has):
+            _log(result=True, func_name='limit_by_clinic_list', user=user,
+                 intervention=intervention.name)
+            return True
+
+    return user_registered_with_all_clinics if combinator == 'all' else\
+        user_registered_with_any_clinics
+
+def not_in_clinic_list(org_list):
+    """Requires user isn't associated with any clinic in the list"""
+    orgs = []
+    for org in org_list:
+        try:
+            organization = Organization.query.filter_by(
+                name=org).one()
+            orgs.append(organization)
+        except NoResultFound:
+            raise ValueError("organization '{}' not found".format(org))
+        except MultipleResultsFound:
+            raise ValueError("more than one organization named '{}'"
+                             "found".format(org))
+    dont_want = set(orgs)
+
+    def user_not_registered_with_clinics(intervention, user):
+        has = set(user.organizations)
+        if has.isdisjoint(dont_want):
+            _log(result=True, func_name='not_in_clinic_list', user=user,
+                 intervention=intervention.name)
+            return True
+
+    return user_not_registered_with_clinics
 
 def allow_if_not_in_intervention(intervention_name):
     """Returns function implementing strategy API checking that user does not belong to named intervention"""
@@ -80,8 +125,12 @@ def observation_check(display, boolean_value):
             system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
     except NoResultFound:
         raise ValueError("coding.display '{}' not found".format(display))
-    cc_id = CodeableConcept.query.filter(
-        CodeableConcept.codings.contains(coding)).one().id
+    try:
+        cc_id = CodeableConcept.query.filter(
+            CodeableConcept.codings.contains(coding)).one().id
+    except NoResultFound:
+        raise ValueError("codeable_concept'{}' not found".format(coding))
+
     if boolean_value == 'true':
         vq = CC.TRUE_VALUE
     elif boolean_value == 'false':
@@ -112,6 +161,11 @@ def combine_strategies(**kwargs):
     for every 'n' strategies being combined, starting at 1.  Set arbitrary
     limit of 6 strategies for time being.
 
+    Nested strategies may actually want a logical 'OR'.  Optional kwarg
+    `combinator` takes values {'any', 'all'} - default 'all' means all
+    strategies must evaluate true.  'any' means just one must eval true for a
+    positive result.
+
     """
     strats = []
     arbitrary_limit = 7
@@ -131,18 +185,38 @@ def combine_strategies(**kwargs):
         func = getattr(sys.modules[__name__], func_name)
         strats.append(func(**func_kwargs))
 
-    def call_combined(intervention, user):
+    def call_all_combined(intervention, user):
+        "Returns True if ALL of the combined strategies return True"
         for strategy in strats:
             if not strategy(intervention, user):
                 _log(result=False, func_name='combine_strategies', user=user,
                     intervention=intervention.name)
                 return
         # still here?  effective AND passed as all returned true
-        _log(result=False, func_name='combine_strategies', user=user,
+        _log(result=True, func_name='combine_strategies', user=user,
             intervention=intervention.name)
         return True
 
-    return call_combined
+    def call_any_combined(intervention, user):
+        "Returns True if ANY of the combined strategies return True"
+        for strategy in strats:
+            if strategy(intervention, user):
+                _log(result=True, func_name='combine_strategies', user=user,
+                    intervention=intervention.name)
+                return True
+        # still here?  effective ANY failed as none returned true
+        _log(result=False, func_name='combine_strategies', user=user,
+            intervention=intervention.name)
+        return
+
+    combinator = kwargs.get('combinator', 'all')
+    if combinator == 'any':
+        return call_any_combined
+    elif combinator == 'all':
+        return call_all_combined
+    else:
+        raise ValueError("unrecognized value {} for `combinator`, "
+                         "limited to {'any', 'all'}").format(combinator)
 
 
 class AccessStrategy(db.Model):
@@ -175,6 +249,11 @@ class AccessStrategy(db.Model):
         obj = cls()
         try:
             obj.name = data['name']
+            if 'id' in data:
+                obj.id = data['id']
+            if 'intervention_name' in data:
+                obj.intervention_id = Intervention.query.filter_by(
+                    name=data['intervention_name']).one().id
             if 'description' in data:
                 obj.description = data['description']
             if 'rank' in data:
@@ -184,16 +263,20 @@ class AccessStrategy(db.Model):
             # validate the given details by attempting to instantiate
             obj.instantiate()
         except Exception, e:
-            raise ValueError("well defined AccessStrategy includes at "
-                             "a minimum 'name' and 'function_details': {}".\
-                            format(e))
-
+            raise ValueError("AccessStrategy instantiation error: {}".format(
+                e))
         return obj
 
     def as_json(self):
         """Return self in JSON friendly dictionary"""
         d = {"name": self.name,
-             "function_details": json.loads(self.function_details)}
+             "function_details": json.loads(self.function_details),
+             "resourceType": 'AccessStrategy'
+            }
+        d['intervention_name'] = Intervention.query.get(
+            self.intervention_id).name
+        if self.id:
+            d['id'] = self.id
         if self.rank:
             d['rank'] = self.rank
         if self.description:
