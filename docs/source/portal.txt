@@ -15,6 +15,9 @@ Portal
 .. automodule:: portal.extensions
     :members:
 
+.. automodule:: portal.site_persistence
+    :members:
+
 .. automodule:: portal.system_uri
     :members:
 

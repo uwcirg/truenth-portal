@@ -50,6 +50,48 @@ class Intervention(db.Model):
     access_strategies = db.relationship(
         'AccessStrategy', order_by="AccessStrategy.rank")
 
+    def as_json(self):
+        """Returns the 'safe to export' portions of an intervention
+
+        The client_id and link_url are non-portable between systems.
+        The id is also independent - return the rest of the not null
+        fields as a simple json dict.
+
+        """
+        d = {'resourceType': 'Intervention'}
+        for attr in ('name', 'description', 'card_html', 'link_label',
+                     'status_text', 'public_access'):
+            if getattr(self, attr, None) is not None:
+                d[attr] = getattr(self, attr)
+
+        return d
+
+    @classmethod
+    def from_json(cls, data):
+        """Looks for match on name - merges data with existing or new
+
+        If the intervention named in data isn't found, a new one will
+        be generated.
+
+        The given data will be used to overwrite / replace any existing
+        data found.
+
+        """
+        if not 'name' in data:
+            raise ValueError("required 'name' field not found")
+        instance = Intervention.query.filter_by(name=data['name']).first()
+        if not instance:
+            instance = cls()
+
+        for attr in ('name', 'description', 'card_html', 'link_label',
+                     'status_text', 'public_access'):
+            if data.get(attr, None) is not None:
+                setattr(instance, attr, data[attr])
+            else:
+                setattr(instance, attr, None)
+
+        return instance
+
     def fetch_strategies(self):
         """Generator to return each registered strategy
 

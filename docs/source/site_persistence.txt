@@ -1,0 +1,58 @@
+Site Persistence
+****************
+
+.. contents::
+   :depth: 3
+   :local:
+
+Persistence File
+================
+
+In order to handle the migration of **site specific** data, one can generate or
+import a persistence file, housing details such as:
+
+- business rules defining when interventions should be presented to users
+- customization of intervention text
+- organizations and clinics on the site
+
+Both importing and exporting use the value of ``PERSISTENCE_FILE``.
+Its value is initially looked up in the configuration file(s) and subsequently
+as an environment variable - with the first well defined value taking
+precedence.
+
+.. note::
+
+    To import data directly from a repository, set the PERSISTENCE_FILE value
+    to the raw file contents, i.e::
+
+        PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
+
+Export
+======
+
+.. note::
+
+   For exports, **PERSISTENCE_FILE** must point to a writable file on the local
+   filesystem.
+
+Exporting site data is done via the ``manage.py`` endpoint ``export_site``,
+a la::
+
+    python manage.py export_site
+
+The results may be then checked into a repository like the one mentioned above
+for imports.  Different projects should make use of seperate repositories.
+
+Import
+======
+
+Import is handled automatically as the last step to the ``seed`` command::
+
+    python manage.py seed
+
+Detailed logging will inform the user of changes made.
+
+.. note::
+
+    It may be wise to back up the existing database prior to running ``python
+    manage.py seed`` in the unlikely event of unwanted overwrites.

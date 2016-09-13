@@ -17,4 +17,5 @@ Contents:
     readme_link
     interventions
     organizations
+    site_persistence
     code

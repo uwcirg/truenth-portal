@@ -9,7 +9,7 @@ import tempfile
 
 from extensions import db
 from models.fhir import FHIR_datetime
-from models.intervention import INTERVENTION
+from models.intervention import Intervention, INTERVENTION
 from models.intervention_strategies import AccessStrategy
 from models.organization import Organization
 
@@ -26,8 +26,8 @@ class SitePersistence(object):
                           Set False for exports, which require write.
 
         Using the first value found, looks for a variable named
-        `PERSISTENCE_FILE` as an envionrment variable, and then in the
-        configuration file(s).
+        `PERSISTENCE_FILE` in the configuration file(s) and then as an
+        environment variable.
 
         For imports (read_only), the value of `PERSISTENCE_FILE` may point
         to a repository file such as
@@ -40,7 +40,7 @@ class SitePersistence(object):
         env_file = os.environ.get('PERSISTENCE_FILE')
         config_file = current_app.config.get("PERSISTENCE_FILE", '')
 
-        filename = env_file if env_file else config_file
+        filename = config_file if config_file else env_file
         if not filename:
             raise ValueError('PERSISTENCE_FILE not defined as environment '
                              'variable nor in a config file')
@@ -122,7 +122,9 @@ class SitePersistence(object):
         d['entry'] += orgs['entry']
 
         # Add strategies (AKA access rules)
+        # and sharable portions of interventions
         for intervention in INTERVENTION:
+            d['entry'].append(intervention.as_json())
             rules = [x.as_json() for x in
                      intervention.access_strategies]
             if rules:
@@ -180,6 +182,28 @@ class SitePersistence(object):
                           "importing".format(strat.id))
                 db.session.add(strat)
 
+        def update_intervention(intervention_json):
+            existing = Intervention.query.filter_by(
+                name=intervention_json['name']).first()
+            existing_json = existing.as_json() if existing else None
+            intervention = Intervention.from_json(intervention_json)
+            if existing:
+                if intervention_json != existing_json:
+                    self._log("Intervention {id} collision on "
+                              "import.  Replacing existing: {existing} with "
+                              "new: {new}".format(
+                                  id=intervention.id, new=intervention_json,
+                                  existing=existing.as_json()))
+                    db.session.delete(existing)
+                    db.session.add(intervention)
+                else:
+                    self._log("Intervention {} matches existing, skip "
+                              "import".format(intervention.id))
+            else:
+                self._log("Intervention {} not found, "
+                          "importing".format(intervention.id))
+                db.session.add(intervention)
+
         # Orgs first:
         max_org_id = 0
         for o in objs_by_type['Organization']:
@@ -188,6 +212,11 @@ class SitePersistence(object):
             # As orgs can refer to other orgs, must commit on the
             # fly to avoid lookup errors
             db.session.commit()
+
+        # Intervention details
+        for i in objs_by_type['Intervention']:
+            update_intervention(i)
+        db.session.commit()  # strategies may use interventions, must exist
 
         # Access rules next
         max_strat_id = 0

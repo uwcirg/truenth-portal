@@ -56,3 +56,17 @@ class TestSitePersistence(TestCase):
         # P3P strategy should now be in view for test user
         self.assertTrue(
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
+
+    def test_interventions(self):
+        """Portions of the interventions migrated"""
+        # confirm we see a sample of changes from the
+        # defauls in add_static_interventions call
+        # to what's expected in the persistence file
+        self.assertEquals(
+            INTERVENTION.CARE_PLAN.card_html, ('<p>Organization and '
+            'support for the many details of life as a prostate cancer '
+            'survivor</p>'))
+        self.assertEquals(
+            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
+        self.assertEquals(
+            INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
