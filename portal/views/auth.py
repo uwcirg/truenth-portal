@@ -855,7 +855,7 @@ def authorize(*args, **kwargs):
         # has completed.
         current_app.logger.debug('Postponing oauth client authorization' +
             ' till user authenticates with CS: %s', str(request.args))
-        session['pending_authorize_args'] = request.args 
+        session['pending_authorize_args'] = request.args
 
         return redirect('/')
     # See "hardwired" note in docstring above
