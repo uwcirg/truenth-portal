@@ -25,7 +25,7 @@ class TestSitePersistence(TestCase):
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
-        self.assertEquals(Organization.query.count(), 5)
+        self.assertTrue(Organization.query.count() > 5)
         npis = []
         for org in Organization.query:
             npis += [id.value for id in org.identifiers if id.system ==
