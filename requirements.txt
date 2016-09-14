@@ -11,7 +11,7 @@ blinker==1.4
 celery==3.1.23
 cffi==1.8.2
 click==6.6
-CommonMark==0.5.4  # pin as workaround to https://github.com/rtfd/recommonmark/issues/24
+CommonMark==0.7.2 # pin as workaround to https://github.com/rtfd/recommonmark/issues/24
 coverage==4.2
 decorator==4.0.10
 docutils==0.12
