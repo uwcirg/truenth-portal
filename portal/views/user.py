@@ -200,15 +200,9 @@ def set_user_consents(user_id):
         schema:
           id: consent_agreement
           required:
-            - user_id
             - organization_id
             - agreement_url
           properties:
-            user_id:
-              type: string
-              description:
-                User identifier defining with whom the consent agreement
-                applies
             organization_id:
               type: string
               description:
@@ -250,6 +244,7 @@ def set_user_consents(user_id):
         user = get_user(user_id)
     if not user:
         abort(404, "user_id {} not found".format(user_id))
+    request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
         if request.json.get('expires'):
