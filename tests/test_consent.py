@@ -39,9 +39,7 @@ class TestUserConsent(TestCase):
         self.test_user = db.session.merge(self.test_user)
         org1 = db.session.merge(org1)
 
-        data = {'user_id': TEST_USER_ID,
-                'organization_id': org1.id,
-                'agreement_url': self.url}
+        data = {'organization_id': org1.id, 'agreement_url': self.url}
 
         self.login()
         rv = self.app.post('/api/user/{}/consent'.format(TEST_USER_ID),
