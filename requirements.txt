@@ -9,7 +9,7 @@ beautifulsoup4==4.5.1
 billiard==3.5.0.0
 blinker==1.4
 celery==3.1.23
-cffi==1.8.2
+cffi==1.8.3
 click==6.6
 CommonMark==0.5.4 # pyup: <=0.5.4  # pin as workaround to https://github.com/rtfd/recommonmark/issues/24
 coverage==4.2
