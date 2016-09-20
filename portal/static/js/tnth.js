@@ -297,6 +297,3 @@ $(document).ready( function() {
         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
 });
 window.sessMon = sessMon;
-
-
-
