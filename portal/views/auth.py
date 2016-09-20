@@ -253,9 +253,13 @@ def logout():
     use authenticated resources be deleted from the OAuth server, and
     clearing the browser session.
 
+    Optional parameter timed_out should be set to clarify the logout
+    request is the result of a stale session.
+
     """
     user = current_user()
     user_id = user.id if user else None
+    timed_out = request.args.get('timed_out', False)
 
     def delete_facebook_authorization(user_id):
         """Remove OAuth authorization for TrueNTH on logout
@@ -281,8 +285,8 @@ def logout():
     def notify_clients(user_id):
         """Inform any client apps of the logout event.
 
-        Look for tokens this user obtained, and notify those clients
-        of the logout event
+        Look for tokens this user obtained, notify the respective clients
+        of the logout event and invalidate all outstanding tokens by deletion
 
         """
         if not user_id:
@@ -290,14 +294,16 @@ def logout():
         for token in Token.query.filter_by(user_id=user_id):
             c = Client.query.filter_by(client_id=token.client_id).first()
             c.notify({'event': 'logout', 'user_id': user_id,
-                    'refresh_token': token.refresh_token})
+                      'refresh_token': token.refresh_token,
+                      'timed_out': timed_out})
             # Invalidate the access token by deletion
             db.session.delete(token)
         db.session.commit()
 
 
     if user_id:
-        auditable_event("logout", user_id=user_id)
+        event = 'logout' if not timed_out else 'logout due to timeout'
+        auditable_event(event, user_id=user_id)
         # delete_facebook_authorization()  #Not using at this time
 
     logout_user()
