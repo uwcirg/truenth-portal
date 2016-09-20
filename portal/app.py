@@ -9,7 +9,6 @@ from flask_webtest import get_scopefunc
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
-from .extensions import babel, celery, db, mail, oauth, user_manager
 from .models.app_text import app_text
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.coredata import configure_coredata
