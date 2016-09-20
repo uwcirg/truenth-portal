@@ -274,29 +274,3 @@ sessionMonitor = function(options) {
 
     return self;
 };
-
-// Configure and start the session timeout monitor
-sessMon = sessionMonitor({
-    sessionLifetime: DEFAULT_SESSION_LIFETIME,
-    timeBeforeWarning: 1 * 60 * 1000,
-    minPingInterval: 1 * 60 * 1000,  // 1 minute
-    onwarning: function() {
-        $("#session-warning-modal").modal("show");
-    }
-});
-$(document).ready( function() {
-    // Configure the session timeout warning modal
-    $("#session-warning-modal")
-        .modal({
-            "backdrop": "static",
-            "keyboard": false,
-            "show": false
-        })
-        .on("click", "#stay-logged-in", sessMon.extendsess)
-        .on("click", "#log-out", sessMon.logout)
-        .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-});
-window.sessMon = sessMon;
-
-
-
