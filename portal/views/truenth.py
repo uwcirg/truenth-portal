@@ -1,5 +1,5 @@
 """TrueNTH API view functions"""
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, session
 from flask import current_app, render_template, request, url_for
 from werkzeug.exceptions import Unauthorized
 
@@ -10,6 +10,13 @@ from ..models.auth import validate_client_origin
 from ..models.user import current_user
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
+
+@truenth_api.route("/ping", methods=['POST'])
+def ping():
+    """POST request prolong session by reseting cookie timeout"""
+    current_app.logger.debug("ping received")
+    session.modified = True
+    return 'OK'
 
 
 @truenth_api.route('/auditlog', methods=('POST',))

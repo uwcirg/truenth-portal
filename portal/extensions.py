@@ -147,6 +147,11 @@ mail = Mail()
 from flask_session import Session
 session = Session()
 
+# Flask-Session provides server side sessions
+from flask_session import Session
+session = Session()
+
+
 # Celery (Distributed Task Queue) is used for any asynchronous tasks
 from flask_celery import Celery
 celery = Celery()
