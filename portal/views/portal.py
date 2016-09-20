@@ -86,9 +86,7 @@ def specific_clinic_landing(clinic_alias):
 
 @portal.route('/initial-queries', methods=('GET', 'POST'))
 def initial_queries():
-    termsXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43682', verify=False)
-    termsXmlText = termsXml.text
-    terms = termsXmlText[123:-28]
+    terms = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603', verify=False)
     if request.method == 'GET':
         return render_template('initial_queries.html', user=current_user(), terms=terms)
     return redirect('home')
@@ -198,35 +196,14 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    contentXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43478', verify=False)
-    #encoding = contentXml.content
-    #contentXml.encoding = encoding
-    contentXmlText = contentXml.text
-#123 chars before what we need
-#28 chars at the end that we don't need
-    #content = contentXmlText
-    content = contentXmlText[123:-28]
-
-    #contentXmlString = StringIO(contentXml)
-    #tree = etree.parse(contentXmlString)
-    #tree = etree.parse(StringIO(contentXml))
-    #tree = etree.fromstring(contentXmlText)
-    #content = "";
-    #for s in tree.xpath("//static-content"):
-    #    content += s.text 
-    #cdata = tree.Element('![CDATA[')
-    #return render_template('legal.html', content=cdata.text)
+    content = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577', verify=False)
     return render_template('legal.html', content=content)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnthXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43522', verify=False)
-    about_tnthXmlText = about_tnthXml.text
-    about_tnth = about_tnthXmlText[123:-28]
-    about_moXml = requests.get('https://stg-cms.us.truenth.org/c/journal/get_latest_article_content?groupId=20182&articleId=43532', verify=False)
-    about_moXmlText = about_moXml.text
-    about_mo = about_moXmlText[123:-28]
+    about_tnth = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549', verify=False)
+    about_mo = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565', verify=False)
     return render_template('about.html', about_tnth=about_tnth, about_mo=about_mo)
 
 @portal.route('/explore')
