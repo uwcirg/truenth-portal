@@ -23,6 +23,8 @@ class BaseConfig(object):
     CONTACT_SENDTO_EMAIL = MAIL_USERNAME
     ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
+    SS_TIMEOUT = 2 * 60  # seconds for session cookie, reset on ping
+    PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PROJECT = "portal"
@@ -30,6 +32,8 @@ class BaseConfig(object):
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
+    SESSION_PERMANENT = True
+    SESSION_TYPE = 'redis'
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
