@@ -84,13 +84,12 @@ def specific_clinic_landing(clinic_alias):
     return redirect('/')
 
 
-@portal.route('/initial-queries', methods=('GET', 'POST'))
+@portal.route('/initial-queries')
 def initial_queries():
-    terms = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603', verify=False)
-    if request.method == 'GET':
-        return render_template('initial_queries.html', user=current_user(), terms=terms)
-    return redirect('home')
+    """Terms of use, initial queries view function"""
 
+    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603', verify=False)
+    return render_template('initial_queries.html', user=current_user(), terms=response.text)
 
 @portal.route('/home')
 def home():
