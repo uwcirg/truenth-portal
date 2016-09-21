@@ -153,9 +153,9 @@ def configure_logging(app):  # pragma: no cover
         log.setLevel(level)
         log.addHandler(info_file_handler)
 
-    from .tasks import logger
-    logger.setLevel(level)
-    logger.addHandler(info_file_handler)
+    from .tasks import logger as task_logger
+    task_logger.setLevel(level)
+    task_logger.addHandler(info_file_handler)
 
     # Configure Error Emails for high level log messages, only in prod mode
     ADMINS = app.config['ERROR_SENDTO_EMAIL']
@@ -167,6 +167,7 @@ def configure_logging(app):  # pragma: no cover
             '{} Log Message'.format(app.config['SERVER_NAME']))
         mail_handler.setLevel(logging.ERROR)
         app.logger.addHandler(mail_handler)
+        task_logger.addHandler(mail_handler)
 
     #app.logger.debug("initiate logging done at level %s, %d",
     #    app.config['LOG_LEVEL'], level)
