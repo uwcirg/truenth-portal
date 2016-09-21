@@ -196,15 +196,15 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    content = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577', verify=False)
-    return render_template('legal.html', content=content)
+    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577', verify=False)
+    return render_template('legal.html', content=response.text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
     about_tnth = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549', verify=False)
     about_mo = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565', verify=False)
-    return render_template('about.html', about_tnth=about_tnth, about_mo=about_mo)
+    return render_template('about.html', about_tnth=about_tnth.text, about_mo=about_mo.text)
 
 @portal.route('/explore')
 def explore():
