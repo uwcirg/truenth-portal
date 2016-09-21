@@ -116,7 +116,7 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/t
     if [[ $VERBOSE ]]; then
         echo "Restarting celeryd"
     fi
-    sudo service apache2 restart
+    sudo service celeryd restart
 fi
 
 # Code changes - update package metadata
