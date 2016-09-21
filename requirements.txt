@@ -59,7 +59,7 @@ requests-oauthlib==0.6.2
 selenium==2.53.6
 six==1.10.0
 snowballstemmer==1.2.1
-Sphinx==1.4.5
+Sphinx==1.4.6
 sphinx-rtd-theme==0.1.9
 SQLAlchemy==1.1.0b3
 swagger-spec-validator==2.0.2
