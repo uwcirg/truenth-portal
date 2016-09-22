@@ -1,7 +1,5 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
-#from cStringIO import StringIO 
-#from lxml import etree
 from flask import current_app, Blueprint, jsonify, render_template
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -88,7 +86,7 @@ def specific_clinic_landing(clinic_alias):
 def initial_queries():
     """Terms of use, initial queries view function"""
 
-    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603', verify=False)
+    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603')
     return render_template('initial_queries.html', user=current_user(), terms=response.text)
 
 @portal.route('/home')
@@ -195,14 +193,14 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577', verify=False)
+    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577')
     return render_template('legal.html', content=response.text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549', verify=False)
-    about_mo = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565', verify=False)
+    about_tnth = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549')
+    about_mo = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565')
     return render_template('about.html', about_tnth=about_tnth.text, about_mo=about_mo.text)
 
 @portal.route('/explore')
