@@ -1,6 +1,3 @@
-sudo: true
-# See https://github.com/travis-ci/travis-ci/issues/4264
-# When implementation on container-based infrastructure is finished remove "sudo: true"
 language: python
 python:
   - "2.7"
