@@ -6,6 +6,7 @@ from flask_login import login_user
 from flask_user import roles_required
 from flask_swagger import swagger
 
+from .auth import next_after_login
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.coredata import Coredata
@@ -52,9 +53,9 @@ def intentional_error():  # pragma: no cover
 
 @portal.route('/')
 def landing():
-    """landing page view function"""
+    """landing page view function - present register / login options"""
     if current_user():
-        return redirect('home')
+        return next_after_login()
     return render_template('landing.html', user=None, no_nav="true")
 
 
@@ -79,49 +80,56 @@ def specific_clinic_landing(clinic_alias):
         identifier_id=identifier.id).one()
     session['associate_clinic_id'] = results.organization_id
 
-    return redirect('/')
+    return redirect(url_for('portal.landing'))
 
 
-@portal.route('/initial-queries')
+@portal.route('/initial-queries', methods=['GET','POST'])
 def initial_queries():
     """Terms of use, initial queries view function"""
+    if request.method == 'POST':
+        # data submission all handled via ajax calls from initial_queries
+        # template.  assume POST can only be sent when valid.
+        return next_after_login()
 
     response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603')
     return render_template('initial_queries.html', user=current_user(), terms=response.text)
 
 @portal.route('/home')
 def home():
-    """home page view function"""
+    """home page view function
+
+    Present user with appropriate view dependent on roles.
+
+    The inital flow through authentication and data collection is
+    controlled by next_after_login().  Only expecting requests
+    here after login and intermediate steps have been handled, and then
+    only if the login didn't include a 'next' target.
+
+    Raising server error (500) if unexpected state is found to assist in
+    finding problems.
+
+    """
     user = current_user()
-    if user:
-        # authorized entry point - take care of pending actions
-        # present intial questions if not already obtained
-        if not Coredata().initial_obtained(user):
-            return redirect(url_for('portal.initial_queries'))
 
-        # now logged in, redirect if next was previously stored
-        if 'next' in session and session['next']:
-            current_app.logger.debug("redirect to session[next]: %s",
-                    session['next'])
-            next_url = session['next']
-            del session['next']
-            return redirect(next_url)
+    # Enforce flow - expect authorized user for this view
+    if not user:
+        abort (500, "unexpected lack of user in /home")
 
-        # default view depends on role
-        if user.has_role(ROLE.PROVIDER):
-            return redirect(url_for('patients.patients_root'))
-        return render_template('portal.html', user=user,
-                               interventions=INTERVENTION)
+    # Enforce flow - don't expect 'next' params here
+    if 'next' in session and session['next']:
+        abort(500, "session['next'] found in /home for user {}".\
+              format(user))
 
-    # 'next' is optionally added as a query parameter during login
-    # steps, as the redirection target after login concludes.
-    # store in session to survive a multi-request login process
-    if request.args.get('next', None):
-        current_app.logger.debug('storing session[next]: %s',
-                request.args.get('next'))
-        session['next'] = request.args.get('next', None)
+    # Enforce flow - confirm we have acquired initial data
+    if not Coredata().initial_obtained(user):
+        abort(500, 'inital data missing in /home for user {}'.\
+              format(user))
 
-    return redirect(url_for('user.login'))
+    # All checks passed - present appropriate view for user role
+    if user.has_role(ROLE.PROVIDER):
+        return redirect(url_for('patients.patients_root'))
+    return render_template('portal.html', user=user,
+                           interventions=INTERVENTION)
 
 
 @portal.route('/admin')
