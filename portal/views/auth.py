@@ -21,6 +21,7 @@ from validators import url as url_validation
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
+from ..models.coredata import Coredata
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
@@ -84,34 +85,63 @@ user_registered.connect(flask_user_registered_event)
 
 @auth.route('/next-after-login')
 def next_after_login():
-    """Redirect to appropriate target depending on client auth status
+    """Redirection to appropriate target depending on data and auth status
 
-    When client applications request OAuth tokens, we sometimes need
-    to postpone the action of authorizing the client while the user
-    logs in to TrueNTH.
+    Multiple authorization paths in, some needing up front information before
+    returning, this attempts to handle such state decisions.  In other words,
+    this function represents the state machine to control initial flow.
 
-    After completing authentication with TrueNTH, this handles
-    redirecting the browser to the appropriate target (either resume
-    the client auth in process or the root).
+    When client applications (interventions) request OAuth tokens, we sometimes
+    need to postpone the action of authorizing the client while the user logs
+    in to TrueNTH.
+
+    After completing authentication with TrueNTH, additional data may need to
+    be obtained, such as a TOU agreement.  In such a case, the user will be
+    directed to initial_queries, then back here for redirection to the
+    appropriate 'next'.
 
     Implemented as a view method for integration with flask-user config.
 
     """
-    # If client auth was pushed aside, resume now
-    if current_user() and 'pending_authorize_args' in session:
+    # Without a current_user - can't continue, send back to root for login
+    user = current_user()
+    if not user:
+        current_app.logger.debug("next_after_login: [no user] -> landing")
+        return redirect(url_for('portal.landing'))
+
+    # Logged in - take care of pending actions
+
+    # Present intial questions (TOU et al) if not already obtained
+    if not Coredata().initial_obtained(user):
+        current_app.logger.debug("next_after_login: [need data] -> "
+                                 "initial_queries")
+        return redirect(url_for('portal.initial_queries'))
+
+    # Clients/interventions trying to obtain an OAuth token for protected
+    # access need to be put in a pending state, if the user isn't already
+    # authenticated with the portal.  It's now time to resume that process;
+    # pop the pending state from the session and resume, if found.
+    if 'pending_authorize_args' in session:
         args = session['pending_authorize_args']
-        current_app.logger.debug("redirecting to interrupted " +
-            "client authorization: %s", str(args))
+        current_app.logger.debug("next_after_login: [resume pending] ->"
+                                 "authorize: {}".format(args))
         del session['pending_authorize_args']
         return redirect(url_for('auth.authorize', **args))
-    elif current_user() and 'next' in session:
+
+    # 'next' is typically set on the way in when gathering authentication.
+    # It's stored in the session to survive the various redirections needed
+    # for external auth, etc.  If found in the session, pop and redirect
+    # as defined.
+    if 'next' in session:
         next_url = session['next']
         del session['next']
-        current_app.logger.debug(
-            "redirecting to session['next'] %s", next_url)
+        current_app.logger.debug("next_after_login: [have session['next']] "
+                                 "-> {}".format(next_url))
         return redirect(next_url)
-    else:
-        return redirect('/')
+
+    # No better place to go, send user home
+    current_app.logger.debug("next_after_login: [no state] -> home")
+    return redirect(url_for('portal.home'))
 
 
 @auth.route('/login/<provider_name>/')
@@ -148,7 +178,7 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
-        current_app.logger.debug('retaining next url %s',
+        current_app.logger.debug("store-session['next'] from login: %s",
                                  session['next'])
         # The existance of any args (including 'next') breaks the authomatic
         # login flow.  Clear out before passing on
@@ -855,7 +885,7 @@ def authorize(*args, **kwargs):
         # has completed.
         current_app.logger.debug('Postponing oauth client authorization' +
             ' till user authenticates with CS: %s', str(request.args))
-        session['pending_authorize_args'] = request.args 
+        session['pending_authorize_args'] = request.args
 
         return redirect('/')
     # See "hardwired" note in docstring above
