@@ -14,7 +14,7 @@ from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
-from portal.models.user import flag_test
+from portal.models.user import delete_user, flag_test
 from portal.site_persistence import SitePersistence
 
 app = create_app()
@@ -61,6 +61,11 @@ def export_site():
     """
     SitePersistence().export()
 
+
+@manager.option('-u', '--username', dest='username')
+def purge_user(username):
+    """Purge the given user from the system"""
+    delete_user(username)
 
 @manager.command
 def mark_test():

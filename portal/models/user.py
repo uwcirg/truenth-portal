@@ -116,6 +116,49 @@ class UserTimezone(Extension):
         raise NotImplementedError
 
 
+def delete_user(username):
+    """Given a username (email), purge the user from the system
+
+    Includes wiping out audit rows, observations, etc.
+
+    """
+    from .audit import Audit
+    from .tou import ToU
+    from .intervention import UserIntervention
+
+    actor = raw_input("\n\nWARNING!!!\n\n"
+                      " This will permanently destroy user: {}\n"
+                      " and all their related data.\n\n"
+                      " If you want to contiue, enter a valid user\n"
+                      " email as the acting party for our records: ".\
+                      format(username))
+    acting_user = User.query.filter_by(username=actor).first()
+    if not acting_user or actor == username:
+        raise ValueError("Actor must be a current user other than the target")
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        raise ValueError("No such user: {}".format(username))
+
+    # purge all the types with user foreign keys, then the user itself
+    UserIntervention.query.filter_by(user_id=user.id).delete()
+    tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+    for t in tous:
+        db.session.delete(t)
+    for o in user.observations:
+        db.session.delete(o)
+    audits = Audit.query.filter_by(user_id=user.id).delete()
+
+    # the rest should die on cascade rules
+    db.session.delete(user)
+    db.session.commit()
+
+    # record this event
+    db.session.add(Audit(
+        user_id=acting_user.id,
+        comment="purged all trace of user {}".format(username)))
+    db.session.commit()
+
+
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone)
 
