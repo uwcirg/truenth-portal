@@ -15,7 +15,7 @@ the parameters given to the closures.
 """
 from flask import current_app
 import json
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
@@ -23,7 +23,7 @@ import sys
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .organization import Organization
-from .intervention import Intervention, INTERVENTION
+from .intervention import Intervention, INTERVENTION, UserIntervention
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
@@ -112,6 +112,36 @@ def allow_if_not_in_intervention(intervention_name):
             return True
 
     return user_not_in_intervention
+
+
+def update_link_url(intervention_name, link_url):
+    """Intervention may need special link per user - set to given for user"""
+
+    intervention = getattr(INTERVENTION, intervention_name)
+
+    def update_user_intervention(intervention, user):
+        # NB - this is by design, a method with side effects
+        # if the user_intevention isn't present, or doesn't include a
+        # matching link_url - one will be created or updated.
+        ui = UserIntervention.query.filter(and_(
+            UserIntervention.user_id == user.id,
+            UserIntervention.intervention_id == intervention.id)).first()
+        if not ui:
+            db.session.add(UserIntervention(user_id = user.id,
+                                           intervention_id = intervention.id,
+                                           link_url = link_url))
+            db.session.commit()
+        else:
+            if ui.link_url != link_url:
+                ui.link_url = link_url
+                db.session.commit()
+
+        # Really this function just exists for the side effects, don't
+        # prevent access
+        return True
+
+    return update_user_intervention
+
 
 def observation_check(display, boolean_value):
     """Returns strategy function for a particular observation and logic value

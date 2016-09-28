@@ -247,6 +247,28 @@ class TestIntervention(TestCase):
         self.assertFalse(ds_p3p.display_for_user(user).access)
         self.assertTrue(ds_wc.display_for_user(user).access)
 
+    def test_side_effects(self):
+        """Test strategy with side effects"""
+        ae  = INTERVENTION.ASSESSMENT_ENGINE
+        ae_id = ae.id
+
+        with SessionScope(db):
+            d = {'function': 'update_link_url',
+                 'kwargs': [{'name': 'intervention_name', 'value': ae.name},
+                            {'name': 'link_url', 'value':
+                             'http://different.org'}]}
+            strat = AccessStrategy(
+                name="fix assessment_engine link_url",
+                intervention_id = ae_id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, ae = map(db.session.merge, (self.test_user, ae))
+
+        # We should now see the updated link_url for this user
+        self.assertEquals(ae.display_for_user(user).link_url,
+                          'http://different.org')
+
     def test_strat_from_json(self):
         """Create access strategy from json"""
         d = {'name': 'unit test example',
