@@ -247,6 +247,7 @@ a:active {
   border-color: #79815D;
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
+  cursor:pointer;
 }
 .btn-tnth-primary:hover,
 .btn-tnth-primary:focus,
@@ -255,6 +256,11 @@ a:active {
   color: #fff;
   background-color: #2a4531;
   border-color: #1c2f21;
+  cursor:pointer;
+}
+.btn-tnth-primary.disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 .btn-tnth-back {
   color: #777;
