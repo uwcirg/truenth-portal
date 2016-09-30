@@ -262,6 +262,12 @@ a:active {
   opacity: 0.65;
   cursor: not-allowed;
 }
+.btn-tnth-primary.disabled:hover {
+  color: #fff;
+  background-color: #79815D;
+  border-color: #79815D;
+  text-decoration:none;
+}
 .btn-tnth-back {
   color: #777;
   padding: 0 5px 0 0;
