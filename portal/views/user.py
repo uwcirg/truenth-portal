@@ -695,18 +695,23 @@ def system_roles():
           Returns a list of all known roles.  Users belong to one or more
           roles used to control authorization.
         schema:
-          id: roles
-          required:
-            - name
-            - description
+          id: nested_roles
           properties:
-            name:
-              type: string
-              description:
-                Role name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the role.
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                  - description
+                properties:
+                  name:
+                    type: string
+                    description:
+                      Role name, always a lower case string with no white space.
+                  description:
+                    type: string
+                    description: Plain text describing the role.
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -743,18 +748,23 @@ def roles(user_id):
         description:
           Returns the list of roles the requested user belongs to.
         schema:
-          id: roles
-          required:
-            - name
-            - description
+          id: nested_roles
           properties:
-            name:
-              type: string
-              description:
-                Role name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the role.
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                  - description
+                properties:
+                  name:
+                    type: string
+                    description:
+                      Role name, always a lower case string with no white space.
+                  description:
+                    type: string
+                    description: Plain text describing the role.
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -800,32 +810,42 @@ def set_roles(user_id):
       - in: body
         name: body
         schema:
-          id: roles
-          required:
-            - name
+          id: nested_roles
           properties:
-            name:
-              type: string
-              description:
-                The string defining the name of each role the user should
-                belong to.  Must exist as an available role in the system.
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                    description:
+                      The string defining the name of each role the user should
+                      belong to.  Must exist as an available role in the system.
     responses:
       200:
         description:
           Returns a list of all roles user belongs to after change.
         schema:
-          id: user_roles
-          required:
-            - name
-            - description
+          id: nested_roles
           properties:
-            name:
-              type: string
-              description:
-                Role name, always a lower case string with no white space.
-            description:
-              type: string
-              description: Plain text describing the role.
+            roles:
+              type: array
+              items:
+                type: object
+                required:
+                  - name
+                  - description
+                properties:
+                  name:
+                    type: string
+                    description:
+                      Role name, always a lower case string with no white space.
+                  description:
+                    type: string
+                    description: Plain text describing the role.
       400:
         description: if the request incudes an unknown role.
       401:
