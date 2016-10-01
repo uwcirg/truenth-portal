@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "flask_user/profile_macros.html" import profile, profileSaveBtn %}
+{% from "profile_macros.html" import profile, profileSaveBtn %}
 
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
@@ -30,58 +30,9 @@ My TrueNTH Profile
         {{profileSaveBtn()}}
 
         <br /><br />
+
         <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
-
     </div>
-
-        <!--
-        <div class="col-md-4 pos-bottom-md">
-        <div id="patientQuestions">
-            <div class="form-group">
-                <label>Have you had a prostate cancer biopsy?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input class="history-q" type="radio" name="biopsy" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="biopsy" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you been diagnosed with prostate cancer?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you begun prostate cancer treatment?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="visible-lg"><br /></div>
-        </div>
-        -->
 </div>
 
 
@@ -92,17 +43,6 @@ My TrueNTH Profile
 {% block document_ready %}
 var patientId = {{ user.id }};
 $(document).ready(function(){
-
-    //tnthAjax.getOrgs({{ user.id }});
-
-    // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
-    //var currentBd = $("#birthday").val();
-    //if (currentBd) {
-    //    var bdArray = currentBd.split("-");
-    //    $("#year").val(bdArray[0]);
-    //    $("#month").val(bdArray[1]);
-    //    $("#date").val(bdArray[2]);
-    //}
 
     // When there's a change, check validation and if good, assembleContent
     $('#profileForm').on('validated.bs.validator', function(e) {
