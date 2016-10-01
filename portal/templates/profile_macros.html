@@ -1,0 +1,252 @@
+{% macro profileImage(person) -%}
+    {% if person.image_url %}
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="profile-img hidden-xs">
+                    <img src="{{ person.image_url }}" />
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro profileBirthDate(person) -%}
+    <input type="hidden" name="birthDate" id="birthday" value="{{ person.birthdate if person.birthdate }}">
+    <div class="form-group" id="bdGroup">
+        <label>Birth Date</label>
+        <div class="row">
+            <div class="col-xs-4">
+                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                    <option value="">Month...</option>
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+            <div class="col-xs-4">
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+            </div>
+            <div class="col-xs-4">
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+            </div>
+        </div>
+        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+     </div>
+     <script>
+        $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
+            var currentBd = $("#birthday").val();
+            if (currentBd) {
+                var bdArray = currentBd.split("-");
+                $("#year").val(bdArray[0]);
+                $("#month").val(bdArray[1]);
+                $("#date").val(bdArray[2]);
+            }
+        });
+     </script>
+{%- endmacro %}
+
+{% macro profileName(person) -%}
+    <div class="form-group" style="margin-bottom: 0">
+        <label>Name</label>
+    </div>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="form-group float-input-label">
+                <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ person.first_name if person.first_name }}" type="text" />
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+        <div class="col-xs-6">
+            <div class="form-group float-input-label">
+                <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person.last_name }}" type="text" />
+                <div class="help-block with-errors"></div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileGender(person) -%}
+    <div class="form-group">
+        <label>Gender</label>
+        <div style="margin-top: -10px">
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person.gender == "male"}}/>
+                Male
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person.gender == "female"}}/>
+                Female
+            </label>
+            <label class="radio-inline">
+                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person.gender == "other"}}/>
+                Other
+            </label>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileRace() -%}
+    <div class="form-group" id="userRace">
+        <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
+        <div style="margin-top: -10px">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="2028-9"> Asian
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="2054-5"> Black or African American
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="2106-3"> White
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="race" value="2131-1"> Other
+                </label>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileEthnicity() -%}
+    <div class="form-group" id="userEthnicity">
+        <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
+        <div style="margin-top: -10px">
+
+            <div class="radio">
+                <label>
+                    <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
+                </label>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileEmail(person) -%}
+    <div class="form-group float-input-label" id="emailGroup">
+        <label for="email">Email address</label>
+        <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person.email }}" data-customemail="true" required>
+        <div class="help-block with-errors" id="erroremail"></div>
+    </div>
+{%- endmacro %}
+
+{% macro profilePhone(person) -%}
+    <div class="form-group float-input-label">
+        <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person.phone }}">
+    </div>
+{%- endmacro %}
+
+<!--this has an ajax call to fill in the content-->
+{% macro profileOrg(person) -%}
+    <div class="form-group" id="userOrgs">
+        <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
+        <div style="margin-left: 10px">
+        <div id="fillOrgs"></div>
+        <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+        </div>
+    </div>
+    <script>$(function () { tnthAjax.getOrgs({{ user.id }}); });</script>
+{%- endmacro %}
+
+{% macro profileRole(person, current_user) -%}
+    {% if current_user.has_role('admin') and not person.has_role('service') %}
+        <p>User Roles for {{ person.username }}</p>
+        <p class="small-text text-muted">Editable by admins only.</small></p>
+        <div class="form-group" id="rolesGroup" style="margin-left: 10px">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="admin"> Admin
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="anon"> Anon
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="application_developer"> Application Developer
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="content_manager"> Content Manager
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="partner"> Partner
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="patient"> Patient
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="provider"> Provider
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="test"> Test
+                </label>
+            </div>
+        </div>
+    {% endif %}
+
+{%- endmacro %}
+
+{% macro profile(person, current_user) -%}
+    <div class="row" style="position: relative;">
+        <div class="col-md-9">
+            {{profileImage(person)}}
+            {{profileName(person)}}
+            {{profileBirthDate(person)}}
+            {{profileGender(person)}}
+            {{profileEthnicity()}}
+            {{profileRace()}}
+            {{profileEmail(person)}}
+            {{profilePhone(person)}}
+            {{profileRole(person, current_user)}}
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro profileSaveBtn() -%}
+    <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+    <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
+    <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
+{%- endmacro %}
