@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
 {% block main %}
 
+{% if config.SHOW_EXPLORE %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Explore TrueNTH</h2>
     <p>Discover online tools to guide you through the cancer journey.</p>
     <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
 </div>
+{% endif %}
 
 {# present each intervention in turn if configured for user #}
 {% for intervention in interventions %}
