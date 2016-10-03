@@ -11,7 +11,7 @@ from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
-from ..models.intervention import INTERVENTION
+from ..models.intervention import Intervention, INTERVENTION
 from ..models.message import EmailMessage
 from ..models.organization import OrganizationIdentifier
 from ..models.role import ROLE
@@ -128,8 +128,10 @@ def home():
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.PROVIDER):
         return redirect(url_for('patients.patients_root'))
+    interventions =\
+            Intervention.query.order_by(Intervention.display_rank).all()
     return render_template('portal.html', user=user,
-                           interventions=INTERVENTION)
+                           interventions=interventions)
 
 
 @portal.route('/admin')
