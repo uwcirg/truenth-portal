@@ -42,6 +42,7 @@ class Intervention(db.Model):
     link_url = db.Column(db.Text)
     status_text = db.Column(db.Text)
     public_access = db.Column(db.Boolean, default=True)
+    display_rank = db.Column(db.Integer)
 
     client = db.relationship('Client',
         primaryjoin="Client.client_id==Intervention.client_id",
@@ -60,7 +61,7 @@ class Intervention(db.Model):
         """
         d = {'resourceType': 'Intervention'}
         for attr in ('name', 'description', 'card_html', 'link_label',
-                     'status_text', 'public_access'):
+                     'status_text', 'public_access', 'display_rank'):
             if getattr(self, attr, None) is not None:
                 d[attr] = getattr(self, attr)
 
@@ -84,7 +85,7 @@ class Intervention(db.Model):
             instance = cls()
 
         for attr in ('name', 'description', 'card_html', 'link_label',
-                     'status_text', 'public_access'):
+                     'status_text', 'public_access', 'display_rank'):
             if data.get(attr, None) is not None:
                 setattr(instance, attr, data[attr])
             else:
