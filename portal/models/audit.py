@@ -36,6 +36,8 @@ class Audit(db.Model):
         d['version'] = self.version
         d['lastUpdated'] = FHIR_datetime.as_fhir(self.timestamp)
         d['by'] = Reference.patient(self.user_id).as_fhir()
+        if self.comment:
+            d['comment'] = self.comment
         return d
 
     @classmethod
