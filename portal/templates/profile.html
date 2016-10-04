@@ -6,18 +6,21 @@
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
-
-{% if current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+{% if providerPerspective == 'true' %}
+{{ back_btn('patients','Patients List') }}
+{% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
 {{ back_btn('admin','User List') }}
 {% else %}
 {{ back_btn(PORTAL,'Home') }}
 {% endif %}
 
 <h3 class="tnth-headline">
-{% if current_user.has_role('admin')%}
-Profile for {{ user.username }}
+{% if providerPerspective == 'true' %}
+     Patient #{{ user.id}} - {{ user.username }}
+{% elif current_user.has_role('admin') %}
+    Profile for {{ user.username }}
 {% else %}
-My TrueNTH Profile
+    My TrueNTH Profile
 {% endif %}
 </h3>
 
@@ -30,8 +33,11 @@ My TrueNTH Profile
         {{profileSaveBtn()}}
 
         <br /><br />
-
-        <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+        {% if providerPerspective == 'true' %}
+            {{ back_btn('patients','Patients List') }}
+        {% else %}
+            <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+        {% endif %}
     </div>
 </div>
 
@@ -41,7 +47,7 @@ My TrueNTH Profile
 {% endblock %}
 
 {% block document_ready %}
-var patientId = {{ user.id }};
+
 $(document).ready(function(){
 
     // When there's a change, check validation and if good, assembleContent

@@ -3,7 +3,7 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="profile-img hidden-xs">
-                    <img src="{{ person.image_url }}" />
+                    <img src="{{ person and person.image_url }}" />
                 </div>
             </div>
         </div>
@@ -11,7 +11,7 @@
 {%- endmacro %}
 
 {% macro profileBirthDate(person) -%}
-    <input type="hidden" name="birthDate" id="birthday" value="{{ person.birthdate if person.birthdate }}">
+    <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
     <div class="form-group" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
@@ -54,20 +54,20 @@
      </script>
 {%- endmacro %}
 
-{% macro profileName(person) -%}
+{% macro profileName(person, isFocus=False) -%}
     <div class="form-group" style="margin-bottom: 0">
         <label>Name</label>
     </div>
     <div class="row">
         <div class="col-xs-6">
             <div class="form-group float-input-label">
-                <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ person.first_name if person.first_name }}" type="text" />
+                <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="col-xs-6">
             <div class="form-group float-input-label">
-                <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person.last_name }}" type="text" />
+                <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
@@ -79,15 +79,15 @@
         <label>Gender</label>
         <div style="margin-top: -10px">
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person.gender == "male"}}/>
+                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 Male
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person.gender == "female"}}/>
+                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person and person.gender == "female"}}/>
                 Female
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person.gender == "other"}}/>
+                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person and person.gender == "other"}}/>
                 Other
             </label>
         </div>
@@ -154,15 +154,76 @@
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label" id="emailGroup">
         <label for="email">Email address</label>
-        <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person.email }}" data-customemail="true" required>
+        <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
+{%- endmacro %}
+
+{% macro profileSendEmail(person) -%}
+    {% if (person and person.email) %}
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
+            <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
+                <input type="hidden" name="recipients" id="recipients" value="{{person.email}}" />
+                <input type="hidden" name="subject" id="subject" value=""/>
+                <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+                <input type="hidden" name="body" id="body" value=""/>
+                <label>Send Email to Patient</label>
+                <select  id="profileEmailSelect" class="form-control bd-element">
+                    <option value="">Select e-mail..</option>
+                    <option value="invite">Registration Invitation for TrueNTH</option>
+                    <option value="reminder">Registration Reminder for TrueNTH</option>
+                </select>
+                <button id="btnProfileSendEmail" class="btn btn-default btn-sm disabled">Send Email</button>
+                <div id="profileEmailMessage" class="text-info"></div>
+            </form>
+        </div>
+        <script>$(function () {
+            
+            $('#profileEmailSelect').on('change', function() {
+                var message = '';
+                //console.log('option value' + this.value );
+                console.log(location)
+                if (this.value != '') {
+                    message =  $(this).children('option:selected').text() + ' Email Will be Sent to ' + $('#email').val();
+                    $('#profileEmailMessage').text(message);
+                    $('#btnProfileSendEmail').removeClass('disabled');
+                } else {
+                    $('#profileEmailMessage').text('');
+                    $('#btnProfileSendEmail').addClass('disabled');
+                }
+            });
+
+            $('#btnProfileSendEmail').on('click', function(event) {
+                event.preventDefault();
+                var emailTypeElem = $('#profileEmailSelect');
+                var selectedOption = emailTypeElem.children('option:selected');
+                if (selectedOption.val() != '') {
+                    $('#subject').val(selectedOption.text());
+                    $('#body').val("http://" + location.host + "/access/" + $("#_userId").val());
+                    $.ajax ({
+                        type: 'POST',
+                        url: '/invite',
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: {'subject': $('#subject').val(), 'recipients': $('#recipients').val(), 'body': $('#body').val()}
+                    }).done(function(data) {
+                        //console.log('data ' + data);
+                        $("#profileEmailMessage").text(selectedOption.text() + ' Email Sent to ' + $('#email').val());
+                    }).fail(function() {
+                        console.log('failed request');
+                        $("#profileEmailMessage").text('Unable to send email.');
+                    });
+                }
+            });
+
+
+         });</script>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
     <div class="form-group float-input-label">
         <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person.phone }}">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
     </div>
 {%- endmacro %}
 
@@ -175,11 +236,11 @@
         <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
     </div>
-    <script>$(function () { tnthAjax.getOrgs({{ user.id }}); });</script>
+    <script>$(function () { if (user) tnthAjax.getOrgs({{ user.id }}); });</script>
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if current_user.has_role('admin') and not person.has_role('service') %}
+    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <p>User Roles for {{ person.username }}</p>
         <p class="small-text text-muted">Editable by admins only.</small></p>
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
@@ -239,6 +300,7 @@
             {{profileRace()}}
             {{profileEmail(person)}}
             {{profilePhone(person)}}
+            {{profileSendEmail(person)}}
             {{profileRole(person, current_user)}}
         </div>
     </div>
@@ -246,7 +308,8 @@
 
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.</small></p>
+    <p id="serviceErrorMsg" class="text-muted text-center bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
 {%- endmacro %}

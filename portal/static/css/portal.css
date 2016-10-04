@@ -747,3 +747,28 @@ fieldset[disabled] .btn-google.active {
   color: #dd4b39;
   background-color: #fff;
 }
+
+#profileCreateForm  .title {
+  margin-top: 5%;
+}
+
+#profileSendEmailContainer {
+  margin-top: 5%;
+  margin-bottom: 5%;
+  padding-bottom: 7%;
+}
+
+#btnProfileSendEmail {
+  margin-top: 5%;
+  font-size: 0.7em;
+}
+
+#profileEmailMessage {
+  font-size: 0.6em;
+  margin-top: 1em;
+  margin-left:0.5em;
+}
+
+#profileIntro a {
+  text-decoration: underline
+}

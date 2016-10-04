@@ -176,7 +176,9 @@ def invite_sent(message_id):
     current_user().check_role('view', other_id=message.user_id)
     return render_template('invite_sent.html', message=message)
 
-
+@portal.route('/profile_create')
+def profile_create():
+    return render_template('profile_create.html')
 @portal.route('/profile', defaults={'user_id': None})
 @portal.route('/profile/<int:user_id>')
 @oauth.require_oauth()
