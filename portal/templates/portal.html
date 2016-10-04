@@ -7,16 +7,22 @@
     <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
 </div>
 
-{# present each intervention named below in turn if configured for user #}
+{# present each intervention in turn if configured for user #}
 {% for intervention in interventions %}
     {% set display = intervention.display_for_user(user) %}
     {% if display.access %}
         <div class="portal-item">
             <h2 class="tnth-subhead">{{ intervention.description }}</h2>
             {{ display.card_html | safe }}
+            {% if display.link_url is none %}
+            <a class="btn-lg btn-tnth-primary disabled" href="{{ display.link_url }}">
+                {{ display.link_label }}
+            </a>
+            {% else %}
             <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
                 {{ display.link_label }}
             </a>
+            {% endif %}
         </div>
     {% endif %}
 {% endfor %}
