@@ -29,7 +29,12 @@ def patients_root():
 
 @patients.route('/profile_create')
 def profile_create():
-    return render_template('profile_create.html')
+    user = current_user()
+    patients_by_org = {}
+    for org in user.organizations:
+        patients_by_org[org.name] = [user for user in org.users if
+                                     user.has_role(ROLE.PATIENT)]
+    return render_template('profile_create.html', patients_by_org=patients_by_org)
 
 @patients.route('/patient_profile/<int:patient_id>')
 @oauth.require_oauth()

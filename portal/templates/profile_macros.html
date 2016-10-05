@@ -160,29 +160,41 @@
 {%- endmacro %}
 
 {% macro profileSendEmail(person) -%}
-    {% if (person and person.email and person.has_role('patient')) %}
+    {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
-                <input type="hidden" name="recipients" id="recipients" value="{{person.email}}" />
-                <input type="hidden" name="subject" id="subject" value=""/>
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-                <input type="hidden" name="body" id="body" value=""/>
                 <label>Send Email to Patient</label>
                 <select  id="profileEmailSelect" class="form-control bd-element">
                     <option value="">Select e-mail..</option>
-                    <option value="invite">Registration Invitation for TrueNTH</option>
-                    <option value="reminder">Registration Reminder for TrueNTH</option>
+                    <option value="invite">Registration Invitation for ePROMs</option>
+                    <option value="reminder">Registration Reminder for ePROMs</option>
                 </select>
                 <button id="btnProfileSendEmail" class="btn btn-default btn-sm disabled">Send Email</button>
                 <div id="profileEmailMessage" class="text-info"></div>
             </form>
         </div>
         <script>$(function () {
+            getUrl();
+            function getUrl() {
+                var url = '';
+                $.ajax ({
+                    type: 'GET',
+                    url: '/api/user/' + $("#_userId").val() + '/access_url',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    async: false
+                }).done(function(data) {
+                    url = data['access_url'];
+                    console.log(url);
+                }).fail(function() {
+                    console.log('failed request');
+                });
+                return url;
+            };
 
             $('#profileEmailSelect').on('change', function() {
                 var message = '';
-                //console.log('option value' + this.value );
-                console.log(location)
                 if (this.value != '') {
                     message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
                     $('#profileEmailMessage').text(message);
@@ -197,22 +209,27 @@
                 event.preventDefault();
                 var emailTypeElem = $('#profileEmailSelect');
                 var selectedOption = emailTypeElem.children('option:selected');
+                var email = $('#email').val();
+
                 if (selectedOption.val() != '') {
-                    $('#subject').val(selectedOption.text());
-                    $('#body').val("http://" + location.host + "/access/" + $("#_userId").val());
-                    $.ajax ({
-                        type: 'POST',
-                        url: '/invite',
-                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        data: {'subject': $('#subject').val(), 'recipients': $('#recipients').val(), 'body': $('#body').val()}
-                    }).done(function(data) {
-                        //console.log('data ' + data);
-                        $("#profileEmailMessage").text(selectedOption.text() + ' email sent to ' + $('#email').val());
-                    }).fail(function() {
-                        console.log('failed request');
-                        $("#profileEmailMessage").text('Unable to send email.');
-                    });
-                }
+                    var url = getUrl();
+                    if (url != '') {
+                        $.ajax ({
+                            type: 'POST',
+                            url: '/invite',
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            data: {'subject': selectedOption.text(), 'recipients': email, 'body': url}
+                        }).done(function(data) {
+                            console.log('data ' + data);
+                            $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
+                        }).fail(function() {
+                            console.log('failed request');
+                            $('#profileEmailMessage').text('Unable to send email.');
+                        });
+                    } else {
+                        $('#profileEmailMessage').text('Unable to generate URL for email');
+                    };
+                };
             });
 
 
@@ -236,15 +253,16 @@
         <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
     </div>
-    <script>$(function () { if (user) tnthAjax.getOrgs({{ user.id }}); });</script>
+    <script>$(function () { if ((typeof person != 'undefined') && person) tnthAjax.getOrgs({{ person.id }}); });</script>
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <p>User Roles for {{ person.username }}</p>
         <p class="small-text text-muted">Editable by admins only.</small></p>
+        <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
-            <div class="checkbox">
+            <!-- <div class="checkbox">
                 <label>
                     <input type="checkbox" name="user_type" value="admin"> Admin
                 </label>
@@ -284,6 +302,11 @@
                     <input type="checkbox" name="user_type" value="test"> Test
                 </label>
             </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="write_only"> Write Only
+                </label>
+            </div> -->
         </div>
     {% endif %}
 

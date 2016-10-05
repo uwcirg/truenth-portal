@@ -165,6 +165,11 @@ var fillContent = {
             html: true
         });
     },
+    "roleList": function(data) {
+        data.roles.forEach(function(role) {
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' >" + role.name.replace("_", " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+        });
+    },
     "roles": function(data,isProfile) {
         $.each(data.roles, function(i,val){
             var userRole = val.name;
@@ -188,7 +193,7 @@ var fillContent = {
                     $("#patientQ, #bdGroup").hide();
                 }
             }
-        })
+        });
     }
 };
 
@@ -404,11 +409,22 @@ var tnthAjax = {
             console.log("Problem deleting procedure on server.");
         });
     },
+    "getRoleList": function() {
+        $.ajax({
+            type: "GET",
+            url: "/api/roles",
+            async: false
+        }).done(function(data) {
+            fillContent.roleList(data);
+        });
+    },
     "getRoles": function(userId,isProfile) {
+        var self = this;
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+'/roles'
         }).done(function(data) {
+            self.getRoleList();
             fillContent.roles(data,isProfile);
         }).fail(function() {
             console.log("Problem retrieving data from server.");

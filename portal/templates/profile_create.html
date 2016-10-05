@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
@@ -47,7 +47,7 @@ $(document).ready(function(){
                 $('#errorMsg').hide();
 
                 _get('/api/account', 'POST').then(function(responseData) {
-                    
+
                     _userId = responseData['user_id'];
                     console.log("userId: " + _userId);
 
@@ -62,9 +62,11 @@ $(document).ready(function(){
                         { "system": "phone", "value": $("input[name=phone]").val() }
                     ];
 
+                    //Adding demographic information
+                    //Adding roles of patient and write_only for user
                     Promise.all([
-                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)), 
-                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({"roles": [{"name": "patient"}]}))])
+                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({"roles": [{"name": "patient"}, {"name": "write_only"}]}))])
                     .then(function(results) {
                         // Both promises resolved
                         //console.log("promises resolved");
@@ -75,11 +77,12 @@ $(document).ready(function(){
                     })
                     .catch(function(error) {
                         // One or more promises was rejected
-                        $("#serviceErrorMsg").html("<small>" + error + "</small>");
+                        $("#serviceErrorMsg").html("<small>" + error + "</small>").fadeIn();
+
                     });
                 }).catch(function(e) {
                     //Display Error Here
-                    $("#serviceErrorMsg").html("<small>" + error + "</small>");
+                    $("#serviceErrorMsg").html("<small>" + error + "</small>").fadeIn();
                 });
 
           };
