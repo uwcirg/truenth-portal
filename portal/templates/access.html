@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block main %}
+<style>
+    #tnthNavWrapper {
+        display: none;
+    }
+    #mainDiv {
+        background: none;
+    }
+</style>
+
+<div id="fullSizeBox" class="box-min-400">
+    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
+
+    <div id="fullSizeContainer">
+
+        <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
+
+        <div id="wellContainer">
+
+            <div class="tnth-splash">
+
+                <div id="wellContent">
+
+                    <div class="headline">
+                        <div style="margin-bottom: 1em">Welcome to TrueNTH</div>
+                        Tools for navigating the prostate cancer journey
+                    </div>
+                     <a href="/home" class="btn feature-btn feature-btn-primary">Report Symptoms</a> &nbsp; &nbsp;
+                     <a href="/initial-queries" class="btn feature-btn feature-btn-primary">Full Register</a>
+
+                </div>
+                <div class="tnth-splash-bottom">
+                    <a href="/explore" class="tnth-splash-bottom-link"><span class="hidden-xs">Explore How This Works</span><span class="hidden-sm hidden-md hidden-lg">Explore</span></a><span class="tnth-splash-bottom-link separator"></span><a href="/about" class="tnth-splash-bottom-link"><span class="hidden-xs">Learn About TrueNTH</span><span class="hidden-sm hidden-md hidden-lg">Learn</span></a>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

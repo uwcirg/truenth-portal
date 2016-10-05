@@ -160,7 +160,7 @@
 {%- endmacro %}
 
 {% macro profileSendEmail(person) -%}
-    {% if (person and person.email) %}
+    {% if (person and person.email and person.has_role('patient')) %}
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="recipients" id="recipients" value="{{person.email}}" />
@@ -178,13 +178,13 @@
             </form>
         </div>
         <script>$(function () {
-            
+
             $('#profileEmailSelect').on('change', function() {
                 var message = '';
                 //console.log('option value' + this.value );
                 console.log(location)
                 if (this.value != '') {
-                    message =  $(this).children('option:selected').text() + ' Email Will be Sent to ' + $('#email').val();
+                    message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
                     $('#profileEmailMessage').text(message);
                     $('#btnProfileSendEmail').removeClass('disabled');
                 } else {
@@ -207,7 +207,7 @@
                         data: {'subject': $('#subject').val(), 'recipients': $('#recipients').val(), 'body': $('#body').val()}
                     }).done(function(data) {
                         //console.log('data ' + data);
-                        $("#profileEmailMessage").text(selectedOption.text() + ' Email Sent to ' + $('#email').val());
+                        $("#profileEmailMessage").text(selectedOption.text() + ' email sent to ' + $('#email').val());
                     }).fail(function() {
                         console.log('failed request');
                         $("#profileEmailMessage").text('Unable to send email.');

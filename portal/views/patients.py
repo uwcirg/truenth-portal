@@ -27,6 +27,9 @@ def patients_root():
     return render_template(
         'patients_by_org.html', patients_by_org=patients_by_org, wide_container="true")
 
+@patients.route('/profile_create')
+def profile_create():
+    return render_template('profile_create.html')
 
 @patients.route('/patient_profile/<int:patient_id>')
 @oauth.require_oauth()

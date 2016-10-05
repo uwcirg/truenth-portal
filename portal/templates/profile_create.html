@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn %}
+
+<div id="loadingIndicator" class="loading-indicator">
+    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
+</div>
+
+<h3 class="tnth-headline">New User</h3>
+
+<form id="createProfileForm" class="form tnth-form to-validate" role="form">
+
+<div class="row" style="position: relative;">
+    <div class="col-md-9">
+
+        {{profileName(False, true)}}
+        {{profileBirthDate(False)}}
+        {{profileEmail(False)}}
+        {{profilePhone(False)}}
+
+        <br />
+        {{profileSaveBtn()}}
+        <br />
+       {{ back_btn('patients','Patients List')}}
+    </div>
+</div>
+
+
+</form>
+
+{% endblock %}
+
+{% block document_ready %}
+
+$(document).ready(function(){
+
+    var _userId = '', _demoArray = {};
+
+    $('#createProfileForm').validator().on('submit', function (e) {
+          if (e.isDefaultPrevented()) {
+            // handle the invalid form...
+            $("#errorMsg").fadeIn("slow");
+          } else {
+                // everything looks good!
+                e.preventDefault();
+                $('#errorMsg').hide();
+
+                _get('/api/account', 'POST').then(function(responseData) {
+                    
+                    _userId = responseData['user_id'];
+                    console.log("userId: " + _userId);
+
+                    _demoArray['resourceType'] = 'Patient';
+                    _demoArray["name"] = {
+                        "given": $("input[name=firstname]").val(),
+                        "family": $("input[name=lastname]").val()
+                    };
+                    _demoArray["birthDate"] = $("input[name=birthDate]").val();
+                    _demoArray["telecom"] = [
+                        { "system": "email", "value": $("input[name=email]").val() },
+                        { "system": "phone", "value": $("input[name=phone]").val() }
+                    ];
+
+                    Promise.all([
+                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)), 
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({"roles": [{"name": "patient"}]}))])
+                    .then(function(results) {
+                        // Both promises resolved
+                        //console.log("promises resolved");
+                        $("#confirmMsg").fadeIn();
+                        setTimeout('$("#confirmMsg").fadeOut();', 2000);
+                        //console.log($("#confirmMsg").length);
+                        $("#createProfileForm")[0].reset();
+                    })
+                    .catch(function(error) {
+                        // One or more promises was rejected
+                        $("#serviceErrorMsg").html("<small>" + error + "</small>");
+                    });
+                }).catch(function(e) {
+                    //Display Error Here
+                    $("#serviceErrorMsg").html("<small>" + error + "</small>");
+                });
+
+          };
+    });
+
+    function _get(apiUrl, requestType, requestData) {
+        var errorMessage = '';
+        return new Promise (function(resolve, reject) {
+            $.ajax ({
+                type: (requestType ? requestType : 'GET'),
+                url: apiUrl,
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: requestData
+            }).done(function(data) {
+                resolve(data);
+            }).fail(function() {
+                errorMessage = 'Error processing request: ' + apiUrl;
+                console.log(errorMessage);
+                reject(Error(errorMessage));
+            });
+
+        });
+
+    }
+
+
+
+
+});
+
+
+{% endblock %}
