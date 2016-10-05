@@ -87,6 +87,8 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py
     fi
     pip install --editable --requirement requirements.txt "${GIT_WORK_TREE}"
 
+    # Restart in case celery module updates
+    sudo service celeryd restart
 fi
 
 # DB Changes
