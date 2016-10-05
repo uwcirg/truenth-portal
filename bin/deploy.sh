@@ -103,7 +103,7 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migratio
 fi
 
 # New seed data
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ) ]]; then
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
