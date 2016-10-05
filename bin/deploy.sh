@@ -86,16 +86,7 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py
         echo "Updating python dependancies"
     fi
     pip install --editable --requirement requirements.txt "${GIT_WORK_TREE}"
-fi
 
-# New seed data
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ) ]]; then
-    activate_once
-
-    if [[ $VERBOSE ]]; then
-        echo "Seeding database"
-    fi
-    python "${GIT_WORK_TREE}/manage.py" seed
 fi
 
 # DB Changes
@@ -108,6 +99,17 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migratio
     cd "${GIT_WORK_TREE}"
     python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
+
+# New seed data
+if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/manage.py) && $? -eq 0 ) ]]; then
+    activate_once
+
+    if [[ $VERBOSE ]]; then
+        echo "Seeding database"
+    fi
+    python "${GIT_WORK_TREE}/manage.py" seed
+fi
+
 
 # Celery Changes
 if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/tasks.py) && $? -eq 0 ) ]]; then
