@@ -9,6 +9,7 @@ Interventions will sometimes require their own set of data, for which the
 
 """
 from abc import ABCMeta, abstractmethod
+import sys
 
 from .audit import Audit
 from .fhir import CC
@@ -29,7 +30,8 @@ class Coredata(object):
             self._registered = []
 
         def register_class(self, cls):
-            self._registered.append(cls)
+            if cls not in self._registered:
+                self._registered.append(cls)
 
         def initial_obtained(self, user):
             # Check if all registered methods have data
@@ -38,6 +40,15 @@ class Coredata(object):
                     continue
                 return False
             return True
+
+        def still_needed(self, user):
+            # Returns list of registered still needing data
+            needed = []
+            for cls in self._registered:
+                instance = cls()
+                if not instance.hasdata(user):
+                    needed.append(instance.id)
+            return needed
 
     instance = None
     def __new__(cls):
@@ -63,6 +74,12 @@ class CoredataPoint(object):
         """Returns true if the data has been obtained, false otherwise"""
         raise NotImplemented
 
+    @property
+    def id(self):
+        """Returns identifier for class - namely lowercase w/o Data suffix"""
+        name = self.__class__.__name__
+        return name[:-4].lower()
+
 ###
 ## Series of "datapoint" collection classes follow
 ###
@@ -71,7 +88,7 @@ class CoredataPoint(object):
 class DobData(CoredataPoint):
     def hasdata(self, user):
         # DOB is only required for patient and partner
-        roles = (r.name for r in user.roles)
+        roles = [r.name for r in user.roles]
         if ROLE.PROVIDER in roles:
             return True
         elif ROLE.PATIENT in roles or ROLE.PARTNER in roles:
@@ -127,5 +144,19 @@ def configure_coredata(app):
     coredata = Coredata()
 
     # Add static list of "configured" datapoints
-    for cls in (DobData, RoleData, OrgData, ClinicalData, TouData):
+    config_datapoints = app.config.get(
+        'REQUIRED_CORE_DATA', ['dob', 'role', 'org', 'clinical', 'tou'])
+
+    for name in config_datapoints:
+        # Camel case with 'Data' suffix - expect to find class in local
+        # scope or raise exception
+        cls_name = name.title() + 'Data'
+        try:
+            # limit class loading to this module - die if not found
+            cls = getattr(sys.modules[__name__], cls_name)
+        except AttributeError as e:
+            app.logger.error("Configuration for REQUIRED_CORE_DATA includes "
+                             "unknown element '{}' - can't continue".format(
+                                 name))
+            raise e
         coredata.register_class(cls)
