@@ -48,6 +48,9 @@ STATIC_ROLES = IterableUserDict({
         'Reserved for automated service accounts needing API access',
     'test':
         'Designates a testing user',
+    'write_only':
+        'Limited access account, write only, cannot view data from '
+        'previous sessions',
 })
 
 

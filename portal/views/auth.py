@@ -159,7 +159,7 @@ def login(provider_name):
         session['id'] = user_id
         user = current_user()
         login_user(user)
-        return redirect('/')
+        return next_after_login()
 
     def picture_url(result):
         """Using OAuth result, fetch the user's picture URL"""
