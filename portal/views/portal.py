@@ -1,6 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
-from flask import current_app, Blueprint, jsonify, render_template
+from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
 from flask_user import roles_required
@@ -16,7 +16,7 @@ from ..models.message import EmailMessage
 from ..models.organization import OrganizationIdentifier
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
-from ..extensions import db, oauth
+from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
@@ -80,6 +80,49 @@ def specific_clinic_landing(clinic_alias):
         identifier_id=identifier.id).one()
     session['associate_clinic_id'] = results.organization_id
 
+    return redirect(url_for('portal.landing'))
+
+
+@portal.route('/access/<string:token>')
+def access_via_token(token):
+    """Limited access users enter here with special token as auth
+
+    Tokens contain encrypted data including the user_id and timestamp
+    from when it was generated.
+
+    If the token is found to be valid, the user will be directly logged
+    in, after confirming the account still has minimal privleges
+
+    The tokens are intended to be single use, but the business rules
+    aren't clear yet. ... TODO
+
+    """
+    # Confirm the token is valid, and not expired.
+    valid_seconds = current_app.config.get(
+        'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
+    is_valid, has_expired, user_id = user_manager.token_manager.verify_token(
+        token, valid_seconds)
+    if has_expired:
+        flash('Your access token has expired.', 'error')
+        return redirect(url_for('portal.landing'))
+    if not is_valid:
+        flash('Your access token is invalid.', 'error')
+        return redirect(url_for('portal.landing'))
+
+    # Valid token - confirm user id looks legit
+    user = get_user(user_id)
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
+    has = set([role.name for role in user.roles])
+    if not has.isdisjoint(not_allowed):
+        abort(400, "Access URL not allowed for privileged accounts")
+    if ROLE.WRITE_ONLY in has:
+        # legit - log in and redirect
+        auditable_event("login using access_via_token", user_id=user.id)
+        session['id'] = user.id
+        login_user(user)
+        return next_after_login()
+
+    flash('Access token for privledged account not allowed.', 'error')
     return redirect(url_for('portal.landing'))
 
 

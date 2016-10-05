@@ -1,8 +1,10 @@
 """User API view functions"""
-from flask import abort, Blueprint, jsonify
+from flask import abort, Blueprint, jsonify, url_for
 from flask import request
+from flask_user import roles_required
 
 from ..audit import auditable_event
+from ..extensions import db, oauth, user_manager
 from ..models.audit import Audit
 from ..models.group import Group
 from ..models.role import ROLE, Role
@@ -10,8 +12,6 @@ from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
-from ..extensions import oauth
-from ..extensions import db
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -58,6 +58,7 @@ def me():
 
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE])
 def account():
     """Create a user account
 
@@ -87,6 +88,72 @@ def account():
     auditable_event("new account {} generated".format(user.id),
                     user_id=current_user().id)
     return jsonify(user_id=user.id)
+
+
+@user_api.route('/user/<int:user_id>/access_url')
+@oauth.require_oauth()
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE])
+def access_url(user_id):
+    """Returns simple JSON with one-time, unique access URL for given user
+
+    Generates a single use access token for the given user as a
+    one click, weak authentication access to the system.
+
+    NB - user must be a member of the WRITE_ONLY role, and not a member
+    of privileged roles, as a safeguard from abuse.
+
+    ---
+    tags:
+      - User
+    operationId: access_url
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID to grant access via unique URL
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - access_url
+          properties:
+            access_url:
+              type: string
+              description: The unique URL providing one time access
+      400:
+        description:
+          if the user has too many privileges for weak authentication
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+      404:
+        description: if the user isn't found
+
+    """
+    user = get_user(user_id)
+    if not user:
+        abort(404, "User {} not found".format(user_id))
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
+    has = set([role.name for role in user.roles])
+    if not has.isdisjoint(not_allowed):
+        abort(400, "Access URL not provided for privileged accounts")
+    if not ROLE.WRITE_ONLY in has:
+        abort(400, "Account {} lacks WRITE_ONLY role".format(user_id))
+
+    # generate an access token
+    token = user_manager.token_manager.generate_token(user_id)
+    access_url = url_for(
+        'portal.access_via_token', token=token, _external=True)
+    auditable_event("generated access token for user {}".format(user_id),
+                    user_id=current_user().id)
+    return jsonify(access_url=access_url)
 
 
 @user_api.route('/user/<int:user_id>/consent')
