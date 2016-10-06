@@ -5,7 +5,6 @@ from tests import TestCase
 from portal.extensions import db
 from portal.models.coredata import Coredata
 from portal.models.role import ROLE
-from portal.models.tou import ToU
 
 
 class TestCoredata(TestCase):
@@ -33,3 +32,15 @@ class TestCoredata(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.assertTrue(Coredata().initial_obtained(self.test_user))
+
+    def test_still_needed(self):
+        """Query for list of missing datapoints in legible format"""
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.test_user = db.session.merge(self.test_user)
+
+        needed = Coredata().still_needed(self.test_user)
+        self.assertTrue(len(needed) > 1)
+        self.assertTrue('dob' in needed)
+        self.assertTrue('tou' in needed)
+        self.assertTrue('clinical' in needed)
+        self.assertTrue('org' in needed)
