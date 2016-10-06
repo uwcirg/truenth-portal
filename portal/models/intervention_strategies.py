@@ -24,6 +24,7 @@ from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
+from .role import Role
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
 
@@ -99,6 +100,30 @@ def not_in_clinic_list(org_list):
             return True
 
     return user_not_registered_with_clinics
+
+def not_in_role_list(role_list):
+    """Requires user isn't associated with any role in the list"""
+    roles = []
+    for role in role_list:
+        try:
+            role = Role.query.filter_by(
+                name=role).one()
+            roles.append(role)
+        except NoResultFound:
+            raise ValueError("role '{}' not found".format(role))
+        except MultipleResultsFound:
+            raise ValueError("more than one role named '{}'"
+                             "found".format(role))
+    dont_want = set(roles)
+
+    def user_not_given_role(intervention, user):
+        has = set(user.roles)
+        if has.isdisjoint(dont_want):
+            _log(result=True, func_name='not_in_role_list', user=user,
+                 intervention=intervention.name)
+            return True
+
+    return user_not_given_role
 
 def allow_if_not_in_intervention(intervention_name):
     """Returns function implementing strategy API checking that user does not belong to named intervention"""

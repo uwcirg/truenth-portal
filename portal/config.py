@@ -28,6 +28,8 @@ class BaseConfig(object):
     PROJECT = "portal"
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    SHOW_EXPLORE = True
+    SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
     TESTING = False

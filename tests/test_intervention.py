@@ -12,6 +12,7 @@ from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
+from portal.models.user import add_role
 
 class TestIntervention(TestCase):
 
@@ -246,6 +247,38 @@ class TestIntervention(TestCase):
 
         self.assertFalse(ds_p3p.display_for_user(user).access)
         self.assertTrue(ds_wc.display_for_user(user).access)
+
+    def test_not_in_role_list(self):
+        user = self.test_user
+        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+
+        ds_p3p.public_access = False
+
+        with SessionScope(db):
+            d = {'function': 'not_in_role_list',
+                 'kwargs': [{'name': 'role_list',
+                            'value': [ROLE.WRITE_ONLY,]}]}
+            strat = AccessStrategy(
+                name="Only get P3P if not in WRITE_ONLY",
+                intervention_id = ds_p3p.id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # Prior to granting user WRITE_ONLY role, the strategy
+        # should give access to p3p
+        self.assertTrue(ds_p3p.display_for_user(user).access)
+
+        # Add WRITE_ONLY to user's roles
+
+        add_role(user, ROLE.WRITE_ONLY)
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        self.assertFalse(ds_p3p.display_for_user(user).access)
+
 
     def test_side_effects(self):
         """Test strategy with side effects"""

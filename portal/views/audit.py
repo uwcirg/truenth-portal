@@ -1,8 +1,8 @@
 """Views for audit"""
-from flask import abort, jsonify, Blueprint, request
+from flask import abort, jsonify, Blueprint
 from flask_user import roles_required
 
-from ..extensions import db, oauth
+from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
 from ..models.role import ROLE
@@ -13,7 +13,7 @@ audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 @audit_api.route('/user/<int:user_id>/audit')
 @oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
-def get_tou(user_id):
+def get_audit(user_id):
     """Access audit info for given user
 
     Returns array of audit data for requested user.
@@ -22,7 +22,7 @@ def get_tou(user_id):
     ---
     tags:
       - Audit
-    operationId: getAudit
+    operationId: get_audit
     produces:
       - application/json
     parameters:
@@ -44,6 +44,13 @@ def get_tou(user_id):
             - version
           properties:
             by:
+              type: object
+              description: A reference from one resource to another
+              properties:
+                reference:
+                  type: string
+                  externalDocs:
+                    url: http://hl7.org/implement/standards/fhir/DSTU2/references-definitions.html#Reference.reference
               type: string
               description:
                 Reference to user who generated the auditable event
