@@ -1,14 +1,16 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, bgGroup, patientQGroup, clinic %}
+{% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic %}
 
   <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
   </div>
   <input type="hidden" id="iq_userId" value="{{user.id}}" />
-  
-  {{tou(terms)}}
+
+  {% if 'tou' in still_needed %}
+    {{tou(terms)}}
+  {% endif %}
 
   <div id="aboutForm" class="tnth-hide">
 
@@ -21,12 +23,22 @@
 
       <p>First, tell us who you are:</p>
 
-      {{nameGroup()}}
-      {{rolesGroup()}}
-      {{bgGroup()}}
-      {{patientQGroup()}}
-      {{clinic()}}
-   
+      {% if 'name' in still_needed %}
+        {{nameGroup()}}
+      {% endif %}
+      {% if 'role' in still_needed %}
+        {{rolesGroup()}}
+      {% endif %}
+      {% if 'dob' in still_needed %}
+        {{dobGroup()}}
+      {% endif %}
+      {% if 'clinical' in still_needed %}
+        {{patientQGroup()}}
+      {% endif %}
+      {% if 'org' in still_needed %}
+        {{clinic()}}
+      {% endif %}
+
     <br />
     <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
     <br />

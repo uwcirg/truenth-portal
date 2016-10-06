@@ -133,6 +133,11 @@ class ClinicalData(CoredataPoint):
         return all(required.values())
 
 
+class NameData(CoredataPoint):
+    def hasdata(self, user):
+        return  user.first_name and user.last_name
+
+
 class TouData(CoredataPoint):
     def hasdata(self, user):
         return  ToU.query.join(Audit).filter(
@@ -145,7 +150,7 @@ def configure_coredata(app):
 
     # Add static list of "configured" datapoints
     config_datapoints = app.config.get(
-        'REQUIRED_CORE_DATA', ['dob', 'role', 'org', 'clinical', 'tou'])
+        'REQUIRED_CORE_DATA', ['name', 'dob', 'role', 'org', 'clinical', 'tou'])
 
     for name in config_datapoints:
         # Camel case with 'Data' suffix - expect to find class in local
