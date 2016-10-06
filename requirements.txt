@@ -28,7 +28,7 @@ flask-swagger==0.2.12
 Flask-Testing==0.6.1
 -e git+https://github.com/pbugni/Flask-User.git#egg=Flask-User-0.6.8.1
 Flask-WebTest==0.0.7
-Flask-WTF==0.13
+Flask-WTF==0.13.1
 functools32==3.2.3.post2
 imagesize==0.7.1
 itsdangerous==0.24
