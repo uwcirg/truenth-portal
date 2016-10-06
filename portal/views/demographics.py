@@ -27,7 +27,7 @@ def demographics(patient_id):
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
     At some point this may be extended to return a more role specific FHIR
-    resource.  At this time, all users, regarless of role, work with the
+    resource.  At this time, all users, regardless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's roles.
     Use the /api/roles endpoints for that purpose.
 
