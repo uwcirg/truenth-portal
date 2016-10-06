@@ -1,6 +1,6 @@
 {% macro profileImage(person) -%}
     {% if person.image_url %}
-        <div class="row">
+        <div class="row profile-section">
             <div class="col-xs-12">
                 <div class="profile-img hidden-xs">
                     <img src="{{ person and person.image_url }}" />
@@ -12,7 +12,7 @@
 
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
-    <div class="form-group" id="bdGroup">
+    <div class="form-group profile-section" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
             <div class="col-xs-4">
@@ -55,10 +55,10 @@
 {%- endmacro %}
 
 {% macro profileName(person, isFocus=False) -%}
-    <div class="form-group" style="margin-bottom: 0">
+    <div class="form-group profile-name-label">
         <label>Name</label>
     </div>
-    <div class="row">
+    <div class="row profile-section name-section">
         <div class="col-xs-6">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
@@ -75,9 +75,9 @@
 {%- endmacro %}
 
 {% macro profileGender(person) -%}
-    <div class="form-group">
+    <div class="form-group profile-section">
         <label>Gender</label>
-        <div style="margin-top: -10px">
+        <div class="profile-radio-list">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 Male
@@ -95,9 +95,9 @@
 {%- endmacro %}
 
 {% macro profileRace() -%}
-    <div class="form-group" id="userRace">
+    <div class="form-group profile-section" id="userRace">
         <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-top: -10px">
+        <div class="profile-radio-list">
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
@@ -133,10 +133,9 @@
 {%- endmacro %}
 
 {% macro profileEthnicity() -%}
-    <div class="form-group" id="userEthnicity">
+    <div class="form-group profile-section" id="userEthnicity">
         <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-top: -10px">
-
+        <div class="profile-radio-list">
             <div class="radio">
                 <label>
                     <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
@@ -152,7 +151,7 @@
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
-    <div class="form-group float-input-label" id="emailGroup">
+    <div class="form-group float-input-label profile-section" id="emailGroup">
         <label for="email">Email address</label>
         <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
@@ -175,7 +174,7 @@
             </form>
         </div>
         <script>$(function () {
-            getUrl();
+
             function getUrl() {
                 var url = '';
                 $.ajax ({
@@ -220,7 +219,7 @@
                             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                             data: {'subject': selectedOption.text(), 'recipients': email, 'body': url}
                         }).done(function(data) {
-                            console.log('data ' + data);
+                           //console.log('data ' + data);
                             $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
                         }).fail(function() {
                             console.log('failed request');
@@ -238,7 +237,7 @@
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
-    <div class="form-group float-input-label">
+    <div class="form-group float-input-label profile-section">
         <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
         <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
     </div>
@@ -246,14 +245,14 @@
 
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person) -%}
-    <div class="form-group" id="userOrgs">
+    <div class="form-group profile-section" id="userOrgs">
         <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-left: 10px">
+        <div class="indent">
         <div id="fillOrgs"></div>
-        <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+        <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
     </div>
-    <script>$(function () { if ((typeof person != 'undefined') && person) tnthAjax.getOrgs({{ person.id }}); });</script>
+    <script>$(function () { tnthAjax.getOrgs({{ person.id if person }}, true); });</script>
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
@@ -323,6 +322,7 @@
             {{profileRace()}}
             {{profileEmail(person)}}
             {{profilePhone(person)}}
+            {{profileOrg(person)}}
             {{profileSendEmail(person)}}
             {{profileRole(person, current_user)}}
         </div>

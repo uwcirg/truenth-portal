@@ -303,7 +303,7 @@ var assembleContent = {
 };
 
 var tnthAjax = {
-    "getOrgs": function(userId) {
+    "getOrgs": function(userId, noOverride) {
         loader(true);
         $.ajax ({
             type: "GET",
@@ -345,20 +345,20 @@ var tnthAjax = {
                    $("#fillOrgs").append(childClinic);
                 });
             });
-            tnthAjax.getDemo(userId);
-            //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures 
+            tnthAjax.getDemo(userId, noOverride);
+            //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures
         }).fail(function() {
             console.log("Problem retrieving data from server.");
             loader();
         });
     },
-    "getDemo": function(userId) {
+    "getDemo": function(userId, noOverride) {
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId
         }).done(function(data) {
             fillContent.orgs(data);
-            fillContent.demo(data);
+            if (!noOverride) fillContent.demo(data);
             loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");
@@ -498,25 +498,28 @@ var tnthAjax = {
 };
 
 $(document).ready(function() {
-    var initial_xhr = $.ajax({
-        url: PORTAL_NAV_PAGE,
-        type:'GET',
-        contentType:'text/plain',
-        //dataFilter:data_filter,
-        //xhr: xhr_function,
-        crossDomain: true
-        //xhrFields: {withCredentials: true},
-    }, 'html')
-    .done(function(data) {
-        embed_page(data);
-        //showSearch();
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-    })
-    .always(function() {
-        // alert( "complete" );
-    });
+
+    if (typeof PORTAL_NAV_PAGE != 'undefined') {
+        var initial_xhr = $.ajax({
+            url: PORTAL_NAV_PAGE,
+            type:'GET',
+            contentType:'text/plain',
+            //dataFilter:data_filter,
+            //xhr: xhr_function,
+            crossDomain: true
+            //xhrFields: {withCredentials: true},
+        }, 'html')
+        .done(function(data) {
+            embed_page(data);
+            //showSearch();
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+        })
+        .always(function() {
+            // alert( "complete" );
+        });
+    }
 
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
