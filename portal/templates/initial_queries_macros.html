@@ -91,9 +91,9 @@
       </div>
   {%- endmacro %}
   {% macro patientQGroup() -%}
-    <div class="tnth-hide" id="patientQ">
+    <div id="patientQ">
         <hr />
-        <div id="patBiopsy" data-topic="biopsy" class="tnth-hide pat-q">
+        <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
           <p>Have you had a prostate cancer biopsy?</p>
           <div class="form-group">
@@ -162,7 +162,7 @@
         </div>
 
       </div>
-      <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
+      <!--<script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>-->
   {%- endmacro %}
   {% macro clinic() -%}
     <div id="clinics" class="tnth-hide">

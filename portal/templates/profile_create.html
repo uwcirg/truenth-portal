@@ -72,7 +72,7 @@ $(document).ready(function(){
                     var demoArray = {};
                     _demoArray["careProvider"] = orgIDs;
 
-                    console.log(_demoArray);
+                    //console.log(_demoArray);
 
 
                     //Adding demographic information
@@ -86,7 +86,8 @@ $(document).ready(function(){
                         $("#confirmMsg").fadeIn();
                         setTimeout('$("#confirmMsg").fadeOut();', 2000);
                         //console.log($("#confirmMsg").length);
-                        $("#createProfileForm")[0].reset();
+                        //$("#createProfileForm")[0].reset();
+                        clear();
                     })
                     .catch(function(error) {
                         // One or more promises was rejected
@@ -122,9 +123,31 @@ $(document).ready(function(){
 
     };
 
-    ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear'].forEach(function(fieldName) {
-        $("#" + fieldName).val('');
-    });
+    
+
+
+    function clear() {
+        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
+            var currentElement = $("#" + fieldName);
+            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : "";
+            switch(_tagName.toLowerCase()) {
+                case "input":
+                    currentElement.val('');
+                    break;
+                case "select":
+                    currentElement.find("option").prop('selected', false);
+                    break;
+                default:
+                    currentElement.val('');
+            };
+
+            $('#month').find('option').prop('selected', false);
+            
+        });
+
+    };
+
+    clear();
 
 });
 

@@ -273,6 +273,7 @@ def explore():
     """Explore TrueNTH page"""
     return render_template('explore.html', user=user)
 
+
 @portal.route('/share-your-story')
 @portal.route('/shareyourstory')
 @portal.route('/shareYourStory')

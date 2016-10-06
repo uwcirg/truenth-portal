@@ -1,11 +1,20 @@
 {% extends "layout.html" %}
 {% block main %}
 
+{% if not user.has_role('write_only') %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Explore TrueNTH</h2>
     <p>Discover online tools to guide you through the cancer journey.</p>
     <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
 </div>
+{% endif %}
+
+{% if user.has_role('write_only') %}
+<div class="portal-item">
+    <h2 class="tnth-subhead">Welcome to TrueNTH</h2>
+    Tools for navigating the prostate cancer journey
+</div>
+{% endif %}
 
 {# present each intervention in turn if configured for user #}
 {% for intervention in interventions %}
@@ -27,6 +36,12 @@
     {% endif %}
 {% endfor %}
 
+{% if user.has_role('write_only') %}
+    <div class="portal-item">
+        <a class="btn-lg btn-tnth-primary" href="javascript:void()">Report Symptom</a>
+        <a class="btn-lg btn-tnth-primary" href="javascript:void()">Complete Registration</a>
+    </div>         
+{% endif %}
 
 <div class="img-with-text flush-with-footer full-width">
     <img src="{{ url_for('static', filename='img/band_man1.jpg') }}" class="img-responsive" />

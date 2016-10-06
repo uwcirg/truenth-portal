@@ -15,11 +15,6 @@ body {
   color: #333;
   font-size: 18px;
 }
-
-div#mainHolder {
-  margin-top: 1.2%;
-}
-
 a {
   color: #57675B;
 }
@@ -36,7 +31,6 @@ a:active {
 .tnth-headline {
   margin: 30px 0 20px;
   font-size: 24px;
-  font-family: Verdana, Geneva, sans-serif;
 }
 .tnth-subhead {
   font-size: 22px;
@@ -439,13 +433,13 @@ a:active {
 @media (min-width: 992px) {
   /** Font sizes changes above 992 **/
   body {
-    font-size: 20px;
+    font-size: 24px;
   }
   .tnth-headline {
-    font-size: 22px;
+    font-size: 32px;
   }
   .tnth-subhead {
-    font-size: 20px;
+    font-size: 29px;
   }
   #fullSizeContainer {
     padding: 30px 0;
@@ -531,7 +525,6 @@ a:active {
     width: 100%;
     height: 100%;
   }
-
   #mainHolder.vertical-center {
     display: table;
     height: 100%;
@@ -755,54 +748,18 @@ fieldset[disabled] .btn-google.active {
   background-color: #fff;
 }
 
-.profile-name-label {
-  margin-bottom:0;
-}
-
-.profile-radio-list {
-  margin-top: -10px;
-}
-
-.noOrg-container {
-  margin: 0.5em 0;
-}
-
-.indent {
-  margin-left: 10px;
-}
-
-.create-user-link {
-  text-decoration: underline;
-}
-
-#profileCreateForm {
-  margin-top: 15%;
-}
-
 #profileCreateForm  .title {
   margin-top: 5%;
 }
 
-#profileCreateForm  .checkbox label {
-  font-size:0.95em;
-}
-
-.profile-section {
-  margin-bottom: 1.4em;
-}
-
-.name-section {
-  margin-bottom: 1.3em;
-}
-
-#profileCreateForm .indent {
-
+#profileCreateForm #userOrgs {
+ font-size:0.8em;
 }
 
 #profileSendEmailContainer {
   margin-top: 5%;
   margin-bottom: 5%;
-  padding-bottom: 6.5%;
+  padding-bottom: 7%;
 }
 
 #btnProfileSendEmail {
@@ -811,7 +768,7 @@ fieldset[disabled] .btn-google.active {
 }
 
 #profileEmailMessage {
-  font-size: 0.7em;
+  font-size: 0.6em;
   margin-top: 1em;
   margin-left:0.5em;
 }
@@ -819,3 +776,8 @@ fieldset[disabled] .btn-google.active {
 #profileIntro a {
   text-decoration: underline
 }
+
+#userSessionsList table{
+  font-size: 0.8em;
+}
+

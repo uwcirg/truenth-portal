@@ -32,7 +32,17 @@ def patients_root():
 @roles_required(ROLE.PROVIDER)
 def profile_create():
     user = current_user()
+    user_orgs = {}
+    for org in user.organizations:
+        user_orgs[org.name] = '1'
     return render_template('profile_create.html', user = user)
+
+
+@patients.route('/sessionReport/<int:user_id>')
+def sessionReport(user_id):
+    user = get_user(user_id)
+    return render_template('sessionReport.html',user=user)
+
 
 @patients.route('/patient_profile/<int:patient_id>')
 @oauth.require_oauth()
