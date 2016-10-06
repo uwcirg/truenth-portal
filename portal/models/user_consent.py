@@ -61,3 +61,29 @@ class UserConsent(db.Model):
         return cls(user_id=data['user_id'],
                    organization_id=data['organization_id'],
                    agreement_url=data['agreement_url'])
+
+
+def fake_consents():
+    """Bootstrap method as we transition from org relations to consent
+
+    Expected as a one time development trick to create fake consent
+    agreements between users and the orgs they currently belong to.
+
+    Should probably have a short life (i.e. delete this and the
+    manager.command if it no longer makes sense.
+
+    """
+    from .organization import UserOrganization
+
+    # Track down all users with orgs
+    users_orgs = db.session.query(User, UserOrganization).filter(
+        User.id == UserOrganization.user_id).distinct(
+            User.id).group_by(User.id, UserOrganization.id)
+    for user, org in users_orgs:
+        # only add consents to "parent" organizations
+        if org.organization.partOf_id is not None:
+            continue
+        existing_org_consents = [uc.org_id for uc in user.consents]
+        if org.id not in existing_org_consents:
+            # CREATE ONE
+            assert("not done")
