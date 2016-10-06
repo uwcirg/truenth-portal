@@ -1,6 +1,14 @@
 {% extends "layout.html" %}
 {% block main %}
 
+{% if config.SHOW_WELCOME %}
+<div class="portal-item">
+    <h2 class="tnth-subhead">Welcome to TrueNTH</h2>
+    <p>Welcome to TrueNTH, this system lets you report your symptoms for
+        the TrueNTH registry.</p>
+</div>
+{% endif %}
+
 {% if config.SHOW_EXPLORE %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Explore TrueNTH</h2>
