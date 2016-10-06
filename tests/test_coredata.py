@@ -42,4 +42,5 @@ class TestCoredata(TestCase):
         self.assertTrue(len(needed) > 1)
         self.assertTrue('dob' in needed)
         self.assertTrue('tou' in needed)
-        self.assertTrue('role' in needed)
+        self.assertTrue('clinical' in needed)
+        self.assertTrue('org' in needed)
