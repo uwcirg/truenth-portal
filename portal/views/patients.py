@@ -32,9 +32,6 @@ def patients_root():
 @roles_required(ROLE.PROVIDER)
 def profile_create():
     user = current_user()
-    user_orgs = {}
-    for org in user.organizations:
-        user_orgs[org.name] = '1'
     return render_template('profile_create.html', user = user)
 
 
