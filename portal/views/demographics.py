@@ -16,7 +16,7 @@ demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 @demographics_api.route('/demographics/<int:patient_id>')
 @oauth.require_oauth()
 def demographics(patient_id):
-    """Get patient demographics
+    """Get patient (or any user's) demographics
 
     Return defined patient demographics fields (eg first name, last name,
     DOB, email, cell phone), as a FHIR patient resource (in JSON)
@@ -25,6 +25,11 @@ def demographics(patient_id):
     (http://www.hl7.org/fhir/patient.html), look in the 'extension'
     list.  This includes 'race' and 'ethnicity'.  See example usage
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
+
+    At some point this may be extended to return a more role specific FHIR
+    resource.  At this time, all users, regarless of role, work with the
+    FHIR patient resource type.  This API has no effect on the user's roles.
+    Use the /api/roles endpoints for that purpose.
 
     ---
     tags:
@@ -65,7 +70,7 @@ def demographics(patient_id):
 @demographics_api.route('/demographics/<int:patient_id>', methods=('PUT',))
 @oauth.require_oauth()
 def demographics_set(patient_id):
-    """Update demographics via FHIR Resource Patient
+    """Update demographics (for any user) via FHIR Resource Patient
 
     Submit a minimal FHIR doc in JSON format including the 'Patient'
     resource type, and any fields to set.
@@ -83,6 +88,11 @@ def demographics_set(patient_id):
     To link a patient with a clinic, use the 'careProvider' entity.  The
     clinic must already be a registered organization.  See the
     [organization endpoints](/dist/#!/Organization).
+
+    At some point this may be extended to consume a more role specific FHIR
+    resource.  At this time, all users, regarless of role, work with the
+    FHIR patient resource type.  This API has no effect on the user's role.
+    Use the /api/roles endpoints for that purpose.
 
     ---
     operationId: setPatientDemographics
