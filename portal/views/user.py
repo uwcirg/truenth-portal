@@ -58,7 +58,8 @@ def me():
 
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
+                ROLE.PROVIDER])
 def account():
     """Create a user account
 
