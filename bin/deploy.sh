@@ -85,7 +85,7 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py
     if [[ $VERBOSE ]]; then
         echo "Updating python dependancies"
     fi
-    pip install --editable --requirement requirements.txt "${GIT_WORK_TREE}"
+    pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
 
     # Restart in case celery module updates
     sudo service celeryd restart

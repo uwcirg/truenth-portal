@@ -248,37 +248,67 @@ class TestIntervention(TestCase):
         self.assertFalse(ds_p3p.display_for_user(user).access)
         self.assertTrue(ds_wc.display_for_user(user).access)
 
-    def test_not_in_role_list(self):
+    def test_not_in_role_or_sr(self):
         user = self.test_user
-        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sr = INTERVENTION.SEXUAL_RECOVERY
 
-        ds_p3p.public_access = False
+        sm.public_access = False
+        sr.public_access = False
+        d = {
+             'function': 'combine_strategies',
+             'kwargs': [
+                 {'name': 'strategy_1',
+                  'value': 'allow_if_not_in_intervention'},
+                 {'name': 'strategy_1_kwargs',
+                  'value': [{'name': 'intervention_name',
+                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 {'name': 'strategy_2',
+                  'value': 'not_in_role_list'},
+                 {'name': 'strategy_2_kwargs',
+                  'value': [{'name': 'role_list',
+                             'value': [ROLE.WRITE_ONLY,]}]}
+                 ]
+            }
 
         with SessionScope(db):
-            d = {'function': 'not_in_role_list',
-                 'kwargs': [{'name': 'role_list',
-                            'value': [ROLE.WRITE_ONLY,]}]}
             strat = AccessStrategy(
-                name="Only get P3P if not in WRITE_ONLY",
-                intervention_id = ds_p3p.id,
+                name="SELF_MANAGEMENT if not SR and not in WRITE_ONLY",
+                intervention_id = sm.id,
                 function_details=json.dumps(d))
+            #print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
-        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        user, sm, sr = map(db.session.merge, (user, sm, sr))
 
         # Prior to granting user WRITE_ONLY role, the strategy
         # should give access to p3p
-        self.assertTrue(ds_p3p.display_for_user(user).access)
+        self.assertTrue(sm.display_for_user(user).access)
 
         # Add WRITE_ONLY to user's roles
-
         add_role(user, ROLE.WRITE_ONLY)
         with SessionScope(db):
             db.session.commit()
-        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        user, sm, sr = map(db.session.merge, (user, sm, sr))
+        self.assertFalse(sm.display_for_user(user).access)
 
-        self.assertFalse(ds_p3p.display_for_user(user).access)
+        # Revert role change for next condition
+        user.roles = []
+        with SessionScope(db):
+            db.session.commit()
+        user, sm, sr = map(db.session.merge, (user, sm, sr))
+        self.assertTrue(sm.display_for_user(user).access)
 
+        # Grant user sr access, they should lose sm visibility
+        ui = UserIntervention(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id,
+            access='granted')
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+        user, sm, sr = map(db.session.merge, (user, sm, sr))
+        self.assertFalse(sm.display_for_user(user).access)
 
     def test_side_effects(self):
         """Test strategy with side effects"""
@@ -528,6 +558,120 @@ class TestIntervention(TestCase):
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
         self.assertEquals(user.organizations.count(), 0)
         self.assertTrue(ds_p3p.display_for_user(user).access)
+
+    def test_eproms_p3p_conditions(self):
+        # Test the list of conditions expected for p3p on eproms
+        # very similar to truenth p3p, plus ! role write_only
+        ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
+        ds_p3p.public_access = False
+        user = self.test_user
+        ucsf = Organization(name='UCSF Medical Center')
+        uw = Organization(name='UW Medicine (University of Washington)')
+        user.organizations.append(ucsf)
+        user.organizations.append(uw)
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False
+        with SessionScope(db):
+            db.session.commit()
+        ucsf, user, uw = map(db.session.merge, (ucsf, user, uw))
+
+        # Full logic from story #127433167
+        description = ("[strategy_1: (user NOT IN sexual_recovery)] "
+            "AND [strategy_2 <a nested combined strategy>: "
+            "((user NOT IN list of clinics (including UCSF)) OR "
+            "(user IN list of clinics including UCSF and UW))] "
+            "AND [strategy_3: (user has NOT started TX)] "
+            "AND [strategy_4: (user does NOT have PCaMETASTASIZE)] "
+            "AND [startegy_5: (user does NOT have roll WRITE_ONLY)]")
+
+        d = {'function': 'combine_strategies',
+             'kwargs': [
+                 # Not in SR (strat 1)
+                 {'name': 'strategy_1',
+                  'value': 'allow_if_not_in_intervention'},
+                 {'name': 'strategy_1_kwargs',
+                  'value': [{'name': 'intervention_name',
+                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                 # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
+                 {'name': 'strategy_2',
+                  'value': 'combine_strategies'},
+                 {'name': 'strategy_2_kwargs',
+                  'value': [
+                      {'name': 'combinator',
+                       'value': 'any'},  # makes this combination an 'OR'
+                      {'name': 'strategy_1',
+                       'value': 'not_in_clinic_list'},
+                      {'name': 'strategy_1_kwargs',
+                       'value': [{'name': 'org_list',
+                                  'value': [ucsf.name,],}]},
+                      {'name': 'strategy_2',
+                       'value': 'limit_by_clinic_list'},
+                      {'name': 'strategy_2_kwargs',
+                       'value': [{'name': 'org_list',
+                                  'value': [uw.name, ucsf.name]}]},
+                  ]},
+                 # Not Started TX (strat 3)
+                 {'name': 'strategy_3',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_3_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.TX.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'false'}]},
+                 # Has Localized PCa (strat 4)
+                 {'name': 'strategy_4',
+                  'value': 'observation_check'},
+                 {'name': 'strategy_4_kwargs',
+                  'value': [{'name': 'display',
+                             'value': CC.PCaLocalized.codings[0].display},
+                            {'name': 'boolean_value', 'value': 'true'}]},
+                 # Does NOT have roll WRITE_ONLY (strat 5)
+                 {'name': 'strategy_5',
+                  'value': 'not_in_role_list'},
+                 {'name': 'strategy_5_kwargs',
+                  'value': [{'name': 'role_list',
+                             'value': [ROLE.WRITE_ONLY,]}]}
+                 ]
+            }
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name='P3P Access Conditions',
+                description=description,
+                intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
+                function_details=json.dumps(d))
+            #print json.dumps(strat.as_json(), indent=2)
+            db.session.add(strat)
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # only first two strats true so far, therfore, should be False
+        self.assertFalse(ds_p3p.display_for_user(user).access)
+
+        user.save_constrained_observation(
+            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        user.save_constrained_observation(
+            codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
+            audit=Audit(user_id=TEST_USER_ID))
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+
+        # All conditions now met, should have access
+        self.assertTrue(ds_p3p.display_for_user(user).access)
+
+        # Remove all clinics, should still have access
+        user.organizations = []
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        self.assertEquals(user.organizations.count(), 0)
+        self.assertTrue(ds_p3p.display_for_user(user).access)
+
+        # Finally, add the WRITE_ONLY group and it should disappear
+        add_role(user, ROLE.WRITE_ONLY)
+        with SessionScope(db):
+            db.session.commit()
+        user, ds_p3p = map(db.session.merge, (user, ds_p3p))
+        self.assertFalse(ds_p3p.display_for_user(user).access)
 
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
