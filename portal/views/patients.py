@@ -25,13 +25,13 @@ def patients_root():
                                      user.has_role(ROLE.PATIENT)]
 
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org, wide_container="true")
+        'patients_by_org.html', patients_by_org=patients_by_org, user=current_user(), wide_container="true")
 
-@patients.route('/profile_create')
+@patients.route('/profile_create/<int:current_user>')
 @oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
-def profile_create():
-    user = current_user()
+def profile_create(current_user):
+    user = get_user(current_user)
     return render_template('profile_create.html', user = user)
 
 

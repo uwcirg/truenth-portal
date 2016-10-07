@@ -18,7 +18,7 @@
 </div>
 {% endif %}
 
-<p><a class="create-user-link" href="{{ url_for('patients.profile_create') }}">Create an user</a> or Select any user to view details or make changes.</p>
+<p><a class="create-user-link" href="{{ url_for('patients.profile_create', current_user = user.id) }}">Create an user</a> or Select any user to view details or make changes.</p>
 <hr />
 
 {% set orgCount = 1 %}

@@ -3,35 +3,33 @@
 {% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 
-<div id="loadingIndicator" class="loading-indicator">
-    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
-</div>
 
 <h3 class="tnth-headline">New User</h3>
 
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
 
-<div class="row" style="position: relative;">
-    <div class="col-md-9">
+    <div class="row" style="position: relative;">
+        <div class="col-md-9">
 
-        {{profileName(False)}}
-        {{profileBirthDate(False)}}
-        {{profileEmail(False)}}
-        {{profilePhone(False)}}
-        {{profileOrg(user)}}
+            {{profileName(False)}}
+            {{profileBirthDate(False)}}
+            {{profileEmail(False)}}
+            {{profilePhone(False)}}
+            {{profileOrg(user)}}
 
-        <br />
-        {{profileSaveBtn()}}
-        <br /><br/>
-       {{ back_btn('patients','Patients List')}}
+            <br />
+            {{profileSaveBtn()}}
+            <br /><br/>
+           {{ back_btn('patients','Patients List')}}
+        </div>
     </div>
-</div>
 
 </form>
 
 {% endblock %}
 
 {% block document_ready %}
+
 
 $(document).ready(function(){
 
@@ -45,32 +43,33 @@ $(document).ready(function(){
                 // everything looks good!
                 e.preventDefault();
                 $('#errorMsg').hide();
+                $('#serviceErrorMsg').html('').hide();
 
                 _get('/api/account', 'POST').then(function(responseData) {
 
                     _userId = responseData['user_id'];
-                    console.log("userId: " + _userId);
+                    console.log('userId: ' + _userId);
 
                     _demoArray['resourceType'] = 'Patient';
-                    _demoArray["name"] = {
-                        "given": $("input[name=firstname]").val(),
-                        "family": $("input[name=lastname]").val()
+                    _demoArray['name'] = {
+                        'given': $('input[name=firstname]').val(),
+                        'family': $('input[name=lastname]').val()
                     };
-                    _demoArray["birthDate"] = $("input[name=birthDate]").val();
-                    _demoArray["telecom"] = [
-                        { "system": "email", "value": $("input[name=email]").val() },
-                        { "system": "phone", "value": $("input[name=phone]").val() }
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['telecom'] = [
+                        { 'system': 'email', 'value': $('input[name=email]').val() },
+                        { 'system': 'phone', 'value': $('input[name=phone]').val() }
                     ];
 
 
-                    var orgIDs = $("#userOrgs input:checkbox:checked").map(function(){
-                        return { reference: "api/organization/"+$(this).val() };
+                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
                     }).get();
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
                     var demoArray = {};
-                    _demoArray["careProvider"] = orgIDs;
+                    _demoArray['careProvider'] = orgIDs;
 
                     //console.log(_demoArray);
 
@@ -79,24 +78,24 @@ $(document).ready(function(){
                     //Adding roles of patient and write_only for user
                     Promise.all([
                         _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
-                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({"roles": [{"name": "patient"}, {"name": "write_only"}]}))])
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}, {'name': 'write_only'}]}))])
                     .then(function(results) {
                         // Both promises resolved
-                        //console.log("promises resolved");
-                        $("#confirmMsg").fadeIn();
-                        setTimeout('$("#confirmMsg").fadeOut();', 2000);
-                        //console.log($("#confirmMsg").length);
-                        //$("#createProfileForm")[0].reset();
+                        //console.log('promises resolved');
+                        $('#confirmMsg').fadeIn();
+                        setTimeout('$('#confirmMsg').fadeOut();', 2000);
+                        //console.log($('#confirmMsg').length);
+                        //$('#createProfileForm')[0].reset();
                         clear();
                     })
                     .catch(function(error) {
                         // One or more promises was rejected
-                        $("#serviceErrorMsg").html("<small>" + error + "</small>").fadeIn();
+                        $('#serviceErrorMsg').html('<small>' + error + '</small>').fadeIn();
 
                     });
                 }).catch(function(e) {
                     //Display Error Here
-                    $("#serviceErrorMsg").html("<small>" + error + "</small>").fadeIn();
+                    $('#serviceErrorMsg').html('<small>' + error + '</small>').fadeIn();
                 });
 
           };
@@ -108,7 +107,7 @@ $(document).ready(function(){
             $.ajax ({
                 type: (requestType ? requestType : 'GET'),
                 url: apiUrl,
-                contentType: "application/json; charset=utf-8",
+                contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 data: requestData
             }).done(function(data) {
@@ -128,14 +127,14 @@ $(document).ready(function(){
 
     function clear() {
         ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
-            var currentElement = $("#" + fieldName);
-            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : "";
+            var currentElement = $('#' + fieldName);
+            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
             switch(_tagName.toLowerCase()) {
-                case "input":
+                case 'input':
                     currentElement.val('');
                     break;
-                case "select":
-                    currentElement.find("option").prop('selected', false);
+                case 'select':
+                    currentElement.find('option').prop('selected', false);
                     break;
                 default:
                     currentElement.val('');
