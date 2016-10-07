@@ -164,7 +164,7 @@ class SitePersistence(object):
 
         def update_strat(strat_json):
             strat = AccessStrategy.from_json(strat_json)
-            existing = AccessStrategy.query.get(strat.id)
+            existing = AccessStrategy.query.get(strat.id) if strat.id else None
             if existing:
                 if strat_json != existing.as_json():
                     self._log("AccessStrategy {id} collision on "
