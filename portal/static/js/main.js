@@ -88,6 +88,7 @@ var fillContent = {
         $('#lastname').val(data.name.family);
         if (data.birthDate) {
             var bdArray = data.birthDate.split("-");
+            $("#birthday").val(data.birthDate);
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
@@ -115,6 +116,23 @@ var fillContent = {
                 //$("#raceOtherVal").fadeToggle();
             }
         });
+    },
+    "name": function(data){
+        if (data && data.name) {
+            $('#firstname').val(data.name.given);
+            $('#lastname').val(data.name.family);
+        };
+    },
+    "dob": function(data) {
+        if (data && data.birthDate) {
+            var bdArray = data.birthDate.split("-");
+            $("#birthday").val(data.birthDate);
+            $("#year").val(bdArray[0]);
+            $("#month").val(bdArray[1]);
+            $("#date").val(bdArray[2]);
+            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
+            if ($("#patBiopsy").length > 0) $("#patBiopsy").fadeIn();
+        };
     },
     "orgs": function(data) {
         $.each(data.careProvider,function(i,val){
@@ -237,6 +255,8 @@ var assembleContent = {
                 { "system": "email", "value": $("input[name=email]").val() },
                 { "system": "phone", "value": $("input[name=phone]").val() }
             ];
+
+           
             demoArray["extension"] = [
                 { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
                     "valueCodeableConcept": {
@@ -249,8 +269,47 @@ var assembleContent = {
                     }
                 }
             ];
+
+           // console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray);
+        //if (demoArray["roles"]) {
+            //tnthAjax.putRoles(userId,demoArray["roles"]);
+        //};
+    },
+    "name": function(userId) {
+        
+        var firstName = $("input[name=firstname]").val();
+        var lastName = $("input[name=lastname]").val();
+        if (firstName != "" && lastName != "") {
+            var demoArray = {};
+            demoArray["resourceType"] = "Patient";
+            demoArray["name"] = {
+                "given": $("input[name=firstname]").val(),
+                "family": $("input[name=lastname]").val()
+            };
+            tnthAjax.putDemo(userId,demoArray);
+        };
+
+    },
+    "dob": function(userId) {
+        var demoArray = {};
+        var birthday = $("input[name='birthDate']").val();
+        var month = $("#month").find("option:selected").val();
+        var day = $("input[name='birthdayDate']").val();
+        var year = $("input[name='birthdayYear']").val();
+        var birthDate = "";
+
+        if (birthday == "") {
+            if (month != "" && day != "" && year != "") {
+                birthDate = year + "-" + month + "-" + day;
+            };
+        };
+        if (birthday  != "" || birthDate != "") {
+            demoArray["resourceType"] = "Patient";
+            demoArray["birthDate"] = (birthday != "" ? birthday: birthDate);
+            tnthAjax.putDemo(userId,demoArray);
+        }
     },
     "orgs": function(userId) {
         $.each($("#userOrgs input:checkbox:checked"),function(i,v){
@@ -333,12 +392,12 @@ var tnthAjax = {
             $.each(clinicArray, function(i,val) {
                 // Fill in parent clinic
                 if (val.name != "none of the above") {
-                    $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' value='"+val.id+"' />");
+                    $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' id='" + val.id + "_org' value='"+val.id+"' />");
                 }
                 // Fill in each child clinic
                 $.each(val.children, function(n,subval) {
                     var childClinic = '<div class="checkbox"><label>' +
-                        '<input class="clinic" type="checkbox" name="organization" value="'+
+                        '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
                         subval.id +'" data-parent-id="'+val.id+'" />'+
                         subval.name +
                         '</label></div>';
@@ -375,6 +434,30 @@ var tnthAjax = {
         }).done(function(data) {
         }).fail(function() {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
+        });
+    },
+    "getDob": function(userId) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/demographics/'+userId
+        }).done(function(data) {
+            fillContent.dob(data);
+            loader();
+        }).fail(function() {
+            console.log("Problem retrieving data from server.");
+            loader();
+        });
+    },
+    "getName": function(userId) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/demographics/'+userId
+        }).done(function(data) {
+            fillContent.name(data);
+            loader();
+        }).fail(function() {
+            console.log("Problem retrieving data from server.");
+            loader();
         });
     },
     "getProc": function(userId,newEntry) {
@@ -424,7 +507,7 @@ var tnthAjax = {
             type: "GET",
             url: '/api/user/'+userId+'/roles'
         }).done(function(data) {
-            self.getRoleList();
+            //self.getRoleList();
             fillContent.roles(data,isProfile);
         }).fail(function() {
             console.log("Problem retrieving data from server.");
@@ -440,8 +523,9 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
 
-        }).fail(function() {
+        }).fail(function(jhr) {
             console.log("Problem updating role on server.");
+           //console.log(jhr.responseText);
 
         });
     },

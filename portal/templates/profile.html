@@ -104,15 +104,20 @@ $("#patientQuestions input").on("change", function(){
 **/
 
 /** Get and Put roles **/
-tnthAjax.getRoles({{ user.id }}, true);
-$("#rolesGroup input:checkbox").on("click",function(){
+function setRoles() {
+    tnthAjax.getRoles({{ user.id }}, true);
+    $("#rolesGroup input:checkbox").on("click",function(){
 
-    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-        return { name: $(this).val() };
-    }).get();
-    var toSend = {"roles": roles}
-    tnthAjax.putRoles({{user.id}},toSend);
+        var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+            return { name: $(this).val() };
+        }).get();
+        var toSend = {"roles": roles};
+        console.log('update role: ' + toSend);
+        tnthAjax.putRoles({{user.id}},toSend);
 
-});
+    });
+};
+
+setRoles();
 
 {% endblock %}

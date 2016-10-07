@@ -22,30 +22,37 @@
     <div class="row" id="nameGroup">
         <div class="col-xs-6">
           <div class="form-group float-input-label">
-            <input class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" type="text" required="required" data-error="First name is required"  />
+            <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="First Name" type="text" required="required" data-error="First name is required"  />
             <div class="help-block with-errors"></div>
           </div>
         </div>
         <div class="col-xs-6">
           <div class="form-group float-input-label">
-            <input class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" type="text" required="required" data-error="Last name is required" />
+            <input class="form-control float-text init-queries-field" id="lastname" name="lastname" placeholder="Last Name" type="text" required="required" data-error="Last name is required" />
             <div class="help-block with-errors"></div>
           </div>
         </div>
     </div>
-    <script>$(function () { tnthAjax.getDemo($("#iq_userId").val());});</script>
+    <script>$(function () { 
+        tnthAjax.getName($("#iq_userId").val());
+        ["firstname", "lastname"].forEach(function(field) {
+            $("#" + field).on("blur", function() {
+                assembleContent.name($("#iq_userId").val());
+            });
+        });
+      });</script>
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
       <div class="form-group" id="rolesGroup">
           <div class="radio">
             <label>
-              <input type="radio" name="user_type" value="patient"> I'm a man who is concerned about prostate cancer for myself
+              <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> I'm a man who is concerned about prostate cancer for myself
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" name="user_type" value="partner"> I'm a caregiver, spouse or partner who wants to learn more about prostate cancer
+              <input type="radio" class="init-queries-field" name="user_type" id="role_caregiver" value="partner"> I'm a caregiver, spouse or partner who wants to learn more about prostate cancer
             </label>
           </div>
       </div>
@@ -63,7 +70,7 @@
             <label>Birth Date</label>
             <div class="row">
               <div class="col-xs-4">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-birthday="true" required>
                   <option value="">Month...</option>
                   <option value="01">January</option>
                   <option value="02">February</option>
@@ -80,15 +87,23 @@
                 </select>
               </div>
               <div class="col-xs-4">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
               </div>
               <div class="col-xs-4">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
               </div>
             </div>
             <span id="errorbirthday" class="help-block tnth-hide">A block of help text that breaks onto a new line and may extend beyond one line.</span>
         </div>
       </div>
+       <script>$(function () { 
+            tnthAjax.getDob($("#iq_userId").val());
+            ["month", "date", "year"].forEach(function(field) {
+              $("#" + field).on("blur", function() {
+                  assembleContent.dob($("#iq_userId").val());
+              });
+            });
+          });</script>
   {%- endmacro %}
   {% macro patientQGroup() -%}
     <div id="patientQ">
@@ -99,12 +114,12 @@
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" name="biopsy" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> Yes
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" name="biopsy" value="false"> No
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_no" value="false"> No
               </label>
             </div>
           </div>
@@ -116,12 +131,12 @@
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" name="pca_diag" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_yes" value="true"> Yes
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" name="pca_diag" value="false"> No
+                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_no" value="false"> No
               </label>
             </div>
           </div>
@@ -133,12 +148,12 @@
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" name="pca_localized" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_yes" value="true"> Yes
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" name="pca_localized" value="false"> No (the cancer is in other parts of my body, too)
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of my body, too)
               </label>
             </div>
           </div>
@@ -150,19 +165,19 @@
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" name="tx" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> Yes
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" name="tx" value="false"> No
+                <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> No
               </label>
             </div>
           </div>
         </div>
 
       </div>
-      <!--<script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>-->
+      <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
   {%- endmacro %}
   {% macro clinic() -%}
     <div id="clinics" class="tnth-hide">

@@ -60,42 +60,52 @@ var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
 $(document).ready(function(){
 
-    var sectionNames = ['nameGroup', 'rolesGroup', 'bdGroup', 'patBiopsy', 'patDiag', 'patMeta', 'patTx', 'clinics'];
+    //remember this, ONLY fields with init_queries_field will be selected - so make sure new field has that class
+    var fields = $("#aboutForm .init-queries-field");
     var sections = [];
     var currentSectionIndex = -1;
 
 
-    var Section = function(id, index) {
+    var Section = function(id) {
       var self = this;
       this.element = $('#' + id);
       this.id = id;
-      this.index = index;
-      this.element.on('click', function() {
-          //last question - so need to enable the update button
+    };
+
+    fields.each(function() {
+        //console.log("id: " + $(this).attr("id"))
+        if ($(this).val() == "") sections.push(new Section($(this).attr("id")));
+
+        var type = $(this).attr('type');
+        console.log('type: ' + type)
+        switch(String(type).toLowerCase()) {
+            case 'checkbox':
+            case 'radio':
+                if (!$(this).is(':checked')) sections.push(new Section($(this).attr("id")));
+                break;
+            case 'select':
+            case 'text':
+                if ($(this).val() == '') sections.push(new Section($(this).attr("id")));
+                break;
+        };
+
+        $(this).on('click', function() {
+             //last question - so need to enable the update button
           if (currentSectionIndex === sections.length-1) $("#updateProfile").removeAttr("disabled");
           //console.log($(this).hasClass('pat-q'));
           console.log("section length: " + sections.length)
           console.log('currentIndex: ' + currentSectionIndex);
           currentSectionIndex = (currentSectionIndex < sections.length - 1 )? (currentSectionIndex + 1) : (sections.length-1);
-      });
-
-    };
-
-    function getSection(sectionName) {
-      return sections.find(function(section) {
-          return section.id === sectionName;
-      });
-    };
-
-
-    sectionNames.forEach(function(sectionName, index) {
-        if ($('#' + sectionName).length > 0) sections.push(new Section(sectionName, index));
+        });
     });
 
     currentSectionIndex = sections.length > 0 ? 0 : -1;
 
-    console.log('sections ' + sections)
-    console.log(currentSectionIndex)
+    //console.log('sections ' + sections);
+    //sections.forEach(function(section) {
+      //console.log(section)
+    //})
+    console.log("Current Index: " + currentSectionIndex)
     //console.log(sections[currentSectionIndex].element)
 
     if (currentSectionIndex != -1) {
@@ -103,7 +113,14 @@ $(document).ready(function(){
       el.show();
       //patientQ div that encloses the patient questions is currently invisible
       if (el.hasClass('pat-q')) $("#patientQ").show();
-    }
+      if (el.attr(name) == "organization") $("#clinics").show();
+    };
+
+
+    if (currentSectionIndex == -1) {  //all questions completed so show clinic
+      $("#clinics").show();
+      $("#updateProfile").removeAttr("disabled");
+    };
 
 
     /** 1st - get all current info **/
@@ -114,10 +131,12 @@ $(document).ready(function(){
     //tnthAjax.getClinical({{ user.id }});
 
     /** 2nd - submit changes and update UI **/
+    /*
     $("#queriesForm input").on("blur",function(){
       //this only works when demo info is present
-      if ($("#firstname").length > 0 || $("#lastname").length > 0)  assembleContent.demo({{ user.id }});
+       assembleContent.dob({{user.id}});
     });
+    */
 
 
     $("#rolesGroup input:radio").on("click",function(){
@@ -217,7 +236,6 @@ $(document).ready(function(){
       };
   });
 
-  if (currentSectionIndex == -1) $("#updateProfile").removeAttr("disabled");
 
 });
 {% endblock %}

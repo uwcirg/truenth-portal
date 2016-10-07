@@ -40,6 +40,16 @@ $(document).ready(function(){
             // handle the invalid form...
             $("#errorMsg").fadeIn("slow");
           } else {
+
+                var hasError = false;
+                $("#createProfileForm .help-block.with-errors").each(function() {
+                    if (!hasError) { if ($(this).text() != "") hasError = true };
+                }); 
+                if (hasError) {
+                    $("#errorMsg").fadeIn("slow");
+                    return false;
+                } else $("#errorMsg").hide();
+
                 // everything looks good!
                 e.preventDefault();
                 $('#errorMsg').hide();
@@ -112,9 +122,11 @@ $(document).ready(function(){
                 data: requestData
             }).done(function(data) {
                 resolve(data);
-            }).fail(function() {
+            }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
                 console.log(errorMessage);
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
                 reject(Error(errorMessage));
             });
 
