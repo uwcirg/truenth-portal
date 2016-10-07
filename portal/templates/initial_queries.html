@@ -71,16 +71,12 @@ $(document).ready(function(){
       this.id = id;
       this.index = index;
       this.element.on('click', function() {
-          
-          currentSectionIndex = (currentSectionIndex < sections.length - 1 )? (currentSectionIndex + 1) : (sections.length-1);
-          
-          //patientQ div that encloses the patient questions is currently invisible
-          //if ($(this).hasClass('pat-q')) $("#patientQ").show();
           //last question - so need to enable the update button
           if (currentSectionIndex === sections.length-1) $("#updateProfile").removeAttr("disabled");
           //console.log($(this).hasClass('pat-q'));
           console.log("section length: " + sections.length)
           console.log('currentIndex: ' + currentSectionIndex);
+          currentSectionIndex = (currentSectionIndex < sections.length - 1 )? (currentSectionIndex + 1) : (sections.length-1);
       });
 
     };
@@ -91,7 +87,7 @@ $(document).ready(function(){
       });
     };
 
-    
+
     sectionNames.forEach(function(sectionName, index) {
         if ($('#' + sectionName).length > 0) sections.push(new Section(sectionName, index));
     });
@@ -101,7 +97,7 @@ $(document).ready(function(){
     console.log('sections ' + sections)
     console.log(currentSectionIndex)
     //console.log(sections[currentSectionIndex].element)
-    
+
     if (currentSectionIndex != -1) {
       var el = sections[currentSectionIndex].element;
       el.show();
@@ -155,7 +151,7 @@ $(document).ready(function(){
           }, 500);
         };
     });
-  
+
 
   $(".pat-q input:radio").on("click",function(){
       var thisItem = $(this);

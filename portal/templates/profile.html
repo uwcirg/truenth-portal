@@ -14,29 +14,28 @@
 {{ back_btn(PORTAL,'Home') }}
 {% endif %}
 
-<h3 class="tnth-headline">
+<h4 class="tnth-headline">
 {% if providerPerspective == 'true' %}
-     Patient #{{ user.id}} - {{ user.username }}
+    Patient #{{ user.id}} - {{ user.username }}
 {% elif current_user.has_role('admin') %}
     Profile for {{ user.username }}
 {% else %}
     My TrueNTH Profile
 {% endif %}
-</h3>
+</h4>
 
 <form id="profileForm" class="form tnth-form to-validate" role="form">
 
 <div class="row" style="position: relative;">
-    <div class="col-md-9">
+    <div class="col-md-10">
 
         {{profile(user, current_user)}}
+        <br/>
         {{profileSaveBtn()}}
-
-        <br /><br />
         {% if providerPerspective == 'true' %}
             {{ back_btn('patients','Patients List') }}
         {% else %}
-            <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Go to TrueNTH Home</small></a>
         {% endif %}
     </div>
 </div>

@@ -151,7 +151,7 @@
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
-    <div class="form-group float-input-label profile-section" id="emailGroup">
+    <div class="form-group float-input-label" id="emailGroup">
         <label for="email">Email address</label>
         <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
@@ -161,7 +161,7 @@
 
 {% macro profileSendEmail(person) -%}
     {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
-        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
+        <div class="form-group float-input-label well well-lg profile-section" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
                 <label>Send Email to Patient</label>
@@ -258,55 +258,11 @@
 
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
-        <p>User Roles for {{ person.username }}</p>
+       <br/>
+       <p>User Roles for {{ person.username }}</p>
         <p class="small-text text-muted">Editable by admins only.</small></p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
-            <!-- <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="admin"> Admin
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="anon"> Anon
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="application_developer"> Application Developer
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="content_manager"> Content Manager
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="partner"> Partner
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="patient"> Patient
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="provider"> Provider
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="test"> Test
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="user_type" value="write_only"> Write Only
-                </label>
-            </div> -->
         </div>
     {% endif %}
 
@@ -314,181 +270,174 @@
 
 {% macro profileSessionList(person) -%}
     <!--hard coded for now -->
-    <br/>
-    <div class="form-group profile-section" id="userSessionsList">
-        <label>Session History</label>
-        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered">
-            <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
-            <tr>
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">Truenth Epic 26 Questinnaire</a></td><td>finished</td><td>9:48AM Tue Sep 27, 2016</td><td>1</td>
-            </tr>
-        </table>
-    </div>
-    </br>
+    {% if person and person.has_role('patient') %}
+
+        <div class="form-group profile-section" id="userSessionsList">
+            <label>Session History</label>
+            <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered small-text">
+                <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
+                <tr>
+                    <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">Truenth Epic 26 Questinnaire</a></td><td>finished</td><td>9:48AM Tue Sep 27, 2016</td><td>1</td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
 {%- endmacro %}
 
 
 {% macro profileAssessment(person) -%}
-   
-        <div>
-            <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
-
-                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="">
-                    <caption>Instrument: Epic26</caption>
-                    <tr>
-                        <th class="table-title">Question
-                        </th>
-                        <th class="table-title">Response
-                        </th>
-                    </tr>
-                    <tr>    
-                        <td>1. Over the past 4 weeks, how often have you leaked urine?"
-                        </td>
-                        <td>Frequent dribbling
-                        </td>
-                    </tr> 
-                    <tr>    
-                        <td>2. Which of the following best describes your urinary control during the last 4 weeks?"
-                        </td>
-                        <td>2 pads per day
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td>3. How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?
-                        </td>
-                        <td>No problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td>a. Dripping or leaking urine
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> b. Pain or burning on urination 
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> d. Weak urine stream or incomplete emptying
-                        </td>
-                        <td>4
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> e. Need to urinate frequently during the day
-                        </td>
-                        <td>Small problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 5. Overall, how big a problem has your urinary function been for you during the last 4 weeks?
-                        </td>
-                        <td>No problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> a. Urgency to have a bowel movement
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> b. Increased frequency of bowel movements
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> c. Losing control of your stools
-                        </td>
-                        <td>3
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> e. Abdominal / Pelvic / Rectal Pain
-                        </td>
-                        <td>Very small problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 7. Overall, how big a problem have your bowel habits been for you during the past 4 weeks?
-                        </td>
-                        <td>Very Poor to None
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> a. Your ability to have an erection?
-                        </td>
-                        <td>4
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> b. Your ability to reach orgasm (climax)?
-                        </td>
-                        <td>Firm enough for masturbation and foreplay only
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 9. How would you describe the usual QUALITY of your erections during the last 4 weeks?
-                        </td>
-                        <td>I had an erection LESS THAN HALF the time I wanted one
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 10. How would you describe the FREQUENCY of your erections during the last 4 weeks?
-                        </td>
-                        <td>Very poor
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 11. Overall, how would you rate your ability to function sexually during the last 4 weeks?
-                        </td>
-                        <td>Moderate problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> 12. Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?
-                        </td>
-                        <td>Big problem
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> a. Hot flashes
-                        </td>
-                        <td>3
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> b. Breast tenderness / enlargement
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> c. Feeling depressed
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> d. Lack of energy
-                        </td>
-                        <td>0
-                        </td>
-                    </tr>
-                    <tr>    
-                        <td> e. Change in body weight"
-                        </td>
-                        <td>0
-                        </td>
-                    </tr>
-                </table>
-            <br />
-        </div>
-
+    <!--hard coded for now -->
+    {% if person and person.has_role('patient') %}
+    <div id="userAssessmentReport" class="table-responsive">
+        <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text">
+            <caption>Instrument: Epic26</caption>
+            <tr>
+                <th></th>
+                <th class="table-title">Question</th>
+                <th class="table-title">Response</th>
+            </tr>
+            <tr>
+                <td width="1%">1.</td>
+                <td>Over the past 4 weeks, how often have you leaked urine?"</td>
+                <td>Frequent dribbling</td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>Which of the following best describes your urinary control during the last 4 weeks?"</td>
+                <td>2 pads per day</td>
+            </tr>
+            <tr>
+                <td>3.</td>
+                <td>How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?</td>
+                <td>No problem</td>
+            </tr>
+            <tr>
+                <td>a.</td>
+                <td>Dripping or leaking urine</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td> b.</td>
+                <td>Pain or burning on urination</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td> d.</td><td>Weak urine stream or incomplete emptying
+                </td>
+                <td>4
+                </td>
+            </tr>
+            <tr>
+                <td> e.</td><td> Need to urinate frequently during the day
+                </td>
+                <td>Small problem
+                </td>
+            </tr>
+            <tr>
+                <td> 5.</td><td> Overall, how big a problem has your urinary function been for you during the last 4 weeks?
+                </td>
+                <td>No problem
+                </td>
+            </tr>
+            <tr>
+                <td> a.</td><td> Urgency to have a bowel movement
+                </td>
+                <td>1
+                </td>
+            </tr>
+            <tr>
+                <td> b.</td><td> Increased frequency of bowel movements
+                </td>
+                <td>2
+                </td>
+            </tr>
+            <tr>
+                <td> c.</td><td> Losing control of your stools
+                </td>
+                <td>3
+                </td>
+            </tr>
+            <tr>
+                <td> e.</td><td> Abdominal / Pelvic / Rectal Pain
+                </td>
+                <td>Very small problem
+                </td>
+            </tr>
+            <tr>
+                <td> 7.</td><td> Overall, how big a problem have your bowel habits been for you during the past 4 weeks?
+                </td>
+                <td>Very Poor to None
+                </td>
+            </tr>
+            <tr>
+                <td> a. </td><td>Your ability to have an erection?
+                </td>
+                <td>4
+                </td>
+            </tr>
+            <tr>
+                <td> b. </td><td>Your ability to reach orgasm (climax)?
+                </td>
+                <td>Firm enough for masturbation and foreplay only
+                </td>
+            </tr>
+            <tr>
+                <td> 9.</td><td> How would you describe the usual QUALITY of your erections during the last 4 weeks?
+                </td>
+                <td>I had an erection LESS THAN HALF the time I wanted one
+                </td>
+            </tr>
+            <tr>
+                <td> 10. </td><td>How would you describe the FREQUENCY of your erections during the last 4 weeks?
+                </td>
+                <td>Very poor
+                </td>
+            </tr>
+            <tr>
+                <td> 11.</td><td> Overall, how would you rate your ability to function sexually during the last 4 weeks?
+                </td>
+                <td>Moderate problem
+                </td>
+            </tr>
+            <tr>
+                <td> 12.</td><td> Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?
+                </td>
+                <td>Big problem
+                </td>
+            </tr>
+            <tr>
+                <td> a. </td><td>Hot flashes
+                </td>
+                <td>3
+                </td>
+            </tr>
+            <tr>
+                <td> b.</td><td> Breast tenderness / enlargement
+                </td>
+                <td>2
+                </td>
+            </tr>
+            <tr>
+                <td> c.</td><td> Feeling depressed
+                </td>
+                <td>1
+                </td>
+            </tr>
+            <tr>
+                <td> d.</td><td> Lack of energy
+                </td>
+                <td>0
+                </td>
+            </tr>
+            <tr>
+                <td> e.</td><td> Change in body weight"
+                </td>
+                <td>0
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profile(person, current_user) -%}
@@ -501,10 +450,10 @@
             {{profileEthnicity()}}
             {{profileRace()}}
             {{profileEmail(person)}}
+            {{profileSendEmail(person)}}
             {{profilePhone(person)}}
             {{profileOrg(person)}}
             {{profileSessionList(person)}}
-            {{profileSendEmail(person)}}
             {{profileRole(person, current_user)}}
         </div>
     </div>

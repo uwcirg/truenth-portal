@@ -83,7 +83,7 @@ $(document).ready(function(){
                         // Both promises resolved
                         //console.log('promises resolved');
                         $('#confirmMsg').fadeIn();
-                        setTimeout('$('#confirmMsg').fadeOut();', 2000);
+                        setTimeout("$('#confirmMsg').fadeOut();", 2000);
                         //console.log($('#confirmMsg').length);
                         //$('#createProfileForm')[0].reset();
                         clear();
@@ -122,9 +122,6 @@ $(document).ready(function(){
 
     };
 
-    
-
-
     function clear() {
         ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
             var currentElement = $('#' + fieldName);
@@ -141,7 +138,7 @@ $(document).ready(function(){
             };
 
             $('#month').find('option').prop('selected', false);
-            
+
         });
 
     };

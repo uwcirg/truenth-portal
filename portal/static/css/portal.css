@@ -758,7 +758,7 @@ fieldset[disabled] .btn-google.active {
 
 #profileSendEmailContainer {
   margin-top: 5%;
-  margin-bottom: 5%;
+  margin-bottom: 6%;
   padding-bottom: 7%;
 }
 
@@ -777,7 +777,17 @@ fieldset[disabled] .btn-google.active {
   text-decoration: underline
 }
 
-#userSessionsList table{
-  font-size: 0.8em;
+#userSessionsList, #fillOrgs{
+  font-size: 0.99em;
 }
 
+#userAssessementReport table {
+  word-break:break-all;
+}
+
+.profile-section {
+  margin-bottom: 1.5em;
+}
+.name-section {
+  margin-bottom: 1.2em;
+}
