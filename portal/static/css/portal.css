@@ -788,6 +788,7 @@ fieldset[disabled] .btn-google.active {
 .create-user-link {
   text-decoration: underline;
   color: #29462a;
+  font-size:1.1em;
 }
 
 .profile-section {
