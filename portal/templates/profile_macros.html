@@ -31,12 +31,15 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
+
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+                
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+               
             </div>
         </div>
         <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
@@ -529,7 +532,7 @@
 
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.</small></p>
+    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.<br/>Make sure all required fields are filled out.</small></p>
     <p id="serviceErrorMsg" class="text-muted text-center bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
