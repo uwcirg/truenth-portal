@@ -26,18 +26,17 @@
     </div>
 
 </form>
-<form id="createProfileReDirect" action=""></form>
+<a id="redirectLink" href="">&nbsp;</a>
 
 {% endblock %}
 
 {% block document_ready %}
 
 function _redirect(userId) {
-    $("#createProfileReDirect").submit(function() {
-        this.action = '/patients/patient_profile/' + userId;
-        return true;
-    });
-    $("#createProfileReDirect").submit();
+    if (userId) {
+        $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
+        $("#redirectLink")[0].click();
+    };
 };
 
 $(document).ready(function(){
