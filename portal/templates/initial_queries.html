@@ -60,17 +60,14 @@ var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
 $(document).ready(function(){
 
-    //remember this, ONLY fields with init_queries_field will be selected - so make sure new field has that class
-    //var fields = $("#aboutForm .init-queries-field");
     var sections = [];
-    var currentSectionIndex = -1;
-
     var incompleteFields = [];
     var mainSections = {
         'nameGroup': [$("#firstname"), $("#lastname")],
         'rolesGroup': [$("input[name='user_type']")],
         'bdGroup': [$("#month"), $("#date"), $("#year")],
-        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")]
+        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
+        'clinics': [$("input[name='organization']")]
       };
 
       for (var section in mainSections) {
@@ -104,14 +101,6 @@ $(document).ready(function(){
 
       });
 
-
-
-    var Section = function(id) {
-      var self = this;
-      this.element = $('#' + id);
-      this.id = id;
-      this.type = this.element.attr('type');
-    };
 
     if (incompleteFields.length == 0) {
         $("#clinics").show();
