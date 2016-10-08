@@ -15,3 +15,5 @@ man
 pip-selfcheck.json
 log
 migrations
+setup*
+.gitignore

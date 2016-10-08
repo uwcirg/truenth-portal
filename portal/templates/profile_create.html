@@ -21,15 +21,24 @@
             {{profileSaveBtn()}}
             <br /><br/>
            {{ back_btn('patients','Patients List')}}
+           <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
         </div>
     </div>
 
 </form>
+<form id="createProfileReDirect" action=""></form>
 
 {% endblock %}
 
 {% block document_ready %}
 
+function _redirect(userId) {
+    $("#createProfileReDirect").submit(function() {
+        this.action = '/patients/patient_profile/' + userId;
+        return true;
+    });
+    $("#createProfileReDirect").submit();
+};
 
 $(document).ready(function(){
 
@@ -40,12 +49,14 @@ $(document).ready(function(){
           if (e.isDefaultPrevented()) {
             // handle the invalid form...
             $("#errorMsg").fadeIn("slow");
+            return false;
           } else {
 
                 hasError = false;
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
-                }); 
+                });
+
                 if (hasError) {
                     $("#errorMsg").fadeIn("slow");
                     return false;
@@ -70,8 +81,8 @@ $(document).ready(function(){
                         orgIDs = [0]  // special value for `none of the above`
                     };
 
-                    console.log("orgs: " + orgIDs);
-                    
+                    //console.log("orgs: " + orgIDs);
+
                     _orgArray['careProvider'] = orgIDs;
 
                     console.log(_orgArray)
@@ -100,7 +111,7 @@ $(document).ready(function(){
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
-                    
+
                     _demoArray['careProvider'] = orgIDs;
                     */
 
@@ -116,8 +127,8 @@ $(document).ready(function(){
                         // Both promises resolved
                         //console.log('promises resolved');
                         $('#confirmMsg').fadeIn();
-                        setTimeout("$('#confirmMsg').fadeOut();", 2000);
-                        //console.log($('#confirmMsg').length);
+                        setTimeout("$('#confirmMsg').fadeOut();", 1000);
+                        setTimeout("_redirect(" + _userId + ");", 1100);
                         //$('#createProfileForm')[0].reset();
                         clear();
                     })
@@ -175,7 +186,7 @@ $(document).ready(function(){
             };
 
             $('#month').find('option').prop('selected', false);
-            
+
         });
 
     };

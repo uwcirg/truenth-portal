@@ -35,11 +35,11 @@
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-                
+
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
-               
+
             </div>
         </div>
         <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
@@ -312,7 +312,7 @@
             </div>
         </div>
     {% endif %}
-    <script>$(function () { 
+    <script>$(function () {
 
     tnthAjax.getRoles({{ person.id }}, true);
     $("#rolesGroup input[name='user_type']").each(function() {
@@ -335,21 +335,23 @@
 {% macro profileSessionList(person) -%}
     <!--hard coded for now -->
     <br/>
+    <hr/>
     <div class="form-group profile-section" id="userSessionsList">
         <label>Session History</label>
-        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered">
+        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered small-text">
             <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
             <tr>
                 <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">Truenth Epic 26 Questinnaire</a></td><td>finished</td><td>9:48AM Tue Sep 27, 2016</td><td>1</td>
             </tr>
         </table>
     </div>
+    <hr/>
     </br>
 {%- endmacro %}
 
 
 {% macro profileAssessment(person) -%}
-   
+
         <div>
             <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
 
@@ -361,145 +363,145 @@
                         <th class="table-title">Response
                         </th>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td>1. Over the past 4 weeks, how often have you leaked urine?"
                         </td>
                         <td>Frequent dribbling
                         </td>
-                    </tr> 
-                    <tr>    
+                    </tr>
+                    <tr>
                         <td>2. Which of the following best describes your urinary control during the last 4 weeks?"
                         </td>
                         <td>2 pads per day
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td>3. How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?
                         </td>
                         <td>No problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td>a. Dripping or leaking urine
                         </td>
                         <td>1
                         </td>
                     </tr>
-                    <tr>    
-                        <td> b. Pain or burning on urination 
+                    <tr>
+                        <td> b. Pain or burning on urination
                         </td>
                         <td>2
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> d. Weak urine stream or incomplete emptying
                         </td>
                         <td>4
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> e. Need to urinate frequently during the day
                         </td>
                         <td>Small problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 5. Overall, how big a problem has your urinary function been for you during the last 4 weeks?
                         </td>
                         <td>No problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> a. Urgency to have a bowel movement
                         </td>
                         <td>1
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> b. Increased frequency of bowel movements
                         </td>
                         <td>2
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> c. Losing control of your stools
                         </td>
                         <td>3
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> e. Abdominal / Pelvic / Rectal Pain
                         </td>
                         <td>Very small problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 7. Overall, how big a problem have your bowel habits been for you during the past 4 weeks?
                         </td>
                         <td>Very Poor to None
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> a. Your ability to have an erection?
                         </td>
                         <td>4
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> b. Your ability to reach orgasm (climax)?
                         </td>
                         <td>Firm enough for masturbation and foreplay only
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 9. How would you describe the usual QUALITY of your erections during the last 4 weeks?
                         </td>
                         <td>I had an erection LESS THAN HALF the time I wanted one
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 10. How would you describe the FREQUENCY of your erections during the last 4 weeks?
                         </td>
                         <td>Very poor
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 11. Overall, how would you rate your ability to function sexually during the last 4 weeks?
                         </td>
                         <td>Moderate problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> 12. Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?
                         </td>
                         <td>Big problem
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> a. Hot flashes
                         </td>
                         <td>3
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> b. Breast tenderness / enlargement
                         </td>
                         <td>2
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> c. Feeling depressed
                         </td>
                         <td>1
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> d. Lack of energy
                         </td>
                         <td>0
                         </td>
                     </tr>
-                    <tr>    
+                    <tr>
                         <td> e. Change in body weight"
                         </td>
                         <td>0
@@ -521,19 +523,19 @@
             {{profileEthnicity()}}
             {{profileRace()}}
             {{profileEmail(person)}}
+            {{profileSendEmail(person)}}
             {{profilePhone(person)}}
             {{profileOrg(person)}}
             {{profileSessionList(person)}}
-            {{profileSendEmail(person)}}
             {{profileRole(person, current_user)}}
         </div>
     </div>
 {%- endmacro %}
 
 {% macro profileSaveBtn() -%}
-    <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.<br/>Make sure all required fields are filled out.</small></p>
-    <p id="serviceErrorMsg" class="text-muted text-center bg-danger" style="display: none"></p>
+    <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.<br/>Make sure all required fields are filled out.</small></p>
+    <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
 {%- endmacro %}

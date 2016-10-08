@@ -752,8 +752,13 @@ fieldset[disabled] .btn-google.active {
   margin-top: 5%;
 }
 
-#profileCreateForm #userOrgs {
- font-size:0.8em;
+#userOrgs {
+ font-size:0.9em;
+}
+
+#fillOrgs legend {
+  font-size:0.9em;
+  color: #595F57;
 }
 
 #profileSendEmailContainer {
@@ -786,9 +791,13 @@ fieldset[disabled] .btn-google.active {
 }
 
 .create-user-link {
-  text-decoration: underline;
+  border-radius:4px;
   color: #29462a;
-  font-size:1.1em;
+  background-color: #FFF;
+  border: 1px solid silver;
+  -webkit-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
+  -moz-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
+  box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
 }
 
 .profile-section {
@@ -796,4 +805,12 @@ fieldset[disabled] .btn-google.active {
 }
 .name-section {
   margin-bottom: 1.2em;
+}
+.orgLinks {
+  margin-top: 4px;
+}
+.error-message {
+  padding: 0.5em;
+  border-radius: 4px;
+  text-align: left;
 }

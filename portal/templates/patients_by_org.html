@@ -3,10 +3,15 @@
 
 <div class="reduce-font-sizes">
 
-<h3 class="tnth-headline">Patients</h3>
+<h3 class="tnth-headline">Patient List</h3>
+
+<br/>
+
+<div><a  href="{{ url_for('patients.profile_create') }}"><button class="create-user-link">Create an user</button></a> or Select any user to view details or make changes.<hr/></div>
+
 
 {% if patients_by_org|length > 1 %}
-<div class="small">
+<div class="small orgLinks">
     <p>Skip to:</p>
     <ul>
         {% set orgCountLink = 1 %}
@@ -18,7 +23,7 @@
 </div>
 {% endif %}
 
-<p><a class="create-user-link" href="{{ url_for('patients.profile_create') }}">Create an user</a> or Select any user to view details or make changes.</p>
+
 <hr />
 
 {% set orgCount = 1 %}

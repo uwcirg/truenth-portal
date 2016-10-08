@@ -256,7 +256,7 @@ var assembleContent = {
                 { "system": "phone", "value": $("input[name=phone]").val() }
             ];
 
-           
+
             demoArray["extension"] = [
                 { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
                     "valueCodeableConcept": {
@@ -278,7 +278,7 @@ var assembleContent = {
         //};
     },
     "name": function(userId) {
-        
+
         var firstName = $("input[name=firstname]").val();
         var lastName = $("input[name=lastname]").val();
         if (firstName != "" && lastName != "") {
