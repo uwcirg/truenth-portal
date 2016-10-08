@@ -27,11 +27,11 @@ def patients_root():
     return render_template(
         'patients_by_org.html', patients_by_org=patients_by_org, user=current_user(), wide_container="true")
 
-@patients.route('/profile_create/<int:current_user>')
+@patients.route('/profile_create')
 @oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
-def profile_create(current_user):
-    user = get_user(current_user)
+def profile_create():
+    user = current_user()
     return render_template('profile_create.html', user = user)
 
 

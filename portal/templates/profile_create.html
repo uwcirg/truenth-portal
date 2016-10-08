@@ -33,7 +33,8 @@
 
 $(document).ready(function(){
 
-    var _userId = '', _demoArray = {};
+    var _userId = '', _demoArray = {}, _orgArray = {};
+    var hasError = false;
 
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
@@ -41,23 +42,44 @@ $(document).ready(function(){
             $("#errorMsg").fadeIn("slow");
           } else {
 
-                var hasError = false;
+                hasError = false;
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 }); 
                 if (hasError) {
                     $("#errorMsg").fadeIn("slow");
                     return false;
-                } else $("#errorMsg").hide();
+                } else {
+                    $("#errorMsg").hide();
+                    hasError = false;
+                };
 
                 // everything looks good!
                 e.preventDefault();
                 $('#errorMsg').hide();
                 $('#serviceErrorMsg').html('').hide();
 
-                _get('/api/account', 'POST').then(function(responseData) {
-
+                _get('/api/account', 'POST').then(function(responseData){
                     _userId = responseData['user_id'];
+                    _orgArray = {};
+                    _orgArray['resourceType'] = 'Patient';
+                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
+                    }).get();
+                    if (typeof orgIDs === 'undefined'){
+                        orgIDs = [0]  // special value for `none of the above`
+                    };
+
+                    console.log("orgs: " + orgIDs);
+                    
+                    _orgArray['careProvider'] = orgIDs;
+
+                    console.log(_orgArray)
+                    _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_orgArray));
+
+                }).then(function(responseData) {
+
+                    //_userId = responseData['user_id'];
                     console.log('userId: ' + _userId);
 
                     _demoArray['resourceType'] = 'Patient';
@@ -71,15 +93,16 @@ $(document).ready(function(){
                         { 'system': 'phone', 'value': $('input[name=phone]').val() }
                     ];
 
-
+                    /*
                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
-                    var demoArray = {};
+                    
                     _demoArray['careProvider'] = orgIDs;
+                    */
 
                     //console.log(_demoArray);
 
@@ -124,6 +147,7 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
+                console.log(requestData);
                 console.log(errorMessage);
                 console.log("response Text: " + xhr.responseText);
                 console.log("response status: " +  xhr.status);

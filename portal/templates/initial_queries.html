@@ -61,68 +61,71 @@ var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 $(document).ready(function(){
 
     //remember this, ONLY fields with init_queries_field will be selected - so make sure new field has that class
-    var fields = $("#aboutForm .init-queries-field");
+    //var fields = $("#aboutForm .init-queries-field");
     var sections = [];
     var currentSectionIndex = -1;
+
+    var incompleteFields = [];
+    var mainSections = {
+        'nameGroup': [$("#firstname"), $("#lastname")],
+        'rolesGroup': [$("input[name='user_type']")],
+        'bdGroup': [$("#month"), $("#date"), $("#year")],
+        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")]
+      };
+
+      for (var section in mainSections) {
+          var fields = mainSections[section];
+          fields.forEach(function(field) {
+              if (field.length > 0) {
+                var type = field.attr('type');
+                switch(String(type).toLowerCase()) {
+                case 'checkbox':
+                case 'radio':
+                    if (!field.is(':checked')) incompleteFields.push(field);
+                    break;
+                case 'select':
+                case 'text':
+                    if (field.val() == '') incompleteFields.push(field);
+                    break;
+                };
+              };
+
+          });
+          
+      };
+
+      incompleteFields.forEach(function(field, index) {
+          field.attr('sectionIndex', index);
+          field.on('click', function() {
+              if ($(this).attr('sectionIndex') == (incompleteFields.length - 1)) $("#updateProfile").removeAttr("disabled");
+              console.log('field index: ' + field.attr('sectionIndex'));
+              console.log('incomplete fields length: ' + incompleteFields.length);
+          });
+
+      });
+
 
 
     var Section = function(id) {
       var self = this;
       this.element = $('#' + id);
       this.id = id;
+      this.type = this.element.attr('type');
     };
 
-    fields.each(function() {
-        //console.log("id: " + $(this).attr("id"))
-        if ($(this).val() == "") sections.push(new Section($(this).attr("id")));
+    if (incompleteFields.length == 0) {
+        $("#clinics").show();
+        $("#updateProfile").removeAttr("disabled");
+    } else {
+         incompleteFields[0].show();
+        //patientQ div that encloses the patient questions is currently invisible
+        if (incompleteFields[0].hasClass('pat-q')) $("#patientQ").show();
+        if (incompleteFields[0].attr(name) == "organization") $("#clinics").show();
 
-        var type = $(this).attr('type');
-        console.log('type: ' + type)
-        switch(String(type).toLowerCase()) {
-            case 'checkbox':
-            case 'radio':
-                if (!$(this).is(':checked')) sections.push(new Section($(this).attr("id")));
-                break;
-            case 'select':
-            case 'text':
-                if ($(this).val() == '') sections.push(new Section($(this).attr("id")));
-                break;
-        };
-
-        $(this).on('click', function() {
-             //last question - so need to enable the update button
-          if (currentSectionIndex === sections.length-1) $("#updateProfile").removeAttr("disabled");
-          //console.log($(this).hasClass('pat-q'));
-          console.log("section length: " + sections.length)
-          console.log('currentIndex: ' + currentSectionIndex);
-          currentSectionIndex = (currentSectionIndex < sections.length - 1 )? (currentSectionIndex + 1) : (sections.length-1);
-        });
-    });
-
-    currentSectionIndex = sections.length > 0 ? 0 : -1;
-
-    //console.log('sections ' + sections);
-    //sections.forEach(function(section) {
-      //console.log(section)
-    //})
-    console.log("Current Index: " + currentSectionIndex)
-    //console.log(sections[currentSectionIndex].element)
-
-    if (currentSectionIndex != -1) {
-      var el = sections[currentSectionIndex].element;
-      el.show();
-      //patientQ div that encloses the patient questions is currently invisible
-      if (el.hasClass('pat-q')) $("#patientQ").show();
-      if (el.attr(name) == "organization") $("#clinics").show();
     };
 
 
-    if (currentSectionIndex == -1) {  //all questions completed so show clinic
-      $("#clinics").show();
-      $("#updateProfile").removeAttr("disabled");
-    };
-
-
+    
     /** 1st - get all current info **/
     /***done in macros now*****/
     //tnthAjax.getRoles({{ user.id }});
