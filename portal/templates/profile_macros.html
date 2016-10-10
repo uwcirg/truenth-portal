@@ -338,7 +338,6 @@
 
 {% macro profileSessionList(person) -%}
     <!--hard coded for now -->
-    <br/>
     <hr/>
     <div class="form-group profile-section" id="userSessionsList">
         <label>Session History</label>
@@ -350,7 +349,6 @@
         </table>
     </div>
     <hr/>
-    </br>
 {%- endmacro %}
 
 
@@ -524,14 +522,14 @@
             {{profileImage(person)}}
             {{profileName(person)}}
             {{profileBirthDate(person)}}
-            {{profileGender(person)}}
             {{profileEmail(person)}}
             {{profileSendEmail(person)}}
+            {{profileSessionList(person)}}
+            {{profileOrg(person)}}
             {{profileEthnicity()}}
             {{profileRace()}}
+            {{profileGender(person)}}
             {{profilePhone(person)}}
-            {{profileOrg(person)}}
-            {{profileSessionList(person)}}
             {{profileRole(person, current_user)}}
         </div>
     </div>
