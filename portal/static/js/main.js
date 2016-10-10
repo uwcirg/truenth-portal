@@ -969,8 +969,11 @@ var tnthTables = {
     "stripLinksSorter": function(a,b) {
         a = $(a).text();
         b = $(b).text();
-        if (a > b) return 1;
-        if (a < b) return -1;
-        return 0;
+        var aa = parseFloat(a);
+        var bb = parseFloat(b);
+        //if (aa > bb) return 1;
+        //if (aa < bb) return -1;
+        //return 0;
+        return  bb - aa;
     }
 };
