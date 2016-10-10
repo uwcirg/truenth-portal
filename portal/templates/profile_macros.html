@@ -52,7 +52,7 @@
                 $("#year").val(bdArray[0]);
                 $("#month").val(bdArray[1]);
                 $("#date").val(bdArray[2]);
-            }
+            };
         });
      </script>
 {%- endmacro %}
@@ -521,10 +521,10 @@
             {{profileName(person)}}
             {{profileBirthDate(person)}}
             {{profileGender(person)}}
-            {{profileEthnicity()}}
-            {{profileRace()}}
             {{profileEmail(person)}}
             {{profileSendEmail(person)}}
+            {{profileEthnicity()}}
+            {{profileRace()}}
             {{profilePhone(person)}}
             {{profileOrg(person)}}
             {{profileSessionList(person)}}
