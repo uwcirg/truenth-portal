@@ -7,6 +7,7 @@ from ..audit import auditable_event
 from ..extensions import db, oauth, user_manager
 from ..models.audit import Audit
 from ..models.group import Group
+from ..models.organization import Organization
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
@@ -65,13 +66,24 @@ def account():
 
     Use cases:
     Interventions call this, get a truenth ID back, and subsequently call:
-    1. PUT /api/demographics/<id>, with known details for the new user
-    2. PUT /api/user/<id>/roles to grant the user role(s)
-    3. PUT /api/intervention/<name> grants the user access to the intervention.
+    1. PUT /api/demographics/{id}, with known details for the new user
+    2. PUT /api/user/{id}/roles to grant the user role(s)
+    3. PUT /api/intervention/{name} grants the user access to the intervention.
     ---
     tags:
       - User
     operationId: createAccount
+    parameters:
+      - in: body
+        name: body
+        schema:
+          id: account_args
+          properties:
+            organization_id:
+              type: string
+              description:
+                Optional organization identifier defining the organization
+                the new user will belong to.
     produces:
       - application/json
     responses:
@@ -88,6 +100,17 @@ def account():
     db.session.commit()
     auditable_event("new account {} generated".format(user.id),
                     user_id=current_user().id)
+    if request.json and 'organization_id' in request.json:
+        # confirm org exists
+        org_id = request.json['organization_id']
+        org = Organization.query.get(org_id)
+        if not org:
+            abort(400, "Organization {} not found".format(org_id))
+        # add org to users account
+        user.organizations.append(org)
+        db.session.commit()
+        auditable_event("added {} to {}".format(org, user),
+                        user_id=current_user().id)
     return jsonify(user_id=user.id)
 
 
