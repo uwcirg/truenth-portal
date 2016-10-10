@@ -39,8 +39,26 @@
 {% if user.has_role('write_only') %}
     <div class="portal-item">
         <h2 class="tnth-subhead">Complete Registration</h2>
-        <p>This will complete your registration for Truenth.</p>
-        <a class="btn-lg btn-tnth-primary" href="javascript:void()">Registration</a>
+        <p>Completing your registration will allow you to return here in the future to see the information you've previously entered.</p>
+        <a href="javascript:void(0)" class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#registrationModal">Registration</a>
+    </div>
+    <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color:#79815D; color: #FFF">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Truenth EPROMs Registration</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-center">This feature is not yet available.</p>
+            <br/>
+          </div>
+          <div class="modal-footer" style="background-color:#79815D; color: #FFF">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
 {% endif %}
 
