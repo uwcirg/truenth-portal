@@ -111,7 +111,8 @@ def access_via_token(token):
 
     # Valid token - confirm user id looks legit
     user = get_user(user_id)
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
+                      ROLE.PROVIDER])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
