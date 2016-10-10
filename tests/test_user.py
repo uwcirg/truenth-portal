@@ -177,6 +177,52 @@ class TestUser(TestCase):
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale.codings[0].code, language)
 
+    def test_account_creation_by_provider(self):
+        # permission challenges when done as provider
+        org = Organization(name='sample')
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        provider = self.add_user('provider@example.com')
+        provider.organizations.append(org)
+        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        provider, org = map(db.session.merge, (provider, org))
+        data = {'organization_id': org.id}
+        self.login(user_id=provider.id)
+        rv = self.app.post('/api/account',
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert200(rv)
+        self.assertTrue(rv.json['user_id'] > 0)
+        user_id = rv.json['user_id']
+
+        # can we add some demographics and role information
+        family = 'User'
+        given = 'Test'
+        language = 'en-AU'
+        coding = {'code': language, 'display': "Australian English",
+                  'system': "urn:ietf:bcp:47"}
+        data = {"name": {"family": family, "given": given},
+                "resourceType": "Patient",
+                "communication": [{"language": {"coding": [coding]}}]}
+        rv = self.app.put('/api/demographics/{}'.format(user_id),
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert200(rv)
+        new_user = User.query.get(user_id)
+        self.assertEquals(new_user.first_name, given)
+        self.assertEquals(new_user.last_name, family)
+        self.assertEquals(new_user.username, None)
+        self.assertEquals(len(new_user.roles), 0)
+        roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
+        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+                          content_type='application/json',
+                          data=json.dumps(roles))
+        self.assertEquals(len(new_user.roles), 1)
+        self.assertEquals(new_user.locale.codings[0].code, language)
+
     def test_user_by_organization(self):
         # generate a handful of users in different orgs
         org_evens = Organization(name='odds')
