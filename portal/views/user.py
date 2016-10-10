@@ -93,7 +93,8 @@ def account():
 
 @user_api.route('/user/<int:user_id>/access_url')
 @oauth.require_oauth()
-@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE])
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
+                ROLE.PROVIDER])
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
@@ -141,7 +142,9 @@ def access_url(user_id):
     user = get_user(user_id)
     if not user:
         abort(404, "User {} not found".format(user_id))
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
+    current_user().check_role(permission='edit', other_id=user_id)
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
+                      ROLE.PROVIDER])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
