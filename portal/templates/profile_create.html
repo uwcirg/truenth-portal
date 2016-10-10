@@ -43,6 +43,33 @@ $(document).ready(function(){
 
     var _userId = '', _demoArray = {}, _orgArray = {};
     var hasError = false;
+    var errorMessage = '';
+
+    function getOrgs(type) {
+        var orgArray = {};
+        switch(type) {
+            case 'demo':
+                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    return { reference: 'api/organization/'+$(this).val() };
+                }).get();
+                //orgArray['resourceType'] = 'Patient';
+                //orgArray = orgIDs;
+                if (typeof orgIDs === 'undefined'){
+                        orgArray = [0]  // special value for `none of the above`
+                } else orgArray = orgIDs;
+                break;
+            case 'account':
+            	console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
+            	var orgId = $('#userOrgs input:checkbox:checked').val();
+                orgArray['organization_id'] = (orgId == '' ? '0': orgId);
+                break;
+
+        };
+        return orgArray;
+    };
+
+   // console.log(getOrgs('demo'));
+   // console.log(getOrgs('account'));
 
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
@@ -69,7 +96,12 @@ $(document).ready(function(){
                 $('#errorMsg').hide();
                 $('#serviceErrorMsg').html('').hide();
 
-                _get('/api/account', 'POST').then(function(responseData){
+
+                //sent in something like this for orgs
+                //{ 'organization_id': 9999 }
+
+                _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
+                /****.then(function(responseData){
                     _userId = responseData['user_id'];
                     _orgArray = {};
                     _orgArray['resourceType'] = 'Patient';
@@ -87,10 +119,17 @@ $(document).ready(function(){
                     console.log(_orgArray)
                     _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_orgArray));
 
-                }).then(function(responseData) {
+                }).catch(function(error) {
+                    console.log('Error processing request:' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
 
-                    //_userId = responseData['user_id'];
-                    console.log('userId: ' + _userId);
+                })***/
+
+                .then(function(responseData) {
+
+                    _userId = responseData['user_id'];
+                    console.log('user: ' + _userId);
 
                     _demoArray['resourceType'] = 'Patient';
                     _demoArray['name'] = {
@@ -102,19 +141,19 @@ $(document).ready(function(){
                         { 'system': 'email', 'value': $('input[name=email]').val() },
                         { 'system': 'phone', 'value': $('input[name=phone]').val() }
                     ];
-
-                    /*
+                    /*****
                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
+                    ****/
 
-                    _demoArray['careProvider'] = orgIDs;
-                    */
+                    _demoArray['careProvider'] = getOrgs('demo');
+                    
 
-                    //console.log(_demoArray);
+                    console.log(_demoArray);
 
 
                     //Adding demographic information
@@ -133,23 +172,30 @@ $(document).ready(function(){
                     })
                     .catch(function(error) {
                         // One or more promises was rejected
-                        $('#serviceErrorMsg').html('<small>' + error + '</small>').fadeIn();
+                        console.log('error: ' + error);
+                        errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
 
                     });
                 }).catch(function(error) {
                     //Display Error Here
-                    $('#serviceErrorMsg').html('<small>' + error + '</small>').fadeIn();
+                    console.log('error: ' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
                 });
+
+                
 
           };
     });
 
     function _get(apiUrl, requestType, requestData) {
         var errorMessage = '';
+        console.log('apiUrl: ' + apiUrl)
         return new Promise (function(resolve, reject) {
             $.ajax ({
                 type: (requestType ? requestType : 'GET'),
-                url: apiUrl,
+                url: String(apiUrl).replace('//', '/'),
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
                 data: requestData

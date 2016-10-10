@@ -33,7 +33,7 @@
         <br/>
         {{profileSaveBtn()}}
         {% if providerPerspective == 'true' %}
-            {{ back_btn('patients','Patients List') }}
+           <br/><br/> {{ back_btn('patients','Patients List') }}
         {% else %}
             <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Go to TrueNTH Home</small></a>
         {% endif %}
@@ -112,7 +112,6 @@ function setRoles() {
             return { name: $(this).val() };
         }).get();
         var toSend = {"roles": roles};
-        console.log('update role: ' + toSend);
         tnthAjax.putRoles({{user.id}},toSend);
 
     });
