@@ -50,7 +50,9 @@
                     </button>
                     <ul class="tnth-dropdown-menu">
                         <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
+                        {% if user and not user.has_roles('write_only') %}
                         <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
+                        {% endif %}
                         <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
                         {% if user and user.has_roles('application_developer') %}
                         <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
