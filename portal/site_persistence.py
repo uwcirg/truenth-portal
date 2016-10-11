@@ -8,6 +8,7 @@ from sqlalchemy import exc
 import tempfile
 
 from extensions import db
+from models.app_text import AppText
 from models.fhir import FHIR_datetime
 from models.intervention import Intervention, INTERVENTION
 from models.intervention_strategies import AccessStrategy
@@ -130,6 +131,11 @@ class SitePersistence(object):
             if rules:
                 d['entry'] += rules
 
+        # Add customized app strings
+        app_strings = AppText.query.all()
+        for app_string in app_strings:
+            d['entry'].append(app_string.as_json())
+
         self.__write__(d)
 
     def import_(self):
@@ -223,6 +229,10 @@ class SitePersistence(object):
         for s in objs_by_type['AccessStrategy']:
             max_strat_id = max(max_strat_id, s.get('id', 0))
             update_strat(s)
+
+        # App Text shouldn't be order dependent, now is good.
+        for a in objs_by_type['AppText']:
+            AppText.from_json(a)
 
         db.session.commit()
 

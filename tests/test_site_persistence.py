@@ -14,6 +14,7 @@ from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
+from portal.models.app_text import AppText, app_text
 from manage import initdb
 
 
@@ -70,3 +71,6 @@ class TestSitePersistence(TestCase):
             INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
+
+    def test_app_text(self):
+        self.assertEquals(app_text('landing title'), 'Welcome to TrueNTH')
