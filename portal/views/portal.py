@@ -3,7 +3,7 @@ import requests
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
-from flask_user import roles_required
+from flask_user import roles_required, roles_not_allowed
 from flask_swagger import swagger
 
 from .auth import next_after_login
@@ -235,6 +235,7 @@ def invite_sent(message_id):
 @portal.route('/profile', defaults={'user_id': None})
 @portal.route('/profile/<int:user_id>')
 @oauth.require_oauth()
+@roles_not_allowed(ROLE.WRITE_ONLY)
 def profile(user_id):
     """profile view function"""
     user = current_user()
