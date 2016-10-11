@@ -116,7 +116,19 @@
 
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
-PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+PORTAL_HOSTNAME = "";
+
+
+if (typeof URL === "undefined") {
+    //for browsers such IE that does not support URL object specifically
+    var parser = document.createElement("a");
+    parser.href = PORTAL_NAV_PAGE;
+    PORTAL_HOSTNAME = parser.hostname;
+    console.log("IN alternative: " + PORTAL_HOSTNAME);
+
+} else PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+
+
 {% block document_ready %}
 $(document).ready(function(){
     $('[data-toggle="popover"]').popover();
