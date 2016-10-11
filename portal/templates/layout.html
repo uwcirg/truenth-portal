@@ -123,7 +123,7 @@ function _setHostName(url) {
         var parser = document.createElement("a");
         parser.href = url;
         PORTAL_HOSTNAME = parser.hostname;
-        console.log("IN alternative: " + PORTAL_HOSTNAME);
+        //console.log("IN alternative: " + PORTAL_HOSTNAME);
     };
 };
 
@@ -136,7 +136,7 @@ if (typeof URL === "undefined") {
     try {
         PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
     } catch(e) {
-        console.log("Error setting host name");
+        //console.log("Error setting host name");
         _setHostName(PORTAL_NAV_PAGE);
     };
 };
