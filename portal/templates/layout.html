@@ -119,14 +119,28 @@ PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/porta
 PORTAL_HOSTNAME = "";
 
 
+function _setHostName(url) {
+    if (url) {
+        var parser = document.createElement("a");
+        parser.href = url;
+        PORTAL_HOSTNAME = parser.hostname;
+        console.log("IN alternative: " + PORTAL_HOSTNAME);
+    };
+};
+
+
 if (typeof URL === "undefined") {
     //for browsers such IE that does not support URL object specifically
-    var parser = document.createElement("a");
-    parser.href = PORTAL_NAV_PAGE;
-    PORTAL_HOSTNAME = parser.hostname;
-    console.log("IN alternative: " + PORTAL_HOSTNAME);
-
-} else PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+    _setHostName(PORTAL_NAV_PAGE);
+    
+} else {
+    try {
+        PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
+    } catch(e) {
+        console.log("Error setting host name");
+        _setHostName(PORTAL_NAV_PAGE);
+    };
+};
 
 
 {% block document_ready %}
