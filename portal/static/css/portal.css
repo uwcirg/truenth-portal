@@ -371,7 +371,8 @@ a:active {
   height: 71px;
 }
 #tnthNavWrapper {
-  display: none;
+  display: block;
+  visibility: hidden;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
