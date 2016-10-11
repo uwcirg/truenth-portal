@@ -1,7 +1,7 @@
 """Configuration"""
 import os
 from flask_script import Server
-from flask import Config
+from flask import Config, url_for
 
 
 class BaseConfig(object):
@@ -25,6 +25,7 @@ class BaseConfig(object):
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
+    PORTAL_STYLESHEET = 'css/portal.css'
     PROJECT = "portal"
     PROJECT_ROOT =\
             os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
