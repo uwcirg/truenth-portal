@@ -5,6 +5,7 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.organization import Organization
 from portal.models.reference import Reference
 from portal.models.role import ROLE
 
@@ -45,6 +46,27 @@ class TestAudit(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
+        rv = self.app.get('/api/user/{}/audit'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(1, len(rv.json['audits']))
+        self.assertEquals(rv.json['audits'][0]['by'],
+                          Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(
+            rv.json['audits'][0]['comment'], 'just test data')
+
+    def test_provider_access(self):
+        provider = self.add_user('provider@example.com')
+        self.promote_user(provider, role_name=ROLE.PROVIDER)
+        org = Organization(name='a clinic')
+        provider.organizations.append(org)
+        self.test_user.organizations.append(org)
+        audit = Audit(user_id=TEST_USER_ID, comment='just test data')
+        with SessionScope(db):
+            db.session.add(audit)
+            db.session.add(org)
+            db.session.commit()
+        provider = db.session.merge(provider)
+        self.login(provider.id)
         rv = self.app.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
