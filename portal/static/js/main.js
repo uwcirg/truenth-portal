@@ -43,7 +43,8 @@ function embed_page(data){
         .html(data);
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
     $("img.tnth-topnav-wordmark").load(function(){
-        $("#tnthNavWrapper").show();
+        //$("#tnthNavWrapper").show();
+        $("#tnthNavWrapper").css({"visibility": "visible", "display": "block"});
     });
     // Todo: add "data-*" HTML attribute
 }

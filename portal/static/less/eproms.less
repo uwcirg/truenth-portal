@@ -1,0 +1,746 @@
+/** Eproms Shared services portal CSS
+ * Uses Bootstrap framework
+ *
+ * = Font sizing =
+ * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
+ * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
+**/
+
+@baseFontSize:    18px;
+@headlineSize:    1.375em;
+@subheadSize:     1.250em;
+@lgFontSize:      1.8em;
+@lgHeadlineSize:  1.5em;
+@lgsubheadSize:   1.3em;
+@smallerText:     0.85em;
+@btnSize:         1em;
+@legendSize:      1em;
+@sessionListSize: 0.95em;
+@orgSize:         0.99em;
+
+/**
+ * = Colors =
+ **/
+@baseColor:       #333;
+@linkColor:       #57675B;
+@linkHover:       #2a4531;
+@btnColor:        #79815D;
+@legendColor:    #595F57;
+
+
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background-color: #FFF;
+  font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
+  color: @baseColor;
+  font-size: @baseFontSize;
+  transition: all 500ms;
+}
+
+/** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
+#mainNav {
+  height: 71px;
+}
+// Hide the actual div that holds nav. This is to avoid flash of unstyled content. .show() on load of nav.
+#tnthNavWrapper {
+  display: none;
+  visibility: hidden;
+}
+
+#mainDiv {
+  margin-top: 22px;
+}
+
+a {
+  color: @linkColor;
+}
+a:hover, a:active {
+  color: @linkHover;
+}
+
+.tnth-hide {
+  display: none;
+}
+
+
+.tnth-headline {
+  margin: 30px 0 20px;
+  font-size: @headlineSize;
+}
+
+.tnth-subhead {
+  font-size: @subheadSize;
+}
+
+// Used for admin tables or other place where we don't need the large font size
+.smaller-text {
+  font-size: @smallerText;
+  .form-control {
+    font-size: @smallerText;
+    height: @smallerText * 2;
+  }
+  .btn {
+    font-size: @smallerText;
+  }
+}
+.loading {
+  opacity: 0.3;
+}
+
+.admin-table {
+  .search .form-control {
+    height: 34px;
+  }
+}
+// For table rowlinks
+.table.rowlink,
+.table .rowlink {
+  td:not(.rowlink-skip) {
+    cursor: pointer;
+    a {
+      color: inherit;
+      font: inherit;
+      text-decoration: inherit;
+    }
+  }
+}
+
+.table-title {
+  font-weight: bold;
+  font-size: @baseFontSize;
+  line-height: @baseFontSize * 1.33;
+}
+.feature-btn {
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  border: 2px solid #ccc;
+}
+.feature-btn-primary {
+  background-color: #fff;
+  color: #333;
+  &:hover, &:active {
+    color: #fff;
+    background-color: #000;
+  }
+}
+// fullsize background image box - used on homepage and similar pages
+#fullSizeBox {
+  position:relative;
+  margin: 0 -15px;
+  text-align: left;
+  background-image: url('../img/bg_canoe.jpg');
+  background-size: cover;
+  background-position: center top;
+  &.box-min-500 {
+    min-height: 500px;
+  }
+  &.box-min-400 {
+    min-height: 400px;
+  }
+}
+#fullSizeContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 18px 0 18px;
+}
+#fullSizeLogo {
+  height: 70px;
+}
+#wellContainer {
+  height: 100%;
+  padding: 18px 18px 70px;
+}
+.tnth-well {
+  margin: 0;
+  padding: 18px;
+  background-color:rgba(255, 255, 255, 0.7);
+  color: #000000;
+  height: 100%;
+  text-align: center;
+  position: relative;
+  .form-group {
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+.tnth-well-close {
+  position: absolute;
+  top: 0;
+  right: 6px;
+}
+.tnth-splash {
+  color: #fff;
+  height: 100%;
+  text-align: center;
+  position: relative;
+  .headline {
+    font-size: 20px;
+    line-height: 1.1;
+    text-shadow: black 0px 0px 10px;
+    margin: -1em 0 1em;
+  }
+  .feature-btn-primary {
+    margin-top: 0.5em;
+    font-weight: bold;
+    padding: 6px 24px;
+  }
+}
+.tnth-splash-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.tnth-splash-bottom-link {
+  color: #fff;
+  padding: 8px;
+  font-size: 18px;
+  text-shadow: black 0px 0px 10px;
+  &.separator {
+    margin: 0 12px;
+    border-left: 1px solid #fff;
+    padding-left: 0;
+    padding-right: 0;
+  }
+  &:hover, &:active, &:focus {
+    color: #ddd;
+  }
+}
+#wellContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  // TODO - Add browser specific styles, check compatibility
+  transform: translate(-50%, -50%);
+  .tnth-splash & {
+    width: 100%;
+  }
+}
+.btn {
+  font-size: @btnSize;
+}
+.btn-set {
+  margin-bottom: 1.5em;
+  .btn {
+    margin-bottom: 0.5em;
+  }
+}
+
+.btn-tnth-primary {
+  color: #fff;
+  background-color: @btnColor;
+  border-color: @btnColor;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  &:hover,
+  &:focus,
+  &.active,
+  .open > .dropdown-toggle& {
+    color: #fff;
+    background-color: #2a4531;
+    border-color: #1c2f21;
+  }
+}
+.btn-tnth-back {
+  color: #777;
+  padding: 0 5px 0 0;
+}
+.form-control {
+  font-size: @baseFontSize;
+  height: 39px;
+}
+.form-group {
+  .help-block {
+    font-size: 16px;
+  }
+  label {
+    font-weight: normal;
+  }
+}
+.profile-img {
+  float: right;
+  margin-top: -70px;
+  img {
+    width: 90px;
+    border-radius: 45px;
+  }
+}
+.portal-item {
+  margin: 2em 0 3em;
+}
+
+.img-with-text {
+  position: relative;
+  &.flush-with-footer {
+    margin-bottom: -30px;
+  }
+  &.full-width {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+}
+.text-on-img {
+  position: absolute;
+  left: 0;
+  padding: 0.5em 1em;
+  &.text-bot {
+    bottom: 0;
+  }
+}
+
+// Footer styles
+#homeFooter {
+  overflow: auto;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  line-height: 1.2;
+  display: none;
+  text-align: left;
+  &.footer-separate {
+    padding-top: 0;
+    .footer-container {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+  }
+}
+
+.separator-horizontal, .separator-vertical {
+  position: relative;
+  text-transform: uppercase;
+  text-align: center;
+  color: #000;
+  font-weight: bold;
+  display: block;
+  padding: 0;
+  &:before {
+    content: '';
+    display: block;
+    position: absolute;
+    border-style: solid;
+    border-color: #C4C6C7;
+  }
+  > span {
+    background: #FFF;
+    display: inline-block;
+  }
+}
+.separator-vertical {
+  height: 100%;
+  margin: 0 2em;
+  &:before {
+    left: 50%;
+    margin-left: -1px;
+    height: 100%;
+    border-width: 0 0 0 1px;
+  }
+  > span {
+    height: 3em;
+    line-height: 3em;
+    width: 4em;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -1.5em;
+    margin-left: -2em;
+  }
+}
+.tnth-form .form-group > label {
+  font-size: 18px;
+  color: #777;
+}
+.form-with-floats {
+  .form-group > label {
+    font-size:18px;
+    color: #aaa;
+    opacity: 0;
+    &.after-load {
+      transition: all 0.1s linear;
+      opacity: 1;
+    }
+  }
+  .float-input-label {
+    position:relative;
+    margin-top: 30px;
+    > label {
+      position:absolute;
+      top:7px;
+      left:13px;
+      opacity:0;
+      &.after-load {
+        transition: all 0.1s linear;
+        opacity: 1;
+      }
+      &.show {
+        top:-24px;
+        left: 0;
+      }
+    }
+
+  }
+}
+
+#userOrgs {
+ font-size:@orgSize;
+ label :first-of-type  {
+    margin-bottom: 0.5em;
+    margin-top: 0.2em;
+ }
+}
+
+
+#fillOrgs legend {
+  font-size:@legendSize;
+  color: #595F57;
+}
+
+#fillOrgs, .noOrg-container{
+  font-size: @orgSize;
+}
+
+#profileCreateForm  .title {
+  margin-top: 5%;
+}
+
+#profileSendEmailContainer {
+  margin-top: 5%;
+  margin-bottom: 6%;
+  padding-bottom: 5%;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  label{
+    font-size:0.95em;
+  }
+}
+
+#btnProfileSendEmail {
+  margin-top: 5%;
+  font-size: 0.9em;
+  padding: 0.5em;
+  border-radius: 6px;
+}
+
+#profileEmailMessage {
+  font-size: 0.95em;
+  margin-top: 1em;
+  margin-left:0.5em;
+}
+
+
+#userSessionsList {
+  font-size: @sessionListSize;
+}
+
+#userAssessementReport table {
+  word-break:break-all;
+}
+
+.create-user-link {
+  border-radius:4px;
+  color: @linkColor;
+  background-color: #FFF;
+  border: 1px solid silver;
+  -webkit-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
+  -moz-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
+  box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
+  padding: 0.5em;
+}
+
+.profile-section {
+  margin-bottom: 1.5em;
+}
+.name-section {
+  margin-bottom: 1.2em;
+}
+.orgLinks {
+  margin-top: 4px;
+}
+.error-message {
+  padding: 0.5em;
+  border-radius: 4px;
+  text-align: left;
+}
+
+/** styles specific to profile **/
+.loading-indicator {
+  display: none;
+  position: fixed;
+  top: 200px;
+  left: 48%;
+  margin-left: -50px;
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  z-index: 99999;
+  color: #444;
+}
+.loading {
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=40);
+  -moz-opacity: 0.4;
+  -khtml-opacity: 0.4;
+  opacity: 0.4;
+}
+.pagination {
+
+  >.active>a {
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+  >.active>a:focus {
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+  >.active>a:hover{
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+  >.active>span{
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+  >.active>span:focus{
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+  >.active>span:hover {
+    background-color: @btnColor;
+    border-color: @btnColor;
+  }
+}
+
+.pagination {
+  >li>a {
+    color: @btnColor;
+  }
+  >li>span {
+    color: @btnColor;
+  }
+}
+
+
+/** Responsive sizes **/
+@media (max-width: 480px) {
+  #footerLockup {
+    max-height: 80px;
+  }
+  #homeFooter {
+    font-size: @smallerText;
+    padding-top: 0.5em;
+  }
+  .text-on-img {
+    padding: 6px;
+    .tnth-subhead {
+      margin: 0;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+@media (min-width: 768px) {
+  #mainNav {
+    height: 135px;
+  }
+  #fullSizeBox {
+    background-image: none;
+    min-height: auto;
+    > img {
+      width: 100%;
+    }
+  }
+  #fullSizeContainer {
+    padding: 24px 0;
+  }
+  #wellContainer {
+    padding: 24px 24px 80px;
+  }
+  #fullSizeLogo {
+    height: 80px;
+  }
+  .tnth-well {
+    padding: 24px;
+  }
+  .tnth-splash {
+    .headline {
+      font-weight: bold;
+      font-size: 28px;
+      margin-bottom: 1em;
+    }
+    .feature-btn-primary {
+      margin-top: 1em;
+      font-weight: bold;
+      padding: 6px 24px;
+      font-size: 22px;
+    }
+  }
+  .tnth-splash-bottom-link {
+    font-size: 24px;
+  }
+}
+@media (min-width: 992px) {
+
+  /** Font sizes changes above 992 **/
+  body {
+    font-size: @lgFontSize;
+  }
+  .tnth-headline {
+    font-size: @lgHeadlineSize;
+  }
+  .tnth-subhead {
+    font-size: @lgsubheadSize;
+  }
+  #fullSizeContainer {
+    padding: 30px 0;
+  }
+  #wellContainer {
+    padding: 30px 30px 90px;
+  }
+  #fullSizeLogo {
+    height: 90px;
+  }
+  .tnth-well {
+    padding: 30px;
+  }
+  .btn-set {
+    margin-bottom: 2em;
+    .btn {
+      margin-bottom: 1em;
+    }
+  }
+  .tnth-splash .headline {
+    font-size: @lgHeadlineSize;
+  }
+  .pos-bottom-md {
+    position: absolute;
+    bottom:0;
+    right:0;
+    .btn {
+      margin: 0 0 15px 15px;
+    }
+  }
+
+  .form-group input[type=checkbox], .form-group  input[type=radio] {
+    margin-top: 5px;
+  }
+
+  /** Unless explicitly wrapped in reduce-font-sizes class **/
+  .reduce-font-sizes {
+    body & {
+      font-size: @baseFontSize;
+    }
+    .tnth-headline {
+      font-size: @headlineSize;
+    }
+    .tnth-subhead {
+      font-size: @subheadSize;
+    }
+    .form-group input[type=checkbox], .form-group  input[type=radio] {
+      margin-top: 4px;
+    }
+  }
+}
+@media (min-width: 1200px) {
+
+  #fullSizeContainer {
+    padding: 60px 0 60px;
+  }
+  #wellContainer {
+    padding: 60px 60px 100px;
+  }
+  #fullSizeLogo {
+    height: 100px;
+  }
+  .tnth-well {
+    padding: 60px;
+  }
+  .tnth-splash .headline {
+    margin: -1em 0 1.5em;
+  }
+  .profile-img {
+    margin-top: -100px;
+    img {
+      width: 120px;
+      border-radius: 60px;
+    }
+  }
+  .btn-set {
+    margin-bottom: 1em;
+    .btn {
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+@media (min-width: 1400px) {
+  html, body {
+    width: 100%;
+    height: 100%;
+  }
+  #mainHolder.vertical-center {
+    display: table;
+    height:100%;
+    margin: 0 auto;
+    #mainDiv {
+      display: table-cell;
+      text-align: center; /* horizontal */
+      vertical-align: middle; /* vertical */
+    }
+  }
+  #fullSizeBox {
+    margin: 0 auto;
+    max-width: 1400px;
+  }
+  #homeFooter {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .btn-set {
+    margin-bottom: 1em;
+    .btn {
+      margin-bottom: 0.5em;
+    }
+  }
+}
+
+
+/*** https://github.com/lipis/bootstrap-social ***/
+.btn-social{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.btn-social>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:39px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
+.btn-social.btn-lg{padding-left:61px}.btn-social.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}
+.btn-social.btn-sm{padding-left:38px}.btn-social.btn-sm>:first-child{line-height:28px;width:28px;font-size:1.4em}
+.btn-social.btn-xs{padding-left:30px}.btn-social.btn-xs>:first-child{line-height:20px;width:20px;font-size:1.2em}
+.btn-social-icon{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:34px;width:34px;padding:0}.btn-social-icon>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:34px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
+.btn-social-icon.btn-lg{padding-left:61px}.btn-social-icon.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}
+.btn-social-icon.btn-sm{padding-left:38px}.btn-social-icon.btn-sm>:first-child{line-height:28px;width:28px;font-size:1.4em}
+.btn-social-icon.btn-xs{padding-left:30px}.btn-social-icon.btn-xs>:first-child{line-height:20px;width:20px;font-size:1.2em}
+.btn-social-icon>:first-child{border:none;text-align:center;width:100% !important}
+.btn-social-icon.btn-lg{height:45px;width:45px;padding-left:0;padding-right:0}
+.btn-social-icon.btn-sm{height:30px;width:30px;padding-left:0;padding-right:0}
+.btn-social-icon.btn-xs{height:22px;width:22px;padding-left:0;padding-right:0}
+.btn-facebook{color:#fff;background-color:#3b5998;border-color:rgba(0,0,0,0.2)}.btn-facebook:hover,.btn-facebook:focus,.btn-facebook:active,.btn-facebook.active,.open>.dropdown-toggle.btn-facebook{color:#fff;background-color:#2d4373;border-color:rgba(0,0,0,0.2)}
+.btn-facebook:active,.btn-facebook.active,.open>.dropdown-toggle.btn-facebook{background-image:none}
+.btn-facebook.disabled,.btn-facebook[disabled],fieldset[disabled] .btn-facebook,.btn-facebook.disabled:hover,.btn-facebook[disabled]:hover,fieldset[disabled] .btn-facebook:hover,.btn-facebook.disabled:focus,.btn-facebook[disabled]:focus,fieldset[disabled] .btn-facebook:focus,.btn-facebook.disabled:active,.btn-facebook[disabled]:active,fieldset[disabled] .btn-facebook:active,.btn-facebook.disabled.active,.btn-facebook[disabled].active,fieldset[disabled] .btn-facebook.active{background-color:#3b5998;border-color:rgba(0,0,0,0.2)}
+.btn-facebook .badge{color:#3b5998;background-color:#fff}
+.btn-google{color:#fff;background-color:#dd4b39;border-color:rgba(0,0,0,0.2)}.btn-google:hover,.btn-google:focus,.btn-google:active,.btn-google.active,.open>.dropdown-toggle.btn-google{color:#fff;background-color:#c23321;border-color:rgba(0,0,0,0.2)}
+.btn-google:active,.btn-google.active,.open>.dropdown-toggle.btn-google{background-image:none}
+.btn-google.disabled,.btn-google[disabled],fieldset[disabled] .btn-google,.btn-google.disabled:hover,.btn-google[disabled]:hover,fieldset[disabled] .btn-google:hover,.btn-google.disabled:focus,.btn-google[disabled]:focus,fieldset[disabled] .btn-google:focus,.btn-google.disabled:active,.btn-google[disabled]:active,fieldset[disabled] .btn-google:active,.btn-google.disabled.active,.btn-google[disabled].active,fieldset[disabled] .btn-google.active{background-color:#dd4b39;border-color:rgba(0,0,0,0.2)}
+.btn-google .badge{color:#dd4b39;background-color:#fff}
