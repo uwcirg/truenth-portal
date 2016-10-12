@@ -93,11 +93,11 @@ class CoredataPoint(object):
 
 class DobData(CoredataPoint):
     def hasdata(self, user):
-        # DOB is only required for patient and partner
+        # DOB is only required for patient
         roles = [r.name for r in user.roles]
-        if ROLE.PROVIDER in roles:
+        if ROLE.PROVIDER in roles or ROLE.PARTNER in roles:
             return True
-        elif ROLE.PATIENT in roles or ROLE.PARTNER in roles:
+        elif ROLE.PATIENT in roles:
             return user.birthdate is not None
         else:
             # If they haven't set a role, we don't know if we care yet
