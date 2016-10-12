@@ -160,6 +160,7 @@ class TestCase(Base):
     def setUp(self):
         """Reset all tables before testing."""
 
+        db.drop_all()  # clean up from previous tests
         db.create_all()
         with SessionScope(db):
             # concepts take forever, only load the quick ones.
@@ -176,10 +177,14 @@ class TestCase(Base):
         self.app = self.__app.test_client()
 
     def tearDown(self):
-        """Clean db session and drop all tables."""
+        """Clean db session.
 
+        Database drop_all is done at setup due to app context challenges with
+        LiveServerTestCase (it cleans up its context AFTER tearDown()
+        is called)
+
+        """
         db.session.remove()
-        db.drop_all()
         db.engine.dispose()
 
         # lazyprops can't survive a db purge - purge cached attributes
