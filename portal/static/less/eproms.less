@@ -403,7 +403,6 @@ a:hover, a:active {
  font-size:@orgSize;
  label :first-of-type  {
     margin-bottom: 0.5em;
-    margin-top: 0.2em;
  }
 }
 
@@ -419,6 +418,9 @@ a:hover, a:active {
 
 #profileCreateForm  .title {
   margin-top: 5%;
+}
+input.clinic {
+  margin-top:6px;
 }
 
 #profileSendEmailContainer {
@@ -537,6 +539,10 @@ a:hover, a:active {
   }
 }
 
+/**override bootstrap style**/
+.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
+  margin-top:5px;
+}
 
 /** Responsive sizes **/
 @media (max-width: 480px) {

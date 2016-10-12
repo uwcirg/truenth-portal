@@ -218,8 +218,8 @@
                     var url = getUrl();
                     if (url != '') {
 
-                        var body = {{ app_text('profileSendEmail email html',
-                                url) | safe }};
+                        var body = '{{ app_text('profileSendEmail email html',
+                                url) | safe }}';
 
                         $.ajax ({
                             type: 'POST',

@@ -363,7 +363,6 @@ a:active {
 }
 #userOrgs label :first-of-type {
   margin-bottom: 0.5em;
-  margin-top: 0.2em;
 }
 #fillOrgs legend {
   font-size: 1em;
@@ -375,6 +374,9 @@ a:active {
 }
 #profileCreateForm .title {
   margin-top: 5%;
+}
+input.clinic {
+  margin-top: 6px;
 }
 #profileSendEmailContainer {
   margin-top: 5%;
@@ -476,6 +478,13 @@ a:active {
 }
 .pagination > li > span {
   color: #79815D;
+}
+/**override bootstrap style**/
+.checkbox input[type=checkbox],
+.checkbox-inline input[type=checkbox],
+.radio input[type=radio],
+.radio-inline input[type=radio] {
+  margin-top: 5px;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
