@@ -10,8 +10,8 @@
 @headlineSize:    1.375em;
 @subheadSize:     1.250em;
 @lgFontSize:      1.8em;
-@lgHeadlineSize:  1.5em;
-@lgsubheadSize:   1.3em;
+@lgHeadlineSize:  1.35em;
+@lgsubheadSize:   1.2em;
 @smallerText:     0.85em;
 @btnSize:         1em;
 @legendSize:      1em;
@@ -399,6 +399,20 @@ a:hover, a:active {
   }
 }
 
+.profile-item-container {
+  background-color: #EFF5F3;
+  padding: 1.5em 2em;
+  border-radius: 8px;
+  margin: 0.5em auto;
+  border: 1px solid #E0E6E3;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.profile-item-title {
+  color: #575F5C;
+  margin-bottom:18px;
+}
 
 .profile-name-label {
   margin-bottom: 2px
@@ -486,6 +500,8 @@ input.clinic {
 
 .profile-section {
   margin-bottom: 1.5em;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .name-section {
   margin-bottom: 1.2em;
@@ -518,6 +534,17 @@ input.clinic {
   -moz-opacity: 0.4;
   -khtml-opacity: 0.4;
   opacity: 0.4;
+}
+.side {
+  height:25em
+}
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.flex div {
+  margin: 0.5em 1em 0.5em 0.5em;
 }
 .pagination {
 
@@ -580,6 +607,22 @@ input.clinic {
     }
   }
 }
+
+@media (max-width: 730) {
+  #userSessionsList {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 630px) {
+  body, .form-control, input, select, h4 {
+    font-size: 13px;
+  }
+  #userSessionsList {
+    font-size: 0.85em
+  }
+}
+
 @media (min-width: 768px) {
   #mainNav {
     height: 135px;

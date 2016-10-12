@@ -164,7 +164,6 @@
 
 {% macro profileSendEmail(person) -%}
     {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
-        <h4>Communications</h4>
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -249,17 +248,17 @@
 {% macro profilePhone(person) -%}
     <div class="form-group float-input-label profile-section">
         <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}" style="width:200px">
     </div>
 {%- endmacro %}
 
 <!--this has an ajax call to fill in the content-->
-{% macro profileOrg(person) -%}
+{% macro profileOrg(person, removeNone) -%}
     <div class="form-group profile-section" id="userOrgs">
         <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="indent">
         <div id="fillOrgs"></div>
-        <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
     </div>
     <script>$(function () { tnthAjax.getOrgs({{ person.id if person }}, true); });</script>
@@ -267,7 +266,7 @@
 
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
-        <p>User Roles for {{ person.username }}</p>
+        <h4 class="profile-item-title">User Roles for {{ person.username }}</h4>
         <p class="small-text text-muted">Editable by admins only.</small></p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
@@ -340,11 +339,8 @@
 
 {% macro profileSessionList(person) -%}
     <!--hard coded for now -->
-    <hr/>
-    <h4>PRO Assessments</h4>
     <div class="form-group profile-section well" id="userSessionsList">
-        <button id="assessPatient" class="btn btn-lg btn-tnth-primary">Assess this patient for the EPIC-26</button>
-        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered small-text">
+        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>Session History</caption>
             <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
             <tr>
@@ -354,8 +350,8 @@
                 <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td>finished</td><td>9:48AM Tue Sep 2, 2016</td><td>1</td>
             </tr>
         </table>
+        <button id="assessPatient" class="btn btn-tnth-primary">Assess this patient for the EPIC-26</button>
     </div>
-    <hr/>
 {%- endmacro %}
 
 
@@ -525,19 +521,65 @@
 
 {% macro profile(person, current_user) -%}
     <div class="row" style="position: relative;">
-        <div class="col-md-9">
-            {{profileImage(person)}}
-            {{profileName(person)}}
-            {{profileBirthDate(person)}}
-            {{profileEmail(person)}}
-            {{profileSendEmail(person)}}
-            {{profileSessionList(person)}}
-            {{profileOrg(person)}}
-            {{profileEthnicity()}}
-            {{profileRace()}}
-            {{profileGender(person)}}
-            {{profilePhone(person)}}
-            {{profileRole(person, current_user)}}
+        <div class="col-md-6">
+            <div class="profile-item-container side">
+                <h4 class="profile-item-title">Patient Information</h4>
+                {{profileImage(person)}}
+                {{profileName(person)}}
+                {{profileBirthDate(person)}}
+                
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="profile-item-container side">
+                <h4 class="profile-item-title">Communications</h4>
+                {{profileEmail(person)}}
+                {{profileSendEmail(person)}}   
+            </div>
+        </div>
+    </div>
+   
+    <div class="row">
+        <div class="col-md-12">
+            <div  class="profile-item-container">
+                <h4 class="profile-item-title">PRO Assessments</h4>
+                {{profileSessionList(person)}}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 class="profile-item-title">Organization Affiliation / Clinics</h4>
+                {{profileOrg(person)}}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 class="profile-item-title">Patient Detail</h4>
+                <div class="flex">
+                    <div>
+                        {{profileGender(person)}}
+                        {{profilePhone(person)}}
+                    </div>
+                    <div>
+                        {{profileEthnicity()}}
+                        {{profileRace()}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                {{profileRole(person, current_user)}}
+            </div>
         </div>
     </div>
 {%- endmacro %}

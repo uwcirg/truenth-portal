@@ -10,13 +10,13 @@
 
     <div class="row" style="position: relative;">
         <div class="col-md-9">
-
-            {{profileName(False)}}
-            {{profileBirthDate(False)}}
-            {{profileEmail(False)}}
-            {{profilePhone(False)}}
-            {{profileOrg(user)}}
-
+            <div class="profile-item-container">
+                {{profileName(False)}}
+                {{profileBirthDate(False)}}
+                {{profileEmail(False)}}
+                {{profilePhone(False)}}
+                {{profileOrg(user, 'true')}}
+            </div>
             <br />
             {{profileSaveBtn()}}
             <br /><br/>
@@ -59,7 +59,7 @@ $(document).ready(function(){
                 } else orgArray = orgIDs;
                 break;
             case 'account':
-            	console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
+            	//console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
             	var orgId = $('#userOrgs input:checkbox:checked').val();
                 orgArray['organization_id'] = (orgId == '' ? '0': orgId);
                 break;
@@ -141,16 +141,16 @@ $(document).ready(function(){
                         { 'system': 'email', 'value': $('input[name=email]').val() },
                         { 'system': 'phone', 'value': $('input[name=phone]').val() }
                     ];
-                    /*****
+                    
                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
-                    ****/
+                    
 
-                    _demoArray['careProvider'] = getOrgs('demo');
+                    _demoArray['careProvider'] = orgIDs;
                     
 
                     console.log(_demoArray);
