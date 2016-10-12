@@ -164,6 +164,7 @@
 
 {% macro profileSendEmail(person) -%}
     {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
+        <h4>Communications</h4>
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -340,12 +341,17 @@
 {% macro profileSessionList(person) -%}
     <!--hard coded for now -->
     <hr/>
-    <div class="form-group profile-section" id="userSessionsList">
-        <label>Session History</label>
+    <h4>PRO Assessments</h4>
+    <div class="form-group profile-section well" id="userSessionsList">
+        <button id="assessPatient" class="btn btn-lg btn-tnth-primary">Assess this patient for the EPIC-26</button>
         <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered small-text">
+            <caption>Session History</caption>
             <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
             <tr>
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">Truenth Epic 26 Questinnaire</a></td><td>finished</td><td>9:48AM Tue Sep 27, 2016</td><td>1</td>
+                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td>finished</td><td>4:03PM Wed Oct 12, 2016</td><td>2</td>
+            </tr>
+            <tr>
+                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td>finished</td><td>9:48AM Tue Sep 2, 2016</td><td>1</td>
             </tr>
         </table>
     </div>
