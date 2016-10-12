@@ -56,8 +56,30 @@ class AppText(db.Model):
         return d
 
 
-def app_text(name):
+def app_text(name, *args):
+    """Look up and return cusomized application text string
+
+    May be embedded directly in jinja2 templates.  Call `app_text()`
+    with the 'name' to uniquely identify the custom string to lookup
+    and return.
+
+    Custom strings may contain an arbitrary number of additional parameters.
+    They should be embedded as zero indexed curly brackets for inclusion.
+
+    For example, given AppText(name='ex', custom_text='Hello {0}. {1} {0}'), a
+    call to `app_text('ex', 'Bob', 'Gooday')` would return:
+        'Hello Bob. Gooday Bob'
+
+    """
     item = AppText.query.filter_by(name=name).first()
     if not item:
         raise ValueError("unknown customized app string '{}'".format(name))
+    if args:
+        text = str(item)
+        try:
+            return text.format(*args)
+        except IndexError:
+            raise ValueError(
+                "AppText with name '{}' defines more parameters "
+                "than provided: `{}`".format(name, *args))
     return str(item)
