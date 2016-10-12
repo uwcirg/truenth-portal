@@ -532,11 +532,17 @@
             {{profileEmail(person)}}
             {{profileSendEmail(person)}}
             {{profileSessionList(person)}}
+            <h4>Organization Affiliation</h4>
+            <div class="well">
             {{profileOrg(person)}}
+            </div>
+            <h4>Patient Details</h4>
+            <div class="well">
             {{profileEthnicity()}}
             {{profileRace()}}
             {{profileGender(person)}}
             {{profilePhone(person)}}
+            </div>
             {{profileRole(person, current_user)}}
         </div>
     </div>
