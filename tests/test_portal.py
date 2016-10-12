@@ -20,7 +20,7 @@ class TestPortal(TestCase):
     def test_card_html(self):
         """Interventions can customize the button text """
         client = self.add_client()
-        intervention = INTERVENTION.sexual_recovery
+        intervention = INTERVENTION.DECISION_SUPPORT_P3P
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
@@ -36,7 +36,7 @@ class TestPortal(TestCase):
     def test_user_card_html(self):
         """Interventions can further customize per user"""
         client = self.add_client()
-        intervention = INTERVENTION.sexual_recovery
+        intervention = INTERVENTION.DECISION_SUPPORT_P3P
         client.intervention = intervention
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id)

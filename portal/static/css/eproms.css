@@ -1,4 +1,4 @@
-/** TrueNTH Shared services portal CSS
+/** Eproms Shared services portal CSS
  * Uses Bootstrap framework
  *
  * = Font sizing =
@@ -8,12 +8,36 @@
 /**
  * = Colors =
  **/
+html {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+}
 body {
   margin: 0;
   background-color: #FFF;
   font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
   color: #333;
   font-size: 18px;
+  transition: all 500ms;
+}
+/** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
+#mainNav {
+  height: 71px;
+}
+#tnthNavWrapper {
+  display: none;
+  visibility: hidden;
+}
+#mainDiv {
+  margin-top: 22px;
 }
 a {
   color: #57675B;
@@ -25,28 +49,25 @@ a:active {
 .tnth-hide {
   display: none;
 }
-.btn {
-  font-size: 18px;
-}
 .tnth-headline {
   margin: 30px 0 20px;
-  font-size: 24px;
+  font-size: 1.375em;
 }
 .tnth-subhead {
-  font-size: 22px;
+  font-size: 1.25em;
 }
 .smaller-text {
-  font-size: 14px;
+  font-size: 0.85em;
 }
 .smaller-text .form-control {
-  font-size: 14px;
-  height: 28px;
+  font-size: 0.85em;
+  height: 1.7em;
 }
 .smaller-text .btn {
-  font-size: 14px;
+  font-size: 0.85em;
 }
-.small-text {
-  font-size: 16.8px;
+.loading {
+  opacity: 0.3;
 }
 .admin-table .search .form-control {
   height: 34px;
@@ -180,11 +201,33 @@ a:active {
 .tnth-splash #wellContent {
   width: 100%;
 }
+.btn {
+  font-size: 1em;
+}
 .btn-set {
   margin-bottom: 1.5em;
 }
 .btn-set .btn {
   margin-bottom: 0.5em;
+}
+.btn-tnth-primary {
+  color: #fff;
+  background-color: #79815D;
+  border-color: #79815D;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+}
+.btn-tnth-primary:hover,
+.btn-tnth-primary:focus,
+.btn-tnth-primary.active,
+.open > .dropdown-toggle.btn-tnth-primary {
+  color: #fff;
+  background-color: #2a4531;
+  border-color: #1c2f21;
+}
+.btn-tnth-back {
+  color: #777;
+  padding: 0 5px 0 0;
 }
 .form-control {
   font-size: 18px;
@@ -240,37 +283,6 @@ a:active {
   margin-top: 30px;
   border-top: 1px solid #ccc;
   padding-top: 1em;
-}
-.btn-tnth-primary {
-  color: #fff;
-  background-color: #79815D;
-  border-color: #79815D;
-  transition: all 0.3s ease-in-out 0s;
-  -webkit-transition: all 0.3s ease-in-out 0s;
-  cursor:pointer;
-}
-.btn-tnth-primary:hover,
-.btn-tnth-primary:focus,
-.btn-tnth-primary.active,
-.open > .dropdown-toggle.btn-tnth-primary {
-  color: #fff;
-  background-color: #2a4531;
-  border-color: #1c2f21;
-  cursor:pointer;
-}
-.btn-tnth-primary.disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-.btn-tnth-primary.disabled:hover {
-  color: #fff;
-  background-color: #79815D;
-  border-color: #79815D;
-  text-decoration:none;
-}
-.btn-tnth-back {
-  color: #777;
-  padding: 0 5px 0 0;
 }
 .separator-horizontal,
 .separator-vertical {
@@ -346,6 +358,77 @@ a:active {
   top: -24px;
   left: 0;
 }
+#userOrgs {
+  font-size: 0.99em;
+}
+#userOrgs label :first-of-type {
+  margin-bottom: 0.5em;
+}
+#fillOrgs legend {
+  font-size: 1em;
+  color: #595F57;
+}
+#fillOrgs,
+.noOrg-container {
+  font-size: 0.99em;
+}
+#profileCreateForm .title {
+  margin-top: 5%;
+}
+input.clinic {
+  margin-top: 6px;
+}
+#profileSendEmailContainer {
+  margin-top: 5%;
+  margin-bottom: 6%;
+  padding-bottom: 5%;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+#profileSendEmailContainer label {
+  font-size: 0.95em;
+}
+#btnProfileSendEmail {
+  margin-top: 5%;
+  font-size: 0.9em;
+  padding: 0.5em;
+  border-radius: 6px;
+}
+#profileEmailMessage {
+  font-size: 0.95em;
+  margin-top: 1em;
+  margin-left: 0.5em;
+}
+#userSessionsList {
+  font-size: 0.95em;
+}
+#userAssessementReport table {
+  word-break: break-all;
+}
+.create-user-link {
+  border-radius: 4px;
+  color: #57675B;
+  background-color: #FFF;
+  border: 1px solid silver;
+  -webkit-box-shadow: 10px 10px 10px -9px #eff2ef;
+  -moz-box-shadow: 10px 10px 10px -9px #eff2ef;
+  box-shadow: 10px 10px 10px -9px #eff2ef;
+  padding: 0.5em;
+}
+.profile-section {
+  margin-bottom: 1.5em;
+}
+.name-section {
+  margin-bottom: 1.2em;
+}
+.orgLinks {
+  margin-top: 4px;
+}
+.error-message {
+  padding: 0.5em;
+  border-radius: 4px;
+  text-align: left;
+}
 /** styles specific to profile **/
 .loading-indicator {
   display: none;
@@ -366,13 +449,42 @@ a:active {
   -khtml-opacity: 0.4;
   opacity: 0.4;
 }
-/** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
-#mainNav {
-  height: 71px;
+.pagination > .active > a {
+  background-color: #79815D;
+  border-color: #79815D;
 }
-#tnthNavWrapper {
-  display: block;
-  visibility: hidden;
+.pagination > .active > a:focus {
+  background-color: #79815D;
+  border-color: #79815D;
+}
+.pagination > .active > a:hover {
+  background-color: #79815D;
+  border-color: #79815D;
+}
+.pagination > .active > span {
+  background-color: #79815D;
+  border-color: #79815D;
+}
+.pagination > .active > span:focus {
+  background-color: #79815D;
+  border-color: #79815D;
+}
+.pagination > .active > span:hover {
+  background-color: #79815D;
+  border-color: #79815D;
+}
+.pagination > li > a {
+  color: #79815D;
+}
+.pagination > li > span {
+  color: #79815D;
+}
+/**override bootstrap style**/
+.checkbox input[type=checkbox],
+.checkbox-inline input[type=checkbox],
+.radio input[type=radio],
+.radio-inline input[type=radio] {
+  margin-top: 5px;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -380,7 +492,7 @@ a:active {
     max-height: 80px;
   }
   #homeFooter {
-    font-size: 14px;
+    font-size: 0.85em;
     padding-top: 0.5em;
   }
   .text-on-img {
@@ -434,13 +546,13 @@ a:active {
 @media (min-width: 992px) {
   /** Font sizes changes above 992 **/
   body {
-    font-size: 24px;
+    font-size: 1.8em;
   }
   .tnth-headline {
-    font-size: 28px;
+    font-size: 1.5em;
   }
   .tnth-subhead {
-    font-size: 25px;
+    font-size: 1.3em;
   }
   #fullSizeContainer {
     padding: 30px 0;
@@ -461,7 +573,7 @@ a:active {
     margin-bottom: 1em;
   }
   .tnth-splash .headline {
-    font-size: 32px;
+    font-size: 1.5em;
   }
   .pos-bottom-md {
     position: absolute;
@@ -473,17 +585,17 @@ a:active {
   }
   .form-group input[type=checkbox],
   .form-group input[type=radio] {
-    margin-top: 9px;
+    margin-top: 5px;
   }
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   body .reduce-font-sizes {
     font-size: 18px;
   }
   .reduce-font-sizes .tnth-headline {
-    font-size: 24px;
+    font-size: 1.375em;
   }
   .reduce-font-sizes .tnth-subhead {
-    font-size: 22px;
+    font-size: 1.25em;
   }
   .reduce-font-sizes .form-group input[type=checkbox],
   .reduce-font-sizes .form-group input[type=radio] {
@@ -748,71 +860,3 @@ fieldset[disabled] .btn-google.active {
   color: #dd4b39;
   background-color: #fff;
 }
-
-#profileCreateForm  .title {
-  margin-top: 5%;
-}
-
-#userOrgs {
- font-size:0.9em;
-}
-
-#fillOrgs legend {
-  font-size:0.9em;
-  color: #595F57;
-}
-
-#profileSendEmailContainer {
-  margin-top: 5%;
-  margin-bottom: 6%;
-  padding-bottom: 7%;
-}
-
-#btnProfileSendEmail {
-  margin-top: 5%;
-  font-size: 0.7em;
-}
-
-#profileEmailMessage {
-  font-size: 0.6em;
-  margin-top: 1em;
-  margin-left:0.5em;
-}
-
-#profileIntro a {
-  text-decoration: underline
-}
-
-#userSessionsList, #fillOrgs{
-  font-size: 0.99em;
-}
-
-#userAssessementReport table {
-  word-break:break-all;
-}
-
-.create-user-link {
-  border-radius:4px;
-  color: #29462a;
-  background-color: #FFF;
-  border: 1px solid silver;
-  -webkit-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
-  -moz-box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
-  box-shadow: 10px 10px 10px -9px rgba(239,242,239,1);
-}
-
-.profile-section {
-  margin-bottom: 1.5em;
-}
-.name-section {
-  margin-bottom: 1.2em;
-}
-.orgLinks {
-  margin-top: 4px;
-}
-.error-message {
-  padding: 0.5em;
-  border-radius: 4px;
-  text-align: left;
-}
-

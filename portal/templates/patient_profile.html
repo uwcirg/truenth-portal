@@ -99,7 +99,8 @@ $("#rolesGroup input:checkbox").on("click",function(){
     var roles = $("#rolesGroup input:checkbox:checked").map(function(){
         return { name: $(this).val() };
     }).get();
-    var toSend = {"roles": roles}
+    var toSend = {"roles": roles};
+    console.log("roles: ", toSend);
     tnthAjax.putRoles({{patient.id}},toSend);
 
 });

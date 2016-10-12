@@ -7,21 +7,17 @@ to life and properly control the visiblity of a intervention card?
 
 """
 from flask_webtest import SessionScope
-from tests import TestCase, TEST_USER_ID, TEST_USERNAME
+from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from manage import initdb
+from portal.models.app_text import app_text
 
 
 class TestSitePersistence(TestCase):
-
-    def setUp(self):
-        """Specialize to perform a seed and persistence approach"""
-        initdb()
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
@@ -38,7 +34,7 @@ class TestSitePersistence(TestCase):
         # (provided we turn off public access)
         INTERVENTION.DECISION_SUPPORT_P3P.public_access = False
         INTERVENTION.SEXUAL_RECOVERY.public_access = False # part of strat.
-        user = self.add_user(username=TEST_USERNAME)
+        user = self.test_user
         self.assertFalse(
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
 
@@ -70,3 +66,6 @@ class TestSitePersistence(TestCase):
             INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
+
+    def test_app_text(self):
+        self.assertEquals(app_text('landing title'), 'Welcome to TrueNTH')

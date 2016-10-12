@@ -25,6 +25,7 @@ from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
+from portal.site_persistence import SitePersistence
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
@@ -169,6 +170,7 @@ class TestCase(Base):
             add_static_relationships()
             add_static_roles()
             db.session.commit()
+            SitePersistence().import_()
         self.init_data()
 
         self.app = self.__app.test_client()

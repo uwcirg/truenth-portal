@@ -16,6 +16,15 @@ from portal.models.user import add_role
 
 class TestIntervention(TestCase):
 
+    def setUp(self):
+        super(TestIntervention, self).setUp()
+
+        # Remove the strategies read in from SitePersistence
+        # to isolate test behavior - i.e. just test what's being added
+        with SessionScope(db):
+            AccessStrategy.query.delete()
+            db.session.commit()
+
     def test_intervention_wrong_service_user(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
@@ -408,7 +417,8 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        uw = Organization(name='UW Medicine (University of Washington)')
+        uw = Organization.query.filter_by(
+            name='UW Medicine (University of Washington)').one()
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
             db.session.commit()
@@ -465,8 +475,9 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        ucsf = Organization(name='UCSF Medical Center')
-        uw = Organization(name='UW Medicine (University of Washington)')
+        ucsf = Organization.query.filter_by(name='UCSF Medical Center').one()
+        uw = Organization.query.filter_by(
+            name='UW Medicine (University of Washington)').one()
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
@@ -565,8 +576,9 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        ucsf = Organization(name='UCSF Medical Center')
-        uw = Organization(name='UW Medicine (University of Washington)')
+        ucsf = Organization.query.filter_by(name='UCSF Medical Center').one()
+        uw = Organization.query.filter_by(
+            name='UW Medicine (University of Washington)').one()
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False

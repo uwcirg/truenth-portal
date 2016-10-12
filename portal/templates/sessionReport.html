@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileAssessment %}
+
+
+<h4 class="tnth-headline">
+Assessment Report for {{user.first_name}}  {{user.last_name}}
+</h4>
+<br/>
+<div class="container">
+	<div class="row" style="position: relative;">
+	    <div class="col-md-9">
+
+	       {{profileAssessment(user)}}
+
+	        <br /><br />
+	        <a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}" class="btn btn-default"> << Back</a>
+	        &nbsp;
+	        <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+	    </div>
+	</div>
+</div>
+
+
+{% endblock %}
+
+{% block document_ready %}
+
+$(document).ready(function(){
+
+});
+
+
+{% endblock %}

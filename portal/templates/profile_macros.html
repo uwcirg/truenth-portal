@@ -1,9 +1,9 @@
 {% macro profileImage(person) -%}
     {% if person.image_url %}
-        <div class="row">
+        <div class="row profile-section">
             <div class="col-xs-12">
                 <div class="profile-img hidden-xs">
-                    <img src="{{ person.image_url }}" />
+                    <img src="{{ person and person.image_url }}" />
                 </div>
             </div>
         </div>
@@ -11,8 +11,8 @@
 {%- endmacro %}
 
 {% macro profileBirthDate(person) -%}
-    <input type="hidden" name="birthDate" id="birthday" value="{{ person.birthdate if person.birthdate }}">
-    <div class="form-group" id="bdGroup">
+    <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
+    <div class="form-group profile-section" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
             <div class="col-xs-4">
@@ -31,12 +31,15 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
+
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+
             </div>
             <div class="col-xs-4">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+
             </div>
         </div>
         <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
@@ -49,25 +52,25 @@
                 $("#year").val(bdArray[0]);
                 $("#month").val(bdArray[1]);
                 $("#date").val(bdArray[2]);
-            }
+            };
         });
      </script>
 {%- endmacro %}
 
-{% macro profileName(person) -%}
-    <div class="form-group" style="margin-bottom: 0">
+{% macro profileName(person, isFocus=False) -%}
+    <div class="form-group profile-name-label">
         <label>Name</label>
     </div>
-    <div class="row">
+    <div class="row profile-section name-section">
         <div class="col-xs-6">
             <div class="form-group float-input-label">
-                <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ person.first_name if person.first_name }}" type="text" />
+                <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div class="col-xs-6">
             <div class="form-group float-input-label">
-                <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person.last_name }}" type="text" />
+                <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
@@ -75,19 +78,19 @@
 {%- endmacro %}
 
 {% macro profileGender(person) -%}
-    <div class="form-group">
+    <div class="form-group profile-section">
         <label>Gender</label>
-        <div style="margin-top: -10px">
+        <div class="profile-radio-list">
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person.gender == "male"}}/>
+                <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 Male
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person.gender == "female"}}/>
+                <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if person and person.gender == "female"}}/>
                 Female
             </label>
             <label class="radio-inline">
-                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person.gender == "other"}}/>
+                <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if person and person.gender == "other"}}/>
                 Other
             </label>
         </div>
@@ -95,9 +98,9 @@
 {%- endmacro %}
 
 {% macro profileRace() -%}
-    <div class="form-group" id="userRace">
+    <div class="form-group profile-section" id="userRace">
         <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-top: -10px">
+        <div class="profile-radio-list">
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
@@ -133,10 +136,9 @@
 {%- endmacro %}
 
 {% macro profileEthnicity() -%}
-    <div class="form-group" id="userEthnicity">
+    <div class="form-group profile-section" id="userEthnicity">
         <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-top: -10px">
-
+        <div class="profile-radio-list">
             <div class="radio">
                 <label>
                     <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
@@ -152,36 +154,120 @@
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
-    <div class="form-group float-input-label" id="emailGroup">
+    <div class="form-group float-input-label profile-section" id="emailGroup">
         <label for="email">Email address</label>
-        <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person.email }}" data-customemail="true" required>
+        <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
 
+
+{% macro profileSendEmail(person) -%}
+    {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
+            <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
+                <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+                <label>Send Email to Patient</label>
+                <select  id="profileEmailSelect" class="form-control bd-element">
+                    <option value="">Select e-mail..</option>
+                    <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
+                    <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+                </select>
+                <button id="btnProfileSendEmail" class="btn btn-default btn-sm disabled">Send Email</button>
+                <div id="profileEmailMessage" class="text-info"></div>
+            </form>
+        </div>
+        <script>$(function () {
+
+            function getUrl() {
+                var url = '';
+                $.ajax ({
+                    type: 'GET',
+                    url: '/api/user/' + $("#_userId").val() + '/access_url',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    async: false
+                }).done(function(data) {
+                    url = data['access_url'];
+                    console.log(url);
+                }).fail(function() {
+                    console.log('failed request');
+                });
+                return url;
+            };
+
+            $('#profileEmailSelect').on('change', function() {
+                var message = '';
+                if (this.value != '') {
+                    message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
+                    $('#profileEmailMessage').text(message);
+                    $('#btnProfileSendEmail').removeClass('disabled');
+                } else {
+                    $('#profileEmailMessage').text('');
+                    $('#btnProfileSendEmail').addClass('disabled');
+                }
+            });
+
+            $('#btnProfileSendEmail').on('click', function(event) {
+                event.preventDefault();
+                var emailTypeElem = $('#profileEmailSelect');
+                var selectedOption = emailTypeElem.children('option:selected');
+                var email = $('#email').val();
+
+                if (selectedOption.val() != '') {
+                    var url = getUrl();
+                    if (url != '') {
+
+                        var body = '{{ app_text('profileSendEmail email html',
+                                url) | safe }}';
+
+                        $.ajax ({
+                            type: 'POST',
+                            url: '/invite',
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            data: {'subject': selectedOption.text(), 'recipients': email, 'body': body}
+                        }).done(function(data) {
+                           //console.log('data ' + data);
+                            $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
+                        }).fail(function() {
+                            console.log('failed request');
+                            $('#profileEmailMessage').text('Unable to send email.');
+                        });
+                    } else {
+                        $('#profileEmailMessage').text('Unable to generate URL for email');
+                    };
+                };
+            });
+
+
+         });</script>
+    {% endif %}
+{%- endmacro %}
+
 {% macro profilePhone(person) -%}
-    <div class="form-group float-input-label">
+    <div class="form-group float-input-label profile-section">
         <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person.phone }}">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
     </div>
 {%- endmacro %}
 
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person) -%}
-    <div class="form-group" id="userOrgs">
+    <div class="form-group profile-section" id="userOrgs">
         <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
-        <div style="margin-left: 10px">
+        <div class="indent">
         <div id="fillOrgs"></div>
-        <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+        <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
     </div>
-    <script>$(function () { tnthAjax.getOrgs({{ user.id }}); });</script>
+    <script>$(function () { tnthAjax.getOrgs({{ person.id if person }}, true); });</script>
 {%- endmacro %}
 
 {% macro profileRole(person, current_user) -%}
-    {% if current_user.has_role('admin') and not person.has_role('service') %}
+    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <p>User Roles for {{ person.username }}</p>
         <p class="small-text text-muted">Editable by admins only.</small></p>
+        <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
             <div class="checkbox">
                 <label>
@@ -223,8 +309,210 @@
                     <input type="checkbox" name="user_type" value="test"> Test
                 </label>
             </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="user_type" value="write_only"> Write Only
+                </label>
+            </div>
         </div>
     {% endif %}
+    <script>$(function () {
+
+    tnthAjax.getRoles({{ person.id }}, true);
+    $("#rolesGroup input[name='user_type']").each(function() {
+        $(this).on("click", function() {
+            var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                    return { name: $(this).val() };
+                }).get();
+                var toSend = {"roles": roles};
+                console.log('update role: ' + toSend);
+                tnthAjax.putRoles({{person.id}},toSend);
+
+             });
+
+        });
+    });
+    </script>
+
+{%- endmacro %}
+
+{% macro profileSessionList(person) -%}
+    <!--hard coded for now -->
+    <hr/>
+    <div class="form-group profile-section" id="userSessionsList">
+        <label>Session History</label>
+        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered small-text">
+            <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
+            <tr>
+                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">Truenth Epic 26 Questinnaire</a></td><td>finished</td><td>9:48AM Tue Sep 27, 2016</td><td>1</td>
+            </tr>
+        </table>
+    </div>
+    <hr/>
+{%- endmacro %}
+
+
+{% macro profileAssessment(person) -%}
+
+        <div>
+            <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
+
+                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="">
+                    <caption>Instrument: Epic26</caption>
+                    <tr>
+                        <th></th>
+                        <th class="table-title">Question
+                        </th>
+                        <th class="table-title">Response
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>1.</td><td> Over the past 4 weeks, how often have you leaked urine?"
+                        </td>
+                        <td>Frequent dribbling
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2.</td><td> Which of the following best describes your urinary control during the last 4 weeks?"
+                        </td>
+                        <td>2 pads per day
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3.</td><td> How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?
+                        </td>
+                        <td>No problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>a.</td><td> Dripping or leaking urine
+                        </td>
+                        <td>1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> b.</td><td> Pain or burning on urination
+                        </td>
+                        <td>2
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> d.</td><td> Weak urine stream or incomplete emptying
+                        </td>
+                        <td>4
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> e.</td><td> Need to urinate frequently during the day
+                        </td>
+                        <td>Small problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 5.</td><td>Overall, how big a problem has your urinary function been for you during the last 4 weeks?
+                        </td>
+                        <td>No problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> a.</td><td> Urgency to have a bowel movement
+                        </td>
+                        <td>1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> b.</td><td> Increased frequency of bowel movements
+                        </td>
+                        <td>2
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> c.</td><td> Losing control of your stools
+                        </td>
+                        <td>3
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> e.</td><td> Abdominal / Pelvic / Rectal Pain
+                        </td>
+                        <td>Very small problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 7.</td><td> Overall, how big a problem have your bowel habits been for you during the past 4 weeks?
+                        </td>
+                        <td>Very Poor to None
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> a.</td><td> Your ability to have an erection?
+                        </td>
+                        <td>4
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> b.</td><td> Your ability to reach orgasm (climax)?
+                        </td>
+                        <td>Firm enough for masturbation and foreplay only
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 9.</td><td> How would you describe the usual QUALITY of your erections during the last 4 weeks?
+                        </td>
+                        <td>I had an erection LESS THAN HALF the time I wanted one
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 10. </td><td>How would you describe the FREQUENCY of your erections during the last 4 weeks?
+                        </td>
+                        <td>Very poor
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 11.</td><td> Overall, how would you rate your ability to function sexually during the last 4 weeks?
+                        </td>
+                        <td>Moderate problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> 12.</td><td> Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?
+                        </td>
+                        <td>Big problem
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> a.</td><td>Hot flashes
+                        </td>
+                        <td>3
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> b.</td><td> Breast tenderness / enlargement
+                        </td>
+                        <td>2
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> c.</td><td> Feeling depressed
+                        </td>
+                        <td>1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> d.</td><td> Lack of energy
+                        </td>
+                        <td>0
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> e.</td><td> Change in body weight"
+                        </td>
+                        <td>0
+                        </td>
+                    </tr>
+                </table>
+            <br />
+        </div>
 
 {%- endmacro %}
 
@@ -234,10 +522,13 @@
             {{profileImage(person)}}
             {{profileName(person)}}
             {{profileBirthDate(person)}}
-            {{profileGender(person)}}
+            {{profileEmail(person)}}
+            {{profileSendEmail(person)}}
+            {{profileSessionList(person)}}
+            {{profileOrg(person)}}
             {{profileEthnicity()}}
             {{profileRace()}}
-            {{profileEmail(person)}}
+            {{profileGender(person)}}
             {{profilePhone(person)}}
             {{profileRole(person, current_user)}}
         </div>
@@ -245,8 +536,9 @@
 {%- endmacro %}
 
 {% macro profileSaveBtn() -%}
-    <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-    <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
+    <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
+    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>There is a problem with your profile. Please correct it before saving.<br/>Make sure all required fields are filled out.</small></p>
+    <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>Profile changes have been saved</em></span>
 {%- endmacro %}

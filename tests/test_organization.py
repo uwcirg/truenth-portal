@@ -30,7 +30,7 @@ class TestOrganization(TestCase):
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
-        parent = Organization(name='fake parent reference')
+        parent = Organization(id=1, name='fake parent reference')
         with SessionScope(db):
             db.session.add(parent)
             db.session.commit()
@@ -91,7 +91,7 @@ class TestOrganization(TestCase):
         self.assert200(rv)
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertEquals(len(bundle['entry']), 3)  # 2 + 'none of the above'
+        self.assertTrue(len(bundle['entry']) > 3)  # 2 + 'none of the above'
 
     def test_organization_put(self):
         with open(os.path.join(
@@ -155,8 +155,7 @@ class TestOrganization(TestCase):
         self.login()
         rv = self.app.delete('/api/organization/{}'.format(org2_id))
         self.assert200(rv)
-        # should leave the `none of the above` and test 1
-        self.assertEquals(Organization.query.count(), 2)
+        self.assertEquals(Organization.query.get(org2_id), None)
         orgs = Organization.query.all()
         names =  [o.name for o in orgs]
         self.assertTrue('none of the above' in names)
@@ -167,7 +166,7 @@ class TestOrganization(TestCase):
             use='official', system='http://www.zorgkaartnederland.nl/',
             value='my official alias', assigner='Organization/1')
         shortcut = Identifier(
-            use='secondary', system=SHORTCUT_ALIAS, value='ucsf')
+            use='secondary', system=SHORTCUT_ALIAS, value='shortcut')
 
         org = Organization(name='test')
         org.identifiers.append(alias)
@@ -185,12 +184,12 @@ class TestOrganization(TestCase):
             data = json.load(fhir_data)
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        org = Organization.query.one()  # only expect the 'none of the above'
+        before = Organization.query.count()
         rv = self.app.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert200(rv)
-        self.assertEquals(Organization.query.count(), 2)
+        self.assertEquals(Organization.query.count(), before + 1)
 
         # the gastro file contains a single identifier - add
         # a second one and PUT, expecting we get two total

@@ -135,8 +135,19 @@ def initial_queries():
         # template.  assume POST can only be sent when valid.
         return next_after_login()
 
-    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603')
-    return render_template('initial_queries.html', user=current_user(), terms=response.text)
+    user = current_user()
+    if not user:
+        # Shouldn't happen, unless user came in on a bookmark
+        return redirect('portal.landing')
+
+    still_needed = Coredata().still_needed(user)
+    terms = None
+    if 'tou' in still_needed:
+        response = requests.get('https://stg-lr7.us.truenth.org/c/portal/'
+                                'truenth/asset?groupId=20147&articleId=41603')
+        terms = response.text
+    return render_template('initial_queries.html', user=user, terms=terms,
+                           still_needed=still_needed)
 
 @portal.route('/home')
 def home():
@@ -263,6 +274,7 @@ def explore():
     user = current_user()
     """Explore TrueNTH page"""
     return render_template('explore.html', user=user)
+
 
 @portal.route('/share-your-story')
 @portal.route('/shareyourstory')

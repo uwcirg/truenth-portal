@@ -1,0 +1,244 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
+
+
+<h3 class="tnth-headline">New User</h3>
+
+<form id="createProfileForm" class="form tnth-form to-validate" role="form">
+
+    <div class="row" style="position: relative;">
+        <div class="col-md-9">
+
+            {{profileName(False)}}
+            {{profileBirthDate(False)}}
+            {{profileEmail(False)}}
+            {{profilePhone(False)}}
+            {{profileOrg(user)}}
+
+            <br />
+            {{profileSaveBtn()}}
+            <br /><br/>
+           {{ back_btn('patients','Patients List')}}
+           <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+        </div>
+    </div>
+
+</form>
+<a id="redirectLink" href="">&nbsp;</a>
+
+{% endblock %}
+
+{% block document_ready %}
+
+function _redirect(userId) {
+    if (userId) {
+        $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
+        $("#redirectLink")[0].click();
+    };
+};
+
+$(document).ready(function(){
+
+    var _userId = '', _demoArray = {}, _orgArray = {};
+    var hasError = false;
+    var errorMessage = '';
+
+    function getOrgs(type) {
+        var orgArray = {};
+        switch(type) {
+            case 'demo':
+                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    return { reference: 'api/organization/'+$(this).val() };
+                }).get();
+                //orgArray['resourceType'] = 'Patient';
+                //orgArray = orgIDs;
+                if (typeof orgIDs === 'undefined'){
+                        orgArray = [0]  // special value for `none of the above`
+                } else orgArray = orgIDs;
+                break;
+            case 'account':
+            	console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
+            	var orgId = $('#userOrgs input:checkbox:checked').val();
+                orgArray['organization_id'] = (orgId == '' ? '0': orgId);
+                break;
+
+        };
+        return orgArray;
+    };
+
+   // console.log(getOrgs('demo'));
+   // console.log(getOrgs('account'));
+
+    $('#createProfileForm').validator().on('submit', function (e) {
+          if (e.isDefaultPrevented()) {
+            // handle the invalid form...
+            $("#errorMsg").fadeIn("slow");
+            return false;
+          } else {
+
+                hasError = false;
+                $("#createProfileForm .help-block.with-errors").each(function() {
+                    if (!hasError) { if ($(this).text() != "") hasError = true };
+                });
+
+                if (hasError) {
+                    $("#errorMsg").fadeIn("slow");
+                    return false;
+                } else {
+                    $("#errorMsg").hide();
+                    hasError = false;
+                };
+
+                // everything looks good!
+                e.preventDefault();
+                $('#errorMsg').hide();
+                $('#serviceErrorMsg').html('').hide();
+
+
+                //sent in something like this for orgs
+                //{ 'organization_id': 9999 }
+
+                _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
+                /****.then(function(responseData){
+                    _userId = responseData['user_id'];
+                    _orgArray = {};
+                    _orgArray['resourceType'] = 'Patient';
+                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
+                    }).get();
+                    if (typeof orgIDs === 'undefined'){
+                        orgIDs = [0]  // special value for `none of the above`
+                    };
+
+                    //console.log("orgs: " + orgIDs);
+
+                    _orgArray['careProvider'] = orgIDs;
+
+                    console.log(_orgArray)
+                    _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_orgArray));
+
+                }).catch(function(error) {
+                    console.log('Error processing request:' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+
+                })***/
+
+                .then(function(responseData) {
+
+                    _userId = responseData['user_id'];
+                    console.log('user: ' + _userId);
+
+                    _demoArray['resourceType'] = 'Patient';
+                    _demoArray['name'] = {
+                        'given': $('input[name=firstname]').val(),
+                        'family': $('input[name=lastname]').val()
+                    };
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['telecom'] = [
+                        { 'system': 'email', 'value': $('input[name=email]').val() },
+                        { 'system': 'phone', 'value': $('input[name=phone]').val() }
+                    ];
+                    /*****
+                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
+                    }).get();
+                    if (typeof orgIDs === 'undefined'){
+                        orgIDs = [0]  // special value for `none of the above`
+                    }
+                    ****/
+
+                    _demoArray['careProvider'] = getOrgs('demo');
+                    
+
+                    console.log(_demoArray);
+
+
+                    //Adding demographic information
+                    //Adding roles of patient and write_only for user
+                    Promise.all([
+                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}, {'name': 'write_only'}]}))])
+                    .then(function(results) {
+                        // Both promises resolved
+                        //console.log('promises resolved');
+                        $('#confirmMsg').fadeIn();
+                        setTimeout("$('#confirmMsg').fadeOut();", 1000);
+                        setTimeout("_redirect(" + _userId + ");", 1100);
+                        //$('#createProfileForm')[0].reset();
+                        clear();
+                    })
+                    .catch(function(error) {
+                        // One or more promises was rejected
+                        console.log('error: ' + error);
+                        errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+
+                    });
+                }).catch(function(error) {
+                    //Display Error Here
+                    console.log('error: ' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                });
+
+                
+
+          };
+    });
+
+    function _get(apiUrl, requestType, requestData) {
+        var errorMessage = '';
+        console.log('apiUrl: ' + apiUrl)
+        return new Promise (function(resolve, reject) {
+            $.ajax ({
+                type: (requestType ? requestType : 'GET'),
+                url: String(apiUrl).replace('//', '/'),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                data: requestData
+            }).done(function(data) {
+                resolve(data);
+            }).fail(function(xhr) {
+                errorMessage = 'Error processing request: ' + apiUrl;
+                console.log(requestData);
+                console.log(errorMessage);
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+                reject(Error(errorMessage));
+            });
+
+        });
+
+    };
+
+
+    function clear() {
+        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
+            var currentElement = $('#' + fieldName);
+            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
+            switch(_tagName.toLowerCase()) {
+                case 'input':
+                    currentElement.val('');
+                    break;
+                case 'select':
+                    currentElement.find('option').prop('selected', false);
+                    break;
+                default:
+                    currentElement.val('');
+            };
+
+            $('#month').find('option').prop('selected', false);
+
+        });
+
+    };
+
+    clear();
+
+});
+
+
+{% endblock %}

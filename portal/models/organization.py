@@ -1,4 +1,4 @@
-"""Modle classes for organizations and related entities.
+"""Model classes for organizations and related entities.
 
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.

@@ -25,7 +25,20 @@ def patients_root():
                                      user.has_role(ROLE.PATIENT)]
 
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org, wide_container="true")
+        'patients_by_org.html', patients_by_org=patients_by_org, user=current_user(), wide_container="true")
+
+@patients.route('/profile_create')
+@oauth.require_oauth()
+@roles_required(ROLE.PROVIDER)
+def profile_create():
+    user = current_user()
+    return render_template("profile_create.html", user = user)
+
+
+@patients.route('/sessionReport/<int:user_id>')
+def sessionReport(user_id):
+    user = get_user(user_id)
+    return render_template("sessionReport.html",user=user)
 
 
 @patients.route('/patient_profile/<int:patient_id>')
@@ -39,4 +52,4 @@ def patient_profile(patient_id):
     if not patient:
         abort(404, "Patient {} Not Found".format(patient_id))
 
-    return render_template('patient_profile.html', patient=patient)
+    return render_template('profile.html', user=patient,  providerPerspective="true")

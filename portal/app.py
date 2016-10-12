@@ -10,6 +10,7 @@ from flask_webtest import get_scopefunc
 from .audit import configure_audit_log
 from .config import DefaultConfig
 from .extensions import babel, celery, db, mail, oauth, user_manager
+from .models.app_text import app_text
 from .models.coredata import configure_coredata
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
@@ -55,6 +56,7 @@ def create_app(config=None, app_name=None, blueprints=None):
 
     app = Flask(app_name, template_folder='templates')
     configure_app(app, config)
+    configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
@@ -72,6 +74,10 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+
+
+def configure_jinja(app):
+    app.jinja_env.globals.update(app_text=app_text)
 
 
 def configure_error_handlers(app):

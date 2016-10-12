@@ -6,32 +6,37 @@
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
-
-{% if current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+{% if providerPerspective == 'true' %}
+{{ back_btn('patients','Patients List') }}
+{% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
 {{ back_btn('admin','User List') }}
 {% else %}
 {{ back_btn(PORTAL,'Home') }}
 {% endif %}
 
-<h3 class="tnth-headline">
-{% if current_user.has_role('admin')%}
-Profile for {{ user.username }}
+<h4 class="tnth-headline">
+{% if providerPerspective == 'true' %}
+    Patient #{{ user.id}} - {{ user.username }}
+{% elif current_user.has_role('admin') %}
+    Profile for {{ user.username }}
 {% else %}
-My TrueNTH Profile
+    My TrueNTH Profile
 {% endif %}
-</h3>
+</h4>
 
 <form id="profileForm" class="form tnth-form to-validate" role="form">
 
 <div class="row" style="position: relative;">
-    <div class="col-md-9">
+    <div class="col-md-11">
 
         {{profile(user, current_user)}}
+        <br/>
         {{profileSaveBtn()}}
-
-        <br /><br />
-
-        <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+        {% if providerPerspective == 'true' %}
+           <br/><br/> {{ back_btn('patients','Patients List') }}
+        {% else %}
+            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Go to TrueNTH Home</small></a>
+        {% endif %}
     </div>
 </div>
 
@@ -41,7 +46,7 @@ My TrueNTH Profile
 {% endblock %}
 
 {% block document_ready %}
-var patientId = {{ user.id }};
+
 $(document).ready(function(){
 
     // When there's a change, check validation and if good, assembleContent
@@ -99,15 +104,19 @@ $("#patientQuestions input").on("change", function(){
 **/
 
 /** Get and Put roles **/
-tnthAjax.getRoles({{ user.id }}, true);
-$("#rolesGroup input:checkbox").on("click",function(){
+function setRoles() {
+    tnthAjax.getRoles({{ user.id }}, true);
+    $("#rolesGroup input:checkbox").on("click",function(){
 
-    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-        return { name: $(this).val() };
-    }).get();
-    var toSend = {"roles": roles}
-    tnthAjax.putRoles({{user.id}},toSend);
+        var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+            return { name: $(this).val() };
+        }).get();
+        var toSend = {"roles": roles};
+        tnthAjax.putRoles({{user.id}},toSend);
 
-});
+    });
+};
+
+setRoles();
 
 {% endblock %}
