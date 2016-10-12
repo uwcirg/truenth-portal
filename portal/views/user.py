@@ -171,7 +171,10 @@ def access_url(user_id):
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
+
     if not ROLE.WRITE_ONLY in has:
+        # KEEP this restriction.  Weak authentication (which the
+        # returned URL provides) should only be available for WRITE_ONLY users
         abort(400, "Account {} lacks WRITE_ONLY role".format(user_id))
 
     # generate an access token

@@ -9,6 +9,7 @@ Interventions will sometimes require their own set of data, for which the
 
 """
 from abc import ABCMeta, abstractmethod
+from flask import current_app
 import sys
 
 from .audit import Audit
@@ -38,6 +39,8 @@ class Coredata(object):
             for cls in self._registered:
                 if cls().hasdata(user):
                     continue
+                current_app.logger.debug(
+                    'intial NOT obtained for at least {}'.format(cls.__name__))
                 return False
             return True
 
@@ -48,6 +51,9 @@ class Coredata(object):
                 instance = cls()
                 if not instance.hasdata(user):
                     needed.append(instance.id)
+            if needed:
+                current_app.logger.debug(
+                    'intial still needed for {}'.format(needed))
             return needed
 
     instance = None
@@ -87,11 +93,11 @@ class CoredataPoint(object):
 
 class DobData(CoredataPoint):
     def hasdata(self, user):
-        # DOB is only required for patient and partner
+        # DOB is only required for patient
         roles = [r.name for r in user.roles]
-        if ROLE.PROVIDER in roles:
+        if ROLE.PROVIDER in roles or ROLE.PARTNER in roles:
             return True
-        elif ROLE.PATIENT in roles or ROLE.PARTNER in roles:
+        elif ROLE.PATIENT in roles:
             return user.birthdate is not None
         else:
             # If they haven't set a role, we don't know if we care yet
