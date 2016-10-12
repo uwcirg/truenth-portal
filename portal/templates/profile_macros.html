@@ -155,7 +155,7 @@
 
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup">
-        <label for="email">Email address</label>
+        <label for="email">Email Address</label>
         <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
@@ -169,7 +169,7 @@
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
                 <label>Send Email to Patient</label>
                 <select  id="profileEmailSelect" class="form-control bd-element">
-                    <option value="">Select e-mail..</option>
+                    <option value="">Select Email...</option>
                     <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
                     <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
                 </select>
