@@ -358,6 +358,15 @@ a:active {
   top: -24px;
   left: 0;
 }
+.profile-name-label {
+  margin-bottom: 2px;
+}
+#userEthnicity label {
+  margin-bottom: 0;
+}
+#userRace label {
+  margin-bottom: 0;
+}
 #userOrgs {
   font-size: 0.99em;
 }
@@ -372,11 +381,11 @@ a:active {
 .noOrg-container {
   font-size: 0.99em;
 }
-#profileCreateForm .title {
-  margin-top: 5%;
-}
 input.clinic {
   margin-top: 6px;
+}
+#profileCreateForm .title {
+  margin-top: 5%;
 }
 #profileSendEmailContainer {
   margin-top: 5%;
@@ -401,6 +410,9 @@ input.clinic {
 }
 #userSessionsList {
   font-size: 0.95em;
+}
+#userSessionsList label {
+  margin-bottom: 6px;
 }
 #userAssessementReport table {
   word-break: break-all;

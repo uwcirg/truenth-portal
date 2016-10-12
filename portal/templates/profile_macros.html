@@ -220,6 +220,7 @@
 
                         var body = '{{ app_text('profileSendEmail email html',
                                 url) | safe }}';
+                        body = body.replace(/href=\"\"/i, 'href="' + url + '"');
 
                         $.ajax ({
                             type: 'POST',
