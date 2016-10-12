@@ -79,11 +79,18 @@ def account():
         schema:
           id: account_args
           properties:
-            organization_id:
-              type: string
-              description:
-                Optional organization identifier defining the organization
-                the new user will belong to.
+            organizations:
+              type: array
+              items:
+                type: object
+                required:
+                  - organization_id
+                properties:
+                  organization_id:
+                      type: string
+                      description:
+                        Optional organization identifier defining the
+                        organization the new user will belong to.
     produces:
       - application/json
     responses:
@@ -100,14 +107,15 @@ def account():
     db.session.commit()
     auditable_event("new account {} generated".format(user.id),
                     user_id=current_user().id)
-    if request.json and 'organization_id' in request.json:
+    if request.json and 'organizations' in request.json:
         # confirm org exists
-        org_id = request.json['organization_id']
-        org = Organization.query.get(org_id)
-        if not org:
-            abort(400, "Organization {} not found".format(org_id))
-        # add org to users account
-        user.organizations.append(org)
+        for org in request.json['organizations']:
+            org_id = org['organization_id']
+            org = Organization.query.get(org_id)
+            if not org:
+                abort(400, "Organization {} not found".format(org_id))
+            # add org to users account
+            user.organizations.append(org)
         db.session.commit()
         auditable_event("added {} to {}".format(org, user),
                         user_id=current_user().id)
