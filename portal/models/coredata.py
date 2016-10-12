@@ -9,6 +9,7 @@ Interventions will sometimes require their own set of data, for which the
 
 """
 from abc import ABCMeta, abstractmethod
+from flask import current_app
 import sys
 
 from .audit import Audit
@@ -38,6 +39,8 @@ class Coredata(object):
             for cls in self._registered:
                 if cls().hasdata(user):
                     continue
+                current_app.logger.debug(
+                    'intial NOT obtained for at least {}'.format(cls.__name__))
                 return False
             return True
 
@@ -48,6 +51,9 @@ class Coredata(object):
                 instance = cls()
                 if not instance.hasdata(user):
                     needed.append(instance.id)
+            if needed:
+                current_app.logger.debug(
+                    'intial still needed for {}'.format(needed))
             return needed
 
     instance = None
