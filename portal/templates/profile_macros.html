@@ -574,7 +574,7 @@
             </div>
         </div>
     </div>
-    
+    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
@@ -582,6 +582,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileSaveBtn() -%}

@@ -63,7 +63,7 @@ $(document).ready(function(){
             	//var orgId = $('#userOrgs input:checkbox:checked').val();
                 //orgArray['organization_id'] = (orgId == '' ? '0': orgId);
                 var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
-                    return { organization_id: 'api/organization/'+$(this).val() };
+                    return { organization_id: $(this).val() };
                 }).get();
                 orgArray['organizations'] = orgIDs;
                 break;
@@ -105,30 +105,6 @@ $(document).ready(function(){
                 //{ 'organization_id': 9999 }
 
                 _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
-                /****.then(function(responseData){
-                    _userId = responseData['user_id'];
-                    _orgArray = {};
-                    _orgArray['resourceType'] = 'Patient';
-                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
-                        return { reference: 'api/organization/'+$(this).val() };
-                    }).get();
-                    if (typeof orgIDs === 'undefined'){
-                        orgIDs = [0]  // special value for `none of the above`
-                    };
-
-                    //console.log("orgs: " + orgIDs);
-
-                    _orgArray['careProvider'] = orgIDs;
-
-                    console.log(_orgArray)
-                    _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_orgArray));
-
-                }).catch(function(error) {
-                    console.log('Error processing request:' + error);
-                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
-
-                })***/
 
                 .then(function(responseData) {
 
@@ -170,7 +146,7 @@ $(document).ready(function(){
                         //console.log('promises resolved');
                         $('#confirmMsg').fadeIn();
                         setTimeout("$('#confirmMsg').fadeOut();", 1000);
-                        //setTimeout("_redirect(" + _userId + ");", 1100);
+                        setTimeout("_redirect(" + _userId + ");", 1100);
                         //$('#createProfileForm')[0].reset();
                         clear();
                     })
