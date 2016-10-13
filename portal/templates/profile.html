@@ -6,6 +6,7 @@
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div>
+<br/>
 {% if providerPerspective == 'true' %}
 {{ back_btn('patients','Patients List') }}
 {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
@@ -23,10 +24,9 @@
         My TrueNTH Profile
     {% endif %}
     </h4>
-
     {{profileImage(user)}}
 </div>
-<br/>
+<hr/>
 
 <form id="profileForm" class="form tnth-form to-validate" role="form">
 
@@ -38,7 +38,7 @@
         {% if providerPerspective == 'true' %}
            <br/><br/> {{ back_btn('patients','Patients List') }}
         {% else %}
-            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Go to TrueNTH Home</small></a>
+            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Back to Home</small></a>
         {% endif %}
     </div>
 </div>

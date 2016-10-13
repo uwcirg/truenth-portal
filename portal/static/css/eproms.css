@@ -37,7 +37,7 @@ body {
   visibility: hidden;
 }
 #mainDiv {
-  margin-top: 22px;
+  /* margin-top: 22px; */
 }
 a {
   color: #57675B;
@@ -456,7 +456,7 @@ input.clinic {
   box-shadow: 10px 10px 10px -9px #eff2ef;
   padding: 0.5em;
 }
-.profiler-header {
+.profile-header {
   width: 45%;
 }
 .profile-section {
@@ -543,6 +543,13 @@ input.clinic {
 .radio-inline input[type=radio] {
   margin-top: 6px;
 }
+
+div.modal-header, div.modal-footer {
+  background-color:#79815D; 
+  color: #FFF;
+}
+
+
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -567,14 +574,17 @@ input.clinic {
     font-size: 0.9em;
   }
 }
-@media (max-width: 630px) {
+@media (max-width: 640px) {
   body,
   .form-control,
   input,
   select,
-  h4 {
+  h4,
+  label,
+  .tnth-form .form-group > label {
     font-size: 13px;
   }
+
   #userSessionsList {
     font-size: 0.85em;
   }
@@ -701,10 +711,10 @@ input.clinic {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -100px;
+    margin-top: -90px;
   }
   .profile-img img {
-    width: 100px;
+    width: 90px;
     border-radius: 60px;
   }
   .btn-set {

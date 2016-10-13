@@ -338,16 +338,35 @@
     <!--hard coded for now -->
     <div class="form-group profile-section well" id="userSessionsList">
         <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
-            <caption>Session History</caption>
-            <th>Project Name</th><th>State</th><th>Last Activity</th><th>Session ID</th>
-            <tr>
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td>finished</td><td>4:03PM Wed Oct 12, 2016</td><td>2</td>
+            <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
+            <th>Project Name</th><th>State</th><th>Last Activity</th>
+            
+            <tr title="Click to view report">
+                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">4:03PM Wed Oct 12, 2016</a></td>
             </tr>
-            <tr>
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td>finished</td><td>9:48AM Tue Sep 2, 2016</td><td>1</td>
+            <tr title="Click to view report">
+                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">9:48AM Tue Sep 2, 2016</a></td>
             </tr>
         </table>
-        <button id="assessPatient" class="btn btn-tnth-primary">Assess this patient for the EPIC-26</button>
+         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+    </div>
+    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Assessment Patient for EPIC-26</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
 {%- endmacro %}
 
@@ -534,15 +553,16 @@
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div  class="profile-item-container">
-                <h4 class="profile-item-title">PRO Assessments</h4>
-                {{profileSessionList(person)}}
+    {% if person and person.has_role('patient') %}
+        <div class="row">
+            <div class="col-md-12">
+                <div  class="profile-item-container">
+                    <h4 class="profile-item-title">PRO Assessments</h4>
+                    {{profileSessionList(person)}}
+                </div>
             </div>
         </div>
-    </div>
+    {%endif %}
 
     <div class="row">
         <div class="col-md-12">

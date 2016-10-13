@@ -3,21 +3,25 @@
 {% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileAssessment %}
 
+<br/>
 
 <h4 class="tnth-headline">
 Assessment Report for {{user.first_name}}  {{user.last_name}}
 </h4>
-<br/>
+<hr/>
 <div class="container">
 	<div class="row" style="position: relative;">
-	    <div class="col-md-9">
+	    <div class="col-md-12">
+	    	
+	       	{{profileAssessment(user)}}
+	        
+	        <br />
 
-	       {{profileAssessment(user)}}
-
-	        <br /><br />
-	        <a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}" class="btn btn-default"> << Back</a>
-	        &nbsp;
-	        <a href="{{PORTAL}}/home" class="btn btn-default">Go to TrueNTH Home</a>
+	        <a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to Profile</small></a>
+	        <br/>
+	        <!--
+	        <a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to Home</small></a>
+	        -->
 	    </div>
 	</div>
 </div>
