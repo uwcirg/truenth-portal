@@ -45,7 +45,9 @@ function embed_page(data){
     $("img.tnth-topnav-wordmark").load(function(){
         $("#tnthNavWrapper").show();
         //adding this for firefox fix
-        $("#tnthNavWrapper").css("visibility","visible").css("display", "block");
+        $("#tnthNavWrapper").css("visibility","visible");
+        $("#tnthNavWrapper").css("display", "block");
+        $("#tnthUserBtn").show();
     });
     // Todo: add "data-*" HTML attribute
 }

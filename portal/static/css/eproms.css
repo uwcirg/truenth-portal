@@ -36,8 +36,11 @@ body {
   display: none;
   visibility: hidden;
 }
+#tnthUserBtn {
+  display: none;
+}
 #mainDiv {
-  /* margin-top: 22px; */
+  /*margin-top: 22px;*/
 }
 a {
   color: #57675B;
@@ -244,7 +247,7 @@ a:active {
   margin-top: -70px;
 }
 .profile-img img {
-  width: 85px;
+  width: 80px;
   border-radius: 45px;
 }
 .portal-item {
@@ -543,13 +546,11 @@ input.clinic {
 .radio-inline input[type=radio] {
   margin-top: 6px;
 }
-
-div.modal-header, div.modal-footer {
-  background-color:#79815D; 
+div.modal-header,
+div.modal-footer {
+  background-color: #79815D;
   color: #FFF;
 }
-
-
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -584,12 +585,42 @@ div.modal-header, div.modal-footer {
   .tnth-form .form-group > label {
     font-size: 13px;
   }
-
+  #profileForm #month {
+    font-size: 12px;
+    width: 8.3em;
+  }
+  #profileForm #date,
+  #profileForm #year {
+    position: relative;
+    left: 1px;
+  }
   #userSessionsList {
     font-size: 0.85em;
   }
   .profile-item-container {
     overflow-y: auto;
+    padding: 0.3em;
+  }
+  .side {
+    height: 27em;
+  }
+  #phone {
+    width: 190px;
+  }
+  #date {
+    position: relative;
+    left: -14px;
+  }
+  #year {
+    position: relative;
+    width: 5em;
+    left: -28px;
+  }
+  .checkbox input[type=checkbox],
+  .checkbox-inline input[type=checkbox],
+  .radio input[type=radio],
+  .radio-inline input[type=radio] {
+    margin-top: 2px;
   }
 }
 @media (min-width: 768px) {
@@ -711,7 +742,7 @@ div.modal-header, div.modal-footer {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -100px;
+    margin-top: -70px;
   }
   .profile-img img {
     width: 80px;
