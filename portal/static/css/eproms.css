@@ -359,7 +359,8 @@ a:active {
   left: 0;
 }
 .profile-item-container {
-  background-color: #EFF5F3;
+  /*background-color: #EFF5F3;*/
+  background-color: rgba(173, 193, 197, 0.14);
   padding: 1.5em 2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -409,7 +410,7 @@ input.clinic {
   font-size: 0.95em;
 }
 .create-account-container {
-  padding: 2.5em 3.5em;
+  padding: 3em 5em;
 }
 #btnProfileSendEmail {
   margin-top: 5%;
