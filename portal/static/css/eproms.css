@@ -33,7 +33,7 @@ body {
   height: 71px;
 }
 #tnthNavWrapper {
-  display: none;
+  display: block;
   visibility: hidden;
 }
 #tnthUserBtn {
