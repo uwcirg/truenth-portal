@@ -4,24 +4,25 @@
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 
 
-<h4 class="tnth-headline">New User</h4>
-
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
 
     <div class="row" style="position: relative;">
         <div class="col-md-12">
+            <h4 class="tnth-headline left-indent">New User</h4>
             <div class="profile-item-container create-account-container">
                 {{profileName(False)}}
                 {{profileBirthDate(False)}}
                 {{profileEmail(False)}}
                 {{profilePhone(False)}}
                 {{profileOrg(user, 'true')}}
+                <br />
+                {{profileSaveBtn()}}
             </div>
-            <br />
-            {{profileSaveBtn()}}
-            <br /><br/>
-           {{ back_btn('patients','Patients List')}}
-           <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            <br/>
+            <div class="left-indent">
+                {{ back_btn('patients','Patients List')}}
+                <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            </div>
         </div>
     </div>
 

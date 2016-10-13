@@ -406,7 +406,7 @@ a:hover, a:active {
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -427,6 +427,9 @@ a:hover, a:active {
   margin-bottom: 0
 }
 
+#genderLabel {
+  margin-bottom: 0
+}
 
 #userOrgs {
  font-size:@orgSize;
@@ -453,6 +456,10 @@ input.clinic {
   margin-top: 5%;
 }
 
+#profileCreateForm a.btn-tnth-back, #profileCreateForm  h4 {
+  margin-left: 3em;
+}
+
 #profileSendEmailContainer {
   padding-bottom: 5%;
   background-color: #f9f9f9;
@@ -463,7 +470,11 @@ input.clinic {
 }
 
 .create-account-container {
-  padding: 3em 5em
+  padding: 3.5em 4em;
+  width: 90%;
+}
+.left-indent {
+  margin-left: 3em;
 }
 
 #btnProfileSendEmail {
@@ -553,7 +564,7 @@ input.clinic {
   justify-content: flex-start;
 }
 .flex div {
-  margin: 0.5em 1.5em 0.5em 0.1em;
+  margin: 0.5em 1.2em 0.5em 0.1em;
 }
 
 .pagination {
@@ -630,6 +641,9 @@ input.clinic {
   }
   #userSessionsList {
     font-size: 0.85em
+  }
+  .profile-item-container {
+    overflow-y:auto
   }
 }
 

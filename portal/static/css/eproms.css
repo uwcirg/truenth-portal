@@ -365,7 +365,7 @@ a:active {
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 .profile-item-title {
@@ -379,6 +379,9 @@ a:active {
   margin-bottom: 0;
 }
 #userRace label {
+  margin-bottom: 0;
+}
+#genderLabel {
   margin-bottom: 0;
 }
 #userOrgs {
@@ -401,6 +404,10 @@ input.clinic {
 #profileCreateForm .title {
   margin-top: 5%;
 }
+#profileCreateForm a.btn-tnth-back,
+#profileCreateForm h4 {
+  margin-left: 3em;
+}
 #profileSendEmailContainer {
   padding-bottom: 5%;
   background-color: #f9f9f9;
@@ -410,7 +417,11 @@ input.clinic {
   font-size: 0.95em;
 }
 .create-account-container {
-  padding: 3em 5em;
+  padding: 3.5em 4em;
+  width: 90%;
+}
+.left-indent {
+  margin-left: 3em;
 }
 #btnProfileSendEmail {
   margin-top: 5%;
@@ -490,7 +501,7 @@ input.clinic {
   justify-content: flex-start;
 }
 .flex div {
-  margin: 0.5em 1.5em 0.5em 0.1em;
+  margin: 0.5em 1.2em 0.5em 0.1em;
 }
 .pagination > .active > a {
   background-color: #79815D;
@@ -563,6 +574,9 @@ input.clinic {
   }
   #userSessionsList {
     font-size: 0.85em;
+  }
+  .profile-item-container {
+    overflow-y: auto;
   }
 }
 @media (min-width: 768px) {

@@ -75,8 +75,8 @@
 {%- endmacro %}
 
 {% macro profileGender(person) -%}
-    <div class="form-group profile-section">
-        <label>Gender</label>
+    <div class="form-group profile-section" id="genderGroup">
+        <label id="genderLabel">Gender</label>
         <div class="profile-radio-list">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
@@ -560,10 +560,14 @@
                 <div class="flex">
                     <div>
                         {{profileGender(person)}}
+                        <br/>
                         {{profilePhone(person)}}
                     </div>
                     <div>
-                        {{profileEthnicity()}}
+
+                         {{profileEthnicity()}}
+                    </div>
+                    <div>
                         {{profileRace()}}
                     </div>
                 </div>
