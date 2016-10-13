@@ -1,0 +1,37 @@
+Configuration
+*************
+
+.. contents::
+   :depth: 3
+   :local:
+
+application.cfg
+===============
+
+The primary configuration file lives in the source directory.
+See `README <readme_link.html>`__ for initial setup.
+
+Values with defaults are defined in the ``portal.config.BaseConfig`` class.
+
+T
+        'REQUIRED_CORE_DATA', ['name', 'dob', 'role', 'org', 'clinical', 'tou'])
+
+
+
+
+Any client can assume the role of an intervention.  By doing so, the client
+becomes the **official** implementation for said role.
+
+Access
+======
+
+Controlling access to interventions deserves special mention.  On the
+``/client/<client_id>`` page, the application developer may view and
+alter the value of **public_accessible**.
+
+.. note::
+
+   With **public_accessible** set, the intervention will always be displayed.
+
+When **public_accessible** is *not* set, two additional options exist for
+enabling said intervention.
