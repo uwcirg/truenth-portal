@@ -47,7 +47,7 @@ function embed_page(data){
         //adding this for firefox fix
         $("#tnthNavWrapper").css("visibility","visible");
         $("#tnthNavWrapper").css("display", "block");
-        $("#tnthUserBtn").show();
+        //$("#tnthUserBtn").show();
     });
     // Todo: add "data-*" HTML attribute
 }

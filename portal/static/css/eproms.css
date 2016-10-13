@@ -33,11 +33,8 @@ body {
   height: 71px;
 }
 #tnthNavWrapper {
-  display: block;
-  visibility: hidden;
-}
-#tnthUserBtn {
   display: none;
+  visibility: hidden;
 }
 #mainDiv {
   /*margin-top: 22px;*/
