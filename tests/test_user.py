@@ -180,15 +180,19 @@ class TestUser(TestCase):
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider
         org = Organization(name='sample')
+        org2 = Organization(name='another sample')
         with SessionScope(db):
             db.session.add(org)
+            db.session.add(org2)
             db.session.commit()
-        org = db.session.merge(org)
+        org, org2 = map(db.session.merge, (org, org2))
         provider = self.add_user('provider@example.com')
         provider.organizations.append(org)
+        provider.organizations.append(org2)
         self.promote_user(user=provider, role_name=ROLE.PROVIDER)
-        provider, org = map(db.session.merge, (provider, org))
-        data = {'organization_id': org.id}
+        provider, org, org2 = map(db.session.merge, (provider, org, org2))
+        data = {'organizations': [{'organization_id': org.id},
+                                  {'organization_id': org2.id}]}
         self.login(user_id=provider.id)
         rv = self.app.post('/api/account',
                 content_type='application/json',
@@ -222,6 +226,7 @@ class TestUser(TestCase):
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale.codings[0].code, language)
+        self.assertEquals(new_user.organizations.count(), 2)
 
     def test_user_by_organization(self):
         # generate a handful of users in different orgs
