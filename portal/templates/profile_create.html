@@ -60,8 +60,12 @@ $(document).ready(function(){
                 break;
             case 'account':
             	//console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
-            	var orgId = $('#userOrgs input:checkbox:checked').val();
-                orgArray['organization_id'] = (orgId == '' ? '0': orgId);
+            	//var orgId = $('#userOrgs input:checkbox:checked').val();
+                //orgArray['organization_id'] = (orgId == '' ? '0': orgId);
+                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    return { organization_id: 'api/organization/'+$(this).val() };
+                }).get();
+                orgArray['organizations'] = orgIDs;
                 break;
 
         };
@@ -166,7 +170,7 @@ $(document).ready(function(){
                         //console.log('promises resolved');
                         $('#confirmMsg').fadeIn();
                         setTimeout("$('#confirmMsg').fadeOut();", 1000);
-                        setTimeout("_redirect(" + _userId + ");", 1100);
+                        //setTimeout("_redirect(" + _userId + ");", 1100);
                         //$('#createProfileForm')[0].reset();
                         clear();
                     })
