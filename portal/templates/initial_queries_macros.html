@@ -33,7 +33,7 @@
           </div>
         </div>
     </div>
-    <script>$(function () { 
+    <script>$(function () {
         tnthAjax.getName($("#iq_userId").val());
         ["firstname", "lastname"].forEach(function(field) {
             $("#" + field).on("blur", function() {
@@ -96,7 +96,7 @@
             <span id="errorbirthday" class="help-block tnth-hide">A block of help text that breaks onto a new line and may extend beyond one line.</span>
         </div>
       </div>
-       <script>$(function () { 
+       <script>$(function () {
             tnthAjax.getDob($("#iq_userId").val());
             ["month", "date", "year"].forEach(function(field) {
               $("#" + field).on("blur", function() {

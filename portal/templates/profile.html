@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "profile_macros.html" import profile, profileSaveBtn %}
+{% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 
 <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
@@ -13,16 +13,19 @@
 {% else %}
 {{ back_btn(PORTAL,'Home') }}
 {% endif %}
+<div style="width:45%">
+    <h4 class="tnth-headline">
+    {% if providerPerspective == 'true' %}
+        Patient #{{ user.id}} - {{ user.username }}
+    {% elif current_user.has_role('admin') %}
+        Profile for {{ user.username }}
+    {% else %}
+        My TrueNTH Profile
+    {% endif %}
+    </h4>
 
-<h4 class="tnth-headline">
-{% if providerPerspective == 'true' %}
-    Patient #{{ user.id}} - {{ user.username }}
-{% elif current_user.has_role('admin') %}
-    Profile for {{ user.username }}
-{% else %}
-    My TrueNTH Profile
-{% endif %}
-</h4>
+    {{profileImage(user)}}
+</div>
 <br/>
 
 <form id="profileForm" class="form tnth-form to-validate" role="form">

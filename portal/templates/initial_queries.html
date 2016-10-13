@@ -23,10 +23,12 @@
 
       <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
 
-        <p>First, tell us who you are:</p>
+        <!--<p>First, tell us who you are:</p>-->
 
         {% if 'name' in still_needed %}
           {{nameGroup()}}
+        {% else %}
+          <p>Name: {{user.first_name}} {{user.last_name}}</p>
         {% endif %}
         {% if 'role' in still_needed %}
           {{rolesGroup()}}
@@ -49,7 +51,7 @@
     {% endif %}
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
   </form>
-
+  <a id="redirectHomeLink" href="">&nbsp;</a>
   </div>
 
 {% endblock %}
@@ -58,8 +60,17 @@
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
-$(document).ready(function(){
 
+function _redirectHome() {
+
+    $("#redirectHomeLink").attr('href', '/home');
+    $("#redirectHomeLink")[0].click();
+
+};
+
+
+$(document).ready(function(){
+    //nameGroup rolesGroup bdGroup patientQ clinics
     var sections = [];
     var incompleteFields = [];
     var mainSections = {
@@ -78,24 +89,25 @@ $(document).ready(function(){
                 switch(String(type).toLowerCase()) {
                 case 'checkbox':
                 case 'radio':
-                    if (!field.is(':checked')) incompleteFields.push(field);
+                    if (!field.is(':checked')) incompleteFields.push({'section': $('#'+ section), 'element':field});
                     break;
                 case 'select':
                 case 'text':
-                    if (field.val() == '') incompleteFields.push(field);
+                    if (field.val() == '') incompleteFields.push({'section': $('#' + section), 'element': field});
                     break;
                 };
               };
 
           });
-          
+
       };
 
       incompleteFields.forEach(function(field, index) {
-          field.attr('sectionIndex', index);
-          field.on('click', function() {
+          var f = field.element;
+          f.attr('sectionIndex', index);
+          f.on('click', function() {
               if ($(this).attr('sectionIndex') == (incompleteFields.length - 1)) $("#updateProfile").removeAttr("disabled");
-              console.log('field index: ' + field.attr('sectionIndex'));
+              console.log('field index: ' + f.attr('sectionIndex'));
               console.log('incomplete fields length: ' + incompleteFields.length);
           });
 
@@ -103,18 +115,24 @@ $(document).ready(function(){
 
 
     if (incompleteFields.length == 0) {
-        $("#clinics").show();
-        $("#updateProfile").removeAttr("disabled");
+        //$("#clinics").show();
+        //$("#updateProfile").removeAttr("disabled");
+        _redirectHome();
     } else {
-         incompleteFields[0].show();
-        //patientQ div that encloses the patient questions is currently invisible
-        if (incompleteFields[0].hasClass('pat-q')) $("#patientQ").show();
-        if (incompleteFields[0].attr(name) == "organization") $("#clinics").show();
+         incompleteFields[0].section.show();
+         incompleteFields[0].element.show();
 
     };
 
+    /**** debugging *****
+    incompleteFields.forEach(function(field, index) {
+        console.log(field.section.attr("id") + " " + field.section.length);
 
-    
+    });
+    *******/
+
+
+
     /** 1st - get all current info **/
     /***done in macros now*****/
     //tnthAjax.getRoles({{ user.id }});

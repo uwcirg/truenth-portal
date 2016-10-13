@@ -408,6 +408,9 @@ input.clinic {
 #profileSendEmailContainer label {
   font-size: 0.95em;
 }
+.create-account-container {
+  padding: 2.5em 3.5em;
+}
 #btnProfileSendEmail {
   margin-top: 5%;
   font-size: 0.9em;
@@ -415,7 +418,7 @@ input.clinic {
   border-radius: 6px;
 }
 #profileEmailMessage {
-  font-size: 0.95em;
+  font-size: 0.9em;
   margin-top: 1em;
   margin-left: 0.5em;
 }
@@ -437,6 +440,9 @@ input.clinic {
   -moz-box-shadow: 10px 10px 10px -9px #eff2ef;
   box-shadow: 10px 10px 10px -9px #eff2ef;
   padding: 0.5em;
+}
+.profiler-header {
+  width: 45%;
 }
 .profile-section {
   margin-bottom: 1.5em;
@@ -483,7 +489,7 @@ input.clinic {
   justify-content: flex-start;
 }
 .flex div {
-  margin: 0.5em 1em 0.5em 0.5em;
+  margin: 0.5em 1.5em 0.5em 0.1em;
 }
 .pagination > .active > a {
   background-color: #79815D;
@@ -520,7 +526,7 @@ input.clinic {
 .checkbox-inline input[type=checkbox],
 .radio input[type=radio],
 .radio-inline input[type=radio] {
-  margin-top: 5px;
+  margin-top: 6px;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -655,6 +661,11 @@ input.clinic {
     margin-top: 4px;
   }
 }
+@media (max-width: 1199px) {
+  .profile-img {
+    display: none;
+  }
+}
 @media (min-width: 1200px) {
   #fullSizeContainer {
     padding: 60px 0 60px;
@@ -675,7 +686,7 @@ input.clinic {
     margin-top: -100px;
   }
   .profile-img img {
-    width: 120px;
+    width: 100px;
     border-radius: 60px;
   }
   .btn-set {

@@ -1,12 +1,9 @@
 {% macro profileImage(person) -%}
     {% if person.image_url %}
-        <div class="row profile-section">
-            <div class="col-xs-12">
-                <div class="profile-img hidden-xs">
-                    <img src="{{ person and person.image_url }}" />
-                </div>
-            </div>
+        <div class="profile-img hidden-xs">
+            <img src="{{ person and person.image_url }}" />
         </div>
+
     {% endif %}
 {%- endmacro %}
 
@@ -523,22 +520,21 @@
     <div class="row" style="position: relative;">
         <div class="col-md-6">
             <div class="profile-item-container side">
-                <h4 class="profile-item-title">Patient Information</h4>
-                {{profileImage(person)}}
+                <h4 class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
                 {{profileName(person)}}
                 {{profileBirthDate(person)}}
-                
+
             </div>
         </div>
         <div class="col-md-6">
             <div class="profile-item-container side">
                 <h4 class="profile-item-title">Communications</h4>
                 {{profileEmail(person)}}
-                {{profileSendEmail(person)}}   
+                {{profileSendEmail(person)}}
             </div>
         </div>
     </div>
-   
+
     <div class="row">
         <div class="col-md-12">
             <div  class="profile-item-container">
@@ -547,7 +543,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
@@ -556,11 +552,11 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
-                <h4 class="profile-item-title">Patient Detail</h4>
+                <h4 class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
                 <div class="flex">
                     <div>
                         {{profileGender(person)}}
@@ -575,13 +571,13 @@
         </div>
     </div>
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
-    <div class="row">
-        <div class="col-md-12">
-            <div class="profile-item-container">
-                {{profileRole(person, current_user)}}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-item-container">
+                    {{profileRole(person, current_user)}}
+                </div>
             </div>
         </div>
-    </div>
     {% endif %}
 {%- endmacro %}
 

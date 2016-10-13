@@ -4,13 +4,13 @@
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 
 
-<h3 class="tnth-headline">New User</h3>
+<h4 class="tnth-headline">New User</h4>
 
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
 
     <div class="row" style="position: relative;">
-        <div class="col-md-9">
-            <div class="profile-item-container">
+        <div class="col-md-12">
+            <div class="profile-item-container create-account-container">
                 {{profileName(False)}}
                 {{profileBirthDate(False)}}
                 {{profileEmail(False)}}
@@ -121,17 +121,17 @@ $(document).ready(function(){
                         { 'system': 'email', 'value': $('input[name=email]').val() },
                         { 'system': 'phone', 'value': $('input[name=phone]').val() }
                     ];
-                    
+
                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
                     if (typeof orgIDs === 'undefined'){
                         orgIDs = [0]  // special value for `none of the above`
                     }
-                    
+
 
                     _demoArray['careProvider'] = orgIDs;
-                    
+
 
                     console.log(_demoArray);
 
@@ -164,7 +164,7 @@ $(document).ready(function(){
                     if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
                 });
 
-                
+
 
           };
     });
