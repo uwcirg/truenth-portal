@@ -79,12 +79,17 @@ new_head=$(git rev-parse origin/$BRANCH)
 
 
 # New modules
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ) ]]; then
+if [[
+    $FORCE ||
+    ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/setup.py) && $? -eq 0 ) ||
+    ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/requirements.txt) && $? -eq 0 )
+]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
         echo "Updating python dependancies"
     fi
+    cd "${GIT_WORK_TREE}"
     pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
 
     # Restart in case celery module updates
