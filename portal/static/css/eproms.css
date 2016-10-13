@@ -420,8 +420,11 @@ input.clinic {
   padding: 3.5em 4em;
   width: 90%;
 }
-.left-indent {
-  margin-left: 3em;
+.left-indent-bottom {
+  margin-left: 3.2em;
+}
+.left-indent-top {
+  margin-left: 2.5em;
 }
 #btnProfileSendEmail {
   margin-top: 5%;
