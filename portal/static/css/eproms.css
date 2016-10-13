@@ -33,7 +33,7 @@ body {
   height: 71px;
 }
 #tnthNavWrapper {
-  display: none;
+  display: block;
   visibility: hidden;
 }
 #mainDiv {
@@ -590,6 +590,14 @@ div.modal-footer {
   #profileForm #year {
     position: relative;
     left: 1px;
+  }
+  #profileCreateForm select {
+    width: 9em;
+  }
+  #profileCreateForm #date,
+  #profileCreateForm #year {
+    position: relative;
+    left: 12px;
   }
   #userSessionsList {
     font-size: 0.85em;
