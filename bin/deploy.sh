@@ -89,6 +89,7 @@ if [[
     if [[ $VERBOSE ]]; then
         echo "Updating python dependancies"
     fi
+    cd "${GIT_WORK_TREE}"
     pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
 
     # Restart in case celery module updates
