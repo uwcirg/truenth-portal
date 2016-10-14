@@ -175,6 +175,18 @@ Tox will pass any options after -- to the test runner, nose, eg:
 ```bash
 $ tox -- -sx tests.test_intervention
 ```
+### Continuous Integration
+
+This project includes integration with the [TravisCI continuous integration platform](https://docs.travis-ci.com/user/languages/python/). The full test suite (every Tox virtual environment) is [automatically run](https://travis-ci.org/uwcirg/true_nth_usa_portal) for the last commit pushed to any branch, and for all pull requests. Results are reported as passing with a &#10004; and failing with a &#10006;.
+
+#### UI/Integration (Selenium) Testing
+
+UI integration/acceptance testing is performed by Selenium and is included in the test suite and continuous intergration setup. Specifically, [Sauce Labs integration](https://docs.travis-ci.com/user/sauce-connect) with TravisCI allows Selenium tests to be run with any number of browser/OS combinations and [captures video from running tests](https://saucelabs.com/open_sauce/user/ivan-c).
+
+UI tests can also be run locally (after installing `xvfb`) by passing Tox the virtual environment that corresponds to the UI tests (`ui`):
+```bash
+$ tox -e ui
+```
 
 ## Dependency Management
 
