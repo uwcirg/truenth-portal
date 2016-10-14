@@ -1,8 +1,10 @@
 {% macro tou(terms) -%}
     <div id="topTerms">
-        <h3 class="tnth-headline">Terms of Use</h3>
+        <h4 class="tnth-headline">Terms of Use</h4>
+        <hr/>
+        <br/>
         <p>Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools:</p>
-        <div class="well" style="margin-left: 2em">
+        <div class="well">
             <div id="termsText">
               {{ terms|safe if terms}}
             </div>
@@ -14,6 +16,7 @@
                 <i class="fa fa-square-o fa-lg"></i> <span>Check here to agree to these terms</span>
               </label>
             </div>
+            <br/>
         </div>
     </div>
   {%- endmacro %}

@@ -444,6 +444,13 @@ input.clinic {
 #userAssessementReport table {
   word-break: break-all;
 }
+
+#termsText {
+  padding: 1.5em 2em;
+}
+#agreeLabel {
+  margin-left: 2em;
+}
 .create-user-link {
   border-radius: 4px;
   color: #57675B;
