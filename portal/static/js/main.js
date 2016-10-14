@@ -40,15 +40,23 @@ function xhr_function(){
 function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
-        .html(data);
+        .html(data).promise().done(function() {
+            showContent();
+            //for firefox? need to figure out why it doesn't show the content
+            setTimeout("showContent();", 500);
+        });
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
-    $("img.tnth-topnav-wordmark").load(function(){
-        $("#tnthNavWrapper").show();
-        //adding this for firefox fix
-        $("#tnthNavWrapper").css("visibility","visible");
-        $("#tnthNavWrapper").css("display", "block");
-    });
+    // $("img.tnth-topnav-wordmark").load(function(){
+
+    // });
     // Todo: add "data-*" HTML attribute
+}
+
+function showContent() {
+    $("#tnthNavWrapper").show();
+    //adding this for firefox fix
+    $("#tnthNavWrapper").css("visibility","visible");
+    $("#tnthNavWrapper").css("display", "block");
 }
 
 // Loading indicator that appears in UI on page loads and when saving
