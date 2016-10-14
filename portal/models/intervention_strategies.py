@@ -21,7 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..extensions import db
-from .fhir import CC, Coding, CodeableConcept
+from .fhir import CC, Coding, CodeableConcept, QuestionnaireResponse
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .role import Role
@@ -166,6 +166,56 @@ def update_link_url(intervention_name, link_url):
         return True
 
     return update_user_intervention
+
+
+def update_card_html_on_completion():
+    """Update card_html if user has completed a survey"""
+
+    def update_user_card_html(intervention, user):
+        # Criteria check could move to its own strategy - inlined
+        # here for time being.
+
+        def most_recent_survey(user):
+            """Only apply the change if the user has a QuestionnaireResponse
+
+            Returns authored (timestamp) of the most recent
+            QuestionnaireResponse, else None
+            """
+            qr = QuestionnaireResponse.query.filter(and_(
+                QuestionnaireResponse.user_id == user.id,
+                QuestionnaireResponse.status == 'completed')).order_by(
+                    QuestionnaireResponse.authored).limit(
+                        1).with_entities(QuestionnaireResponse.authored).first()
+            return qr[0] if qr else None
+
+        # NB - this is by design, a method with side effects
+        # if the criteria_check passes, generate or update a
+        # user_intervention to alter the card_html for said user
+        authored = most_recent_survey(user)
+        if authored:
+            prefix = '<i>EPIC-26 completed {:%b %d, %Y}</i></br>'.format(
+                authored)
+            card_html = prefix + Intervention.query.filter_by(
+                id=intervention.id).first().card_html
+            ui = UserIntervention.query.filter(and_(
+                UserIntervention.user_id == user.id,
+                UserIntervention.intervention_id == intervention.id)).first()
+            if not ui:
+                db.session.add(
+                    UserIntervention(user_id = user.id,
+                                     intervention_id = intervention.id,
+                                     card_html = card_html))
+                db.session.commit()
+            else:
+                if ui.card_html != card_html:
+                    ui.card_html = card_html
+                    db.session.commit()
+
+        # Really this function just exists for the side effects, don't
+        # prevent access
+        return True
+
+    return update_user_card_html
 
 
 def observation_check(display, boolean_value):
