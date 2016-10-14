@@ -41,9 +41,11 @@ function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
         .html(data).promise().done(function() {
-            showContent();
             //for firefox? need to figure out why it doesn't show the content
-            setTimeout("showContent();", 500);
+            if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
+                setTimeout("showContent();", 500);
+                console.log("in firefox")
+            } else setTimeout("showContent();", 0);
         });
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
     // $("img.tnth-topnav-wordmark").load(function(){
@@ -53,7 +55,7 @@ function embed_page(data){
 }
 
 function showContent() {
-    $("#tnthNavWrapper").show();
+    //$("#tnthNavWrapper").show();
     //adding this for firefox fix
     $("#tnthNavWrapper").css("visibility","visible");
     $("#tnthNavWrapper").css("display", "block");
@@ -601,6 +603,7 @@ $(document).ready(function() {
             url: PORTAL_NAV_PAGE,
             type:'GET',
             contentType:'text/plain',
+            cache: true,
             //dataFilter:data_filter,
             //xhr: xhr_function,
             crossDomain: true
