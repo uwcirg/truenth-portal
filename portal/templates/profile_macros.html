@@ -12,7 +12,7 @@
     <div class="form-group profile-section" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
-            <div class="col-xs-4">
+            <div class="col-md-4 col-xs-12">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                     <option value="">Month...</option>
                     <option value="01">January</option>
@@ -30,11 +30,11 @@
                 </select>
 
             </div>
-            <div class="col-xs-4">
+            <div class="col-md-4 col-xs-6">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
 
             </div>
-            <div class="col-xs-4">
+            <div class="col-md-4 col-xs-6">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
 
             </div>
@@ -340,7 +340,7 @@
         <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
             <th>Project Name</th><th>State</th><th>Last Activity</th>
-            
+
             <tr title="Click to view report">
                 <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">4:03PM Wed Oct 12, 2016</a></td>
             </tr>

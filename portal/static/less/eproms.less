@@ -614,7 +614,7 @@ input.clinic {
 }
 
 div.modal-header, div.modal-footer {
-  background-color:#79815D; 
+  background-color:#79815D;
   color: #FFF;
 }
 
@@ -639,12 +639,6 @@ div.modal-header, div.modal-footer {
   }
 }
 
-@media (max-width: 730) {
-  #userSessionsList {
-    font-size: 0.9em;
-  }
-}
-
 @media (max-width: 640px) {
   body,
   .form-control,
@@ -654,51 +648,38 @@ div.modal-header, div.modal-footer {
   label,
   .tnth-form .form-group > label {
     font-size: 13px;
-  } 
-
-  #profileForm #month {
-    font-size: 12px;
-    width: 8.3em;
-  }
-
-  #profileForm #date, #profileForm #year {
-    position: relative;
-    left: 1px;
-  }
-
-  #profileCreateForm select {
-  width: 9em;
-  }
-
-  #profileCreateForm #date, #profileCreateForm #year {
-    position: relative;
-    left: 12px;
   }
 
   #userSessionsList {
-    font-size: 0.85em
+    font-size: 0.85em;
   }
   .profile-item-container {
-    overflow-y:auto;
-    padding: 0.3em;
+    overflow-y: auto;
+    padding: 1em;
   }
   .side {
-  height: 27em;
+    height: 27em;
   }
-  #phone {
-    width: 190px;
+  #phone, #email {
+    width: 95%;
+    max-width: 95%;
   }
-  #date {
-    position: relative;
-    left: -14px;
+
+  .form-control {
+    height: 34px;
+    margin: 4px auto;
   }
-  #year {
-    position: relative;
-    width:5em;
-    left: -28px;
+  .checkbox input[type=checkbox],
+  .checkbox-inline input[type=checkbox],
+  .radio input[type=radio],
+  .radio-inline input[type=radio] {
+    margin-top: 2px;
   }
-  .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
-    margin-top:2px;
+}
+
+@media (max-width: 730) {
+  #userSessionsList {
+    font-size: 0.9em;
   }
 }
 

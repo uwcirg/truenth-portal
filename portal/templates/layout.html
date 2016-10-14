@@ -18,13 +18,13 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <script src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/css/bootstrap-datepicker.css" />
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}"></script>
+
 </head>
 
 {# sets container to full-width #}
@@ -113,7 +113,6 @@
             {% endif %}
         {%- endwith %}
     {% endblock %}
-
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = "";
