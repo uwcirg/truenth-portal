@@ -261,6 +261,88 @@
     <script>$(function () { tnthAjax.getOrgs({{ person.id if person }}, true); });</script>
 {%- endmacro %}
 
+{% macro profileAuditLog(person, current_user) -%}
+    {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
+        <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
+        <h4 class="profile-item-title">Audit Log</h4>
+        <table id="profileAuditLogTable" class="smaller-text">
+        </table>
+        <script>
+        function _showText(obj) {
+            if (obj) {
+                var f = $(obj).parent().find('.second');
+                f.toggleClass('hide');
+                $(obj).text($(obj).text() ==='More...' ? 'Less...': 'More...');
+            }
+        }
+
+        $(function () {
+             ///api/user/<user_id>/audit
+             var ww = $(window).width();
+
+            $.ajax ({
+                type: "GET",
+                url: '/api/user/' + $("#audit_user_id").val() + '/audit',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json'
+            }).done(function(data) {
+                //console.log(data["audits"]);
+                var fData = [];
+                data["audits"].forEach(function(item) {
+                    item["by"] = item["by"]["reference"];
+                    item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
+                    var c = String(item["comment"]);
+                    var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
+
+                    item["comment"] = c.length > len ? (c.substring(0, len+1) + "<div class='second hide'>" + c.substr(len+1) + "</div><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
+                    fData.push(item);
+                });
+
+                $('#profileAuditLogTable').bootstrapTable( {
+                    data: fData,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [10, 25, 50, 100],
+                    classes: 'table table-responsive profile-audit-log',
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#FAFAFA" : "#FFF")}
+                          };
+                    },
+                    undefinedText: '--',
+                    columns: [
+                        {
+                            field: 'by',
+                            title: 'Reference URL',
+                            width: '17%',
+                            sortable: true
+                        }, {
+                            field: 'comment',
+                            title: 'Comment',
+                            sortable: true
+                        }, {
+                            field: 'lastUpdated',
+                            title: 'Last Updated',
+                            sortable: true,
+                            width: '17%'
+                        },
+                        {
+                            field: 'version',
+                            title: 'Version',
+                            sortable: true,
+                            visible: false
+                        }
+                    ]
+                } );
+
+
+            }).fail(function() {
+                console.log("Problem retrieving audit log from server.");
+            });
+         });</script>
+     {% endif %}
+{%- endmacro %}
+
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <h4 class="profile-item-title">User Roles for {{ person.username }}</h4>
@@ -599,6 +681,15 @@
             <div class="col-md-12">
                 <div class="profile-item-container">
                     {{profileRole(person, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-item-container">
+                    {{profileAuditLog(person, current_user)}}
                 </div>
             </div>
         </div>

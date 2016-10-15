@@ -465,6 +465,7 @@ input.clinic {
 }
 .profile-header {
   width: 45%;
+  max-width:100%;
 }
 .profile-section {
   margin-bottom: 1.5em;
@@ -477,6 +478,12 @@ input.clinic {
 .orgLinks {
   margin-top: 4px;
 }
+
+.profile-audit-log {
+  border-color: #57675B;
+  font-size: 0.85em;
+}
+
 .error-message {
   padding: 0.5em;
   border-radius: 4px;
@@ -512,6 +519,12 @@ input.clinic {
 }
 .flex div {
   margin: 0.5em 1.2em 0.5em 0.1em;
+}
+.pagination {
+  font-size: 0.95em;
+}
+.pagination-detail {
+  font-size: 0.95em;
 }
 .pagination > .active > a {
   background-color: #79815D;
@@ -555,6 +568,15 @@ div.modal-footer {
   background-color: #79815D;
   color: #FFF;
 }
+.hide {
+  display: none;
+}
+sub.pointer {
+  cursor:pointer;
+}
+sub.pointer:hover {
+  color: #79815D;
+}
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -580,10 +602,15 @@ div.modal-footer {
   .form-control,
   input,
   select,
-  h4,
+  h1,h2,h3,h4,h5,
   label,
-  .tnth-form .form-group > label {
+  .tnth-form .form-group > label
+   {
     font-size: 13px;
+  }
+
+  .fixed-table-pagination {
+    font-size: 0.9em;
   }
 
   #userSessionsList {
@@ -653,6 +680,12 @@ div.modal-footer {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+}
+
+@media (max-width: 991px) {
+  .form-control {
+    margin-bottom: 4px;
   }
 }
 @media (min-width: 992px) {

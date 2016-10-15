@@ -26,6 +26,9 @@
 @linkHover:       #2a4531;
 @btnColor:        #79815D;
 @legendColor:    #595F57;
+@sectionColor:    rgba(173, 193, 197, 0.14);
+@sectionTitleColor: #575F5C;
+
 
 
 html {
@@ -400,8 +403,7 @@ a:hover, a:active {
 }
 
 .profile-item-container {
-  /*background-color: #EFF5F3;*/
-  background-color: rgba(173, 193, 197, 0.14);
+  background-color: @sectionColor;
   padding: 1.5em 2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -411,7 +413,7 @@ a:hover, a:active {
 }
 
 .profile-item-title {
-  color: #575F5C;
+  color: @sectionTitleColor;
   margin-bottom:18px;
 }
 
@@ -440,7 +442,7 @@ a:hover, a:active {
 
 #fillOrgs legend {
   font-size:@legendSize;
-  color: #595F57;
+  color: @legendColor;
 }
 
 #fillOrgs, .noOrg-container{
@@ -467,6 +469,11 @@ input.clinic {
   label{
     font-size:0.95em;
   }
+}
+
+.profile-audit-log {
+  border-color: #57675B;
+  font-size: 0.9em;
 }
 
 .create-account-container {
@@ -526,7 +533,13 @@ input.clinic {
 }
 
 .profile-header {
-  width:45%
+  width:45%;
+  max-width: 100%;
+}
+
+.profile-audit-log {
+  border-color: #57675B;
+  font-size: 0.85em;
 }
 
 .profile-section {
@@ -579,6 +592,13 @@ input.clinic {
 }
 
 .pagination {
+  font-size: 0.95em;
+}
+.pagination-detail {
+  font-size: 0.95em;
+}
+
+.pagination {
 
   >.active>a {
     background-color: @btnColor;
@@ -621,8 +641,18 @@ input.clinic {
 }
 
 div.modal-header, div.modal-footer {
-  background-color:#79815D;
+  background-color: @btnColor;
   color: #FFF;
+}
+
+.hide {
+  display: none;
+}
+sub.pointer {
+  cursor:pointer;
+}
+sub.pointer:hover {
+  color: #79815D;
 }
 
 
@@ -651,10 +681,14 @@ div.modal-header, div.modal-footer {
   .form-control,
   input,
   select,
-  h4,
+  h1, h2, h3, h4, h5,
   label,
   .tnth-form .form-group > label {
     font-size: 13px;
+  }
+
+  .fixed-table-pagination {
+    font-size:0.9em;
   }
 
   #userSessionsList {
@@ -728,6 +762,11 @@ div.modal-header, div.modal-footer {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+}
+@media (max-width: 991px) {
+  .form-control {
+    margin-bottom: 4px;
   }
 }
 @media (min-width: 992px) {
