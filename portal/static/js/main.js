@@ -64,6 +64,12 @@ function showContent() {
 
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
+    //landing page
+    if ($("#fullSizeContainer").length > 0) {
+        $("#loadingIndicator").hide();
+        $("#mainHolder").show();
+        return false;
+    }
 
     if (show) {
         $("#mainHolder").hide();
