@@ -94,7 +94,7 @@
     </div>
 {%- endmacro %}
 
-{% macro profileRace() -%}
+{% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
         <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="profile-radio-list">
@@ -130,9 +130,19 @@
             </div>
         </div>
     </div>
+    <script>
+        $(function () {
+            $("#userRace input:checkbox").each(function() {
+                $(this).on("click", function() {
+                    assembleContent.demo({{ person.id if person }},true);
+                });
+            });
+        });
+    </script>
+
 {%- endmacro %}
 
-{% macro profileEthnicity() -%}
+{% macro profileEthnicity(person) -%}
     <div class="form-group profile-section" id="userEthnicity">
         <label>Ethnicity <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="profile-radio-list">
@@ -148,6 +158,15 @@
             </div>
         </div>
     </div>
+    <script>
+        $(function () {
+            $("#userEthnicity input:radio").each(function() {
+                $(this).on("click", function() {
+                    assembleContent.demo({{ person.id if person }},true);
+                });
+            });
+        });
+    </script>
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
@@ -667,10 +686,10 @@
                     </div>
                     <div>
 
-                         {{profileEthnicity()}}
+                         {{profileEthnicity(person)}}
                     </div>
                     <div>
-                        {{profileRace()}}
+                        {{profileRace(person)}}
                     </div>
                 </div>
             </div>

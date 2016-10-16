@@ -29,11 +29,26 @@ body {
   transition: all 500ms;
 }
 #mainHolder {
-  display: none;
+  visibility: hidden;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+  filter: alpha(opacity=0);
+  -moz-opacity: 0;
+  -khtml-opacity: 0;
+  opacity: 0;
+
+
 }
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
+}
+
+#mainHolder,
+#patientList,
+#createProfileForm,
+#profileForm {
+ -webkit-transition: all 0.3s ease-in;
+  transition: all 0.3s ease-in;
 }
 #tnthNavWrapper {
   /*display: none;*/
@@ -514,26 +529,45 @@ table.profile-audit-log TH {
 /** styles specific to profile **/
 /*.loading-indicator {*/
 #loadingIndicator{
-  display: none;
+  /*display: none;*/
   position: fixed;
   /*top: 200px;
   left: 48%;*/
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2em;
+  width: 2em;
+  overflow: show;
   /*margin-left: -50px;*/
   /*width: 100px;
   height: 100px;*/
-  width: 100vw;
-  height: 100vw;
+  font-size: 1em;
   text-align: center;
   z-index: 99999;
   color: #444;
-  padding: 20% 10%;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  margin: auto;
+  /*-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
   filter: alpha(opacity=80);
   -moz-opacity: 0.8;
   -khtml-opacity: 0.8;
-  opacity: 0.8;
+  opacity: 0.8;*/
+}
+#loadingIndicator:before {
+  content: ' ';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.3);
+}
+
+
+#loadingIndicator i {
+  font-size: 1em;
 }
 
 .loading {

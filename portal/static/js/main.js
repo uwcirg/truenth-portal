@@ -43,9 +43,9 @@ function embed_page(data){
         .html(data).promise().done(function() {
             //for firefox? need to figure out why it doesn't show the content if not deling this call??
             if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("showContent();loader();", 100);
+                setTimeout("showWrapper();loader();", 100);
                 //console.log("in firefox")
-            } else setTimeout("showContent();loader();", 0);
+            } else setTimeout("showWrapper();loader();", 0);
 
         });
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
@@ -55,11 +55,23 @@ function embed_page(data){
     // Todo: add "data-*" HTML attribute
 }
 
-function showContent() {
+function showMain() {
+
+    $("#mainHolder").css({
+                          "visibility" : "visible",
+                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
+                          "filter": "alpha(opacity=100)",
+                          "-moz-opacity": 1,
+                          "-khtml-opacity": 1,
+                          "opacity": 1
+                        });
+
+}
+
+function showWrapper() {
     //$("#tnthNavWrapper").show();
     //adding this for firefox fix
-    $("#tnthNavWrapper").css("visibility","visible");
-    $("#tnthNavWrapper").css("display", "block");
+    $("#tnthNavWrapper").css({"visibility":"visible", "display": "block"});
 }
 
 // Loading indicator that appears in UI on page loads and when saving
@@ -67,27 +79,19 @@ var loader = function(show) {
     //landing page
     if ($("#fullSizeContainer").length > 0) {
         $("#loadingIndicator").hide();
-        $("#mainHolder").show();
+        showMain();
         return false;
-    }
+    };
 
     if (show) {
-        $("#mainHolder").hide();
-        $("#patientList").addClass("loading");
-        $("#createProfileForm").addClass("loading");
-        $("#profileForm").addClass("loading");
+        // $("#profileForm").addClass("loading");
         $("#loadingIndicator").show();
     } else {
         // Otherwise we'll hide it
-
-        $("#patientList").removeClass("loading");
-        $("#createProfileForm").removeClass("loading");
-        $("#profileForm").removeClass("loading");
-        $("#mainHolder").removeClass("loading");
-        $("#loadingIndicator").fadeOut(300);
-        $("#mainHolder").show();
-        //console.log("what?")
-    }
+        showMain();
+        // $("#profileForm").removeClass("loading");
+        $("#loadingIndicator").fadeOut();
+    };
 };
 
 var fillContent = {
@@ -300,7 +304,7 @@ var assembleContent = {
                 }
             ];
 
-           // console.log("demoArray", demoArray);
+           //console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray);
         //if (demoArray["roles"]) {
@@ -642,6 +646,7 @@ $(document).ready(function() {
 
         });
     } else loader();
+
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
 
