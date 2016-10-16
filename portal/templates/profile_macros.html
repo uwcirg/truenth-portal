@@ -294,7 +294,7 @@
                     var c = String(item["comment"]);
                     var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
-                    item["comment"] = c.length > len ? (c.substring(0, len+1) + "<div class='second hide'>" + c.substr(len+1) + "</div><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
+                    item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
                     fData.push(item);
                 });
 
