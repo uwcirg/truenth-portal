@@ -41,11 +41,12 @@ function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
         .html(data).promise().done(function() {
-            //for firefox? need to figure out why it doesn't show the content
+            //for firefox? need to figure out why it doesn't show the content if not deling this call??
             if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("showContent();", 500);
-                console.log("in firefox")
-            } else setTimeout("showContent();", 0);
+                setTimeout("showContent();loader();", 100);
+                //console.log("in firefox")
+            } else setTimeout("showContent();loader();", 0);
+
         });
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
     // $("img.tnth-topnav-wordmark").load(function(){
@@ -63,13 +64,23 @@ function showContent() {
 
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
+
     if (show) {
+        $("#mainHolder").hide();
+        $("#patientList").addClass("loading");
+        $("#createProfileForm").addClass("loading");
         $("#profileForm").addClass("loading");
         $("#loadingIndicator").show();
     } else {
         // Otherwise we'll hide it
-        $("#loadingIndicator").fadeOut();
+
+        $("#patientList").removeClass("loading");
+        $("#createProfileForm").removeClass("loading");
         $("#profileForm").removeClass("loading");
+        $("#mainHolder").removeClass("loading");
+        $("#loadingIndicator").fadeOut(300);
+        $("#mainHolder").show();
+        //console.log("what?")
     }
 };
 
@@ -599,6 +610,9 @@ var tnthAjax = {
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
+
+        loader(true);
+
         var initial_xhr = $.ajax({
             url: PORTAL_NAV_PAGE,
             type:'GET',
@@ -615,12 +629,13 @@ $(document).ready(function() {
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
             console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+            loader();
         })
         .always(function() {
             // alert( "complete" );
-        });
-    }
 
+        });
+    } else loader();
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
 
@@ -707,6 +722,7 @@ $(document).ready(function() {
                 if (emailReg.test($el.val())) {
                     $.ajax ({
                         type: "GET",
+                        //url: '/api/unique_email?email='+encodeURIComponent($el.val())+addUserId
                         url: '/api/unique_email?email='+encodeURIComponent($el.val())+addUserId
                     }).done(function(data) {
                         if (data.unique) {

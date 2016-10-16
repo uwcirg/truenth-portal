@@ -2,8 +2,6 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
-
-
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
 
     <div class="row" style="position: relative;">
@@ -12,13 +10,15 @@
             <hr/>
             <br/>
             <div class="profile-item-container create-account-container">
-                {{profileName(False)}}
-                {{profileBirthDate(False)}}
-                {{profileEmail(False)}}
-                {{profilePhone(False)}}
-                {{profileOrg(user, 'true')}}
-                <br />
-                {{profileSaveBtn()}}
+
+                    {{profileName(False)}}
+                    {{profileBirthDate(False)}}
+                    <br/>
+                    {{profileEmail(False)}}
+                    {{profilePhone(False)}}
+                    <br/>
+                    {{profileOrg(user, 'true')}}
+                    {{profileSaveBtn()}}
             </div>
             <br/>
             <div class="left-indent-bottom">

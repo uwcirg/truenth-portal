@@ -28,6 +28,7 @@
 @legendColor:    #595F57;
 @sectionColor:    rgba(173, 193, 197, 0.14);
 @sectionTitleColor: #575F5C;
+@sectionBorderColor: #E0E6E3;
 
 
 
@@ -51,6 +52,10 @@ body {
   transition: all 500ms;
 }
 
+#mainHolder {
+  display: none;
+}
+
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
@@ -70,6 +75,9 @@ a {
 }
 a:hover, a:active {
   color: @linkHover;
+}
+a.btn {
+  cursor: pointer;
 }
 
 .tnth-hide {
@@ -407,7 +415,7 @@ a:hover, a:active {
   padding: 1.5em 2em;
   border-radius: 8px;
   margin: 0.5em auto;
-  border: 1px solid #E0E6E3;
+  border: 1px solid @sectionBorderColor;
   overflow-y: hidden;
   overflow-x: hidden;
 }
@@ -419,6 +427,14 @@ a:hover, a:active {
 
 .profile-name-label {
   margin-bottom: 2px
+}
+
+.profile-create-item-container {
+  border-radius: 8px;
+  margin: 0.5em auto;
+  border: 1px solid @sectionBorderColor;
+  padding: 1.5em;
+
 }
 
 #userEthnicity label {
@@ -539,7 +555,11 @@ input.clinic {
 
 .profile-audit-log {
   border-color: #57675B;
-  font-size: 0.85em;
+  font-size: 0.87em;
+}
+
+table.profile-audit-log TH {
+  background-color: #FFF;
 }
 
 .profile-section {
@@ -552,6 +572,11 @@ input.clinic {
 }
 .orgLinks {
   margin-top: 4px;
+}
+
+#phone, #email {
+  width: 300px;
+  max-width: 100%;
 }
 .error-message {
   padding: 0.5em;
@@ -592,10 +617,10 @@ input.clinic {
 }
 
 .pagination {
-  font-size: 0.95em;
+  font-size: 0.93em;
 }
 .pagination-detail {
-  font-size: 0.95em;
+  font-size: 0.93em;
 }
 
 .pagination {
@@ -701,10 +726,7 @@ sub.pointer:hover {
   .side {
     height: 27em;
   }
-  #phone, #email {
-    width: 95%;
-    max-width: 95%;
-  }
+
 
   .form-control {
     height: 34px;

@@ -28,6 +28,9 @@ body {
   font-size: 18px;
   transition: all 500ms;
 }
+#mainHolder {
+  display: none;
+}
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
   height: 71px;
@@ -45,6 +48,9 @@ a {
 a:hover,
 a:active {
   color: #2a4531;
+}
+a.btn {
+  cursor:pointer;
 }
 .tnth-hide {
   display: none;
@@ -375,6 +381,13 @@ a:active {
 .profile-name-label {
   margin-bottom: 2px;
 }
+.profile-create-item-container {
+  border-radius: 8px;
+  margin: 0.5em auto;
+  border: 1px solid #E0E6E3;
+  padding: 1.5em;
+}
+
 #userEthnicity label {
   margin-bottom: 0;
 }
@@ -453,6 +466,11 @@ input.clinic {
 #agreeLabel {
   margin-left: 2em;
 }
+
+#phone, #email {
+    width: 300px;
+    max-width: 100%;
+}
 .create-user-link {
   border-radius: 4px;
   color: #57675B;
@@ -481,7 +499,11 @@ input.clinic {
 
 .profile-audit-log {
   border-color: #57675B;
-  font-size: 0.85em;
+  font-size: 0.87em;
+}
+
+table.profile-audit-log TH {
+  background-color: #FFF;
 }
 
 .error-message {
@@ -490,20 +512,32 @@ input.clinic {
   text-align: left;
 }
 /** styles specific to profile **/
-.loading-indicator {
+/*.loading-indicator {*/
+#loadingIndicator{
   display: none;
   position: fixed;
-  top: 200px;
-  left: 48%;
-  margin-left: -50px;
-  width: 100px;
-  height: 100px;
+  /*top: 200px;
+  left: 48%;*/
+  top: 0;
+  left: 0;
+  /*margin-left: -50px;*/
+  /*width: 100px;
+  height: 100px;*/
+  width: 100vw;
+  height: 100vw;
   text-align: center;
   z-index: 99999;
   color: #444;
+  padding: 20% 10%;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80);
+  -moz-opacity: 0.8;
+  -khtml-opacity: 0.8;
+  opacity: 0.8;
 }
+
 .loading {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
   filter: alpha(opacity=40);
   -moz-opacity: 0.4;
   -khtml-opacity: 0.4;
@@ -521,10 +555,10 @@ input.clinic {
   margin: 0.5em 1.2em 0.5em 0.1em;
 }
 .pagination {
-  font-size: 0.95em;
+  font-size: 0.93em;
 }
 .pagination-detail {
-  font-size: 0.95em;
+  font-size: 0.93em;
 }
 .pagination > .active > a {
   background-color: #79815D;
@@ -622,10 +656,6 @@ sub.pointer:hover {
   }
   .side {
     height: 27em;
-  }
-  #phone, #email {
-    width: 95%;
-    max-width: 95%;
   }
 
   .form-control {

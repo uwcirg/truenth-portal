@@ -245,7 +245,7 @@
 {% macro profilePhone(person) -%}
     <div class="form-group float-input-label profile-section">
         <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}" style="width:200px">
+        <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
     </div>
 {%- endmacro %}
 
@@ -302,19 +302,19 @@
                     data: fData,
                     pagination: true,
                     pageSize: 5,
-                    pageList: [10, 25, 50, 100],
+                    pageList: [5, 10, 25, 50, 100],
                     classes: 'table table-responsive profile-audit-log',
                     rowStyle: function rowStyle(row, index) {
                           return {
-                            css: {"background-color": (index % 2 != 0 ? "#FAFAFA" : "#FFF")}
+                            css: {"background-color": (index % 2 == 0 ? "#FAFAFA" : "#FFF")}
                           };
                     },
                     undefinedText: '--',
                     columns: [
                         {
                             field: 'by',
-                            title: 'Reference URL',
-                            width: '17%',
+                            title: 'Reference',
+                            width: '15%',
                             sortable: true
                         }, {
                             field: 'comment',
