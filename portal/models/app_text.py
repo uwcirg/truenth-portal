@@ -70,6 +70,10 @@ def app_text(name, *args):
     call to `app_text('ex', 'Bob', 'Gooday')` would return:
         'Hello Bob. Gooday Bob'
 
+    NB javascript variables are not evaluated till the client browser sees
+    the page, therefore any javascript variables will not be available in time
+    for app_text() to use them.
+
     """
     item = AppText.query.filter_by(name=name).first()
     if not item:
