@@ -236,9 +236,12 @@
                     var url = getUrl();
                     if (url != '') {
 
+                        {# javascript variables are not available at template
+                           rendering time.  insert a placeholder and then
+                           replace once the variable is available. #}
                         var body = '{{ app_text('profileSendEmail email html',
-                                url) | safe }}';
-                        body = body.replace(/href=\"\"/i, 'href="' + url + '"');
+                                'url_placeholder') | safe }}';
+                        body = body.replace(/url_placeholder/g, url);
 
                         $.ajax ({
                             type: 'POST',

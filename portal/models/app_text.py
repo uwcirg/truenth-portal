@@ -78,12 +78,13 @@ def app_text(name, *args):
     item = AppText.query.filter_by(name=name).first()
     if not item:
         raise ValueError("unknown customized app string '{}'".format(name))
-    if args:
-        text = str(item)
-        try:
-            return text.format(*args)
-        except IndexError:
-            raise ValueError(
-                "AppText with name '{}' defines more parameters "
-                "than provided: `{}`".format(name, *args))
-    return str(item)
+
+    text = str(item)
+    try:
+        return text.format(*args)
+    except IndexError as err:
+        if not args:
+            args = ('<None>',)
+        raise ValueError(
+            "AppText with name '{}' defines more parameters "
+            "than provided: `{}`".format(name, *args))
