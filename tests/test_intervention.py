@@ -359,7 +359,7 @@ class TestIntervention(TestCase):
 
         # without completing an assessment, no change
         self.assertTrue(ae.display_for_user(user).card_html.startswith(
-            "<p>When the button below is active"))
+            "Assessment Engine"))
         # Add a fake assessment and see a change
         with SessionScope(db):
             a = QuestionnaireResponse(
