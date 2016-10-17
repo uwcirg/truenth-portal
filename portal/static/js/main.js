@@ -43,9 +43,9 @@ function embed_page(data){
         .html(data).promise().done(function() {
             //for firefox? need to figure out why it doesn't show the content if not deling this call??
             if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("showWrapper();loader();", 100);
+                setTimeout("loader();", 100);
                 //console.log("in firefox")
-            } else setTimeout("showWrapper();loader();", 0);
+            } else setTimeout("loader();", 0);
 
         });
     // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
@@ -89,8 +89,9 @@ var loader = function(show) {
     } else {
         // Otherwise we'll hide it
         showMain();
+        showWrapper();
         // $("#profileForm").removeClass("loading");
-        $("#loadingIndicator").fadeOut();
+        setTimeout('$("#loadingIndicator").fadeOut();', 0);
     };
 };
 
