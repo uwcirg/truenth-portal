@@ -119,6 +119,7 @@ var fillContent = {
         })
     },
     "demo": function(data) {
+
         $('#firstname').val(data.name.given);
         $('#lastname').val(data.name.family);
         if (data.birthDate) {
@@ -132,25 +133,9 @@ var fillContent = {
         }
         // TODO - add email and phone for profile page use
         // Only on profile page
-        $.each(data.extension[0].valueCodeableConcept.coding,function(i,val){
-            $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes - output but hide, for submitting on update
-            if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
-                $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
-            }
-        });
+        this.ethnicity(data);
         // Get Races
-        $.each(data.extension[1].valueCodeableConcept.coding,function(i,val){
-            $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes
-            if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
-                // If there is any non-standard, then check the "other" in the UI
-                $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
-                // Add hidden list of non-standard for form submission
-                $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
-                //$("#raceOtherVal").fadeToggle();
-            }
-        });
+        this.race(data);
     },
     "name": function(data){
         if (data && data.name) {
@@ -168,6 +153,30 @@ var fillContent = {
             // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
             if ($("#patBiopsy").length > 0) $("#patBiopsy").fadeIn();
         };
+    },
+    "ethnicity": function(data) {
+        $.each(data.extension[0].valueCodeableConcept.coding,function(i, val){
+            $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
+            // Way to handle non-standard codes - output but hide, for submitting on update
+            if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
+                if (val.code !== "undefined") $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
+            }
+        });
+    },
+    "race": function(data) {
+        // Get Races
+        $.each(data.extension[1].valueCodeableConcept.coding,function(i,val){
+            //console.log(val)
+            $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
+            // Way to handle non-standard codes
+            if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
+                // If there is any non-standard, then check the "other" in the UI
+                $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
+                // Add hidden list of non-standard for form submission
+               if (val.code !== "undefined") $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
+                //$("#raceOtherVal").fadeToggle();
+            }
+        });
     },
     "orgs": function(data) {
         $.each(data.careProvider,function(i,val){
@@ -285,6 +294,8 @@ var assembleContent = {
             var raceIDs = $("#userRace input:checkbox:checked").map(function(){
                 return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
             }).get();
+
+
             demoArray["gender"] = $("input[name=sex]:checked").val();
             demoArray["telecom"] = [
                 { "system": "email", "value": $("input[name=email]").val() },
@@ -453,6 +464,8 @@ var tnthAjax = {
             type: "GET",
             url: '/api/demographics/'+userId
         }).done(function(data) {
+            fillContent.race(data);
+            fillContent.ethnicity(data);
             fillContent.orgs(data);
             if (!noOverride) fillContent.demo(data);
             loader();

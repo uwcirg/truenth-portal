@@ -98,6 +98,7 @@
     <div class="form-group profile-section" id="userRace">
         <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="profile-radio-list">
+    
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
@@ -134,6 +135,7 @@
         $(function () {
             $("#userRace input:checkbox").each(function() {
                 $(this).on("click", function() {
+                	//console.log("value: " + $(this).val());
                     assembleContent.demo({{ person.id if person }},true);
                 });
             });
