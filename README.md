@@ -46,28 +46,6 @@ $ cd $PROJECT_HOME
 $ source env/bin/activate
 ```
 
-### Install the Lastest Package (and Dependencies)
-
-To update your Shared Services installation run the `deploy.sh` script as described below.
-
-This script will:
-* Update the project with the latest code
-* Install any dependencies, if necessary
-* Perform any database migrations, if necessary
-* Seed any new data to the database, if necessary
-* Restart apache, if served by apache
-
-```bash
-$ cd $PROJECT_HOME
-$ ./bin/deploy.sh
-```
-
-To see all available options run:
-
-```bash
-$ ./bin/deploy.sh -h
-```
-
 ## CONFIGURE
 
 Copy the default to the named configuration file
@@ -94,6 +72,28 @@ https://console.developers.google.com/project/_/apiui/credential?pli=1
 
 Write to the respective GOOGLE_CONSUMER_KEY and GOOGLE_CONSUMER_SECRET
 variables in the same `application.cfg` configuration file.
+
+### Install the Lastest Package (and Dependencies)
+
+To update your Shared Services installation run the `deploy.sh` script as described below.
+
+This script will:
+* Update the project with the latest code
+* Install any dependencies, if necessary
+* Perform any database migrations, if necessary
+* Seed any new data to the database, if necessary
+* Restart apache, if served by apache
+
+```bash
+$ cd $PROJECT_HOME
+$ ./bin/deploy.sh
+```
+
+To see all available options run:
+
+```bash
+$ ./bin/deploy.sh -h
+```
 
 ## Run the Central Services Server
 ```bash
