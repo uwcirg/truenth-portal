@@ -103,7 +103,7 @@ This script will:
 
 ```bash
 $ cd $PROJECT_HOME
-$ ./bin/deploy.sh
+$ ./bin/deploy.sh -fv # -f to force a run, -v for verbose output
 ```
 
 To see all available options run:
