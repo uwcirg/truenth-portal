@@ -46,6 +46,15 @@ $ cd $PROJECT_HOME
 $ source env/bin/activate
 ```
 
+#### Create the Database
+
+To create the postgresql database that backs your Shared Services issue the following commands:
+
+```bash
+$ sudo -u postgres createuser truenth-dev --pwprompt # enter password at prompt
+$ sudo -u postgres createdb truenth-dev --owner truenth-dev
+```
+
 ## CONFIGURE
 
 Copy the default to the named configuration file
