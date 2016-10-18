@@ -106,6 +106,13 @@ $ cd $PROJECT_HOME
 $ ./bin/deploy.sh -fv # -f to force a run, -v for verbose output
 ```
 
+When running deploy.sh for the first time, add the -i flag to initialize the database. Do not add this flag when running deploy.sh on a working database.
+
+```bash
+$ cd $PROJECT_HOME
+$ ./bin/deploy.sh -fvi # -i to initialize the database
+```
+
 To see all available options run:
 
 ```bash
