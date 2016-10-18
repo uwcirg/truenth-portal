@@ -6,6 +6,7 @@ usage() {
     echo -e "\nOptions: " >&2
     echo -e "-v\n Be verbose" >&2
     echo -e "-f\n Force all conditional deployment processes" >&2
+    echo -e "-i\n Run initial deployment procedure" >&2
     exit 1
 }
 
@@ -34,7 +35,7 @@ activate_once(){
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-while getopts ":b:p:vf" option; do
+while getopts ":b:p:ivf" option; do
     case "${option}" in
         b)
             BRANCH=${OPTARG}
@@ -44,6 +45,9 @@ while getopts ":b:p:vf" option; do
             ;;
         v)
             VERBOSE=true
+            ;;
+        i)
+            INIT=true
             ;;
         f)
             FORCE=true
@@ -90,14 +94,17 @@ if [[
         echo "Updating python dependancies"
     fi
     cd "${GIT_WORK_TREE}"
-    pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
+    env -u GIT_WORK_TREE pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
 
     # Restart in case celery module updates
     sudo service celeryd restart
 fi
 
 # DB Changes
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 ) ]]; then
+if [[
+    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 )) &&
+    -z $INIT
+]]; then
     activate_once
 
     if [[ $VERBOSE ]]; then
@@ -111,10 +118,13 @@ fi
 if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
 
-    if [[ $VERBOSE ]]; then
+    if [[ $INIT ]]; then
+        echo "Initializing database"
+        python "${GIT_WORK_TREE}/manage.py" initdb
+    else
         echo "Seeding database"
+        python "${GIT_WORK_TREE}/manage.py" seed
     fi
-    python "${GIT_WORK_TREE}/manage.py" seed
 fi
 
 

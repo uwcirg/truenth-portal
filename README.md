@@ -46,26 +46,20 @@ $ cd $PROJECT_HOME
 $ source env/bin/activate
 ```
 
-### Install the Lastest Package (and Dependencies)
+#### Create the Database
 
-To update your Shared Services installation run the `deploy.sh` script as described below.
-
-This script will:
-* Update the project with the latest code
-* Install any dependencies, if necessary
-* Perform any database migrations, if necessary
-* Seed any new data to the database, if necessary
-* Restart apache, if served by apache
+To create the postgresql database that backs your Shared Services issue the following commands:
 
 ```bash
-$ cd $PROJECT_HOME
-$ ./bin/deploy.sh
+$ sudo -u postgres createuser truenth-dev --pwprompt # enter password at prompt
+$ sudo -u postgres createdb truenth-dev --owner truenth-dev
 ```
 
-To see all available options run:
+#### Update pip
+The OS default version of pip is often out of date and may need to be updated before it is able to install other project dependencies:
 
 ```bash
-$ ./bin/deploy.sh -h
+$ pip install --upgrade pip setuptools
 ```
 
 ## CONFIGURE
@@ -94,6 +88,35 @@ https://console.developers.google.com/project/_/apiui/credential?pli=1
 
 Write to the respective GOOGLE_CONSUMER_KEY and GOOGLE_CONSUMER_SECRET
 variables in the same `application.cfg` configuration file.
+
+### Install the Lastest Package (and Dependencies)
+
+To update your Shared Services installation run the `deploy.sh` script as described below.
+
+This script will:
+* Update the project with the latest code
+* Install any dependencies, if necessary
+* Perform any database migrations, if necessary
+* Seed any new data to the database, if necessary
+* Restart apache, if served by apache
+
+```bash
+$ cd $PROJECT_HOME
+$ ./bin/deploy.sh -fv # -f to force a run, -v for verbose output
+```
+
+When running deploy.sh for the first time, add the -i flag to initialize the database. Do not add this flag when running deploy.sh on a working database.
+
+```bash
+$ cd $PROJECT_HOME
+$ ./bin/deploy.sh -fvi # -i to initialize the database
+```
+
+To see all available options run:
+
+```bash
+$ ./bin/deploy.sh -h
+```
 
 ## Run the Central Services Server
 ```bash
