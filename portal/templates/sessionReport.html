@@ -5,16 +5,18 @@
 
 <br/>
 
-<h4 class="tnth-headline">
-Assessment Report for {{user.first_name}}  {{user.last_name}}
-</h4>
-<hr/>
+<div  class="tnth-headline custom-header gradient">
+	<h4>Assessment Report Detail</h4>
+	<h4 class="text-muted">Patient #{{user.id}} - {{user.first_name}}  {{user.last_name}}</h4>
+	
+</div>
+<div class="report-error-message">Unable to load report</div>
 <div class="container">
 	<div class="row" style="position: relative;">
 	    <div class="col-md-12">
 	    	
-	       	{{profileAssessment(user)}}
-	        
+	       	{{profileAssessment(user, instrument_id)}}
+	 
 	        <br />
 
 	        <a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to Profile</small></a>

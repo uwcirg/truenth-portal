@@ -98,7 +98,7 @@
     <div class="form-group profile-section" id="userRace">
         <label>Race <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="profile-radio-list">
-    
+
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
@@ -311,56 +311,61 @@
                 dataType: 'json'
             }).done(function(data) {
                 //console.log(data["audits"]);
-                var fData = [];
-                data["audits"].forEach(function(item) {
-                    item["by"] = item["by"]["reference"];
-                    item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
-                    var c = String(item["comment"]);
-                    var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
+                if (data["audits"] && data["audits"].length > 0 ) {
+                    var fData = [];
+                    data["audits"].forEach(function(item) {
+                        item["by"] = item["by"]["reference"];
+                        item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
+                        var c = String(item["comment"]);
+                        var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
-                    item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
-                    fData.push(item);
-                });
+                        item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
+                        fData.push(item);
+                    });
 
-                $('#profileAuditLogTable').bootstrapTable( {
-                    data: fData,
-                    pagination: true,
-                    pageSize: 5,
-                    pageList: [5, 10, 25, 50, 100],
-                    classes: 'table table-responsive profile-audit-log',
-                    rowStyle: function rowStyle(row, index) {
-                          return {
-                            css: {"background-color": (index % 2 == 0 ? "#FAFAFA" : "#FFF")}
-                          };
-                    },
-                    undefinedText: '--',
-                    columns: [
-                        {
-                            field: 'by',
-                            title: 'Reference',
-                            width: '15%',
-                            sortable: true
-                        }, {
-                            field: 'comment',
-                            title: 'Comment',
-                            sortable: true
-                        }, {
-                            field: 'lastUpdated',
-                            title: 'Last Updated',
-                            sortable: true,
-                            width: '17%'
+                    $('#profileAuditLogTable').bootstrapTable( {
+                        data: fData,
+                        pagination: true,
+                        pageSize: 5,
+                        pageList: [5, 10, 25, 50, 100],
+                        classes: 'table table-responsive profile-audit-log',
+                        rowStyle: function rowStyle(row, index) {
+                              return {
+                                css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                              };
                         },
-                        {
-                            field: 'version',
-                            title: 'Version',
-                            sortable: true,
-                            visible: false
-                        }
-                    ]
-                } );
+                        undefinedText: '--',
+                        columns: [
+                            {
+                                field: 'by',
+                                title: 'Reference',
+                                width: '15%',
+                                sortable: true
+                            }, {
+                                field: 'comment',
+                                title: 'Comment',
+                                sortable: true
+                            }, {
+                                field: 'lastUpdated',
+                                title: 'Last Updated',
+                                sortable: true,
+                                width: '17%'
+                            },
+                            {
+                                field: 'version',
+                                title: 'Version',
+                                sortable: true,
+                                visible: false
+                            }
+                        ]
+                    } );
+                } else {
+                    $("#profileAuditLogTable").closest("div.profile-item-container").hide();
+                }
 
 
             }).fail(function() {
+                $("#profileAuditLogTable").closest("div.profile-item-container").hide();
                 console.log("Problem retrieving audit log from server.");
             });
          });</script>
@@ -429,7 +434,7 @@
                     return { name: $(this).val() };
                 }).get();
                 var toSend = {"roles": roles};
-                console.log('update role: ' + toSend);
+                //console.log('update role: ' + toSend);
                 tnthAjax.putRoles({{person.id}},toSend);
 
              });
@@ -441,203 +446,138 @@
 {%- endmacro %}
 
 {% macro profileSessionList(person) -%}
-    <!--hard coded for now -->
-    <div class="form-group profile-section well" id="userSessionsList">
-        <table class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
-            <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
-            <th>Project Name</th><th>State</th><th>Last Activity</th>
 
-            <tr title="Click to view report">
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">4:03PM Wed Oct 12, 2016</a></td>
-            </tr>
-            <tr title="Click to view report">
-                <td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id) }}">9:48AM Tue Sep 2, 2016</a></td>
-            </tr>
-        </table>
-         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
-    </div>
-    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.8em">
-            <br/>
-            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% if person and person.has_role('patient') %}
+		<!--hard coded for now -->
+        <h4 class="profile-item-title">PRO Assessments</h4>
+		<div class="form-group profile-section" id="userSessionsListContainer">
+
+			<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
+			<table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
+			    <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
+			    <th>Assessment Name</th><th>Status</th><th>Last Activity</th>
+
+			    <!-- <tr title="Click to view report">
+			        <td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id,instrument_id='epic26') }}">4:03PM Wed Oct 12, 2016</a></td>
+			    </tr>
+			    <tr title="Click to view report">
+			        <td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">9:48AM Tue Sep 2, 2016</a></td>
+			    </tr> -->
+			</table>
+		</div>
+        <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+
+	    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
+	      <div class="modal-dialog" role="document">
+	        <div class="modal-content">
+	          <div class="modal-header">
+	            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
+	          </div>
+	          <div class="modal-body" style="font-size:0.8em">
+	            <br/>
+	            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
+	            <br/>
+	          </div>
+	          <div class="modal-footer">
+	            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	    <script>
+
+            function goToReport(obj) {
+                window.document.location = $(obj).attr("href");
+            };
+
+            $(function () {
+	    	var sessionListHTML = "";
+	    	var sessionUserId = $("#_session_user_id").val();
+	    	$.ajax ({
+	                type: "GET",
+	                url: '/api/patient/' + sessionUserId + '/assessment',
+	                contentType: "application/json; charset=utf-8",
+	                dataType: 'json'
+	            }).done(function(data) {
+	                //console.log(data["audits"]);
+	                //console.log(data);
+	                var entries = data.entry ? data.entry : null;
+	                if (entries && entries.length > 0) {
+	                	entries.forEach(function(entry, index) {
+	                		/****will this always be an epic26 report?****/
+	                		var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
+	                		sessionListHTML += '<tr title="Click to view report" href="' + reportLink + 
+                                               '" onclick="goToReport(this)" ' +
+                                                (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
+	                						   '<td>' + entry['questionnaire']['display'] + '<a></td>' +
+	                						   '<td>' + entry['status'] + "</a></td>" +
+	                						   '<td>' + String(entry['authored']).replace(/[tz]/gi, ' ') + "</a></td>" +
+	                						   '</tr>';
+	                	});
+	                	$("#userSessionListTable").append(sessionListHTML);
+	                } else $("#userSessionsListContainer").hide();
+
+	            }).fail(function() {
+	                console.log("Problem retrieving session data from server.");
+	                $("#userSessionsListContainer").hide();
+	            });
+
+	    });
+	    </script>
+    {% endif %}
 {%- endmacro %}
 
 
-{% macro profileAssessment(person) -%}
+{% macro profileAssessment(person, instrument_id) -%}
 
-        <div>
+        <div id="userSessionReportDetail" cellpadding="2">
             <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
-
-                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="">
-                    <caption>Instrument: Epic26</caption>
-                    <tr>
-                        <th></th>
-                        <th class="table-title">Question
-                        </th>
-                        <th class="table-title">Response
-                        </th>
-                    </tr>
-                    <tr>
-                        <td>1.</td><td> Over the past 4 weeks, how often have you leaked urine?"
-                        </td>
-                        <td>Frequent dribbling
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2.</td><td> Which of the following best describes your urinary control during the last 4 weeks?"
-                        </td>
-                        <td>2 pads per day
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3.</td><td> How many pads or adult diapers per day did you usually use to control leakage during the last 4 weeks?
-                        </td>
-                        <td>No problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>a.</td><td> Dripping or leaking urine
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> b.</td><td> Pain or burning on urination
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> d.</td><td> Weak urine stream or incomplete emptying
-                        </td>
-                        <td>4
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> e.</td><td> Need to urinate frequently during the day
-                        </td>
-                        <td>Small problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 5.</td><td>Overall, how big a problem has your urinary function been for you during the last 4 weeks?
-                        </td>
-                        <td>No problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> a.</td><td> Urgency to have a bowel movement
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> b.</td><td> Increased frequency of bowel movements
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> c.</td><td> Losing control of your stools
-                        </td>
-                        <td>3
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> e.</td><td> Abdominal / Pelvic / Rectal Pain
-                        </td>
-                        <td>Very small problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 7.</td><td> Overall, how big a problem have your bowel habits been for you during the past 4 weeks?
-                        </td>
-                        <td>Very Poor to None
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> a.</td><td> Your ability to have an erection?
-                        </td>
-                        <td>4
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> b.</td><td> Your ability to reach orgasm (climax)?
-                        </td>
-                        <td>Firm enough for masturbation and foreplay only
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 9.</td><td> How would you describe the usual QUALITY of your erections during the last 4 weeks?
-                        </td>
-                        <td>I had an erection LESS THAN HALF the time I wanted one
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 10. </td><td>How would you describe the FREQUENCY of your erections during the last 4 weeks?
-                        </td>
-                        <td>Very poor
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 11.</td><td> Overall, how would you rate your ability to function sexually during the last 4 weeks?
-                        </td>
-                        <td>Moderate problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> 12.</td><td> Overall, how big a problem has your sexual function or lack of sexual function been for you during the last 4 weeks?
-                        </td>
-                        <td>Big problem
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> a.</td><td>Hot flashes
-                        </td>
-                        <td>3
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> b.</td><td> Breast tenderness / enlargement
-                        </td>
-                        <td>2
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> c.</td><td> Feeling depressed
-                        </td>
-                        <td>1
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> d.</td><td> Lack of energy
-                        </td>
-                        <td>0
-                        </td>
-                    </tr>
-                    <tr>
-                        <td> e.</td><td> Change in body weight"
-                        </td>
-                        <td>0
-                        </td>
-                    </tr>
+            	<input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
+                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" >
                 </table>
             <br />
         </div>
+        <script>$(function () {
+	    	var sessionListHTML = "";
+	    	var sessionUserId = $("#_report_user_id").val();
+	    	$.ajax ({
+	                type: "GET",
+	                url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
+	                contentType: "application/json; charset=utf-8",
+	                dataType: 'json'
+	            }).done(function(data) {
+	                console.log(data)
+                    $(".report-error-message").hide();
+	                $("#userSessionReportDetailTable").html('');
+	                if (data.entry && data.entry.length > 0) {
+	                	var entries = data['entry'];
+	                	var reportHTML = '<caption><hr/><span class="profile-item-title">' + 
+                                        entries[0]['questionnaire']['display'] + 
+                                        '</span><br/><span class="text-muted smaller-text">Last Updated - ' + 
+                                        String(entries[0]['authored']).replace(/[tz]/gi, " ") + 
+                                        '</span><hr/></caption>';
+	                	reportHTML += '<TH>Question</TH><TH>Response</TH>';
+	                	entries[0]['group']['question'].forEach(function(entry) {
+	                		//console.log(entry['answer'])
+                            var q = entry['text'] ? entry['text'] : '';
+                            var a = entry['answer'] && entry['answer'][0] && entry['answer'][0]['valueString'] ? entry['answer'][0]['valueString'] : 'undefined';
+	                		reportHTML += '<tr><td>' + String(q).substr(q.indexOf('.') + 1) + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
+	                	});
+	                	$("#userSessionReportDetailTable").append(reportHTML);
+
+	                }
+	                //console.log(data);
+
+	            }).fail(function(xhr) {
+	                console.log("Problem retrieving session data from server.");
+                    $(".report-error-message").show();
+                    $(".report-error-message").append("<br/>" + xhr.responseText);
+
+	            });
+
+	    });
+	    </script>
 
 {%- endmacro %}
 
@@ -659,15 +599,15 @@
             </div>
         </div>
     </div>
+
     {% if person and person.has_role('patient') %}
-        <div class="row">
+     	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
-                    <h4 class="profile-item-title">PRO Assessments</h4>
-                    {{profileSessionList(person)}}
-                </div>
-            </div>
-        </div>
+					{{profileSessionList(person)}}
+				</div>
+			</div>
+		</div>
     {%endif %}
 
     <div class="row">
@@ -690,7 +630,6 @@
                         {{profilePhone(person)}}
                     </div>
                     <div>
-
                          {{profileEthnicity(person)}}
                     </div>
                     <div>
