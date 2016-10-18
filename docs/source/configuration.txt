@@ -50,7 +50,8 @@ PORTAL_STYLESHEET::
 Site Persistence
 ================
 
-The ``portal.SitePersistence`` class manages the import and export of a
+The ``portal.SitePersistence`` class (see also `Site Persistence
+<site_persistence.html>`__) manages the import and export of a
 number of database tables holding significant data required for a rich
 experience.  This should never include any patient or personal data, but
 will include codified business rules and required data to support them.

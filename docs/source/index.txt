@@ -20,3 +20,4 @@ Contents:
     organizations
     site_persistence
     code
+    contributing
