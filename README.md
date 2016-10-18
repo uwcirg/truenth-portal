@@ -60,7 +60,6 @@ The OS default version of pip is often out of date and may need to be updated be
 
 ```bash
 $ pip install --upgrade pip setuptools
-$ source env/bin/activate
 ```
 
 ## CONFIGURE
