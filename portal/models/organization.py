@@ -132,6 +132,7 @@ class UserOrganization(db.Model):
     __table_args__ = (UniqueConstraint('user_id', 'organization_id',
         name='_user_organization'),)
 
+    organization = db.relationship('Organization')
 
 class OrganizationAddress(db.Model):
     """link table for organization : n addresses"""

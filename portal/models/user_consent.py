@@ -19,6 +19,7 @@ class UserConsent(db.Model):
     Capture data when user consents to share data with an organization.
 
     """
+    __tablename__ = 'user_consents'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     organization_id = db.Column(
@@ -69,21 +70,34 @@ def fake_consents():
     Expected as a one time development trick to create fake consent
     agreements between users and the orgs they currently belong to.
 
-    Should probably have a short life (i.e. delete this and the
-    manager.command if it no longer makes sense.
+    Should probably have a short life (i.e. delete this code and the
+    manager.command if it no longer makes sense).
 
     """
     from .organization import UserOrganization
+
+    admin_id = User.query.filter_by(email='bob25mary@gmail.com').one().id
 
     # Track down all users with orgs
     users_orgs = db.session.query(User, UserOrganization).filter(
         User.id == UserOrganization.user_id).distinct(
             User.id).group_by(User.id, UserOrganization.id)
-    for user, org in users_orgs:
-        # only add consents to "parent" organizations
-        if org.organization.partOf_id is not None:
+    for user, user_org in users_orgs:
+        org = user_org.organization
+        # None of the above doesn't apply
+        if org.name == 'none of the above':
             continue
-        existing_org_consents = [uc.org_id for uc in user.consents]
+
+        # only add consents to "parent" organizations
+        if org.partOf_id is not None:
+            continue
+
+        existing_org_consents = [uc.organization_id for uc in user.consents]
         if org.id not in existing_org_consents:
             # CREATE ONE
-            assert("not done")
+            audit = Audit(user_id=admin_id, comment='fake consent added')
+            uc = UserConsent(
+                user_id=user.id, organization_id=org.id, audit=audit,
+                agreement_url='http://fake-consent.org')
+            db.session.add(uc)
+    db.session.commit()
