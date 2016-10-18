@@ -55,6 +55,14 @@ $ sudo -u postgres createuser truenth-dev --pwprompt # enter password at prompt
 $ sudo -u postgres createdb truenth-dev --owner truenth-dev
 ```
 
+#### Update pip
+The OS default version of pip is often out of date and may need to be updated before it is able to install other project dependencies:
+
+```bash
+$ pip install --upgrade pip setuptools
+$ source env/bin/activate
+```
+
 ## CONFIGURE
 
 Copy the default to the named configuration file
