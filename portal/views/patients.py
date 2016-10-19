@@ -1,9 +1,13 @@
 """Patient view functions (i.e. not part of the API or auth)"""
+from datetime import datetime
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
+from sqlalchemy import and_
 
+from ..models.organization import OrgTree
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
+from ..models.user_consent import UserConsent
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -20,12 +24,23 @@ def patients_root():
     """
     user = current_user()
     patients_by_org = {}
+    now = datetime.utcnow()
     for org in user.organizations:
+        # we require a consent agreement between the user and the
+        # respective 'top-level' organization
+        top_level_id = OrgTree().find(org.id).top_level()
+        consent_query = UserConsent.query.filter(and_(
+            UserConsent.organization_id == top_level_id,
+            UserConsent.expires > now)).with_entities(UserConsent.user_id)
+        consented_users = [u[0] for u in consent_query]
+
         patients_by_org[org.name] = [user for user in org.users if
-                                     user.has_role(ROLE.PATIENT)]
+                                     user.has_role(ROLE.PATIENT) and
+                                     user.id in consented_users]
 
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org, user=current_user(), wide_container="true")
+        'patients_by_org.html', patients_by_org=patients_by_org,
+        user=current_user(), wide_container="true")
 
 @patients.route('/profile_create')
 @oauth.require_oauth()
