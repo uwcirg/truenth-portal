@@ -488,7 +488,6 @@
 	    <script>
 
             $(function () {
-
 	    	var sessionListHTML = "";
 	    	var sessionUserId = $("#_session_user_id").val();
 	    	$.ajax ({
@@ -541,7 +540,16 @@
                 </table>
             <br />
         </div>
-        <script>$(function () {
+        <script>
+        
+        function _isTouchDevice(){
+            return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
+        };
+
+        $(function () {
+
+            if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
+
 	    	var sessionListHTML = "";
 	    	var sessionUserId = $("#_report_user_id").val();
 	    	$.ajax ({

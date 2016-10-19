@@ -524,6 +524,25 @@ input.clinic {
   margin-left: -1%;
 }
 
+#userSessionReportDetailHeader span.glyphicon
+{
+-webkit-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
+border-left: 1px solid #ddd;
+border-top: 1px solid #ddd;
+border-radius: 2px;
+padding: 0.2em;
+}
+#userSessionReportDetailHeader span.glyphicon:hover
+{
+  color: #979a8d;
+}
+
+#userSessionReportDetailHeader span.glyphicon-home {
+  top: 5px;
+}
+t
 #userSessionReportDetailTable caption {
   padding: 0;
 }
@@ -884,6 +903,20 @@ position: relative;
 z-index: 88; 
 color: #777
 }
+
+.tooltip > .tooltip-inner {
+    background-color: #979a8d; 
+    border: 1px solid #979a8d;
+    padding: 0.3em;
+    width: 150%;
+    font-size: 0.85em;
+}
+
+.tooltip.top > .tooltip-arrow {
+    border-top: 5px solid #979a8d; ;
+}
+
+
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
