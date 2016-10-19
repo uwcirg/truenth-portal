@@ -294,9 +294,9 @@ a.btn {
 }
 .profile-img {
   float: right;
-  margin-top: -70px;
+  margin-top: -66px;
   img {
-    width: 80px;
+    width: 60px;
     border-radius: 45px;
   }
 }
@@ -864,10 +864,25 @@ sub.pointer:hover {
 }
 
 .custom-header {
-  margin-left: 12px; 
-  padding: 0.3em 0.5em; 
-  border-radius: 4px; 
-  border: 1px solid #f5f5f5
+  padding: 0.3em 0.5em;
+  border-radius: 4px;
+  border-left: 2px solid #f5f5f5;
+  border-bottom: 2px solid #f5f5f5;
+  width: 100%;
+  max-width: 100%;
+  margin: auto;
+  height: 86px;
+}
+
+.custom-header .left {
+float:left;
+}
+
+.custom-header .right {
+float:right; padding-top:1%; 
+position: relative; 
+z-index: 88; 
+color: #777
 }
 
 /** Responsive sizes **/
@@ -930,6 +945,11 @@ sub.pointer:hover {
   }
   table.profile-audit-log {
     font-size: 0.7em;
+  }
+  .create-account-container {
+    padding: 3.5em 3em;
+    width: 90%;
+    max-width: 100%;
   }
 }
 
@@ -1072,11 +1092,12 @@ sub.pointer:hover {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -80px;
-    img {
-      width: 60px;
-      border-radius: 60px;
-    }
+  float: right;
+  margin-top: -66px;
+  img {
+    width: 60px;
+    border-radius: 45px;
+  }
   }
   .btn-set {
     margin-bottom: 1em;

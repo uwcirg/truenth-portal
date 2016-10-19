@@ -59,13 +59,13 @@
         <label>Name</label>
     </div>
     <div class="row profile-section name-section">
-        <div class="col-xs-6">
+        <div class="col-md-6 col-xs-12">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        <div class="col-xs-6">
+        <div class="col-md-6 col-xs-12">
             <div class="form-group float-input-label">
                 <input required="required" data-error="Last name is required" class="form-control float-text" id="lastname" name="lastname" placeholder="Last Name" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
@@ -507,13 +507,19 @@
 	                	entries.forEach(function(entry, index) {
 	                		/****will this always be an epic26 report?****/
 	                		var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
-	                		sessionListHTML += '<tr title="Click to view report" href="' + reportLink + 
-                                               '" onclick="goToReport(this)" ' +
+	                		sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-	                						   '<td>' + entry['questionnaire']['display'] + '<a></td>' +
-	                						   '<td>' + entry['status'] + "</a></td>" +
-	                						   '<td>' + String(entry['authored']).replace(/[tz]/gi, ' ') + "</a></td>" +
-	                						   '</tr>';
+                                                [entry['questionnaire']['display'], 
+                                                 entry['status'], 
+                                                 String(entry['authored']).replace(/[tz]/gi, ' ')].map(function(o) {
+                                                    return  '<td href="' + reportLink + '" onclick="goToReport(this)">' + o + '<a></td>'
+                                                 }).join('') + 
+                                                 '</tr>';
+
+	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + entry['questionnaire']['display'] + '<a></td>' +
+	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + entry['status'] + "</a></td>" +
+	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + String(entry['authored']).replace(/[tz]/gi, ' ') + "</a></td>" +
+	                						   // '</tr>';
 	                	});
 	                	$("#userSessionListTable").append(sessionListHTML);
 	                } else $("#userSessionsListContainer").hide();
@@ -552,10 +558,10 @@
 	                $("#userSessionReportDetailTable").html('');
 	                if (data.entry && data.entry.length > 0) {
 	                	var entries = data['entry'];
-	                	var reportHTML = '<caption><hr/><span class="profile-item-title">' + 
-                                        entries[0]['questionnaire']['display'] + 
-                                        '</span><br/><span class="text-muted smaller-text">Last Updated - ' + 
-                                        String(entries[0]['authored']).replace(/[tz]/gi, " ") + 
+	                	var reportHTML = '<caption><hr/><span class="profile-item-title">' +
+                                        entries[0]['questionnaire']['display'] +
+                                        '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
+                                        String(entries[0]['authored']).replace(/[tz]/gi, " ") +
                                         '</span><hr/></caption>';
 	                	reportHTML += '<TH>Question</TH><TH>Response</TH>';
 	                	entries[0]['group']['question'].forEach(function(entry) {

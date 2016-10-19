@@ -253,12 +253,12 @@ a.btn {
   font-weight: normal;
 }
 .profile-img {
-  float: right;
-  margin-top: -70px;
-}
+    margin-top: -64px;
+    float:right;
+  }
 .profile-img img {
-  width: 80px;
-  border-radius: 45px;
+    width: 60px;
+    border-radius: 60px;
 }
 .portal-item {
   margin: 2em 0 3em;
@@ -781,19 +781,31 @@ sub.pointer:hover {
 .gradient {
   background-image:
     linear-gradient(
-      to top right, 
+      to top right,
       #FFF, #e1e2e1
     );
 }
 
 .custom-header {
-  padding: 0.3em 0.5em; 
-  border-radius: 4px; 
+  padding: 0.3em 0.5em;
+  border-radius: 4px;
   border-left: 2px solid #f5f5f5;
   border-bottom: 2px solid #f5f5f5;
   width: 100%;
   max-width: 100%;
   margin: auto;
+  height: 86px;
+}
+
+.custom-header .left {
+float:left;
+}
+
+.custom-header .right {
+float:right; padding-top:1%; 
+position: relative; 
+z-index: 88; 
+color: #777
 }
 
 /** Responsive sizes **/
@@ -839,7 +851,7 @@ sub.pointer:hover {
   #userSessionsList {
     font-size: 0.85em;
   }
-  
+
   .side {
     height: 27em;
   }
@@ -857,6 +869,12 @@ sub.pointer:hover {
   table.profile-audit-log {
     font-size: 0.7em;
   }
+  .create-account-container {
+    padding: 3.5em 3em;
+    width: 90%;
+    max-width: 100%;
+  }
+
 }
 @media (max-width: 730) {
   #userSessionsList {
@@ -966,6 +984,7 @@ sub.pointer:hover {
     margin-top: 4px;
   }
 }
+
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -988,7 +1007,8 @@ sub.pointer:hover {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -70px;
+    margin-top: -66px;
+    float:right;
   }
   .profile-img img {
     width: 60px;
