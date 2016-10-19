@@ -492,6 +492,7 @@
             };
 
             $(function () {
+
 	    	var sessionListHTML = "";
 	    	var sessionUserId = $("#_session_user_id").val();
 	    	$.ajax ({
@@ -512,7 +513,7 @@
                                                 [entry['questionnaire']['display'], 
                                                  entry['status'], 
                                                  String(entry['authored']).replace(/[tz]/gi, ' ')].map(function(o) {
-                                                    return  '<td href="' + reportLink + '" onclick="goToReport(this)">' + o + '<a></td>'
+                                                    return  '<td><a href="' + reportLink + '" onclick="goToReport(this)">' + o + '</a></td>'
                                                  }).join('') + 
                                                  '</tr>';
 
