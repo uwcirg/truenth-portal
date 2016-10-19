@@ -5,7 +5,7 @@ from validators import url as url_validation
 from .audit import Audit
 from ..extensions import db
 from .fhir import FHIR_datetime
-from .organization import Organization
+from .organization import Organization, OrgTree
 from .user import User
 
 def default_expires():
@@ -78,7 +78,7 @@ def fake_consents():
 
     admin_id = User.query.filter_by(email='bob25mary@gmail.com').one().id
 
-    # Track down all users with orgs
+    # Track down all users with org associations
     users_orgs = db.session.query(User, UserOrganization).filter(
         User.id == UserOrganization.user_id).distinct(
             User.id).group_by(User.id, UserOrganization.id)
@@ -88,16 +88,14 @@ def fake_consents():
         if org.name == 'none of the above':
             continue
 
-        # only add consents to "parent" organizations
-        if org.partOf_id is not None:
-            continue
+        # lookup top-level organization for consent
+        top_id = OrgTree().find(org.id).top_level()
 
         existing_org_consents = [uc.organization_id for uc in user.consents]
-        if org.id not in existing_org_consents:
-            # CREATE ONE
+        if top_id not in existing_org_consents:
             audit = Audit(user_id=admin_id, comment='fake consent added')
             uc = UserConsent(
-                user_id=user.id, organization_id=org.id, audit=audit,
+                user_id=user.id, organization_id=top_id, audit=audit,
                 agreement_url='http://fake-consent.org')
             db.session.add(uc)
     db.session.commit()
