@@ -315,7 +315,8 @@
                     var fData = [];
                     data["audits"].forEach(function(item) {
                         item["by"] = item["by"]["reference"];
-                        item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
+                        //item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
+                        item["lastUpdated"] = convertGMTToLocalTime(item["lastUpdated"], 'mm/dd/yyyy hh:mm:ss');
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -329,6 +330,7 @@
                         pageSize: 5,
                         pageList: [5, 10, 25, 50, 100],
                         classes: 'table table-responsive profile-audit-log',
+                        sortName: 'lastUpdated',
                         rowStyle: function rowStyle(row, index) {
                               return {
                                 css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
@@ -349,7 +351,10 @@
                                 field: 'lastUpdated',
                                 title: 'Last Updated',
                                 sortable: true,
-                                width: '17%'
+                                sorter: function(a, b) {
+                                    return new Date(b).getTime() - new Date(a).getTime();
+                                },
+                                width: '20%'
                             },
                             {
                                 field: 'version',
@@ -486,7 +491,6 @@
 	      </div>
 	    </div>
 	    <script>
-
             $(function () {
 	    	var sessionListHTML = "";
 	    	var sessionUserId = $("#_session_user_id").val();
@@ -501,21 +505,16 @@
 	                var entries = data.entry ? data.entry : null;
 	                if (entries && entries.length > 0) {
 	                	entries.forEach(function(entry, index) {
-	                		/****will this always be an epic26 report?****/
-	                		var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
-	                		sessionListHTML += '<tr title="Click to view report"  ' +
-                                                (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-                                                [entry['questionnaire']['display'], 
-                                                 entry['status'], 
-                                                 String(entry['authored']).replace(/[tz]/gi, ' ')].map(function(o) {
-                                                    return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
-                                                 }).join('') + 
-                                                 '</tr>';
-
-	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + entry['questionnaire']['display'] + '<a></td>' +
-	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + entry['status'] + "</a></td>" +
-	                						   // '<td href="' + reportLink + '" onclick="goToReport(this)">' + String(entry['authored']).replace(/[tz]/gi, ' ') + "</a></td>" +
-	                						   // '</tr>';
+                        //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
+                        var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
+                        sessionListHTML += '<tr title="Click to view report"  ' +
+                                            (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
+                                            [entry['questionnaire']['display'], 
+                                             entry['status'], 
+                                             convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss')].map(function(o) {
+                                                return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
+                                             }).join('') + 
+                                             '</tr>';
 	                	});
 	                	$("#userSessionListTable").append(sessionListHTML);
 	                } else $("#userSessionsListContainer").hide();
@@ -558,7 +557,7 @@
 	                contentType: "application/json; charset=utf-8",
 	                dataType: 'json'
 	            }).done(function(data) {
-	                console.log(data)
+	                //console.log(data)
                     $(".report-error-message").hide();
 	                $("#userSessionReportDetailTable").html('');
 	                if (data.entry && data.entry.length > 0) {
