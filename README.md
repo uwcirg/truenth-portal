@@ -135,8 +135,7 @@ http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html
 ## DATABASE
 
 The value of `SQLALCHEMY_DATABASE_URI` defines which database engine
-and database to use.  In general, sqlite is used for small testing
-instances, and PostgreSQL is used otherwise.
+and database to use.  At this time, only PostgreSQL is supported.
 
 ### Migrations
 
