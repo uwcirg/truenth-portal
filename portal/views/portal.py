@@ -9,11 +9,13 @@ from flask_swagger import swagger
 from .auth import next_after_login
 from ..audit import auditable_event
 from .crossdomain import crossdomain
+from ..models.app_text import app_text
+from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
 from ..models.message import EmailMessage
-from ..models.organization import OrganizationIdentifier
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE
 from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth, user_manager
@@ -141,13 +143,19 @@ def initial_queries():
         return redirect('portal.landing')
 
     still_needed = Coredata().still_needed(user)
-    terms = None
+    terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        response = requests.get('https://stg-lr7.us.truenth.org/c/portal/'
-                                'truenth/asset?groupId=20147&articleId=41603')
+        response = requests.get(app_text(ToU_ATMA.name_key()))
         terms = response.text
-    return render_template('initial_queries.html', user=user, terms=terms,
-                           still_needed=still_needed)
+    if 'consent' in still_needed:
+        for org_id in OrgTree().all_top_level_ids():
+            org = Organization.query.get(org_id)
+            response = requests.get(
+                app_text(ConsentATMA.name_key(organization=org)))
+            consent_agreements[org.id] = response.text
+    return render_template(
+        'initial_queries.html', user=user, terms=terms,
+        consent_agreements=consent_agreements, still_needed=still_needed)
 
 @portal.route('/home')
 def home():
@@ -259,15 +267,16 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    response = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577')
+    response = requests.get(app_text(LegalATMA.name_key()))
     return render_template('legal.html', content=response.text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549')
-    about_mo = requests.get('https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565')
-    return render_template('about.html', about_tnth=about_tnth.text, about_mo=about_mo.text)
+    about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
+    about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
+    return render_template('about.html', about_tnth=about_tnth.text,
+                           about_mo=about_mo.text)
 
 @portal.route('/explore')
 def explore():

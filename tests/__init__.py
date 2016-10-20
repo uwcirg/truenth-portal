@@ -25,6 +25,7 @@ from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
+from portal.models.user_consent import UserConsent
 from portal.site_persistence import SitePersistence
 
 TEST_USER_ID = 1
@@ -139,11 +140,14 @@ class TestCase(Base):
         org = Organization(name='fake urology clinic')
         self.test_user.organizations.append(org)
 
-        # Agree to Terms of Use
+        # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID)
         tou = ToU(audit=audit, text="filler text")
+        consent = UserConsent(user_id=TEST_USER_ID, organization=org,
+                              audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
             db.session.add(tou)
+            db.session.add(consent)
             db.session.commit()
 
     def add_concepts(self):
