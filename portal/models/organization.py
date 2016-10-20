@@ -3,7 +3,7 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, and_
 from flask import url_for
 
 import address
@@ -260,8 +260,9 @@ class OrgTree(object):
 
         def add_descendents(node):
             partOf_id = node.id
-            for org in Organization.query.filter(
-                Organization.partOf_id == partOf_id):
+            for org in Organization.query.filter(and_(
+                Organization.id != 0,  # none of the above doesn't apply
+                Organization.partOf_id == partOf_id)):
                 new_node = node.insert(id=org.id, partOf_id=partOf_id)
                 assert org.id not in self.lookup_table
                 self.lookup_table[org.id] = new_node
@@ -283,6 +284,10 @@ class OrgTree(object):
         if organization_id not in self.lookup_table:
             raise ValueError("{} not found in OrgTree".format(organization_id))
         return self.lookup_table[organization_id]
+
+    def all_top_level_ids(self):
+        """Return list of all top level organization identifiers"""
+        return self.root.children.keys()
 
 
 def add_static_organization():

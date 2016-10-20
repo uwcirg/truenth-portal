@@ -111,6 +111,23 @@ class RoleData(CoredataPoint):
             return True
 
 
+class ConsentData(CoredataPoint):
+    def hasdata(self, user):
+        """Does user have at least one consent?
+
+        Only required for patients.
+
+        TODO - this needs to be smarter
+        about checking for consents for the user's organizations.
+        Bit of a bootstrap problem, as user's organizations aren't
+        necessarily assigned when this test hits.
+
+        """
+        if user.has_role(ROLE.PATIENT):
+            return user.consents.count() > 0
+        return True
+
+
 class OrgData(CoredataPoint):
     def hasdata(self, user):
         """Does user have at least one org?

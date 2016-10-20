@@ -7,6 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from abc import ABCMeta, abstractmethod
 from ..extensions import db
 
 
@@ -54,6 +55,83 @@ class AppText(db.Model):
         if self.custom_text:
             d['custom_text'] = self.custom_text
         return d
+
+
+class AppTextModelAdapter(object):
+    """Several special purpose patterns used for lookups
+
+    Make access consistent and easy for model classes where appropriate
+
+    Abstract base class - defining methods each model adapter needs
+    """
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def name_key(**kwargs):
+        """Return the named key as used by AppText for the type"""
+        raise NotImplemented
+
+
+class ConsentATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Consent agreements - namely the URL per org"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a consent agreement
+
+        :param organization: for which the consent agreement applies
+        :returns: string for AppText.name field
+
+        """
+        organization = kwargs.get('organization')
+        if not organization:
+            raise ValueError("required organization parameter not defined")
+        return "{} organization consent URL".format(organization.name)
+
+
+class ToU_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Terms Of Use agreements - namely the URL"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a Terms of Use agreement
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+
+        :returns: string for AppText.name field
+
+        """
+        return "Terms of Use URL"
+
+
+class AboutATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for `About` - namely the URL"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for `about` URL
+
+        :param subject: required subject, i.e. 'TrueNTH' or 'Movember'
+        :returns: string for AppText.name field
+
+        """
+        if not kwargs.get('subject'):
+            raise ValueError("required 'subject' parameter not defined")
+        return "About {} URL".format(kwargs.get('subject'))
+
+
+class LegalATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Legal - namely the URL"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for legal URL
+
+        :returns: string for AppText.name field
+
+        """
+        return "Legal URL"
 
 
 def app_text(name, *args):
