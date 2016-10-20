@@ -316,7 +316,7 @@
                     data["audits"].forEach(function(item) {
                         item["by"] = item["by"]["reference"];
                         //item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
-                        item["lastUpdated"] = convertGMTToLocalTime(item["lastUpdated"], 'mm/dd/yyyy hh:mm:ss');
+                        item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -349,7 +349,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Last Updated',
+                                title: 'Last Updated <small>( GMT Time Zone )</small>',
                                 sortable: true,
                                 sorter: function(a, b) {
                                     return new Date(b).getTime() - new Date(a).getTime();
@@ -380,7 +380,7 @@
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <h4 class="profile-item-title">User Roles for {{ person.username }}</h4>
-        <p class="small-text text-muted">Editable by admins only.</small></p>
+        <p class="small-text text-muted">Editable by admins only.</p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
             <div class="checkbox">
@@ -460,14 +460,7 @@
 			<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
 			<table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
 			    <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
-			    <th>Assessment Name</th><th>Status</th><th>Last Activity</th>
-
-			    <!-- <tr title="Click to view report">
-			        <td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id,instrument_id='epic26') }}">4:03PM Wed Oct 12, 2016</a></td>
-			    </tr>
-			    <tr title="Click to view report">
-			        <td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">EPIC-26 Questionnaire</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">finished</a></td><td><a href="{{ url_for('patients.sessionReport', user_id=person.id, instrument_id='epic26') }}">9:48AM Tue Sep 2, 2016</a></td>
-			    </tr> -->
+			    <tr><th>Assessment Name</th><th>Status</th><th>Last Updated <small>( GMT Time Zone )</small></th></tr>
 			</table>
 		</div>
         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
@@ -511,7 +504,7 @@
                                             (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                             [entry['questionnaire']['display'], 
                                              entry['status'], 
-                                             convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss')].map(function(o) {
+                                             String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
                                                 return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
                                              }).join('') + 
                                              '</tr>';
@@ -566,8 +559,8 @@
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         String(entries[0]['authored']).replace(/[tz]/gi, " ") +
-                                        '</span><hr/></caption>';
-	                	reportHTML += '<TH>Question</TH><TH>Response</TH>';
+                                        ' GMT</span><hr/></caption>';
+	                	reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
 	                	entries[0]['group']['question'].forEach(function(entry) {
 	                		//console.log(entry['answer'])
                             var q = entry['text'] ? entry['text'] : '';
