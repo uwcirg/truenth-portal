@@ -9,7 +9,8 @@ SitePersistence mechanism, and looked up in a template using the
 """
 from abc import ABCMeta, abstractmethod
 from ..extensions import db
-
+from urllib import urlencode
+from urlparse import parse_qsl, urlparse
 
 class AppText(db.Model):
     """Model representing application specific strings for customization
@@ -87,6 +88,35 @@ class ConsentATMA(AppTextModelAdapter):
         if not organization:
             raise ValueError("required organization parameter not defined")
         return "{} organization consent URL".format(organization.name)
+
+    @staticmethod
+    def permanent_url(generic_url, version):
+        """Produce a permanent url from the metadata provided
+
+        Consent agreements are versioned - but the link maintained
+        in the app_text table is not.
+
+        On request for the consent URL, the effective version number is
+        returned.  This method returns a permanent URL including the version
+        number.
+
+        """
+        parsed = urlparse(generic_url)
+        qs = parse_qsl(parsed.query)
+        if not qs:
+            qs = []
+        if 'version' not in qs:
+            qs.append(('version', version))
+        path = parsed.path
+        if path.endswith('/detailed'):
+            path = path[:-(len('/detailed'))]
+        format_dict = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': path,
+            'qs': urlencode(qs)}
+        url = "{scheme}://{netloc}{path}?{qs}".format(**format_dict)
+        return url
 
 
 class ToU_ATMA(AppTextModelAdapter):
