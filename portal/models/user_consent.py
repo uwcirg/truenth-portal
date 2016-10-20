@@ -5,7 +5,7 @@ from validators import url as url_validation
 from .audit import Audit
 from ..extensions import db
 from .fhir import FHIR_datetime
-from .organization import Organization
+from .organization import Organization, OrgTree
 from .user import User
 
 def default_expires():
@@ -19,6 +19,7 @@ class UserConsent(db.Model):
     Capture data when user consents to share data with an organization.
 
     """
+    __tablename__ = 'user_consents'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     organization_id = db.Column(
@@ -61,3 +62,40 @@ class UserConsent(db.Model):
         return cls(user_id=data['user_id'],
                    organization_id=data['organization_id'],
                    agreement_url=data['agreement_url'])
+
+
+def fake_consents():
+    """Bootstrap method as we transition from org relations to consent
+
+    Expected as a one time development trick to create fake consent
+    agreements between users and the orgs they currently belong to.
+
+    Should probably have a short life (i.e. delete this code and the
+    manager.command if it no longer makes sense).
+
+    """
+    from .organization import UserOrganization
+
+    admin_id = User.query.filter_by(email='bob25mary@gmail.com').one().id
+
+    # Track down all users with org associations
+    users_orgs = db.session.query(User, UserOrganization).filter(
+        User.id == UserOrganization.user_id).distinct(
+            User.id).group_by(User.id, UserOrganization.id)
+    for user, user_org in users_orgs:
+        org = user_org.organization
+        # None of the above doesn't apply
+        if org.name == 'none of the above':
+            continue
+
+        # lookup top-level organization for consent
+        top_id = OrgTree().find(org.id).top_level()
+
+        existing_org_consents = [uc.organization_id for uc in user.consents]
+        if top_id not in existing_org_consents:
+            audit = Audit(user_id=admin_id, comment='fake consent added')
+            uc = UserConsent(
+                user_id=user.id, organization_id=top_id, audit=audit,
+                agreement_url='http://fake-consent.org')
+            db.session.add(uc)
+    db.session.commit()
