@@ -68,10 +68,14 @@ function showMain() {
 
 }
 
-function showWrapper() {
-    //$("#tnthNavWrapper").show();
+function showWrapper(hasLoader) {
+    var cssProp = {"visibility":"visible", "display": "block"};
     //adding this for firefox fix
-    $("#tnthNavWrapper").css({"visibility":"visible", "display": "block"});
+    if (hasLoader) {
+        $("#tnthNavWrapper").css(cssProp).promise().done(function() {
+            setTimeout('$("#loadingIndicator").fadeOut();', 0);
+        });
+    } else $("#tnthNavWrapper").css(cssProp);
 }
 
 // Loading indicator that appears in UI on page loads and when saving
@@ -88,10 +92,14 @@ var loader = function(show) {
         $("#loadingIndicator").show();
     } else {
         // Otherwise we'll hide it
+        //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
-        showWrapper();
+        showWrapper(true);
+        if ($("#loadingIndicator").is("visible")) {
+            setTimeout('$("#loadingIndicator").fadeOut();', 100);
+            //console.log("shouldn't get here")
+        }
         // $("#profileForm").removeClass("loading");
-        setTimeout('$("#loadingIndicator").fadeOut();', 0);
     };
 };
 

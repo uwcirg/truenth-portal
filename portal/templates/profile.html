@@ -16,15 +16,15 @@
 {% endif %}
 <hr>
 <div class="profile-header">
-    <h4 class="tnth-headline">
+   
     {% if providerPerspective == 'true' %}
-        Patient #{{ user.id}} - {{ user.username }}
+        <h4 class="tnth-headline">Patient Profile</h4><h4 class="profile-item-title">#{{ user.id}} - {{ user.username }}</h4>
     {% elif current_user.has_role('admin') %}
-        Profile for {{ user.username }}
+        <h4 class="tnth-headline">Profile for {{ user.username }}</h4>
     {% else %}
-        My TrueNTH Profile
+         <h4 class="tnth-headline">My TrueNTH Profile</h4>
     {% endif %}
-    </h4>
+   
     {{profileImage(user)}}
 </div>
 <hr/>

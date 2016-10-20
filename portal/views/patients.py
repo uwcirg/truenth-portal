@@ -50,10 +50,10 @@ def profile_create():
     return render_template("profile_create.html", user = user)
 
 
-@patients.route('/sessionReport/<int:user_id>')
-def sessionReport(user_id):
+@patients.route('/sessionReport/<int:user_id>/<instrument_id>')
+def sessionReport(user_id, instrument_id):
     user = get_user(user_id)
-    return render_template("sessionReport.html",user=user)
+    return render_template("sessionReport.html",user=user, instrument_id=instrument_id)
 
 
 @patients.route('/patient_profile/<int:patient_id>')
