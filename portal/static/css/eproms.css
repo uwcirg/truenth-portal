@@ -473,6 +473,11 @@ border-left: 1px solid #ddd;
 border-top: 1px solid #ddd;
 border-radius: 2px;
 padding: 0.2em;
+-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+filter: alpha(opacity=80);
+-moz-opacity: 0.8;
+-khtml-opacity: 0.8;
+opacity: 0.8;
 }
 #userSessionReportDetailHeader span.glyphicon:hover
 {
@@ -805,7 +810,7 @@ sub.pointer:hover {
     );
 }
 
-.custom-header {
+.report-custom-header {
   padding: 0.3em 0.5em;
   border-radius: 4px;
   border-left: 2px solid #f5f5f5;
@@ -816,19 +821,19 @@ sub.pointer:hover {
   height: 86px;
 }
 
-.custom-header .left {
+.report-custom-header .left {
 float:left;
 }
 
-.custom-header .right {
-float:right; padding-top:1%; 
-position: relative; 
-z-index: 88; 
+.report-custom-header .right {
+float:right; padding-top:1%;
+position: relative;
+z-index: 88;
 color: #777
 }
 
 .tooltip > .tooltip-inner {
-    background-color: #979a8d; 
+    background-color: #979a8d;
     border: 1px solid #979a8d;
     padding: 0.3em;
     width: 150%;

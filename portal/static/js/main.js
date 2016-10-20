@@ -144,6 +144,7 @@ var fillContent = {
         this.ethnicity(data);
         // Get Races
         this.race(data);
+        this.orgs(data);
     },
     "name": function(data){
         if (data && data.name) {
@@ -1043,6 +1044,61 @@ var tnthTables = {
     }
 };
 
+/*assume dateString is ISO-8601 formatted date returned from server: e.g. '2011-06-29T16:52:48.000Z'*/
+function convertGMTToLocalTime(dateString, format) {
+    if (dateString) {
+           //console.log('unformated date: ' + dateString);
+           var d = new Date(String(dateString));
+            //console.log("new date: " + d)
+           // console.log((new Date(d)).toString().replace(/GMT.*/g,""));
+           var ap = "AM";
+           var day = d.getDate();
+           var month = (d.getMonth() + 1);
+           var year = d.getFullYear();
+           var hours = d.getHours();
+           var minutes = d.getMinutes();
+           var seconds = d.getSeconds();
+           var nd = "";
+
+
+           if (hours   > 11) { ap = "PM";             };
+           if (hours   > 12) { hours = hours - 12;      };
+           if (hours   === 0) { hours = 12;};
+
+           day = pad(day);
+           month = pad(month);
+           hours = pad(hours);
+           minutes = pad(minutes);
+           seconds = pad(seconds);
+
+           function pad(n) {
+                n = parseInt(n);
+                return (n < 10) ? '0' + n : n;
+           };
+
+           switch(format) {
+                case "mm/dd/yyyy":
+                    nd = month + "/" + day + "/" + year;
+                    break;
+                case "mm/dd/yyyy hh:mm:ss":
+                    nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
+                    break;
+                case "mm-dd-yyyy":
+                    nd = month + "-" + day + "-" + year;
+                    break;
+                case "mm-dd-yyyy hh:mm:ss":
+                    nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
+                    break;
+                default:
+                    //yyyy-mm-dd hh:mm:ss;
+                    nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
+           }
+        
+           return nd;
+    } else return "";
+
+
+};
 
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
