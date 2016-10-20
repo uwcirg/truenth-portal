@@ -14,7 +14,8 @@ $ export PROJECT_HOME=~/truenth_ss
 #### Install required packages
 
 ```bash
-$ sudo apt-get install python-virtualenv libffi-dev redis-server
+$ sudo apt-get install postgresql python-virtualenv python-dev
+$ sudo apt-get install libffi-dev libpq-dev build-essential redis-server
 ```
 
 #### Clone the Project
@@ -172,6 +173,10 @@ python manage.py db upgrade
 ```
 
 ## Testing
+
+To run the tests, repeat the ``postgres createuser && postgres createdb``
+commands as above with the values for the {user, password, database}
+as defined in the `TestConfig` class within ``portal.config.py``
 
 All test modules under the `tests` directory can be executed via `nosetests`
 (again from project root with the virtual environment activated)
