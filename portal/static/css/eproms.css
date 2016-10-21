@@ -28,7 +28,8 @@ body {
   font-size: 18px;
   transition: all 500ms ease-in;
 }
-.registration-container {
+
+#fullSizeBox a[href*="register"] {
   display: none;
 }
 #mainHolder {
@@ -530,7 +531,7 @@ opacity: 0.8;
 }
 
 #termsText {
-  padding: 1.5em 2em;
+  padding: 1.5em 1.8em;
 }
 #agreeLabel {
   margin-left: 2em;
@@ -846,6 +847,8 @@ color: #777
 .tooltip.top > .tooltip-arrow {
     border-top: 5px solid #979a8d; ;
 }
+
+.consent { display: none; }
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
