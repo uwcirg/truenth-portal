@@ -28,6 +28,9 @@ body {
   font-size: 18px;
   transition: all 500ms ease-in;
 }
+.registration-container {
+  display: none;
+}
 #mainHolder {
   visibility: hidden;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
