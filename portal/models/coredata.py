@@ -10,9 +10,11 @@ Interventions will sometimes require their own set of data, for which the
 """
 from abc import ABCMeta, abstractmethod
 from flask import current_app
+from sqlalchemy import and_
 import sys
 
 from .audit import Audit
+from .intervention import UserIntervention, INTERVENTION
 from .fhir import CC
 from .role import ROLE
 from .tou import ToU
@@ -132,12 +134,26 @@ class OrgData(CoredataPoint):
     def hasdata(self, user):
         """Does user have at least one org?
 
+        As per #130776783 - SR and CP users aren't required to select a clinic
+
         Special "none of the above" org still counts.
         """
         if user.has_role(ROLE.PROVIDER):
             return True
         if user.organizations.count() > 0:
             return True
+
+        # as per
+        # https://www.pivotaltracker.com/n/projects/1225464/stories/130776783
+        # don't require clinics for SR and CP users
+
+        sr_id = INTERVENTION.SEXUAL_RECOVERY.id
+        cp_id = INTERVENTION.CARE_PLAN.id
+        q = UserIntervention.query.filter(and_(
+            UserIntervention.user_id == user.id,
+            UserIntervention.intervention_id.in_((sr_id, cp_id)),
+            UserIntervention.access == 'granted'))
+        return q.count() > 0
 
 
 class ClinicalData(CoredataPoint):
