@@ -92,7 +92,7 @@ class TestUI(TestCase, LiveServerTestCase):
 
         self.assertNotIn("Uh-oh", page.w.find_element_by_tag_name("body").text)
 
-    def test_login_form_facebook_exists(self):
+    def test_login_form_fb_exists(self):
         """Ensure Facebook button present on login form"""
 
         page = LoginPage(self.driver)
