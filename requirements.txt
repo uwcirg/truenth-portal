@@ -67,7 +67,7 @@ tox==2.4.1
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 virtualenv==15.0.3
 waitress==1.0.0
-WebOb==1.6.1
+WebOb==1.6.2
 WebTest==2.0.23
 Werkzeug==0.11.11
 WTForms==2.1
