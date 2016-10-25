@@ -73,7 +73,7 @@ function showWrapper(hasLoader) {
     //adding this for firefox fix
     if (hasLoader) {
         $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-            setTimeout('$("#loadingIndicator").fadeOut();', 0);
+            setTimeout('$("#loadingIndicator").fadeOut();', 100);
         });
     } else $("#tnthNavWrapper").css(cssProp);
 }
@@ -1093,7 +1093,7 @@ function convertGMTToLocalTime(dateString, format) {
                     //yyyy-mm-dd hh:mm:ss;
                     nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
            }
-        
+
            return nd;
     } else return "";
 

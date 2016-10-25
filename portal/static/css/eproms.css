@@ -26,7 +26,7 @@ body {
   font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
   color: #333;
   font-size: 18px;
-  transition: all 500ms ease-in;
+  /*transition: all 500ms ease-in;*/
 }
 
 #fullSizeBox a[href*="register"] {
@@ -47,8 +47,7 @@ body {
   height: 71px;
 }
 #tnthNavWrapper {
-  /*display: none;*/
-  display:block;
+  display:none;
   visibility: hidden;
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
@@ -793,8 +792,14 @@ opacity: 0.8;
 }
 div.modal-header,
 div.modal-footer {
-  background-color: #79815D;
+  background-color: #627371;
   color: #FFF;
+}
+div.modal-body {
+  font-size: 0.8em;
+}
+div.modal-footer button {
+  font-size: 0.7em;
 }
 .hide {
   display: none;
@@ -845,10 +850,9 @@ color: #777
 }
 
 .tooltip.top > .tooltip-arrow {
-    border-top: 5px solid #979a8d; ;
+    border-top: 5px solid #979a8d;
 }
 
-.consent { display: none; }
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
