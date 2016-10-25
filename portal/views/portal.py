@@ -98,8 +98,8 @@ def access_via_token(token):
     If the token is found to be valid, and the user_id isn't associated
     with a *privilidged* account, the behavior depends on the roles assigned
     to the token's user_id:
-        - WRITE_ONLY users will be directly logged into the weak auth account
-        - others will be given a chance to prove their identity
+    * WRITE_ONLY users will be directly logged into the weak auth account
+    * others will be given a chance to prove their identity
 
     The tokens are intended to be single use, but the business rules
     aren't clear yet. ... TODO
