@@ -159,6 +159,7 @@ $('.tnth-navbar-toggle').click(function(){
 
 $(document).ready(function(){
   // Once nav is loaded, make the wrapper visible
-  $("#tnthNavWrapper").css("visibility","visible");
+  $("#tnthNavWrapper").css("visibility","visible").css("display", "block");
+
 });
 var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
