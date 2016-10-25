@@ -21,6 +21,7 @@ from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.organization import Organization, add_static_organization
+from portal.models.organization import OrgTree
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
@@ -198,3 +199,4 @@ class TestCase(Base):
         for attr in dir(INTERVENTION):
             if attr.startswith('_lazy'):
                 delattr(INTERVENTION, attr)
+        OrgTree.invalidate_cache()

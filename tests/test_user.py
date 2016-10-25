@@ -501,21 +501,23 @@ class TestUser(TestCase):
         self.assertTrue(score < 67)  # 2/3 correct
 
     def test_merge(self):
-        other = self.add_user('other@foo.com', first_name='keep users',
-                              last_name='Better')
-        self.test_user.last_name = None  # or it'll prefer users
-        other.birthdate = '02-05-1968'
-        other.gender = 'male'
-        orgs = Organization.query.limit(2)
-        other.organizations.append(orgs[0])
-        other.organizations.append(orgs[1])
-        self.bless_with_basics()
         with SessionScope(db):
+            self.bless_with_basics()
+            self.test_user.last_name = None  # or it'll prefer users
+            other = self.add_user('other@foo.com', first_name='keep users',
+                                  last_name='Better')
+            other.birthdate = '02-05-1968'
+            other.gender = 'male'
+            orgs = Organization.query.limit(2)
+            other.organizations.append(orgs[0])
+            other.organizations.append(orgs[1])
             db.session.commit()
-        user, other = map(db.session.merge, (self.test_user, other))
-        user.merge_with(other.id)
-        self.assertEquals(user.first_name, FIRST_NAME)
-        self.assertEquals(user.last_name, 'Better')
-        self.assertEquals(user.gender, 'male')
-        self.assertTrue({o.name for o in user.organizations} -
-                        {o.name for o in orgs} == {'fake urology clinic',})
+            user, other = map(db.session.merge, (self.test_user, other))
+            user.merge_with(other.id)
+            db.session.commit()
+            user, other = map(db.session.merge, (user, other))
+            self.assertEquals(user.first_name, FIRST_NAME)
+            self.assertEquals(user.last_name, 'Better')
+            self.assertEquals(user.gender, 'male')
+            self.assertTrue({o.name for o in user.organizations} -
+                            {o.name for o in orgs} == {'fake urology clinic',})

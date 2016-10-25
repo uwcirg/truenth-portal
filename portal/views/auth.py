@@ -118,6 +118,7 @@ def next_after_login():
         auditable_event("merging invited user {} into account {}".format(
             invited_user_id, user.id), user_id=user.id)
         user.merge_with(invited_user_id)
+        db.session.commit()
         del session['invited_verified_user_id']
 
     # Present intial questions (TOU et al) if not already obtained
