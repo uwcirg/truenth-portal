@@ -106,8 +106,8 @@ def access_via_token(token):
 
     """
     # Should never be here if already logged in - enforce
-    if current_user():
-        abort(500, "Already logged in - can't continue")
+    #if current_user():
+        #abort(500, "Already logged in - can't continue")
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
@@ -175,7 +175,7 @@ def challenge_identity():
         # identity confirmed
         del session['invited_user_id']
         session['invited_verified_user_id'] = user.id
-        redirect(url_for('portal.landing'))
+        return redirect(url_for('portal.landing'))
 
     else:
         auditable_event("Failed identity challenge tests with values:"

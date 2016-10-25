@@ -181,7 +181,7 @@
 
 
 {% macro profileSendEmail(person) -%}
-    {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
+    {% if (person and person.email and person.has_role('patient')) %}
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
