@@ -19,7 +19,6 @@
       <h3 class="tnth-headline">About You</h3>
 
       <p>Thank You! Now, please finish your registration by telling us about yourself.</p>
-      <hr />
 
       <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
 
@@ -27,7 +26,9 @@
         {% if 'name' in still_needed %}
           {{nameGroup()}}
         {% else %}
-          <p>Name: {{user.first_name}} {{user.last_name}}</p>
+            {% if user and user.first_name and user.last_name %}
+              <p>Name: {{user.first_name}} {{user.last_name}}</p>
+            {% endif %}
         {% endif %}
         {% if 'role' in still_needed %}
           {{rolesGroup()}}
