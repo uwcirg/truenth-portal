@@ -111,6 +111,16 @@ def next_after_login():
 
     # Logged in - take care of pending actions
 
+    # Look for an invited user scenario - may need to merge provided
+    # info (what the provider set in invited user) with the current user.
+    if 'invited_verified_user_id' in session:
+        invited_user_id = session['invited_verified_user_id']
+        auditable_event("merging invited user {} into account {}".format(
+            invited_user_id, user.id), user_id=user.id)
+        user.merge_with(invited_user_id)
+        db.session.commit()
+        del session['invited_verified_user_id']
+
     # Present intial questions (TOU et al) if not already obtained
     if not Coredata().initial_obtained(user):
         current_app.logger.debug("next_after_login: [need data] -> "

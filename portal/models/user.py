@@ -10,6 +10,7 @@ from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.dialects.postgresql import ENUM
 from flask_login import current_user as flask_login_current_user
+from fuzzywuzzy import fuzz
 
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
@@ -494,6 +495,38 @@ class User(db.Model, UserMixin):
                 self.organizations.remove(org)
         db.session.add(self)
 
+    def merge_with(self, other_id):
+        """merge details from other user into self
+
+        Part of an account generation or login flow - scenarios include
+        a provider setting up an account (typically the *other_id*) and
+        then a user logs into an existing account or registers a new (self)
+        and now we need to pull the data set up by the provider into the
+        new account.
+
+        """
+        other = User.query.get(other_id)
+        if not other:
+            abort(404, 'other_id {} not found'.format(other_id))
+
+        for attr in ('email', 'first_name', 'last_name', 'birthdate',
+                     'gender', 'phone', 'locale_id', 'timezone'):
+            if not getattr(other, attr):
+                continue
+            if not getattr(self, attr):
+                setattr(self, attr, getattr(other, attr))
+            # value present in both.  assume user just set to best value
+
+        for relationship in ('organizations', 'consents', 'procedures',
+                             'observations', 'relationships', 'roles',
+                             'races', 'ethnicities', 'groups'):
+            self_entity = getattr(self, relationship)
+            other_entity = getattr(other, relationship)
+            append_list = [item for item in other_entity if item not in
+                           self_entity]
+            for item in append_list:
+                self_entity.append(item)
+
     def check_role(self, permission, other_id):
         """check user for adequate role
 
@@ -549,6 +582,19 @@ class User(db.Model, UserMixin):
         else:
             return '<div>' + '</div><div>'.join(
                 [ui.provider_html for ui in uis]) + '</div>'
+
+    def fuzzy_match(self, first_name, last_name, birthdate):
+        """Returns probability score [0-100] of it being the same user"""
+        # remove case issues as it confuses the match
+        scores = []
+        scores.append(fuzz.ratio(self.first_name.lower(), first_name.lower()))
+        scores.append(fuzz.ratio(self.last_name.lower(), last_name.lower()))
+
+        # birthdate is trickier - raw delta doesn't make sense.  treat
+        # it like a string, assuming only typos for a mismatch
+        scores.append(fuzz.ratio(self.birthdate.strftime('%d%m%Y'),
+                                 birthdate.strftime('%d%m%Y')))
+        return sum(scores) / len(scores)
 
 
 def add_authomatic_user(authomatic_user, image_url):

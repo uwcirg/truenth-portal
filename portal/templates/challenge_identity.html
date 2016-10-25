@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field %}
+
+    <h3 class="tnth-headline">Verify Identity</h3><br />
+
+    <p>To ensure your personal details are not shared with others, please enter
+    the following data for account confirmation.</p>
+
+    <form action="/challenge" method="post">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.first_name, tabindex=10) }}
+
+        {{ render_field(form.last_name, tabindex=20) }}
+
+        {{ render_field(form.birthdate, tabindex=30) }}
+
+        <button type="submit" class="btn btn-tnth-primary">Confirm Identity</button>
+    </form>
+
+{% endblock %}
