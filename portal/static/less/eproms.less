@@ -72,7 +72,7 @@ body {
 }
 
 #tnthNavWrapper {
-  display: none;
+  /*display: none;*/
   visibility: hidden;
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
@@ -922,6 +922,38 @@ color: #777
 .tooltip.top > .tooltip-arrow {
     border-top: 5px solid #979a8d; ;
 }
+
+#consentContainer {
+  .consent {
+  display: none;
+  padding: 1.15em 1.3em;
+  color: #57675B;
+  font-size: 0.95em;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  }
+  label {
+  font-weight: normal;
+  margin-left: 6px;
+  }
+  a {
+  color:#696f69;
+  margin-left: 1.3em;
+  font-size: 0.9em
+  }
+  a:hover {
+  color: #979a8d;
+  }
+}
+.consent-checkbox {
+  margin-left:-2px;
+  margin-right: 8px;
+  position:relative;
+  top:-2px;
+}
+
 
 
 /** Responsive sizes **/

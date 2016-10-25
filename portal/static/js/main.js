@@ -73,7 +73,8 @@ function showWrapper(hasLoader) {
     //adding this for firefox fix
     if (hasLoader) {
         $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-            setTimeout('$("#loadingIndicator").fadeOut();', 100);
+            //delay removal of loading div to prevent FOUC
+            setTimeout('$("#loadingIndicator").fadeOut();', 300);
         });
     } else $("#tnthNavWrapper").css(cssProp);
 }
@@ -96,7 +97,7 @@ var loader = function(show) {
         showMain();
         showWrapper(true);
         if ($("#loadingIndicator").is("visible")) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 100);
+            setTimeout('$("#loadingIndicator").fadeOut();', 300);
             //console.log("shouldn't get here")
         }
         // $("#profileForm").removeClass("loading");
@@ -447,22 +448,93 @@ var tnthAjax = {
             $.each(clinicArray, function(i,val) {
                 // Fill in parent clinic
                 if (val.name != "none of the above" && (val.children.length > 0)) {
-                    $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' id='" + val.id + "_org' value='"+val.id+"' />");
+                    $("#fillOrgs").append("<legend style='margin: 0  0 4px'>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
                 }
                 // Fill in each child clinic
                 if (val.children.length > 0) {
                     $.each(val.children, function(n,subval) {
                         var childClinic = '<div class="checkbox"><label>' +
                             '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
-                            subval.id +'" data-parent-id="'+val.id+'" />'+
+                            subval.id +'" data-parent-id="'+val.id+'"  data-parent-name="' + val.name + '"/>'+
                             subval.name +
                             '</label></div>';
                        $("#fillOrgs").append(childClinic);
                     });
                 }
             });
+
+            $("#clinics input[name='organization']").each(function() {
+                $(this).on("click", function() {
+                    var parentOrg = $(this).attr("data-parent-id");
+                    var parentName = $(this).attr("data-parent-name");
+                    //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
+                    if (parentOrg != "") {
+                        if ($(this).prop("checked")) {
+                            if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
+                                $("#consentContainer .consent").hide();
+                                if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
+                                else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
+                                $("#" + parentOrg + "_consentItem").show();
+                            };
+                        } else {
+                             $("#consentContainer .consent").hide();
+                        };
+                    };
+                });
+            });
+
+            $("#consentContainer input.consent-checkbox").each(function() {
+                   $(this).on("click", function() {
+                        if ($(this).is(":checked")) {
+                            //sent off ajax
+                            var org = $(this).attr("id").split("_")[0];
+                            var agreementUrl = $("#" + org + "_agreement_url").val();
+                            console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+                            $.ajax ({
+                                type: "POST",
+                                url: '/api/user/' + userId + '/consent',
+                                contentType: "application/json; charset=utf-8",
+                                dataType: 'json',
+                                data: JSON.stringify({"organization_id": org, "agreement_url": encodeURIComponent(agreementUrl)})
+                            }).done(function(data) {
+                                console.log("consent sent successfully.");
+                            }).fail(function(xhr) {
+                                console.log("request to set consent failed.");
+                                //console.log(xhr.responseText)
+                            });
+
+                        };
+
+                   });
+
+             });
+
             tnthAjax.getDemo(userId, noOverride);
             //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures
+        }).fail(function() {
+            console.log("Problem retrieving data from server.");
+            loader();
+        });
+    },
+    "getConsent": function(userId, sync) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+"/consent",
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data.consent_agreements) {
+                var d = data["consent_agreements"];
+                d.forEach(function(item) {
+                    var orgId = item.organization_id;
+                    //console.log("org Id: " + orgId);
+                    var orgName = $("#" + orgId + "_org").attr("org_name");
+                    if ($("#" + orgId + "_consent").length > 0) {
+                        $("#" + orgId + "_consent").attr("checked", true);
+                        //$("#" + orgId + "_consent").closest(".consent").show();
+                    };
+                });
+            };
+           loader();
         }).fail(function() {
             console.log("Problem retrieving data from server.");
             loader();
@@ -680,6 +752,9 @@ $(document).ready(function() {
                 $("#noOrgs").attr('checked',false);
             } else {
                 $("input[name='organization']:not(#noOrgs)").attr('checked',false);
+                $("#consentContainer input.consent-checkbox").each(function() {
+                    $(this).attr("checked", false);
+                });
             }
         }
     });

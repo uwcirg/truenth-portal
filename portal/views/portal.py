@@ -210,20 +210,20 @@ def initial_queries():
     if 'tou' in still_needed:
         response = requests.get(app_text(ToU_ATMA.name_key()))
         terms = response.text
-    if 'consent' in still_needed:
-        for org_id in OrgTree().all_top_level_ids():
-            org = Organization.query.get(org_id)
-            consent_url = app_text(ConsentATMA.name_key(organization=org))
-            response = requests.get(consent_url)
-            if response.json:
-                consent_agreements[org.id] = {
-                    'asset': response.json()['asset'],
-                    'agreement_url': ConsentATMA.permanent_url(
-                        version=response.json()['version'],
-                        generic_url=consent_url)}
-            else:
-                consent_agreements[org.id] = {
-                    'asset': response.text, 'agreement_url': consent_url}
+    #if 'consent' in still_needed:
+    for org_id in OrgTree().all_top_level_ids():
+        org = Organization.query.get(org_id)
+        consent_url = app_text(ConsentATMA.name_key(organization=org))
+        response = requests.get(consent_url)
+        if response.json:
+            consent_agreements[org.id] = {
+                'asset': response.json()['asset'],
+                'agreement_url': ConsentATMA.permanent_url(
+                    version=response.json()['version'],
+                    generic_url=consent_url)}
+        else:
+            consent_agreements[org.id] = {
+                'asset': response.text, 'agreement_url': consent_url}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)

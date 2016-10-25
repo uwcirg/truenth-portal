@@ -433,6 +433,43 @@ input.clinic {
   margin-top: 6px;
 }
 
+#profileCreateForm .title {
+  margin-top: 5%;
+}
+#profileCreateForm a.btn-tnth-back,
+#profileCreateForm h4 {
+  margin-left: 3em;
+}
+#profileSendEmailContainer {
+  padding-bottom: 5%;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+#profileSendEmailContainer label {
+  font-size: 0.95em;
+}
+.create-account-container {
+  padding: 3.5em 4em;
+  width: 90%;
+}
+.left-indent-bottom {
+  margin-left: 3.2em;
+}
+.left-indent-top {
+  margin-left: 2.5em;
+}
+#btnProfileSendEmail {
+  margin-top: 5%;
+  font-size: 0.9em;
+  padding: 0.5em;
+  border-radius: 6px;
+}
+#profileEmailMessage {
+  font-size: 0.87em;
+  margin-top: 1em;
+  margin-left: 0.5em;
+}
+
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
@@ -504,7 +541,21 @@ opacity: 0.8;
 #agreeLabel {
   margin-left: 2em;
 }
-
+#createProfileForm #phone, #createProfileForm #email {
+    width: 350px;
+    max-width: 100%;
+}
+.create-user-link {
+  border-radius: 4px;
+  color: #57675B;
+  background-color: #FFF;
+  border: 1px solid silver;
+  -webkit-box-shadow: 10px 10px 10px -9px #eff2ef;
+  -moz-box-shadow: 10px 10px 10px -9px #eff2ef;
+  box-shadow: 10px 10px 10px -9px #eff2ef;
+  padding: 0.5em;
+  transition: all 300ms ease-in;
+}
 .profile-header {
   width: 45%;
   max-width:100%;
@@ -809,6 +860,39 @@ color: #777
   opacity: 0.4;
 }**/
 
+#consentContainer .consent {
+  display: none;
+  padding: 1.15em 1.3em;
+  color: #57675B;
+  font-size: 0.95em;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+
+}
+#consentContainer label {
+  font-weight: normal;
+  margin-left: 6px;
+}
+
+#consentContainer a {
+  color:#696f69;
+  margin-left: 1.3em;
+  font-size: 0.9em
+}
+#consentContainer a:hover {
+  color: #979a8d;
+}
+.consent-checkbox {
+  margin-left:-2px;
+  margin-right: 8px;
+  position:relative;
+  top:-2px;
+}
+
+
+
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -869,6 +953,11 @@ color: #777
   }
   table.profile-audit-log {
     font-size: 0.7em;
+  }
+  .create-account-container {
+    padding: 3.5em 3em;
+    width: 90%;
+    max-width: 100%;
   }
 
 }

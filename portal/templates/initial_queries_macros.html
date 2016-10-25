@@ -182,7 +182,7 @@
       </div>
       <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
   {%- endmacro %}
-  {% macro clinic() -%}
+  {% macro clinic(consent_agreements) -%}
     <div id="clinics" class="tnth-hide">
       <hr />
       <h3 class="tnth-headline">Your Clinic</h3>
@@ -195,8 +195,45 @@
           <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">I'm not receiving care at any of the above clinics</label></div>
         </div>
       </div>
+      {{consent(consent_agreements)}}
     </div>
-    <script>$(function () { tnthAjax.getOrgs($("#iq_userId").val());});</script>
+    <script>
+    $(function () { 
+        tnthAjax.getConsent($("#iq_userId").val(), true);
+        tnthAjax.getOrgs($("#iq_userId").val());
+      });
+    </script>
 
   {%- endmacro %}
+  {% macro consent(consent_agreements) -%}
+    {% if consent_agreements %}
+        <div id="consentContainer">
+          {% for org in consent_agreements %}
+            <div id="{{org}}_consentItem" class="well consent">
+              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
+              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox" /><label id="{{org}}_consent_label" labelfor="#{{org}}_consent"><!--text for sharing data--></label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
+              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">Consent Agreement</h4>
+                        </div>
+                        <div class="modal-body">
+                          <br/>
+                           {{consent_agreements[org].asset|safe}}
+                          <br/>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+  {%- endmacro %}
+
 

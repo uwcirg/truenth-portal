@@ -2,7 +2,7 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-{% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic %}
+{% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 
 
   <!-- <div id="loadingIndicator" class="loading-indicator">
@@ -24,7 +24,6 @@
       <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
 
         <!--<p>First, tell us who you are:</p>-->
-
         {% if 'name' in still_needed %}
           {{nameGroup()}}
         {% else %}
@@ -40,7 +39,7 @@
           {{patientQGroup()}}
         {% endif %}
         {% if 'org' in still_needed %}
-          {{clinic()}}
+          {{clinic(consent_agreements)}}
         {% endif %}
         <br />
         <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
