@@ -4,7 +4,7 @@ from werkzeug.exceptions import Unauthorized
 import json
 import re
 import urllib
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase, TEST_USER_ID, FIRST_NAME
 
 from portal.extensions import db
 from portal.models.fhir import Coding, UserEthnicity
@@ -479,3 +479,43 @@ class TestUser(TestCase):
         ur = UserRelationship.query.filter_by(
             other_user_id=TEST_USER_ID).first()
         self.assertEquals(ur.relationship.name, RELATIONSHIP.SPONSOR)
+
+    def test_fuzzy_match(self):
+        self.test_user.birthdate = "01-31-1950"
+        with SessionScope(db):
+            db.session.commit()
+        user = db.session.merge(self.test_user)
+        score = user.fuzzy_match(first_name=user.first_name,
+                                 last_name=user.last_name,
+                                 birthdate=user.birthdate)
+        self.assertEquals(score, 100)  # should be perfect match
+
+        score = user.fuzzy_match(first_name=user.first_name + 's',
+                                 last_name='O' + user.last_name,
+                                 birthdate=user.birthdate)
+        self.assertTrue(score > 90)  # should be close
+
+        score = user.fuzzy_match(first_name=user.first_name,
+                                 last_name='wrong',
+                                 birthdate=user.birthdate)
+        self.assertTrue(score < 67)  # 2/3 correct
+
+    def test_merge(self):
+        other = self.add_user('other@foo.com', first_name='keep users',
+                              last_name='Better')
+        self.test_user.last_name = None  # or it'll prefer users
+        other.birthdate = '02-05-1968'
+        other.gender = 'male'
+        orgs = Organization.query.limit(2)
+        other.organizations.append(orgs[0])
+        other.organizations.append(orgs[1])
+        self.bless_with_basics()
+        with SessionScope(db):
+            db.session.commit()
+        user, other = map(db.session.merge, (self.test_user, other))
+        user.merge_with(other.id)
+        self.assertEquals(user.first_name, FIRST_NAME)
+        self.assertEquals(user.last_name, 'Better')
+        self.assertEquals(user.gender, 'male')
+        self.assertTrue({o.name for o in user.organizations} -
+                        {o.name for o in orgs} == {'fake urology clinic',})
