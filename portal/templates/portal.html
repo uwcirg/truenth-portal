@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 
+{#
 {% if not user.has_role('write_only') %}
 <div class="portal-item">
     <h2 class="tnth-subhead">Explore TrueNTH</h2>
@@ -8,6 +9,7 @@
     <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
 </div>
 {% endif %}
+#}
 
 {% if user.has_role('write_only') %}
 <div class="portal-item">
