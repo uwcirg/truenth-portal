@@ -5,6 +5,9 @@ from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
 from flask_user import roles_required, roles_not_allowed
 from flask_swagger import swagger
+from flask_wtf import Form
+from wtforms import validators, HiddenField, StringField
+from wtforms.fields.html5 import DateField
 
 from .auth import next_after_login
 from ..audit import auditable_event
@@ -92,13 +95,20 @@ def access_via_token(token):
     Tokens contain encrypted data including the user_id and timestamp
     from when it was generated.
 
-    If the token is found to be valid, the user will be directly logged
-    in, after confirming the account still has minimal privleges
+    If the token is found to be valid, and the user_id isn't associated
+    with a *privilidged* account, the behavior depends on the roles assigned
+    to the token's user_id:
+        - WRITE_ONLY users will be directly logged into the weak auth account
+        - others will be given a chance to prove their identity
 
     The tokens are intended to be single use, but the business rules
     aren't clear yet. ... TODO
 
     """
+    # Should never be here if already logged in - enforce
+    if current_user():
+        abort(500, "Already logged in - can't continue")
+
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
@@ -125,8 +135,61 @@ def access_via_token(token):
         login_user(user)
         return next_after_login()
 
-    flash('Access token for privledged account not allowed.', 'error')
-    return redirect(url_for('portal.landing'))
+    # Without WRITE_ONLY, we don't log the user in, but preserve the
+    # invited user id, should we need to merge associated details
+    # after user proves themselves and logs in
+    auditable_event("invited user entered using token, pending "
+                    "registration", user_id=user.id)
+    session['invited_user_id'] = user.id
+    return redirect(url_for('portal.challenge_identity'))
+
+
+class ChallengeIdForm(Form):
+    retry_count = HiddenField('retry count', default=0)
+    first_name = StringField(
+        'First Name', validators=[validators.input_required()])
+    last_name = StringField(
+        'First Name', validators=[validators.input_required()])
+    birthdate = DateField(
+        'Birthdate', validators=[validators.input_required()])
+
+
+@portal.route('/challenge', methods=['GET', 'POST'])
+def challenge_identity():
+    user = get_user(session.get('invited_user_id', None))
+    if not user:
+        abort(400, "missing invited user in identity challenge")
+
+    form = ChallengeIdForm(request.form)
+    if not form.validate_on_submit():
+        return render_template('challenge_identity.html', form=form)
+
+    first_name = form.first_name.data
+    last_name = form.last_name.data
+    birthdate = form.birthdate.data
+
+    score = user.fuzzy_match(first_name=first_name,
+                             last_name=last_name,
+                             birthdate=birthdate)
+    if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
+        # identity confirmed
+        del session['invited_user_id']
+        session['invited_verified_user_id'] = user.id
+        redirect(url_for('portal.landing'))
+
+    else:
+        auditable_event("Failed identity challenge tests with values:"
+                        "(first_name={}, last_name={}, birthdate={})".\
+                        format(first_name, last_name, birthdate),
+                        user_id=user.id)
+
+        # very modest brute force test
+        form.retry_count.data = int(form.retry_count.data) + 1
+        if form.retry_count.data > 3:
+            del session['invited_user_id']
+            abort(404, "User Not Found")
+
+        return render_template('challenge_identity.html', form=form)
 
 
 @portal.route('/initial-queries', methods=['GET','POST'])
