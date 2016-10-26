@@ -498,7 +498,6 @@ class TestUser(TestCase):
 
     def test_merge(self):
         with SessionScope(db):
-            self.bless_with_basics()
             self.test_user.last_name = None  # or it'll prefer users
             other = self.add_user('other@foo.com', first_name='keep users',
                                   last_name='Better')
@@ -515,5 +514,5 @@ class TestUser(TestCase):
             self.assertEquals(user.first_name, FIRST_NAME)
             self.assertEquals(user.last_name, 'Better')
             self.assertEquals(user.gender, 'male')
-            self.assertTrue({o.name for o in user.organizations} -
-                            {o.name for o in orgs} == {'fake urology clinic',})
+            self.assertEquals({o.name for o in user.organizations},
+                            {o.name for o in orgs})

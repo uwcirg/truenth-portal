@@ -33,7 +33,7 @@ def patients_root():
         top_level_id = OrgTree().find(org.id).top_level()
         consent_query = UserConsent.query.filter(and_(
             UserConsent.organization_id == top_level_id,
-            UserConsent.deleted_id is None,
+            UserConsent.deleted_id == None,
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
 

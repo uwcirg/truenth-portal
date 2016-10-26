@@ -138,13 +138,15 @@ class TestCase(Base):
         self.test_user.birthdate = datetime.utcnow()
 
         # Register with a clinic
-        org = Organization(name='fake urology clinic')
+        org = Organization.query.filter(
+            Organization.partOf_id != None).first()
         self.test_user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID)
         tou = ToU(audit=audit, text="filler text")
-        consent = UserConsent(user_id=TEST_USER_ID, organization=org,
+        parent_org = OrgTree().find(org.id).top_level()
+        consent = UserConsent(user_id=TEST_USER_ID, organization_id=parent_org,
                               audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
             db.session.add(tou)
