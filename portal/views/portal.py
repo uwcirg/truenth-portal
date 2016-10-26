@@ -173,11 +173,12 @@ def challenge_identity():
                              birthdate=birthdate)
     if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         # identity confirmed
+        email = user.email
         user.mask_email()
         db.session.commit()
         del session['invited_user_id']
         session['invited_verified_user_id'] = user.id
-        return redirect(url_for('portal.landing'))
+        return redirect(url_for('user.register', email=email))
 
     else:
         auditable_event("Failed identity challenge tests with values:"
