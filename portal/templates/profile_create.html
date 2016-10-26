@@ -53,16 +53,6 @@ $(document).ready(function(){
     function getOrgs(type) {
         var orgArray = {};
         switch(type) {
-            case 'demo':
-                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
-                    return { reference: 'api/organization/'+$(this).val() };
-                }).get();
-                //orgArray['resourceType'] = 'Patient';
-                //orgArray = orgIDs;
-                if (typeof orgIDs === 'undefined'){
-                        orgArray = [0]  // special value for `none of the above`
-                } else orgArray = orgIDs;
-                break;
             case 'account':
             	//console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
             	//var orgId = $('#userOrgs input:checkbox:checked').val();
@@ -145,7 +135,7 @@ $(document).ready(function(){
                     //Adding roles of patient and write_only for user
                     Promise.all([
                         _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
-                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}, {'name': 'write_only'}]}))])
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}]}))])
                     .then(function(results) {
                         // Both promises resolved
                         //console.log('promises resolved');

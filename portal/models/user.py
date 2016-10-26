@@ -8,6 +8,7 @@ import pytz
 from sqlalchemy.orm import synonym
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
@@ -24,6 +25,7 @@ from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from .telecom import Telecom
 
+INVITE_PREFIX = "__invite__"
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -192,7 +194,7 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.utcnow)
-    email = db.Column(db.String(120), unique=True)
+    _email = db.Column('email', db.String(120), unique=True)
     phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
@@ -236,6 +238,33 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    @hybrid_property
+    def email(self):
+        # Called in different contexts - only compare string
+        # value if it's a base string type, as opposed to when
+        # its being used in a query statement (email.ilike('foo'))
+        if isinstance(self._email, basestring):
+            if self._email.startswith(INVITE_PREFIX):
+                return self._email[len(INVITE_PREFIX):]
+
+        return self._email
+
+    @email.setter
+    def email(self, email):
+        self._email = email
+
+    def mask_email(self, prefix=INVITE_PREFIX):
+        """Mask temporary account email to avoid collision with registered
+
+        Temporary user accounts created for the purpose of invites get
+        in the way of the user creating a registered account.  Add a hidden
+        prefix to the email address in the temporary account to avoid
+        collision.
+
+        """
+        if not self._email.startswith(prefix):
+            self._email = prefix + self._email
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
@@ -684,6 +713,7 @@ class UserRoles(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "UserRole {0.user_id}:{0.role_id}".format(self)
+
 
 def flag_test():  # pragma: no test
     """Find all non-service users and flag as test"""

@@ -106,8 +106,8 @@ def access_via_token(token):
 
     """
     # Should never be here if already logged in - enforce
-    if current_user():
-        abort(500, "Already logged in - can't continue")
+    #if current_user():
+        #abort(500, "Already logged in - can't continue")
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
@@ -173,9 +173,11 @@ def challenge_identity():
                              birthdate=birthdate)
     if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         # identity confirmed
+        user.mask_email()
+        db.session.commit()
         del session['invited_user_id']
         session['invited_verified_user_id'] = user.id
-        redirect(url_for('portal.landing'))
+        return redirect(url_for('portal.landing'))
 
     else:
         auditable_event("Failed identity challenge tests with values:"
@@ -210,20 +212,20 @@ def initial_queries():
     if 'tou' in still_needed:
         response = requests.get(app_text(ToU_ATMA.name_key()))
         terms = response.text
-    #if 'consent' in still_needed:
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org))
-        response = requests.get(consent_url)
-        if response.json:
-            consent_agreements[org.id] = {
-                'asset': response.json()['asset'],
-                'agreement_url': ConsentATMA.permanent_url(
-                    version=response.json()['version'],
-                    generic_url=consent_url)}
-        else:
-            consent_agreements[org.id] = {
-                'asset': response.text, 'agreement_url': consent_url}
+    if 'org' in still_needed:
+        for org_id in OrgTree().all_top_level_ids():
+            org = Organization.query.get(org_id)
+            consent_url = app_text(ConsentATMA.name_key(organization=org))
+            response = requests.get(consent_url)
+            if response.json:
+                consent_agreements[org.id] = {
+                    'asset': response.json()['asset'],
+                    'agreement_url': ConsentATMA.permanent_url(
+                        version=response.json()['version'],
+                        generic_url=consent_url)}
+            else:
+                consent_agreements[org.id] = {
+                    'asset': response.text, 'agreement_url': consent_url}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -256,8 +258,9 @@ def home():
 
     # Enforce flow - confirm we have acquired initial data
     if not Coredata().initial_obtained(user):
-        abort(500, 'inital data missing in /home for user {}'.\
-              format(user))
+        still_needed = Coredata().still_needed(user)
+        abort(500, 'Missing inital data still needed: {}'.\
+              format(still_needed))
 
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.PROVIDER):
