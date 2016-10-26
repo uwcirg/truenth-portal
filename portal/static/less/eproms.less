@@ -956,6 +956,22 @@ color: #777
 
 
 
+#identityVerificationContainer {
+  width: 50%;
+  padding: 2em 3em;
+  margin: 1em 0;
+  border: 1px solid @sectionBorderColor;
+  border-radius: 4px;
+  input {
+    width: 100%;
+    max-width: 100%;
+  }
+  .form-group {
+    margin-bottom: 1em;
+  }
+}
+
+
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -1022,6 +1038,20 @@ color: #777
     width: 90%;
     max-width: 100%;
   }
+
+  #identityVerificationContainer {
+    width: 100%;
+    max-width: 100%;
+    input {
+      width: 100%;
+      max-width: 100%;
+    }
+    select {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+
 }
 
 @media (max-width: 730) {

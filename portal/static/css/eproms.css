@@ -884,6 +884,22 @@ color: #777
   top:-2px;
 }
 
+#identityVerificationContainer {
+  padding: 2em 0.5em;
+  margin: 1em auto;
+  /*border: 1px solid #E0E6E3;
+  border-radius: 4px;*/
+}
+
+#identityVerificationContainer input {
+  width: 100%;
+  max-width: 100%;
+}
+
+#identityVerificationContainer .form-group {
+  margin-bottom: 1em;
+}
+
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -950,6 +966,19 @@ color: #777
   .create-account-container {
     padding: 3.5em 3em;
     width: 90%;
+    max-width: 100%;
+  }
+
+  #identityVerificationContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+  #identityVerificationContainer input {
+    width: 100%;
+    max-width: 100%;
+  }
+  #identityVerificationContainer select {
+    width: 100%;
     max-width: 100%;
   }
 
