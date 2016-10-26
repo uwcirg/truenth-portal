@@ -25,10 +25,14 @@ class UserConsent(db.Model):
     organization_id = db.Column(
         db.ForeignKey('organizations.id'), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    deleted_id = db.Column(db.ForeignKey('audit.id'), nullable=True)
     expires = db.Column(db.DateTime, default=default_expires, nullable=False)
     agreement_url = db.Column(db.Text, nullable=False)
 
-    audit = db.relationship(Audit, cascade="save-update")
+    audit = db.relationship(Audit, cascade="save-update",
+                            foreign_keys=[audit_id])
+    deleted = db.relationship(Audit, cascade="save-update",
+                              foreign_keys=[deleted_id])
     organization = db.relationship(Organization, cascade="save-update")
 
     def __str__(self):
@@ -42,6 +46,8 @@ class UserConsent(db.Model):
         d['signed'] = FHIR_datetime.as_fhir(self.audit.timestamp)
         d['expires'] = FHIR_datetime.as_fhir(self.expires)
         d['agreement_url'] = self.agreement_url
+        if self.deleted_id:
+            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
 
         return d
 
@@ -62,7 +68,6 @@ class UserConsent(db.Model):
         return cls(user_id=data['user_id'],
                    organization_id=data['organization_id'],
                    agreement_url=data['agreement_url'])
-
 
 def fake_consents():
     """Bootstrap method as we transition from org relations to consent
@@ -91,7 +96,8 @@ def fake_consents():
         # lookup top-level organization for consent
         top_id = OrgTree().find(org.id).top_level()
 
-        existing_org_consents = [uc.organization_id for uc in user.consents]
+        existing_org_consents = [uc.organization_id for uc in
+                                 user.valid_consents]
         if top_id not in existing_org_consents:
             audit = Audit(user_id=admin_id, comment='fake consent added')
             uc = UserConsent(
