@@ -149,7 +149,7 @@ class ChallengeIdForm(Form):
     first_name = StringField(
         'First Name', validators=[validators.input_required()])
     last_name = StringField(
-        'First Name', validators=[validators.input_required()])
+        'Last Name', validators=[validators.input_required()])
     birthdate = DateField(
         'Birthdate', validators=[validators.input_required()])
 
