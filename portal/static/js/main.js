@@ -420,6 +420,7 @@ var assembleContent = {
 var tnthAjax = {
     "getOrgs": function(userId, noOverride) {
         loader(true);
+        var self = this;
         $.ajax ({
             type: "GET",
             url: '/api/organization'
@@ -477,7 +478,7 @@ var tnthAjax = {
                                 $("#" + parentOrg + "_consentItem").show();
                             };
                         } else {
-                             $("#consentContainer .consent").hide();
+                            $("#consentContainer .consent").hide();
                         };
                     };
                 });
@@ -485,24 +486,18 @@ var tnthAjax = {
 
             $("#consentContainer input.consent-checkbox").each(function() {
                    $(this).on("click", function() {
+                        var org = $(this).attr("id").split("_")[0];
+                        var agreementUrl = $("#" + org + "_agreement_url").val();
                         if ($(this).is(":checked")) {
                             //sent off ajax
-                            var org = $(this).attr("id").split("_")[0];
-                            var agreementUrl = $("#" + org + "_agreement_url").val();
+                            var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
+                            if (! consented) {
+                                console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+                                self.setConsent(userId, {"org": org, "agreementUrl": agreementUrl});
+                            };
+                        } else {
                             console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
-                            $.ajax ({
-                                type: "POST",
-                                url: '/api/user/' + userId + '/consent',
-                                contentType: "application/json; charset=utf-8",
-                                dataType: 'json',
-                                data: JSON.stringify({"organization_id": org, "agreement_url": encodeURIComponent(agreementUrl)})
-                            }).done(function(data) {
-                                console.log("consent sent successfully.");
-                            }).fail(function(xhr) {
-                                console.log("request to set consent failed.");
-                                //console.log(xhr.responseText)
-                            });
-
+                            self.deleteConsent(userId, {"org": org});
                         };
 
                    });
@@ -535,10 +530,44 @@ var tnthAjax = {
                 });
             };
            loader();
+           return true;
         }).fail(function() {
             console.log("Problem retrieving data from server.");
             loader();
+            return false;
         });
+    },
+    "setConsent": function(userId, params) {
+        if (userId && params) { 
+            $.ajax ({
+                type: "POST",
+                url: '/api/user/' + userId + '/consent',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: JSON.stringify({"organization_id": params["org"], "agreement_url": params["agreementUrl"]})
+            }).done(function(data) {
+                console.log("consent updated successfully.");
+            }).fail(function(xhr) {
+                console.log("request to updated consent failed.");
+                //console.log(xhr.responseText)
+            });
+        };
+    },
+    deleteConsent: function(userId, params) {
+        if (userId && params) { 
+            $.ajax ({
+                type: "DELETE",
+                url: '/api/user/' + userId + '/consent',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                data: JSON.stringify({"organization_id": parseInt(params["org"])})
+            }).done(function(data) {
+                console.log("consent deleted successfully.");
+            }).fail(function(xhr) {
+                console.log("request to delete consent failed.");
+                //console.log(xhr.responseText)
+            });
+        };
     },
     "getDemo": function(userId, noOverride) {
         $.ajax ({
