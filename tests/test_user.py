@@ -179,21 +179,17 @@ class TestUser(TestCase):
 
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider
-        org = Organization(name='sample')
-        org2 = Organization(name='another sample')
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.add(org2)
-            db.session.commit()
-        org, org2 = map(db.session.merge, (org, org2))
+        org, org2 = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
+        org_id, org2_id = org.id, org2.id
         provider = self.add_user('provider@example.com')
         provider.organizations.append(org)
         provider.organizations.append(org2)
+        provider_id = provider.id
         self.promote_user(user=provider, role_name=ROLE.PROVIDER)
-        provider, org, org2 = map(db.session.merge, (provider, org, org2))
-        data = {'organizations': [{'organization_id': org.id},
-                                  {'organization_id': org2.id}]}
-        self.login(user_id=provider.id)
+        data = {'organizations': [{'organization_id': org_id},
+                                  {'organization_id': org2_id}]}
+        self.login(user_id=provider_id)
         rv = self.app.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))

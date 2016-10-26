@@ -66,6 +66,7 @@ class TestOrganization(TestCase):
         self.assertEquals(org.name, data['name'])
 
     def test_organization_get(self):
+        self.login()
         org = Organization(name='test')
         with SessionScope(db):
             db.session.add(org)
@@ -73,17 +74,11 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
 
         # use api to obtain FHIR
-        self.login()
         rv = self.app.get('/api/organization/{}'.format(org.id))
         self.assert200(rv)
 
     def test_organization_list(self):
-        org1 = Organization(name='test 1')
-        org2 = Organization(name='test 2')
-        with SessionScope(db):
-            db.session.add(org1)
-            db.session.add(org2)
-            db.session.commit()
+        count = Organization.query.count()
 
         # use api to obtain FHIR bundle
         self.login()
@@ -91,9 +86,11 @@ class TestOrganization(TestCase):
         self.assert200(rv)
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
-        self.assertTrue(len(bundle['entry']) > 3)  # 2 + 'none of the above'
+        self.assertEquals(len(bundle['entry']), count)
 
     def test_organization_put(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
         with open(os.path.join(
             os.path.dirname(__file__),
             'organization-example-f001-burgers.json'), 'r') as fhir_data:
@@ -110,8 +107,6 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         org_id = org.id
 
-        self.promote_user(role_name=ROLE.ADMIN)
-        self.login()
         rv = self.app.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',
                           data=json.dumps(data))
@@ -142,13 +137,9 @@ class TestOrganization(TestCase):
         self.assert400(rv)
 
     def test_organization_delete(self):
-        org1 = Organization(name='test 1')
-        org2 = Organization(name='test 2')
-        with SessionScope(db):
-            db.session.add(org1)
-            db.session.add(org2)
-            db.session.commit()
-            org2_id = org2.id
+        (org1_id, org1_name), (org2_id, org2_name) = [
+            (org.id, org.name) for org in Organization.query.filter(
+                Organization.id > 0).limit(2)]
 
         # use api to delete one and confirm the other remains
         self.promote_user(role_name=ROLE.ADMIN)
@@ -159,7 +150,7 @@ class TestOrganization(TestCase):
         orgs = Organization.query.all()
         names =  [o.name for o in orgs]
         self.assertTrue('none of the above' in names)
-        self.assertTrue('test 1' in names)
+        self.assertTrue(org1_name in names)
 
     def test_organization_identifiers(self):
         alias = Identifier(
@@ -168,14 +159,14 @@ class TestOrganization(TestCase):
         shortcut = Identifier(
             use='secondary', system=SHORTCUT_ALIAS, value='shortcut')
 
-        org = Organization(name='test')
+        org = Organization.query.filter(Organization.id > 0).first()
+        before = org.identifiers.count()
         org.identifiers.append(alias)
         org.identifiers.append(shortcut)
         with SessionScope(db):
-            db.session.add(org)
             db.session.commit()
         org = db.session.merge(org)
-        self.assertEquals(org.identifiers.count(), 2)
+        self.assertEquals(org.identifiers.count(), before + 2)
 
     def test_organization_identifiers_update(self):
         with open(os.path.join(

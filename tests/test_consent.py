@@ -13,8 +13,8 @@ class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
 
     def test_user_consent(self):
-        org1 = Organization(name='test_1')
-        org2 = Organization(name='test_2')
+        org1, org2 = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
 
         audit = Audit(user_id=TEST_USER_ID)
         uc1 = UserConsent(organization=org1, agreement_url=self.url,
@@ -32,13 +32,7 @@ class TestUserConsent(TestCase):
         self.assertEquals(len(rv.json['consent_agreements']), 2)
 
     def test_post_user_consent(self):
-        org1 = Organization(name='test_1')
-        with SessionScope(db):
-            db.session.add(org1)
-            db.session.commit()
-        self.test_user = db.session.merge(self.test_user)
-        org1 = db.session.merge(org1)
-
+        org1 = Organization.query.filter(Organization.id > 0).first()
         data = {'organization_id': org1.id, 'agreement_url': self.url}
 
         self.login()

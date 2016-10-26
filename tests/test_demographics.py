@@ -36,15 +36,9 @@ class TestDemographics(TestCase):
         self.add_concepts()
 
         # clinic reference requires pre-existing organization
-        org = Organization(name='test org')
-        org2 = Organization(name='another org')
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.add(org2)
-            db.session.commit()
-        org = db.session.merge(org)
-        org2 = db.session.merge(org2)
-        org_id, org2_id = org.id, org2.id
+        (org_id, org_name), (org2_id, org2_name) = [
+            (org.id, org.name) for org in Organization.query.filter(
+                Organization.id > 0).limit(2)]
 
         family = 'User'
         given = 'Test'
@@ -97,8 +91,8 @@ class TestDemographics(TestCase):
         self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
         self.assertEquals(['1096-7',], [c.code for c in user.races])
         self.assertEquals(user.organizations.count(), 2)
-        self.assertEquals(user.organizations[0].name, 'test org')
-        self.assertEquals(user.organizations[1].name, 'another org')
+        self.assertEquals(user.organizations[0].name, org_name)
+        self.assertEquals(user.organizations[1].name, org2_name)
 
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
@@ -118,12 +112,8 @@ class TestDemographics(TestCase):
     def test_demographics_duplicate_ref(self):
         # adding duplicate careProvider
 
-        org = Organization(name='test org')
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.commit()
-        org = db.session.merge(org)
-        org_id = org.id
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id, org_name = org.id, org.name
 
         # associate test org with test user
         self.test_user.organizations.append(org)
@@ -144,10 +134,11 @@ class TestDemographics(TestCase):
         self.assert200(rv)
         user = db.session.merge(self.test_user)
         self.assertEquals(user.organizations.count(), 1)
-        self.assertEquals(user.organizations[0].name, 'test org')
+        self.assertEquals(user.organizations[0].name, org_name)
 
     def test_demographics_delete_ref(self):
         # existing careProvider should get removed
+        self.login()
 
         org = Organization(name='test org')
         org2 = Organization(name='two')
@@ -175,7 +166,6 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        self.login()
         rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))

@@ -57,13 +57,12 @@ class TestAudit(TestCase):
     def test_provider_access(self):
         provider = self.add_user('provider@example.com')
         self.promote_user(provider, role_name=ROLE.PROVIDER)
-        org = Organization(name='a clinic')
+        org = Organization.query.filter(Organization.id > 0).first()
         provider.organizations.append(org)
         self.test_user.organizations.append(org)
         audit = Audit(user_id=TEST_USER_ID, comment='just test data')
         with SessionScope(db):
             db.session.add(audit)
-            db.session.add(org)
             db.session.commit()
         provider = db.session.merge(provider)
         self.login(provider.id)
