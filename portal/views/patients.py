@@ -26,6 +26,8 @@ def patients_root():
     patients_by_org = {}
     now = datetime.utcnow()
     for org in user.organizations:
+        if org.id == 0:  # None of the above doesn't count
+            continue
         # we require a consent agreement between the user and the
         # respective 'top-level' organization
         top_level_id = OrgTree().find(org.id).top_level()
