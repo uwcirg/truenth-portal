@@ -197,10 +197,12 @@ def access_url(user_id):
 @user_api.route('/user/<int:user_id>/consent')
 @oauth.require_oauth()
 def user_consents(user_id):
-    """Returns simple JSON listing user's consent agreements
+    """Returns simple JSON listing user's valid consent agreements
 
     Returns the list of consent agreements between the requested user
     and the respective organizations.
+
+    NB does not include expired or deleted consents.
 
     ---
     tags:
@@ -273,7 +275,8 @@ def user_consents(user_id):
     if not user:
         abort(404, "User {} not found".format(user_id))
 
-    return jsonify(consent_agreements=[c.as_json() for c in user.consents])
+    return jsonify(consent_agreements=[c.as_json() for c in
+                                       user.valid_consents])
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('POST',))
@@ -361,6 +364,82 @@ def set_user_consents(user_id):
                   comment="Adding consent agreement")
     consent.audit = audit
     db.session.add(consent)
+    db.session.commit()
+
+    return jsonify(message="ok")
+
+
+@user_api.route('/user/<int:user_id>/consent', methods=('DELETE',))
+@oauth.require_oauth()
+def delete_user_consents(user_id):
+    """Delete a consent agreement between the user and the named organization
+
+    Used to delete consent agreements between a user and an organization.
+
+    ---
+    tags:
+      - User
+      - Consent
+      - Organization
+    operationId: delete_user_consent
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: consent_agreement
+          required:
+            - organization_id
+          properties:
+            organization_id:
+              type: string
+              description:
+                Organization identifier defining with whom the consent
+                agreement applies
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request incudes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if not user:
+        abort(404, "user_id {} not found".format(user_id))
+    remove_uc = None
+    for uc in user.valid_consents:
+        if uc.organization.id == request.json['organization_id']:
+            remove_uc = uc
+            break
+    if not remove_uc:
+        abort(404, "matching user consent not found")
+
+    remove_uc.deleted = Audit(
+        user_id=current_user().id, comment="Deleted consent agreement")
     db.session.commit()
 
     return jsonify(message="ok")

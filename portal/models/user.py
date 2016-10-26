@@ -5,6 +5,7 @@ from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
 import pytz
+from sqlalchemy import text
 from sqlalchemy.orm import synonym
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
@@ -215,7 +216,7 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
 
     auth_providers = db.relationship('AuthProvider', lazy='dynamic')
-    consents = db.relationship('UserConsent', lazy='dynamic')
+    _consents = db.relationship('UserConsent', lazy='dynamic')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
@@ -231,6 +232,13 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
+
+    @property
+    def valid_consents(self):
+        """Access to consents that have neither been deleted or expired"""
+        now = datetime.utcnow()
+        return self._consents.filter(
+            text("expires>:now and deleted_id is null")).params(now=now)
 
     @property
     def display_name(self):
@@ -546,7 +554,7 @@ class User(db.Model, UserMixin):
                 setattr(self, attr, getattr(other, attr))
             # value present in both.  assume user just set to best value
 
-        for relationship in ('organizations', 'consents', 'procedures',
+        for relationship in ('organizations', '_consents', 'procedures',
                              'observations', 'relationships', 'roles',
                              'races', 'ethnicities', 'groups'):
             self_entity = getattr(self, relationship)
