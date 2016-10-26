@@ -48,7 +48,7 @@ class TestUserConsent(TestCase):
         org1, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org1_id, org2_id = org1.id, org2.id
-        data = {'organization_id': org1_id, 'agreement_url': self.url}
+        data = {'organization_id': org1_id}
 
         audit = Audit(user_id=TEST_USER_ID)
         uc1 = UserConsent(organization=org1, agreement_url=self.url,
@@ -60,6 +60,7 @@ class TestUserConsent(TestCase):
         with SessionScope(db):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
+        self.assertEqual(self.test_user.valid_consents.count(), 2)
         self.login()
         rv = self.app.delete('/api/user/{}/consent'.format(TEST_USER_ID),
                              content_type='application/json',

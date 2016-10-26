@@ -312,7 +312,8 @@ def set_user_consents(user_id):
             - agreement_url
           properties:
             organization_id:
-              type: string
+              type: integer
+              format: int64
               description:
                 Organization identifier defining with whom the consent
                 agreement applies
@@ -399,7 +400,8 @@ def delete_user_consents(user_id):
             - organization_id
           properties:
             organization_id:
-              type: string
+              type: integer
+              format: int64
               description:
                 Organization identifier defining with whom the consent
                 agreement applies
@@ -431,8 +433,12 @@ def delete_user_consents(user_id):
     if not user:
         abort(404, "user_id {} not found".format(user_id))
     remove_uc = None
+    try:
+        id_to_delete = int(request.json['organization_id'])
+    except ValueError:
+        abort(400, "requires integer value for `organization_id`")
     for uc in user.valid_consents:
-        if uc.organization.id == request.json['organization_id']:
+        if uc.organization.id == id_to_delete:
             remove_uc = uc
             break
     if not remove_uc:
