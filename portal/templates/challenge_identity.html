@@ -2,21 +2,52 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
 
-    <h3 class="tnth-headline">Verify Identity</h3><br />
+    <h4 class="tnth-headline">Identity Verification</h4>
 
-    <p>To ensure your personal details are not shared with others, please enter
-    the following data for account confirmation.</p>
+    <hr/>
+
+    <br/>
+
+    <p class="profile-item-title">To ensure your personal details are not shared with others, please enter the following data for account confirmation.</p>
 
     <form action="/challenge" method="post">
-        {{ form.hidden_tag() }}
 
-        {{ render_field(form.first_name, tabindex=10) }}
-
-        {{ render_field(form.last_name, tabindex=20) }}
-
-        {{ render_field(form.birthdate, tabindex=30) }}
-
+         {{ form.hidden_tag() }}
+        <div id="identityVerificationContainer">
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                {{ render_field(form.first_name, tabindex=10) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                {{ render_field(form.last_name, tabindex=20) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                     {{ render_field(form.birthdate, tabindex=30) }}
+                </div>
+            </div>
+        </div>
         <button type="submit" class="btn btn-tnth-primary">Confirm Identity</button>
     </form>
 
+{% endblock %}
+
+{% block document_ready %}
+$(document).ready(function() {
+    //html5 native date input field is only recognized in Chrome/Opera, and not others so use bootstrap datepicker object instead
+    $("#identityVerificationContainer").find("#birthdate").prop("type", "text").attr("placeholder", "yyyy-mm-dd").attr("pattern", "(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))");
+    $("#birthdate")
+    .datepicker({format: "yyyy-mm-dd", autoclose: true, immediateUpdates: true, startDate: "1920-01-01"})
+    .on('changeDate', function (ev) {
+        $(this).datepicker('hide');
+    })
+    .on('clearDate', function(ev) {
+        $(this).datepicker('show')
+    });
+
+
+});
 {% endblock %}
