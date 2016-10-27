@@ -15,40 +15,40 @@
   {% endif %}
 
   <div id="aboutForm" class="tnth-hide">
-    {% if still_needed %}
-      <h3 class="tnth-headline">About You</h3>
+     <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
+        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed%}
+          <h3 class="tnth-headline">About You</h3>
 
-      <p>Thank You! Now, please finish your registration by telling us about yourself.</p>
+          <p>Thank You! Now, please finish your registration by telling us about yourself.</p>
 
-      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
-
-        <!--<p>First, tell us who you are:</p>-->
-        {% if 'name' in still_needed %}
-          {{nameGroup()}}
-        {% else %}
-            {% if user and user.first_name and user.last_name %}
-              <p>Name: {{user.first_name}} {{user.last_name}}</p>
+            <!--<p>First, tell us who you are:</p>-->
+            {% if 'name' in still_needed %}
+              {{nameGroup()}}
+            {% else %}
+                {% if user and user.first_name and user.last_name %}
+                  <p>Name: {{user.first_name}} {{user.last_name}}</p>
+                {% endif %}
             {% endif %}
+            {% if 'role' in still_needed %}
+              {{rolesGroup()}}
+            {% endif %}
+            {% if 'dob' in still_needed %}
+              {{dobGroup()}}
+            {% endif %}
+            {% if 'clinical' in still_needed %}
+              {{patientQGroup()}}
+            {% endif %}
+            {% if 'org' in still_needed %}
+              {{clinic(consent_agreements)}}
+            {% endif %}
+            <br />
+            <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
+            <br />
+        {% else %}
+          <br/>
+          <p> Thank you for your registration.</p>
+          <p>Click continue to start using TrueNTH</p>
         {% endif %}
-        {% if 'role' in still_needed %}
-          {{rolesGroup()}}
-        {% endif %}
-        {% if 'dob' in still_needed %}
-          {{dobGroup()}}
-        {% endif %}
-        {% if 'clinical' in still_needed %}
-          {{patientQGroup()}}
-        {% endif %}
-        {% if 'org' in still_needed %}
-          {{clinic(consent_agreements)}}
-        {% endif %}
-        <br />
-        <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
-        <br />
-    {% else %}
-      <p> Thank you for your registration.</p>
-      <p>Click continue to start using TrueNTH</p>
-    {% endif %}
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
   </form>
   <a id="redirectHomeLink" href="">&nbsp;</a>
