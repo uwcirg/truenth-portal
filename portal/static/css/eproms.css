@@ -909,7 +909,11 @@ color: #777
   margin-bottom: 1em;
 }
 
-
+.box-shadow-container {
+-webkit-box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
+-moz-box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
+box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
