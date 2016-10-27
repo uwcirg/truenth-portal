@@ -129,6 +129,7 @@ def delete_user(username):
     from .audit import Audit
     from .tou import ToU
     from .intervention import UserIntervention
+    from .user_consent import UserConsent
 
     actor = raw_input("\n\nWARNING!!!\n\n"
                       " This will permanently destroy user: {}\n"
@@ -145,6 +146,12 @@ def delete_user(username):
 
     # purge all the types with user foreign keys, then the user itself
     UserIntervention.query.filter_by(user_id=user.id).delete()
+    consent_audits = Audit.query.join(
+        UserConsent, UserConsent.audit_id==Audit.id).filter(
+        UserConsent.user_id==user.id)
+    UserConsent.query.filter_by(user_id=user.id).delete()
+    for ca in consent_audits:
+        db.session.delete(ca)
     tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
     for t in tous:
         db.session.delete(t)
