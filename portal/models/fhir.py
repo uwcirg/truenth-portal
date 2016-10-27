@@ -6,7 +6,6 @@ import json
 import pytz
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
-import urllib
 
 from ..extensions import db
 from .lazy import lazyprop
