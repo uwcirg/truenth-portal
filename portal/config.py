@@ -41,6 +41,8 @@ class BaseConfig(object):
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
+    PROVIDER_BULK_DATA_ACCESS = False
+
     FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
     FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
     GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
