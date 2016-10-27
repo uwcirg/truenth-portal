@@ -51,7 +51,19 @@ body {
   font-size: @baseFontSize;
 }
 
-#fullSizeBox a[href*="register"] {
+#fullSizeBox {
+  a[href*="register"] {
+    display: none;
+  }
+  a[href*="google"] {
+    display: none;
+  }
+  a[href*="facebook"] {
+    display: none;
+  }
+}
+
+#socialMediaRegistrationContainer {
   display: none;
 }
 
@@ -971,6 +983,11 @@ color: #777
   }
 }
 
+.box-shadow-container {
+-webkit-box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
+-moz-box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
+box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
+}
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
