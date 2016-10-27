@@ -32,6 +32,15 @@ body {
 #fullSizeBox a[href*="register"] {
   display: none;
 }
+
+#fullSizeBox a[href*="google"], #fullSizeBox a[href*="facebook"] {
+  display: none;
+}
+
+#socialMediaRegistrationContainer {
+  display: none;
+}
+
 #mainHolder {
   visibility: hidden;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
