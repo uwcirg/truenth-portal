@@ -115,9 +115,8 @@ $(document).ready(function(){
 
 
     if (incompleteFields.length == 0) {
-        //$("#clinics").show();
-        //$("#updateProfile").removeAttr("disabled");
-        _redirectHome();
+        $("#updateProfile").removeAttr("disabled");
+        //_redirectHome();
     } else {
          incompleteFields[0].section.show();
          incompleteFields[0].element.show();
