@@ -56,7 +56,7 @@ class TestProcedure(TestCase):
         last_updated = FHIR_datetime.parse(
             data['entry'][0]['resource']['meta']['lastUpdated'])
         self.assertAlmostEquals(
-            datetime.utcnow(), last_updated, delta=timedelta(seconds=2))
+            datetime.utcnow(), last_updated, delta=timedelta(seconds=5))
         start_time = FHIR_datetime.parse(
             data['entry'][0]['resource']['performedPeriod']['start'])
         self.assertAlmostEquals(
