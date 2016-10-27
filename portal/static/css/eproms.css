@@ -910,9 +910,9 @@ color: #777
 }
 
 .box-shadow-container {
--webkit-box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
--moz-box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
-box-shadow: 8px 8px 5px -5px rgba(133,140,134,1);
+-webkit-box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
+-moz-box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
+box-shadow: 8px 8px 7px -6px rgba(150,158,151,1);
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
