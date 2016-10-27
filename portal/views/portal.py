@@ -8,6 +8,7 @@ from flask_swagger import swagger
 from flask_wtf import Form
 from wtforms import validators, HiddenField, StringField
 from wtforms.fields.html5 import DateField
+from datetime import datetime
 
 from .auth import next_after_login
 from ..audit import auditable_event
@@ -24,6 +25,7 @@ from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
+
 
 portal = Blueprint('portal', __name__)
 
@@ -150,7 +152,7 @@ class ChallengeIdForm(Form):
         'First Name', validators=[validators.input_required()])
     last_name = StringField(
         'Last Name', validators=[validators.input_required()])
-    birthdate = DateField(
+    birthdate = StringField(
         'Birthdate', validators=[validators.input_required()])
 
 
@@ -166,7 +168,7 @@ def challenge_identity():
 
     first_name = form.first_name.data
     last_name = form.last_name.data
-    birthdate = form.birthdate.data
+    birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y');
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
