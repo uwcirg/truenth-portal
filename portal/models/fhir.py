@@ -11,6 +11,7 @@ import urllib
 from ..extensions import db
 from .lazy import lazyprop
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
+import requests
 
 
 def as_fhir(obj):
@@ -451,8 +452,9 @@ def fetch_HL7_V3_Namespace(valueSet):
     """Pull and parse the published FHIR ethnicity namespace"""
     src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.json'.format(
         valueSet=valueSet)
-    response = urllib.urlopen(src_url)
-    data = json.loads(response.read())
+    response = requests.get(src_url)
+    load = response.text
+    data = json.loads(load)
     return parse_concepts(data['codeSystem']['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
