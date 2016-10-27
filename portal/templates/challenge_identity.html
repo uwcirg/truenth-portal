@@ -45,7 +45,7 @@ $(document).ready(function() {
     //html5 native date input field is only recognized in Chrome/Opera, and not others so use bootstrap datepicker object instead
     $("#identityVerificationContainer").find("#birthdate").prop("type", "text").attr("placeholder", "mm-dd-yyyy").attr("pattern", "(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))-(?:19|20)[0-9]{2}");
     $("#birthdate")
-    .datepicker({format: "mm-dd-yyyy", autoclose: true, startDate: "01-01-1920"})
+    .datepicker({format: "mm-dd-yyyy", autoclose: true, clearBtn: true, defaultViewDate: {year:_defaultDate.getFullYear(), month:_defaultDate.getMonth(), day:_defaultDate.getDate()}, forceParse: false, startDate: "01-01-1920"})
     .on('changeDate', function (ev) {
         $(this).datepicker("hide");
     })
