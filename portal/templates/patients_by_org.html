@@ -28,6 +28,14 @@
 {% for org in patients_by_org.keys() %}
 <div class="admin-table table-responsive smaller-text">
     <h4 id="location{{orgCount}}">{{ org }} Patients</h4>
+
+{% if config.PROVIDER_BULK_DATA_ACCESS %}
+
+    <a href="javascript:void(0)" id="patientDataDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient list for this clinic</a>        
+    <a href="javascript:void(0)" id="patientAssessmentDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient assessment data for this clinic</a>        
+
+{% endif %}
+
     <div id="adminTableToolbar{{ orgCount }}" class="admin-toolbar"><span id="tableCount{{orgCount}}"></span></div>
     <table id="adminTable{{orgCount}}"
            data-table-id="{{orgCount}}"
@@ -74,6 +82,26 @@
 {% endfor %}
 
 </div>
+
+        <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Bulk data download not yet implemented</h4>
+              </div>
+              <div class="modal-body" style="font-size:0.8em">
+                <br/>
+                <p class="text-left">Bulk data download not yet implemented</p>
+                <br/>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
 {% endblock %}
 {% block document_ready %}
