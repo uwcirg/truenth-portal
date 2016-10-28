@@ -94,7 +94,7 @@ if [[
         echo "Updating python dependancies"
     fi
     cd "${GIT_WORK_TREE}"
-    env -u GIT_WORK_TREE pip install --requirement "${GIT_WORK_TREE}"/requirements.txt "${GIT_WORK_TREE}"
+    env -u GIT_WORK_TREE pip install --requirement requirements.txt
 
     # Restart in case celery module updates
     sudo service celeryd restart
