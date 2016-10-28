@@ -1,5 +1,4 @@
 """Organization related views module"""
-import datetime
 from flask import abort, current_app, Blueprint, jsonify, request
 from flask_user import roles_required
 import json
@@ -135,7 +134,7 @@ def organization_post():
 
     Include an **identifier** with system of
     http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
-    alias for the organization, useful at `/clinic/<alias>`.
+    alias for the organization, useful at `/go/<alias>`.
 
     A resource mentioned as partOf the given organization must exist as a
     prerequisit or a 400 will result.
@@ -204,7 +203,7 @@ def organization_put(organization_id):
 
     Include an **identifier** with system of
     http://us.truenth.org/identity-codes/shortcut-alias to name a shortcut
-    alias for the organization, useful at `/clinic/<alias>`.
+    alias for the organization, useful at `/go/<alias>`.
 
     A resource mentioned as partOf the given organization must exist as a
     prerequisit or a 400 will result.

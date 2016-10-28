@@ -6,8 +6,8 @@ from flask_login import login_user
 from flask_user import roles_required, roles_not_allowed
 from flask_swagger import swagger
 from flask_wtf import Form
+from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, StringField
-from wtforms.fields.html5 import DateField
 from datetime import datetime
 
 from .auth import next_after_login
@@ -62,11 +62,43 @@ def intentional_error():  # pragma: no cover
 def landing():
     """landing page view function - present register / login options"""
     if current_user():
+        current_app.logger.debug("landing (found user) -> next_after_login")
         return next_after_login()
     return render_template('landing.html', user=None, no_nav="true")
 
 
-@portal.route('/clinic/<string:clinic_alias>')
+class ShortcutAliasForm(Form):
+    shortcut_alias = StringField('Code', validators=[validators.Required()])
+
+    def validate_shortcut_alias(form, field):
+        """Custom validation to confirm an alias match"""
+        if len(field.data.strip()):
+            try:
+                Identifier.query.filter_by(
+                    system=SHORTCUT_ALIAS, value=field.data).one()
+            except NoResultFound:
+                raise validators.ValidationError("Code not found")
+
+
+@portal.route('/go', methods=['GET', 'POST'])
+def specific_clinic_entry():
+    """Entry point with form to insert a coded clinic shortcut
+
+    Invited users may start here to obtain a specific clinic assignment,
+    by entering the code or shortcut alias they were given.
+
+    Store the clinic in the session for association with the user once
+    registered and redirect to the standard landing page.
+
+    """
+    form = ShortcutAliasForm(request.form)
+    if not form.validate_on_submit():
+        return render_template('shortcut_alias.html', form=form)
+
+    return specific_clinic_landing(form.shortcut_alias.data)
+
+
+@portal.route('/go/<string:clinic_alias>')
 def specific_clinic_landing(clinic_alias):
     """Invited users start here to obtain a specific clinic assignment
 
@@ -203,11 +235,13 @@ def initial_queries():
     if request.method == 'POST':
         # data submission all handled via ajax calls from initial_queries
         # template.  assume POST can only be sent when valid.
+        current_app.logger.debug("POST initial_queries -> next_after_login")
         return next_after_login()
 
     user = current_user()
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
+        current_app.logger.debug("initial_queries (no user!) -> landing")
         return redirect('portal.landing')
 
     still_needed = Coredata().still_needed(user)

@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field %}
+
+    <h4 class="tnth-headline">Enter Code</h4>
+
+    <hr/>
+
+    <br/>
+
+    <p class="profile-item-title">Welcome, please enter the code you recevied
+    in your invite.</p>
+
+    <form  action="/go" method="post">
+        {{ form.csrf_token }}
+
+        <div id="identityVerificationContainer">
+            <div class="row">
+                <div class="col-md-6 col-xs-12">
+                {{ render_field(form.shortcut_alias, tabindex=10) }}
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-tnth-primary">Go</button>
+    </form>
+
+{% endblock %}

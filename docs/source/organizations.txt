@@ -14,7 +14,7 @@ document defining the organization compliant with the `FHIR Organization
    The parent organization must exist in the system before a child
    can name it in the **partOf** reference.
 
-To enable use of the `/clinic/<shortcut_alias>` endpoint, to pre-select
+To enable use of the `/go/<shortcut_alias>` endpoint, to pre-select
 clinics for new users, an **identifier** must be included in the FHIR resource.
 
 For example, after looking up the correct ID, a PUT of the following document
