@@ -695,7 +695,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profileProcedures() -%}
+{% macro profileProcedures(person) -%}
 <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
 <p>Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
     date, please make your best guess.<span class="text-muted smaller-text"></span></p>
