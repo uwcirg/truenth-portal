@@ -429,24 +429,25 @@
                 </label>
             </div>
         </div>
-    {% endif %}
-    <script>$(function () {
+   
+        <script>$(function () {
 
-    tnthAjax.getRoles({{ person.id }}, true);
-    $("#rolesGroup input[name='user_type']").each(function() {
-        $(this).on("click", function() {
-            var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-                    return { name: $(this).val() };
-                }).get();
-                var toSend = {"roles": roles};
-                //console.log('update role: ' + toSend);
-                tnthAjax.putRoles({{person.id}},toSend);
+        tnthAjax.getRoles({{ person.id }}, true);
+        $("#rolesGroup input[name='user_type']").each(function() {
+            $(this).on("click", function() {
+                var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                        return { name: $(this).val() };
+                    }).get();
+                    var toSend = {"roles": roles};
+                    //console.log('update role: ' + toSend);
+                    tnthAjax.putRoles({{person.id}},toSend);
 
-             });
+                 });
 
+            });
         });
-    });
-    </script>
+        </script>
+     {% endif %}
 
 {%- endmacro %}
 
@@ -591,19 +592,22 @@
                 <h4 class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
                 {{profileName(person)}}
                 {{profileBirthDate(person)}}
-
             </div>
         </div>
         <div class="col-md-6">
             <div class="profile-item-container side">
                 <h4 class="profile-item-title">Communications</h4>
-                {{profileEmail(person)}}
-                {{profileSendEmail(person)}}
+                {% if person.has_role('patient') %}
+                    {{profileEmail(person)}}
+                    {{profileSendEmail(person)}}
+                {% elif person.has_role('provider') %}
+                    {{profileEmail(person)}}
+                    {{profilePhone(person)}}
+                {% endif %}
             </div>
         </div>
     </div>
-
-    {% if person and person.has_role('patient') %}
+    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -612,7 +616,6 @@
 			</div>
 		</div>
     {%endif %}
-
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
@@ -621,27 +624,29 @@
             </div>
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="profile-item-container">
-                <h4 class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
-                <div class="flex">
-                    <div>
-                        {{profileGender(person)}}
-                        <br/>
-                        {{profilePhone(person)}}
-                    </div>
-                    <div>
-                         {{profileEthnicity(person)}}
-                    </div>
-                    <div>
-                        {{profileRace(person)}}
+    <!-- show demographic information for patient only -->
+    {% if person and person.has_role('patient') %}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-item-container">
+                    <h4 class="profile-item-title">Patient Detail</h4>
+                    <div class="flex">
+                        <div>
+                            {{profileGender(person)}}
+                            <br/>
+                            {{profilePhone(person)}}
+                        </div>
+                        <div>
+                             {{profileEthnicity(person)}}
+                        </div>
+                        <div>
+                            {{profileRace(person)}}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
             <div class="col-md-12">
