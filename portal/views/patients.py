@@ -40,8 +40,8 @@ def patients_root():
             UserConsent.deleted_id == None,
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
-
-        patients_by_org[org.name] = [user for user in org.users if
+        #need to sort organizations by id instead of name - so parent org is listed ahead
+        patients_by_org[str(org.id) + "|" + org.name] = [user for user in org.users if
                                      user.has_role(ROLE.PATIENT) and
                                      user.id in consented_users]
 
