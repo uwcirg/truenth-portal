@@ -585,6 +585,12 @@
 
 {%- endmacro %}
 
+{% macro profileInterventionReports(person) -%}
+    {% if person.provider_html() %}
+       <div>{{person.provider_html()|safe}}</div>
+    {% endif %}
+{%- endmacro %}
+
 {% macro profile(person, current_user) -%}
     <div class="row" style="position: relative;">
         <div class="col-md-6">
@@ -600,7 +606,7 @@
                 {% if person.has_role('patient') %}
                     {{profileEmail(person)}}
                     {{profileSendEmail(person)}}
-                {% elif person.has_role('provider') %}
+                {% else %}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
                 {% endif %}
@@ -616,6 +622,16 @@
 			</div>
 		</div>
     {%endif %}
+    {% if person and person.has_role('patient') and person.provider_html() and current_user.has_role('provider') %}
+        <div class="row">
+            <div class="col-md-12">
+                 <div class="profile-item-container">
+                    <h4 class="profile-item-title">Intervention Reports</h4>
+                    {{profileInterventionReports(person)}}
+                 </div>
+            </div>
+        </div>
+    {%endif%}
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
