@@ -28,6 +28,7 @@ def patients_root():
     """
     user = current_user()
     patients_by_org = {}
+    org_list = {}
     now = datetime.utcnow()
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count
@@ -44,9 +45,10 @@ def patients_root():
         patients_by_org[org.name] = [user for user in org.users if
                                      user.has_role(ROLE.PATIENT) and
                                      user.id in consented_users]
+        org_list[org.id] = org.name
 
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org,
+        'patients_by_org.html', patients_by_org=patients_by_org, org_list = org_list,
         user=current_user(), wide_container="true")
 
 @patients.route('/profile_create')

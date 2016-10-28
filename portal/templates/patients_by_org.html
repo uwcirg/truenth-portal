@@ -13,8 +13,8 @@
     <p>Skip to:</p>
     <ul>
         {% set orgCountLink = 1 %}
-        {% for org in patients_by_org.keys() %}
-        <li><a href="#location{{orgCountLink}}">{{ org }}</a></li>
+        {% for id, name in org_list | dictsort %}
+        <li><a href="#location{{orgCountLink}}">{{ name }}</a></li>
         {% set orgCountLink = orgCountLink + 1 %}
         {% endfor %}
     </ul>
@@ -82,7 +82,6 @@
 {% endfor %}
 
 </div>
-
         <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
