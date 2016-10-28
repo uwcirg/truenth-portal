@@ -56,6 +56,9 @@ My TrueNTH Profile
             <label>Birth Date</label>
             <div class="row">
                 <div class="col-xs-4">
+                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+                </div>
+                <div class="col-xs-4">
                     <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                         <option value="">Month...</option>
                         <option value="01">January</option>
@@ -71,9 +74,6 @@ My TrueNTH Profile
                         <option value="11">November</option>
                         <option value="12">December</option>
                     </select>
-                </div>
-                <div class="col-xs-4">
-                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
                 </div>
                 <div class="col-xs-4">
                     <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />

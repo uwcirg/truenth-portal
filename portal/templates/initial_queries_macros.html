@@ -73,6 +73,9 @@
             <label>Birth Date</label>
             <div class="row">
               <div class="col-xs-4">
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+              </div>
+              <div class="col-xs-4">
                 <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-birthday="true" required>
                   <option value="">Month...</option>
                   <option value="01">January</option>
@@ -88,9 +91,6 @@
                   <option value="11">November</option>
                   <option value="12">December</option>
                 </select>
-              </div>
-              <div class="col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
               </div>
               <div class="col-xs-4">
                 <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
