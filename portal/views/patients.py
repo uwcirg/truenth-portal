@@ -1,4 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
+import requests
 from datetime import datetime
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
@@ -8,6 +9,9 @@ from ..models.organization import OrgTree
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..models.user_consent import UserConsent
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree
+from ..models.app_text import app_text
+from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -49,8 +53,22 @@ def patients_root():
 @oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
 def profile_create():
+    consent_agreements = {}
+    for org_id in OrgTree().all_top_level_ids():
+            org = Organization.query.get(org_id)
+            consent_url = app_text(ConsentATMA.name_key(organization=org))
+            response = requests.get(consent_url)
+            if response.json:
+                consent_agreements[org.id] = {
+                    'asset': response.json()['asset'],
+                    'agreement_url': ConsentATMA.permanent_url(
+                        version=response.json()['version'],
+                        generic_url=consent_url)}
+            else:
+                consent_agreements[org.id] = {
+                    'asset': response.text, 'agreement_url': consent_url}
     user = current_user()
-    return render_template("profile_create.html", user = user)
+    return render_template("profile_create.html", user = user, consent_agreements=consent_agreements)
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>')

@@ -907,6 +907,12 @@ color: #777
   margin-bottom: 1em;
 }
 
+.box-shadow-container {
+-webkit-box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
+-moz-box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
+box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
+}
+
 /*
 
 /** Responsive sizes **/

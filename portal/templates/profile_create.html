@@ -30,6 +30,14 @@
         </div>
     </div>
 
+    {% if consent_agreements %}
+        <div id="_consentContainer">
+          {% for org in consent_agreements %}
+            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].agreement_url}}" />
+          {% endfor %}
+        </div>
+    {% endif %}
+
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
 
@@ -50,6 +58,25 @@ $(document).ready(function(){
     var hasError = false;
     var errorMessage = '';
 
+
+    //TODO
+    //for each org send off ajax to set consent
+    function setConsents(userId) {
+        var orgs = {};
+        $("#createProfileForm input[name='organization']").each(function() {
+            if ($(this).prop("checked")) {
+                var parentOrg = $(this).attr("data-parent-id");
+                if (!orgs[parentOrg]) {
+                    orgs[parentOrg] = true;
+                    console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
+                    //send off ajax for this
+                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}));
+                };
+            };
+        });
+    };
+
+
     function getOrgs(type) {
         var orgArray = {};
         switch(type) {
@@ -66,9 +93,6 @@ $(document).ready(function(){
         };
         return orgArray;
     };
-
-   // console.log(getOrgs('demo'));
-   // console.log(getOrgs('account'));
 
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
@@ -139,9 +163,10 @@ $(document).ready(function(){
                     .then(function(results) {
                         // Both promises resolved
                         //console.log('promises resolved');
+                        setConsents(_userId);
                         $('#confirmMsg').fadeIn();
-                        setTimeout("$('#confirmMsg').fadeOut();", 1000);
-                        setTimeout("_redirect(" + _userId + ");", 1100);
+                        setTimeout("$('#confirmMsg').fadeOut();", 800);
+                        setTimeout("_redirect(" + _userId + ");", 1000);
                         //$('#createProfileForm')[0].reset();
                         clear();
                     })
