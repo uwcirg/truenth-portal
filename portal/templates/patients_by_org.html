@@ -14,7 +14,7 @@
     <ul>
         {% set orgCountLink = 1 %}
         {% for id, name in org_list | dictsort %}
-        <li><a href="#location{{orgCountLink}}">{{ name }}</a></li>
+        <li><a href="#location{{name | replace(" ", "_")}}">{{ name }}</a></li>
         {% set orgCountLink = orgCountLink + 1 %}
         {% endfor %}
     </ul>
@@ -27,7 +27,7 @@
 {% set orgCount = 1 %}
 {% for org in patients_by_org.keys() %}
 <div class="admin-table table-responsive smaller-text">
-    <h4 id="location{{orgCount}}">{{ org }} Patients</h4>
+    <h4 id="location{{org | replace(" ", "_")}}">{{ org }} Patients</h4>
 
 {% if config.PROVIDER_BULK_DATA_ACCESS %}
 
