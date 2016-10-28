@@ -425,8 +425,9 @@ a.btn {
   margin-bottom: 0.5em;
 }
 #fillOrgs legend {
-  font-size: 1em;
+  font-size: 0.90em;
   color: #595F57;
+  margin: 4px 0 4px 0;
 }
 #fillOrgs,
 .noOrg-container {
