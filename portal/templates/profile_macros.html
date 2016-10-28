@@ -662,6 +662,18 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-item-container">
+                    <h4 class="profile-item-title">Clinical Data</h4>
+                    <div class="flex">
+                        <div>
+                            {{profileProcedures(person)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
@@ -681,6 +693,68 @@
             </div>
         </div>
     {% endif %}
+{%- endmacro %}
+
+{% macro profileProcedures() -%}
+<script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
+<p>Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
+    date, please make your best guess.<span class="text-muted smaller-text"></span></p>
+
+<div style="margin: 1em 0">
+    <p>Your treatments:</p>
+    <div id="userProcedures"></div>
+
+</div>
+<p>Add a treatment:</p>
+<form class="form-inline event-element" style='margin-left: 1em'>
+    <div class='form-group' style="margin: 0.5em 0.5em 0 0">
+        <select class='form-control' id='tnthproc'>
+            <option value=''>Select treatment...</option>
+            <option value='373818007'>Started watchful waiting</option>
+            <option value='424313000'>Started active surveillance</option>
+            <option value='26294005'>Radical prostatectomy (nerve-sparing)</option>
+            <option value='26294005-nns'>Radical prostatectomy (non-nerve-sparing)</option>
+            <option value='33195004'>External beam radiation therapy</option>
+            <option value='228748004'>Brachytherapy</option>
+            <option value='707266006'>Androgen deprivation therapy</option>
+            <option value='999999999'>None of the above</option>
+        </select>
+    </div>
+    <div class='form-group' style="margin: 0.5em 0.5em 0 0">
+        <label>Date:</label>
+        <div class="input-group date">
+            <input class='event-value form-control' type='text' placeholder='MM/DD/YYYY' maxlength='10' id='tnthproc-date' name='tnthproc-date'/>
+            <span class="input-group-addon">
+                <i class="fa fa-calendar"></i>
+            </span>
+        </div>
+
+    </div>
+    <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' disabled>
+        <i class='fa fa-plus'></i> Add Procedure
+    </button>
+</form>
+<br /><br />
+<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;
+<div class="btn btn-default continue-btn">Skip This <i class="fa fa-chevron-right"></i></div>
+
+<script>
+    var subjectId = {{ person.id }};
+
+$(document).ready(function(){
+
+    tnthAjax.getProc({{ person.id }}, false);
+/**
+    // Class for both "done" and "skip" buttons
+    $(".continue-btn").on("click", function(event){
+        event.preventDefault();
+        window.location.replace("{{ return_address | safe }}");
+    });
+*/
+});
+
+</script>
+
 {%- endmacro %}
 
 {% macro profileSaveBtn() -%}
