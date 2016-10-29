@@ -194,13 +194,15 @@ def challenge_identity():
     if not user:
         abort(400, "missing invited user in identity challenge")
 
+    errorMessage = ""
     form = ChallengeIdForm(request.form)
     if not form.validate_on_submit():
-        return render_template('challenge_identity.html', form=form)
+        return render_template('challenge_identity.html', form=form, errorMessage=None)
 
     first_name = form.first_name.data
     last_name = form.last_name.data
     birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y');
+
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
@@ -219,14 +221,15 @@ def challenge_identity():
                         "(first_name={}, last_name={}, birthdate={})".\
                         format(first_name, last_name, birthdate),
                         user_id=user.id)
-
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
+        if form.retry_count.data >= 1:
+             errorMessage = "Unable to match identity"
         if form.retry_count.data > 3:
             del session['invited_user_id']
             abort(404, "User Not Found")
 
-        return render_template('challenge_identity.html', form=form)
+        return render_template('challenge_identity.html', form=form, errorMessage=errorMessage)
 
 
 @portal.route('/initial-queries', methods=['GET','POST'])

@@ -2,6 +2,13 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
 
+    <style>
+        .label {color: #777; font-size: 0.9em; margin-left: -8px; position: relative; top:-3px;}
+        .field {margin-top: 1.2em;}
+        .hr {margin-top: -8px;}
+        .text-muted { color: #9e9c9c;}
+        .error-message { margin-left: 0; display: none;}
+    </style>
     <h4 class="tnth-headline">Identity Verification</h4>
 
     <hr/>
@@ -10,27 +17,79 @@
 
     <p class="profile-item-title">To ensure your personal details are not shared with others, please enter the following data for account confirmation.</p>
 
-    <form  action="/challenge" method="post">
+    <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate">
 
          {{ form.hidden_tag() }}
+
+         <input type="hidden" id="birthdate" name="birthdate" value="{{form.birthdate.data if form.birthdate.data}}" />
+
         <div id="identityVerificationContainer">
+             <p class="text-muted">Name</p>
+             <hr class="hr"/>
             <div class="row">
-                <div class="col-md-6 col-xs-12">
-                {{ render_field(form.first_name, tabindex=10) }}
+                <div class="col-md-5 col-xs-10">
+                    <div class="form-group float-input-label">
+                        <input required="required" data-error="First name is required" class="form-control float-text" id="first_name" name="first_name" placeholder="First Name" value="{{form.first_name.data if form.first_name.data}}" type="text">
+                        <div class="help-block with-errors"></div>
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6 col-xs-12">
-                {{ render_field(form.last_name, tabindex=20) }}
+                <div class="col-md-5 col-xs-10">
+                    <div class="form-group float-input-label">
+                        <input required="required" data-error="Last name is required" class="form-control float-text" id="last_name" name="last_name" placeholder="Last Name" value="{{form.last_name.data if form.last_name.data}}" type="text">
+                        <div class="help-block with-errors"></div>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-6 col-xs-12">
-                     {{ render_field(form.birthdate, tabindex=30) }}
+            <br/>
+            <p class="text-muted">Birth Date</p>
+            <hr class="hr"/>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-5 col-xs-10">
+                         <label class="label">Day</label>
+                        <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="\d{2}">
+                    </div>
+                </div>
+                <div class="row field">
+                    <div class="col-md-5 col-xs-10">
+                        <label class="label">Month</label>
+                        <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required="">
+                            <option value="">Month...</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row field">
+                    <div class="col-md-5 col-xs-10">
+                        <label class="label">Year</label>
+                        <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
+                    </div>
+                </div>
+                <div class="row field">
+                     <div class="col-md-5 col-xs-10">
+                        <div class="help-block with-errors"></div>
+                     </div>
                 </div>
             </div>
+            <hr/>
+            <button type="submit" class="btn btn-tnth-primary">Confirm Identity</button>
+            <br/><br/>
+            <div class="error-message text-muted bg-danger" {%if errorMessage %} style="display:block"{% endif%}>{{errorMessage}}</div>
         </div>
-        &nbsp;&nbsp;<button type="submit" class="btn btn-tnth-primary">Confirm Identity</button>
+
     </form>
 
 {% endblock %}
@@ -38,39 +97,24 @@
 {% block document_ready %}
 $(document).ready(function() {
 
-    var now = new Date();
-    //50 years ago
-    var _defaultDate = new Date(now.getFullYear()-50,now.getMonth(),now.getDate());
+    var fmBirthDate = "{{form.birthdate.data if form.birthdate.data}}";
+    if (fmBirthDate) {
+        var arrDate = String(fmBirthDate).split("-");
+        $("#month").val(arrDate[0]);
+        $("#date").val(arrDate[1]);
+        $("#year").val(arrDate[2]);
+    };
 
-    //html5 native date input field is only recognized in Chrome/Opera, and not others so use bootstrap datepicker object instead
-    $("#identityVerificationContainer").find("#birthdate").prop("type", "text").attr("placeholder", "mm-dd-yyyy").attr("pattern", "(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))-(?:19|20)[0-9]{2}");
-    $("#birthdate")
-    .datepicker({format: "mm-dd-yyyy", autoclose: true, defaultViewDate: {year:_defaultDate.getFullYear(), month:_defaultDate.getMonth(), day:_defaultDate.getDate()}, forceParse: false, startDate: "01-01-1920"})
-    .on('changeDate', function (ev) {
-        $(this).datepicker("hide");
-    })
-    .on('clearDate', function(ev) {
-        $(this).datepicker("show");
+    $('#challengeForm').validator().on('submit', function (e) {
+          if (!e.isDefaultPrevented()) {
+
+                if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
+                    $("#birthdate").val($("#month").val() + "-" + $("#date").val() + "-" + $("#year").val());
+                }
+
+          };
     });
 
-    $("#birthdate").datepicker("setDate", _defaultDate);
-    $("#birthdate").datepicker("update");
-    $("#birthdate").val("");
-
-    $("#birthdate").on("keydown", function(ev) {
-        if (ev.keyCode === 8 || ev.keyCode === 46 || ev.keyCode === 37 || ev.keyCode === 39) return; //backspace or delete or right or left arrow key
-        var match0 = /^\d{3}$/;
-        var match         = /^\d{2}[-]?\d{2}[-]?\d{1,4}$/;  //11-111
-        var d = $(this).val();
-        //if (match1.test(d)) d = d.slice(0, 2) + "-" + d.slice(2);
-        if (match0.test(d)) {
-            d = d.slice(0, 2) + "-" + d.slice(2);
-        } else if (match.test(d)) {
-            d = d.replace(/-/g, "");
-            d = d.slice(0, 2) + "-" + d.slice(2,4) + "-" + d.slice(4);
-        }
-        $(this).val(d);
-    });
 
 });
 {% endblock %}

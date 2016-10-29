@@ -25,16 +25,15 @@
 <hr />
 
 {% set orgCount = 1 %}
-{% for org in patients_by_org.keys() %}
+{% for id, name in org_list | dictsort %}
 <div class="admin-table table-responsive smaller-text">
-    <h4 id="location{{org | replace(" ", "_")}}">{{ org }} Patients</h4>
+    <h4 id="location{{name | replace(" ", "_")}}">{{ name }} Patients</h4>
+    {% if config.PROVIDER_BULK_DATA_ACCESS %}
 
-{% if config.PROVIDER_BULK_DATA_ACCESS %}
+        <a href="javascript:void(0)" id="patientDataDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient list for this clinic</a>
+        <a href="javascript:void(0)" id="patientAssessmentDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient assessment data for this clinic</a>
 
-    <a href="javascript:void(0)" id="patientDataDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient list for this clinic</a>        
-    <a href="javascript:void(0)" id="patientAssessmentDownload{{ orgCount }}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient assessment data for this clinic</a>        
-
-{% endif %}
+    {% endif %}
 
     <div id="adminTableToolbar{{ orgCount }}" class="admin-toolbar"><span id="tableCount{{orgCount}}"></span></div>
     <table id="adminTable{{orgCount}}"
@@ -50,7 +49,9 @@
            data-page-list="[25,50,100,ALL]"
            data-toolbar="#adminTableToolbar{{orgCount}}"
            data-show-toggle="true"
-           data-show-columns="true">
+           data-show-columns="true"
+           data-smart-display="true"
+           >
         <thead>
             <tr>
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">ID</th>
@@ -62,7 +63,7 @@
             </tr>
         </thead>
         <tbody data-link="row" class="rowlink">
-        {% for user in patients_by_org[org] %}
+        {% for user in patients_by_org[name] %}
             <tr>
                 <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.id }}</a></td>
                 <td>{{ user.username }}</td>
@@ -75,7 +76,7 @@
         </tbody>
     </table>
 </div>
-{% if orgCount < patients_by_org.keys()|length %}
+{% if orgCount < org_list.keys()|length %}
 <hr />
 {% endif %}
 {% set orgCount = orgCount + 1 %}
