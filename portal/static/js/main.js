@@ -220,12 +220,16 @@ var fillContent = {
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(performedDateTime);
+            var deleteInvocation = '';
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
-            if (creator == subjectId) creator = "you";
+            if (creator == subjectId) {
+                creator = "you";
+                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
+            }
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dtEdited + ")</i>" + "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a></li>";
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dtEdited + ")</i>" + deleteInvocation + "</li>";
             if (procID > highestId) {
                 highestId = procID;
             }
