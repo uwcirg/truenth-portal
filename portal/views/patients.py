@@ -29,6 +29,7 @@ def patients_root():
     user = current_user()
     patients_by_org = {}
     org_list = {}
+    all_top_level_ids = []
     now = datetime.utcnow()
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count
@@ -45,10 +46,15 @@ def patients_root():
         patients_by_org[org.name] = [user for user in org.users if
                                      user.has_role(ROLE.PATIENT) and
                                      user.id in consented_users]
+        #for rendering ordered org list
         org_list[org.id] = org.name
 
+        #collect this to see which org is the top level org
+        if org.id == top_level_id:
+            all_top_level_ids.append(org.id)
+
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org, org_list = org_list,
+        'patients_by_org.html', patients_by_org=patients_by_org, org_list = org_list, all_top_level_ids = all_top_level_ids,
         user=current_user(), wide_container="true")
 
 @patients.route('/profile_create')

@@ -11,10 +11,14 @@
 {% if patients_by_org|length > 1 %}
 <div class="small orgLinks">
     <p>Skip to:</p>
-    <ul>
+    <ul style="list-style-type: none">
         {% set orgCountLink = 1 %}
         {% for id, name in org_list | dictsort %}
-        <li><a href="#location{{name | replace(" ", "_")}}">{{ name }}</a></li>
+            {% if id not in all_top_level_ids %}
+              <ul style="list-style-type: disc"><li><a href="#location{{name | replace(" ", "_")}}">{{ name }}</a></li></ul>
+            {% else %}
+              <li><a href="#location{{name | replace(" ", "_")}}">{{ name }}</a></li>
+            {% endif %}
         {% set orgCountLink = orgCountLink + 1 %}
         {% endfor %}
     </ul>
