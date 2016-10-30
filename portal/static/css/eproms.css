@@ -895,10 +895,8 @@ color: #777
 }
 
 #identityVerificationContainer {
-  padding: 2em 0.5em;
+  padding: 2em 1.5em;
   margin: 1em auto;
-  /*border: 1px solid #E0E6E3;
-  border-radius: 4px;*/
 }
 
 #identityVerificationContainer input {
@@ -916,11 +914,6 @@ color: #777
 box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
 }
 
-#eventListtnthproc a.confirm-delete {
-  font-size: 0.90em;
-  margin-left: 0.5em;
-  padding: 0.38em;
-}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {

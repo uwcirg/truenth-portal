@@ -28,9 +28,13 @@ def patients_root():
     """
     user = current_user()
     patients_by_org = {}
-    org_list = {}
-    all_top_level_ids = []
+    org_list_by_parent = {}
     now = datetime.utcnow()
+    orgObj = {}
+
+    for org_id in OrgTree().all_top_level_ids():
+        org_list_by_parent[org_id] = []
+
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count
             continue
@@ -43,19 +47,18 @@ def patients_root():
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
 
-        patients_by_org[org.name] = [user for user in org.users if
-                                     user.has_role(ROLE.PATIENT) and
-                                     user.id in consented_users]
-        #for rendering ordered org list
-        org_list[org.id] = org.name
-
-        #collect this to see which org is the top level org
-        if org.id == top_level_id:
-            all_top_level_ids.append(org.id)
-
+        #patients_by_org[org.name] = [user for user in org.users if
+                                     #user.has_role(ROLE.PATIENT) and
+                                     #user.id in consented_users]
+        orgObj = org
+        orgObj.users = [user for user in org.users if
+                        user.has_role(ROLE.PATIENT) and
+                        user.id in consented_users]
+        #store patients by org into top level org list
+        org_list_by_parent[top_level_id].append(orgObj)
     return render_template(
-        'patients_by_org.html', patients_by_org=patients_by_org, org_list = org_list, all_top_level_ids = all_top_level_ids,
-        user=current_user(), wide_container="true")
+        'patients_by_org.html', org_list_by_parent = org_list_by_parent, wide_container="true")
+
 
 @patients.route('/profile_create')
 @oauth.require_oauth()

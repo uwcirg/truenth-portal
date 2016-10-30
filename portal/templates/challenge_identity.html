@@ -6,7 +6,7 @@
         .label {color: #777; font-size: 0.9em; margin-left: -8px; position: relative; top:-3px;}
         .field {margin-top: 1.2em;}
         .hr {margin-top: -8px;}
-        .text-muted { color: #808080;}
+        .title { color: #6b7571;}
         .error-message { margin-left: 0; display: none;}
     </style>
     <h4 class="tnth-headline">Identity Verification</h4>
@@ -24,7 +24,7 @@
          <input type="hidden" id="birthdate" name="birthdate" value="{{form.birthdate.data if form.birthdate.data}}" />
 
         <div id="identityVerificationContainer">
-             <p class="text-muted">Name</p>
+             <p class="title">Name</p>
              <hr class="hr"/>
             <div class="row">
                 <div class="col-md-5 col-xs-10">
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <br/>
-            <p class="text-muted">Birth Date</p>
+            <p class="title">Birth Date</p>
             <hr class="hr"/>
             <div class="form-group">
                 <div class="row">
