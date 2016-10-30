@@ -223,9 +223,12 @@ var fillContent = {
             var deleteInvocation = '';
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
-            if (creator == subjectId) {
+            if (creator == currentUserId) {
                 creator = "you";
                 deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
+            }
+            else if (creator == subjectId) {
+                creator = "this patient";
             }
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
