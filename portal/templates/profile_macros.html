@@ -288,6 +288,7 @@
     {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <h4 class="profile-item-title">Audit Log</h4>
+        <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
         </table>
         <script>
@@ -330,6 +331,11 @@
                         pageList: [5, 10, 25, 50, 100],
                         classes: 'table table-responsive profile-audit-log',
                         sortName: 'lastUpdated',
+                        search: true,
+                        smartDisplay: true,
+                        showToggle: true,
+                        showColumns: true,
+                        toolbar: "#auditTableToolBar",
                         rowStyle: function rowStyle(row, index) {
                               return {
                                 css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
@@ -341,15 +347,18 @@
                                 field: 'by',
                                 title: 'Reference',
                                 width: '15%',
-                                sortable: true
+                                sortable: true,
+                                searchable: true
                             }, {
                                 field: 'comment',
                                 title: 'Comment',
+                                searchable: true,
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
                                 title: 'Last Updated <small>( GMT Time Zone )</small>',
                                 sortable: true,
+                                searchable: true,
                                 sorter: function(a, b) {
                                     return new Date(b).getTime() - new Date(a).getTime();
                                 },
