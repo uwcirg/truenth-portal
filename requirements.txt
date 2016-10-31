@@ -18,7 +18,7 @@ docutils==0.12
 Flask==0.11.1
 Flask-Babel==0.11.1
 Flask-Celery-Helper==1.1.0
-Flask-Login==0.3.2
+Flask-Login==0.4.0
 Flask-Mail==0.9.1
 Flask-Migrate==2.0.0
 Flask-OAuthlib==0.9.3
