@@ -57,3 +57,18 @@ Pull Request
 To bring the feature into the main develop branch, head over to
 `github <https://github.com/uwcirg/true_nth_usa_portal>`_ and trigger
 a **pull request**.
+
+Rebase
+======
+
+Occasionally, it's desirable or even necessary to bring commits on another
+branch into your feature branch prior to publication.
+
+For example, to bring changes into your branch that have been pushed
+to `develop` since your feature branch was cut::
+
+
+    git checkout develop
+    git pull
+    git checkout feature/<my-feature-name>
+    git flow feature rebase
