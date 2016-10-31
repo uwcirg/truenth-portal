@@ -59,7 +59,7 @@ class TestClinical(TestCase):
                 clinical_data['entry'][0]['content']['meta']['lastUpdated'])
         found = found.replace(tzinfo=None)
         self.assertAlmostEquals(datetime.utcnow(), found,
-                                delta= timedelta(seconds=2))
+                                delta= timedelta(seconds=5))
         self.assertEquals(
             current_app.config.metadata.version,
             clinical_data['entry'][0]['content']['meta']['version'])
