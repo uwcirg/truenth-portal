@@ -27,10 +27,8 @@ def patients_root():
 
     """
     user = current_user()
-    patients_by_org = {}
     org_list_by_parent = {}
     now = datetime.utcnow()
-    orgObj = {}
 
     for org_id in OrgTree().all_top_level_ids():
         org_list_by_parent[org_id] = []
@@ -46,16 +44,12 @@ def patients_root():
             UserConsent.deleted_id == None,
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
-
-        #patients_by_org[org.name] = [user for user in org.users if
-                                     #user.has_role(ROLE.PATIENT) and
-                                     #user.id in consented_users]
-        orgObj = org
-        orgObj.users = [user for user in org.users if
+        org.users = [user for user in org.users if
                         user.has_role(ROLE.PATIENT) and
                         user.id in consented_users]
-        #store patients by org into top level org list
-        org_list_by_parent[top_level_id].append(orgObj)
+        #store patients by org into top level org list so we can list them by top-level org
+        #before we were sorting by org only
+        org_list_by_parent[top_level_id].append(org)
     return render_template(
         'patients_by_org.html', org_list_by_parent = org_list_by_parent, wide_container="true")
 
