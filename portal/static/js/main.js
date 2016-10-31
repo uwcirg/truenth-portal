@@ -901,16 +901,14 @@ var tnthDates = {
     /***
      * changeFormat - changes date format, particularly for submitting to server
      * @param currentDate - date to change
-     * @param reverse - use to switch from yyyy-mm-dd to mm/dd/yyyy
+     * @param reverse - use to switch from yyyy-mm-dd to dd/mm/yyyy
      * @param shorten - removes padding from zeroes (only in reverse)
      * @returns - a date as a string
      *
-     * If language is es_MX or en_AU then uses dd/mm/yyyy format
-     *
      * Examples:
-     * changeFormat("04/29/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
-     * changeFormat("2016-04-29",true) returns "04/29/2016"
-     * changeFormat("2016-04-29",true,true) returns "4/29/2016"
+     * changeFormat("29/04/2016") returns "2016-04-29T07:00:00", converts according to getTimezoneOffset
+     * changeFormat("2016-04-29",true) returns "29/04/2016"
+     * changeFormat("2016-04-29",true,true) returns "29/04/2016"
      ***/
     "changeFormat": function(currentDate,reverse,shorten) {
         if (currentDate == null || currentDate == "") {
@@ -924,11 +922,7 @@ var tnthDates = {
                 dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
                 dateFormatArray[2] = dateFormatArray[2].replace(/^0+/, '');
             }
-            if (userSetLang !== undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
-                convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
-            } else {
-                convertDate = dateFormatArray[1]+"/"+dateFormatArray[2]+"/"+yearToPass;
-            }
+            convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
         } else {
             dateFormatArray = currentDate.split("/");
             // If patient manuals enters two digit year, then add 19 or 20 to year.
@@ -945,11 +939,7 @@ var tnthDates = {
             } else {
                 yearToPass = dateFormatArray[2];
             }
-            if (userSetLang !== undefined && (userSetLang == 'es_MX' || userSetLang == 'en_AU')) {
-                convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
-            } else {
-                convertDate = yearToPass+"-"+dateFormatArray[0]+"-"+dateFormatArray[1]
-            }
+            convertDate = yearToPass+"-"+dateFormatArray[1]+"-"+dateFormatArray[0]
             // add T according to timezone
             var tzOffset = currentTime.getTimezoneOffset();//minutes
             tzOffset /= 60;//hours
@@ -959,7 +949,7 @@ var tnthDates = {
         return convertDate
     },
     /***
-     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a mm/dd/yyyy (optional time) format. Used with mPOWEr
+     * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
      * @param date - the date to be converted
      * @param noReplace - prevent replacing any spaces with "T" to get in proper javascript format. 2016-02-24 15:28:09-0800 becomes 2016-02-24T15:28:09-0800
      * @param padZero - if true, will add padded zero to month and date
@@ -967,7 +957,7 @@ var tnthDates = {
      * @param blankText - pass a value to display if date is null
      * @returns date as a string with optional time
      *
-     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "2/24/2016 3:28pm"
+     * parseDate("2016-02-24T15:28:09-0800",true,false,true) returns "24/2/2016 3:28pm"
      */
     "parseDate": function(date,noReplace,padZero,keepTime,blankText) {
         if(date == null) {
@@ -1010,9 +1000,9 @@ var tnthDates = {
                     hour = (a[3]-12);
                 }
             }
-            return month + "/" + day + "/" + toConvert.getFullYear()+" "+hour+":"+a[4]+amPm;
+            return day + "/" + month + "/" + toConvert.getFullYear()+" "+hour+":"+a[4]+amPm;
         } else {
-            return month + "/" + day + "/" + toConvert.getFullYear();
+            return day + "/" + month + "/" + toConvert.getFullYear();
         }
     },
     /***
@@ -1049,7 +1039,7 @@ var tnthDates = {
     /***
      * spellDate - spells out date in a format based on language/local. Currently not in use.
      * @param passDate - date to use. If empty, defaults to today.
-     * @param ymdFormat - false by default. false = mm/dd/yyyy. true = yyyy-mm-dd
+     * @param ymdFormat - false by default. false = dd/mm/yyyy. true = yyyy-mm-dd
      * @returns spelled out date, localized
      */
     "spellDate": function(passDate,ymdFormat) {
@@ -1060,9 +1050,9 @@ var tnthDates = {
                 todayDate = passDate.split("-");
                 todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
             } else {
-                // Otherwide mm/dd/yyyy
+                // Otherwide dd/mm/yyyy
                 todayDate = passDate.split("/");
-                todayDate = new Date(todayDate[2], todayDate[0] - 1, todayDate[1])
+                todayDate = new Date(todayDate[2], todayDate[1] - 1, todayDate[0])
             }
         }
         var returnDate;
@@ -1193,17 +1183,17 @@ function convertGMTToLocalTime(dateString, format) {
            };
 
            switch(format) {
-                case "mm/dd/yyyy":
-                    nd = month + "/" + day + "/" + year;
+                case "dd/mm/yyyy":
+                    nd = day + "/" + month + "/" + year;
                     break;
-                case "mm/dd/yyyy hh:mm:ss":
-                    nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
+                case "dd/mm/yyyy hh:mm:ss":
+                    nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
                     break;
-                case "mm-dd-yyyy":
-                    nd = month + "-" + day + "-" + year;
+                case "dd-mm-yyyy":
+                    nd = day + "-" + month + "-" + year;
                     break;
-                case "mm-dd-yyyy hh:mm:ss":
-                    nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
+                case "dd-mm-yyyy hh:mm:ss":
+                    nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
                     break;
                 default:
                     //yyyy-mm-dd hh:mm:ss;
