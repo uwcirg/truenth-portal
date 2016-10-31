@@ -39,7 +39,7 @@ def post_request(self, url, data, timeout=10, retries=3):
         if resp.status_code < 400:
             logger.info("{} received from {}".format(resp.status_code, url))
         else:
-            logger.error("{} received from {}".format(resp.status_cod, url))
+            logger.error("{} received from {}".format(resp.status_code, url))
 
     except RequestException as exc:
         """Typically raised on timeout or connection error
