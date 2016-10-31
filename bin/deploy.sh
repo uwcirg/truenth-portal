@@ -4,6 +4,7 @@ usage() {
     echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
     echo "Usage: $0 [-v] [-f] [-b <branch>] [-p <path>]" >&2
     echo -e "\nOptions: " >&2
+    echo -e "-s\n 'seed' the database" >&2
     echo -e "-v\n Be verbose" >&2
     echo -e "-f\n Force all conditional deployment processes" >&2
     echo -e "-i\n Run initial deployment procedure" >&2
@@ -35,7 +36,7 @@ activate_once(){
 
 repo_path=$( cd $(dirname $0) ; git rev-parse --show-toplevel )
 
-while getopts ":b:p:ivf" option; do
+while getopts ":b:p:ivsf" option; do
     case "${option}" in
         b)
             BRANCH=${OPTARG}
@@ -48,6 +49,9 @@ while getopts ":b:p:ivf" option; do
             ;;
         i)
             INIT=true
+            ;;
+        s)
+            SEED=true
             ;;
         f)
             FORCE=true
@@ -115,7 +119,7 @@ if [[
 fi
 
 # New seed data
-if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
+if [[ $FORCE || $SEED || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
 
     if [[ $INIT ]]; then
