@@ -999,16 +999,27 @@ z-index: 88;
 color: #777
 }
 
-.tooltip > .tooltip-inner {
+.tooltip > .tooltip-inner{
     background-color: #979a8d;
     border: 1px solid #979a8d;
     padding: 0.3em;
     width: 150%;
     font-size: 0.85em;
 }
+.tooltip.top .tooltip-arrow {
+    border-top-color: #979a8d;
+}
 
-.tooltip.top > .tooltip-arrow {
-    border-top: 5px solid #979a8d; ;
+.tooltip.right .tooltip-arrow {
+    border-right-color: #979a8d;
+}
+
+.tooltip.bottom .tooltip-arrow {
+    border-bottom-color: #979a8d;
+}
+
+.tooltip.left .tooltip-arrow {
+    border-left-color: #979a8d;
 }
 
 #consentContainer {
