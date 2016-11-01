@@ -58,8 +58,12 @@ $(document).ready(function(){
     var hasError = false;
     var errorMessage = '';
 
+    $("#userOrgs input[name='organization']").each(function() {
+        $(this).on("click", function() {
+            $("#userOrgs").find(".help-block").text("");
+        });
+    });
 
-    //TODO
     //for each org send off ajax to set consent
     function setConsents(userId) {
         var orgs = {};
@@ -102,6 +106,12 @@ $(document).ready(function(){
           } else {
 
                 hasError = false;
+
+                if ($("#userOrgs input:checkbox:checked").length == 0) {
+                    $("#userOrgs .help-block").text("You must select an organization").css("color", "#a94442");
+                } else $("#userOrgs .help-block").text("").css("color", "#777");
+
+
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 });

@@ -54,6 +54,11 @@
 <a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to {{text}}</small></a><br/>
 {%- endmacro %}
 
+{% macro back_link(url,text) -%}
+<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="back to {{text}}"></span></a></div>
+{%- endmacro %}
+
+
 {% macro left_nav(current_user) -%}
 <div class="col-sm-3 hidden-xs">
 

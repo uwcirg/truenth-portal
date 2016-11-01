@@ -1,22 +1,16 @@
 {% extends "layout.html" %}
 {% block main %}
-{% from "flask_user/_macros.html" import back_btn %}
+{% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 
 <!-- <div id="loadingIndicator" class="loading-indicator">
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
 </div> -->
+
 <br/>
-{% if providerPerspective == 'true' %}
-{{ back_btn('patients','Patients List') }}
-{% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
-{{ back_btn('admin','User List') }}
-{% else %}
-{{ back_btn(PORTAL,'Home') }}
-{% endif %}
-<hr>
+
 <div class="profile-header">
-   
+
     {% if providerPerspective == 'true' %}
         <h4 class="tnth-headline">Patient Profile</h4><h4 class="profile-item-title">#{{ user.id}} - {{ user.username }}</h4>
     {% elif current_user.has_role('admin') %}
@@ -24,16 +18,27 @@
     {% else %}
          <h4 class="tnth-headline">My TrueNTH Profile</h4>
     {% endif %}
-   
+
     {{profileImage(user)}}
 </div>
-<hr/>
 
+<div id="indexNavBar">
+{% if providerPerspective == 'true' %}
+{{ back_link('patients','Patients List') }}
+{% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+{{ back_link('admin','User List') }}
+{% else %}
+{{ back_link(PORTAL,'Home') }}
+{% endif %}
+<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="index list"></span>
+</div>
+<div id="indexContainer">Index List</div>
+<br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form">
 
 <div class="row" style="position: relative;">
     <div class="col-md-12">
-        {{profile(user, current_user)}}
+        {{profile(user, current_user, consent_agreements)}}
         <br/>
         {{profileSaveBtn()}}
         {% if providerPerspective == 'true' %}
@@ -51,7 +56,49 @@
 
 {% block document_ready %}
 
+function goTo(event, id) {
+    event.stopPropagation();
+    window.location = "#" + id;
+    $("#indexContainer").removeClass("open");
+};
+
+
 $(document).ready(function(){
+
+
+    $("#clinics input[name='organization']").each(function() {
+
+        var parentOrg = $(this).attr("data-parent-id");
+
+        if (parentOrg != "") {
+            if ($(this).is(":checked")) {
+               $("#" + parentOrg + "_consentItem").show();
+            };
+        };
+
+    });
+
+    if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
+
+    $("html").click(function(event){
+        $("#indexContainer").removeClass('open');
+    });
+
+    $("#indexNavBar span.index-list").click(function(event) {
+        event.stopPropagation();
+        $('#indexContainer').toggleClass('open');
+
+    });
+
+
+    var t = $("#profileForm").find("h4.profile-item-title");
+    var indexContent = "<ul style='padding:0; margin:0; list-style-type:square'>";
+        t.each(function() {
+        indexContent += "<li style='margin-bottom:4px; cursor:pointer' onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
+    });
+    indexContent += "</ul>";
+    $("#indexContainer").html(indexContent);
+
 
     // When there's a change, check validation and if good, assembleContent
     $('#profileForm').on('validated.bs.validator', function(e) {

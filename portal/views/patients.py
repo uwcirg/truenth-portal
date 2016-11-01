@@ -58,20 +58,7 @@ def patients_root():
 @oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
 def profile_create():
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-            org = Organization.query.get(org_id)
-            consent_url = app_text(ConsentATMA.name_key(organization=org))
-            response = requests.get(consent_url)
-            if response.json:
-                consent_agreements[org.id] = {
-                    'asset': response.json()['asset'],
-                    'agreement_url': ConsentATMA.permanent_url(
-                        version=response.json()['version'],
-                        generic_url=consent_url)}
-            else:
-                consent_agreements[org.id] = {
-                    'asset': response.text, 'agreement_url': consent_url}
+    consent_agreements = get_orgs_consent_agreements()
     user = current_user()
     return render_template("profile_create.html", user = user, consent_agreements=consent_agreements)
 
@@ -92,5 +79,25 @@ def patient_profile(patient_id):
     patient = get_user(patient_id)
     if not patient:
         abort(404, "Patient {} Not Found".format(patient_id))
+    consent_agreements = get_orgs_consent_agreements()
 
-    return render_template('profile.html', user=patient,  providerPerspective="true")
+    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements)
+
+
+def get_orgs_consent_agreements():
+    consent_agreements = {}
+    for org_id in OrgTree().all_top_level_ids():
+        org = Organization.query.get(org_id)
+        consent_url = app_text(ConsentATMA.name_key(organization=org))
+        response = requests.get(consent_url)
+        if response.json:
+            consent_agreements[org.id] = {
+                'organization_name': org.name,
+                'asset': response.json()['asset'],
+                'agreement_url': ConsentATMA.permanent_url(
+                    version=response.json()['version'],
+                    generic_url=consent_url)}
+        else:
+            consent_agreements[org.id] = {
+                'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
+    return consent_agreements
