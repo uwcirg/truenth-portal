@@ -651,7 +651,8 @@
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
+    <!-- viewable only by patient-->
+    {% if current_user.has_role('patient') and current_user.id == person.id %}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -662,12 +663,11 @@
 		</div>
     {%endif %}
 
-    {% if (person and person.has_role('patient')) or (current_user and (current_user.has_role('admin') or current_user.has_role('provider'))) %}
+    {% if person.id == current_user.id and person.has_role("patient") %}
         <div class="row">
             <div class="col-md-12">
                 <div class="profile-item-container">
                     <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
-                    {% if current_user.id != person.id %}<h4 class="text-muted">Questions asked of the patient at registration</h4>{% endif %}
                     <input type="hidden" id="iq_userId" value="{{person.id}}" />
                     <div class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
                         {{patientQGroup()}}
@@ -721,6 +721,7 @@
                  //wait for ajax calls to finish?
                  //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
                  setTimeout("checkDiagnosis();", 1000);
+
 
             });
         </script>
