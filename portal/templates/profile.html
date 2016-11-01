@@ -10,7 +10,6 @@
 <br/>
 
 <div class="profile-header">
-
     {% if providerPerspective == 'true' %}
         <h4 class="tnth-headline">Patient Profile</h4><h4 class="profile-item-title">#{{ user.id}} - {{ user.username }}</h4>
     {% elif current_user.has_role('admin') %}
