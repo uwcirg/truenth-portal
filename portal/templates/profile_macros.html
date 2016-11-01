@@ -646,13 +646,14 @@
             <div class="profile-item-container side">
                 <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
                 {{profileEmail(person)}}
-                {{profileSendEmail(person)}}
+                {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+                    {{profileSendEmail(person)}}
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- viewable only by patient-->
-    {% if current_user.has_role('patient') and current_user.id == person.id %}
+    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -727,8 +728,8 @@
         </script>
     {% endif %}
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
-         <div class="row">
+    {% if person.has_role('patient') %}
+        <div class="row">
                 <div class="col-md-12">
                     <div class="profile-item-container">
                         <h4 id="clinicalDataLoc" class="profile-item-title">Clinical Data</h4>
@@ -740,7 +741,7 @@
                     </div>
                 </div>
         </div>
-     {%endif%}
+    {% endif %}
 
     <div class="row">
         <div class="col-md-12">
@@ -750,6 +751,7 @@
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-md-12">
@@ -761,12 +763,14 @@
                         <br/>
                         {{profilePhone(person)}}
                     </div>
-                    <div>
-                         {{profileEthnicity(person)}}
-                    </div>
-                    <div>
-                        {{profileRace(person)}}
-                    </div>
+                    {%if person.has_role('patient')%}
+                        <div>
+                            {{profileEthnicity(person)}}
+                        </div>
+                        <div>
+                            {{profileRace(person)}}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
