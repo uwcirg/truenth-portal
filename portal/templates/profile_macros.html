@@ -1,3 +1,5 @@
+{% from "initial_queries_macros.html" import patientQGroup %}
+
 {% macro profileImage(person) -%}
     {% if person.image_url %}
         <div class="profile-img hidden-xs">
@@ -12,9 +14,6 @@
     <div class="form-group profile-section" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
-            <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-            </div>
             <div class="col-md-4 col-xs-12">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                     <option value="">Month...</option>
@@ -31,6 +30,10 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
+
+            </div>
+            <div class="col-md-4 col-xs-6">
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
 
             </div>
             <div class="col-md-4 col-xs-6">
@@ -180,7 +183,7 @@
 
 
 {% macro profileSendEmail(person) -%}
-    {% if (person and person.email and person.has_role('patient')) %}
+    {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
             <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
                 <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -273,21 +276,57 @@
 {%- endmacro %}
 
 <!--this has an ajax call to fill in the content-->
-{% macro profileOrg(person, removeNone) -%}
+{% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div class="form-group profile-section" id="userOrgs">
         <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
         <div class="indent">
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
+        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+        <div class="help-block with-errors"></div>
     </div>
-    <script>$(function () { tnthAjax.getOrgs({{ person.id if person }}, true); });</script>
+    <script>$(function () {
+                 {% if consent_agreements and person.has_role('patient') %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
+                tnthAjax.getOrgs({{ person.id if person }}, true);
+
+            });</script>
+{%- endmacro %}
+
+{% macro consent(person, consent_agreements, current_user) -%}
+    {% if consent_agreements %}
+        <div id="consentContainer">
+            {% for org in consent_agreements %}
+              <div id="{{org}}_consentItem" class="consent">
+                <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
+                <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"  {% if current_user.id != person.id%} disabled {% endif %}/><label id="{{org}}_consent_label" labelfor="#{{org}}_consent">Sharing data with {{consent_agreements[org].organization_name}}?</label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
+                <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Consent Agreement</h4>
+                          </div>
+                          <div class="modal-body">
+                            <br/>
+                             {{consent_agreements[org].asset|safe}}
+                            <br/>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileAuditLog(person, current_user) -%}
     {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
-        <h4 class="profile-item-title">Audit Log</h4>
         <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
         </table>
@@ -316,6 +355,12 @@
                     data["audits"].forEach(function(item) {
                         item["by"] = item["by"]["reference"];
                         //item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
+                        var r = /\d+/g;
+                        var m = r.exec(String(item["by"]));
+                        if (m) item["by"] = m[0]
+                        else item["by"] = "-";
+                        //console.log(r.exec(String(item["by"])));
+
                         item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
@@ -345,8 +390,8 @@
                         columns: [
                             {
                                 field: 'by',
-                                title: 'Reference',
-                                width: '15%',
+                                title: 'User',
+                                width: '10%',
                                 sortable: true,
                                 searchable: true
                             }, {
@@ -356,7 +401,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Last Updated <small>( GMT Time Zone )</small>',
+                                title: 'Date/Time (GMT)',
                                 sortable: true,
                                 searchable: true,
                                 sorter: function(a, b) {
@@ -387,7 +432,7 @@
 
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
-        <h4 class="profile-item-title">User Roles for {{ person.username }}</h4>
+        <h4 class="text-muted">for {{ person.username }}</h4>
         <p class="small-text text-muted">Editable by admins only.</p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
@@ -437,33 +482,31 @@
                 </label>
             </div>
         </div>
+    {% endif %}
+    <script>$(function () {
 
-        <script>$(function () {
+    tnthAjax.getRoles({{ person.id }}, true);
+    $("#rolesGroup input[name='user_type']").each(function() {
+        $(this).on("click", function() {
+            var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                    return { name: $(this).val() };
+                }).get();
+                var toSend = {"roles": roles};
+                //console.log('update role: ' + toSend);
+                tnthAjax.putRoles({{person.id}},toSend);
 
-        tnthAjax.getRoles({{ person.id }}, true);
-        $("#rolesGroup input[name='user_type']").each(function() {
-            $(this).on("click", function() {
-                var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-                        return { name: $(this).val() };
-                    }).get();
-                    var toSend = {"roles": roles};
-                    //console.log('update role: ' + toSend);
-                    tnthAjax.putRoles({{person.id}},toSend);
+             });
 
-                 });
-
-            });
         });
-        </script>
-     {% endif %}
+    });
+    </script>
 
 {%- endmacro %}
 
-{% macro profileSessionList(person) -%}
+{% macro profileSessionList(person, current_user) -%}
 
-    {% if person and person.has_role('patient') %}
+    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
 		<!--hard coded for now -->
-        <h4 class="profile-item-title">PRO Assessments</h4>
 		<div class="form-group profile-section" id="userSessionsListContainer">
 
 			<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
@@ -543,10 +586,6 @@
         </div>
         <script>
 
-        function _isTouchDevice(){
-            return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
-        };
-
         $(function () {
 
             if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
@@ -593,100 +632,150 @@
 
 {%- endmacro %}
 
-{% macro profileInterventionReports(person) -%}
-    {% if person.provider_html() %}
-       <div>{{person.provider_html()|safe}}</div>
-    {% endif %}
-{%- endmacro %}
-
-{% macro profile(person, current_user) -%}
+{% macro profile(person, current_user, consent_agreements) -%}
     <div class="row" style="position: relative;">
         <div class="col-md-6">
             <div class="profile-item-container side">
-                <h4 class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
                 {{profileName(person)}}
                 {{profileBirthDate(person)}}
+
             </div>
         </div>
         <div class="col-md-6">
             <div class="profile-item-container side">
-                <h4 class="profile-item-title">Communications</h4>
-                {% if person.has_role('patient') %}
-                    {{profileEmail(person)}}
-                    {{profileSendEmail(person)}}
-                {% else %}
-                    {{profileEmail(person)}}
-                    {{profilePhone(person)}}
-                {% endif %}
+                <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
+                {{profileEmail(person)}}
+                {{profileSendEmail(person)}}
             </div>
         </div>
     </div>
-    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
+
+    <!-- viewable only by patient-->
+    {% if current_user.has_role('patient') and current_user.id == person.id %}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
-					{{profileSessionList(person)}}
+                     <h4 id="proAssessmentsLoc" class="profile-item-title">PRO Assessments</h4>
+					{{profileSessionList(person, current_user)}}
 				</div>
 			</div>
 		</div>
     {%endif %}
-    {% if person and person.has_role('patient') and person.provider_html() and current_user.has_role('provider') %}
+
+    {% if person.id == current_user.id and person.has_role("patient") %}
         <div class="row">
             <div class="col-md-12">
-                 <div class="profile-item-container">
-                    <h4 class="profile-item-title">Intervention Reports</h4>
-                    {{profileInterventionReports(person)}}
-                 </div>
+                <div class="profile-item-container">
+                    <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
+                    <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                    <div class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                        {{patientQGroup()}}
+                    </div>
+                </div>
             </div>
         </div>
-    {%endif%}
+        <script>
+            function checkDiagnosis() {
+                var diag = $("#pca_diag_yes");
+
+                if (diag.is(":checked")) {
+                  diag.parents(".pat-q").nextAll().fadeIn();
+                } else {
+                  diag.parents(".pat-q").nextAll().fadeOut();
+                };
+            };
+            $(function () {
+                //$("#patientQ").show();
+                $("#patientQ hr").hide();
+                {% if person and current_user and person.id != current_user.id %} 
+                    $("#patientQ input[type='radio']").each(function() {
+                        $(this).attr("disabled", "disabled");
+                    });
+                {% endif %}
+
+                {% if person %}
+                    $(".pat-q input:radio").on("click",function(){
+                          var thisItem = $(this);
+                          var toCall = thisItem.attr("name")
+                          // Get value from div - either true or false
+                          var toSend = thisItem.val();
+                          tnthAjax.putClinical({{person.id}},toCall,toSend);
+                          if (toSend == "true" || toCall ==  "pca_localized") {
+                            thisItem.parents(".pat-q").nextAll().fadeIn();
+                            
+                          } else {
+                            if (toCall == "biopsy") {
+                              tnthAjax.putClinical({{person.id}},"pca_diag","false");
+                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                              tnthAjax.putClinical({{person.id}},"tx","false");
+                            } else if (toCall == "pca_diag") {
+                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                              tnthAjax.putClinical({{person.id}},"tx","false");
+                            }
+                            thisItem.parents(".pat-q").nextAll().fadeOut();
+                          };
+                      });
+                 {% endif %}
+
+                 //wait for ajax calls to finish?
+                 //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+                 setTimeout("checkDiagnosis();", 1000);
+
+
+            });
+        </script>
+    {% endif %}
+
+    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
+         <div class="row">
+                <div class="col-md-12">
+                    <div class="profile-item-container">
+                        <h4 id="clinicalDataLoc" class="profile-item-title">Clinical Data</h4>
+                        <div class="flex">
+                            <div>
+                                {{profileProcedures(person, current_user)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+     {%endif%}
+
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
-                <h4 class="profile-item-title">Organization Affiliation / Clinics</h4>
-                {{profileOrg(person)}}
+                <h4 id="orgsLoc" class="profile-item-title">Organization Affiliation / Clinics</h4>
+                {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
         </div>
     </div>
-    <!-- show demographic information for patient only -->
-    {% if person and person.has_role('patient') %}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="profile-item-container">
-                    <h4 class="profile-item-title">Patient Detail</h4>
-                    <div class="flex">
-                        <div>
-                            {{profileGender(person)}}
-                            <br/>
-                            {{profilePhone(person)}}
-                        </div>
-                        <div>
-                             {{profileEthnicity(person)}}
-                        </div>
-                        <div>
-                            {{profileRace(person)}}
-                        </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 id="patientDetailLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
+                <div class="flex">
+                    <div>
+                        {{profileGender(person)}}
+                        <br/>
+                        {{profilePhone(person)}}
+                    </div>
+                    <div>
+                         {{profileEthnicity(person)}}
+                    </div>
+                    <div>
+                        {{profileRace(person)}}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="profile-item-container">
-                    <h4 class="profile-item-title">Clinical Data</h4>
-                    <div class="flex">
-                        <div>
-                            {{profileProcedures(person, current_user)}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
+    </div>
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
             <div class="col-md-12">
                 <div class="profile-item-container">
+                     <h4 id="rolesLoc" class="profile-item-title">User Roles</h4>
                     {{profileRole(person, current_user)}}
                 </div>
             </div>
@@ -696,6 +785,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="profile-item-container">
+                    <h4 id="auditLogLoc" class="profile-item-title">Audit Log</h4>
                     {{profileAuditLog(person, current_user)}}
                 </div>
             </div>
@@ -717,8 +807,8 @@
 
     </div>
     <p class="text-muted">Add a treatment:</p>
-    <form class="form-inline event-element" style='margin-left: 1em'>
-        <div class='form-group' style="margin: 0 0.5em 0 0">
+    <form class="form-inline event-element" style='margin-left: 1em; display: flex'>
+        <div class='form-group'>
             <select class='form-control' id='tnthproc'>
                 <option value=''>Select treatment...</option>
                 <option value='373818007'>Started watchful waiting</option>
@@ -731,7 +821,7 @@
                 <option value='999999999'>None of the above</option>
             </select>
         </div>
-        <div class='form-group' style="margin: 0.5em 0.5em 0 0">
+        <div class='form-group'>
             <label>Date:</label>
             <div class="input-group date">
                 <input class='event-value form-control' type='text' placeholder='MM/DD/YYYY' maxlength='10' id='tnthproc-date' name='tnthproc-date'/>
@@ -765,6 +855,9 @@ $(document).ready(function(){
 </script>
 
 {%- endmacro %}
+
+
+
 
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>

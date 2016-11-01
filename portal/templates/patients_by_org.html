@@ -32,14 +32,20 @@
   {% for org in org_list_by_parent[parent_id] %}
       <div class="admin-table table-responsive smaller-text">
           <h4 id="location{{org.id}}">{{ org.name }} Patients</h4>
-          {% if config.PROVIDER_BULK_DATA_ACCESS %}
 
-              <a href="javascript:void(0)" id="patientDataDownload{{org.id}}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient list for this clinic</a>
-              <a href="javascript:void(0)" id="patientAssessmentDownload{{org.id}}" class="btn btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">Download patient assessment data for this clinic</a>
+          <div id="adminTableToolbar{{org.id}}" class="admin-toolbar">
+          {% if config.PROVIDER_BULK_DATA_ACCESS %}
+            <div class="orglist-download-container">
+                <div>
+                <a href="javascript:void(0)" id="patientDataDownload{{org.id}}" class="btn btn-default" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;Download patient list</a>
+                </div>
+                <div>
+                <a href="javascript:void(0)" id="patientAssessmentDownload{{org.id}}" class="btn btn-default" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;Download patient assessment data</a>
+                </div>
+            </div>
 
           {% endif %}
-
-          <div id="adminTableToolbar{{org.id}}" class="admin-toolbar"><span id="tableCount{{org.id}}"></span></div>
+          <span id="tableCount{{org.id}}"></span></div>
           <table id="adminTable{{org.id}}"
                  data-table-id="adminTable{{org.id}}"
                  class="tnth-admin-table"

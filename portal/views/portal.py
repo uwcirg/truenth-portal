@@ -364,7 +364,22 @@ def profile(user_id):
     if user_id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
-    return render_template('profile.html', user=user)
+    consent_agreements = {}
+    for org_id in OrgTree().all_top_level_ids():
+        org = Organization.query.get(org_id)
+        consent_url = app_text(ConsentATMA.name_key(organization=org))
+        response = requests.get(consent_url)
+        if response.json:
+            consent_agreements[org.id] = {
+                'organization_name': org.name,
+                'asset': response.json()['asset'],
+                'agreement_url': ConsentATMA.permanent_url(
+                    version=response.json()['version'],
+                    generic_url=consent_url)}
+        else:
+            consent_agreements[org.id] = {
+                'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
+    return render_template('profile.html', user=user, consent_agreements=consent_agreements)
 
 @portal.route('/profile-test', defaults={'user_id': None})
 @portal.route('/profile-test/<int:user_id>')
