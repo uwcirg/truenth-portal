@@ -697,6 +697,8 @@ def token_status():
     """
     token_type, access_token = request.headers.get('Authorization').split()
     token = Token.query.filter_by(access_token=access_token).first()
+    if not token:
+        abort(404, "token not found")
     expires_in = token.expires - datetime.utcnow()
     return jsonify(access_token=access_token,
             refresh_token=token.refresh_token, token_type=token_type,
