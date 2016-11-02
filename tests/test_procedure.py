@@ -60,7 +60,7 @@ class TestProcedure(TestCase):
         start_time = FHIR_datetime.parse(
             data['entry'][0]['resource']['performedPeriod']['start'])
         self.assertAlmostEquals(
-            datetime.utcnow(), start_time, delta=timedelta(seconds=2))
+            datetime.utcnow(), start_time, delta=timedelta(seconds=5))
         self.assertEquals(
             current_app.config.metadata.version,
             data['entry'][0]['resource']['meta']['version'])
