@@ -669,7 +669,7 @@
                     <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
                     <h4 class="text-muted">Questions inquired of the patient at registration</h4>
                     <input type="hidden" id="iq_userId" value="{{person.id}}" />
-                    <div class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                    <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
                         {{patientQGroup(current_user)}}
                     </div>
                 </div>
@@ -684,14 +684,23 @@
                 } else {
                   diag.parents(".pat-q").nextAll().fadeOut();
                 };
+                {% if person and current_user and person.id != current_user.id %}
+                    if (!$("#patientQ input[type='radio']").is(":checked")) {
+                        $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
+                    };
+                {% endif %}
+
+
             };
             $(function () {
                 //$("#patientQ").show();
                 $("#patientQ hr").hide();
                 {% if person and current_user and person.id != current_user.id %}
-                    //$("#patientQ input[type='radio']").each(function() {
-                        //$(this).attr("disabled", "disabled");
-                    //});
+                    $("#patientQ input[type='radio']").each(function() {
+                        $(this).attr("disabled", "disabled");
+                    });
+                    
+
                 {% endif %}
 
                 {% if person %}
