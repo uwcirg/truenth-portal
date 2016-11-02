@@ -1,3 +1,5 @@
 #!/usr/bin/make -f
+distclean:
+	rm -Rf build debian/portal/ env
 %:
 	dh $@ --with python-virtualenv
