@@ -108,12 +108,12 @@
             });
           });</script>
   {%- endmacro %}
-  {% macro patientQGroup() -%}
+  {% macro patientQGroup(user) -%}
     <div id="patientQ">
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
-          <p>Have you had a prostate cancer biopsy?</p>
+          <p>{% if user.has_role('patient') %}Have you{%else%}Has the patient{%endif%} had a prostate cancer biopsy?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -130,7 +130,7 @@
 
         <div id="patDiag" data-topic="pca_diag" class="tnth-hide pat-q">
           <br />
-          <p>Have you been diagnosed with prostate cancer?</p>
+          <p>{%if user.has_role('patient')%}Have you{%else%}Has the patient{%endif%} been diagnosed with prostate cancer?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -156,7 +156,7 @@
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of my body, too)
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of {%if user.has_role('patient')%}my{%endif%} body, too)
               </label>
             </div>
           </div>
@@ -164,7 +164,7 @@
 
         <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
           <br />
-          <p>Have you begun prostate cancer treatment?</p>
+          <p>{%if user.has_role('patient')%}Have you{%else%}Has the patient{%endif%} begun prostate cancer treatment?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -198,7 +198,7 @@
       {{consent(consent_agreements)}}
     </div>
     <script>
-    $(function () { 
+    $(function () {
         tnthAjax.getConsent($("#iq_userId").val(), true);
         tnthAjax.getOrgs($("#iq_userId").val());
       });

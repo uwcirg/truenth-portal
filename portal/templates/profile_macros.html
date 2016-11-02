@@ -14,6 +14,10 @@
     <div class="form-group profile-section" id="bdGroup">
         <label>Birth Date</label>
         <div class="row">
+            <div class="col-md-4 col-xs-6">
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+
+            </div>
             <div class="col-md-4 col-xs-12">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                     <option value="">Month...</option>
@@ -30,10 +34,6 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-
-            </div>
-            <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
 
             </div>
             <div class="col-md-4 col-xs-6">
@@ -183,89 +183,87 @@
 
 
 {% macro profileSendEmail(person) -%}
-    {% if (person and person.email and person.has_role('patient') and person.has_role('write_only')) %}
-        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
-            <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
-                <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-                <label>Send Email to Patient</label>
-                <select  id="profileEmailSelect" class="form-control bd-element">
-                    <option value="">Select Email...</option>
-                    <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
-                    <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
-                </select>
-                <button id="btnProfileSendEmail" class="btn btn-lg btn-tnth-primary disabled">Send Email</button>
-                <div id="profileEmailMessage" class="text-info"></div>
-            </form>
-        </div>
-        <script>$(function () {
+    <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
+        <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
+            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+            <label>Send Email to Patient</label>
+            <select  id="profileEmailSelect" class="form-control bd-element">
+                <option value="">Select Email...</option>
+                <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
+                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+            </select>
+            <button id="btnProfileSendEmail" class="btn btn-lg btn-tnth-primary disabled">Send Email</button>
+            <div id="profileEmailMessage" class="text-info"></div>
+        </form>
+    </div>
+    <script>$(function () {
 
-            function getUrl() {
-                var url = '';
-                $.ajax ({
-                    type: 'GET',
-                    url: '/api/user/' + $("#_userId").val() + '/access_url',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    async: false
-                }).done(function(data) {
-                    url = data['access_url'];
-                    console.log(url);
-                }).fail(function() {
-                    console.log('failed request');
-                });
-                return url;
-            };
+        function getUrl() {
+            var url = '';
+            $.ajax ({
+                type: 'GET',
+                url: '/api/user/' + $("#_userId").val() + '/access_url',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false
+            }).done(function(data) {
+                url = data['access_url'];
+                console.log(url);
+            }).fail(function() {
+                console.log('failed request');
+            });
+            return url;
+        };
 
-            $('#profileEmailSelect').on('change', function() {
-                var message = '';
-                if (this.value != '') {
-                    message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
-                    $('#profileEmailMessage').text(message);
-                    $('#btnProfileSendEmail').removeClass('disabled');
+        $('#profileEmailSelect').on('change', function() {
+            var message = '';
+            if (this.value != '') {
+                message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
+                $('#profileEmailMessage').text(message);
+                $('#btnProfileSendEmail').removeClass('disabled');
+            } else {
+                $('#profileEmailMessage').text('');
+                $('#btnProfileSendEmail').addClass('disabled');
+            }
+        });
+
+        $('#btnProfileSendEmail').on('click', function(event) {
+            event.preventDefault();
+            var emailTypeElem = $('#profileEmailSelect');
+            var selectedOption = emailTypeElem.children('option:selected');
+            var email = $('#email').val();
+
+            if (selectedOption.val() != '') {
+                var url = getUrl();
+                if (url != '') {
+
+                    {# javascript variables are not available at template
+                       rendering time.  insert a placeholder and then
+                       replace once the variable is available. #}
+                    var body = '{{ app_text('profileSendEmail email html',
+                            'url_placeholder') | safe }}';
+                    body = body.replace(/url_placeholder/g, url);
+
+                    $.ajax ({
+                        type: 'POST',
+                        url: '/invite',
+                        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                        data: {'subject': selectedOption.text(), 'recipients': email, 'body': body}
+                    }).done(function(data) {
+                       //console.log('data ' + data);
+                        $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
+                    }).fail(function() {
+                        console.log('failed request');
+                        $('#profileEmailMessage').text('Unable to send email.');
+                    });
                 } else {
-                    $('#profileEmailMessage').text('');
-                    $('#btnProfileSendEmail').addClass('disabled');
-                }
-            });
-
-            $('#btnProfileSendEmail').on('click', function(event) {
-                event.preventDefault();
-                var emailTypeElem = $('#profileEmailSelect');
-                var selectedOption = emailTypeElem.children('option:selected');
-                var email = $('#email').val();
-
-                if (selectedOption.val() != '') {
-                    var url = getUrl();
-                    if (url != '') {
-
-                        {# javascript variables are not available at template
-                           rendering time.  insert a placeholder and then
-                           replace once the variable is available. #}
-                        var body = '{{ app_text('profileSendEmail email html',
-                                'url_placeholder') | safe }}';
-                        body = body.replace(/url_placeholder/g, url);
-
-                        $.ajax ({
-                            type: 'POST',
-                            url: '/invite',
-                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                            data: {'subject': selectedOption.text(), 'recipients': email, 'body': body}
-                        }).done(function(data) {
-                           //console.log('data ' + data);
-                            $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
-                        }).fail(function() {
-                            console.log('failed request');
-                            $('#profileEmailMessage').text('Unable to send email.');
-                        });
-                    } else {
-                        $('#profileEmailMessage').text('Unable to generate URL for email');
-                    };
+                    $('#profileEmailMessage').text('Unable to generate URL for email');
                 };
-            });
+            };
+        });
 
 
-         });</script>
-    {% endif %}
+     });</script>
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
@@ -391,7 +389,7 @@
                             {
                                 field: 'by',
                                 title: 'User',
-                                width: '10%',
+                                width: '5%',
                                 sortable: true,
                                 searchable: true
                             }, {
@@ -505,73 +503,70 @@
 
 {% macro profileSessionList(person, current_user) -%}
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
-		<!--hard coded for now -->
-		<div class="form-group profile-section" id="userSessionsListContainer">
+	<div class="form-group profile-section" id="userSessionsListContainer">
 
-			<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
-			<table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
-			    <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
-			    <tr><th>Assessment Name</th><th>Status</th><th>Last Updated <small>( GMT Time Zone )</small></th></tr>
-			</table>
-		</div>
-        <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+		<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
+		<table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
+		    <caption>Session History <span class="text-muted smaller-text">(click each row to review report)</span></caption>
+		    <tr><th>Assessment Name</th><th>Status</th><th>Last Updated <small>( GMT Time Zone )</small></th></tr>
+		</table>
+	</div>
+    <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
 
-	    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
-	      <div class="modal-dialog" role="document">
-	        <div class="modal-content">
-	          <div class="modal-header">
-	            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-	            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
-	          </div>
-	          <div class="modal-body" style="font-size:0.8em">
-	            <br/>
-	            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
-	            <br/>
-	          </div>
-	          <div class="modal-footer">
-	            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
-	          </div>
-	        </div>
-	      </div>
-	    </div>
-	    <script>
-            $(function () {
-	    	var sessionListHTML = "";
-	    	var sessionUserId = $("#_session_user_id").val();
-	    	$.ajax ({
-	                type: "GET",
-	                url: '/api/patient/' + sessionUserId + '/assessment',
-	                contentType: "application/json; charset=utf-8",
-	                dataType: 'json'
-	            }).done(function(data) {
-	                //console.log(data["audits"]);
-	                //console.log(data);
-	                var entries = data.entry ? data.entry : null;
-	                if (entries && entries.length > 0) {
-	                	entries.forEach(function(entry, index) {
-                        //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
-                        var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
-                        sessionListHTML += '<tr title="Click to view report"  ' +
-                                            (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-                                            [entry['questionnaire']['display'],
-                                             entry['status'],
-                                             String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
-                                                return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
-                                             }).join('') +
-                                             '</tr>';
-	                	});
-	                	$("#userSessionListTable").append(sessionListHTML);
-	                } else $("#userSessionsListContainer").hide();
+    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+        $(function () {
+    	var sessionListHTML = "";
+    	var sessionUserId = $("#_session_user_id").val();
+    	$.ajax ({
+                type: "GET",
+                url: '/api/patient/' + sessionUserId + '/assessment',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json'
+            }).done(function(data) {
+                //console.log(data["audits"]);
+                //console.log(data);
+                var entries = data.entry ? data.entry : null;
+                if (entries && entries.length > 0) {
+                	entries.forEach(function(entry, index) {
+                    //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
+                    var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
+                    sessionListHTML += '<tr title="Click to view report"  ' +
+                                        (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
+                                        [entry['questionnaire']['display'],
+                                         entry['status'],
+                                         String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
+                                            return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
+                                         }).join('') +
+                                         '</tr>';
+                	});
+                	$("#userSessionListTable").append(sessionListHTML);
+                } else $("#userSessionsListContainer").hide();
 
-	            }).fail(function() {
-	                console.log("Problem retrieving session data from server.");
-	                $("#userSessionsListContainer").hide();
-	            });
+            }).fail(function() {
+                console.log("Problem retrieving session data from server.");
+                $("#userSessionsListContainer").hide();
+            });
 
-	    });
-	    </script>
-    {% endif %}
+    });
+    </script>
 {%- endmacro %}
 
 
@@ -649,11 +644,14 @@
                 {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
                     {{profileSendEmail(person)}}
                 {% endif %}
+                {% if person.has_role('provider') and not person.has_role('patient') %}
+                    {{profilePhone(person)}}
+                {% endif %}
             </div>
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider') %}
+    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -662,16 +660,17 @@
 				</div>
 			</div>
 		</div>
-    {%endif %}
+    {% endif %}
 
-    {% if person.id == current_user.id and person.has_role("patient") %}
+    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
         <div class="row">
             <div class="col-md-12">
                 <div class="profile-item-container">
                     <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
+                    <h4 class="text-muted">Questions inquired of the patient at registration</h4>
                     <input type="hidden" id="iq_userId" value="{{person.id}}" />
                     <div class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
-                        {{patientQGroup()}}
+                        {{patientQGroup(current_user)}}
                     </div>
                 </div>
             </div>
@@ -689,10 +688,10 @@
             $(function () {
                 //$("#patientQ").show();
                 $("#patientQ hr").hide();
-                {% if person and current_user and person.id != current_user.id %} 
-                    $("#patientQ input[type='radio']").each(function() {
-                        $(this).attr("disabled", "disabled");
-                    });
+                {% if person and current_user and person.id != current_user.id %}
+                    //$("#patientQ input[type='radio']").each(function() {
+                        //$(this).attr("disabled", "disabled");
+                    //});
                 {% endif %}
 
                 {% if person %}
@@ -704,7 +703,7 @@
                           tnthAjax.putClinical({{person.id}},toCall,toSend);
                           if (toSend == "true" || toCall ==  "pca_localized") {
                             thisItem.parents(".pat-q").nextAll().fadeIn();
-                            
+
                           } else {
                             if (toCall == "biopsy") {
                               tnthAjax.putClinical({{person.id}},"pca_diag","false");
@@ -752,29 +751,29 @@
         </div>
     </div>
 
+    {%if person.has_role('patient')%}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="profile-item-container">
+                    <h4 id="patientDetailLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
+                    <div class="flex">
+                        <div>
+                            {{profileGender(person)}}
+                            <br/>
+                            {{profilePhone(person)}}
+                        </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="profile-item-container">
-                <h4 id="patientDetailLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
-                <div class="flex">
-                    <div>
-                        {{profileGender(person)}}
-                        <br/>
-                        {{profilePhone(person)}}
+                            <div>
+                                {{profileEthnicity(person)}}
+                            </div>
+                            <div>
+                                {{profileRace(person)}}
+                            </div>
                     </div>
-                    {%if person.has_role('patient')%}
-                        <div>
-                            {{profileEthnicity(person)}}
-                        </div>
-                        <div>
-                            {{profileRace(person)}}
-                        </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
             <div class="col-md-12">
@@ -806,7 +805,7 @@
     date, please make your best guess.<span class="text-muted smaller-text"></span></p>
 <div style="margin-left: 1em">
     <div style="margin: 1em 0">
-        <p class="text-muted">Your treatments:</p>
+        <p class="text-muted">{%if current_user.id == person.id%}Your treatments{%else%}Treatments{%endif%}:</p>
         <div id="userProcedures"></div>
 
     </div>
@@ -859,8 +858,6 @@ $(document).ready(function(){
 </script>
 
 {%- endmacro %}
-
-
 
 
 {% macro profileSaveBtn() -%}

@@ -36,7 +36,7 @@
               {{dobGroup()}}
             {% endif %}
             {% if 'clinical' in still_needed %}
-              {{patientQGroup()}}
+              {{patientQGroup(user)}}
             {% endif %}
             {% if 'org' in still_needed %}
               {{clinic(consent_agreements)}}

@@ -13,7 +13,7 @@
     <p>Skip to:</p>
     <ul style="list-style-type: circle">
         {% for parent_id in org_list_by_parent %}
-          {% for org in org_list_by_parent[parent_id] %}
+          {% for org in org_list_by_parent[parent_id] | sort(attribute='id') %}
               {% if org.id != parent_id %}
                 <ul style="list-style-type: disc"><li><a href="#location{{org.id}}">{{ org.name }}</a></li></ul>
               {% else %}
@@ -29,7 +29,7 @@
 <hr />
 {% for parent_id in org_list_by_parent %}
   {% set orgCount = 1 %}
-  {% for org in org_list_by_parent[parent_id] %}
+  {% for org in org_list_by_parent[parent_id] | sort(attribute='id')%}
       <div class="admin-table table-responsive smaller-text">
           <h4 id="location{{org.id}}">{{ org.name }} Patients</h4>
 

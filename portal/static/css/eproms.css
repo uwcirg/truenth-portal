@@ -1004,7 +1004,7 @@ color: #777
 box-shadow: 7px 8px 7px -7px rgba(79,82,80,1);
 }
 
-div.columns input, div.search {
+div.search input, div.columns {
   font-size:0.9em;
 }
 
