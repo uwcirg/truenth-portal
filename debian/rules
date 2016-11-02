@@ -3,3 +3,5 @@ distclean:
 	rm -Rf build debian/portal/ env
 %:
 	dh $@ --with python-virtualenv
+override_dh_virtualenv:
+	dh_virtualenv --no-test
