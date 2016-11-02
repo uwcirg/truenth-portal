@@ -33,6 +33,7 @@ class BaseConfig(object):
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
+    SESSION_TYPE = 'redis'
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'

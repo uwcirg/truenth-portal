@@ -18,6 +18,7 @@ Contents:
     configuration
     interventions
     organizations
+    sessions
     site_persistence
     code
     contributing
