@@ -303,7 +303,7 @@
                         <div class="modal-content">
                           <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">Consent Agreement</h4>
+                            <h4 class="modal-title">Sharing your data</h4>
                           </div>
                           <div class="modal-body">
                             <br/>
@@ -684,7 +684,7 @@
                 } else {
                   diag.parents(".pat-q").nextAll().fadeOut();
                 };
-                {% if person and current_user and person.id != current_user.id %}
+                {% if person and current_user and (person.id != current_user.id) %}
                     if (!$("#patientQ input[type='radio']").is(":checked")) {
                         $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
                     };

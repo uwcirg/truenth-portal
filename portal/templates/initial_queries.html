@@ -236,7 +236,31 @@ $(document).ready(function(){
   });
 
 
-});
+  $("#userOrgs input[name='organization']").each(function() {
+      $(this).on("click", function() {
+          var parentOrg = $(this).attr("data-parent-id");
+          var parentName = $(this).attr("data-parent-name");
+          //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
+          if (parentOrg != "") {
+              if ($(this).prop("checked")) {
+                  if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
+                      $("#consentContainer .consent").hide();
+                      if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
+                      else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
+                      $("#" + parentOrg + "_consentItem").show();
+                      console.log($("#" + parentOrg + "_consentItem"))
+                  };
+              } else {
+                  $("#consentContainer .consent").hide();
+              };
+          };
+
+          $("#userOrgs").find(".help-block").text("");
+
+          
+      });
+    });
+  });
 {% endblock %}
 
 

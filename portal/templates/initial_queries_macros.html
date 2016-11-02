@@ -113,7 +113,7 @@
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
-          <p>{% if user.has_role('patient') %}Have you{%else%}Has the patient{%endif%} had a prostate cancer biopsy?</p>
+          <p>Have you had a prostate cancer biopsy?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -130,7 +130,7 @@
 
         <div id="patDiag" data-topic="pca_diag" class="tnth-hide pat-q">
           <br />
-          <p>{%if user.has_role('patient')%}Have you{%else%}Has the patient{%endif%} been diagnosed with prostate cancer?</p>
+          <p>Have you been diagnosed with prostate cancer?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -156,7 +156,7 @@
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of {%if user.has_role('patient')%}my{%endif%} body, too)
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of my body, too)
               </label>
             </div>
           </div>
@@ -164,7 +164,7 @@
 
         <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
           <br />
-          <p>{%if user.has_role('patient')%}Have you{%else%}Has the patient{%endif%} begun prostate cancer treatment?</p>
+          <p>Have you begun prostate cancer treatment?</p>
           <div class="form-group">
             <div class="radio">
               <label>
@@ -217,7 +217,7 @@
                       <div class="modal-content">
                         <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">Consent Agreement</h4>
+                          <h4 class="modal-title">Sharing Your Data</h4>
                         </div>
                         <div class="modal-body">
                           <br/>

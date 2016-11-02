@@ -490,7 +490,7 @@ var tnthAjax = {
                                 if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
                                 else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
                                 $("#" + parentOrg + "_consentItem").show();
-                                console.log($("#" + parentOrg + "_consentItem"))
+                                //console.log($("#" + parentOrg + "_consentItem"))
                             //};
                         } else {
                             $("#consentContainer .consent").hide();
@@ -502,7 +502,7 @@ var tnthAjax = {
                     
                 });
 
-                $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
+                if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
             });
 
             $("#consentContainer input.consent-checkbox").each(function() {
