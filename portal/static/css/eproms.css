@@ -33,7 +33,15 @@ body {
   display: none;
 }
 
-#fullSizeBox a[href*="google"], #fullSizeBox a[href*="facebook"] {
+#fullSizeBox a[href*="google"], #fullSizeBox a[href*="facebook"], #fullSizeBox a[href*="explore"], #fullSizeBox a[href*="about"], #fullSizeBox span.separator{
+  display: none;
+}
+
+.eproms-image {
+  display: block;
+}
+
+.tnth-image {
   display: none;
 }
 
@@ -200,12 +208,18 @@ a.btn {
 }
 #fullSizeBox {
   position: relative;
-  margin: 0 -15px;
+  margin: 0 -20px;
   text-align: left;
-  background-image: url('../img/bg_canoe.jpg');
+  background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: center top;
+  overflow: hidden;
 }
+
+#fullSizeBox.box-min-250 {
+  min-height: 250px;
+}
+
 #fullSizeBox.box-min-500 {
   min-height: 500px;
 }
@@ -1047,6 +1061,23 @@ div.input-group.date {
     font-size: 13px;
   }
 
+  .eproms-image {
+    display: none;
+  }
+
+  #fullSizeBox {
+    position: relative;
+    margin: 0 -20px;
+    text-align: left;
+    background-image: url('../img/twoMen_sm.jpg');
+    background-size: cover;
+    background-position: center top;
+    overflow: hidden;
+ }
+
+  #wellContainer .tnth-well {
+    height: 60%;
+  }
   .profile-item-container {
   padding: 1em;
   }
