@@ -11,7 +11,7 @@ from flask import render_template, request, session, abort, url_for
 from flask_login import login_user, logout_user
 from flask_user import roles_required
 from flask_user.signals import user_logged_in, user_registered
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField
 from werkzeug.exceptions import Unauthorized
@@ -316,7 +316,7 @@ def logout():
     notify_clients(user_id)
     return redirect('/')
 
-class InterventionEditForm(Form):
+class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""
     public_access = BooleanField('Public Access', default=True)
     card_html = TextField('Card HTML')
@@ -337,7 +337,7 @@ class InterventionEditForm(Form):
             except Unauthorized:
                 raise validators.ValidationError("Invalid URL (unknown origin)")
 
-class ClientEditForm(Form):
+class ClientEditForm(FlaskForm):
     """wtform class for validation during client edits"""
     intervention_names = [(k, v) for k, v in STATIC_INTERVENTIONS.items()]
 
