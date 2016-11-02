@@ -5,7 +5,7 @@ from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
 from flask_user import roles_required, roles_not_allowed
 from flask_swagger import swagger
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, StringField
 from datetime import datetime
@@ -67,7 +67,7 @@ def landing():
     return render_template('landing.html', user=None, no_nav="true")
 
 
-class ShortcutAliasForm(Form):
+class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
 
     def validate_shortcut_alias(form, field):
@@ -178,7 +178,7 @@ def access_via_token(token):
     return redirect(url_for('portal.challenge_identity'))
 
 
-class ChallengeIdForm(Form):
+class ChallengeIdForm(FlaskForm):
     retry_count = HiddenField('retry count', default=0)
     first_name = StringField(
         'First Name', validators=[validators.input_required()])
