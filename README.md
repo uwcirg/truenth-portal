@@ -40,7 +40,7 @@ $ virtualenv $PROJECT_HOME/env
 
 Required to interact with the python installed in this virtual
 environment.  Forgetting this step will result in obvious warnings
-about missing dependencies.
+about missing dependencies. This needs to be done in every shell session that you work from.
 
 ```bash
 $ cd $PROJECT_HOME
