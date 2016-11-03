@@ -5,4 +5,6 @@ distclean:
 	dh $@ --with python-virtualenv
 override_dh_virtualenv:
 	dh_virtualenv \
-        --no-test
+		--preinstall='pip>=8' \
+		--preinstall='setuptools>=12' \
+		--no-test
