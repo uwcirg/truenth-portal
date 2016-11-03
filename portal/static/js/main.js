@@ -926,6 +926,7 @@ var tnthDates = {
         var yearToPass, convertDate, dateFormatArray;
         if (reverse) {
             dateFormatArray = currentDate.split("-");
+            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
             yearToPass = dateFormatArray[0];
             if (shorten) {
                 dateFormatArray[1] = dateFormatArray[1].replace(/^0+/, '');
@@ -934,6 +935,7 @@ var tnthDates = {
             convertDate = dateFormatArray[2]+"/"+dateFormatArray[1]+"/"+yearToPass;
         } else {
             dateFormatArray = currentDate.split("/");
+            if (!dateFormatArray || (dateFormatArray.length == 0)) return null;
             // If patient manuals enters two digit year, then add 19 or 20 to year.
             // TODO - this is susceptible to Y2K for 2100s. Be better to force
             // user to type 4 digits.

@@ -747,14 +747,6 @@
                     </div>
                 </div>
         </div>
-        <script>$("document").ready(function() {
-             $("#tnthproc-date").datepicker({
-                    dateFormat: 'dd/mm/yy',
-                    endDate: "0d",
-                    startDate: "-10y",
-                    autoclose: true
-              });
-         });</script>
     {% endif %}
 
     <div class="row">
@@ -825,31 +817,34 @@
 
     </div>
     <p class="text-muted">Add a treatment:</p>
-    <form class="form-inline event-element" style='margin-left: 1em;'>
-        <div class='form-group'>
-            <select class='form-control' id='tnthproc'>
-                <option value=''>Select treatment...</option>
-                <option value='373818007'>Started watchful waiting</option>
-                <option value='424313000'>Started active surveillance</option>
-                <option value='26294005'>Radical prostatectomy (nerve-sparing)</option>
-                <option value='26294005-nns'>Radical prostatectomy (non-nerve-sparing)</option>
-                <option value='33195004'>External beam radiation therapy</option>
-                <option value='228748004'>Brachytherapy</option>
-                <option value='707266006'>Androgen deprivation therapy</option>
-                <option value='999999999'>None of the above</option>
-            </select>
-        </div>
-        <div class='form-group'>
-            <label>Date:</label>
-            <div class="input-group date">
-                <input class='event-value form-control' type='text' placeholder='MM/DD/YYYY' maxlength='10' id='tnthproc-date' name='tnthproc-date'/>
-                <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
-                    <i class="fa fa-calendar"></i>
-                </span>
+    <form class="form-inline event-element to-validate" style='margin-left: 1em;' data-toggle="validator">
+        <div class="flex">
+            <div class='form-group'>
+                <select class='form-control' id='tnthproc'>
+                    <option value=''>Select treatment...</option>
+                    <option value='373818007'>Started watchful waiting</option>
+                    <option value='424313000'>Started active surveillance</option>
+                    <option value='26294005'>Radical prostatectomy (nerve-sparing)</option>
+                    <option value='26294005-nns'>Radical prostatectomy (non-nerve-sparing)</option>
+                    <option value='33195004'>External beam radiation therapy</option>
+                    <option value='228748004'>Brachytherapy</option>
+                    <option value='707266006'>Androgen deprivation therapy</option>
+                    <option value='999999999'>None of the above</option>
+                </select>
+                <div class="help-block with-errors"></div>
             </div>
-
+            <div class='form-group'>
+                <label>Date:</label>
+                <div class="input-group date">
+                    <input class='event-value form-control' type='text' placeholder='DD/MM/YYYY' maxlength='10' data-error="Date should be in valid DD/MM/YYYY format" id='tnthproc-date' name='tnthproc-date' pattern="^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$"/>
+                    <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                </div>
+                <div class="help-block with-errors"></div>
+            </div>
         </div>
-        <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read='' disabled>
+        <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
             <i class='fa fa-plus'></i> Add Procedure
         </button>
     </form>
@@ -861,6 +856,14 @@
 $(document).ready(function(){
 
     tnthAjax.getProc({{ person.id }}, false);
+    $("#tnthproc-date").datepicker({
+        dateFormat: 'dd/mm/yy',
+        endDate: "0d",
+        startDate: "-10y",
+        autoclose: true,
+        forceParse: false
+    });
+
 /**
     // Class for both "done" and "skip" buttons
     $(".continue-btn").on("click", function(event){

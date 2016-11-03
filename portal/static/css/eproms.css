@@ -1249,11 +1249,12 @@ div.input-group.date {
   }
 
   #profileProcedureContainer #tnthproc {
-    width: 50%;
+    max-width: 95%;
   }
 
   #profileProcedureContainer div.input-group.date {
-    width: 50%;
+    width: 60%;
+    max-width: 100%;
   }
 
 }

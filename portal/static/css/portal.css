@@ -1011,6 +1011,14 @@ div.input-group.date {
   margin-top:-2px;
 }
 
+#profileProcedureContainer #tnthproc {
+    max-width: 95%
+  }
+
+#profileProcedureContainer div.input-group.date {
+    width: 60%;
+    max-width: 100%;
+}
 
 /*
 

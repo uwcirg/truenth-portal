@@ -70,6 +70,7 @@ $(document).ready(function() {
 
     // Add/remove disabled from submit button
     function checkSubmit(btnId) {
+
         if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
             // We trigger the click here. The button is actually hidden so user doesn't interact with it
             // TODO - Remove the button completely and store the updated values elsewhere
@@ -95,11 +96,14 @@ $(document).ready(function() {
         $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
         var dateFormatted;
         // Change dates to YYYY-MM-DD
-        if (passedDate && passedDate != '') {
+        //and make sure date is in dd/mm/yyyy format before reformat
+        if (passedDate && passedDate != '' && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
             dateFormatted = tnthDates.changeFormat(passedDate);
-        }
-        $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
-        checkSubmit("button[id^='tnthproc-submit']");
+            //console.log("formatted date: " + dateFormatted);
+            $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+            checkSubmit("button[id^='tnthproc-submit']");
+        };
+        
     });
 
     /*** Delete functions ***/
