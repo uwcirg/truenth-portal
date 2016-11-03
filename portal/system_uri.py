@@ -17,6 +17,12 @@ TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(
 # Local valuesets, where a decent published FHIR match could not be found
 TRUENTH_VALUESET = '{}/fhir/valueset'.format(TRUENTH_NAMESPACE)
 
-# Australian Standard Classification of Cultural and Ethnic Groups (ASCCEG)
-TRUENTH_EXTENSTION_ASCCEG = '{}/ascceg'.format(TRUENTH_STRUCTURE_DEFINITION)
-TRUENTH_VALUESET_ASCCEG = '{}/ascceg'.format(TRUENTH_VALUESET)
+# Australian Institute of Health and Welfare's
+# "National Health Data Dictionary 2012 version 16"
+# Spec: http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824
+# METeOR identifier: 291036
+NHHD_291036 = "AU-NHHD-METeOR-id-291036"
+TRUENTH_VALUESET_NHHD_291036 = "{}/{}".format(TRUENTH_VALUESET, NHHD_291036)
+TRUENTH_EXTENSTION_NHHD_291036 = "{}/{}".format(
+    TRUENTH_STRUCTURE_DEFINITION, NHHD_291036)
+

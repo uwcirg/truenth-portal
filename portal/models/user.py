@@ -23,7 +23,8 @@ from .organization import Organization
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM, TRUENTH_EXTENSTION_ASCCEG
+from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import Telecom
 
 INVITE_PREFIX = "__invite__"
@@ -44,10 +45,11 @@ class Extension:
         pass
 
     def as_fhir(self):
-        return {'url': self.extension_url,
-                'valueCodeableConcept': {
-                    'coding': [c.as_fhir() for c in self.children]}
-               }
+        if self.children.count():
+            return {'url': self.extension_url,
+                    'valueCodeableConcept': {
+                        'coding': [c.as_fhir() for c in self.children]}
+                   }
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
@@ -76,11 +78,11 @@ class Extension:
 class UserIndigenousStatusExtension(Extension):
     # Used in place of us-core-race and us-core-ethnicity for
     # Australian configurations.
-    extension_url = TRUENTH_EXTENSTION_ASCCEG
+    extension_url = TRUENTH_EXTENSTION_NHHD_291036
 
     @property
     def children(self):
-        return self.user.ethnicities
+        return self.user.indigenous
 
 
 class UserEthnicityExtension(Extension):
@@ -234,6 +236,8 @@ class User(db.Model, UserMixin):
 
     auth_providers = db.relationship('AuthProvider', lazy='dynamic')
     _consents = db.relationship('UserConsent', lazy='dynamic')
+    indigenous = db.relationship(Coding, lazy='dynamic',
+            secondary="user_indigenous")
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
