@@ -1,8 +1,8 @@
 #!/usr/bin/make -f
+
 distclean:
 	rm -Rf build debian/portal/ env
-%:
-	dh $@ --with python-virtualenv
+
 override_dh_virtualenv:
 	cp requirements.txt requirements.backup.txt
 	cat requirements.build.txt requirements.backup.txt > requirements.txt
@@ -14,3 +14,6 @@ override_dh_virtualenv:
 override_dh_builddeb:
 	dh_builddeb
 	if [ -f requirements.backup.txt ]; then mv requirements.backup.txt requirements.txt; fi;
+
+%:
+	dh $@ --with python-virtualenv
