@@ -699,7 +699,7 @@
                     $("#patientQ input[type='radio']").each(function() {
                         $(this).attr("disabled", "disabled");
                     });
-                    
+
 
                 {% endif %}
 
@@ -741,14 +741,20 @@
                 <div class="col-md-12">
                     <div class="profile-item-container">
                         <h4 id="clinicalDataLoc" class="profile-item-title">Clinical Data</h4>
-                        <div class="flex">
-                            <div>
-                                {{profileProcedures(person, current_user)}}
-                            </div>
+                        <div>
+                            {{profileProcedures(person, current_user)}}
                         </div>
                     </div>
                 </div>
         </div>
+        <script>$("document").ready(function() {
+             $("#tnthproc-date").datepicker({
+                    dateFormat: 'dd/mm/yy',
+                    endDate: "0d",
+                    startDate: "-10y",
+                    autoclose: true
+              });
+         });</script>
     {% endif %}
 
     <div class="row">
@@ -812,14 +818,14 @@
 </style>
 <p>Which of the following prostate cancer treatments {%if current_user.has_role('provider') and current_user.id != person.id %}has the patient{%else%}have you{%endif%} had, if any? If you don&#39;t remember the exact
     date, please make your best guess.<span class="text-muted smaller-text"></span></p>
-<div style="margin-left: 1em">
+<div id="profileProcedureContainer" style="margin-left: 1em">
     <div style="margin: 1em 0">
         <p class="text-muted">{%if current_user.id == person.id%}Your treatments{%else%}Treatments{%endif%}:</p>
         <div id="userProcedures"></div>
 
     </div>
     <p class="text-muted">Add a treatment:</p>
-    <form class="form-inline event-element" style='margin-left: 1em; display: flex'>
+    <form class="form-inline event-element" style='margin-left: 1em;'>
         <div class='form-group'>
             <select class='form-control' id='tnthproc'>
                 <option value=''>Select treatment...</option>
@@ -837,7 +843,7 @@
             <label>Date:</label>
             <div class="input-group date">
                 <input class='event-value form-control' type='text' placeholder='MM/DD/YYYY' maxlength='10' id='tnthproc-date' name='tnthproc-date'/>
-                <span class="input-group-addon">
+                <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
                     <i class="fa fa-calendar"></i>
                 </span>
             </div>

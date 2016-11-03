@@ -69,15 +69,6 @@ body {
   }
 }
 
-
-.eproms-image {
-  display: block;
-}
-
-.tnth-image {
-  display: none;
-}
-
 #socialMediaRegistrationContainer {
   display: none;
 }
@@ -144,7 +135,9 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   font-size: 0.9em;
   background-image: linear-gradient(
       to right,
-      #FFF, rgba(173, 193, 197, 0.16), #FFF, rgba(173, 193, 197, 0.16)
+      background-image: linear-gradient(
+      to right,
+      #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
   );
   vertical-align: center;
 
@@ -254,12 +247,17 @@ a.btn {
 }
 // fullsize background image box - used on homepage and similar pages
 #fullSizeBox {
-  position:relative;
-  margin: 0 -15px;
+  position: relative;
   text-align: left;
-  background-image: url('../img/bg_canoe.jpg');
+  left:0;
+  top:0;
+  margin:0;
+  background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: center top;
+  overflow: hidden;
+  max-width: 100%;
+  height:100%;
   &.box-min-500 {
     min-height: 500px;
   }
@@ -344,7 +342,7 @@ a.btn {
 }
 #wellContent {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   // TODO - Add browser specific styles, check compatibility
   transform: translate(-50%, -50%);
@@ -1127,20 +1125,6 @@ div.input-group.date {
     font-size: 13px;
   }
 
-  .eproms-image {
-    display: none;
-  }
-
-  #fullSizeBox {
-    position: relative;
-    margin: 0 -20px;
-    text-align: left;
-    background-image: url('../img/twoMen_sm.jpg');
-    background-size: cover;
-    background-position: center top;
-    overflow: hidden;
- }
-
   .profile-item-container {
   padding: 1em;
   }
@@ -1228,8 +1212,9 @@ div.input-group.date {
     height: 135px;
   }
   #fullSizeBox {
-    background-image: none;
-    min-height: auto;
+    /*background-image: none;
+    min-height: auto;*/
+    height:800px;
     > img {
       width: 100%;
     }
@@ -1273,6 +1258,9 @@ div.input-group.date {
   /** Font sizes changes above 992 **/
   body {
     font-size: @lgFontSize;
+  }
+  #wellContainer{
+    height:90%;
   }
   .tnth-headline {
     font-size: @lgHeadlineSize;
@@ -1328,6 +1316,14 @@ div.input-group.date {
     .form-group input[type=checkbox], .form-group  input[type=radio] {
       margin-top: 4px;
     }
+  }
+
+  #profileProcedureContainer #tnthproc {
+    width: 50%;
+  }
+
+  #profileProcedureContainer div.input-group.date {
+    width: 50%;
   }
 }
 

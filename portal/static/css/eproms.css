@@ -37,13 +37,6 @@ body {
   display: none;
 }
 
-.eproms-image {
-  display: block;
-}
-
-.tnth-image {
-  display: none;
-}
 
 #socialMediaRegistrationContainer {
   display: none;
@@ -108,7 +101,7 @@ display: block;
   font-size: 0.9em;
   background-image: linear-gradient(
       to right,
-      #FFF, rgba(173, 193, 197, 0.16), #FFF, rgba(173, 193, 197, 0.16)
+      #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
   );
   vertical-align: center;
 }
@@ -206,18 +199,19 @@ a.btn {
   color: #fff;
   background-color: #000;
 }
+
 #fullSizeBox {
   position: relative;
-  margin: 0 -20px;
   text-align: left;
+  left:0;
+  top:0;
+  margin:0;
   background-image: url('../img/twoMen.jpg');
   background-size: cover;
   background-position: center top;
   overflow: hidden;
-}
-
-#fullSizeBox.box-min-250 {
-  min-height: 250px;
+  max-width: 100%;
+  height:100%;
 }
 
 #fullSizeBox.box-min-500 {
@@ -305,7 +299,7 @@ a.btn {
 }
 #wellContent {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -1061,20 +1055,6 @@ div.input-group.date {
     font-size: 13px;
   }
 
-  .eproms-image {
-    display: none;
-  }
-
-  #fullSizeBox {
-    position: relative;
-    margin: 0 -20px;
-    text-align: left;
-    background-image: url('../img/twoMen_sm.jpg');
-    background-size: cover;
-    background-position: center top;
-    overflow: hidden;
- }
-
   #wellContainer .tnth-well {
     height: 60%;
   }
@@ -1163,8 +1143,9 @@ div.input-group.date {
     height: 135px;
   }
   #fullSizeBox {
-    background-image: none;
-    min-height: auto;
+    /*background-image: none;*/
+    /*min-height: auto;*/
+    height:800px;
   }
   #fullSizeBox > img {
     width: 100%;
@@ -1206,6 +1187,9 @@ div.input-group.date {
   /** Font sizes changes above 992 **/
   body {
     font-size: 1.8em;
+  }
+  #wellContainer {
+    height: 90%;
   }
   .tnth-headline {
     font-size: 1.20em;
@@ -1260,6 +1244,15 @@ div.input-group.date {
   .reduce-font-sizes .form-group input[type=radio] {
     margin-top: 4px;
   }
+
+  #profileProcedureContainer #tnthproc {
+    width: 50%;
+  }
+
+  #profileProcedureContainer div.input-group.date {
+    width: 50%;
+  }
+
 }
 
 @media (max-width: 1199px) {

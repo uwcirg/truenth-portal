@@ -28,13 +28,6 @@ body {
   font-size: 18px;
 }
 
-.eproms-image {
-  display: none;
-}
-
-.tnth-image {
-  display: block;
-}
 
 #mainHolder {
   visibility: hidden;
@@ -195,11 +188,16 @@ a.btn{
 }
 #fullSizeBox {
   position: relative;
-  margin: 0 -15px;
   text-align: left;
+  left:0;
+  top:0;
+  margin:0;
   background-image: url('../img/bg_canoe.jpg');
   background-size: cover;
   background-position: center top;
+  overflow: hidden;
+  max-width: 100%;
+  height:100%;
 }
 #fullSizeBox.box-min-500 {
   min-height: 500px;
@@ -286,7 +284,7 @@ a.btn{
 }
 #wellContent {
   position: absolute;
-  top: 50%;
+  top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
@@ -1047,6 +1045,12 @@ div.input-group.date {
     font-size: 13px;
   }
 
+  .bgContainer {
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 400px;
+  }
+
   .fixed-table-pagination {
     font-size: 0.9em;
   }
@@ -1131,8 +1135,9 @@ div.input-group.date {
     height: 135px;
   }
   #fullSizeBox {
-    background-image: none;
-    min-height: auto;
+    /*background-image: none;
+    min-height: auto;*/
+    height:700px;
   }
   #fullSizeBox > img {
     width: 100%;

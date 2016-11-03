@@ -13,21 +13,14 @@
 </style>
 
 <div id="fullSizeBox" class="box-min-500">
-    <img class="eproms-image" src="{{ url_for('static', filename='img/twoMen.jpg') }}" class="img-responsive hidden-xs" />
-    <img class="tnth-image" src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
+    <img  src="{{ url_for('static', filename='img/spacer.jpg') }}" style="visibility: hidden" class="img-responsive hidden-xs"/>
 
     <div id="fullSizeContainer">
-
         <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
-
         <div id="wellContainer">
-
             <div class="tnth-well well">
-
                 <div class="tnth-well-close"><a href="/"><i class="fa fa-close text-muted"></i></a></div>
-
                 <div id="wellContent">
-
                     <div class="btn-set">
                         <a href="{{ url_for('auth.login', provider_name='facebook') }}"
                            class="btn btn-social btn-facebook btn-block">
@@ -38,7 +31,6 @@
                             <i class="fa fa-google"></i> Log in with Google
                         </a>
                     </div>
-
                     <form action="" method="POST" class="form" role="form">
                         {{ form.hidden_tag() }}
 
@@ -61,13 +53,15 @@
                     </div>
                     {% endif %}
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+
+{% endblock %}
+{% block document_ready %}
+$("document").ready(function() {
+    $("#fullSizeBox").closest("div.col-lg-12").css("padding", "0");
+});
 
 {% endblock %}
