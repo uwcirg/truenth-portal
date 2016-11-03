@@ -232,7 +232,8 @@ var fillContent = {
             }
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dtEdited + ")</i>" + deleteInvocation + "</li>";
+            dateEdited = new Date(dtEdited);
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString() + ")</i>" + deleteInvocation + "</li>";
             if (procID > highestId) {
                 highestId = procID;
             }
