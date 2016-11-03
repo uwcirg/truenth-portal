@@ -4,6 +4,8 @@ distclean:
 %:
 	dh $@ --with python-virtualenv
 override_dh_virtualenv:
+	cp requirements.txt requirements.backup.txt
+	cat requirements.build.txt requirements.backup.txt > requirements.txt
 	dh_virtualenv \
 		--preinstall='pip>=8' \
 		--preinstall='setuptools>=12' \
