@@ -10,3 +10,7 @@ override_dh_virtualenv:
 		--preinstall='pip>=8' \
 		--preinstall='setuptools>=12' \
 		--no-test
+
+override_dh_builddeb:
+	dh_builddeb
+	if [ -f requirements.backup.txt ]; then mv requirements.backup.txt requirements.txt; fi;
