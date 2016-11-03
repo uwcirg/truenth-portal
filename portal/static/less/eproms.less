@@ -258,6 +258,9 @@ a.btn {
   overflow: hidden;
   max-width: 100%;
   height:100%;
+   -webkit-transition: height 0.8s ease-in;
+  -moz-transition: height 0.8s ease-in;
+  transition: height 0.8s ease-in;
   &.box-min-500 {
     min-height: 500px;
   }
@@ -1214,7 +1217,7 @@ div.input-group.date {
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
-    height:800px;
+    /*height:700px;*/
     > img {
       width: 100%;
     }
@@ -1234,7 +1237,7 @@ div.input-group.date {
   .tnth-splash {
     .headline {
       font-weight: bold;
-      font-size: 28px;
+      font-size: 1.2em;
       margin-bottom: 1em;
     }
     .feature-btn-primary {
@@ -1364,6 +1367,12 @@ div.input-group.date {
     .btn {
       margin-bottom: 0.5em;
     }
+  }
+}
+
+@media(max-width: 1300px) {
+  #fullSizeBox {
+    height: 680px;
   }
 }
 
