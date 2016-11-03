@@ -6,11 +6,12 @@ import json
 import pytz
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
+import requests
 
 from ..extensions import db
 from .lazy import lazyprop
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
-import requests
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
+from ..views.fhir import valueset_ascceg
 
 
 def as_fhir(obj):
@@ -457,6 +458,13 @@ def fetch_HL7_V3_Namespace(valueSet):
     return parse_concepts(data['codeSystem']['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
 
+def fetch_local_valueset(valueSet):
+    """Pull and parse the named valueSet from our local definition"""
+    response = valueset_ascceg()
+    data = json.loads(response.data)
+    return parse_concepts(data['codeSystem']['concept'],
+                          system='{}/{}'.format(TRUENTH_VALUESET,valueSet))
+
 
 def add_static_concepts(only_quick=False):
     """Seed database with default static concepts
@@ -477,6 +485,7 @@ def add_static_concepts(only_quick=False):
                          display='treatment begun')
 
     concepts = [BIOPSY, PCaDIAG, PCaLocalized, TX]
+    concepts += fetch_local_valueset('ascceg')
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')

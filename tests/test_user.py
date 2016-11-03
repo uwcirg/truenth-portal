@@ -13,6 +13,9 @@ from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship, UserTimezone
+from portal.models.user import UserIndigenousStatusExtension
+from portal.system_uri import TRUENTH_EXTENSTION_ASCCEG
+from portal.system_uri import TRUENTH_VALUESET_ASCCEG
 
 class TestUser(TestCase):
     """User model and view tests"""
@@ -114,6 +117,54 @@ class TestUser(TestCase):
         found = [c.code for c in self.test_user.ethnicities]
         self.assertIn('2162-6', found)
         self.assertIn('2142-8', found)
+
+    def test_australian_ethnicities(self):
+        """Apply a few ethnicities via FHIR from the ASCCEG value set"""
+
+        # Add two ethnicities directly - one in and one not in extension below
+        concepts = Coding.query.filter(Coding.code.in_(
+            ('1102-1104', '4999'))).all()
+        with SessionScope(db):
+            db.session.add(UserEthnicity(user_id=TEST_USER_ID,
+                                         coding_id=concepts[0].id))
+            db.session.add(UserEthnicity(user_id=TEST_USER_ID,
+                                         coding_id=concepts[1].id))
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        self.assertEquals(2, self.test_user.ethnicities.count())
+
+        extension = {"url": TRUENTH_EXTENSTION_ASCCEG}
+        kls = user_extension_map(user=self.test_user, extension=extension)
+        self.assertTrue(isinstance(kls, UserIndigenousStatusExtension))
+
+        # generate FHIR from user's ethnicities
+        fhir_data = kls.as_fhir()
+
+        self.assertEquals(2, len(fhir_data['valueCodeableConcept']['coding']))
+        codes = [c['code'] for c in fhir_data['valueCodeableConcept']['coding']]
+        self.assertIn('1102-1104', codes)
+        self.assertIn('4999', codes)
+
+        # now create a new extension (FHIR like) and apply to the user
+        extension = {"url": TRUENTH_EXTENSTION_ASCCEG,
+            "valueCodeableConcept": {
+                "coding": [
+                    {"system": TRUENTH_VALUESET_ASCCEG,
+                     "code": "1101"
+                    },
+                    {"system": TRUENTH_VALUESET_ASCCEG,
+                     "code": "4999"
+                    },
+                ]
+            }}
+
+        ue = UserIndigenousStatusExtension(self.test_user, extension)
+        ue.apply_fhir()
+        self.assertEquals(2, self.test_user.ethnicities.count())
+        found = [c.code for c in self.test_user.ethnicities]
+        self.assertIn('1101', found)
+        self.assertIn('4999', found)
+
 
     def test_user_timezone(self):
         self.assertEquals(self.test_user.timezone, 'UTC')

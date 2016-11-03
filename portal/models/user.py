@@ -23,7 +23,7 @@ from .organization import Organization
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import TRUENTH_IDENTITY_SYSTEM, TRUENTH_EXTENSTION_ASCCEG
 from .telecom import Telecom
 
 INVITE_PREFIX = "__invite__"
@@ -71,6 +71,16 @@ class Extension:
         # Remove the stale concepts that weren't requested again
         for concept in remove_if_not_requested.values():
             self.children.remove(concept)
+
+
+class UserIndigenousStatusExtension(Extension):
+    # Used in place of us-core-race and us-core-ethnicity for
+    # Australian configurations.
+    extension_url = TRUENTH_EXTENSTION_ASCCEG
+
+    @property
+    def children(self):
+        return self.user.ethnicities
 
 
 class UserEthnicityExtension(Extension):
@@ -171,7 +181,7 @@ def delete_user(username):
 
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
-                          UserTimezone)
+                          UserTimezone, UserIndigenousStatusExtension)
 
 def user_extension_map(user, extension):
     """Map the given extension to the User
