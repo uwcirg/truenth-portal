@@ -19,6 +19,7 @@ from .views.coredata import coredata_api
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
 from .views.fhir import fhir_api
+from .views.filters import filters_blueprint
 from .views.group import group_api
 from .views.intervention import intervention_api
 from .views.patients import patients
@@ -38,6 +39,7 @@ DEFAULT_BLUEPRINTS = (
     clinical_api,
     demographics_api,
     fhir_api,
+    filters_blueprint,
     group_api,
     intervention_api,
     org_api,
