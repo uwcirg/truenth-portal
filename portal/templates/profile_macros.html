@@ -511,7 +511,9 @@
 		    <tr><th>Assessment Name</th><th>Status</th><th>Last Updated <small>( GMT Time Zone )</small></th></tr>
 		</table>
 	</div>
-    <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+    {% if current_user.has_role('provider') %}
+        <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+    {% endif %}
 
     <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
       <div class="modal-dialog" role="document">
@@ -651,7 +653,7 @@
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
+    {% if person and person.has_role('patient') and (current_user.has_role('provider') or (current_user.id == person.id))%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
