@@ -261,9 +261,11 @@ class User(db.Model, UserMixin):
     # FIXME kludge for random demo data
     @property
     def random_due_date_status(self):
-        if (self.due_date - date.today()) < 0:
+        timedelta_days = self.due_date - datetime.today()
+        timedelta_days = timedelta_days.days
+        if timedelta_days < 0:
             desc = 'overdue'
-        elif (self.due_date - date.today()) < 30:
+        elif timedelta_days < 30:
             desc = 'due'
         else:
             desc = 'not due'
