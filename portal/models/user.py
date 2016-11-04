@@ -265,7 +265,7 @@ class User(db.Model, UserMixin):
             desc = 'overdue'
         elif (self.due_date - date.today()) < 30:
             desc = 'due'
-        else
+        else:
             desc = 'not due'
         return desc
 
