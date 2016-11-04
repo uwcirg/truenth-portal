@@ -74,8 +74,6 @@
               {% endif %}
               {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <th data-field="status" data-sortable="true">Status</th>
-              {% endif %}
-              {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <th data-field="provider_html" data-sortable="true">Next Due</th>
               {% endif %}
                   </tr>
@@ -91,11 +89,26 @@
                 {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
                 {% endif %}
-                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td>{{ 'due' }}</td>
-                {% endif %}
-                {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td>{{ '15 Dec 2016' }}</td>
+                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS 
+                      year = random.randint(2016, 2017)
+                      month = random.randint(1, 12)
+                      day = random.randint(1, 28)
+                      randomDueDate = datetime(year, month, day)
+                      today = date.today()
+                      dueDate_timedelta = randomDueDate - today
+                      if dueDate_timedelta < 0:
+                        dueStatus = 'overdue'
+                      else if dueDate_timedelta.days < 30:
+                        dueStatus = 'due'
+                      else dueStatus = 'not due'
+                      endif
+                %}
+                      <td>
+                        {{ dueStatus }}
+                      </td>
+                      <td>
+                        {{ randomDueDate }}
+                      </td>
                 {% endif %}
                   </tr>
               {% endfor %}
