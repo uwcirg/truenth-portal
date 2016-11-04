@@ -82,6 +82,19 @@ def flask_user_registered_event(app, user, **extra):
 user_logged_in.connect(flask_user_login_event)
 user_registered.connect(flask_user_registered_event)
 
+def capture_next_view_function(real_function):
+    """closure to hang onto real view function to use after saving 'next'"""
+    real_function = real_function
+
+    def capture_next():
+        """Alternate view function plugged in to capture 'next' in session"""
+        if request.args.get('next'):
+            session['next'] = request.args.get('next')
+            current_app.logger.debug(
+                "store-session['next']: <{}> before {}()".format(
+                    session['next'], real_function.func_name))
+        return real_function()
+    return capture_next
 
 @auth.route('/next-after-login')
 def next_after_login():
@@ -189,8 +202,9 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
-        current_app.logger.debug("store-session['next'] from login: %s",
-                                 session['next'])
+        current_app.logger.debug(
+            "store-session['next'] <{}> from login/{}".format(
+                session['next'], provider_name))
         # The existance of any args (including 'next') breaks the authomatic
         # login flow.  Clear out before passing on
         from werkzeug.datastructures import ImmutableMultiDict
