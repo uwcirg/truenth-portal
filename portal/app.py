@@ -129,7 +129,7 @@ def configure_extensions(app):
 def configure_i18n(app):
     #do after babel.init_app; otherwise, language installation is overwritten
     default_lang = app.config['DEFAULT_LOCALE']
-    language = gettext.translation ('portal', 'portal/locale', [default_lang])
+    language = gettext.translation ('portal', os.path.join(app.root_path, "locale"), [default_lang])
     app.jinja_env.install_gettext_translations(language)
 
 
