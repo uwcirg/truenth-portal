@@ -1,6 +1,6 @@
 """User model """
 from abc import ABCMeta, abstractproperty
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
