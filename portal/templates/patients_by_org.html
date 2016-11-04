@@ -69,7 +69,15 @@
                       <th data-field="firstname" data-sortable="true">First Name</th>
                       <th data-field="lastname" data-sortable="true">Last Name</th>
                       <th data-field="email" data-sortable="true">Email</th>
+              {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <th data-field="provider_html" data-sortable="true">Reports</th>
+              {% endif %}
+              {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      <th data-field="status" data-sortable="true">Status</th>
+              {% endif %}
+              {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      <th data-field="provider_html" data-sortable="true">Next Due</th>
+              {% endif %}
                   </tr>
               </thead>
               <tbody data-link="row" class="rowlink">
@@ -80,7 +88,15 @@
                       <td>{{ user.first_name if user.first_name }}</td>
                       <td>{{ user.last_name if user.last_name }}</td>
                       <td>{{ user.email if user.email }}</td>
+                {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
+                {% endif %}
+                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      <td>{{ 'due' }}</td>
+                {% endif %}
+                {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      <td>{{ '15 Dec 2016' }}</td>
+                {% endif %}
                   </tr>
               {% endfor %}
               </tbody>
