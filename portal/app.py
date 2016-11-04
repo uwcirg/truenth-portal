@@ -14,7 +14,7 @@ from .models.app_text import app_text
 from .models.coredata import configure_coredata
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
-from .views.auth import auth
+from .views.auth import auth, capture_next_view_function
 from .views.coredata import coredata_api
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
@@ -96,7 +96,17 @@ def configure_extensions(app):
         db.session_options = session_options
 
     # flask-user
-    user_manager.init_app(app)
+
+    ## The default login and register view functions fail to capture
+    ## the next parameter in a reliable fashion.  Using a simple closure
+    ## capture 'next' before redirecting to the real view function to
+    ## manage the flask-user business logic
+
+    from flask_user.views import login, register
+    user_manager.init_app(
+        app,
+        register_view_function=capture_next_view_function(register),
+        login_view_function=capture_next_view_function(login))
 
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
