@@ -95,6 +95,45 @@
         </div>
     </div>
 {%- endmacro %}
+{% macro profileIndigenous(person) -%}
+    <div id="userIndigenousStatusContainer"></div>
+    <script>
+    $(function () {
+        (function() {
+            $.ajax({
+                type:"GET",
+                url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
+            }).done(function(data) {
+                //console.log(data);
+                //fillContent.indigenous(data);
+                var as = data["codeSystem"]["concept"];
+                //console.log(as);
+                var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                '<label>Indigenous Status <span class="text-muted smaller-text">(Optional)</span></label>' +'<div class="profile-radio-list">';
+                as.forEach(function(o) {
+                    html += '<div class="checkbox">' + '<label>' +
+                            '<input type="checkbox" name="indigenous" value="' + o.code + '">' + o.display + '</label></div>';
+
+                });
+                html += "</div></div>";
+                $("#userIndigenousStatusContainer").html(html);
+
+
+            }).fail(function(){
+                console.log("Problem retrieiving indigenous statuses");
+
+            });
+        })();
+
+        $("#userIndigenousStatusContainer input:checkbox").each(function() {
+            $(this).on("click", function() {
+                //console.log("value: " + $(this).val());
+                assembleContent.demo({{ person.id if person }},true);
+            });
+        });
+    });
+    </script>
+{%- endmacro %}
 
 {% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
@@ -281,7 +320,7 @@
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
-        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
     <script>$(function () {
@@ -626,43 +665,7 @@
 	    </script>
 
 {%- endmacro %}
-
-{% macro profile(person, current_user, consent_agreements) -%}
-    <div class="row" style="position: relative;">
-        <div class="col-md-6">
-            <div class="profile-item-container side">
-                <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
-                {{profileName(person)}}
-                {{profileBirthDate(person)}}
-
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="profile-item-container side">
-                <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
-                {{profileEmail(person)}}
-                {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
-                    {{profileSendEmail(person)}}
-                {% endif %}
-                {% if person.has_role('provider') and not person.has_role('patient') %}
-                    {{profilePhone(person)}}
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
-     	<div class="row">
-            <div class="col-md-12">
-                <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title">PRO Assessments</h4>
-					{{profileSessionList(person, current_user)}}
-				</div>
-			</div>
-		</div>
-    {% endif %}
-
-    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
+{% macro profileClinicalQuestions(person, current_user) -%}
         <div class="row">
             <div class="col-md-12">
                 <div class="profile-item-container">
@@ -734,6 +737,45 @@
 
             });
         </script>
+{%- endmacro %}
+
+{% macro profile(person, current_user, consent_agreements) -%}
+    <div class="row" style="position: relative;">
+        <div class="col-md-6">
+            <div class="profile-item-container side">
+                <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                {{profileName(person)}}
+                {{profileBirthDate(person)}}
+
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="profile-item-container side">
+                <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
+                {{profileEmail(person)}}
+                {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+                    {{profileSendEmail(person)}}
+                {% endif %}
+                {% if person.has_role('provider') and not person.has_role('patient') %}
+                    {{profilePhone(person)}}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
+     	<div class="row">
+            <div class="col-md-12">
+                <div  class="profile-item-container">
+                     <h4 id="proAssessmentsLoc" class="profile-item-title">PRO Assessments</h4>
+					{{profileSessionList(person, current_user)}}
+				</div>
+			</div>
+		</div>
+    {% endif %}
+
+    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
+        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
     {% if person.has_role('patient') %}
@@ -775,6 +817,9 @@
                             </div>
                             <div>
                                 {{profileRace(person)|show_macro('race')}}
+                            </div>
+                            <div>
+                                {{profileIndigenous(person)|show_macro('indigenous')}}
                             </div>
                     </div>
                 </div>

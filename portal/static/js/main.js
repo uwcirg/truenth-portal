@@ -128,6 +128,8 @@ var fillContent = {
         })
     },
     "demo": function(data) {
+        //console.log("in demo");
+        //console.log(data)
 
         $('#firstname').val(data.name.given);
         $('#lastname').val(data.name.family);
@@ -145,6 +147,7 @@ var fillContent = {
         this.ethnicity(data);
         // Get Races
         this.race(data);
+        this.indigenous(data);
         this.orgs(data);
     },
     "name": function(data){
@@ -165,27 +168,47 @@ var fillContent = {
         };
     },
     "ethnicity": function(data) {
-        $.each(data.extension[0].valueCodeableConcept.coding,function(i, val){
-            $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes - output but hide, for submitting on update
-            if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
-                if (val.code !== "undefined") $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
-            }
+        data.extension.forEach(function(item, index) {
+            if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity") {
+                console.log(item)
+                item.valueCodeableConcept.coding.forEach(function(val){
+                    $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
+                    // Way to handle non-standard codes - output but hide, for submitting on update
+                    if ($("#userEthnicity input:radio[value="+val.code+"]").length == 0) {
+                        if (val.code !== "undefined") $("#userEthnicity").append("<input class='tnth-hide' type='checkbox' checked name='ethnicity' value='"+val.code+"' data-label='"+val.display+"' />");
+                    }
+                });
+            };
         });
     },
     "race": function(data) {
         // Get Races
-        $.each(data.extension[1].valueCodeableConcept.coding,function(i,val){
-            //console.log(val)
-            $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
-            // Way to handle non-standard codes
-            if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
-                // If there is any non-standard, then check the "other" in the UI
-                $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
-                // Add hidden list of non-standard for form submission
-               if (val.code !== "undefined") $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
-                //$("#raceOtherVal").fadeToggle();
-            }
+        data.extension.forEach(function(item, index) {
+            if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-race") {
+                item.valueCodeableConcept.coding.forEach(function(val){
+                    //console.log(val)
+                    $("#userRace input:checkbox[value="+val.code+"]").prop('checked', true);
+                    // Way to handle non-standard codes
+                    if ($("#userRace input:checkbox[value="+val.code+"]").length == 0) {
+                        // If there is any non-standard, then check the "other" in the UI
+                        $("#userRace input:checkbox[value=2131-1]").prop('checked', true);
+                        // Add hidden list of non-standard for form submission
+                       if (val.code !== "undefined") $("#userRace").append("<input class='tnth-hide' type='checkbox' checked name='race' value='"+val.code+"' data-label='"+val.display+"' />");
+                        //$("#raceOtherVal").fadeToggle();
+                    }
+                });
+            };
+        });
+    },
+    "indigenous": function(data) {
+        data.extension.forEach(function(item, index) {
+            if (item.url === "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036") {
+                item.valueCodeableConcept.coding.forEach(function(val){
+                    //console.log(val)
+                    $("#userIndigenousStatus input:checkbox[value="+val.code+"]").prop('checked', true);
+                   
+                });
+            };
         });
     },
     "orgs": function(data) {
@@ -310,14 +333,46 @@ var assembleContent = {
             demoArray["careProvider"] = orgIDs;
 
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio
-            var ethnicityIDs = $("#userEthnicity input:checked").map(function(){
-                return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
-            }).get();
+            var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus");
+            var ethnicityIDs, raceIDs, indigenousIDs;
+            
+            if (e.length > 0) {
+                ethnicityIDs = $("#userEthnicity input:checked").map(function(){
+                    return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
+                }).get();
+            };
             // Look for race checkboxes, can be hidden
-            var raceIDs = $("#userRace input:checkbox:checked").map(function(){
-                return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
-            }).get();
+            if (r.length > 0 ) {
+                raceIDs = $("#userRace input:checkbox:checked").map(function(){
+                    return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
+                }).get();
+            };
 
+            if (i.length > 0) {
+                indigenousIDs = $("#userIndigenousStatus input:checkbox:checked").map(function() {
+                    return { code: $(this).val(), system: "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036" };
+                }).get();
+            };
+
+            demoArray["extension"] = [
+
+                {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
+                    "valueCodeableConcept": {
+                        "coding": ethnicityIDs ? ethnicityIDs : []
+                    }
+                },
+                {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
+                    "valueCodeableConcept": {
+                        "coding": raceIDs ? raceIDs : []
+                    }
+                }
+                 ,
+                 {   "url": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
+                     "valueCodeableConcept": {
+                         "coding": indigenousIDs ? indigenousIDs: []
+                     }
+                 }
+            ];
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
             demoArray["telecom"] = [
@@ -325,19 +380,8 @@ var assembleContent = {
                 { "system": "phone", "value": $("input[name=phone]").val() }
             ];
 
-
-            demoArray["extension"] = [
-                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
-                    "valueCodeableConcept": {
-                        "coding": ethnicityIDs
-                    }
-                },
-                { "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
-                    "valueCodeableConcept": {
-                        "coding": raceIDs
-                    }
-                }
-            ];
+            //try updating indigenous status
+        
 
            //console.log("demoArray", demoArray);
         }
@@ -403,7 +447,7 @@ var assembleContent = {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["extension"] = [];
-        if ($("#userEthnicity").length) {
+        if ($("#userEthnicity").length > 0) {
             var ethnicityIDs = $("#userEthnicity input:checked").map(function(){
                 return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
             }).get();
@@ -415,7 +459,7 @@ var assembleContent = {
                 }
             );
         }
-        if ($("#userRace").length) {
+        if ($("#userRace").length > 0) {
             var raceIDs = $("#userRace input:checkbox:checked").map(function(){
                 return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Race" };
             }).get();
@@ -500,7 +544,7 @@ var tnthAjax = {
 
                     $("#userOrgs").find(".help-block").text("");
 
-                    
+
                 });
 
                 if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
@@ -560,7 +604,7 @@ var tnthAjax = {
         });
     },
     "setConsent": function(userId, params) {
-        if (userId && params) { 
+        if (userId && params) {
             $.ajax ({
                 type: "POST",
                 url: '/api/user/' + userId + '/consent',
@@ -576,7 +620,7 @@ var tnthAjax = {
         };
     },
     deleteConsent: function(userId, params) {
-        if (userId && params) { 
+        if (userId && params) {
             $.ajax ({
                 type: "DELETE",
                 url: '/api/user/' + userId + '/consent',
@@ -598,6 +642,7 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.race(data);
             fillContent.ethnicity(data);
+            fillContent.indigenous(data);
             fillContent.orgs(data);
             if (!noOverride) fillContent.demo(data);
             loader();
@@ -614,6 +659,8 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
+            console.log("done");
+            console.log(data);
         }).fail(function() {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
         });

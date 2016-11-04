@@ -25,7 +25,7 @@ body {
   background-color: #FFF;
   font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
   /*transition: all 500ms ease-in;*/
 }
 
@@ -338,11 +338,11 @@ a.btn {
   padding: 0 5px 0 0;
 }
 .form-control {
-  font-size: 18px;
+  font-size: 1em;
   height: 39px;
 }
 .form-group .help-block {
-  font-size: 16px;
+  font-size: 0.95em;
 }
 .form-group label {
   font-weight: normal;
@@ -436,11 +436,11 @@ a.btn {
   margin-left: -2em;
 }
 .tnth-form .form-group > label {
-  font-size: 18px;
+  font-size: 1em;
   color: #777;
 }
 .form-with-floats .form-group > label {
-  font-size: 18px;
+  font-size: 1em;
   color: #aaa;
   opacity: 0;
 }
@@ -497,6 +497,9 @@ a.btn {
 #userRace label {
   margin-bottom: 0;
 }
+/*#userIndigenousStatus .checkbox label {
+  font-size: 0.95em;
+}*/
 #genderLabel {
   margin-bottom: 0;
 }
@@ -886,6 +889,9 @@ opacity: 0.8;
 .radio-inline input[type=radio] {
   margin-top: 6px;
 }
+#userIndigenousStatusContainer .checkbox label, #userIndigenousStatusContainer .radio label{
+  margin-bottom: 4px;
+}
 div.modal-header,
 div.modal-footer {
   background-color: #627371;
@@ -1189,7 +1195,7 @@ div.input-group.date {
 @media (min-width: 992px) {
   /** Font sizes changes above 992 **/
   body {
-    font-size: 1.8em;
+    font-size: 1.6em;
   }
   #wellContainer {
     height: 90%;
