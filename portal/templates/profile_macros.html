@@ -550,7 +550,9 @@
 		    <tr><th>Assessment Name</th><th>Status</th><th>Last Updated <small>( GMT Time Zone )</small></th></tr>
 		</table>
 	</div>
-    <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+    {% if current_user.has_role('provider') %}
+        <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+    {% endif %}
 
     <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
       <div class="modal-dialog" role="document">
@@ -665,78 +667,79 @@
 	    </script>
 
 {%- endmacro %}
+
 {% macro profileClinicalQuestions(person, current_user) -%}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="profile-item-container">
-                    <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
-                    <h4 class="text-muted">Questions inquired of the patient at registration</h4>
-                    <input type="hidden" id="iq_userId" value="{{person.id}}" />
-                    <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
-                        {{patientQGroup(current_user)}}
-                    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
+                <h4 class="text-muted">Questions inquired of the patient at registration</h4>
+                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                    {{patientQGroup(current_user)}}
                 </div>
             </div>
         </div>
-        <script>
-            function checkDiagnosis() {
-                var diag = $("#pca_diag_yes");
+    </div>
+    <script>
+        function checkDiagnosis() {
+            var diag = $("#pca_diag_yes");
 
-                if (diag.is(":checked")) {
-                  diag.parents(".pat-q").nextAll().fadeIn();
-                } else {
-                  diag.parents(".pat-q").nextAll().fadeOut();
-                };
-                {% if person and current_user and (person.id != current_user.id) %}
-                    if (!$("#patientQ input[type='radio']").is(":checked")) {
-                        $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
-                    };
-                {% endif %}
-
-
+            if (diag.is(":checked")) {
+              diag.parents(".pat-q").nextAll().fadeIn();
+            } else {
+              diag.parents(".pat-q").nextAll().fadeOut();
             };
-            $(function () {
-                //$("#patientQ").show();
-                $("#patientQ hr").hide();
-                {% if person and current_user and person.id != current_user.id %}
-                    $("#patientQ input[type='radio']").each(function() {
-                        $(this).attr("disabled", "disabled");
-                    });
+            {% if person and current_user and (person.id != current_user.id) %}
+                if (!$("#patientQ input[type='radio']").is(":checked")) {
+                    $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
+                };
+            {% endif %}
 
 
-                {% endif %}
-
-                {% if person %}
-                    $(".pat-q input:radio").on("click",function(){
-                          var thisItem = $(this);
-                          var toCall = thisItem.attr("name")
-                          // Get value from div - either true or false
-                          var toSend = thisItem.val();
-                          tnthAjax.putClinical({{person.id}},toCall,toSend);
-                          if (toSend == "true" || toCall ==  "pca_localized") {
-                            thisItem.parents(".pat-q").nextAll().fadeIn();
-
-                          } else {
-                            if (toCall == "biopsy") {
-                              tnthAjax.putClinical({{person.id}},"pca_diag","false");
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
-                            } else if (toCall == "pca_diag") {
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
-                            }
-                            thisItem.parents(".pat-q").nextAll().fadeOut();
-                          };
-                      });
-                 {% endif %}
-
-                 //wait for ajax calls to finish?
-                 //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-                 setTimeout("checkDiagnosis();", 1000);
+        };
+        $(function () {
+            //$("#patientQ").show();
+            $("#patientQ hr").hide();
+            {% if person and current_user and person.id != current_user.id %}
+                $("#patientQ input[type='radio']").each(function() {
+                    $(this).attr("disabled", "disabled");
+                });
 
 
-            });
-        </script>
+            {% endif %}
+
+            {% if person %}
+                $(".pat-q input:radio").on("click",function(){
+                      var thisItem = $(this);
+                      var toCall = thisItem.attr("name")
+                      // Get value from div - either true or false
+                      var toSend = thisItem.val();
+                      tnthAjax.putClinical({{person.id}},toCall,toSend);
+                      if (toSend == "true" || toCall ==  "pca_localized") {
+                        thisItem.parents(".pat-q").nextAll().fadeIn();
+
+                      } else {
+                        if (toCall == "biopsy") {
+                          tnthAjax.putClinical({{person.id}},"pca_diag","false");
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        } else if (toCall == "pca_diag") {
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        }
+                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                      };
+                  });
+             {% endif %}
+
+             //wait for ajax calls to finish?
+             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+             setTimeout("checkDiagnosis();", 1000);
+
+
+        });
+    </script>
 {%- endmacro %}
 
 {% macro profile(person, current_user, consent_agreements) -%}

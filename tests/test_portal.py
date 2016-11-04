@@ -51,6 +51,7 @@ class TestPortal(TestCase):
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
         self.login()
+
         rv = self.app.get('/home')
 
         ui = db.session.merge(ui)
@@ -76,6 +77,11 @@ class TestPortal(TestCase):
         self.login()
         self.promote_user(role_name=ROLE.PROVIDER)
         self.promote_user(role_name=ROLE.PATIENT)
+
+        # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the
+        # 'reports' field
+        self.app.application.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
+            'reports',]
         rv = self.app.get('/patients/')
 
         ui = db.session.merge(ui)

@@ -74,9 +74,7 @@
               {% endif %}
               {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <th data-field="status" data-sortable="true">Status</th>
-              {% endif %}
-              {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <th data-field="provider_html" data-sortable="true">Next Due</th>
+                      <th data-field="next_due" data-sortable="true">Next Due</th>
               {% endif %}
                   </tr>
               </thead>
@@ -91,11 +89,19 @@
                 {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
                 {% endif %}
+                      <td>
                 {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td>{{ 'due' }}</td>
-                {% endif %}
-                {% if 'next_due' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td>{{ '15 Dec 2016' }}</td>
+                    {% if (user.randomDueDate - date.today()) < 0 %}
+                        overdue
+                    {% elif (user.randomDueDate - date.today()) < 30 %}
+                        due
+                    {% else %}
+                        not due
+                    {% endif %}
+                      </td>
+                      <td>
+                        {{ user.randomDueDate }}
+                      </td>
                 {% endif %}
                   </tr>
               {% endfor %}
