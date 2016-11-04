@@ -241,6 +241,9 @@ class User(db.Model, UserMixin):
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
 
+    # FIXME kludge for random demo data
+    due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
+
     @property
     def valid_consents(self):
         """Access to consents that have neither been deleted or expired"""
@@ -257,10 +260,14 @@ class User(db.Model, UserMixin):
 
     # FIXME kludge for random demo data
     @property
-    def randomDueDate(self):
-    	return datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
-    # dueDate_timedelta = randomDueDate - date.today()
-
+    def random_due_date_status(self):
+        if (self.due_date - date.today()) < 0
+            desc = 'overdue'
+        elif (self.due_date - date.today()) < 30
+            desc = 'due'
+        else
+            desc = 'not due'
+        return desc
 
     @hybrid_property
     def email(self):

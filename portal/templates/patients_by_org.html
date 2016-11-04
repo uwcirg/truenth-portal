@@ -86,21 +86,15 @@
                       <td>{{ user.first_name if user.first_name }}</td>
                       <td>{{ user.last_name if user.last_name }}</td>
                       <td>{{ user.email if user.email }}</td>
-                {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                    {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
-                {% endif %}
-                      <td>
-                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                    {% if (user.randomDueDate - date.today()) < 0 %}
-                        overdue
-                    {% elif (user.randomDueDate - date.today()) < 30 %}
-                        due
-                    {% else %}
-                        not due
                     {% endif %}
+                    {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      <td>
+                        {{ user.due_date }}
                       </td>
                       <td>
-                        {{ user.randomDueDate }}
+                        {{ user.random_due_date_status }}
                       </td>
                 {% endif %}
                   </tr>
