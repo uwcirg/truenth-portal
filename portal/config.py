@@ -51,6 +51,8 @@ class BaseConfig(object):
     GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
     GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
+    DEFAULT_LOCALE = 'en_US'
+
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
