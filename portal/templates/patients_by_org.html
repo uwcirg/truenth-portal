@@ -93,7 +93,7 @@
                 {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                     {% if (user.randomDueDate - date.today()) < 0 %}
                         overdue
-                    {% else if (user.randomDueDate - date.today()) < 30 %}
+                    {% elif (user.randomDueDate - date.today()) < 30 %}
                         due
                     {% else %}
                         not due
