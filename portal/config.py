@@ -43,6 +43,7 @@ class BaseConfig(object):
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
     PROVIDER_BULK_DATA_ACCESS = False
+    PATIENTS_BY_PROVIDER_ADDL_FIELDS = [] # 'status', 'next_due', 'reports'
 
     FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
     FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
