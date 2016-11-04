@@ -89,7 +89,7 @@
                 {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
                 {% endif %}
-                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS 
+                {% if ('status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS): 
                       year = random.randint(2016, 2017)
                       month = random.randint(1, 12)
                       day = random.randint(1, 28)
