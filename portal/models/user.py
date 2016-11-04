@@ -257,7 +257,7 @@ class User(db.Model, UserMixin):
     # FIXME kludge for random demo data
     @property
     def randomDueDate(self):
-    	return datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28)
+    	return datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
     # dueDate_timedelta = randomDueDate - date.today()
 
 
