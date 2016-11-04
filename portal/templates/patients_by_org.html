@@ -89,25 +89,18 @@
                 {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
                 {% endif %}
-                {% if ('status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS): 
-                      year = random.randint(2016, 2017)
-                      month = random.randint(1, 12)
-                      day = random.randint(1, 28)
-                      randomDueDate = datetime(year, month, day)
-                      today = date.today()
-                      dueDate_timedelta = randomDueDate - today
-                      if dueDate_timedelta < 0:
-                        dueStatus = 'overdue'
-                      else if dueDate_timedelta.days < 30:
-                        dueStatus = 'due'
-                      else dueStatus = 'not due'
-                      endif
-                %}
                       <td>
-                        {{ dueStatus }}
+                {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                    {% if (user.randomDueDate - date.today()) < 0 %}
+                        overdue
+                    {% else if (user.randomDueDate - date.today()) < 30 %}
+                        due
+                    {% else %}
+                        not due
+                    {% endif %}
                       </td>
                       <td>
-                        {{ randomDueDate }}
+                        {{ user.randomDueDate }}
                       </td>
                 {% endif %}
                   </tr>

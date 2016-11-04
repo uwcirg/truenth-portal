@@ -1,6 +1,6 @@
 """User model """
 from abc import ABCMeta, abstractproperty
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
@@ -253,6 +253,13 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    # FIXME kludge for random demo data
+    @property
+    def randomDueDate(self):
+    	return datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28)
+    # dueDate_timedelta = randomDueDate - date.today()
+
 
     @hybrid_property
     def email(self):
