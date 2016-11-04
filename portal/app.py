@@ -1,9 +1,10 @@
-"""Poral module"""
+"""Portal module"""
 from logging import handlers
 import logging
 import os
 import pkginfo
 import sys
+import gettext
 from flask import Flask
 from flask_webtest import get_scopefunc
 
@@ -59,6 +60,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
+    configure_i18n(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
     configure_audit_log(app)
@@ -122,6 +124,13 @@ def configure_extensions(app):
 
     # babel - i18n
     babel.init_app(app)
+
+
+def configure_i18n(app):
+    #do after babel.init_app; otherwise, language installation is overwritten
+    default_lang = app.config['DEFAULT_LOCALE']
+    language = gettext.translation ('portal', os.path.join(app.root_path, "locale"), [default_lang])
+    app.jinja_env.install_gettext_translations(language)
 
 
 def configure_blueprints(app, blueprints):
