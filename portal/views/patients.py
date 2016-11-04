@@ -1,7 +1,7 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 import requests
 import random 
-from datetime import datetime timedelta
+from datetime import datetime, timedelta
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
 from sqlalchemy import and_
