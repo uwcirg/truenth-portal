@@ -243,6 +243,7 @@ class User(db.Model, UserMixin):
 
     # FIXME kludge for random demo data
     due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
+    random_due_date_status = 'due'
 
     @property
     def valid_consents(self):
@@ -257,19 +258,6 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
-
-    # FIXME kludge for random demo data
-    @property
-    def random_due_date_status(self):
-        timedelta_days = self.due_date - datetime.today()
-        timedelta_days = timedelta_days.days
-        if timedelta_days < 0:
-            desc = 'overdue'
-        elif timedelta_days < 30:
-            desc = 'due'
-        else:
-            desc = 'not due'
-        return desc
 
     @hybrid_property
     def email(self):
