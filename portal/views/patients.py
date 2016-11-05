@@ -62,7 +62,7 @@ def patients_root():
             else:
                 desc = 'not due'
             user.random_due_date_status = desc
-            user.due_date = user.due_date.date
+            user.due_date = user.due_date.strftime('%w %b %Y')
 
         #store patients by org into top level org list so we can list them by top-level org
         #before we were sorting by org only
