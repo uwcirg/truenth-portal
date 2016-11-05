@@ -1,8 +1,5 @@
 language: python
-python:
-  - "2.7"
-  - "3.5"
-  - "pypy"
+python: "2.7"
 
 cache: pip
 addons:
@@ -17,9 +14,6 @@ env:
     - PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
 
 matrix:
-  allow_failures:
-    - python: "3.5"
-    - python: "pypy"
   include:
     - python: "2.7"
       env: TOXENV=docs
