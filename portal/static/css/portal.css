@@ -25,7 +25,7 @@ body {
   background-color: #FFF;
   font-family: "Helvetica Neue Light", "Helvetica Neue", Arial, sans-serif;
   color: #333;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 
@@ -49,6 +49,15 @@ body {
   visibility: hidden;
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
+}
+.save-info {
+  opacity: 0;
+   -webkit-transition: opacity 0.8s ease-in;
+  transition: opacity 0.8s ease-in;
+  position: absolute;
+  top: 2px
+  left: 0;
+  font-size: 0.90em;
 }
 #indexContainer {
 display: block;
@@ -332,11 +341,11 @@ a.btn{
   padding: 0 5px 0 0;
 }
 .form-control {
-  font-size: 18px;
+  font-size: 1em;
   height: 39px;
 }
 .form-group .help-block {
-  font-size: 16px;
+  font-size: 0.95em;
 }
 .form-group label {
   font-weight: normal;
@@ -431,11 +440,11 @@ a.btn{
   margin-left: -2em;
 }
 .tnth-form .form-group > label {
-  font-size: 18px;
+  font-size: 1em;
   color: #777;
 }
 .form-with-floats .form-group > label {
-  font-size: 18px;
+  font-size: 1em;
   color: #aaa;
   opacity: 0;
 }
@@ -528,6 +537,12 @@ input.clinic {
 .create-account-container {
   padding: 3.5em 4em;
   width: 90%;
+}
+#profileForm #bdGroup div.row {
+  height: 4.5em;
+}
+#profileForm div.name-section {
+  height: 4.5em;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1186,7 +1201,7 @@ div.input-group.date {
 @media (min-width: 992px) {
   /** Font sizes changes above 992 **/
   body {
-    font-size: 1.8em;
+    font-size: 1.6em;
   }
   .tnth-headline {
     font-size: 1.20em;

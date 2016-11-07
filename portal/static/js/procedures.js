@@ -92,7 +92,8 @@ $(document).ready(function() {
     });
     // When date changes, update submit button w/ both mm/dd/yyyy and yyyy-mm-dd
     $("input[id^='tnthproc-date']").on('change', function( event ) {
-        var passedDate = $(this).val();
+        var passedDate = $(this).val(); // eg "11/20/2016"
+        passedDate = tnthDates.swap_mm_dd(passedDate);
         $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
         var dateFormatted;
         // Change dates to YYYY-MM-DD

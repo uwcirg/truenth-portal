@@ -39,7 +39,6 @@
     <div class="col-md-12">
         {{profile(user, current_user, consent_agreements)}}
         <br/>
-        {{profileSaveBtn()}}
         {% if providerPerspective == 'true' %}
            <br/><br/> {{ back_btn('patients','Patients List') }}
         {% else %}
@@ -47,8 +46,6 @@
         {% endif %}
     </div>
 </div>
-
-
 </form>
 
 {% endblock %}
@@ -60,7 +57,6 @@ function goTo(event, id) {
     window.location = "#" + id;
     $("#indexContainer").removeClass("open");
 };
-
 
 $(document).ready(function(){
 
@@ -75,6 +71,67 @@ $(document).ready(function(){
             };
         };
 
+    });
+
+    [{
+        attachID: "month",
+        targetField: $("#month")
+     },
+     {
+        attachID: "date",
+        targetField: $("#date")
+     },
+     {
+        attachID: "year",
+        targetField: $("#year")
+     },
+     {
+        attachID: "firstname",
+        targetField: $("#firstname")
+     },
+     {
+        attachID: "lastname",
+        targetField: $("#lastname")
+     },
+     {
+        attachID: "email",
+        targetField: $("#email")
+     },
+     {
+        attachID: "phone",
+        targetField: $("#phone")
+     },
+     {
+        attachID: "genderGroup",
+        targetField: $("input[name='sex']")
+     },
+     {
+        attachID: "userRace",
+        targetField: $("input[name='race']")
+     },
+     {
+        attachID: "userEthnicity",
+        targetField: $("input[name='ethnicity']")
+     },
+     {
+        attachID: "rolesGroup",
+        targetField: $("input[name='user_type']")
+     }].forEach(function(o) {
+        /*
+        $("#profileForm #" + o.attachID).after('<div>' + '<i id="' + o.attachID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:4px" aria-hidden="true"></i><i id="' + o.attachID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + o.attachID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+        */
+        getSaveLoaderDiv("profileForm", o.attachID);
+        
+        o.targetField.each(function() {
+            $(this).attr("save-container-id", o.attachID);
+            $(this).on("change", function() {
+                var validator = $("#profileForm").data('bs.validator');
+                if (!validator.hasErrors()) {
+                    assembleContent.demo({{ user.id }},true, $(this));
+                };
+            });
+            
+        });
     });
 
     if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
@@ -103,7 +160,7 @@ $(document).ready(function(){
     $('#profileForm').on('validated.bs.validator', function(e) {
         var validator = $(this).data('bs.validator');
         if (!validator.hasErrors()) {
-            assembleContent.demo({{ user.id }},true);
+           // assembleContent.demo({{ user.id }},true);
             $("#errorMsg").hide()
         } else {
             $("#errorMsg").fadeIn("slow")
@@ -166,7 +223,7 @@ function setRoles() {
 
     });
 };
-
-setRoles();
+/* done in on change event for role now*/
+//setRoles();
 
 {% endblock %}
