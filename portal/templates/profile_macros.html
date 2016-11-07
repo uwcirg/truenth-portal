@@ -95,6 +95,46 @@
         </div>
     </div>
 {%- endmacro %}
+{% macro profileIndigenous(person) -%}
+    <div id="userIndigenousStatusContainer"></div>
+    <script>
+    $(function () {
+        (function() {
+            $.ajax({
+                type:"GET",
+                url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
+            }).done(function(data) {
+                //console.log(data);
+                //fillContent.indigenous(data);
+                var as = data["codeSystem"]["concept"];
+                //console.log(as);
+                var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                '<label>Indigenous Status <span class="text-muted smaller-text">(Optional)</span></label>' +'<div class="profile-radio-list">';
+                as.forEach(function(o) {
+                    html += '<div class="checkbox">' + '<label>' +
+                            '<input type="checkbox" name="indigenous" value="' + o.code + '">' + o.display + '</label></div>';
+
+                });
+                html += "</div></div>";
+                $("#userIndigenousStatusContainer").html(html);
+                getSaveLoaderDiv("profileForm", "userIndigenousStatus");
+                $("#userIndigenousStatusContainer input:checkbox").each(function() {
+                    $(this).attr("save-container-id", "userIndigenousStatus");
+                    $(this).on("click", function() {
+                        //console.log("value: " + $(this).val());
+                        assembleContent.demo({{ person.id if person }},true, $(this));
+                    });
+                });
+
+
+            }).fail(function(){
+                console.log("Problem retrieiving indigenous statuses");
+
+            });
+        })();
+    });
+    </script>
+{%- endmacro %}
 
 {% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
@@ -198,7 +238,7 @@
     </div>
     <script>$(function () {
 
-        function getUrl() {
+        function getAccessUrl() {
             var url = '';
             $.ajax ({
                 type: 'GET',
@@ -234,21 +274,29 @@
             var email = $('#email').val();
 
             if (selectedOption.val() != '') {
-                var url = getUrl();
-                if (url != '') {
-
+                var subject = '';
+                var body = '';
+                var return_url = '';
+                if (selectedOption.val() == 'invite'){
+                    return_url = getAccessUrl();
                     {# javascript variables are not available at template
                        rendering time.  insert a placeholder and then
                        replace once the variable is available. #}
-                    var body = '{{ app_text('profileSendEmail email html',
+                    body = '{{ app_text('profileSendEmail invite email_body',
                             'url_placeholder') | safe }}';
-                    body = body.replace(/url_placeholder/g, url);
-
+                    body = body.replace(/url_placeholder/g, return_url);
+                    subject = '{{ app_text('profileSendEmail invite email_subject') }}'
+                }
+                else { // reminder
+                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}';
+                    subject = '{{ app_text('profileSendEmail reminder email_subject') }}'
+                }
+                if (body != '') {
                     $.ajax ({
                         type: 'POST',
                         url: '/invite',
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        data: {'subject': selectedOption.text(), 'recipients': email, 'body': body}
+                        data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
                        //console.log('data ' + data);
                         $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
@@ -281,7 +329,7 @@
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
-        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
     <script>$(function () {
@@ -513,6 +561,7 @@
 	</div>
     {% if current_user.has_role('provider') %}
         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+        <a href="javascript:void(0)" id="loginAsPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#loginAsModal">Log in as this patient</a>
     {% endif %}
 
     <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
@@ -533,6 +582,26 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="loginAsModalLabel">Log in as the Patient</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
         $(function () {
     	var sessionListHTML = "";
@@ -629,6 +698,80 @@
 
 {%- endmacro %}
 
+{% macro profileClinicalQuestions(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
+                <h4 class="text-muted">Questions inquired of the patient at registration</h4>
+                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                    {{patientQGroup(current_user)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkDiagnosis() {
+            var diag = $("#pca_diag_yes");
+
+            if (diag.is(":checked")) {
+              diag.parents(".pat-q").nextAll().fadeIn();
+            } else {
+              diag.parents(".pat-q").nextAll().fadeOut();
+            };
+            {% if person and current_user and (person.id != current_user.id) %}
+                if (!$("#patientQ input[type='radio']").is(":checked")) {
+                    $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
+                };
+            {% endif %}
+
+
+        };
+        $(function () {
+            //$("#patientQ").show();
+            $("#patientQ hr").hide();
+            {% if person and current_user and person.id != current_user.id %}
+                $("#patientQ input[type='radio']").each(function() {
+                    $(this).attr("disabled", "disabled");
+                });
+
+
+            {% endif %}
+
+            {% if person %}
+                $(".pat-q input:radio").on("click",function(){
+                      var thisItem = $(this);
+                      var toCall = thisItem.attr("name")
+                      // Get value from div - either true or false
+                      var toSend = thisItem.val();
+                      tnthAjax.putClinical({{person.id}},toCall,toSend);
+                      if (toSend == "true" || toCall ==  "pca_localized") {
+                        thisItem.parents(".pat-q").nextAll().fadeIn();
+
+                      } else {
+                        if (toCall == "biopsy") {
+                          tnthAjax.putClinical({{person.id}},"pca_diag","false");
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        } else if (toCall == "pca_diag") {
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        }
+                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                      };
+                  });
+             {% endif %}
+
+             //wait for ajax calls to finish?
+             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+             setTimeout("checkDiagnosis();", 1000);
+
+
+        });
+    </script>
+{%- endmacro %}
+
 {% macro profile(person, current_user, consent_agreements) -%}
 
     <div class="row" style="position: relative;">
@@ -654,7 +797,7 @@
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and (current_user.has_role('provider') or (current_user.id == person.id))%}
+    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -666,103 +809,7 @@
     {% endif %}
 
     {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="profile-item-container">
-                    <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
-                    <h4 class="text-muted">Questions inquired of the patient at registration</h4>
-                    <input type="hidden" id="iq_userId" value="{{person.id}}" />
-                    <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
-                        {{patientQGroup(current_user)}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            function checkDiagnosis() {
-                var diag = $("#pca_diag_yes");
-
-                if (diag.is(":checked")) {
-                  diag.parents(".pat-q").nextAll().fadeIn();
-                } else {
-                  diag.parents(".pat-q").nextAll().fadeOut();
-                };
-                {% if person and current_user and (person.id != current_user.id) %}
-                    if (!$("#patientQ input[type='radio']").is(":checked")) {
-                        $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
-                    };
-                {% endif %}
-
-
-            };
-            $(function () {
-                //$("#patientQ").show();
-                $("#patientQ hr").hide();
-                {% if person and current_user and person.id != current_user.id %}
-                    $("#patientQ input[type='radio']").each(function() {
-                        $(this).attr("disabled", "disabled");
-                    });
-
-
-                {% endif %}
-
-                {% if person %}
-                    [
-                     {
-                        attachID: "patBiopsy",
-                        targetField: $("input[name='biopsy']")
-                     },
-                     {
-                        attachID: "patDiag",
-                        targetField: $("input[name='pca_diag']")
-                     },
-                     {
-                        attachID: "patMeta",
-                        targetField: $("input[name='pca_localized']")
-                     },
-                     {
-                        attachID: "patTx",
-                        targetField: $("input[name='tx']")
-                     }
-                     ].forEach(function(o) {
-                        getSaveLoaderDiv("profileForm", o.attachID);
-                        o.targetField.each(function() {
-                            $(this).attr("save-container-id", o.attachID);
-                        });
-                     });
-
-
-
-                    $(".pat-q input:radio").on("click",function(){
-                          var thisItem = $(this);
-                          var toCall = thisItem.attr("name")
-                          // Get value from div - either true or false
-                          var toSend = thisItem.val();
-                          tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
-                          if (toSend == "true" || toCall ==  "pca_localized") {
-                            thisItem.parents(".pat-q").nextAll().fadeIn();
-
-                          } else {
-                            if (toCall == "biopsy") {
-                              tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                              tnthAjax.putClinical({{person.id}},"tx","false", $(this));
-                            } else if (toCall == "pca_diag") {
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
-                              tnthAjax.putClinical({{person.id}},"tx","false", $(this));
-                            }
-                            thisItem.parents(".pat-q").nextAll().fadeOut(1000);
-                          };
-                      });
-                 {% endif %}
-
-                 //wait for ajax calls to finish?
-                 //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-                 setTimeout("checkDiagnosis();", 1000);
-
-
-            });
-        </script>
+        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
     {% if person.has_role('patient') %}
@@ -800,10 +847,13 @@
                         </div>
 
                             <div>
-                                {{profileEthnicity(person)}}
+                                {{profileEthnicity(person)|show_macro('ethnicity')}}
                             </div>
                             <div>
-                                {{profileRace(person)}}
+                                {{profileRace(person)|show_macro('race')}}
+                            </div>
+                            <div>
+                                {{profileIndigenous(person)|show_macro('indigenous')}}
                             </div>
                     </div>
                 </div>

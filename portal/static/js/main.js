@@ -170,7 +170,7 @@ var fillContent = {
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
             if (item.url === "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity") {
-                console.log(item)
+                //console.log(item)
                 item.valueCodeableConcept.coding.forEach(function(val){
                     $("#userEthnicity input:radio[value="+val.code+"]").prop('checked', true);
                     // Way to handle non-standard codes - output but hide, for submitting on update
@@ -256,7 +256,7 @@ var fillContent = {
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString()  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString() + ")</i>" + deleteInvocation + "</li>";
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</i>" + deleteInvocation + "</li>";
             if (procID > highestId) {
                 highestId = procID;
             }
@@ -335,12 +335,15 @@ var assembleContent = {
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio
             var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus");
             var ethnicityIDs, raceIDs, indigenousIDs;
+
             demoArray["extension"] = [];
+
 
             if (e.length > 0) {
                 ethnicityIDs = $("#userEthnicity input:checked").map(function(){
                     return { code: $(this).val(), system: "http://hl7.org/fhir/v3/Ethnicity" };
                 }).get();
+
                 if (ethnicityIDs) {
                     demoArray["extension"].push(
                         {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
@@ -408,10 +411,6 @@ var assembleContent = {
                 { "system": "email", "value": $("input[name=email]").val() },
                 { "system": "phone", "value": $("input[name=phone]").val() }
             ];
-
-            //try updating indigenous status
-
-
            //console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray, targetField);
@@ -574,9 +573,6 @@ var tnthAjax = {
                     };
 
                     $("#userOrgs").find(".help-block").text("");
-
-
-
                     getSaveLoaderDiv("profileForm", "userOrgs");
                     $(this).attr("save-container-id", "userOrgs");
                     assembleContent.demo(userId,true, $(this));
