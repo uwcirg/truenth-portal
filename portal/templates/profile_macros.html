@@ -521,6 +521,7 @@
 	</div>
     {% if current_user.has_role('provider') %}
         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
+        <a href="javascript:void(0)" id="loginAsPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#loginAsModal">Log in as this patient</a>
     {% endif %}
 
     <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
@@ -541,6 +542,26 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="loginAsModalLabel">Log in as the Patient</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", effectively logging the staff person out of their session, and automatically logging in this patient without their needing to enter login credentials.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
         $(function () {
     	var sessionListHTML = "";
