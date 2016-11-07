@@ -234,21 +234,34 @@
             var email = $('#email').val();
 
             if (selectedOption.val() != '') {
-                var url = getUrl();
+                var url = '';
+                var app_text_email;
+                if (selectedOption.val() == 'invite') 
+                    url = getUrl();
+                else // reminder
+                    url = '{{ url_for('') }}';
                 if (url != '') {
 
                     {# javascript variables are not available at template
                        rendering time.  insert a placeholder and then
                        replace once the variable is available. #}
-                    var body = '{{ app_text('profileSendEmail email html',
+                    var body_invite = '{{ app_text('profileSendEmail invite email_body',
                             'url_placeholder') | safe }}';
+                    var body_reminder = '{{ app_text('profileSendEmail reminder email_body',
+                            'url_placeholder') | safe }}';
+
+                    var body = window['body_' + selectedOption.val()];
+
                     body = body.replace(/url_placeholder/g, url);
+
+                    var subject_invite = '{{ app_text('profileSendEmail invite email_subject') }}'
+                    var subject_reminder = '{{ app_text('profileSendEmail reminder email_subject') }}'
 
                     $.ajax ({
                         type: 'POST',
                         url: '/invite',
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        data: {'subject': selectedOption.text(), 'recipients': email, 'body': body}
+                        data: {'subject': window['subject_' + selectedOption.val()], 'recipients': email, 'body': body}
                     }).done(function(data) {
                        //console.log('data ' + data);
                         $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
