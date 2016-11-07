@@ -239,7 +239,7 @@
                 if (selectedOption.val() == 'invite') 
                     url = getUrl();
                 else // reminder
-                    url = '{{ url_for('/') }}';
+                    url = '{{ url_for('portal.landing') }}';
                 if (url != '') {
 
                     {# javascript variables are not available at template
