@@ -58,7 +58,7 @@ $(document).ready(function() {
     // Options for datepicker - prevent future dates, no default
     $('.event-element .input-group.date').each(function(){
         $(this).datepicker({
-            format: 'd/M/yyyy',
+            format: 'dd/mm/yyyy',
             endDate: "0d",
             startDate: "-10y",
             autoclose: true
