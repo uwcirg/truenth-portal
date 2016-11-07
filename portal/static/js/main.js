@@ -1064,6 +1064,19 @@ var tnthDates = {
         }
         return convertDate
     },
+    /**
+     * Simply swaps:
+     *      a/b/cdef to b/a/cdef
+     *      (single & double digit permutations accepted...)
+     *      ab/cd/efgh to cd/ab/efgh
+     * Does not check for valid dates on input or output!
+     * @param currentDate string eg 7/4/1976
+     * @returns string eg 4/7/1976
+     */
+    "swap_mm_dd": function(currentDate) {
+        var splitDate = currentDate.split('/');
+        return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
+    },
     /***
      * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
      * @param date - the date to be converted
