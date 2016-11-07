@@ -198,7 +198,7 @@
     </div>
     <script>$(function () {
 
-        function getUrl() {
+        function getAccessUrl() {
             var url = '';
             $.ajax ({
                 type: 'GET',
@@ -234,34 +234,29 @@
             var email = $('#email').val();
 
             if (selectedOption.val() != '') {
-                var url = '';
-                var app_text_email;
-                if (selectedOption.val() == 'invite') 
-                    url = getUrl();
-                else // reminder
-                    url = '{{ url_for('portal.landing') }}';
-                if (url != '') {
-
+                var subject = '';
+                var body = '';
+                var return_url = '';
+                if (selectedOption.val() == 'invite'){
+                    return_url = getAccessUrl();
                     {# javascript variables are not available at template
                        rendering time.  insert a placeholder and then
                        replace once the variable is available. #}
-                    var body_invite = '{{ app_text('profileSendEmail invite email_body',
+                    body = '{{ app_text('profileSendEmail invite email_body',
                             'url_placeholder') | safe }}';
-                    var body_reminder = '{{ app_text('profileSendEmail reminder email_body',
-                            'url_placeholder') | safe }}';
-
-                    var body = window['body_' + selectedOption.val()];
-
-                    body = body.replace(/url_placeholder/g, url);
-
-                    var subject_invite = '{{ app_text('profileSendEmail invite email_subject') }}'
-                    var subject_reminder = '{{ app_text('profileSendEmail reminder email_subject') }}'
-
+                    body = body.replace(/url_placeholder/g, return_url);
+                    subject = '{{ app_text('profileSendEmail invite email_subject') }}'
+                }
+                else { // reminder
+                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('portal.landing')) | safe }}';
+                    subject = '{{ app_text('profileSendEmail reminder email_subject') }}'
+                }
+                if (body != '') {
                     $.ajax ({
                         type: 'POST',
                         url: '/invite',
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                        data: {'subject': window['subject_' + selectedOption.val()], 'recipients': email, 'body': body}
+                        data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
                        //console.log('data ' + data);
                         $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
