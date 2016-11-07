@@ -193,7 +193,7 @@ def update_card_html_on_completion():
         # user_intervention to alter the card_html for said user
         authored = most_recent_survey(user)
         if authored:
-            prefix = '<i>EPIC-26 completed {:%b %d, %Y}</i></br>'.format(
+            prefix = '<b>Thank you,</b><br/><i>Questionnaire completed {:%d %b, %Y}</i></br>'.format(
                 authored)
             card_html = prefix + Intervention.query.filter_by(
                 id=intervention.id).first().card_html
