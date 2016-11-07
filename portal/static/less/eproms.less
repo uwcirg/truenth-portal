@@ -96,6 +96,16 @@ body {
   transition: visibility 0.5s ease-in;
 }
 
+.save-info {
+  opacity: 0;
+   -webkit-transition: opacity 0.8s ease-in;
+  transition: opacity 0.8s ease-in;
+  position: absolute;
+  top: 2px
+  left: 0;
+  font-size: 0.90em;
+}
+
 #indexContainer {
 display: block;
 padding: 1.8em 2em;
@@ -544,6 +554,13 @@ a.btn {
   border: 1px solid @sectionBorderColor;
   padding: 1.5em;
 
+}
+
+#profileForm #bdGroup div.row {
+  height: 4.5em;
+}
+#profileForm div.name-section {
+  height: 4.5em;
 }
 
 #userEthnicity label {

@@ -28,7 +28,15 @@ body {
   font-size: 18px;
   /*transition: all 500ms ease-in;*/
 }
-
+.save-info {
+  opacity: 0;
+   -webkit-transition: opacity 0.8s ease-in;
+  transition: opacity 0.8s ease-in;
+  position: absolute;
+  top: 2px
+  left: 0;
+  font-size: 0.90em;
+}
 #fullSizeBox a[href*="register"] {
   display: none;
 }
@@ -489,6 +497,13 @@ a.btn {
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
   padding: 1.5em;
+}
+
+#profileForm #bdGroup div.row {
+  height: 4.5em;
+}
+#profileForm div.name-section {
+  height: 4.5em;
 }
 
 #userEthnicity label {

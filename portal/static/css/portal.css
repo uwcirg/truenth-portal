@@ -50,6 +50,15 @@ body {
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
 }
+.save-info {
+  opacity: 0;
+   -webkit-transition: opacity 0.8s ease-in;
+  transition: opacity 0.8s ease-in;
+  position: absolute;
+  top: 2px
+  left: 0;
+  font-size: 0.90em;
+}
 #indexContainer {
 display: block;
 padding: 1.8em 2em;
@@ -528,6 +537,12 @@ input.clinic {
 .create-account-container {
   padding: 3.5em 4em;
   width: 90%;
+}
+#profileForm #bdGroup div.row {
+  height: 4.5em;
+}
+#profileForm div.name-section {
+  height: 4.5em;
 }
 .left-indent-bottom {
   margin-left: 3.2em;

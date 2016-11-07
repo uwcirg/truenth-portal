@@ -60,7 +60,7 @@
     <div class="form-group profile-name-label">
         <label>Name</label>
     </div>
-    <div class="row profile-section name-section">
+    <div class="row profile-section name-section" style="height:4.5em">
         <div class="col-md-6 col-xs-12">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
@@ -135,12 +135,12 @@
     </div>
     <script>
         $(function () {
-            $("#userRace input:checkbox").each(function() {
-                $(this).on("click", function() {
+            //$("#userRace input:checkbox").each(function() {
+             //   $(this).on("click", function() {
                 	//console.log("value: " + $(this).val());
-                    assembleContent.demo({{ person.id if person }},true);
-                });
-            });
+               //     assembleContent.demo({{ person.id if person }},true);
+               // });
+            //});
         });
     </script>
 
@@ -164,11 +164,11 @@
     </div>
     <script>
         $(function () {
-            $("#userEthnicity input:radio").each(function() {
-                $(this).on("click", function() {
-                    assembleContent.demo({{ person.id if person }},true);
-                });
-            });
+            //$("#userEthnicity input:radio").each(function() {
+                //$(this).on("click", function() {
+                    //assembleContent.demo({{ person.id if person }},true);
+                //});
+            //});
         });
     </script>
 {%- endmacro %}
@@ -630,6 +630,7 @@
 {%- endmacro %}
 
 {% macro profile(person, current_user, consent_agreements) -%}
+
     <div class="row" style="position: relative;">
         <div class="col-md-6">
             <div class="profile-item-container side">
@@ -646,7 +647,7 @@
                 {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
                     {{profileSendEmail(person)}}
                 {% endif %}
-                {% if person.has_role('provider') and not person.has_role('patient') %}
+                {% if not person.has_role('patient') %}
                     {{profilePhone(person)}}
                 {% endif %}
             </div>
@@ -706,25 +707,51 @@
                 {% endif %}
 
                 {% if person %}
+                    [
+                     {
+                        attachID: "patBiopsy",
+                        targetField: $("input[name='biopsy']")
+                     },
+                     {
+                        attachID: "patDiag",
+                        targetField: $("input[name='pca_diag']")
+                     },
+                     {
+                        attachID: "patMeta",
+                        targetField: $("input[name='pca_localized']")
+                     },
+                     {
+                        attachID: "patTx",
+                        targetField: $("input[name='tx']")
+                     }
+                     ].forEach(function(o) {
+                        getSaveLoaderDiv("profileForm", o.attachID);
+                        o.targetField.each(function() {
+                            $(this).attr("save-container-id", o.attachID);
+                        });
+                     });
+
+
+
                     $(".pat-q input:radio").on("click",function(){
                           var thisItem = $(this);
                           var toCall = thisItem.attr("name")
                           // Get value from div - either true or false
                           var toSend = thisItem.val();
-                          tnthAjax.putClinical({{person.id}},toCall,toSend);
+                          tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
                           if (toSend == "true" || toCall ==  "pca_localized") {
                             thisItem.parents(".pat-q").nextAll().fadeIn();
 
                           } else {
                             if (toCall == "biopsy") {
-                              tnthAjax.putClinical({{person.id}},"pca_diag","false");
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
+                              tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
+                              tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                              tnthAjax.putClinical({{person.id}},"tx","false", $(this));
                             } else if (toCall == "pca_diag") {
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
+                              tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                              tnthAjax.putClinical({{person.id}},"tx","false", $(this));
                             }
-                            thisItem.parents(".pat-q").nextAll().fadeOut();
+                            thisItem.parents(".pat-q").nextAll().fadeOut(1000);
                           };
                       });
                  {% endif %}
