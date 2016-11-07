@@ -95,6 +95,45 @@
         </div>
     </div>
 {%- endmacro %}
+{% macro profileIndigenous(person) -%}
+    <div id="userIndigenousStatusContainer"></div>
+    <script>
+    $(function () {
+        (function() {
+            $.ajax({
+                type:"GET",
+                url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
+            }).done(function(data) {
+                //console.log(data);
+                //fillContent.indigenous(data);
+                var as = data["codeSystem"]["concept"];
+                //console.log(as);
+                var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                '<label>Indigenous Status <span class="text-muted smaller-text">(Optional)</span></label>' +'<div class="profile-radio-list">';
+                as.forEach(function(o) {
+                    html += '<div class="checkbox">' + '<label>' +
+                            '<input type="checkbox" name="indigenous" value="' + o.code + '">' + o.display + '</label></div>';
+
+                });
+                html += "</div></div>";
+                $("#userIndigenousStatusContainer").html(html);
+
+
+            }).fail(function(){
+                console.log("Problem retrieiving indigenous statuses");
+
+            });
+        })();
+
+        $("#userIndigenousStatusContainer input:checkbox").each(function() {
+            $(this).on("click", function() {
+                //console.log("value: " + $(this).val());
+                assembleContent.demo({{ person.id if person }},true);
+            });
+        });
+    });
+    </script>
+{%- endmacro %}
 
 {% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
@@ -289,7 +328,7 @@
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
         </div>
-        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
     <script>$(function () {
@@ -658,6 +697,80 @@
 
 {%- endmacro %}
 
+{% macro profileClinicalQuestions(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
+                <h4 class="text-muted">Questions inquired of the patient at registration</h4>
+                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                    {{patientQGroup(current_user)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkDiagnosis() {
+            var diag = $("#pca_diag_yes");
+
+            if (diag.is(":checked")) {
+              diag.parents(".pat-q").nextAll().fadeIn();
+            } else {
+              diag.parents(".pat-q").nextAll().fadeOut();
+            };
+            {% if person and current_user and (person.id != current_user.id) %}
+                if (!$("#patientQ input[type='radio']").is(":checked")) {
+                    $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
+                };
+            {% endif %}
+
+
+        };
+        $(function () {
+            //$("#patientQ").show();
+            $("#patientQ hr").hide();
+            {% if person and current_user and person.id != current_user.id %}
+                $("#patientQ input[type='radio']").each(function() {
+                    $(this).attr("disabled", "disabled");
+                });
+
+
+            {% endif %}
+
+            {% if person %}
+                $(".pat-q input:radio").on("click",function(){
+                      var thisItem = $(this);
+                      var toCall = thisItem.attr("name")
+                      // Get value from div - either true or false
+                      var toSend = thisItem.val();
+                      tnthAjax.putClinical({{person.id}},toCall,toSend);
+                      if (toSend == "true" || toCall ==  "pca_localized") {
+                        thisItem.parents(".pat-q").nextAll().fadeIn();
+
+                      } else {
+                        if (toCall == "biopsy") {
+                          tnthAjax.putClinical({{person.id}},"pca_diag","false");
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        } else if (toCall == "pca_diag") {
+                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                          tnthAjax.putClinical({{person.id}},"tx","false");
+                        }
+                        thisItem.parents(".pat-q").nextAll().fadeOut();
+                      };
+                  });
+             {% endif %}
+
+             //wait for ajax calls to finish?
+             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+             setTimeout("checkDiagnosis();", 1000);
+
+
+        });
+    </script>
+{%- endmacro %}
+
 {% macro profile(person, current_user, consent_agreements) -%}
     <div class="row" style="position: relative;">
         <div class="col-md-6">
@@ -682,7 +795,7 @@
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and (current_user.has_role('provider') or (current_user.id == person.id))%}
+    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
@@ -694,77 +807,7 @@
     {% endif %}
 
     {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
-        <div class="row">
-            <div class="col-md-12">
-                <div class="profile-item-container">
-                    <h4 id="clinicalQuestionsLoc" class="profile-item-title">Clinical Questions</h4>
-                    <h4 class="text-muted">Questions inquired of the patient at registration</h4>
-                    <input type="hidden" id="iq_userId" value="{{person.id}}" />
-                    <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
-                        {{patientQGroup(current_user)}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            function checkDiagnosis() {
-                var diag = $("#pca_diag_yes");
-
-                if (diag.is(":checked")) {
-                  diag.parents(".pat-q").nextAll().fadeIn();
-                } else {
-                  diag.parents(".pat-q").nextAll().fadeOut();
-                };
-                {% if person and current_user and (person.id != current_user.id) %}
-                    if (!$("#patientQ input[type='radio']").is(":checked")) {
-                        $("#patientQContainer").append("<span class='text-muted'>no answers provided</span>");
-                    };
-                {% endif %}
-
-
-            };
-            $(function () {
-                //$("#patientQ").show();
-                $("#patientQ hr").hide();
-                {% if person and current_user and person.id != current_user.id %}
-                    $("#patientQ input[type='radio']").each(function() {
-                        $(this).attr("disabled", "disabled");
-                    });
-
-
-                {% endif %}
-
-                {% if person %}
-                    $(".pat-q input:radio").on("click",function(){
-                          var thisItem = $(this);
-                          var toCall = thisItem.attr("name")
-                          // Get value from div - either true or false
-                          var toSend = thisItem.val();
-                          tnthAjax.putClinical({{person.id}},toCall,toSend);
-                          if (toSend == "true" || toCall ==  "pca_localized") {
-                            thisItem.parents(".pat-q").nextAll().fadeIn();
-
-                          } else {
-                            if (toCall == "biopsy") {
-                              tnthAjax.putClinical({{person.id}},"pca_diag","false");
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
-                            } else if (toCall == "pca_diag") {
-                              tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                              tnthAjax.putClinical({{person.id}},"tx","false");
-                            }
-                            thisItem.parents(".pat-q").nextAll().fadeOut();
-                          };
-                      });
-                 {% endif %}
-
-                 //wait for ajax calls to finish?
-                 //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-                 setTimeout("checkDiagnosis();", 1000);
-
-
-            });
-        </script>
+        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
     {% if person.has_role('patient') %}
@@ -802,10 +845,13 @@
                         </div>
 
                             <div>
-                                {{profileEthnicity(person)}}
+                                {{profileEthnicity(person)|show_macro('ethnicity')}}
                             </div>
                             <div>
-                                {{profileRace(person)}}
+                                {{profileRace(person)|show_macro('race')}}
+                            </div>
+                            <div>
+                                {{profileIndigenous(person)|show_macro('indigenous')}}
                             </div>
                     </div>
                 </div>
