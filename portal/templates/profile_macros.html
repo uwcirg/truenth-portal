@@ -111,14 +111,14 @@
                 var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
                 '<label>Indigenous Status <span class="text-muted smaller-text">(Optional)</span></label>' +'<div class="profile-radio-list">';
                 as.forEach(function(o) {
-                    html += '<div class="checkbox">' + '<label>' +
-                            '<input type="checkbox" name="indigenous" value="' + o.code + '">' + o.display + '</label></div>';
+                    html += '<div>' + '<label>' +
+                            '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
 
                 });
                 html += "</div></div>";
                 $("#userIndigenousStatusContainer").html(html);
                 getSaveLoaderDiv("profileForm", "userIndigenousStatus");
-                $("#userIndigenousStatusContainer input:checkbox").each(function() {
+                $("#userIndigenousStatusContainer input[type='radio']").each(function() {
                     $(this).attr("save-container-id", "userIndigenousStatus");
                     $(this).on("click", function() {
                         //console.log("value: " + $(this).val());
@@ -797,7 +797,7 @@
         </div>
     </div>
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider')%}
+    {% if (person and person.has_role('patient')) or current_user.has_role('provider')%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">

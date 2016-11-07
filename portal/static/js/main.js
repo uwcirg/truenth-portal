@@ -205,7 +205,7 @@ var fillContent = {
             if (item.url === "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036") {
                 item.valueCodeableConcept.coding.forEach(function(val){
                     //console.log(val)
-                    $("#userIndigenousStatus input:checkbox[value="+val.code+"]").prop('checked', true);
+                    $("#userIndigenousStatus input[type='radio'][value="+val.code+"]").prop('checked', true);
 
                 });
             };
@@ -372,7 +372,7 @@ var assembleContent = {
             };
 
             if (i.length > 0) {
-                indigenousIDs = $("#userIndigenousStatus input:checkbox:checked").map(function() {
+                indigenousIDs = $("#userIndigenousStatus input[type='radio']:checked").map(function() {
                     return { code: $(this).val(), system: "http://us.truenth.org/fhir/valueset/AU-NHHD-METeOR-id-291036" };
                 }).get();
                 if (indigenousIDs) {
