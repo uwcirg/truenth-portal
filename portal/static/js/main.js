@@ -386,6 +386,7 @@ var assembleContent = {
                 };
             };
 
+
             // demoArray["extension"] = [
 
             //     {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
@@ -571,12 +572,14 @@ var tnthAjax = {
                             $("#consentContainer .consent").hide();
                         };
                     };
+
                     if ($("#createProfileForm").length == 0) {
                         $("#userOrgs").find(".help-block").text("");
                         getSaveLoaderDiv("profileForm", "userOrgs");
                         $(this).attr("save-container-id", "userOrgs");
                         assembleContent.demo(userId,true, $(this));
                     };
+
                 });
 
                 if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
