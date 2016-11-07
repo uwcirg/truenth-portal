@@ -149,7 +149,8 @@ if [[ $FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}) && $? -
     if [[ $VERBOSE ]]; then
         echo "Updating package metadata"
     fi
-    python "${GIT_WORK_TREE}/setup.py" egg_info
+    cd "${GIT_WORK_TREE}"
+    python setup.py egg_info
 fi
 
 # Restart apache if application is served by apache
