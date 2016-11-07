@@ -248,7 +248,7 @@
                     subject = '{{ app_text('profileSendEmail invite email_subject') }}'
                 }
                 else { // reminder
-                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('portal.landing')) | safe }}';
+                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('portal.landing', _external=True)) | safe }}';
                     subject = '{{ app_text('profileSendEmail reminder email_subject') }}'
                 }
                 if (body != '') {
