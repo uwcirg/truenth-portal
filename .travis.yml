@@ -15,10 +15,8 @@ env:
 
 matrix:
   include:
-    - python: "2.7"
-      env: TOXENV=docs
-    - python: "2.7"
-      env:
+    - env: TOXENV=docs
+    - env:
         - TOXENV=ui
 
         # _SAUCE_USERNAME
