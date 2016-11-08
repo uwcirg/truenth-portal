@@ -13,8 +13,9 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
-from flask import current_app
+from flask import current_app, url_for
 import json
+from datetime import timedelta
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -168,48 +169,91 @@ def update_link_url(intervention_name, link_url):
     return update_user_intervention
 
 
+def most_recent_survey(user):
+    """Look up timestamp for most recently completed QuestionnaireResponse
+
+    Returns authored (timestamp) of the most recent
+    QuestionnaireResponse, else None
+    """
+    qr = QuestionnaireResponse.query.filter(and_(
+        QuestionnaireResponse.user_id == user.id,
+        QuestionnaireResponse.status == 'completed')).order_by(
+            QuestionnaireResponse.authored).limit(
+                1).with_entities(QuestionnaireResponse.authored).first()
+    return qr[0] if qr else None
+
+
 def update_card_html_on_completion():
-    """Update card_html if user has completed a survey"""
+    """Update description and card_html depending on state"""
 
     def update_user_card_html(intervention, user):
-        # Criteria check could move to its own strategy - inlined
-        # here for time being.
-
-        def most_recent_survey(user):
-            """Only apply the change if the user has a QuestionnaireResponse
-
-            Returns authored (timestamp) of the most recent
-            QuestionnaireResponse, else None
-            """
-            qr = QuestionnaireResponse.query.filter(and_(
-                QuestionnaireResponse.user_id == user.id,
-                QuestionnaireResponse.status == 'completed')).order_by(
-                    QuestionnaireResponse.authored).limit(
-                        1).with_entities(QuestionnaireResponse.authored).first()
-            return qr[0] if qr else None
-
         # NB - this is by design, a method with side effects
-        # if the criteria_check passes, generate or update a
-        # user_intervention to alter the card_html for said user
+        # namely, alters card_html and links depending on survey state
         authored = most_recent_survey(user)
+        if not authored:
+            card_html = """
+            <h2 class="tnth-subhead">Welcome {},</h2>
+
+            <p>
+            The questionnaire you are about to complete asks about your health.
+            Many of the questions relate to symptoms people with prostate
+            cancer may experience in their journey, as well as some general
+            health questions. It should take approximately 15 minutes
+            </p><p>
+            By having many people come back and complete this same
+            questionnaire over time, we can collectively improve the care of
+            all men with prostate cancer.
+            </p><p>
+            It is important that you answer all questions honestly and
+            completely. Information contained within this survey will remain
+            strictly confidential.
+            </p>
+            """.format(user.display_name)
+            link_label = 'Begin questionnaire'
         if authored:
-            prefix = '<b>Thank you,</b><br/><i>Questionnaire completed {:%d %b, %Y}</i></br>'.format(
-                authored)
-            card_html = prefix + Intervention.query.filter_by(
-                id=intervention.id).first().card_html
-            ui = UserIntervention.query.filter(and_(
-                UserIntervention.user_id == user.id,
-                UserIntervention.intervention_id == intervention.id)).first()
-            if not ui:
-                db.session.add(
-                    UserIntervention(user_id = user.id,
-                                     intervention_id = intervention.id,
-                                     card_html = card_html))
+            card_html = """
+            <h2 class="tnth-subhead">Thank you,</h2>
+
+            <p>
+            By contributing your information to this
+            project, we can collectively improve the care of all men with
+            prostate cancer.
+            </p><p>
+            You will be reminded by email on your email address {email} when
+            the next questionnaire is to be completed.
+            <a href={change_email_url}>Change email address</a>
+            </p><p>
+            <a class="btn-lg btn-tnth-primary disabled"
+                href=""> Next questionnaire to be completed {next_survey_date}
+            </a>
+            </p><p>
+            Your most recently completed questionnaire was on
+            {most_recent_survey_date}.
+            You can view previous responses below.
+            </p>
+            """.format(email=user.email,
+                       change_email_url=url_for("portal.profile"),
+                       next_survey_date=authored+timedelta(days=365),
+                       most_recent_survey_date=authored)
+            link_label = 'View previous questionnaire'
+
+        ui = UserIntervention.query.filter(and_(
+            UserIntervention.user_id == user.id,
+            UserIntervention.intervention_id == intervention.id)).first()
+        if not ui:
+            db.session.add(
+                UserIntervention(
+                    user_id=user.id,
+                    intervention_id=intervention.id,
+                    card_html=card_html,
+                    link_label=link_label
+                ))
+            db.session.commit()
+        else:
+            if ui.card_html != card_html or ui.link_label != link_label:
+                ui.card_html = card_html
+                ui.link_label = link_label
                 db.session.commit()
-            else:
-                if ui.card_html != card_html:
-                    ui.card_html = card_html
-                    db.session.commit()
 
         # Really this function just exists for the side effects, don't
         # prevent access
