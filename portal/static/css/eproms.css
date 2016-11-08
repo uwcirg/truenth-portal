@@ -105,16 +105,17 @@ display: block;
   color: #575F5C;
   border-top: 1px solid  #E0E6E3;
   border-bottom: 1px solid  #E0E6E3;
-  padding: 0.2em 0.4em 0.1em 0.4em;
+  padding: 0.4em;
   font-size: 0.9em;
-  background-image: linear-gradient(
+  /*background-image: linear-gradient(
       to right,
       #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
-  );
+  );*/
+  background-image: linear-gradient( to right, #ffffff, rgba(183, 193, 195, 0.16), rgba(173, 193, 197, 0.26) );
   vertical-align: center;
 }
 
-#indexNavBar span {
+#indexNavBar span.glyphicon {
   cursor: pointer;
   font-size: 1em;
   -webkit-box-shadow: 1px 1px 1px 0px #777;
@@ -126,10 +127,27 @@ display: block;
   padding: 0.3em;
 }
 
+#indexNavBar span.link {
+  margin-left: 0.5em;
+  border: 1px solid #EEE;
+  padding: 0.6em;
+  border-radius: 4px;
+  color: #53583f;
+  -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+  -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+  box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+  cursor:pointer;
+}
+
 #indexNavBar #backLink {
  position: relative;
  top: -4px;
-  display: inline-block;
+ display: inline-block;
+}
+
+#backLink a {
+  position: relative;
+  top: 1px;
 }
 
 .orglist-download-container {
@@ -477,7 +495,7 @@ a.btn {
 .profile-item-container {
   background-color: #EFF5F3;
   background-color: rgba(173, 193, 197, 0.16);
-  padding: 1.5em 2em;
+  padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;

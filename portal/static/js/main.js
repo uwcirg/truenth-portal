@@ -212,6 +212,11 @@ var fillContent = {
         });
     },
     "orgs": function(data) {
+        $("#userOrgs input[name='organization']").each(function() {
+            $(this).prop("checked", false);
+        });
+
+
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
             $("body").find("#userOrgs input.clinic:checkbox[value="+orgID+"]").prop('checked', true);
@@ -320,17 +325,28 @@ var assembleContent = {
                     $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
                 }
             });
-            var orgIDs = $("#userOrgs input:checkbox:checked").map(function(){
-                if (!isNaN(parseInt($(this).val()))) return { reference: "api/organization/"+$(this).val() };
-            }).get();
-            var parentId;
-            $.each($("#userOrgs input:checkbox:checked"),function(i,v){
-                if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
-                    orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
-                    parentId = $(this).attr("data-parent-id");
-                }
-            });
+
+            var orgIDs;
+            //if ($("#noOrgs").prop("checked")) {
+               // orgIDs = [{ reference: "api/organization/0" }];
+            //} else {
+                orgIDs = $("#userOrgs input[name='organization']").map(function(){
+                    //if (!isNaN(parseInt($(this).val()))) return { reference: "api/organization/"+$(this).val() };
+                    if ($(this).prop("checked")) console.log($(this).val());
+                    if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
+                }).get();
+                var parentId;
+
+                $.each($("#userOrgs input:checkbox:checked"),function(i,v){
+                    if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
+                        orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
+                        parentId = $(this).attr("data-parent-id");
+                    };
+                });
+           // };
+
             demoArray["careProvider"] = orgIDs;
+            console.log(demoArray["careProvider"]);
 
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio
             var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus");
@@ -457,15 +473,20 @@ var assembleContent = {
         $.each($("#userOrgs input:checkbox:checked"),function(i,v){
             if ($(this).attr("data-parent-id")) {
                 $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
-            }
+            };
         });
 
         var orgIDs = $("#userOrgs input:checkbox:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
         }).get();
+
+        //console.log("org ids" + orgIDs)
+
         if (typeof orgIDs === 'undefined'){
             orgIDs = [0]  // special value for `none of the above`
-        }
+        };
+
+
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
@@ -536,8 +557,8 @@ var tnthAjax = {
             $.each(clinicArray, function(i,val) {
                 // Fill in parent clinic
                 if (val.name != "none of the above" && (val.children.length > 0)) {
-                    //$("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
-                    $("#fillOrgs").append("<legend>"+val.name+"</legend>");
+                    $("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
+                    //$("#fillOrgs").append("<legend>"+val.name+"</legend>");
                 }
                 // Fill in each child clinic
                 if (val.children.length > 0) {
@@ -554,8 +575,29 @@ var tnthAjax = {
 
             });
 
+
             $("#userOrgs input[name='organization']").each(function() {
                 $(this).on("click", function() {
+
+                    if ($(this).prop("checked")){
+                        if ($(this).attr("id") !== "noOrgs") {
+                            //console.log("set no org here")
+                            $("#noOrgs").prop('checked',false);
+                        } else {
+                            $("#userOrgs input[name='organization']").each(function() {
+                                //console.log("in id: " + $(this).attr("id"))
+                               if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
+                            });
+                            $("#consentContainer input.consent-checkbox").each(function() {
+                                $(this).prop("checked", false);
+                            });
+                        }
+                    //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
+                    //else $("#noOrgs").attr("checked", false);
+                    };
+
+
+
                     var parentOrg = $(this).attr("data-parent-id");
                     var parentName = $(this).attr("data-parent-name");
                     //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
@@ -905,18 +947,30 @@ $(document).ready(function() {
     $("#homeFooter").show();
 
     // Handling "none of the above" clinic choice
-    $("#userOrgs").on("click", ".clinic", function(){
-        if ($(this).prop('checked')){
-            if ($(this).attr("id") !== "noOrgs") {
-                $("#noOrgs").attr('checked',false);
-            } else {
-                $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-                $("#consentContainer input.consent-checkbox").each(function() {
-                    $(this).attr("checked", false);
-                });
-            }
-        }
-    });
+
+    // $("#userOrgs input[name='organization']").each(function() {
+    //     $(this).prop("checked", false);
+    // });
+
+    // $("#userOrgs").on("click", ".clinic", function(){
+    //     console.log("id: " + $(this).attr("id") + " checked: " + $(this).prop("checked"))
+    //     if ($(this).prop("checked")){
+    //         if ($(this).attr("id") !== "noOrgs") {
+    //             //console.log("set no org here")
+    //             $("#noOrgs").prop('checked',false);
+    //         } else {
+    //             $("#userOrgs input[name='organization']").each(function() {
+    //                 //console.log("in id: " + $(this).attr("id"))
+    //                if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
+    //             });
+    //             $("#consentContainer input.consent-checkbox").each(function() {
+    //                 $(this).prop("checked", false);
+    //             });
+    //         }
+    //         //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
+    //         //else $("#noOrgs").attr("checked", false);
+    //     };
+    // });
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({

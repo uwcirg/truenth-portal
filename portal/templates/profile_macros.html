@@ -60,7 +60,7 @@
     <div class="form-group profile-name-label">
         <label>Name</label>
     </div>
-    <div class="row profile-section name-section" style="height:4.5em">
+    <div class="row profile-section name-section">
         <div class="col-md-6 col-xs-12">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="First Name" value="{{ person.first_name if person and person.first_name }}" type="text" />
@@ -774,28 +774,47 @@
 
 {% macro profile(person, current_user, consent_agreements) -%}
 
-    <div class="row" style="position: relative;">
-        <div class="col-md-6">
-            <div class="profile-item-container side">
-                <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
-                {{profileName(person)}}
-                {{profileBirthDate(person)}}
+    {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+         <div class="row" style="position: relative;">
+            <div class="col-md-6">
+                <div class="profile-item-container side">
+                    <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
 
+                </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="profile-item-container side">
-                <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
-                {{profileEmail(person)}}
-                {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+            <div class="col-md-6">
+                <div class="profile-item-container side">
+                    <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
+                    {{profileEmail(person)}}
                     {{profileSendEmail(person)}}
-                {% endif %}
-                {% if not person.has_role('patient') %}
-                    {{profilePhone(person)}}
-                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+
+    {% else %}
+         <div class="row" style="position: relative;">
+            <div class="col-md-12 profile-item-container">
+        
+                 <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                 <div class="row">
+                    <div class="col-md-8 col-xs-12">
+                        {{profileName(person)}}
+                    </div>
+                    <div class="col-md-8 col-xs-12">
+                        {{profileBirthDate(person)}}
+                    </div>
+                    <div class="col-md-5 col-xs-12">
+                        {{profileEmail(person)}}
+                        {% if not person.has_role('patient') %}
+                            {{profilePhone(person)}}
+                        {% endif %}
+                    </div>
+                 </div>
+               
+            </div>
+    {% endif %}
 
     {% if (person and person.has_role('patient')) or current_user.has_role('provider')%}
      	<div class="row">

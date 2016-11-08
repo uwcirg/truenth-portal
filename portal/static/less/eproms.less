@@ -151,7 +151,7 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   );
   vertical-align: center;
 
-  span {
+  span.glyphicon {
     cursor: pointer;
     font-size: 1em;
     -webkit-box-shadow: 1px 1px 1px 0px #777;
@@ -163,11 +163,29 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
     padding: 0.3em;
   }
 
+  span.link {
+    margin-left: 0.5em;
+    border: 1px solid #EEE;
+    padding: 0.6em;
+    border-radius: 4px;
+    color: #53583f;
+    -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+    box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+    cursor:pointer;
+  }
+
   #backLink {
    position: relative;
    top: -4px;
    display: inline-block;
+   a {
+    position: relative;
+    top: 1px;
+    }
   }
+
+
 }
 
 .orglist-download-container {
@@ -530,11 +548,11 @@ a.btn {
 
 .profile-item-container {
   background-color: #EFF5F3;
-  background-color: @sectionColor;
-  padding: 1.5em 2em;
+  background-color: rgba(173, 193, 197, 0.16);
+  padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
-  border: 1px solid @sectionBorderColor;
+  border: 1px solid #E0E6E3;
   overflow-y: hidden;
   overflow-x: hidden;
  }
