@@ -357,9 +357,10 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, ae = map(db.session.merge, (self.test_user, ae))
 
-        # without completing an assessment, no change
-        self.assertTrue(ae.display_for_user(user).card_html.startswith(
-            "Assessment Engine"))
+        # without completing an assessment, card_html should includ username
+        self.assertTrue(
+            user.display_name in ae.display_for_user(user).card_html)
+
         # Add a fake assessment and see a change
         with SessionScope(db):
             a = QuestionnaireResponse(
@@ -369,8 +370,8 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         user, ae = map(db.session.merge, (self.test_user, ae))
-        self.assertTrue(ae.display_for_user(user).card_html.startswith(
-            "<i>EPIC-26 completed"))
+        self.assertTrue(
+            "Thank you" in ae.display_for_user(user).card_html)
 
     def test_combine_effects(self):
         """Create combined effect strategies as used on ePROMs"""
