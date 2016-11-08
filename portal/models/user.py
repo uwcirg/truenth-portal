@@ -1,6 +1,6 @@
 """User model """
 from abc import ABCMeta, abstractproperty
-from datetime import datetime, date, timedelta
+from datetime import datetime
 from dateutil import parser
 from flask import abort
 from flask_user import UserMixin, _call_or_get
@@ -512,17 +512,50 @@ class User(db.Model, UserMixin):
         d['careProvider'] = careProviders()
         return d
 
-    def update_from_fhir(self, fhir):
+    def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
         If a field is defined, it is the final definition for the respective
         field, resulting in a deletion of existing values in said field
         that are not included.
 
+        :param fhir: JSON defining portions of the user demographics to change
+        :param acting_user: user requesting the change
+
         """
         def v_or_n(value):
             """Return None unless the value contains data"""
             return value.rstrip() or None
+
+        def update_orgs():
+            def allow_org_change(org, user, acting_user):
+                """don't allow non-admin providers to change top level orgs
+
+                as per
+                https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
+                raise exception if non-admin provider is attempting to
+                change their top level orgs
+
+                """
+                if org.partOf_id is None:  # top-level orgs
+                    if not acting_user.has_role(ROLE.ADMIN) and\
+                       user.has_role(ROLE.PROVIDER):
+                        raise ValueError("non-admin providers can't change "
+                                         "their high-level orgs")
+                return True
+
+            remove_if_not_requested = {org.id: org for org in
+                                       self.organizations}
+            for item in fhir['careProvider']:
+                org = reference.Reference.parse(item)
+                if org.id in remove_if_not_requested:
+                    remove_if_not_requested.pop(org.id)
+                if org not in self.organizations:
+                    allow_org_change(org, user=self, acting_user=acting_user)
+                    self.organizations.append(org)
+            for org in remove_if_not_requested.values():
+                allow_org_change(org, user=self, acting_user=acting_user)
+                self.organizations.remove(org)
 
         if 'name' in fhir:
             self.first_name = v_or_n(fhir['name']['given']) or self.first_name
@@ -546,16 +579,7 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
-            remove_if_not_requested = {org.id: org for org in
-                                       self.organizations}
-            for item in fhir['careProvider']:
-                org = reference.Reference.parse(item)
-                if org.id in remove_if_not_requested:
-                    remove_if_not_requested.pop(org.id)
-                if org not in self.organizations:
-                    self.organizations.append(org)
-            for org in remove_if_not_requested.values():
-                self.organizations.remove(org)
+            update_orgs()
         db.session.add(self)
 
     def merge_with(self, other_id):
