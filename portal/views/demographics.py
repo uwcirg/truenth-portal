@@ -137,7 +137,7 @@ def demographics_set(patient_id):
             request.json['resourceType'] != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
     try:
-        patient.update_from_fhir(request.json)
+        patient.update_from_fhir(request.json, acting_user=current_user())
     except MissingReference, e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))

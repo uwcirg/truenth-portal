@@ -4,7 +4,7 @@ from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 import json
 
 from portal.extensions import db
-from portal.models.organization import Organization
+from portal.models.organization import Organization, OrgTree
 from portal.models.role import ROLE
 
 
@@ -176,3 +176,24 @@ class TestDemographics(TestCase):
         # confirm only the one sent via API is intact.
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, 'test org')
+
+    def test_non_admin_org_change(self):
+        """non-admin providers can't change their top-level orgs"""
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.PROVIDER)
+        self.test_user = db.session.merge(self.test_user)
+
+        top = OrgTree().find(
+            self.test_user.organizations.first().id).top_level()
+
+        # Attempt to add the top-level org should raise
+        self.login()
+        data = {"careProvider": [{"reference": "Organization/{}".format(
+                top)}],
+                "resourceType": "Patient",
+               }
+
+        with self.assertRaises(ValueError):
+            self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                         content_type='application/json',
+                         data=json.dumps(data))
