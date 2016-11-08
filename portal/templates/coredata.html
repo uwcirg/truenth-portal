@@ -125,6 +125,7 @@
 
 {% block document_ready %}
     var subjectId = {{ user.id }}; 
+    var currentUserId = subjectId;
 
 $(document).ready(function(){
 
