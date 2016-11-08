@@ -29,8 +29,8 @@ matrix:
         sauce_connect: true
 
 before_install:
-  # Set tox env from TravisCI environmental variable
-  - if [[ ! -v TOXENV ]]; then export TOXENV=$(sed "s/pypypy/pypy/" <<<"py""${TRAVIS_PYTHON_VERSION//.}");fi
+  # Set TOXENV default (if not overridden by matrix environmental variables)
+  - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
   # Allow environmental variables set in TravisCI to override .travis.yml defaults
   - if [[ ! -v SAUCE_USERNAME ]]; then export SAUCE_USERNAME=$_SAUCE_USERNAME;fi
