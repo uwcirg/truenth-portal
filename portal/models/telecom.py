@@ -24,8 +24,8 @@ class Telecom(object):
     def from_fhir(cls, data):
         telecom = cls()
         for item in data:
-            attr = item['system']
-            value = item['value']
+            attr = item.get('system')
+            value = item.get('value')
             if not hasattr(telecom, attr):
                 current_app.logger.warn(
                     "FHIR contains unexpected telecom system {system}"\
