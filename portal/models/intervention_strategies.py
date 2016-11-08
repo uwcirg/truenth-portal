@@ -140,35 +140,6 @@ def allow_if_not_in_intervention(intervention_name):
     return user_not_in_intervention
 
 
-def update_link_url(intervention_name, link_url):
-    """Intervention may need special link per user - set to given for user"""
-
-    intervention = getattr(INTERVENTION, intervention_name)
-
-    def update_user_intervention(intervention, user):
-        # NB - this is by design, a method with side effects
-        # if the user_intevention isn't present, or doesn't include a
-        # matching link_url - one will be created or updated.
-        ui = UserIntervention.query.filter(and_(
-            UserIntervention.user_id == user.id,
-            UserIntervention.intervention_id == intervention.id)).first()
-        if not ui:
-            db.session.add(UserIntervention(user_id = user.id,
-                                           intervention_id = intervention.id,
-                                           link_url = link_url))
-            db.session.commit()
-        else:
-            if ui.link_url != link_url:
-                ui.link_url = link_url
-                db.session.commit()
-
-        # Really this function just exists for the side effects, don't
-        # prevent access
-        return True
-
-    return update_user_intervention
-
-
 def most_recent_survey(user):
     """Look up timestamp for most recently completed QuestionnaireResponse
 
@@ -210,6 +181,8 @@ def update_card_html_on_completion():
             </p>
             """.format(user.display_name)
             link_label = 'Begin questionnaire'
+            link_url = url_for('assessment_engine_api.present_assessment',
+                               instrument_id='epic26')
         if authored:
             card_html = """
             <h2 class="tnth-subhead">Thank you,</h2>
@@ -236,6 +209,7 @@ def update_card_html_on_completion():
                        next_survey_date=authored+timedelta(days=365),
                        most_recent_survey_date=authored)
             link_label = 'View previous questionnaire'
+            link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
@@ -246,13 +220,16 @@ def update_card_html_on_completion():
                     user_id=user.id,
                     intervention_id=intervention.id,
                     card_html=card_html,
-                    link_label=link_label
+                    link_label=link_label,
+                    link_url=link_url
                 ))
             db.session.commit()
         else:
-            if ui.card_html != card_html or ui.link_label != link_label:
+            if ui.card_html != card_html or ui.link_label != link_label or\
+               ui.link_url != link_url:
                 ui.card_html = card_html
-                ui.link_label = link_label
+                ui.link_label = link_label,
+                ui.link_url = link_url
                 db.session.commit()
 
         # Really this function just exists for the side effects, don't

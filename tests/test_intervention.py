@@ -319,28 +319,6 @@ class TestIntervention(TestCase):
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
 
-    def test_side_effects(self):
-        """Test strategy with side effects"""
-        ae  = INTERVENTION.ASSESSMENT_ENGINE
-        ae_id = ae.id
-
-        with SessionScope(db):
-            d = {'function': 'update_link_url',
-                 'kwargs': [{'name': 'intervention_name', 'value': ae.name},
-                            {'name': 'link_url', 'value':
-                             'http://different.org'}]}
-            strat = AccessStrategy(
-                name="fix assessment_engine link_url",
-                intervention_id = ae_id,
-                function_details=json.dumps(d))
-            db.session.add(strat)
-            db.session.commit()
-        user, ae = map(db.session.merge, (self.test_user, ae))
-
-        # We should now see the updated link_url for this user
-        self.assertEquals(ae.display_for_user(user).link_url,
-                          'http://different.org')
-
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
         ae  = INTERVENTION.ASSESSMENT_ENGINE
@@ -372,41 +350,6 @@ class TestIntervention(TestCase):
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
             "Thank you" in ae.display_for_user(user).card_html)
-
-    def test_combine_effects(self):
-        """Create combined effect strategies as used on ePROMs"""
-
-        ae  = INTERVENTION.ASSESSMENT_ENGINE
-        ae_id = ae.id
-
-        with SessionScope(db):
-            d = {'function': 'update_link_url',
-                 'kwargs': [{'name': 'intervention_name', 'value': ae.name},
-                            {'name': 'link_url', 'value':
-                             'http://different.org'}]}
-            d = {'function': 'update_card_html_on_completion',
-                 'kwargs': []}
-            d = {'function': 'combine_strategies',
-                 'kwargs': [
-                     {'name': 'strategy_1',
-                      'value': 'update_link_url'},
-                     {'name': 'strategy_1_kwargs',
-                      'value': [{'name': 'intervention_name', 'value': ae.name},
-                                {'name': 'link_url', 'value':
-                                 'https://eproms-demo.cirg.washington.edu/api/present-assessment/epic26'}]},
-                     {'name': 'strategy_2',
-                      'value': 'update_card_html_on_completion'},
-                     {'name': 'strategy_2_kwargs',
-                      'value': []}
-                 ]
-                }
-            strat = AccessStrategy(
-                name="fix assessment_engine link_url and update on completion",
-                intervention_id = ae_id,
-                function_details=json.dumps(d))
-            #print json.dumps(strat.as_json(), indent=2)
-            db.session.add(strat)
-            db.session.commit()
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
