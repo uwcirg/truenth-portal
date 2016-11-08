@@ -82,9 +82,10 @@ def profile_create():
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>')
+@oauth.require_oauth()
 def sessionReport(user_id, instrument_id):
     user = get_user(user_id)
-    return render_template("sessionReport.html",user=user, instrument_id=instrument_id)
+    return render_template("sessionReport.html",user=user, current_user = current_user(), instrument_id=instrument_id)
 
 
 @patients.route('/patient_profile/<int:patient_id>')
