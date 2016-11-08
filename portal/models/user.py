@@ -519,10 +519,8 @@ class User(db.Model, UserMixin):
         field, resulting in a deletion of existing values in said field
         that are not included.
 
-        :param fhir: The JSON defining portions of the user demographics to
-        change
-        :param acting_user: The user requesting the change, used to enforce
-        permissions, etc.
+        :param fhir: JSON defining portions of the user demographics to change
+        :param acting_user: user requesting the change
 
         """
         def v_or_n(value):
