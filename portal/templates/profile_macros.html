@@ -816,7 +816,7 @@
             </div>
     {% endif %}
 
-    {% if (person and person.has_role('patient')) or current_user.has_role('provider')%}
+    {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
      	<div class="row">
             <div class="col-md-12">
                 <div  class="profile-item-container">
