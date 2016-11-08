@@ -32,7 +32,7 @@ before_install:
   # Set TOXENV default (if not overridden by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
-  # Allow environmental variables set in TravisCI to override .travis.yml defaults
+  # Allow environmental variables configured per-repo on TravisCI website to override .travis.yml defaults
   - if [[ ! -v SAUCE_USERNAME ]]; then export SAUCE_USERNAME=$_SAUCE_USERNAME;fi
   - if [[ ! -v SAUCE_ACCESS_KEY ]]; then export SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY;fi
 
