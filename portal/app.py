@@ -10,6 +10,7 @@ from flask_webtest import get_scopefunc
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
+from .extensions import authomatic
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
@@ -116,6 +117,9 @@ def configure_extensions(app):
         register_view_function=capture_next_view_function(register),
         login_view_function=capture_next_view_function(login))
 
+    # authomatic - OAuth lib between Portal and other external IdPs
+    authomatic.init_app(app)
+
     # flask-oauthlib - OAuth between Portal and Interventions
     oauth.init_app(app)
 
@@ -184,7 +188,7 @@ def configure_logging(app):  # pragma: no cover
 
     # OAuth library logging tends to be helpful for connection
     # debugging
-    for logger in ('oauthlib', 'flask_oauthlib', 'authomatic.core'):
+    for logger in ('oauthlib', 'flask_oauthlib'):
         log = logging.getLogger(logger)
         log.setLevel(level)
         log.addHandler(info_file_handler)

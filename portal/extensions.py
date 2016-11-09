@@ -101,27 +101,42 @@ oauth = OAuthOrAlternateAuth()
 # identity providers such as Facebook
 from authomatic import Authomatic
 from authomatic.providers import oauth2
-from .config import early_app_config_access
 
-app_config = early_app_config_access()
-authomatic = Authomatic(
-    config={
-        'facebook': {
-            'class_': oauth2.Facebook,
-            'consumer_key': app_config['FB_CONSUMER_KEY'],
-            'consumer_secret': app_config['FB_CONSUMER_SECRET'],
-            'scope': ['public_profile', 'email'],
-        },
-        'google': {
-            'class_': oauth2.Google,
-            'consumer_key': app_config['GOOGLE_CONSUMER_KEY'],
-            'consumer_secret': app_config['GOOGLE_CONSUMER_SECRET'],
-            'scope': ['profile', 'email'],
-        },
-    },
-    secret=app_config['SECRET_KEY'],
-    debug=True,
-)
+class _delay_init(object):
+    """We can't initialize authomatic till the app config is ready"""
+
+    def __init__(self):
+        self._authomatic = None
+
+    @property
+    def authomatic(self):
+        return self._authomatic
+
+    def init_app(self, app):
+        if self._authomatic:
+            return
+        self._authomatic = Authomatic(
+            config={
+                'facebook': {
+                    'class_': oauth2.Facebook,
+                    'consumer_key': app.config['FB_CONSUMER_KEY'],
+                    'consumer_secret': app.config['FB_CONSUMER_SECRET'],
+                    'scope': ['public_profile', 'email'],
+                },
+                'google': {
+                    'class_': oauth2.Google,
+                    'consumer_key': app.config['GOOGLE_CONSUMER_KEY'],
+                    'consumer_secret': app.config['GOOGLE_CONSUMER_SECRET'],
+                    'scope': ['profile', 'email'],
+                },
+            },
+            secret=app.config['SECRET_KEY'],
+            debug=True,
+            logger=app.logger
+        )
+
+
+authomatic = _delay_init()
 
 
 # Flask-Mail is used for email communication

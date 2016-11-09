@@ -212,12 +212,19 @@ def login(provider_name):
 
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
-    result = authomatic.login(adapter, provider_name)
+    result = authomatic.authomatic.login(adapter, provider_name)
 
     if current_user():
         return next_after_login()
     if result:
         if result.error:
+            reload_count = session.get('force_reload_count', 0)
+            if reload_count > 2:
+                current_app.logger.warn("Failed 3 attempts: {}".format(
+                    result.error.message))
+                abort(500, "unable to authorize with provider {}".format(
+                    provider_name))
+            session['force_reload_count'] = reload_count + 1
             current_app.logger.info(result.error.message)
             # Work around for w/ Safari and cookies set to current site only
             # forcing a reload brings the local cookies back into view

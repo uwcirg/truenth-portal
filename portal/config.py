@@ -70,27 +70,6 @@ class TestConfig(BaseConfig):
     WTF_CSRF_ENABLED = False
 
 
-def early_app_config_access():
-    """Workaround to bootstrap configuration problems
-
-    Some extensions require config values before the flask app can be
-    initialized.  Expose the same configuration used by the app by
-    direct access.
-
-    Avoid use of this approach, as the app has its own config with a
-    chain of overwrites.  i.e. use app.config whenever possible.
-
-    """
-    root_path = os.path.join(os.path.dirname(__file__), "..")
-    _app_config = Config(root_path=root_path)
-    _app_config.from_object(BaseConfig)
-    _app_config.from_pyfile(
-        os.path.join(os.path.dirname(__file__), 'application.cfg'),
-        silent=True,
-    )
-    return _app_config
-
-
 class ConfigServer(Server):  # pragma: no cover
     """Correctly read Flask configuration values when running Flask
 
