@@ -316,7 +316,7 @@
 
 {% macro profilePhone(person) -%}
     <div class="form-group float-input-label profile-section">
-        <label for="phone">{{ _("CELLPHONE") }} <span class="text-muted smaller-text">(Optional)</span></label>
+        <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">(Optional)</span></label>
         <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ person.phone if person and person.phone }}">
     </div>
 {%- endmacro %}
