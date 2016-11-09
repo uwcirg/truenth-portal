@@ -199,7 +199,7 @@
     </div>
     <script>
     $(function () {
-        tnthAjax.getConsent($("#iq_userId").val(), true);
+        //tnthAjax.getConsent($("#iq_userId").val(), true);
         tnthAjax.getOrgs($("#iq_userId").val());
       });
     </script>
@@ -207,7 +207,7 @@
   {%- endmacro %}
   {% macro consent(consent_agreements) -%}
     {% if consent_agreements %}
-        <div id="consentContainer">
+        <div id="consentContainer" style="display:none">
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="well consent">
               <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />

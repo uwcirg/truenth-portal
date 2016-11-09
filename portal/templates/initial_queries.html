@@ -22,11 +22,18 @@
           <p>Thank You! Now, please finish your registration by telling us about yourself.</p>
 
             <!--<p>First, tell us who you are:</p>-->
+            {% if user and user._email %}
+                <input type="hidden" name="email" id="email" value="{{user._email}}" />
+            {% endif %}
+
+
             {% if 'name' in still_needed %}
               {{nameGroup()}}
             {% else %}
                 {% if user and user.first_name and user.last_name %}
                   <p>Name: {{user.first_name}} {{user.last_name}}</p>
+                  <input type="text" name="firstname" id="fistname" value="{{user.first_name}}" style="display:none"/>
+                  <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" style="display:none"/>
                 {% endif %}
             {% endif %}
             {% if 'role' in still_needed %}
@@ -34,6 +41,10 @@
             {% endif %}
             {% if 'dob' in still_needed %}
               {{dobGroup()}}
+            {% else %}
+                {% if user and user.birthdate %}
+                  <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
+                {% endif %}
             {% endif %}
             {% if 'clinical' in still_needed %}
               {{patientQGroup(user)}}
@@ -96,8 +107,14 @@ $(document).ready(function(){
       incompleteFields.forEach(function(field, index) {
           var f = field.element;
           f.attr('sectionIndex', index);
-          f.on('click', function() {
+          var triggerEvent = ($(f).attr("type") == "text" ? "change" : "click");
+
+          f.on(triggerEvent, function() {
               if ($(this).attr('sectionIndex') == (incompleteFields.length - 1)) $("#updateProfile").removeAttr("disabled");
+              else {
+                incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].section.show();
+                incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].element.show();
+              };
               console.log('field index: ' + f.attr('sectionIndex'));
               console.log('incomplete fields length: ' + incompleteFields.length);
           });
@@ -197,7 +214,7 @@ $(document).ready(function(){
   });
 
   $("#userOrgs").on("change", "input", function() {
-      assembleContent.orgs({{ user.id }});
+      assembleContent.demo({{ user.id }});
       $("#continueText").fadeIn();
       $("#updateProfile").removeAttr("disabled");
   });
