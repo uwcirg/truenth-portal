@@ -20,5 +20,6 @@ Contents:
     organizations
     sessions
     site_persistence
+    development
     code
     contributing
