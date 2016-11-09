@@ -25,6 +25,10 @@ class AppText(db.Model):
     name = db.Column(db.Text, unique=True, nullable=False)
     custom_text = db.Column(db.Text, nullable=True)
 
+    def __repr__(self):
+        return "{} ({}, {})".format(self.__class__.__name__,
+                                    self.name, str(self))
+
     def __str__(self):
         if self.custom_text:
             return self.custom_text

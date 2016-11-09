@@ -7,6 +7,7 @@ import requests
 from sqlalchemy import exc
 import tempfile
 
+from app import SITE_CFG
 from extensions import db
 from models.app_text import AppText
 from models.fhir import FHIR_datetime
@@ -136,6 +137,10 @@ class SitePersistence(object):
         for app_string in app_strings:
             d['entry'].append(app_string.as_json())
 
+        # Add site.cfg
+        config_data = read_site_cfg()
+        d['entry'].append(config_data)
+
         self.__write__(d)
 
     def import_(self):
@@ -212,27 +217,68 @@ class SitePersistence(object):
 
         # Orgs first:
         max_org_id = 0
+        orgs_seen = []
         for o in objs_by_type['Organization']:
             max_org_id = max(max_org_id, o.get('id', 0))
             update_org(o)
+            orgs_seen.append(o['id'])
             # As orgs can refer to other orgs, must commit on the
             # fly to avoid lookup errors
             db.session.commit()
 
+        # Delete any orgs not named
+        for org in Organization.query.filter(~Organization.id.in_(orgs_seen)):
+            current_app.logger.info("Deleting organization not mentioned in "
+                                 "site_persistence: {}".format(org))
+            db.session.delete(org)
+
         # Intervention details
+        interventions_seen = []
         for i in objs_by_type['Intervention']:
             update_intervention(i)
+            interventions_seen.append(i['name'])
+
         db.session.commit()  # strategies may use interventions, must exist
+
+        # Delete any interventions not named
+        for intervention in Intervention.query.filter(
+            ~Intervention.name.in_(interventions_seen)):
+            current_app.logger.info("Deleting Intervention not mentioned in "
+                                 "site_persistence: {}".format(intervention))
+            db.session.delete(intervention)
 
         # Access rules next
         max_strat_id = 0
+        strategies_seen = []
         for s in objs_by_type['AccessStrategy']:
             max_strat_id = max(max_strat_id, s.get('id', 0))
             update_strat(s)
+            strategies_seen.append(s['id'])
+
+        # Delete any strategies not named
+        for strategy in AccessStrategy.query.filter(
+            ~AccessStrategy.id.in_(strategies_seen)):
+            current_app.logger.info("Deleting AccessStrategy not mentioned in "
+                                 "site_persistence: {}".format(strategy))
+            db.session.delete(strategy)
 
         # App Text shouldn't be order dependent, now is good.
+        apptext_seen = []
         for a in objs_by_type['AppText']:
             AppText.from_json(a)
+            apptext_seen.append(a['name'])
+
+        # Delete any AppTexts not named
+        for apptext in AppText.query.filter(
+            ~AppText.name.in_(apptext_seen)):
+            current_app.logger.info("Deleting AppText not mentioned in "
+                                 "site_persistence: {}".format(repr(apptext)))
+            db.session.delete(apptext)
+
+        # Config isn't order dependent, now is good.
+        assert len(objs_by_type[SITE_CFG]) < 2
+        for c in objs_by_type[SITE_CFG]:
+            write_site_cfg(c)
 
         db.session.commit()
 
@@ -254,3 +300,20 @@ class SitePersistence(object):
         fix_sequence('organizations_id_seq', max_org_id)
         fix_sequence('access_strategies_id_seq', max_strat_id)
         self._log("SitePersistence import complete")
+
+
+def read_site_cfg():
+    cfg_file = os.path.join(current_app.instance_path, SITE_CFG)
+    with open(cfg_file, 'r') as fp:
+        results = [line for line in fp.readlines()]
+    # Package for inclusion
+    d = {"resourceType": SITE_CFG,
+         "results": results}
+    return d
+
+def write_site_cfg(data):
+    cfg_file = os.path.join(current_app.instance_path, SITE_CFG)
+    assert data.get('resourceType') == SITE_CFG
+    with open(cfg_file, 'w') as fp:
+        for line in data['results']:
+            fp.write(line)
