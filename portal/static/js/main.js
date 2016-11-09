@@ -247,7 +247,8 @@ var fillContent = {
             var procID = val.resource.id;
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
-            var performedDate = new Date(performedDateTime);
+            var performedDate = new Date(performedDateTime.replace("T", " "));
+            //console.log("date: " + performedDateTime + " cdate: " + performedDate);
             var deleteInvocation = '';
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
@@ -262,6 +263,7 @@ var fillContent = {
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
             proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</i>" + deleteInvocation + "</li>";
+
             if (procID > highestId) {
                 highestId = procID;
             }
@@ -332,7 +334,7 @@ var assembleContent = {
             //} else {
                 orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     //if (!isNaN(parseInt($(this).val()))) return { reference: "api/organization/"+$(this).val() };
-                    if ($(this).prop("checked")) console.log($(this).val());
+                    //if ($(this).prop("checked")) console.log($(this).val());
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
                 }).get();
                 var parentId;
@@ -346,7 +348,7 @@ var assembleContent = {
            // };
 
             demoArray["careProvider"] = orgIDs;
-            console.log(demoArray["careProvider"]);
+           // console.log(demoArray["careProvider"]);
 
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio
             var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus");
@@ -607,7 +609,7 @@ var tnthAjax = {
                                 $("#consentContainer .consent").hide();
                                 if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
                                 else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
-                                $("#" + parentOrg + "_consentItem").show();
+                                //$("#" + parentOrg + "_consentItem").show();
                                 //console.log($("#" + parentOrg + "_consentItem"))
                             //};
                         } else {
@@ -624,7 +626,7 @@ var tnthAjax = {
 
                 });
 
-                if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
+                //if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
             });
 
             $("#consentContainer input.consent-checkbox").each(function() {
@@ -1440,7 +1442,7 @@ function convertGMTToLocalTime(dateString, format) {
 })();
 
 function getSaveLoaderDiv(parentID, containerID) {
-    $("#" + parentID + " #" + containerID).after('<div>' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:4px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+    $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
 };
 
 function _isTouchDevice(){

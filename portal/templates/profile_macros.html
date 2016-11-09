@@ -18,7 +18,7 @@
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
 
             </div>
-            <div class="col-md-4 col-xs-12">
+            <div class="col-md-4 col-xs-10">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                     <option value="">Month...</option>
                     <option value="01">January</option>
@@ -173,7 +173,7 @@
             </div>
         </div>
     </div>
-    <script>
+   <script>
         $(function () {
             //$("#userRace input:checkbox").each(function() {
              //   $(this).on("click", function() {
@@ -560,10 +560,12 @@
 		</table>
 	</div>
     {% if current_user.has_role('provider') %}
+        <!--
         <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
         <a href="javascript:void(0)" id="loginAsPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#loginAsModal">Log in as this patient</a>
+        -->
     {% endif %}
-
+    <!--
     <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -601,6 +603,7 @@
         </div>
       </div>
     </div>
+    -->
 
     <script>
         $(function () {
@@ -629,11 +632,11 @@
                                          '</tr>';
                 	});
                 	$("#userSessionListTable").append(sessionListHTML);
-                } else $("#userSessionsListContainer").hide();
+                } else $("#profileSessionListMainContainer").hide();
 
             }).fail(function() {
                 console.log("Problem retrieving session data from server.");
-                $("#userSessionsListContainer").hide();
+                $("profileSessionListMainContainer").hide();
             });
 
     });
@@ -775,8 +778,8 @@
 {% macro profile(person, current_user, consent_agreements) -%}
 
     {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
-         <div class="row" style="position: relative;">
-            <div class="col-md-6">
+         <div class="row">
+            <div class="col-md-6 col-xs-12">
                 <div class="profile-item-container side">
                     <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
                     {{profileName(person)}}
@@ -784,7 +787,7 @@
 
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-xs-12">
                 <div class="profile-item-container side">
                     <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
                     {{profileEmail(person)}}
@@ -794,31 +797,61 @@
         </div>
 
     {% else %}
-         <div class="row" style="position: relative;">
-            <div class="col-md-12 profile-item-container">
-        
-                 <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
-                 <div class="row">
-                    <div class="col-md-8 col-xs-12">
-                        {{profileName(person)}}
+         {% if person.has_role('patient') %}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container">
+                         <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                         <br/>
+                         <div class="row">
+                            <div class="col-md-9 col-xs-11">
+                                {{profileName(person)}}
+                                {{profileBirthDate(person)}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-xs-11">
+                                {{profileEmail(person)}}
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-8 col-xs-12">
-                        {{profileBirthDate(person)}}
-                    </div>
-                    <div class="col-md-5 col-xs-12">
-                        {{profileEmail(person)}}
-                        {% if not person.has_role('patient') %}
-                            {{profilePhone(person)}}
-                        {% endif %}
-                    </div>
-                 </div>
-               
+                </div>
             </div>
+         {% else %}
+            <div class="row">
+                <div class="col-md-7 col-xs-12">
+                    <div class="profile-item-container side">
+                         <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Information</h4>
+                         <br/>
+                         <div class="row">
+                            <div class="col-md-11 col-xs-11">
+                                {{profileName(person)}}
+                                {{profileBirthDate(person)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 col-xs-12">
+                    <div class="profile-item-container side">
+                        <h4 id="communicationsLoc" class="profile-item-title">Communications</h4>
+                        <br/>
+                        <div class="row">
+                            <div class="col-md-11 col-xs-11">
+                                {{profileEmail(person)}}
+                                {{profilePhone(person)}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+         {% endif %}
+         
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
-     	<div class="row">
-            <div class="col-md-12">
+     	<div class="row" id="profileSessionListMainContainer">
+            <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
                      <h4 id="proAssessmentsLoc" class="profile-item-title">PRO Assessments</h4>
 					{{profileSessionList(person, current_user)}}
@@ -833,19 +866,19 @@
 
     {% if person.has_role('patient') %}
         <div class="row">
-                <div class="col-md-12">
-                    <div class="profile-item-container">
-                        <h4 id="clinicalDataLoc" class="profile-item-title">Clinical Data</h4>
-                        <div>
-                            {{profileProcedures(person, current_user)}}
-                        </div>
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="clinicalDataLoc" class="profile-item-title">Clinical Data</h4>
+                    <div>
+                        {{profileProcedures(person, current_user)}}
                     </div>
                 </div>
+            </div>
         </div>
     {% endif %}
 
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">
                 <h4 id="orgsLoc" class="profile-item-title">Organization Affiliation / Clinics</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
@@ -855,7 +888,7 @@
 
     {%if person.has_role('patient')%}
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="patientDetailLoc" class="profile-item-title">{% if person.has_role('patient') %}Patient{%else%}User{%endif%} Detail</h4>
                     <div class="flex">
@@ -864,16 +897,15 @@
                             <br/>
                             {{profilePhone(person)}}
                         </div>
-
-                            <div>
-                                {{profileEthnicity(person)|show_macro('ethnicity')}}
-                            </div>
-                            <div>
-                                {{profileRace(person)|show_macro('race')}}
-                            </div>
-                            <div>
-                                {{profileIndigenous(person)|show_macro('indigenous')}}
-                            </div>
+                        <div>
+                            {{profileEthnicity(person)|show_macro('ethnicity')}}
+                        </div>
+                        <div>
+                            {{profileRace(person)|show_macro('race')}}
+                        </div>
+                        <div>
+                            {{profileIndigenous(person)|show_macro('indigenous')}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -881,7 +913,7 @@
     {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                      <h4 id="rolesLoc" class="profile-item-title">User Roles</h4>
                     {{profileRole(person, current_user)}}
@@ -891,7 +923,7 @@
     {% endif %}
     {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="auditLogLoc" class="profile-item-title">Audit Log</h4>
                     {{profileAuditLog(person, current_user)}}
@@ -954,13 +986,15 @@
 $(document).ready(function(){
 
     tnthAjax.getProc({{ person.id }}, false);
+   /***
     $("#tnthproc-date").datepicker({
-        dateFormat: 'dd/mm/yy',
+        format: 'dd/mm/yyyy',
         endDate: "0d",
         startDate: "-10y",
         autoclose: true,
         forceParse: false
     });
+  ***/
 
 /**
     // Class for both "done" and "skip" buttons

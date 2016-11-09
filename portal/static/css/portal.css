@@ -59,39 +59,96 @@ body {
   left: 0;
   font-size: 0.90em;
 }
+#indexContainer {
+display: block;
+padding: 1.8em 2em;
+position: absolute;
+/*-webkit-transform: translate(-1000px, 0);
+transform(-1000px, 0);*/
+display: none;
+-webkit-transform: translate(0, -200px);
+transform: (0, -200px);
+transition: all 0.5s ease;
+z-index:9;
+width:25%;
+min-width:200px;
+max-width:100%;
+border-radius: 4px;
+background-color: #9b9c95;
+color: #FFF;
+font-size: 0.85em;
+-webkit-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
+-moz-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
+box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
+}
+#indexContainer.open {
+-webkit-transform: translate(0, 0);
+transform: translate(0, 0);
+display: block;
+}
+
+#indexNavBar {
+  width: 100%;
+  max-width: 100%;
+  color: #575F5C;
+  border-top: 1px solid  #E0E6E3;
+  border-bottom: 1px solid  #E0E6E3;
+  padding: 0.25em;
+  /*background-image: linear-gradient(
+      to right,
+      #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
+  );*/
+  /*background-image: linear-gradient( to right, #ffffff, rgba(183, 193, 195, 0.16), rgba(186, 190, 191, 0.18) );*/
+  background-image: linear-gradient( to right, #ffffff, rgba(159, 165, 167, 0.16), rgba(173, 193, 197, 0.18) );
+  vertical-align: center;
+}
+
 #indexNavBar span.glyphicon {
   cursor: pointer;
   font-size: 1em;
+  padding: 0.3em 0.8em;
   -webkit-box-shadow: 1px 1px 1px 0px #777;
   -moz-box-shadow: 1px 1px 1px 0px #777;
   box-shadow: 1px 1px 1px 0px #777;
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
-  border-radius: 2px;
-  padding: 0.3em;
+  border-radius: 4px;
+  position: relative;
+  top: 2px;
+  margin-left: -4px;
 }
 
 #indexNavBar span.link {
   margin-left: 0.5em;
   border: 1px solid #EEE;
-  padding: 0.6em;
+  padding: 0.5em 0.7em;
   border-radius: 4px;
   color: #53583f;
-  -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
-  -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
-  box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.75);
+  font-size:0.90em;
+  font-weight: 500;
+  -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
+  -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
+  box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
   cursor:pointer;
+  background-color: #FFF;
+  background: linear-gradient(to top, rgba(159, 165, 167, 0.20), rgba(159, 165, 167, 0.16)));
+  max-width: 100%;
 }
+
+#indexNavBar span:hover{
+  color: #79815D;
+}
+
 
 #indexNavBar #backLink {
  position: relative;
- top: -4px;
+ top: -3.5px;
  display: inline-block;
 }
 
 #backLink a {
   position: relative;
-  top: 1px;
+  top: 0.8px;
 }
 
 .orglist-download-container {
@@ -464,6 +521,21 @@ a.btn{
   margin-bottom: 2px;
 }
 
+.profile-create-item-container {
+  border-radius: 8px;
+  margin: 0.5em auto;
+  border: 1px solid #E0E6E3;
+  padding: 1.5em;
+}
+
+#profileForm #bdGroup div.row {
+  height: 4.5em;
+}
+#profileForm div.name-section {
+  height: 4.5em;
+}
+
+
 #userEthnicity label {
   margin-bottom: 0;
 }
@@ -510,12 +582,6 @@ input.clinic {
 .create-account-container {
   padding: 3.5em 4em;
   width: 90%;
-}
-#profileForm #bdGroup div.row {
-  height: 4.5em;
-}
-#profileForm div.name-section {
-  height: 4.5em;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -630,7 +696,7 @@ opacity: 0.8;
 }
 .profile-section {
   margin-bottom: 1.5em;
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 .name-section {
@@ -660,7 +726,7 @@ opacity: 0.8;
 }
 
 .side {
-  height: 25em;
+  height: 26em;
 }
 .flex {
   display: flex;
@@ -1041,17 +1107,37 @@ div.input-group.date {
     font-size: 13px;
   }
 
-  .bgContainer {
-    min-width: 100%;
+  #backLink a {
+  position: relative;
+  top: -1px;
+  }
+
+  #indexNavBar {
     max-width: 100%;
-    min-height: 400px;
+  }
+
+  #indexNavBar span.link {
+    font-size: 0.85em;
+    display: inline-block;
+    width: 98%;
+    max-width: 100%;
+    margin: 0.5em auto;
+  }
+
+  #indexNavBar span.glyphicon {
+    margin-left: -2px;
+  }
+
+  #wellContainer .tnth-well {
+    height: 60%;
+  }
+  .profile-item-container {
+  padding: 1em;
+  max-width: 100%;
   }
 
   .fixed-table-pagination {
     font-size: 0.9em;
-  }
-  .profile-item-container {
-  padding: 1em;
   }
 
   #phone, #email {
@@ -1064,7 +1150,7 @@ div.input-group.date {
   }
 
   .side {
-    height: 27em;
+    height: 38em;
   }
 
   .form-control {
@@ -1168,6 +1254,15 @@ div.input-group.date {
 @media (max-width: 991px) {
   .form-control {
     margin-bottom: 4px;
+  }
+  #profileForm #bdGroup div.row {
+    height: 10em;
+  }
+  #profileForm div.name-section {
+    height: 10em;
+  }
+  .side {
+    height: 34em;
   }
 }
 

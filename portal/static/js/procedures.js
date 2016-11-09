@@ -61,7 +61,8 @@ $(document).ready(function() {
             format: 'dd/mm/yyyy',
             endDate: "0d",
             startDate: "-10y",
-            autoclose: true
+            autoclose: true,
+            forceParse: false
         });
     });
 
@@ -93,18 +94,18 @@ $(document).ready(function() {
     // When date changes, update submit button w/ both mm/dd/yyyy and yyyy-mm-dd
     $("input[id^='tnthproc-date']").on('change', function( event ) {
         var passedDate = $(this).val(); // eg "11/20/2016"
-        passedDate = tnthDates.swap_mm_dd(passedDate);
+        //passedDate = tnthDates.swap_mm_dd(passedDate);
         $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
         var dateFormatted;
         // Change dates to YYYY-MM-DD
         //and make sure date is in dd/mm/yyyy format before reformat
         if (passedDate && passedDate != '' && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
             dateFormatted = tnthDates.swap_mm_dd(passedDate);
-            //console.log("formatted date: " + dateFormatted);
+            console.log("formatted date: " + dateFormatted);
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
             checkSubmit("button[id^='tnthproc-submit']");
         };
-        
+
     });
 
     /*** Delete functions ***/

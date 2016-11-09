@@ -11,7 +11,7 @@
 
 <div class="profile-header">
     {% if providerPerspective == 'true' %}
-        <h4 class="tnth-headline">Patient Profile</h4><h4 class="profile-item-title">#{{ user.id}} - {{ user.username }}</h4>
+        <h4 class="tnth-headline">Patient Profile <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
     {% elif current_user.has_role('admin') %}
         <h4 class="tnth-headline">Profile for {{ user.username }}</h4>
     {% else %}
@@ -21,7 +21,7 @@
     {{profileImage(user)}}
 </div>
 
-<div id="indexNavBar">
+<nav id="indexNavBar">
 {% if providerPerspective == 'true' %}
 {{ back_link('patients','Patients List') }}
 {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
@@ -30,8 +30,56 @@
 {{ back_link(PORTAL,'Home') }}
 {% endif %}
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="index list"></span>
-</div>
+{% if current_user.has_role('provider') and user.has_role('patient') %}
+
+<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
+<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">Login as this Patient</span>
+
+<div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="loginAsModalLabel">Log in as the Patient</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">Not yet implemented. This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials.</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+{% endif %}
+</nav>
 <div id="indexContainer">Index List</div>
+
+
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form">
 
@@ -121,7 +169,7 @@ $(document).ready(function(){
         $("#profileForm #" + o.attachID).after('<div>' + '<i id="' + o.attachID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:4px" aria-hidden="true"></i><i id="' + o.attachID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + o.attachID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
         */
         getSaveLoaderDiv("profileForm", o.attachID);
-        
+
         o.targetField.each(function() {
             $(this).attr("save-container-id", o.attachID);
             $(this).on("change", function() {
@@ -130,7 +178,7 @@ $(document).ready(function(){
                     assembleContent.demo({{ user.id }},true, $(this));
                 };
             });
-            
+
         });
     });
 
