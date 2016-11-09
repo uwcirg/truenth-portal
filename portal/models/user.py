@@ -558,8 +558,10 @@ class User(db.Model, UserMixin):
                 self.organizations.remove(org)
 
         if 'name' in fhir:
-            self.first_name = v_or_n(fhir['name']['given']) or self.first_name
-            self.last_name = v_or_n(fhir['name']['family']) or self.last_name
+            self.first_name = v_or_n(
+                fhir['name'].get('given')) or self.first_name
+            self.last_name = v_or_n(
+                fhir['name'].get('family')) or self.last_name
         if 'birthDate' in fhir and fhir['birthDate'].strip():
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
@@ -572,7 +574,7 @@ class User(db.Model, UserMixin):
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
-                    self.locale = CodeableConcept.from_fhir(e['language'])
+                    self.locale = CodeableConcept.from_fhir(e.get('language'))
         if 'extension' in fhir:
             # a number of elements live in extension - handle each in turn
             for e in fhir['extension']:
