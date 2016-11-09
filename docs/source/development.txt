@@ -11,12 +11,12 @@ Context
 This documentation is oriented towards supporting CHCR implementation of non-authenticated designs and content: mostly front-end. Note that one complexity is that this code base is used for two different systems/configuations (and more will be added): TrueNTH USA, and ePROMs.
 
 System-specific text (app_text)
-=================
+===============================
 
-app_text :ref:`AppText`
+`app_text <configuration#apptext>`_
 
 Internationalization (i18n)
-=================
+===========================
 We use gettext for this within python files; we also use `Liferay to manage content in different languages <http://tiny.cc/truenth_liferay#heading=h.ei0lyxrk4ix0>`_.
 
 Surround all strings with ``_( )`` and it will automatically attempt to find a translation, like:
@@ -37,28 +37,28 @@ You then need to generate a new .mo file from the .po file:
 ``$ msgfmt portal.po -o portal.mo``
 
 
-Outside documentation `http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension`_ and `https://docs.python.org/dev/library/gettext.html <https://docs.python.org/dev/library/gettext.html>`
+Outside documentation `http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension <http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension>`_ and `https://docs.python.org/dev/library/gettext.html <https://docs.python.org/dev/library/gettext.html>`
 
 System-specific pages
-=================
+=====================
 
 For example, adding a link from the landing page to a "prostate cancer 101" page, but only for TrueNTH (not ePROMs). 
 Guidance: use ``SHOW_*`` configurations. See this example: `https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372 <https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372>`_ 
 
 Mapping URL's to views
-=================
+======================
 
 Eg in views/patients.py:
 ``@patients.route('/patient_profile/<int:patient_id>')``
 
 Retrieving content from Liferay
-=================
+===============================
 
 Note that one of the systems used for this is `AppText <configuration.html#apptext>`_
 Information on managing content in Liferay is `here <http://tiny.cc/truenth_liferay>`_
 
 Use of front-end libs
-=================
+=====================
 
 LESS, jquery, bootstrap, and other 
 
