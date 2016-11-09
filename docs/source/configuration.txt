@@ -4,54 +4,45 @@ Configuration
 TruenNTH Shared Services can be configured in a number of fashions, to support
 a variety of use cases.
 
-Three primary mechanims are in place to setup the system as desired:
+Four primary mechanims are in place to setup the system as desired:
 
 - `application.cfg`_
 - `Site Persistence`_
+- `site.cfg`_
 - `AppText`_
 
 application.cfg
 ===============
 
-This primary configuration file lives in the `portal` source directory.
+This primary configuration file lives in the `instance` source directory.
 See `README <readme_link.html>`__ for initial setup of ``application.cfg``.
 
 Values with defaults are typically defined in the ``portal.config.BaseConfig``
 class.  Most are self explanitory or include inline comments for clarification.
-A few worthy of special mention for the task of customizing Shared Services.
 
-REQUIRED_CORE_DATA::
-
-    Set to control what portions of data are considered *required* prior
-    to allowing the user to transition beyond initial_queries.  Expects
-    a list, with the following options:
-
-    REQUIRED_CORE_DATA = ['name', 'dob', 'role', 'org', 'clinical', 'tou']
+Of special note, the one used to control which set of values are pulled in
+by `Site Persistence`_
 
 PERSISTENCE_FILE::
 
     See also Site Persistence, this controls which persistence file the
-    `python manage.py seed` command uses to load persistence data.
+    `python manage.py seed` command uses to load persistence data and build
+    the `site.cfg` file.
 
-    PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
+    For TrueNTH:
 
-    For ePROMs:
-
-    PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/ePROMs-site-config/master/site_persistence_file.json'
-
-PORTAL_STYLESHEET::
-
-    Define which stylesheet to include.  Defaults to 'css/portal.css'
+        PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
 
     For ePROMs:
 
-    PORTAL_STYLESHEET = 'css/eproms.css'
+        PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/ePROMs-site-config/master/site_persistence_file.json'
 
 Site Persistence
 ================
 
 The ``portal.SitePersistence`` class (see also `Site Persistence
-<site_persistence.html>`__) manages the import and export of a
+<site_persistence.html>`__) manages the import and export of 
+the ``site.cfg`` configuration file as well as a
 number of database tables holding significant data required for a rich
 experience.  This should never include any patient or personal data, but
 will include codified business rules and required data to support them.
@@ -73,6 +64,37 @@ Existing repositories include:
 
 - `TrueNTH-site-config <https://github.com/uwcirg/TrueNTH-USA-site-config>`_
 - `ePROMs-site-config <https://github.com/uwcirg/ePROMs-site-config>`_
+
+site.cfg
+========
+
+This configuration file also lives in the `instance` source directory, but
+unlike `application.cfg`_, it is managed by `Site Persistence`_.  It houses
+the configuration variables used to define the look of the site, such as
+those use to differentiate `ePROMs` from `TrueNTH`.
+
+A few worthy of special mention for the task of customizing Shared Services.
+
+REQUIRED_CORE_DATA::
+
+    Set to control what portions of data are considered *required* prior
+    to allowing the user to transition beyond initial_queries.  Expects
+    a list, with the following options:
+
+    REQUIRED_CORE_DATA = ['name', 'dob', 'role', 'org', 'clinical', 'tou']
+
+PORTAL_STYLESHEET::
+
+    Define which stylesheet to include.  Defaults to 'css/portal.css'
+
+    For ePROMs:
+
+    PORTAL_STYLESHEET = 'css/eproms.css'
+
+To update the ``site.cfg`` file contents, edit the
+``site_persistence_file.json`` file or use the ``python manage.py export_site``
+command and commit the changed ``site_persistence_file.json`` to the
+appropriate repository.
 
 AppText
 =======

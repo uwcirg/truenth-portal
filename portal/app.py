@@ -31,7 +31,7 @@ from .views.tou import tou_api
 from .views.truenth import truenth_api
 from .views.user import user_api
 
-
+SITE_CFG = 'site.cfg'
 DEFAULT_BLUEPRINTS = (
     assessment_engine_api,
     audit_api,
@@ -59,7 +59,8 @@ def create_app(config=None, app_name=None, blueprints=None):
     if blueprints is None:
         blueprints = DEFAULT_BLUEPRINTS
 
-    app = Flask(app_name, template_folder='templates')
+    app = Flask(app_name, template_folder='templates',
+                instance_relative_config=True)
     configure_app(app, config)
     configure_jinja(app)
     configure_error_handlers(app)
@@ -76,6 +77,7 @@ def create_app(config=None, app_name=None, blueprints=None):
 def configure_app(app, config):
     """Load successive configs - overriding defaults"""
     app.config.from_object(DefaultConfig)
+    app.config.from_pyfile(SITE_CFG, silent=True)
     app.config.from_pyfile('application.cfg', silent=True)
 
     if config:

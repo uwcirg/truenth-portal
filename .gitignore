@@ -6,6 +6,7 @@
 *.swp
 .coverage
 application.cfg
+site.cfg
 env
 lib
 local

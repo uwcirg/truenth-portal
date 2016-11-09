@@ -68,7 +68,7 @@ $ pip install --upgrade pip setuptools
 Copy the default to the named configuration file
 
 ```bash
-$ cp $PROJECT_HOME/portal/application.cfg{.default,}
+$ cp $PROJECT_HOME/instance/application.cfg{.default,}
 ```
 
 Obtain `consumer_key` and `consumer_secret` values from https://developers.facebook.com/apps  Write the values from Facebook to `application.cfg`:

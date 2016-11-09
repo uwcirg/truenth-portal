@@ -27,8 +27,6 @@ class BaseConfig(object):
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
     PROJECT = "portal"
-    PROJECT_ROOT =\
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_WELCOME = False
