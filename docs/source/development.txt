@@ -20,36 +20,37 @@ Internationalization (i18n)
 We use gettext for this within python files; we also use `Liferay to manage content in different languages <http://tiny.cc/truenth_liferay#heading=h.ei0lyxrk4ix0>`_.
 
 Surround all strings with ``_( )`` and it will automatically attempt to find a translation, like:
-``_('CELLPHONE')``
+   | _('CELLPHONE')
 This should automatically be available in any template file.
+*Note that we are moving to a model where en_US is used as the key here, with no need to use an english .po file.*
 
 For adding new translations, you need to add the blank translation to the .pot file:
-``# <optional comment pointing to where in the code the translation is used>``
-``msgid "CELLPHONE"``
-``msgstr ""``
+   | # <optional comment pointing to where in the code the translation is used>
+   | msgid "CELLPHONE"
+   | msgstr ""
 
 ...and the full translation to the .po file:
-``# <optional comment pointing to where in the code the translation is used>``
-``msgid "CELLPHONE"``
-``msgstr "Mobile"``
+   | # <optional comment pointing to where in the code the translation is used>
+   | msgid "CELLPHONE"
+   | msgstr "Mobile"
 
 You then need to generate a new .mo file from the .po file:
-``$ msgfmt portal.po -o portal.mo``
+   | $ msgfmt portal.po -o portal.mo
 
 
-Outside documentation `http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension <http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension>`_ and `https://docs.python.org/dev/library/gettext.html <https://docs.python.org/dev/library/gettext.html>`
+Outside documentation `jinja i18n-extension <http://jinja.pocoo.org/docs/dev/extensions/#i18n-extension>`_ and `https://docs.python.org/dev/library/gettext.html <https://docs.python.org/dev/library/gettext.html>`
 
 System-specific pages
 =====================
 
 For example, adding a link from the landing page to a "prostate cancer 101" page, but only for TrueNTH (not ePROMs). 
-Guidance: use ``SHOW_*`` configurations. See this example: `https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372 <https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372>`_ 
+Guidance: use ``SHOW_*`` configurations. See this example: `https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372`_ 
 
 Mapping URL's to views
 ======================
 
 Eg in views/patients.py:
-``@patients.route('/patient_profile/<int:patient_id>')``
+   | @patients.route('/patient_profile/<int:patient_id>')
 
 Retrieving content from Liferay
 ===============================
