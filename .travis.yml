@@ -1,9 +1,18 @@
 language: python
 python: "2.7"
-
+dist: trusty
+sudo: required
 cache: pip
 addons:
   postgresql: "9.4"
+  apt:
+    packages:
+      - dh-virtualenv
+      - libc6-i386
+      - debhelper
+git:
+  depth: 2000
+
 services:
   - postgresql
   - redis-server
@@ -46,3 +55,23 @@ install:
 
 script:
   - tox
+
+before_deploy:
+  # Use make-deb to update changelog so version is correct in package filename
+  - pip install make-deb
+  - yes | make-deb
+  - git add debian/changelog
+  - git stash --keep-index
+
+  - dpkg-buildpackage -us -uc
+
+deploy:
+  on:
+    all_branches: true
+    condition: $TOXENV = py27
+  provider: bintray
+  file: "descriptor.json"
+  user: "ivan-c"
+  key:
+    secure: M9cm19G950npuMpgpwe76ZsccMtDjaXvnGwWWjwK4sGqUv1jnE4+6bJ4fZ4PM/yQNVomjZ2Etdv6AHzsSmsV954Sk1GKqGt7BKCDCmCrQpSLduU6vsYDswbyjMXihlWNfLdMOe7pO/k9J9GDStCDnUEjCB6R5yCN+F8o9RAUm+4SvASwn0t9e7isFnGxVirSqbTTVlNw8L+qVwWkGdWHxOBCfCj//r6E3GdqkffvitZ9/uO3suCpJ74pRdeZyXOeERHEutZIGDWNyxvmpI1JjxLvFeGTh+AIaK70d2o6vORVNK/skbc+BCXPskYDi+7Nhl7mspuDn1UvbkR32mTjOuNBfxGfD6ISkb8dEd1hrQPWLfYToh5SvBa8gCZy0IbsTyJKdGhABYiHbl670JE+dHx+IZjA49K706Xilits4l0m3yMc3AP4O2R4ARGWSQUpLcxc1J8b/lZz8UKBKB6y3Iia7W3yxXntfDNDvhA45+rgHDS5XVTe0cYiwojqhjWrMm0pyxCEzRJ6Bv9ybGrrVZi+gwu2/zbes0CC0nkUswPAcSMrRODEmkGhrpxMNHK8OsoxmUk4VoejcQ9IlvqeIGXqiMgn5V6Q6/K7YJ7KbBavo0hTmDPUJRJzUNJn1FyJsSdeiErGWZAiR+mfyRy90LsiT0fdU9aCYGRgegTlcN0=
+  dry-run: true
