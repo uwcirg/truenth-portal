@@ -22,7 +22,7 @@ System-specific pages
 =================
 
 For example, adding a link from the landing page to a "prostate cancer 101" page, but only for TrueNTH (not ePROMs). 
-Guidance: use ``SHOW_*`` configurations (see examples in the code). See `(example) https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372 <https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372>` 
+Guidance: use ``SHOW_*`` configurations (see examples in the code). See `(example) https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372 <https://github.com/uwcirg/ePROMs-site-config/blob/master/site_persistence_file.json#L372>`_ 
 
 Mapping URL's to views
 =================
@@ -33,7 +33,8 @@ Eg in views/patients.py:
 Retrieving content from LR. 
 =================
 
-Note that one of the systems used for this is app_text :ref:`AppText`
+Note that one of the systems used for this is `AppText <configuration.html#apptext>`_
+Information on managing content in Liferay is `here <http://tiny.cc/truenth_liferay >`_
 
 Use of front-end libs
 =================
