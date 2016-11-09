@@ -10,8 +10,8 @@ override_dh_virtualenv:
 
 	dh_virtualenv \
 		--preinstall='pip>=8' \
-		--preinstall='setuptools>=12' \
-		--no-test
+		--preinstall='setuptools>=12'# \
+		#--no-test
 		# Enable when dh-virtualenv >= 0.8
 		# --extra-pip-arg='--no-binary=:all:'
 
