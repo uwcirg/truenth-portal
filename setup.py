@@ -25,6 +25,8 @@ setup(
     long_description=long_description,
     author="CIRG, University of Washington",
     author_email="truenth-dev@uw.edu",
+    maintainer="CIRG, University of Washington",
+    maintainer_email="truenth-dev@uw.edu",
     classifiers=(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
