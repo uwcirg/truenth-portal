@@ -70,16 +70,20 @@ $(document).ready(function() {
     $("button[id^='tnthproc-submit']").eventInput();
 
     // Add/remove disabled from submit button
+
     function checkSubmit(btnId) {
 
+       
         if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
             // We trigger the click here. The button is actually hidden so user doesn't interact with it
             // TODO - Remove the button completely and store the updated values elsewhere
             $(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
         } else {
             $(btnId).addClass('disabled').attr('disabled',true);
-        }
-    }
+        };
+        
+        
+    };
 
     // Update submit button when select changes
     $("select[id^='tnthproc']").on('change', function() {
@@ -95,16 +99,17 @@ $(document).ready(function() {
     $("input[id^='tnthproc-date']").on('change', function( event ) {
         var passedDate = $(this).val(); // eg "11/20/2016"
         //passedDate = tnthDates.swap_mm_dd(passedDate);
-        $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
+        //$("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
         var dateFormatted;
         // Change dates to YYYY-MM-DD
         //and make sure date is in dd/mm/yyyy format before reformat
         if (passedDate && passedDate != '' && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
+            $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
             dateFormatted = tnthDates.swap_mm_dd(passedDate);
             console.log("formatted date: " + dateFormatted);
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
             checkSubmit("button[id^='tnthproc-submit']");
-        };
+        }
 
     });
 

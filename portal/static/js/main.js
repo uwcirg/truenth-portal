@@ -590,9 +590,9 @@ var tnthAjax = {
                                 //console.log("in id: " + $(this).attr("id"))
                                if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
                             });
-                            $("#consentContainer input.consent-checkbox").each(function() {
-                                $(this).prop("checked", false);
-                            });
+                            //$("#consentContainer input.consent-checkbox").each(function() {
+                                //$(this).prop("checked", false);
+                            //});
                         }
                     //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
                     //else $("#noOrgs").attr("checked", false);
@@ -605,15 +605,22 @@ var tnthAjax = {
                     //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
                     if (parentOrg != "") {
                         if ($(this).prop("checked")) {
+                            var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
+                            if (! consented) {
+                                var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                                console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
+                                self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
+                            };
                             //if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
-                                $("#consentContainer .consent").hide();
-                                if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
-                                else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
+                                //$("#consentContainer .consent").hide();
+                                //if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
+                               // else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
                                 //$("#" + parentOrg + "_consentItem").show();
                                 //console.log($("#" + parentOrg + "_consentItem"))
                             //};
+
                         } else {
-                            $("#consentContainer .consent").hide();
+                            //$("#consentContainer .consent").hide();
                         };
                     };
 
