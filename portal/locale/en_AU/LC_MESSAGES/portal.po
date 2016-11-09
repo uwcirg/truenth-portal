@@ -5,6 +5,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# portal.templates.profile_macros.html:271 portal.templates.profile_test.html:107
-msgid "CELLPHONE"
+# portal.templates.profile_macros.html portal.templates.profile_test.html
+msgid "Cell"
 msgstr "Mobile"
