@@ -67,6 +67,9 @@ body {
   a[href*="about"]{
     display: none;
   }
+  span.separator {
+    display: none;
+  }
 }
 
 #socialMediaRegistrationContainer {
@@ -107,14 +110,13 @@ body {
 }
 
 #indexContainer {
-display: block;
 padding: 1.8em 2em;
 position: absolute;
 /*-webkit-transform: translate(-1000px, 0);
 transform(-1000px, 0);*/
 display: none;
 -webkit-transform: translate(0, -200px);
-transform: (0, -200px);
+transform: translate(0, -200px);
 transition: all 0.5s ease;
 z-index:9;
 width:25%;
@@ -127,13 +129,13 @@ font-size: 0.85em;
 -webkit-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 -moz-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
-  .open {
+  
+}
+#indexContainer.open {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
   display: block;
-  }
 }
-
 
 #indexNavBar {
   width: 100%;
@@ -172,13 +174,15 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
     border-radius: 4px;
     color: #53583f;
     font-size:0.90em;
-    font-weight: 450;
+    font-weight: 500;
     -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
     -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
     box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
     cursor:pointer;
     background-color: #FFF;
-    background: linear-gradient(to top, rgba(159, 165, 167, 0.20), rgba(159, 165, 167, 0.16)));
+    /*
+    background: linear-gradient(to top, rgba(159, 165, 167, 0.05), rgba(159, 165, 167, 0.01));
+    */
     max-width: 100%;
   }
 
@@ -1343,6 +1347,9 @@ div.input-group.date {
   .side {
     height: 34em;
   }
+  .load-container {
+    min-height: 1.5em;
+  }
 }
 @media (min-width: 992px) {
 
@@ -1396,7 +1403,7 @@ div.input-group.date {
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   .reduce-font-sizes {
     body & {
-      font-size: @baseFontSize;
+      font-size: 1.1em;
     }
     .tnth-headline {
       font-size: @headlineSize;
@@ -1407,14 +1414,6 @@ div.input-group.date {
     .form-group input[type=checkbox], .form-group  input[type=radio] {
       margin-top: 4px;
     }
-  }
-
-  #profileProcedureContainer #tnthproc {
-    width: 50%;
-  }
-
-  #profileProcedureContainer div.input-group.date {
-    width: 50%;
   }
 }
 
