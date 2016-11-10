@@ -254,7 +254,7 @@ var fillContent = {
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
             if (creator == currentUserId) {
                 creator = "you";
-                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
+                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\" style=\"font-size:0.90em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
             }
             else if (creator == subjectId) {
                 creator = "this patient";

@@ -73,7 +73,6 @@ $(document).ready(function() {
 
     function checkSubmit(btnId) {
 
-       
         if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
             // We trigger the click here. The button is actually hidden so user doesn't interact with it
             // TODO - Remove the button completely and store the updated values elsewhere
@@ -81,9 +80,31 @@ $(document).ready(function() {
         } else {
             $(btnId).addClass('disabled').attr('disabled',true);
         };
-        
-        
     };
+
+    function checkDate() {
+        return /(0[1-9]|[12][0-9]|3[01])/.test($("#procDay").val())
+               &&
+              ($( "#procMonth option:selected" ).val() != "")
+              &&
+             /\d{4}/.test($("#procYear").val());
+    };
+
+    function setDate() {
+        var passedDate = dateFields.map(function(fn) {
+            fd = $("#" + fn);
+            if (fd.attr("type") == "text") return fd.val();
+            else return fd.find("option:selected").val();
+        }).join("/");
+        console.log("passedDate: " + passedDate);
+        $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
+        dateFormatted = tnthDates.swap_mm_dd(passedDate);
+        console.log("formatted date: " + dateFormatted);
+        $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+        checkSubmit("button[id^='tnthproc-submit']");
+
+    };
+
 
     // Update submit button when select changes
     $("select[id^='tnthproc']").on('change', function() {
@@ -91,11 +112,24 @@ $(document).ready(function() {
         checkSubmit("button[id^='tnthproc-submit']");
     });
     // Update submit button when text input changes (single option)
+    //datepicker field
     $("input[id^='tnthproc-value']").on('change', function() {
         $("button[id^='tnthproc-submit']").attr("data-name", $(this).val());
         checkSubmit("button[id^='tnthproc-submit']");
     });
+
     // When date changes, update submit button w/ both mm/dd/yyyy and yyyy-mm-dd
+    var dateFields = ["procDay", "procMonth", "procYear"];
+
+    dateFields.forEach(function(fn) {
+        $("#" + fn).on("change", function() {
+            var isValid = checkDate();
+            if (isValid) {
+                setDate();
+            }
+        });
+    });
+
     $("input[id^='tnthproc-date']").on('change', function( event ) {
         var passedDate = $(this).val(); // eg "11/20/2016"
         //passedDate = tnthDates.swap_mm_dd(passedDate);

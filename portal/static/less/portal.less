@@ -122,7 +122,7 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   color: #575F5C;
   border-top: 1px solid  #E0E6E3;
   border-bottom: 1px solid  #E0E6E3;
-  padding: 0.25em;
+  padding: 0.3em 0.25em;
   /*background-image: linear-gradient(
       to right,
       #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
@@ -148,21 +148,24 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 
   span.link {
     margin-left: 0.3em;
-    border: 1px solid #EEE;
-    padding: 0.5em;
-    border-radius: 4px;
-    color: #53583f;
-    font-size:0.90em;
-    font-weight: 500;
-    -webkit-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
-    -moz-box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
-    box-shadow: 1px 1px 1px -1px rgba(0,0,0,0.85);
+    background: #fff;
+    background-image: -webkit-linear-gradient(top, #fff, #eee);
+    background-image: -moz-linear-gradient(top, #fff, #eee);
+    background-image: -ms-linear-gradient(top, #fff, #eee);
+    background-image: -o-linear-gradient(top, #fff, #eee);
+    background-image: linear-gradient(to bottom, #fff, #eee);
+    -webkit-border-radius: 8;
+    -moz-border-radius: 8;
+    border-radius: 8px;
     cursor:pointer;
-    background-color: #FFF;
-    /*
-    background: linear-gradient(to top, rgba(159, 165, 167, 0.05), rgba(159, 165, 167, 0.01));
-    */
+    font-weight: 500;
     max-width: 100%;
+    font-family: Arial;
+    color: @linkColor;
+    font-size: 0.90em;
+    padding: 0.5em 1em;
+    border: solid #eee 2px;
+    text-decoration: none;
   }
 
   #indexNavBar span:hover{
@@ -660,13 +663,17 @@ input.clinic {
 box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
 border-left: 1px solid #ddd;
 border-top: 1px solid #ddd;
-border-radius: 2px;
+border-radius: 4px;
 padding: 0.2em;
 -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 filter: alpha(opacity=80);
 -moz-opacity: 0.8;
 -khtml-opacity: 0.8;
 opacity: 0.8;
+background-color: #FFF;
+}
+#userSessionReportDetailHeader span.glyphicon-user {
+  top: -0.01px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover
 {
@@ -1322,7 +1329,7 @@ div.input-group.date {
     height: 10em;
   }
   #profileForm div.name-section {
-    height: 10em;
+    height: 8em;
   } 
   .side {
     height: 34em;
@@ -1431,6 +1438,13 @@ div.input-group.date {
       margin-bottom: 0.5em;
     }
   }
+
+  #profileForm #bdGroup div.row {
+    height: 10em;
+  }
+  #profileForm div.name-section {
+    height: 6em;
+  } 
 }
 
 @media (min-width: 1400px) {

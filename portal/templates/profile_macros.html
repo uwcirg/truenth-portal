@@ -846,7 +846,7 @@
             </div>
 
          {% endif %}
-         
+
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
@@ -946,9 +946,10 @@
         <div id="userProcedures"></div>
 
     </div>
-    <p class="text-muted">Add a treatment:</p>
+    <br/>
     <form class="form-inline event-element to-validate" style='margin-left: 1em;' data-toggle="validator">
-        <div class="flex">
+
+            <p class="text-muted">Add a treatment:</p>
             <div class='form-group'>
                 <select class='form-control' id='tnthproc'>
                     <option value=''>Select treatment...</option>
@@ -963,6 +964,7 @@
                 </select>
                 <div class="help-block with-errors"></div>
             </div>
+            <!--
             <div class='form-group'>
                 <label>Date:</label>
                 <div class="input-group date">
@@ -973,7 +975,41 @@
                 </div>
                 <div class="help-block with-errors"></div>
             </div>
-        </div>
+            -->
+            <br/><br/>
+            <div class="form-group">
+                <label style="margin-bottom:0">Date:</label>
+                <div class="flex">
+                    <div>
+                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="(0[1-9]|[12][0-9]|3[01])">
+                    </div>
+                    <div>
+                        <select class="form-control" name="procMonth" style="width:100%" id="procMonth" data-birthday="true" required="">
+                            <option value="">Month...</option>
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08">August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
+                    </div>
+                </div>
+                <div class="row">
+                     <div class="col-md-5 col-xs-10">
+                        <div class="help-block with-errors"></div>
+                     </div>
+                </div>
+            </div>
         <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
             <i class='fa fa-plus'></i> Add Procedure
         </button>
@@ -986,15 +1022,6 @@
 $(document).ready(function(){
 
     tnthAjax.getProc({{ person.id }}, false);
-   /***
-    $("#tnthproc-date").datepicker({
-        format: 'dd/mm/yyyy',
-        endDate: "0d",
-        startDate: "-10y",
-        autoclose: true,
-        forceParse: false
-    });
-  ***/
 
 /**
     // Class for both "done" and "skip" buttons
