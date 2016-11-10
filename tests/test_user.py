@@ -168,6 +168,15 @@ class TestUser(TestCase):
         self.assertIn('9', found)
 
 
+    def test_delete_lock(self):
+        """changing attributes on a deleted user should raise"""
+        actor = self.add_user('actor')
+        user, actor = map(db.session.merge,(self.test_user, actor))
+        user.delete_user(acting_user=actor)
+
+        with self.assertRaises(ValueError):
+            user.first_name = 'DontDoIt'
+
     def test_user_timezone(self):
         self.assertEquals(self.test_user.timezone, 'UTC')
         self.login()
