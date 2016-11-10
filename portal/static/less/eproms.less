@@ -191,11 +191,12 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 
   #indexNavBar span:hover{
     color: #79815D;
+    cursor:pointer;
   }
 
   #backLink {
    position: relative;
-   top: -3.5px;
+   top: -3.8px;
    display: inline-block;
    a {
     position: relative;
@@ -565,7 +566,8 @@ a.btn {
 
 .profile-item-container {
   background-color: #EFF5F3;
-  background-color: rgba(173, 193, 197, 0.16);
+  /*background-color: rgba(173, 193, 197, 0.16);*/
+  background-color: rgba(204, 204, 204, 0.3);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -652,6 +654,7 @@ input.clinic {
 #profileSendEmailContainer {
   padding-bottom: 5%;
   background-color: #f9f9f9;
+  background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
   label{
     font-size:0.95em;
@@ -695,7 +698,7 @@ box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.2);
 border-left: 1px solid #ddd;
 border-top: 1px solid #ddd;
 border-radius: 4px;
-padding: 0.2em;
+padding: 0.4em;
 -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
 filter: alpha(opacity=80);
 -moz-opacity: 0.8;
@@ -704,7 +707,7 @@ opacity: 0.8;
 background-color: #FFF;
 }
 #userSessionReportDetailHeader span.glyphicon-user {
-  top: -0.01px;
+  top: -0.1px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover
 {
@@ -1210,6 +1213,9 @@ div.input-group.date {
     span.glyphicon {
       margin-left: -2px;
     }
+    #backLink a {
+      top: -0.1px;
+    }
   }
  
   #wellContainer .tnth-well {
@@ -1287,9 +1293,12 @@ div.input-group.date {
     max-width: 100%;
   }
 
-  #indexNavBar #backLink {
-    top: -2px;
+  #profileForm #bdGroup div.row {
+    height: 10em;
   }
+  #profileForm div.name-section {
+    height: 10em;
+  } 
 
 }
 
@@ -1349,7 +1358,7 @@ div.input-group.date {
     height: 10em;
   }
   #profileForm div.name-section {
-    height: 8em;
+    height: 10em;
   } 
   .side {
     height: 34em;
@@ -1468,10 +1477,10 @@ div.input-group.date {
   }
 
   #profileForm #bdGroup div.row {
-    height: 10em;
+    height: 4em;
   }
   #profileForm div.name-section {
-    height: 6em;
+    height: 4em;
   } 
 }
 

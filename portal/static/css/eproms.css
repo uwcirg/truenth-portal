@@ -155,10 +155,11 @@ transform(-1000px, 0);*/
 }
 #indexNavBar #indexNavBar span:hover {
   color: #79815D;
+  cursor: pointer;
 }
 #indexNavBar #backLink {
   position: relative;
-  top: -3.5px;
+  top: -3.8px;
   display: inline-block;
 }
 #indexNavBar #backLink a {
@@ -506,7 +507,8 @@ a.btn {
 }
 .profile-item-container {
   background-color: #EFF5F3;
-  background-color: rgba(173, 193, 197, 0.16);
+  /*background-color: rgba(173, 193, 197, 0.16);*/
+  background-color: rgba(204, 204, 204, 0.3);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -576,6 +578,7 @@ input.clinic {
 #profileSendEmailContainer {
   padding-bottom: 5%;
   background-color: #f9f9f9;
+  background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
 }
 #profileSendEmailContainer label {
@@ -612,7 +615,7 @@ input.clinic {
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   border-radius: 4px;
-  padding: 0.2em;
+  padding: 0.4em;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
   filter: alpha(opacity=80);
   -moz-opacity: 0.8;
@@ -621,7 +624,7 @@ input.clinic {
   background-color: #FFF;
 }
 #userSessionReportDetailHeader span.glyphicon-user {
-  top: -0.01px;
+  top: -0.1px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover {
   color: #979a8d;
@@ -1082,6 +1085,9 @@ div.input-group.date {
   #indexNavBar span.glyphicon {
     margin-left: -2px;
   }
+  #indexNavBar #backLink a {
+    top: -0.1px;
+  }
   #wellContainer .tnth-well {
     height: 60%;
   }
@@ -1151,8 +1157,11 @@ div.input-group.date {
     width: 100%;
     max-width: 100%;
   }
-  #indexNavBar #backLink {
-    top: -2px;
+  #profileForm #bdGroup div.row {
+    height: 10em;
+  }
+  #profileForm div.name-section {
+    height: 10em;
   }
 }
 @media (max-width: 730) {
@@ -1207,7 +1216,7 @@ div.input-group.date {
     height: 10em;
   }
   #profileForm div.name-section {
-    height: 8em;
+    height: 10em;
   }
   .side {
     height: 34em;
@@ -1316,10 +1325,10 @@ div.input-group.date {
     margin-bottom: 0.5em;
   }
   #profileForm #bdGroup div.row {
-    height: 10em;
+    height: 4em;
   }
   #profileForm div.name-section {
-    height: 6em;
+    height: 4em;
   }
 }
 @media (max-width: 1300px) {

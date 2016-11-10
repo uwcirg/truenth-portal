@@ -254,7 +254,7 @@ var fillContent = {
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
             if (creator == currentUserId) {
                 creator = "you";
-                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\" style=\"font-size:0.90em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
+                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='border-radius:8px; font-size:0.9em; padding: 0.1em 0.6em;' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</a>";
             }
             else if (creator == subjectId) {
                 creator = "this patient";
@@ -262,7 +262,7 @@ var fillContent = {
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0'>" + performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</i>" + deleteInvocation + "</li>";
+            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0; font-family: Georgia serif; font-size:1.1em'>" + performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</i>" + deleteInvocation + "</li>";
 
             if (procID > highestId) {
                 highestId = procID;

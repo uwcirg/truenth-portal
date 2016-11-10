@@ -39,7 +39,7 @@
 <form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
 
     <div class="row" style="margin: 0 auto">
-        <div class="col-md-push-2 col-md-7 col-xs-11 profile-item-container box-shadow-container" style="padding: 2.9em 2.5em">
+        <div class="col-md-push-2 col-md-7 col-xs-11 profile-item-container" style="padding: 3em 2.5em">
             {{ form.hidden_tag() }}
             {# Username or Email #}
             {% set field = form.username if user_manager.enable_username else form.email %}
