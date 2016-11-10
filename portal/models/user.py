@@ -133,7 +133,7 @@ class UserTimezone(Extension):
         raise NotImplementedError
 
 
-def delete_user(username):
+def permanently_delete_user(username):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
@@ -156,6 +156,7 @@ def delete_user(username):
     user = User.query.filter_by(username=username).first()
     if not user:
         raise ValueError("No such user: {}".format(username))
+    comment = "purged all trace of {}".format(user)  # while format works
 
     # purge all the types with user foreign keys, then the user itself
     UserIntervention.query.filter_by(user_id=user.id).delete()
@@ -170,16 +171,14 @@ def delete_user(username):
         db.session.delete(t)
     for o in user.observations:
         db.session.delete(o)
-    audits = Audit.query.filter_by(user_id=user.id).delete()
+    Audit.query.filter_by(user_id=user.id).delete()
 
     # the rest should die on cascade rules
     db.session.delete(user)
     db.session.commit()
 
     # record this event
-    db.session.add(Audit(
-        user_id=acting_user.id,
-        comment="purged all trace of user {}".format(username)))
+    db.session.add(Audit(user_id=acting_user.id, comment=comment))
     db.session.commit()
 
 
@@ -224,6 +223,9 @@ class User(db.Model, UserMixin):
             server_default='1')
     locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
+    deleted_id = db.Column(
+        db.ForeignKey('audit.id', use_alter=True,
+                      name='user_deleted_audit_id_fk'), nullable=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -254,10 +256,20 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     locale = db.relationship(CodeableConcept, cascade="save-update")
+    deleted = db.relationship('Audit', cascade="save-update",
+                              foreign_keys=[deleted_id])
 
     # FIXME kludge for random demo data
     due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
     random_due_date_status = 'due'
+
+    def __setattr__(self, name, value):
+        """Make sure deleted users aren't being updated"""
+        if not name.startswith('_'):
+            if getattr(self, 'deleted'):
+                raise ValueError("can not update {} on deleted {}".format(
+                    name, self))
+        return super(User, self).__setattr__(name, value)
 
     @property
     def valid_consents(self):
@@ -510,6 +522,8 @@ class User(db.Model, UserMixin):
         if extensions:
             d['extension'] = extensions
         d['careProvider'] = careProviders()
+        if self.deleted_id:
+            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
         return d
 
     def update_from_fhir(self, fhir, acting_user):
@@ -684,6 +698,41 @@ class User(db.Model, UserMixin):
         scores.append(fuzz.ratio(self.birthdate.strftime('%d%m%Y'),
                                  birthdate.strftime('%d%m%Y')))
         return sum(scores) / len(scores)
+
+
+    def delete_user(self, acting_user):
+        """Mark user deleted from the system
+
+        Due to audit constraints, we do NOT actually delete the user, but
+        mark the user as deleted.  See `permanently_delete_user` for
+        more serious alternative.
+
+        :param self: user to mark deleted
+        :param acting_user: individual executing the command, for audit trail
+
+        """
+        from .audit import Audit
+        from .auth import Client, Token
+
+        if self == acting_user:
+            raise ValueError("can't delete self")
+        if self is None or acting_user is None:
+            raise ValueError("both user and acting_user must be well defined")
+
+        # Don't allow deletion of users with client applications
+        clients = Client.query.filter_by(user_id=self.id)
+        if clients.count():
+            raise ValueError("Users owning client applications can not "
+                             "be deleted.  Delete client apps first: {}".format(
+                                 [client.id for client in clients]))
+
+        self.active = False
+        self.deleted = Audit(
+            user_id=acting_user.id, comment="marking deleted {}".format(self))
+
+        # purge any outstanding access tokens
+        Token.query.filter_by(user_id=self.id).delete()
+        db.session.commit()
 
 
 def add_authomatic_user(authomatic_user, image_url):
