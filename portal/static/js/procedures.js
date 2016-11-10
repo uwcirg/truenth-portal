@@ -31,6 +31,9 @@ $.fn.extend({
                     $("select[id^='tnthproc']").val('');
                     $("input[id^='tnthproc-value']").val('');
                     $("input[id^='tnthproc-date']").val('');
+                    $("#procDay").val("");
+                    $("#procMonth").val("");
+                    $("#procYear").val("");
                     // Clear submit button
                     $("button[id^='tnthproc-submit']").addClass('disabled').attr({
                         "data-name": "",
@@ -124,6 +127,7 @@ $(document).ready(function() {
     dateFields.forEach(function(fn) {
         $("#" + fn).on("change", function() {
             var isValid = checkDate();
+            console.log("isValid: " +  isValid)
             if (isValid) {
                 setDate();
             }
