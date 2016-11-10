@@ -940,7 +940,7 @@
 <p>Which of the following prostate cancer treatments {%if current_user.has_role('provider') and current_user.id != person.id %}has the patient{%else%}have you{%endif%} had, if any? If you don&#39;t remember the exact
     date, please make your best guess.<span class="text-muted smaller-text"></span></p>
 <div id="profileProcedureContainer" style="margin-left: 1em">
-    <div style="margin: 1em 0 1em 1em">
+    <div style="margin: 1em 0.5em 1em 0.5em">
         <p class="text-muted">{%if current_user.id == person.id%}Your treatments{%else%}Treatments{%endif%}:</p>
         <div id="userProcedures"></div>
 
@@ -980,7 +980,7 @@
                 <div class="help-block with-errors"></div>
             </div>
             -->
-            <br/><br/>
+            <br/>
             <div class="form-group">
                 <label style="margin-bottom:0">Date:</label>
                 <div class="flex">

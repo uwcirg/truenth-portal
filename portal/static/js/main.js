@@ -603,7 +603,7 @@ var tnthAjax = {
                     var parentOrg = $(this).attr("data-parent-id");
                     var parentName = $(this).attr("data-parent-name");
                     //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
-                    if (parentOrg != "") {
+                    if (parentOrg) {
                         if ($(this).prop("checked")) {
                             var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
                             if (! consented) {
