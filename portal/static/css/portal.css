@@ -370,10 +370,10 @@ btn {
 }
 .profile-img {
   float: right;
-  margin-top: -70px;
+  margin-top: -66px;
 }
 .profile-img img {
-  width: 90px;
+  width: 60px;
   border-radius: 45px;
 }
 .portal-item {
@@ -1286,11 +1286,11 @@ div.input-group.date {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -100px;
+    margin-top: -66px;
   }
   .profile-img img {
-    width: 120px;
-    border-radius: 60px;
+    width: 60px;
+    border-radius: 45px;
   }
   .btn-set {
     margin-bottom: 1em;
