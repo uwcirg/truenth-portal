@@ -216,6 +216,9 @@ def user_intervention_set(intervention_name):
     user_id = request.json.get('user_id')
     current_user().check_role(permission='edit', other_id=user_id)
 
+    user = User.query.get(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     ui = UserIntervention.query.filter_by(
         user_id=user_id, intervention_id=intervention.id).first()
     if not ui:

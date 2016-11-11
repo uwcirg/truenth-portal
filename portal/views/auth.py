@@ -216,6 +216,8 @@ def login(provider_name):
     result = authomatic.authomatic.login(adapter, provider_name)
 
     if current_user():
+        if current_user().deleted:
+            abort(400, "deleted user - operation not permitted")
         return next_after_login()
     if result:
         if result.error:

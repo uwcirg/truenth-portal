@@ -42,9 +42,7 @@ def biopsy(patient_id):
           to view requested patient
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    return clinical_api_shortcut_get(patient_id=patient.id,
+    return clinical_api_shortcut_get(patient_id=patient_id,
                                      codeable_concept=CC.BIOPSY)
 
 
@@ -79,9 +77,7 @@ def pca_diag(patient_id):
           to view requested patient
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    return clinical_api_shortcut_get(patient_id=patient.id,
+    return clinical_api_shortcut_get(patient_id=patient_id,
                                      codeable_concept=CC.PCaDIAG)
 
 
@@ -116,9 +112,7 @@ def pca_localized(patient_id):
           to view requested patient
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    return clinical_api_shortcut_get(patient_id=patient.id,
+    return clinical_api_shortcut_get(patient_id=patient_id,
                                      codeable_concept=CC.PCaLocalized)
 
 
@@ -153,9 +147,7 @@ def treatment(patient_id):
           to view requested patient
 
     """
-    current_user().check_role(permission='view', other_id=patient_id)
-    patient = get_user(patient_id)
-    return clinical_api_shortcut_get(patient_id=patient.id,
+    return clinical_api_shortcut_get(patient_id=patient_id,
                                      codeable_concept=CC.TX)
 
 
@@ -416,6 +408,8 @@ def clinical(patient_id):
     """
     current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
     return jsonify(patient.clinical_history(requestURL=request.url))
 
 
@@ -481,6 +475,8 @@ def clinical_set(patient_id):
     """
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
@@ -497,7 +493,8 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
     current_user().check_role(permission='edit', other_id=patient_id)
     patient = get_user(patient_id)
-
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     if not request.json or 'value' not in request.json:
         abort(400, "Expects 'value' in JSON")
@@ -517,8 +514,10 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
 
 def clinical_api_shortcut_get(patient_id, codeable_concept):
     """Helper for common code used in clincal api shortcuts"""
-    current_user().check_role(permission='edit', other_id=patient_id)
+    current_user().check_role(permission='view', other_id=patient_id)
     patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
     value_quantities = patient.fetch_values_for_concept(codeable_concept)
     if value_quantities:
         assert len(value_quantities) == 1

@@ -43,9 +43,9 @@ def procedure(patient_id):
 
     """
     patient = get_user(patient_id)
-    if not patient:
-        abort(404)
     current_user().check_role(permission='view', other_id=patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
     return jsonify(patient.procedure_history(requestURL=request.url))
 
 
