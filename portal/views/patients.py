@@ -107,7 +107,7 @@ def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org),babel.get_locale())
+        consent_url = app_text(ConsentATMA.name_key(organization=org),get_locale())
         response = requests.get(consent_url)
         if response.json:
             consent_agreements[org.id] = {
@@ -116,7 +116,7 @@ def get_orgs_consent_agreements():
                 'agreement_url': ConsentATMA.permanent_url(
                     version=response.json()['version'],
                     generic_url=consent_url,
-                    languageId=babel.get_locale())}
+                    languageId=get_locale())}
         else:
             consent_agreements[org.id] = {
                 'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
