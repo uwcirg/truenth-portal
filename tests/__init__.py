@@ -135,6 +135,7 @@ class TestCase(Base):
 
     def bless_with_basics(self):
         """Bless test user with basic requirements for coredata"""
+        self.test_user = db.session.merge(self.test_user)
         self.test_user.birthdate = datetime.utcnow()
 
         # Register with a clinic

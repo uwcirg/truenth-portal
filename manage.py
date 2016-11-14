@@ -14,7 +14,7 @@ from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
-from portal.models.user import delete_user, flag_test
+from portal.models.user import permanently_delete_user, flag_test
 from portal.models.user_consent import fake_consents
 from portal.site_persistence import SitePersistence
 
@@ -66,7 +66,7 @@ def export_site():
 @manager.option('-u', '--username', dest='username')
 def purge_user(username):
     """Purge the given user from the system"""
-    delete_user(username)
+    permanently_delete_user(username)
 
 @manager.command
 def mark_test():

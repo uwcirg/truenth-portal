@@ -131,7 +131,8 @@ def next_after_login():
         auditable_event("merging invited user {} into account {}".format(
             invited_user_id, user.id), user_id=user.id)
         user.merge_with(invited_user_id)
-        #TODO: disable_account(user_id=invited_user_id, audit_user=user)
+        invited_user = User.query.get(invited_user_id)
+        invited_user.delete_user(acting_user=user)
         db.session.commit()
         del session['invited_verified_user_id']
 
@@ -215,6 +216,8 @@ def login(provider_name):
     result = authomatic.authomatic.login(adapter, provider_name)
 
     if current_user():
+        if current_user().deleted:
+            abort(400, "deleted user - operation not permitted")
         return next_after_login()
     if result:
         if result.error:

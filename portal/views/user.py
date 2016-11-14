@@ -53,6 +53,8 @@ def me():
 
     """
     user = current_user()
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     return jsonify(id=user.id, username=user.username,
                    email=user.email)
 
@@ -170,10 +172,10 @@ def access_url(user_id):
         description: if the user isn't found
 
     """
-    user = get_user(user_id)
-    if not user:
-        abort(404, "User {} not found".format(user_id))
     current_user().check_role(permission='edit', other_id=user_id)
+    user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
                       ROLE.PROVIDER])
     has = set([role.name for role in user.roles])
@@ -272,8 +274,6 @@ def user_consents(user_id):
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "User {} not found".format(user_id))
 
     return jsonify(consent_agreements=[c.as_json() for c in
                                        user.valid_consents])
@@ -351,8 +351,8 @@ def set_user_consents(user_id):
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "user_id {} not found".format(user_id))
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
@@ -430,8 +430,8 @@ def delete_user_consents(user_id):
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "user_id {} not found".format(user_id))
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     remove_uc = None
     try:
         id_to_delete = int(request.json['organization_id'])
@@ -498,8 +498,6 @@ def user_groups(user_id):
     if user.id != user_id:
         current_user().check_role(permission='view', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "User {} not found".format(user_id))
 
     return jsonify(groups=[g.as_json() for g in user.groups])
 
@@ -579,9 +577,8 @@ def set_user_groups(user_id):
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "user_id {} not found".format(user_id))
-
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     if not request.json or 'groups' not in request.json:
         abort(400, "Requires 'groups' list")
 
@@ -813,7 +810,8 @@ def set_relationships(user_id):
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
-
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     if not request.json or 'relationships' not in request.json:
         abort(400, "Requires relationship list in JSON")
     # First confirm all the data is valid and the user has permission
@@ -1050,8 +1048,8 @@ def set_roles(user_id):
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
         user = get_user(user_id)
-    if not user:
-        abort(404, "user_id {} not found".format(user_id))
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     # Don't allow promotion of service accounts
     if user.has_role(ROLE.SERVICE):

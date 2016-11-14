@@ -1,5 +1,4 @@
 """Assessment Engine API view functions"""
-import datetime
 from flask import abort, Blueprint, current_app, jsonify, request, redirect
 from flask import session
 from flask_swagger import swagger
@@ -8,8 +7,8 @@ import jsonschema
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.fhir import FHIR_datetime, QuestionnaireResponse
-from ..models.intervention import Intervention, INTERVENTION
-from ..models.user import current_user
+from ..models.intervention import INTERVENTION
+from ..models.user import current_user, get_user
 from ..extensions import oauth
 from ..extensions import db
 
@@ -560,6 +559,9 @@ def assessment(patient_id, instrument_id):
     """
 
     current_user().check_role(permission='view', other_id=patient_id)
+    patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
     questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
 
     if instrument_id is not None:
@@ -1015,6 +1017,9 @@ def assessment_set(patient_id):
 
     # Verify the current user has permission to edit given patient
     current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     swag = swagger(current_app)
 

@@ -140,8 +140,8 @@ def access_via_token(token):
 
     """
     # Should never be here if already logged in - enforce
-    #if current_user():
-        #abort(500, "Already logged in - can't continue")
+    if current_user():
+        abort(500, "Already logged in - can't continue")
 
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
@@ -157,6 +157,8 @@ def access_via_token(token):
 
     # Valid token - confirm user id looks legit
     user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
     not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
                       ROLE.PROVIDER])
     has = set([role.name for role in user.roles])
