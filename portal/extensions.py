@@ -23,7 +23,7 @@ user_manager = UserManager(db_adapter)
 
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
-from flask import abort, request
+from flask import abort, request, current_app
 from flask_login import login_user
 from flask_oauthlib.provider import OAuth2Provider
 from .models.user import current_user
@@ -154,3 +154,9 @@ celery = Celery()
 # Bable is used for i18n
 from flask_babel import Babel
 babel = Babel()
+
+@babel.localeselector
+def get_locale():
+    if current_user() and current_user().locale_code:
+        return current_user().locale_code
+    return current_app.config.get("DEFAULT_LOCALE")

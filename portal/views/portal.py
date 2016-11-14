@@ -23,7 +23,7 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import add_anon_user, current_user, get_user, User
-from ..extensions import db, oauth, user_manager, babel
+from ..extensions import db, oauth, user_manager, get_locale
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
@@ -607,11 +607,3 @@ def celery_result(task_id):
 def post_result(task_id):
     r = post_request.AsyncResult(task_id).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
-
-
-# return user locale if it exists, otherwise return default config locale
-@babel.localeselector
-def get_locale():
-    if current_user() and current_user().locale_code:
-        return current_user().locale_code
-    return current_app.config.get("DEFAULT_LOCALE")
