@@ -695,7 +695,7 @@ table.profile-audit-log TH,
   transition: all 300ms ease-in;
 }
 .profile-header {
-  width: 45%;
+  width: 100%%;
   max-width: 100%;
 }
 .profile-section {

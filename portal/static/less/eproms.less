@@ -129,7 +129,7 @@ font-size: 0.85em;
 -webkit-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 -moz-box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
-  
+
 }
 #indexContainer.open {
   -webkit-transform: translate(0, 0);
@@ -155,15 +155,16 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   span.glyphicon {
     cursor: pointer;
     font-size: 1em;
-    padding: 0.3em 0.8em;
+    padding: 0.5em 0.8em;
     -webkit-box-shadow: 1px 1px 1px 0px #777;
     -moz-box-shadow: 1px 1px 1px 0px #777;
     box-shadow: 1px 1px 1px 0px #777;
     border-left: 1px solid #ddd;
     border-top: 1px solid #ddd;
-    border-radius: 2px;
-    position: relative;
-    top: 2px;
+    border-radius: 4px;
+    display: inline-block;
+    /*position: relative;
+    top: 2px;*/
     margin-left: -4px;
   }
 
@@ -185,7 +186,7 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
     color: @linkColor;
     font-size: 0.90em;
     padding: 0.5em 1em;
-    border: solid #eee 2px;
+    border: solid #ccc 1px;
     text-decoration: none;
   }
 
@@ -202,6 +203,11 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
     position: relative;
     top: 0.8px;
     }
+  }
+
+  .link-xs {
+    margin-left: 8px;
+    display: none;
   }
 
 }
@@ -567,7 +573,7 @@ a.btn {
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
-  background-color: rgba(204, 204, 204, 0.3);
+  background-color: rgba(204, 206, 204, 0.2);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -615,7 +621,7 @@ a.btn {
   .radio label{
     margin-bottom: 4px;
   }
-} 
+}
 
 #genderLabel {
   margin-bottom: 0
@@ -792,7 +798,7 @@ t
 }
 
 .profile-header {
-  width:45%;
+  width: 100%%;
   max-width: 100%;
 }
 .profile-section {
@@ -1203,12 +1209,13 @@ div.input-group.date {
 
   #indexNavBar {
     max-width: 100%;
-      span.link {
-      font-size: 0.85em;
+    .link-xs {
       display: inline-block;
-      width: 98%;
-      max-width: 100%;
-      margin: 0.5em auto;
+      font-size: 1em;
+      margin-top: -1px;
+    }
+    span.link {
+      display: none;
     }
     span.glyphicon {
       margin-left: -2px;
@@ -1217,7 +1224,7 @@ div.input-group.date {
       top: -0.1px;
     }
   }
- 
+
   #wellContainer .tnth-well {
     height: 60%;
   }
@@ -1298,7 +1305,7 @@ div.input-group.date {
   }
   #profileForm div.name-section {
     height: 10em;
-  } 
+  }
 
 }
 
@@ -1359,7 +1366,7 @@ div.input-group.date {
   }
   #profileForm div.name-section {
     height: 10em;
-  } 
+  }
   .side {
     height: 34em;
   }
@@ -1481,7 +1488,7 @@ div.input-group.date {
   }
   #profileForm div.name-section {
     height: 4em;
-  } 
+  }
 }
 
 @media(max-width: 1300px) {

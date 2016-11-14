@@ -239,7 +239,7 @@ var fillContent = {
         data.entry.sort(function(a,b){
             return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
         });
-        var proceduresHtml = '<ul id="eventListtnthproc">';
+        var proceduresHtml = '<table  class="table-responsive" width="100%" id="eventListtnthproc" cellspacing="4" cellpadding="4">';
 
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
@@ -247,8 +247,9 @@ var fillContent = {
             var procID = val.resource.id;
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
-            var performedDate = new Date(performedDateTime.replace("T", " "));
-            //console.log("date: " + performedDateTime + " cdate: " + performedDate);
+            var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
+            var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
+            console.log("date: " + performedDateTime + " cdate: " + performedDate);
             var deleteInvocation = '';
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
@@ -262,21 +263,21 @@ var fillContent = {
             else creator = "staff member " + creator;
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
-            proceduresHtml += "<li data-id='" + procID + "' style='margin: 8px 0; font-family: Georgia serif; font-size:1.1em'>" + performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'})  + " -- " + displayText + " <i>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</i>" + deleteInvocation + "</li>";
+            proceduresHtml += "<tr data-id='" + procID + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-9 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-3 col-xs-3 lastCell text-left'>" + deleteInvocation + "</td></tr>";
 
             if (procID > highestId) {
                 highestId = procID;
             }
         });
-        proceduresHtml += '</ul>';
+        proceduresHtml += '</table>';
         $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
         // If newEntry, then add icon to what we just added
         if (newEntry) {
-            $("body").find("li[data-id='" + highestId + "']").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
+            $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
         }
         $('[data-toggle="popover"]').popover({
             trigger: 'click',
-            placement: 'right',
+            placement: 'top',
             html: true
         });
     },

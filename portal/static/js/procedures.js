@@ -157,12 +157,12 @@ $(document).ready(function() {
     });
     // Need to attach delete functionality to body b/c section gets reloaded
     $("body").on('click', ".btn-delete", function() {
-        var procId = $(this).parents('li').attr('data-id');
+        var procId = $(this).parents('tr').attr('data-id');
         // Remove from list
-        $(this).parents('li').fadeOut('slow', function(){
+        $(this).parents('tr').fadeOut('slow', function(){
             $(this).remove();
             // If there's no events left, add status msg back in
-            if ($('#eventListtnthproc li').length == 0) {
+            if ($('#eventListtnthproc tr').length == 0) {
                 $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
             }
         });

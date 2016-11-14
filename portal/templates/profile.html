@@ -8,7 +8,7 @@
 </div> -->
 
 <br/>
-
+<div class="flex">
 <div class="profile-header">
     {% if providerPerspective == 'true' %}
         <h4 class="tnth-headline">Patient Profile <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
@@ -17,10 +17,9 @@
     {% else %}
          <h4 class="tnth-headline">My TrueNTH Profile</h4>
     {% endif %}
-
-    {{profileImage(user)}}
 </div>
-
+{{profileImage(user)}}
+</div>
 <nav id="indexNavBar">
 {% if providerPerspective == 'true' %}
 {{ back_link('patients','Patients List') }}
@@ -34,6 +33,16 @@
 
 <span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
 <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">Login as this Patient</span>
+<!-- shown only in reduced browser size-->
+<div class="btn-group link-xs">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Select <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">Assess this Patient <em>for Epic 26</em></a></li>
+    <li><a href="javacript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">Login as this Patient</a></li>
+  </ul>
+</div>
 
 <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
       <div class="modal-dialog" role="document">

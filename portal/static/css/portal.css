@@ -104,15 +104,15 @@ transform(-1000px, 0);*/
 #indexNavBar span.glyphicon {
   cursor: pointer;
   font-size: 1em;
-  padding: 0.3em 0.8em;
+  padding: 0.5em 0.8em;
   -webkit-box-shadow: 1px 1px 1px 0px #777;
   -moz-box-shadow: 1px 1px 1px 0px #777;
   box-shadow: 1px 1px 1px 0px #777;
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
-  border-radius: 2px;
-  position: relative;
-  top: 2px;
+  border-radius: 4px;
+  /*position: relative;
+    top: 2px;*/
   margin-left: -4px;
 }
 #indexNavBar span.link {
@@ -133,7 +133,7 @@ transform(-1000px, 0);*/
   color: #57675B;
   font-size: 0.90em;
   padding: 0.5em 1em;
-  border: solid #eee 2px;
+  border: solid #ccc 1px;
   text-decoration: none;
 }
 #indexNavBar #indexNavBar span:hover {
@@ -147,6 +147,10 @@ transform(-1000px, 0);*/
 #indexNavBar #backLink a {
   position: relative;
   top: 0.8px;
+}
+#indexNavBar .link-xs {
+  margin-left: 8px;
+  display: none;
 }
 .orglist-download-container {
   display: flex;
@@ -490,7 +494,7 @@ btn {
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
-  background-color: rgba(204, 204, 204, 0.3);
+  background-color: rgba(204, 206, 204, 0.2);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -668,7 +672,7 @@ table.profile-audit-log TH,
   transition: all 300ms ease-in;
 }
 .profile-header {
-  width: 45%;
+  width: 100%;
   max-width: 100%;
 }
 .profile-section {
@@ -1055,12 +1059,13 @@ div.input-group.date {
   #indexNavBar {
     max-width: 100%;
   }
-  #indexNavBar span.link {
-    font-size: 0.85em;
+  #indexNavBar .link-xs {
     display: inline-block;
-    width: 98%;
-    max-width: 100%;
-    margin: 0.5em auto;
+    font-size: 1em;
+    margin-top: -1px;
+  }
+  #indexNavBar span.link {
+    display: none;
   }
   #indexNavBar span.glyphicon {
     margin-left: -2px;
