@@ -247,7 +247,7 @@ class TestUser(TestCase):
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
-        self.assertEquals(new_user.locale.codings[0].code, language)
+        self.assertEquals(new_user.locale.code, language)
 
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider

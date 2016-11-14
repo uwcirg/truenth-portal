@@ -94,7 +94,7 @@ class ConsentATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
     @staticmethod
-    def permanent_url(generic_url, version):
+    def permanent_url(generic_url, version, languageId='en_US'):
         """Produce a permanent url from the metadata provided
 
         Consent agreements are versioned - but the link maintained
@@ -111,6 +111,7 @@ class ConsentATMA(AppTextModelAdapter):
             qs = []
         if 'version' not in qs:
             qs.append(('version', version))
+        qs.append(('languageId', languageId))
         path = parsed.path
         if path.endswith('/detailed'):
             path = path[:-(len('/detailed'))]

@@ -27,7 +27,8 @@ class TestAppText(TestCase):
     def test_permanent_url(self):
         sample = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668'
         version = '1.3'
-        expected = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=52668&version=1.3'
+        locale = 'en_AU'
+        expected = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=52668&version=1.3&languageId=en_AU'
 
-        result = ConsentATMA.permanent_url(generic_url=sample, version=version)
+        result = ConsentATMA.permanent_url(generic_url=sample, version=version, languageId=locale)
         self.assertEquals(result, expected)
