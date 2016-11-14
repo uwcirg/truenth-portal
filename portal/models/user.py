@@ -263,6 +263,10 @@ class User(db.Model, UserMixin):
     due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
     random_due_date_status = 'due'
 
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "user {0.id}".format(self)
+
     def __setattr__(self, name, value):
         """Make sure deleted users aren't being updated"""
         if not name.startswith('_'):
@@ -727,8 +731,8 @@ class User(db.Model, UserMixin):
                                  [client.id for client in clients]))
 
         self.active = False
-        self.deleted = Audit(
-            user_id=acting_user.id, comment="marking deleted {}".format(self))
+        self.deleted = Audit(user_id=acting_user.id,
+                             comment="marking deleted {}".format(self))
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

@@ -132,7 +132,7 @@ def next_after_login():
             invited_user_id, user.id), user_id=user.id)
         user.merge_with(invited_user_id)
         invited_user = User.query.get(invited_user_id)
-        delete_user(user=invited_user, audit_user=user)
+        invited_user.delete_user(acting_user=user)
         db.session.commit()
         del session['invited_verified_user_id']
 
