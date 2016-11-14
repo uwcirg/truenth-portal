@@ -782,7 +782,7 @@
                     <h4 id="interventionReportsLoc" class="profile-item-title">Intervention Reports</h4>
                     <div>
                         {% if person.provider_html() %}
-                            {{person.provider_html()}}
+                            {{person.provider_html() | safe}}
                         {% else %}
                             <div class="text-mute">No Reports Available</div>
                         {% endif %}
