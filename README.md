@@ -142,6 +142,14 @@ and database to use.  At this time, only PostgreSQL is supported.
 Thanks to Alembic and Flask-Migrate, database migrations are easily
 managed and run.
 
+Note::
+
+    Alembic tracks the current version of the database to determine which
+    migration scripts to apply.  After the initial install, stamp the current
+    version for subsequent upgrades to succeed:
+
+    `python manage.py db stamp head`
+
 #### Upgrade
 
 Anytime a database (might) need an upgrade, run the manage script with
