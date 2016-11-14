@@ -319,7 +319,7 @@ def home():
 def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
-    users = User.query.all()
+    users = User.query.filter_by(deleted=None).all()
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true")
