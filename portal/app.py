@@ -5,6 +5,7 @@ import os
 import pkginfo
 import sys
 import gettext
+import requests_cache
 from flask import Flask
 from flask_webtest import get_scopefunc
 
@@ -72,6 +73,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_audit_log(app)
     configure_metadata(app)
     configure_coredata(app)
+    configure_cache(app)
     return app
 
 
@@ -217,3 +219,9 @@ def configure_metadata(app):
     """Add distribution metadata for display in templates"""
     metadata = pkginfo.Develop(os.path.join(app.root_path, ".."))
     app.config.metadata = metadata
+
+
+def configure_cache(app):
+    """Configure requests-cache"""
+    requests_cache.install_cache(cache_name=app.name, backend='redis',
+                                 expire_after=180, old_data_on_error=True)
