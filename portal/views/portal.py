@@ -122,8 +122,11 @@ def specific_clinic_landing(clinic_alias):
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
     session['associate_clinic_id'] = results.organization_id
+    current_app.logger.debug(
+        "Storing session['associate_clinic_id']{}".format(
+            session['associate_clinic_id']))
 
-    return redirect(url_for('portal.landing'))
+    return redirect(url_for('user.register'))
 
 
 @portal.route('/access/<string:token>')
