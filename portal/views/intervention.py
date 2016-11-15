@@ -114,8 +114,8 @@ def user_intervention_get(intervention_name, user_id):
 
 @intervention_api.route('/intervention/<string:intervention_name>',
                         methods=('PUT',))
-@oauth.require_oauth()
 @roles_required(ROLE.SERVICE)
+@oauth.require_oauth()
 def user_intervention_set(intervention_name):
     """Update user access to the named intervention
 
@@ -248,8 +248,8 @@ def user_intervention_set(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule')
-@oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
 def intervention_rule_list(intervention_name):
     """Return the list of intervention rules for named intervention
 
@@ -266,8 +266,8 @@ def intervention_rule_list(intervention_name):
 
 @intervention_api.route(
     '/intervention/<string:intervention_name>/access_rule', methods=('POST',))
-@oauth.require_oauth()
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@oauth.require_oauth()
 def intervention_rule_set(intervention_name):
     """POST an access rule to the named intervention
 

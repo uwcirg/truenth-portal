@@ -76,8 +76,8 @@ def organization_get(organization_id):
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('DELETE',))
-@oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
 def organization_delete(organization_id):
     """Delete the requested organization
 
@@ -121,8 +121,8 @@ def organization_delete(organization_id):
 
 
 @org_api.route('/organization', methods=('POST',))
-@oauth.require_oauth()
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@oauth.require_oauth()
 def organization_post():
     """Add a new organization.  Updates should use PUT
 
@@ -192,8 +192,8 @@ def organization_post():
 
 
 @org_api.route('/organization/<int:organization_id>', methods=('PUT',))
-@oauth.require_oauth()
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@oauth.require_oauth()
 def organization_put(organization_id):
     """Update organization via FHIR Resource Organization. New should POST
 

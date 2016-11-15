@@ -1,25 +1,23 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 import requests
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
 from sqlalchemy import and_
 
-from ..models.organization import OrgTree
 from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..models.user_consent import UserConsent
-from ..models.organization import Organization, OrganizationIdentifier, OrgTree
+from ..models.organization import Organization, OrgTree
 from ..models.app_text import app_text
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def patients_root():
     """patients view function, intended for providers
 
@@ -75,8 +73,8 @@ def patients_root():
 
 
 @patients.route('/profile_create')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
@@ -91,8 +89,8 @@ def sessionReport(user_id, instrument_id):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for providers"""
     user = current_user()
