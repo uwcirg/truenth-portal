@@ -95,8 +95,8 @@ def group_by_name(group_name):
 
 
 @group_api.route('/', methods=('POST',))
-@oauth.require_oauth()
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@oauth.require_oauth()
 def add_group():
     """Add new group
 
@@ -164,8 +164,8 @@ def add_group():
 
 
 @group_api.route('/<string:group_name>', methods=('PUT',))
-@oauth.require_oauth()
 @roles_required([ROLE.ADMIN, ROLE.SERVICE])
+@oauth.require_oauth()
 def edit_group(group_name):
     """Edit an existing group
 
