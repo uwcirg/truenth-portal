@@ -14,7 +14,6 @@ from .config import DefaultConfig
 from .extensions import authomatic
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
-from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.coredata import configure_coredata
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
