@@ -71,7 +71,7 @@ before_deploy:
     {
         "package": {
             "name": "true_nth_usa_portal",
-            "repo": "TrueNTH-test",
+            "repo": "true_nth",
             "subject": "ivan-c",
             "public_download_numbers": false,
             "public_stats": false
