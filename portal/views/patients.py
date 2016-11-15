@@ -1,6 +1,6 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 import requests
-import random 
+import random
 from datetime import datetime, timedelta
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
@@ -52,18 +52,20 @@ def patients_root():
         #todo iterate on users? here to add due_date stuff
         # FIXME kludge for random demo data
         for user in org.users:
-            user.due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
-            timedelta_days = user.due_date - datetime.today()
-            timedelta_days = timedelta_days.days
-            if timedelta_days < 0:
-                desc = 'overdue'
-            elif timedelta_days < 30:
-                desc = 'due'
-            else:
-                desc = 'not due'
-            user.random_due_date_status = desc
-            user.due_date = user.due_date.strftime('%d %b %Y')
-            user.due_date = user.due_date.lstrip('0') # remove any leading 0 from day
+            if not user.deleted:
+                user.due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
+                timedelta_days = user.due_date - datetime.today()
+                timedelta_days = timedelta_days.days
+                if timedelta_days < 0:
+                    desc = 'overdue'
+                elif timedelta_days < 30:
+                    desc = 'due'
+                else:
+                    desc = 'not due'
+
+                user.random_due_date_status = desc
+                user.due_date = user.due_date.strftime('%d %b %Y')
+                user.due_date = user.due_date.lstrip('0') # remove any leading 0 from day
 
         #store patients by org into top level org list so we can list them by top-level org
         #before we were sorting by org only

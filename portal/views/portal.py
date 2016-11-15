@@ -1,5 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
+
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -323,6 +324,19 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true")
+
+@portal.route('/admin/<int:user_id>/delete', methods=['GET'])
+@oauth.require_oauth()
+@roles_required(ROLE.ADMIN)
+def delete_user(user_id):
+    user = get_user(user_id)
+    error = ""
+    if user:
+        try:
+            user.delete_user(current_user())
+        except BaseException, e:
+            error = str(e)
+    return jsonify(error=error)
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
