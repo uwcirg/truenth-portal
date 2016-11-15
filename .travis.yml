@@ -63,9 +63,11 @@ before_deploy:
   - git add debian/changelog
   - git stash --keep-index
 
+  - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
+
   # Build bintray descriptor file dynamically
   - >
-    echo '
+    printf '
     {
         "package": {
             "name": "true_nth_usa_portal",
@@ -75,7 +77,7 @@ before_deploy:
             "public_stats": false
         },
         "version": {
-            "name": "0.5",
+            "name": "%s",
             "gpgSign": false
         },
         "files": [
@@ -91,7 +93,7 @@ before_deploy:
         ],
         "publish": true
     }
-    '
+    ' "$PORTAL_VERSION"
     > "${TRAVIS_BUILD_DIR}/bintray.json"
   - dpkg-buildpackage -us -uc
 
