@@ -314,8 +314,8 @@ def home():
 
 
 @portal.route('/admin')
-@oauth.require_oauth()
 @roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
 def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
@@ -358,8 +358,8 @@ def invite_sent(message_id):
 
 @portal.route('/profile', defaults={'user_id': None})
 @portal.route('/profile/<int:user_id>')
-@oauth.require_oauth()
 @roles_not_allowed(ROLE.WRITE_ONLY)
+@oauth.require_oauth()
 def profile(user_id):
     """profile view function"""
     user = current_user()

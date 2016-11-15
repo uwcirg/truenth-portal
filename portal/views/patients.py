@@ -16,8 +16,8 @@ from ..extensions import oauth
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def patients_root():
     """patients view function, intended for providers
 
@@ -71,8 +71,8 @@ def patients_root():
 
 
 @patients.route('/profile_create')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
@@ -87,8 +87,8 @@ def sessionReport(user_id, instrument_id):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@oauth.require_oauth()
 @roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for providers"""
     user = current_user()
