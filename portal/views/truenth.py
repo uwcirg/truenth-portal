@@ -149,7 +149,6 @@ def portal_wrapper_html():
     def expires_in():
         """compute remaining seconds on session"""
         expires = current_app.permanent_session_lifetime.total_seconds()
-        current_app.logger.info("seconds in session: {}".format(expires))
         return expires
 
     html = render_template(

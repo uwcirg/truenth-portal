@@ -143,19 +143,6 @@ authomatic = _delay_init()
 from flask_mail import Mail
 mail = Mail()
 
-# Flask-Session provides server side sessions
-from flask_session import Session
-session = Session()
-
-# Flask-Session provides server side sessions
-from flask_session import Session
-session = Session()
-
-
-# Flask-Session provides server side sessions
-from flask_session import Session
-session = Session()
-
 
 # Flask-Session provides server side sessions
 from flask_session import Session
