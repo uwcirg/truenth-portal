@@ -70,6 +70,8 @@ def landing():
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
+    yes_access_code = HiddenField('Yes_Access_Code')
+    no_access_code = HiddenField('No_Access_Code')
 
     def validate_shortcut_alias(form, field):
         """Custom validation to confirm an alias match"""
@@ -93,6 +95,7 @@ def specific_clinic_entry():
 
     """
     form = ShortcutAliasForm(request.form)
+
     if not form.validate_on_submit():
         return render_template('shortcut_alias.html', form=form)
 
@@ -118,9 +121,18 @@ def specific_clinic_landing(clinic_alias):
     # Expecting exactly one organization for this alias, save ID in session
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
-    session['associate_clinic_id'] = results.organization_id
 
-    return redirect(url_for('portal.landing'))
+    # Top-level orgs won't work, as the UI only lists the clinic level
+    org = Organization.query.get(results.organization_id)
+    if org.partOf_id is None:
+        abort(400, "alias points to top-level organization")
+
+    session['associate_clinic_id'] = results.organization_id
+    current_app.logger.debug(
+        "Storing session['associate_clinic_id']{}".format(
+            session['associate_clinic_id']))
+
+    return redirect(url_for('user.register'))
 
 
 @portal.route('/access/<string:token>')

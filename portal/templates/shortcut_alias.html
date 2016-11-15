@@ -1,27 +1,105 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
+    
+    <style>
+     #accessCodeWrapper {
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+     }
+    .access-button {
+        opacity: 1; 
+        box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px; 
+        border-color: rgb(221, 221, 221); 
+        background-color: rgb(52, 152, 219); 
+        background-image: none; 
+        color: rgb(255, 255, 255); 
+        font-weight: normal; 
+        padding: 6px 10px; 
+        border-width: 0px; 
+        border-radius: 3px; 
+        border-style: solid; 
+        background-size: auto; 
+        background-repeat: repeat; 
+        background-position: center center; 
+        font-size: 14px; 
+        font-style: normal; 
+        font-family: Arial; 
+        text-align: center; 
+        width: 120px; 
+        height: 30px; 
+        /*transform: rotate(0deg) translate(87px, 302px) rotate(0deg);*/
+    }
 
-    <h4 class="tnth-headline">Enter Code</h4>
+    #accessPromptContainer{
+        margin: 5% auto 1% auto;
+        padding: 2em;
+    }
 
-    <hr/>
+     #yesContainer, #noContainer{
+        display: none;
+        padding: 2em;
+    }
 
-    <br/>
+    #shortcut_alias {
+        width: 40%;
+    }
 
-    <p class="profile-item-title">Welcome, please enter the code you recevied
-    in your invite.</p>
-
-    <form  action="/go" method="post">
-        {{ form.csrf_token }}
-
-        <div id="identityVerificationContainer">
-            <div class="row">
-                <div class="col-md-6 col-xs-12">
-                {{ render_field(form.shortcut_alias, tabindex=10) }}
+    </style>
+    <article id="accessCodeWrapper">
+    {{validationError}}
+            <section>
+                <div  id="accessPromptContainer">
+                    <h4 class="tnth-headline">Do you have an access code?</h4>
+                    <button class="btn btn-default" id="btnYes">Yes</button>&nbsp;&nbsp;<button class="btn btn-default" id="btnNo" >No</button>
                 </div>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-tnth-primary">Go</button>
-    </form>
+            </section>
+         <form  action="/go" method="post">
+         {{ form.hidden_tag() }}
+            <section id="yesContainer">
+                    <p class="profile-item-title">Welcome, please enter the code you recevied
+                        in your invite.</p>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-12">
+                        {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
+                         <button type="submit" class="access-button">Next</button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <section id="noContainer">
+                    <p class="profile-item-title">I do not have access code</p>
+                    <p>Continue registration without an access code</p>
+                   <a href="/user/register" role="button" class="access-button">Register</a>
+            </section>
+          {{ form.csrf_token }}
+        </form>
+    </article>
+{% endblock %}
+{% block document_ready %}
+    $("document").ready(function() {
+        $("#btnYes").on("click", function() {
+            $("#noContainer").hide();
+            $("#yesContainer").fadeIn();
+            $("#yes_access_code").val("1");
+            $("#no_access_code").val("0");
+
+        });
+        $("#btnNo").on("click", function() {
+            $("#yesContainer").hide();
+            $("#noContainer").fadeIn();
+            $("#yes_access_code").val("0");
+            $("#no_access_code").val("1");
+        });
+
+
+        if ($("#yes_access_code").val() == "1") {
+       
+            //only getting this error if the user has click on Next button
+            $("#btnYes").click();
+        };
+
+    });
 
 {% endblock %}
