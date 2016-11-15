@@ -29,17 +29,19 @@
                 <th data-field="lastname" data-sortable="true">Last Name</th>
                 <th data-field="email" data-sortable="true">Email</th>
                 <th data-field="roles" data-sortable="true">Roles</th>
+                <th class="text-center"><em>Delete</em> User</span></th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in users %}
-            <tr>
+            <tr id="data_row_{{user.id}}">
                 <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.first_name if user.first_name }}</td>
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
+                <td class="text-center">{% if not user.has_role("admin") and (not user.has_role("provider"))%}<button onclick="deleteUser(event, {{user.id}})" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -64,4 +66,26 @@ $("#adminTableToolbar").on("click",function(){
     $('#adminTable').bootstrapTable('filterBy', {roles: "patient"});
 });
 **/
+
+function deleteUser(event, userId) {
+    if (event) event.stopPropagation();
+    if (userId) {
+       var c = confirm("Are you sure you want to delete this user?");
+       if (c) {
+         $.ajax ({
+              type: "DELETE",
+              url: "/api/user/" + userId,
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json'
+          }).done(function(data) {
+                if (data["message"] === "deleted") {
+                    $("#data_row_" + userId).fadeOut();
+                } else alert("System error: " + data["message"]);
+          }).fail(function(xhr) {
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+          });
+        };
+    };
+};
 {% endblock %}

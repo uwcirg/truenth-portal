@@ -60,6 +60,7 @@ def patients_root():
                 desc = 'due'
             else:
                 desc = 'not due'
+
             user.random_due_date_status = desc
             user.due_date = user.due_date.strftime('%d %b %Y')
             user.due_date = user.due_date.lstrip('0') # remove any leading 0 from day
