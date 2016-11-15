@@ -121,6 +121,12 @@ def specific_clinic_landing(clinic_alias):
     # Expecting exactly one organization for this alias, save ID in session
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
+
+    # Top-level orgs won't work, as the UI only lists the clinic level
+    org = Organization.query.get(results.organization_id)
+    if org.partOf_id is None:
+        abort(400, "alias points to top-level organization")
+
     session['associate_clinic_id'] = results.organization_id
     current_app.logger.debug(
         "Storing session['associate_clinic_id']{}".format(
