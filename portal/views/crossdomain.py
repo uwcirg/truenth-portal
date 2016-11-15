@@ -79,6 +79,7 @@ def crossdomain(origin=None, methods=None,
                 h['Access-Control-Allow-Methods'] = get_methods()
                 h['Access-Control-Max-Age'] = get_max_age()
                 h['Access-Control-Allow-Headers'] = get_headers()
+                h['Access-Control-Expose-Headers'] = 'content-length'
             return resp
 
         f.provide_automatic_options = False
