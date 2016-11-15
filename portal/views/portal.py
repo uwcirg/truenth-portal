@@ -1,5 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
+
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user

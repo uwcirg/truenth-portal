@@ -4,7 +4,7 @@
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 <br/>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
-
+    <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row" style="position: relative;">
         <div class="col-md-12">
             <hr>
@@ -106,6 +106,13 @@ $(document).ready(function(){
           } else {
 
                 hasError = false;
+
+                if ($("#current_user_email").val() === $("#email").val()) {
+                    $("#emailGroup .help-block").text("Email is already in use.").css("color", "#a94442");
+                } else {
+                    $("#emailGroup .help-block").text("").css("color", "#777");
+                };
+
 
                 if ($("#userOrgs input:checkbox:checked").length == 0) {
                     $("#userOrgs .help-block").text("You must select an organization").css("color", "#a94442");
