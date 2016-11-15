@@ -325,19 +325,6 @@ def admin():
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true")
 
-@portal.route('/admin/<int:user_id>/delete', methods=['GET'])
-@oauth.require_oauth()
-@roles_required(ROLE.ADMIN)
-def delete_user(user_id):
-    user = get_user(user_id)
-    error = ""
-    if user:
-        try:
-            user.delete_user(current_user())
-        except BaseException, e:
-            error = str(e)
-    return jsonify(error=error)
-
 
 @portal.route('/invite', methods=('GET', 'POST'))
 @oauth.require_oauth()

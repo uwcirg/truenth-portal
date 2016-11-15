@@ -124,6 +124,63 @@ def account():
     return jsonify(user_id=user.id)
 
 
+@user_api.route('/user/<int:user_id>', methods=['DELETE'])
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def delete_user(user_id):
+    """Delete the named user from the system
+
+    Mark the given user as deleted.  The user isn't actually deleted,
+    but marked as such to maintain the audit trail.  After deletion,
+    all other operations on said user are prohibited.
+
+    ---
+    tags:
+      - User
+    operationId: delete_user
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID to delete
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "deleted"
+      400:
+        description:
+          Invalid requests, such as deleting a user owning client applications.
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if the user isn't found
+
+    """
+    user = get_user(user_id)
+    if not user:
+        abort(404, "user not found")
+    if user.deleted:
+        abort(400, "user already deleted")
+    try:
+        user.delete_user(acting_user=current_user())
+    except ValueError as v:
+        return jsonify(message=v.message)
+    return jsonify(message="deleted")
+
+
 @user_api.route('/user/<int:user_id>/access_url')
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
                 ROLE.PROVIDER])

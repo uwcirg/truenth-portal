@@ -167,6 +167,16 @@ class TestUser(TestCase):
         self.assertIn('1', found)
         self.assertIn('9', found)
 
+    def test_delete_user(self):
+        actor = self.add_user('actor')
+        user, actor = map(db.session.merge,(self.test_user, actor))
+        user_id, actor_id = user.id, actor.id
+        self.promote_user(user=actor, role_name=ROLE.ADMIN)
+        self.login(user_id=actor_id)
+        rv = self.app.delete('/api/user/{}'.format(user_id))
+        self.assert200(rv)
+        user = db.session.merge(user)
+        self.assertTrue(user.deleted_id)
 
     def test_delete_lock(self):
         """changing attributes on a deleted user should raise"""

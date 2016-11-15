@@ -73,14 +73,14 @@ function deleteUser(event, userId) {
        var c = confirm("Are you sure you want to delete this user?");
        if (c) {
          $.ajax ({
-              type: "GET",
-              url: "/admin/" + userId + "/delete",
+              type: "DELETE",
+              url: "/api/user/" + userId,
               contentType: 'application/json; charset=utf-8',
               dataType: 'json'
           }).done(function(data) {
-                if (data["error"] === "") {
+                if (data["message"] === "deleted") {
                     $("#data_row_" + userId).fadeOut();
-                } else alert("System error: " + data["error"]);
+                } else alert("System error: " + data["message"]);
           }).fail(function(xhr) {
                 console.log("response Text: " + xhr.responseText);
                 console.log("response status: " +  xhr.status);
