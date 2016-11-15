@@ -1,5 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 import requests
+
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
@@ -69,6 +70,8 @@ def landing():
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
+    yes_access_code = HiddenField('Yes_Access_Code')
+    no_access_code = HiddenField('No_Access_Code')
 
     def validate_shortcut_alias(form, field):
         """Custom validation to confirm an alias match"""
@@ -92,6 +95,7 @@ def specific_clinic_entry():
 
     """
     form = ShortcutAliasForm(request.form)
+
     if not form.validate_on_submit():
         return render_template('shortcut_alias.html', form=form)
 
