@@ -44,8 +44,9 @@ def patients_root():
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
         org.users = [user for user in org.users if
-                        user.has_role(ROLE.PATIENT) and
-                        user.id in consented_users]
+                     user.has_role(ROLE.PATIENT) and
+                     user.id in consented_users and
+                     user.deleted_id is None]
 
         #todo iterate on users? here to add due_date stuff
         # FIXME kludge for random demo data
