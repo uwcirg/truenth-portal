@@ -143,11 +143,9 @@ authomatic = _delay_init()
 from flask_mail import Mail
 mail = Mail()
 
-
 # Flask-Session provides server side sessions
 from flask_session import Session
 session = Session()
-
 
 # Celery (Distributed Task Queue) is used for any asynchronous tasks
 from flask_celery import Celery
