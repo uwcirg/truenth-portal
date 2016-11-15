@@ -423,6 +423,21 @@ class TestUser(TestCase):
         user = User.query.get(TEST_USER_ID)
         self.assertEquals(len(user.roles), len(data['roles']))
 
+    def test_prevent_service_role(self):
+        "Don't allow promotion of accounts to service"
+        data = {"roles": [
+                {"name": ROLE.SERVICE},
+                {"name": ROLE.ADMIN}
+                ]}
+
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assertEquals(rv.status_code, 400)
+
     def test_user_check_roles(self):
         org = Organization(name='members only')
         user = self.test_user

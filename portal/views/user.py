@@ -1114,6 +1114,10 @@ def set_roles(user_id):
 
     if not request.json or 'roles' not in request.json:
         abort(400, "Requires role list")
+
+    if 'service' in (item['name'] for item in request.json['roles']):
+        abort(400, "Service role is restricted to service accounts")
+
     remove_if_not_requested = {role.id: role for role in user.roles}
     requested_roles = [r['name'] for r in request.json['roles']]
     matching_roles = Role.query.filter(Role.name.in_(requested_roles)).all()
