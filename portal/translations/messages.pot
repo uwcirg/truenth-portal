@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: templates/profile_macros.html templates/profile_test.html
+# portal/templates/profile_macros.html portal/templates/profile_test.html
 msgid "Cell"
 msgstr ""
 
