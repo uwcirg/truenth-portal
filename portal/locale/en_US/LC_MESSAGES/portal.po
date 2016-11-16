@@ -8,3 +8,27 @@ msgstr ""
 # portal.templates.profile_macros.html portal.templates.profile_test.html
 msgid "Cell"
 msgstr "Cell"
+
+# app_text - UCSF Medical Center organization consent URL | IRONMAN organization consent URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668&languageId=en_US"
+
+# app_text - UW Medicine (University of Washington) organization consent URL | Australian Urology Associates organization consent URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651&languageId=en_US"
+
+# app_text - Terms of Use URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603&languageId=en_US"
+
+# app_text - About TrueNTH URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549&languageId=en_US"
+
+# app_text - About Movember URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565&languageId=en_US"
+
+# app_text - Legal URL
+msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577"
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577&languageId=en_US"

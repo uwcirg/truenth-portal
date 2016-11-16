@@ -7,6 +7,7 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from flask_babel import gettext
 from abc import ABCMeta, abstractmethod
 from ..extensions import db
 from urllib import urlencode
@@ -193,7 +194,7 @@ def app_text(name, *args):
 
     text = str(item)
     try:
-        return text.format(*args)
+        return gettext(text.format(*args))
     except IndexError as err:
         if not args:
             args = ('<None>',)

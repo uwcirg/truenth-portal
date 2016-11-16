@@ -255,7 +255,7 @@ class User(db.Model, UserMixin):
             backref=db.backref('user'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
-    locale = db.relationship(CodeableConcept, cascade="save-update")
+    _locale = db.relationship(CodeableConcept, cascade="save-update")
     deleted = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deleted_id])
 
@@ -288,6 +288,31 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    @property
+    def locale(self):
+        if self._locale and self._locale.codings and (len(self._locale.codings) > 0):
+            return self._locale.codings[0]
+        return None
+
+    @property
+    def locale_code(self):
+        if self.locale:
+            #Locale codes are stored with '-' per IETF BCP 47 standard, but underscores are expected for gettext/LR/etc
+            return self.locale.replace("-","_")
+        return None
+
+    @property
+    def locale_name(self):
+        if self.locale:
+            return self.locale.display
+        return None
+
+    @locale.setter
+    def locale(self, code, name):
+        data = {"coding": [{'code': code.replace("_","-"), 'display': name,
+                  'system': "urn:ietf:bcp:47"}]}
+        self._locale = CodeableConcept.from_fhir(data)
 
     @hybrid_property
     def email(self):
@@ -510,8 +535,8 @@ class User(db.Model, UserMixin):
         if self.gender:
             d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
-        if self.locale:
-            d['communication'] = [{"language": self.locale.as_fhir()}]
+        if self._locale:
+            d['communication'] = [{"language": self._locale.as_fhir()}]
         telecom = Telecom(email=self.email, phone=self.phone)
         d['telecom'] = telecom.as_fhir()
         d['photo'] = []
@@ -592,7 +617,7 @@ class User(db.Model, UserMixin):
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
-                    self.locale = CodeableConcept.from_fhir(e.get('language'))
+                    self._locale = CodeableConcept.from_fhir(e.get('language'))
         if 'extension' in fhir:
             # a number of elements live in extension - handle each in turn
             for e in fhir['extension']:
