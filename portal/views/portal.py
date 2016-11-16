@@ -23,7 +23,7 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import add_anon_user, current_user, get_user, User
-from ..extensions import db, oauth, user_manager, get_locale
+from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
@@ -265,20 +265,19 @@ def initial_queries():
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        response = requests.get(app_text(ToU_ATMA.name_key()),get_locale())
+        response = requests.get(app_text(ToU_ATMA.name_key()))
         terms = response.text
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
-            consent_url = app_text(ConsentATMA.name_key(organization=org),get_locale())
+            consent_url = app_text(ConsentATMA.name_key(organization=org))
             response = requests.get(consent_url)
             if response.json:
                 consent_agreements[org.id] = {
                     'asset': response.json()['asset'],
                     'agreement_url': ConsentATMA.permanent_url(
                         version=response.json()['version'],
-                        generic_url=consent_url,
-                        languageId=get_locale())}
+                        generic_url=consent_url)}
             else:
                 consent_agreements[org.id] = {
                     'asset': response.text, 'agreement_url': consent_url}
@@ -383,7 +382,7 @@ def profile(user_id):
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org),get_locale())
+        consent_url = app_text(ConsentATMA.name_key(organization=org))
         response = requests.get(consent_url)
         if response.json:
             consent_agreements[org.id] = {
@@ -391,8 +390,7 @@ def profile(user_id):
                 'asset': response.json()['asset'],
                 'agreement_url': ConsentATMA.permanent_url(
                     version=response.json()['version'],
-                    generic_url=consent_url,
-                    languageId=get_locale())}
+                    generic_url=consent_url)}
         else:
             consent_agreements[org.id] = {
                 'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
@@ -413,14 +411,14 @@ def profile_test(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    response = requests.get(app_text(LegalATMA.name_key(),get_locale()))
+    response = requests.get(app_text(LegalATMA.name_key()))
     return render_template('legal.html', content=response.text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH'),get_locale()))
-    about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember'),get_locale()))
+    about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
+    about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
     return render_template('about.html', about_tnth=about_tnth.text,
                            about_mo=about_mo.text)
 

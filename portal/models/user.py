@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort
+from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
@@ -297,14 +297,15 @@ class User(db.Model, UserMixin):
 
     @property
     def locale_code(self):
-        if self._locale and self._locale.codings and (len(self._locale.codings) > 0):
-            return self._locale.codings[0].code.replace("-","_")
+        if self.locale:
+            #Locale codes are stored with '-' per IETF BCP 47 standard, but underscores are expected for gettext/LR/etc
+            return self.locale.replace("-","_")
         return None
 
     @property
     def locale_name(self):
-        if self._locale and self._locale.codings and (len(self._locale.codings) > 0):
-            return self._locale.codings[0].display
+        if self.locale:
+            return self.locale.display
         return None
 
     @locale.setter

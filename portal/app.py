@@ -6,7 +6,7 @@ import pkginfo
 import sys
 import gettext
 import requests_cache
-from flask import Flask
+from flask import Flask, current_app
 from flask_webtest import get_scopefunc
 
 from .audit import configure_audit_log
@@ -15,6 +15,7 @@ from .extensions import authomatic
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
+from .models.user import current_user
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
 from .views.auth import auth, capture_next_view_function
@@ -221,7 +222,15 @@ def configure_metadata(app):
     app.config.metadata = metadata
 
 
+<<<<<<< edd515a11be119205bf0be091d5b910039494f96
 def configure_cache(app):
     """Configure requests-cache"""
     requests_cache.install_cache(cache_name=app.name, backend='redis',
                                  expire_after=180, old_data_on_error=True)
+=======
+@babel.localeselector
+def get_locale():
+    if current_user() and current_user().locale_code:
+        return current_user().locale_code
+    return current_app.config.get("DEFAULT_LOCALE")
+>>>>>>> modifying apptext trans, moving localeselector

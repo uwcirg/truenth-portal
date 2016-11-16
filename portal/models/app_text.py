@@ -7,8 +7,9 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from flask_babel import gettext
 from abc import ABCMeta, abstractmethod
-from ..extensions import db
+from ..extensions import db, babel
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -94,7 +95,7 @@ class ConsentATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
     @staticmethod
-    def permanent_url(generic_url, version, languageId='en_US'):
+    def permanent_url(generic_url, version):
         """Produce a permanent url from the metadata provided
 
         Consent agreements are versioned - but the link maintained
@@ -111,7 +112,6 @@ class ConsentATMA(AppTextModelAdapter):
             qs = []
         if 'version' not in qs:
             qs.append(('version', version))
-        qs.append(('languageId', languageId))
         path = parsed.path
         if path.endswith('/detailed'):
             path = path[:-(len('/detailed'))]
@@ -194,7 +194,7 @@ def app_text(name, *args):
 
     text = str(item)
     try:
-        return text.format(*args)
+        return gettext(text.format(*args))
     except IndexError as err:
         if not args:
             args = ('<None>',)
