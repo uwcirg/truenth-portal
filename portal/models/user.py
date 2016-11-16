@@ -299,7 +299,7 @@ class User(db.Model, UserMixin):
     def locale_code(self):
         if self.locale:
             #Locale codes are stored with '-' per IETF BCP 47 standard, but underscores are expected for gettext/LR/etc
-            return self.locale.replace("-","_")
+            return self.locale.code.replace("-","_")
         return None
 
     @property
