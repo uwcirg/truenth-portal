@@ -4,7 +4,7 @@ import requests
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, redirect, request, session, url_for
 from flask_login import login_user
-from flask_user import roles_required, roles_not_allowed
+from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
@@ -21,7 +21,7 @@ from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
-from ..models.role import ROLE
+from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import add_anon_user, current_user, get_user, User
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
@@ -371,7 +371,7 @@ def invite_sent(message_id):
 
 @portal.route('/profile', defaults={'user_id': None})
 @portal.route('/profile/<int:user_id>')
-@roles_not_allowed(ROLE.WRITE_ONLY)
+@roles_required(ALL_BUT_WRITE_ONLY)
 @oauth.require_oauth()
 def profile(user_id):
     """profile view function"""
