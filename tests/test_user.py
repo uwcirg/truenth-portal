@@ -229,7 +229,8 @@ class TestUser(TestCase):
         family = 'User'
         given = 'Test'
         language = 'en-AU'
-        coding = {'code': language, 'display': "Australian English",
+        language_name = "Australian English"
+        coding = {'code': language, 'display': language_name,
                   'system': "urn:ietf:bcp:47"}
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
@@ -248,6 +249,8 @@ class TestUser(TestCase):
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale.code, language)
+        self.assertEquals(new_user.locale_code, language.replace("-","_"))
+        self.assertEquals(new_user.locale_name, language_name)
 
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider
@@ -274,7 +277,8 @@ class TestUser(TestCase):
         family = 'User'
         given = 'Test'
         language = 'en-AU'
-        coding = {'code': language, 'display': "Australian English",
+        language_name = "Australian English"
+        coding = {'code': language, 'display': language_name,
                   'system': "urn:ietf:bcp:47"}
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
@@ -294,6 +298,8 @@ class TestUser(TestCase):
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale.code, language)
+        self.assertEquals(new_user.locale_code, language.replace("-","_"))
+        self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
 
     def test_user_by_organization(self):
