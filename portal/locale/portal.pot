@@ -9,11 +9,11 @@ msgstr ""
 msgid "Cell"
 msgstr ""
 
-# app_text - UCSF Medical Center organization consent URL
+# app_text - UCSF Medical Center organization consent URL | IRONMAN organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
 msgstr ""
 
-# app_text - UW Medicine (University of Washington) organization consent URL
+# app_text - UW Medicine (University of Washington) organization consent URL | Australian Urology Associates organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
 msgstr ""
 
