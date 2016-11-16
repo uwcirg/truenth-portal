@@ -293,7 +293,7 @@ class TestUser(TestCase):
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
-        self.assertEquals(new_user.locale.codings[0].code, language)
+        self.assertEquals(new_user.locale.code, language)
         self.assertEquals(new_user.organizations.count(), 2)
 
     def test_user_by_organization(self):
