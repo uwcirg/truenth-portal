@@ -157,14 +157,21 @@ $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
 
-$(document).ready(function(){
-  // Once nav is loaded, make the wrapper visible
-  setTimeout('$("#tnthNavWrapper").css("visibility","visible")', 0);
 
+(function (e) {
+var $winWidth = e(window).width();
+e(document).on('show.bs.modal', function () {
+if($winWidth < e(window).width()){
+e('body.modal-open,.navbar-fixed-top,.navbar-fixed-bottom').css('marginRight',e(window).width()-$winWidth)
+}
 });
-var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+e(document).on('hidden.bs.modal', function () {
+e('body,.navbar-fixed-top,.navbar-fixed-bottom').css('marginRight',0)
+});
+})(jQuery);
 
-sessionMonitor = function(options) {
+
+var sessionMonitor = function(options) {
     "use strict";
 
     var defaults = {
@@ -209,7 +216,7 @@ sessionMonitor = function(options) {
                 $('body').prepend($alert);
             }
             $('div#jqsm-warning').show();
-            $('button#jqsm-stay-logged-in').on('click', self.extendsess)
+            $('button#jqsm-stay-logged-in').on('click', function(event) { self.extendsess(event) })
                 .on('click', function() { $alert.hide(); });
             $('button#jqsm-log-out').on('click', self.logout);
         },
@@ -231,17 +238,24 @@ sessionMonitor = function(options) {
     // The time of the last ping to the server.
     _lastPingTime = 0;
 
-    function extendsess() {
+    function extendsess(ev) {
         // Extend the session expiration. Ping the server and reset the
         // timers if the minimum interval has passed since the last ping.
-        var now = $.now(),
-            timeSinceLastPing = now - _lastPingTime;
+       //var now = $.now(), timeSinceLastPing = now - _lastPingTime;
+       var now = new Date(), timeSinceLastPing = now - _lastPingTime;
 
-        if (timeSinceLastPing > self.minPingInterval) {
+       //console.log("time elapse: " + timeSinceLastPing + " min: " + self.minPingInterval);
+       if (ev) { //an event should automatically reset timer
+          _resetTimers();
+          self.ping();
+
+       } else {
+          if (timeSinceLastPing > self.minPingInterval) {
             _lastPingTime = now;
             _resetTimers();
             self.ping();
-        }
+          };
+       };
     }
 
     function _resetTimers() {
@@ -250,6 +264,7 @@ sessionMonitor = function(options) {
 
         window.clearTimeout(_warningTimeoutID);
         window.clearTimeout(_expirationTimeoutID);
+
         _warningTimeoutID = window.setTimeout(self.onwarning, warningTimeout);
         _expirationTimeoutID = window.setTimeout(_onTimeout, self.sessionLifetime);
     }
@@ -275,25 +290,10 @@ sessionMonitor = function(options) {
     return self;
 };
 
-// Configure and start the session timeout monitor
-sessMon = sessionMonitor({
-    sessionLifetime: DEFAULT_SESSION_LIFETIME,
-    timeBeforeWarning: 1 * 60 * 1000,
-    minPingInterval: 1 * 60 * 1000,  // 1 minute
-    onwarning: function() {
-        $("#session-warning-modal").modal("show");
-    }
-});
-$(document).ready( function() {
-    // Configure the session timeout warning modal
-    $("#session-warning-modal")
-        .modal({
-            "backdrop": "static",
-            "keyboard": false,
-            "show": false
-        })
-        .on("click", "#stay-logged-in", sessMon.extendsess)
-        .on("click", "#log-out", sessMon.logout)
-        .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-});
-window.sessMon = sessMon;
+var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+
+
+
+
+
+

@@ -5,8 +5,42 @@
 </style>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
-<script type="text/javascript">
+<script>
+
     var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
+    // Set default sessionLifetime from Flask config
+    // Subtract 10 seconds to ensure the backend doesn't expire the session first
+    var DEFAULT_SESSION_LIFETIME = {{ config.PERMANENT_SESSION_LIFETIME * 1000 }} - (10 * 1000);
+
+    $(document).ready(function(){
+      // Once nav is loaded, make the wrapper visible
+      $("#tnthNavWrapper").css("visibility","visible");
+
+      // Configure and start the session timeout monitor
+      var sessMon = sessionMonitor({
+            sessionLifetime: DEFAULT_SESSION_LIFETIME,
+            timeBeforeWarning: 1 * 60 * 1000,
+            minPingInterval: 1 * 60 * 1000,  // 1 minute
+            activityEvents: "mouseup keydown mouseenter",
+            pingUrl: '{{PORTAL}}/api/ping',
+            logoutUrl: '{{PORTAL}}/logout',
+            timeoutUrl: '{{PORTAL}}/logout?timeout=1',
+            onwarning: function() {
+                $("#session-warning-modal").modal("show");
+            }
+      });
+
+      window.sessMon = sessMon;
+       // Configure the session timeout warning modal
+      $("#session-warning-modal").modal({
+          "backdrop": false,
+          "keyboard": false,
+          "show": false})
+              .on("click", "#stay-logged-in", sessMon.extendsess)
+              .on("click", "#log-out", sessMon.logout)
+              .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+      });
+
 </script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
@@ -33,7 +67,6 @@
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
 <div id="tnthNavWrapper">
-
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
             <div id="tnthLogo">
@@ -76,31 +109,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div id="session-warning-modal" class="modal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="sessWarnLabel">Your session is about to expire
-                                <a class="sectionlink" title="Section permalink" href="#sessWarnLabel"></a>
-                            </h4>
-                        </div>
-                        <div class="modal-body">
-                            Your session will expire in <span id="remaining-time"></span> seconds due to inactivity.
-                        </div>
-                        <div class="modal-footer">
-                            <button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button>
-                            <button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <script type="text/javascript">
-                // Set default sessionLifetime from Flask config
-                // Subtract 10 seconds to ensure the backend doesn't expire the session first
-                DEFAULT_SESSION_LIFETIME = {{ config.PERMANENT_SESSION_LIFETIME * 1000 }} - (10 * 1000);
-            </script>
         </div>
-
     </div>
 
     <div id="tnthNavXs">
@@ -133,6 +142,26 @@
     </div>
 
 </div>
+
+<div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+         <h4 class="modal-title" id="sessWarnLabel">Your session is about to expire
+            <a class="sectionlink" title="Section permalink" href="#sessWarnLabel"></a>
+         </h4>
+      </div>
+      <div class="modal-body">
+        Your session will expire in <span id="remaining-time"></span> seconds due to inactivity.
+      </div>
+      <div class="modal-footer">
+        <button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button>
+        <button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <!--
 When calling the wrapper, you can avoid the remainder of the page moving down after the page loads by setting the
 height of the containing div. In this example, #mainNav is the containing div:
