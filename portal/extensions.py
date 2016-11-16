@@ -154,4 +154,3 @@ celery = Celery()
 # Bable is used for i18n
 from flask_babel import Babel
 babel = Babel()
-

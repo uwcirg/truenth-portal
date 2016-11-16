@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort, current_app
+from flask import abort
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text

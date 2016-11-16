@@ -222,15 +222,13 @@ def configure_metadata(app):
     app.config.metadata = metadata
 
 
-<<<<<<< edd515a11be119205bf0be091d5b910039494f96
 def configure_cache(app):
     """Configure requests-cache"""
     requests_cache.install_cache(cache_name=app.name, backend='redis',
                                  expire_after=180, old_data_on_error=True)
-=======
+
 @babel.localeselector
 def get_locale():
     if current_user() and current_user().locale_code:
         return current_user().locale_code
     return current_app.config.get("DEFAULT_LOCALE")
->>>>>>> modifying apptext trans, moving localeselector

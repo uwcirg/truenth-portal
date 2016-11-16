@@ -9,7 +9,7 @@ SitePersistence mechanism, and looked up in a template using the
 """
 from flask_babel import gettext
 from abc import ABCMeta, abstractmethod
-from ..extensions import db, babel
+from ..extensions import db
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
