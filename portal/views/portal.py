@@ -70,9 +70,7 @@ def landing():
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
-    yes_access_code = HiddenField('Yes_Access_Code')
-    no_access_code = HiddenField('No_Access_Code')
-
+  
     def validate_shortcut_alias(form, field):
         """Custom validation to confirm an alias match"""
         if len(field.data.strip()):

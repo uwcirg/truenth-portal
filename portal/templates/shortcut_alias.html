@@ -32,46 +32,38 @@
         /*transform: rotate(0deg) translate(87px, 302px) rotate(0deg);*/
     }
 
-    #accessPromptContainer{
+    #accessCodeWrapper .main {
         margin: 5% auto 1% auto;
         padding: 2em;
     }
-
-     #yesContainer, #noContainer{
-        display: none;
-        padding: 2em;
-    }
-
     #shortcut_alias {
         width: 40%;
     }
 
+    #accessCodeWrapper .disabled {
+        background-color: #999;
+        opacity: 0.65;
+    }
+    #registerLink {
+        padding:6.5px 24px;
+    }
+
     </style>
     <article id="accessCodeWrapper">
-    {{validationError}}
-            <section>
-                <div  id="accessPromptContainer">
+        <form  action="/go" method="post">
+            <section class="main">
+                <div>
                     <h4 class="tnth-headline">Do you have an access code?</h4>
-                    <button class="btn btn-default" id="btnYes">Yes</button>&nbsp;&nbsp;<button class="btn btn-default" id="btnNo" >No</button>
                 </div>
-            </section>
-         <form  action="/go" method="post">
-         {{ form.hidden_tag() }}
-            <section id="yesContainer">
-                    <p class="profile-item-title">Welcome, please enter the code you recevied
-                        in your invite.</p>
-                    <div class="row">
-                        <div class="col-md-6 col-xs-12">
-                        {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
-                         <button type="submit" class="access-button">Next</button>
-                        </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-6 col-xs-12">
+                    {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
+                    <br/>
+                     <button type="submit" class="access-button disabled" disabled id="nextLink">Next</button>
+                      <a href="/user/register" role="button" class="access-button" id="registerLink">Register</a>
                     </div>
-                </form>
-            </section>
-            <section id="noContainer">
-                    <p class="profile-item-title">I do not have access code</p>
-                    <p>Continue registration without an access code</p>
-                   <a href="/user/register" role="button" class="access-button">Register</a>
+                </div>
             </section>
           {{ form.csrf_token }}
         </form>
@@ -79,27 +71,15 @@
 {% endblock %}
 {% block document_ready %}
     $("document").ready(function() {
-        $("#btnYes").on("click", function() {
-            $("#noContainer").hide();
-            $("#yesContainer").fadeIn();
-            $("#yes_access_code").val("1");
-            $("#no_access_code").val("0");
-
+        $("#shortcut_alias").on("keyup", function() {
+            if ($(this).val() == "") {
+                $("#nextLink").addClass("disabled").attr("disabled", true);
+                $("#registerLink").removeClass("disabled").attr("disabled", false);
+            } else {
+                $("#registerLink").addClass("disabled").attr("disabled", true);
+                $("#nextLink").removeClass("disabled").attr("disabled", false);
+            };
         });
-        $("#btnNo").on("click", function() {
-            $("#yesContainer").hide();
-            $("#noContainer").fadeIn();
-            $("#yes_access_code").val("0");
-            $("#no_access_code").val("1");
-        });
-
-
-        if ($("#yes_access_code").val() == "1") {
-       
-            //only getting this error if the user has click on Next button
-            $("#btnYes").click();
-        };
-
     });
 
 {% endblock %}
