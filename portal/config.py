@@ -1,7 +1,6 @@
 """Configuration"""
 import os
 from flask_script import Server
-from flask import Config, url_for
 
 
 class BaseConfig(object):
@@ -53,6 +52,7 @@ class BaseConfig(object):
     GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
     DEFAULT_LOCALE = 'en_US'
+    LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
