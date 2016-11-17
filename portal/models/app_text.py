@@ -7,11 +7,14 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from flask import current_app
 from flask_babel import gettext
 from abc import ABCMeta, abstractmethod
-from ..extensions import db
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
+
+from ..extensions import db
+
 
 class AppText(db.Model):
     """Model representing application specific strings for customization
@@ -183,6 +186,15 @@ def app_text(name, *args):
     call to `app_text('ex', 'Bob', 'Gooday')` would return:
         'Hello Bob. Gooday Bob'
 
+    Custom strings may also reference configuration variables.  For example,
+    to include the configured value of USER_APP_NAME in the custom_text,
+    given:
+        AppText(name='config example',
+                custom_text='Welcome to {config[USER_APP_NAME]}")
+
+    a call to `app_text('config example')` would produce something like:
+        'Welcome to TrueNTH'
+
     NB javascript variables are not evaluated till the client browser sees
     the page, therefore any javascript variables will not be available in time
     for app_text() to use them.
@@ -194,8 +206,10 @@ def app_text(name, *args):
 
     text = str(item)
     try:
+        if 'config[' in text:
+            return gettext(text.format(*args, config=current_app.config))
         return gettext(text.format(*args))
-    except IndexError as err:
+    except IndexError:
         if not args:
             args = ('<None>',)
         raise ValueError(

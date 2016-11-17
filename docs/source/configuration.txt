@@ -160,14 +160,16 @@ added to the site persistence file.  Such an entry looks like::
       "resourceType": "AppText"
     },
 
-AppText can also handle positional arguments to fill in dynamic values within
-a string.  These are zero indexed, and must be defined when the template
+AppText can also handle positional arguments as well as references to
+configuration values to fill in dynamic values within a string.  The
+positional arguments are zero indexed, and must be defined when the template
 is rendered (i.e. JavaScript variables will not be properly defined until
 the script is evaluated within the browser, and will therefore not work).
 
-For example, given::
+For example, given the application has the configuration
+value ``USER_APP_NAME`` set to ``TrueNTH`` and the following::
 
-    AppText(name='ex', custom_text='Hello {0}. {1} {0}')
+    AppText(name='ex', custom_text='Welcome to {config[USER_APP_NAME]}, {0}. {1} {0}')
 
 A template including::
 
@@ -175,4 +177,4 @@ A template including::
 
 Would render::
 
-    <p>Hello Bob. Goodbye Bob</p>
+    <p>Welcome to TrueNTH, Bob. Goodbye Bob</p>
