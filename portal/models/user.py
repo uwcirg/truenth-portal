@@ -298,8 +298,7 @@ class User(db.Model, UserMixin):
     @property
     def locale_code(self):
         if self.locale:
-            #Locale codes are stored with '-' per IETF BCP 47 standard, but underscores are expected for gettext/LR/etc
-            return self.locale.code.replace("-","_")
+            return self.locale.code
         return None
 
     @property
@@ -310,7 +309,9 @@ class User(db.Model, UserMixin):
 
     @locale.setter
     def locale(self, code, name):
-        data = {"coding": [{'code': code.replace("_","-"), 'display': name,
+        # IETF BCP 47 standard uses hyphens, but we instead store w/ underscores,
+        # to better integrate with babel/LR URLs/etc
+        data = {"coding": [{'code': code, 'display': name,
                   'system': "urn:ietf:bcp:47"}]}
         self._locale = CodeableConcept.from_fhir(data)
 
