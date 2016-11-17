@@ -143,8 +143,17 @@ class SitePersistence(object):
 
         self.__write__(d)
 
-    def import_(self):
-        """If persistence file is found, import the data"""
+    def import_(self, include_interventions):
+        """If persistence file is found, import the data
+
+        :param include_interventions: if True, intervention data in the
+            persistence file will be included (and potentially replace
+            existing intervention state).  if False, intervention data
+            will be ignored.
+
+        """
+
+
         data = self.__read__()
         self.__verify_header__(data)
 
@@ -194,6 +203,7 @@ class SitePersistence(object):
                 db.session.add(strat)
 
         def update_intervention(intervention_json):
+            assert include_interventions
             existing = Intervention.query.filter_by(
                 name=intervention_json['name']).first()
             existing_json = existing.as_json() if existing else None
@@ -233,19 +243,21 @@ class SitePersistence(object):
             db.session.delete(org)
 
         # Intervention details
-        interventions_seen = []
-        for i in objs_by_type['Intervention']:
-            update_intervention(i)
-            interventions_seen.append(i['name'])
+        if include_interventions:
+            interventions_seen = []
+            for i in objs_by_type['Intervention']:
+                update_intervention(i)
+                interventions_seen.append(i['name'])
 
-        db.session.commit()  # strategies may use interventions, must exist
+            db.session.commit()  # strategies may use interventions, must exist
 
-        # Delete any interventions not named
-        for intervention in Intervention.query.filter(
-            ~Intervention.name.in_(interventions_seen)):
-            current_app.logger.info("Deleting Intervention not mentioned in "
-                                 "site_persistence: {}".format(intervention))
-            db.session.delete(intervention)
+            # Delete any interventions not named
+            for intervention in Intervention.query.filter(
+                ~Intervention.name.in_(interventions_seen)):
+                current_app.logger.info(
+                    "Deleting Intervention not mentioned in "
+                    "site_persistence: {}".format(intervention))
+                db.session.delete(intervention)
 
         # Access rules next
         max_strat_id = 0
