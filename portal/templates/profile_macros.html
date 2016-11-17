@@ -819,17 +819,19 @@
                 <div class="col-md-12 col-xs-12">
                     <div class="profile-item-container">
                          <h4 id="patientInformationLoc" class="profile-item-title">Patient Information</h4>
+                         <br/>
                          <div class="row">
-                            <div class="col-md-push-1 col-md-9 col-xs-11">
+                            <div class="col-md-push-1 col-md-8 col-xs-11">
                                 {{profileName(person)}}
                                 {{profileBirthDate(person)}}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-push-1 col-md-6 col-xs-11">
+                            <div class="col-md-push-1 col-md-5 col-xs-11">
                                 {{profileEmail(person)}}
                             </div>
                         </div>
+                        <br/>
                     </div>
                 </div>
             </div>
@@ -1008,11 +1010,11 @@
             </div>
             -->
             <br/>
-            <div class="form-group">
+            <div id="procDateGroup" class="form-group">
                 <label class="procedureDateLabel">Date:</label>
                 <div class="flex">
                     <div>
-                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="(0[1-9]|[12][0-9]|3[01])">
+                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="([1-9]|[12][0-9]|3[01])">
                     </div>
                     <div>
                         <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
@@ -1037,7 +1039,7 @@
                 </div>
                 <div class="row">
                      <div class="col-md-5 col-xs-10">
-                        <div class="help-block with-errors"></div>
+                        <div id="procDateErrorContainer" class="help-block with-errors"></div>
                      </div>
                 </div>
             </div>

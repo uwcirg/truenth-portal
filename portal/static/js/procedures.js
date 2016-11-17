@@ -85,12 +85,41 @@ $(document).ready(function() {
         };
     };
 
+    function isLeapYear(year)
+    {
+      return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
+    };
+
     function checkDate() {
-        return /(0[1-9]|[12][0-9]|3[01])/.test($("#procDay").val())
-               &&
-              ($( "#procMonth option:selected" ).val() != "")
-              &&
-             /\d{4}/.test($("#procYear").val());
+        var d = $("#procDay").val(), m = $("#procMonth").val(), y = $("#procYear").val();
+        var dTest = /([1-9]|[12][0-9]|3[01])/.test(d);
+        var mTest = (m != "");
+        var yTest =  /\d{4}/.test(y);
+        var errorText = "Please match the requested format.";
+        var dgField = $("#procDateGroup");
+        var deField = $("#procDateErrorContainer");
+        var errorColor = "#a94442";
+        var validColor = "#777";
+
+        if (dTest && mTest && yTest) {
+            if (parseInt(m) === 2) { //month of February
+                if (isLeapYear(parseInt(y))) {
+                    if (parseInt(d) > 29)  {
+                        deField.text(errorText).css("color", errorColor);
+                        return false;
+                    };
+                } else {
+                    if (parseInt(d) > 28) {
+                        dgField.addClass("has-error");
+                        deField.text(errorText).css("color", errorColor);
+                        return false;
+                    };
+                };
+                deField.text("").css("color", validColor);
+                return true;
+            } else return true;
+
+        } else return false;
     };
 
     function setDate() {
@@ -130,7 +159,7 @@ $(document).ready(function() {
             console.log("isValid: " +  isValid)
             if (isValid) {
                 setDate();
-            }
+            }; 
         });
     });
 
