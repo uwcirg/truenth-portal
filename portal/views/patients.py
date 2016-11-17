@@ -10,7 +10,7 @@ from ..models.role import ROLE
 from ..models.user import current_user, get_user
 from ..models.user_consent import UserConsent
 from ..models.organization import Organization, OrgTree
-from ..models.app_text import app_text
+from ..models.app_text import app_text, ConsentATMA
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')

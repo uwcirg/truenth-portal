@@ -4,9 +4,8 @@ import logging
 import os
 import pkginfo
 import sys
-import gettext
 import requests_cache
-from flask import Flask
+from flask import Flask, current_app
 from flask_webtest import get_scopefunc
 
 from .audit import configure_audit_log
@@ -15,6 +14,7 @@ from .extensions import authomatic
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
+from .models.user import current_user
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
 from .views.auth import auth, capture_next_view_function
@@ -67,7 +67,6 @@ def create_app(config=None, app_name=None, blueprints=None):
     configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
-    configure_i18n(app)
     configure_blueprints(app, blueprints=DEFAULT_BLUEPRINTS)
     configure_logging(app)
     configure_audit_log(app)
@@ -136,13 +135,6 @@ def configure_extensions(app):
 
     # babel - i18n
     babel.init_app(app)
-
-
-def configure_i18n(app):
-    #do after babel.init_app; otherwise, language installation is overwritten
-    default_lang = app.config['DEFAULT_LOCALE']
-    language = gettext.translation ('portal', os.path.join(app.root_path, "locale"), [default_lang])
-    app.jinja_env.install_gettext_translations(language)
 
 
 def configure_blueprints(app, blueprints):
@@ -225,3 +217,9 @@ def configure_cache(app):
     """Configure requests-cache"""
     requests_cache.install_cache(cache_name=app.name, backend='redis',
                                  expire_after=180, old_data_on_error=True)
+
+@babel.localeselector
+def get_locale():
+    if current_user() and current_user().locale_code:
+        return current_user().locale_code
+    return current_app.config.get("DEFAULT_LOCALE")

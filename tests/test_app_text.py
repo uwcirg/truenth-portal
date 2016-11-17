@@ -3,7 +3,7 @@ from flask import render_template
 from flask_webtest import SessionScope
 
 from portal.extensions import db
-from portal.models.app_text import AppText, ConsentATMA
+from portal.models.app_text import AppText, ConsentATMA, app_text
 from tests import TestCase
 
 
@@ -31,3 +31,16 @@ class TestAppText(TestCase):
 
         result = ConsentATMA.permanent_url(generic_url=sample, version=version)
         self.assertEquals(result, expected)
+
+    def test_config_value_in_custom_text(self):
+        self.app.application.config['CT_TEST'] = 'found!'
+        with SessionScope(db):
+            embed_config_value = AppText(
+                name='embed config value',
+                custom_text='Do you see {config[CT_TEST]}?')
+            db.session.add(embed_config_value)
+            db.session.commit()
+
+        result = app_text('embed config value')
+        self.assertTrue('found!' in result)
+
