@@ -1,77 +1,84 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
-    
+
     <style>
      #accessCodeWrapper {
-        height: 100vh;
-        width: 100vw;
+        height: 100%;
+        width: 100%;
+        min-height: 400px;
         overflow: hidden;
+        margin: auto;
      }
     .access-button {
-        opacity: 1; 
-        box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px; 
-        border-color: rgb(221, 221, 221); 
-        background-color: rgb(52, 152, 219); 
-        background-image: none; 
-        color: rgb(255, 255, 255); 
-        font-weight: normal; 
-        padding: 6px 10px; 
-        border-width: 0px; 
-        border-radius: 3px; 
-        border-style: solid; 
-        background-size: auto; 
-        background-repeat: repeat; 
-        background-position: center center; 
-        font-size: 14px; 
-        font-style: normal; 
-        font-family: Arial; 
-        text-align: center; 
-        width: 120px; 
-        height: 30px; 
+        opacity: 1;
+        box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
+        border-color: rgb(221, 221, 221);
+        background-color: rgb(52, 152, 219);
+        background-image: none;
+        color: rgb(255, 255, 255);
+        font-weight: normal;
+        padding: 6px 10px;
+        border-width: 0px;
+        border-radius: 3px;
+        border-style: solid;
+        background-size: auto;
+        background-repeat: repeat;
+        background-position: center center;
+        font-size: 14px;
+        font-style: normal;
+        font-family: Arial;
+        text-align: center;
+        width: 140px;
+        height: 32px;
         /*transform: rotate(0deg) translate(87px, 302px) rotate(0deg);*/
     }
 
-    #accessPromptContainer{
-        margin: 5% auto 1% auto;
-        padding: 2em;
+    #accessCodeWrapper {
+        margin: 0 auto;
+        width: 600px;
+        max-width: 100%;
+        min-height: 500px;
     }
 
-     #yesContainer, #noContainer{
-        display: none;
-        padding: 2em;
+    #accessCodeWrapper .main {
+        padding: 4em;
     }
-
     #shortcut_alias {
-        width: 40%;
+        width: 140px;
+        max-width: 100%;
+        height: 34px;
     }
 
+    #accessCodeWrapper .disabled {
+        background-color: #999;
+        opacity: 0.65;
+    }
+    #registerLink {
+        position: relative;
+        top: -1.1px;
+        width: 140px;
+        display: inline-block;
+    }
     </style>
     <article id="accessCodeWrapper">
-    {{validationError}}
-            <section>
-                <div  id="accessPromptContainer">
-                    <h4 class="tnth-headline">Do you have an access code?</h4>
-                    <button class="btn btn-default" id="btnYes">Yes</button>&nbsp;&nbsp;<button class="btn btn-default" id="btnNo" >No</button>
+        <form  action="/go" method="post">
+            <section class="main">
+                <div>
+                    <h4>Do you have an access code?</h4>
                 </div>
-            </section>
-         <form  action="/go" method="post">
-         {{ form.hidden_tag() }}
-            <section id="yesContainer">
-                    <p class="profile-item-title">Welcome, please enter the code you recevied
-                        in your invite.</p>
-                    <div class="row">
-                        <div class="col-md-6 col-xs-12">
-                        {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
-                         <button type="submit" class="access-button">Next</button>
-                        </div>
+                <div class="row">
+                    <div class="col-md-12 col-xs-12">
+                    {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
+                     <button type="submit" class="access-button disabled" disabled id="nextLink">Next</button>
                     </div>
-                </form>
-            </section>
-            <section id="noContainer">
-                    <p class="profile-item-title">I do not have access code</p>
+                </div>
+                <br/><br/>
+                <div>
+                    <h4>I do not have an access code</h4>
                     <p>Continue registration without an access code</p>
-                   <a href="/user/register" role="button" class="access-button">Register</a>
+                    <a href="/user/register" role="button" class="access-button" id="registerLink">Register</a>
+                </div>
             </section>
           {{ form.csrf_token }}
         </form>
@@ -79,27 +86,16 @@
 {% endblock %}
 {% block document_ready %}
     $("document").ready(function() {
-        $("#btnYes").on("click", function() {
-            $("#noContainer").hide();
-            $("#yesContainer").fadeIn();
-            $("#yes_access_code").val("1");
-            $("#no_access_code").val("0");
-
-        });
-        $("#btnNo").on("click", function() {
-            $("#yesContainer").hide();
-            $("#noContainer").fadeIn();
-            $("#yes_access_code").val("0");
-            $("#no_access_code").val("1");
+        $("#shortcut_alias").on("keyup", function() {
+            if ($(this).val() == "") {
+                $("#nextLink").addClass("disabled").attr("disabled", true);
+            } else {
+                $("#nextLink").removeClass("disabled").attr("disabled", false);
+            };
         });
 
-
-        if ($("#yes_access_code").val() == "1") {
-       
-            //only getting this error if the user has click on Next button
-            $("#btnYes").click();
-        };
-
+        $("#shortcut_alias").attr("placeholder", "").focus();
+        if ($("#shortcut_alias").val() !== "")  $("#nextLink").removeClass("disabled").attr("disabled", false);
     });
 
 {% endblock %}

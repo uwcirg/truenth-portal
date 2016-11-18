@@ -164,4 +164,3 @@ $(document).ready(function(){
 });
 var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
 
-

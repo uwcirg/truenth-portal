@@ -59,6 +59,7 @@ def enum(**items):
     return type('Enum', (), items)
 
 ROLE = enum(**{unicode(r).upper():r for r in STATIC_ROLES})
+ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
 
 
 def add_static_roles():

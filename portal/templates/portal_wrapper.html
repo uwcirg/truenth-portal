@@ -72,7 +72,6 @@
 
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                         Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
-                        {% if config.DEBUG_TIMEOUTS %} ({{ expires_in }} seconds remaining) {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                         &nbsp;&nbsp; MENU <i class="fa fa-bars"></i>
                     </button>
@@ -103,29 +102,6 @@
                     {% endif %}
                 </div>
             </div>
-            <div id="session-warning-modal" class="modal">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="sessWarnLabel">Your session is about to expire
-                                <a class="sectionlink" title="Section permalink" href="#sessWarnLabel"></a>
-                            </h4>
-                        </div>
-                        <div class="modal-body">
-                            Your session will expire in <span id="remaining-time"></span> seconds due to inactivity.
-                        </div>
-                        <div class="modal-footer">
-                            <button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button>
-                            <button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <script type="text/javascript">
-                // Set default sessionLifetime from Flask config
-                // Subtract 10 seconds to ensure the backend doesn't expire the session first
-                DEFAULT_SESSION_LIFETIME = {{ config.PERMANENT_SESSION_LIFETIME * 1000 }} - (10 * 1000);
-            </script>
         </div>
 
     </div>

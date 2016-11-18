@@ -35,7 +35,7 @@ def initdb():
 
 
 @manager.command
-def seed():
+def seed(include_interventions=False):
     """Seed database with required data"""
     add_static_concepts()
     add_static_interventions()
@@ -45,7 +45,7 @@ def seed():
     db.session.commit()
 
     # import site export file if found
-    SitePersistence().import_()
+    SitePersistence().import_(include_interventions)
 
 
 @manager.command

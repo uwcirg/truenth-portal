@@ -393,7 +393,8 @@ a.btn {
   font-weight: normal;
 }
 .profile-img {
-  float: right;
+  /*float: right;*/
+  display: inline-block;
   margin-top: -66px;
 }
 .profile-img img {
@@ -514,7 +515,7 @@ a.btn {
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
-  background-color: rgba(204, 206, 204, 0.2);
+  background-color: rgba(204, 206, 204, 0.25);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -523,7 +524,8 @@ a.btn {
   overflow-x: hidden;
 }
 .profile-item-title {
-  color: #575F5C;
+  /*color: #575F5C;*/
+  color: #526960;
   margin-bottom: 18px;
 }
 .profile-name-label {
@@ -701,8 +703,11 @@ table.profile-audit-log TH,
   transition: all 300ms ease-in;
 }
 .profile-header {
+  /*
   width: 100%%;
   max-width: 100%;
+  */
+  display:inline-block;
 }
 .profile-section {
   margin-bottom: 1.5em;
@@ -1319,7 +1324,8 @@ div.input-group.date {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    float: right;
+    /*float: right;*/
+    display: inline-block;
     margin-top: -66px;
   }
   .profile-img img {

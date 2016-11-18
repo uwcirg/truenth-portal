@@ -179,7 +179,7 @@ class TestCase(Base):
             add_static_relationships()
             add_static_roles()
             db.session.commit()
-            SitePersistence().import_()
+            SitePersistence().import_(include_interventions=True)
         self.init_data()
 
         self.app = self.__app.test_client()
