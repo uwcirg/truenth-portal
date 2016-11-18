@@ -23,7 +23,7 @@ class BaseConfig(object):
     CONTACT_SENDTO_EMAIL = MAIL_USERNAME
     ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
-    SS_TIMEOUT = 2 * 60  # seconds for session cookie, reset on ping
+    SS_TIMEOUT = 15 * 60  # seconds for session cookie, reset on ping
     PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
