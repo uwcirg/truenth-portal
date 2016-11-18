@@ -1,5 +1,5 @@
 """TrueNTH API view functions"""
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, session
 from flask import current_app, render_template, request, url_for
 from werkzeug.exceptions import Unauthorized
 
@@ -10,6 +10,15 @@ from ..models.auth import validate_client_origin
 from ..models.user import current_user
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
+
+
+@truenth_api.route("/ping", methods=['POST'])
+@crossdomain()
+def ping():
+    """POST request prolong session by reseting cookie timeout"""
+    current_app.logger.debug("ping received")
+    session.modified = True
+    return 'OK'
 
 
 @truenth_api.route('/auditlog', methods=('POST',))
@@ -139,12 +148,19 @@ def portal_wrapper_html():
             url_for('static', filename='img/movember_profile_thumb.png'),
         ))
 
+
+    def expires_in():
+        """compute remaining seconds on session"""
+        expires = current_app.permanent_session_lifetime.total_seconds()
+        return expires
+
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         user=user,
         movember_profile=movember_profile,
-        login_url=login_url
+        login_url=login_url,
+        expires_in=expires_in()
     )
     return make_response(html)
 

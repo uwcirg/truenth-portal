@@ -5,8 +5,41 @@
 </style>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
-<script type="text/javascript">
+<script>
+    var sessionMonitor=function(a){"use strict";function g(a){var b=new Date,d=b-f;a?(h(),c.ping()):d>c.minPingInterval&&(f=b,h(),c.ping())}function h(){var a=c.sessionLifetime-c.timeBeforeWarning;window.clearTimeout(d),window.clearTimeout(e),d=window.setTimeout(c.onwarning,a),e=window.setTimeout(i,c.sessionLifetime)}function i(){$.when(c.onbeforetimeout()).always(c.ontimeout)}var d,e,b={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",url:c.pingUrl})},logout:function(){window.location.href=c.logoutUrl},onwarning:function(){var a=Math.round(c.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#jqsm-stay-logged-in").on("click",function(a){c.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",c.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=c.timeoutUrl}},c={},f=0;return $.extend(c,b,a,{extendsess:g}),$(document).on(c.activityEvents,g),g(),c};
+
     var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
+    // Set default sessionLifetime from Flask config
+    // Subtract 10 seconds to ensure the backend doesn't expire the session first
+    var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+    try {
+        CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} config.PERMANENT_SESSION_LIFETIME {% else %} "" {% endif %};
+        if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
+        DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (10 * 1000);
+    } catch(e) {
+        DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+    };
+    $(document).ready(function(){
+      // Once nav is loaded, make the wrapper visible
+      setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 0);
+      // Configure and start the session timeout monitor
+      var sessMon = sessionMonitor({
+            sessionLifetime: DEFAULT_SESSION_LIFETIME,
+            timeBeforeWarning: 1 * 60 * 1000,
+            minPingInterval: 1 * 60 * 1000,  // 1 minute
+            activityEvents: "mouseup keydown mouseenter",
+            pingUrl: '{{PORTAL}}/api/ping',
+            logoutUrl: '{{PORTAL}}/logout',
+            timeoutUrl: '{{PORTAL}}/logout?timeout=1',
+            onwarning: function() {$("#session-warning-modal").modal("show");}
+      });
+      window.sessMon = sessMon;
+       // Configure the session timeout warning modal
+      $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+              .on("click", "#stay-logged-in", sessMon.extendsess)
+              .on("click", "#log-out", sessMon.logout)
+              .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+      });
 </script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
@@ -33,18 +66,15 @@
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
 <div id="tnthNavWrapper">
-
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
-            <div id="tnthLogo">
-                <a href="{{PORTAL}}"><img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
-            </div>
+            <div id="tnthLogo"><a href="{{PORTAL}}"><img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a></div>
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if user %}
-
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                         Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                        {% if config.DEBUG_TIMEOUTS %} ({{ expires_in }} seconds remaining) {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                         &nbsp;&nbsp; MENU <i class="fa fa-bars"></i>
                     </button>
@@ -76,15 +106,11 @@
                 </div>
             </div>
         </div>
-
     </div>
-
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">
-                    MENU <img src="{{movember_profile}}" width="45" height="45" />
-                </div>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">MENU <img src="{{movember_profile}}" width="45" height="45" /></div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
             </div>
             <div id="tnthNavbarXs">
@@ -107,8 +133,16 @@
             </div>
         </div>
     </div>
-
 </div>
+<div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">Your session is about to expire</h4></div>
+      <div class="modal-body">Your session will expire in approximately <span id="remaining-time"></span> seconds due to inactivity.</div>
+      <div class="modal-footer"><button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button></div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <!--
 When calling the wrapper, you can avoid the remainder of the page moving down after the page loads by setting the
 height of the containing div. In this example, #mainNav is the containing div:
