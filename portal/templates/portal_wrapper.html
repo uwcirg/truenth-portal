@@ -11,7 +11,14 @@
     var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
     // Set default sessionLifetime from Flask config
     // Subtract 10 seconds to ensure the backend doesn't expire the session first
-    var DEFAULT_SESSION_LIFETIME = {{ config.PERMANENT_SESSION_LIFETIME * 1000 }} - (10 * 1000);
+    var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+    try {
+        CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} config.PERMANENT_SESSION_LIFETIME {% else %} "" {% endif %};
+        if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
+        DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (10 * 1000);
+    } catch(e) {
+        DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+    };
 
     $(document).ready(function(){
       // Once nav is loaded, make the wrapper visible
