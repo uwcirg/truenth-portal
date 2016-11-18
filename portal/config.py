@@ -1,7 +1,6 @@
 """Configuration"""
 import os
 from flask_script import Server
-from flask import Config, url_for
 
 
 class BaseConfig(object):
@@ -23,8 +22,6 @@ class BaseConfig(object):
     CONTACT_SENDTO_EMAIL = MAIL_USERNAME
     ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
-    SS_TIMEOUT = 15 * 60  # seconds for session cookie, reset on ping
-    PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
     PORTAL_STYLESHEET = 'css/portal.css'
@@ -34,7 +31,6 @@ class BaseConfig(object):
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
-    SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
@@ -53,6 +49,7 @@ class BaseConfig(object):
     GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
     DEFAULT_LOCALE = 'en_US'
+    LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

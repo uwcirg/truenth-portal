@@ -157,23 +157,10 @@ $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
 
+$(document).ready(function(){
+  // Once nav is loaded, make the wrapper visible
+  setTimeout('$("#tnthNavWrapper").css("visibility","visible")', 0);
 
-(function (e) {
-var $winWidth = e(window).width();
-e(document).on('show.bs.modal', function () {
-if($winWidth < e(window).width()){
-e('body.modal-open,.navbar-fixed-top,.navbar-fixed-bottom').css('marginRight',e(window).width()-$winWidth)
-}
 });
-e(document).on('hidden.bs.modal', function () {
-e('body,.navbar-fixed-top,.navbar-fixed-bottom').css('marginRight',0)
-});
-})(jQuery);
 
 var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
-
-
-
-
-
-
