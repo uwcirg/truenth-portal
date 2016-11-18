@@ -19,7 +19,6 @@
     } catch(e) {
         DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
     };
-
     $(document).ready(function(){
       // Once nav is loaded, make the wrapper visible
       setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 0);
@@ -41,7 +40,6 @@
               .on("click", "#log-out", sessMon.logout)
               .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
       });
-
 </script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
@@ -68,18 +66,15 @@
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
 <div id="tnthNavWrapper">
-
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
-            <div id="tnthLogo">
-                <a href="{{PORTAL}}"><img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
-            </div>
+            <div id="tnthLogo"><a href="{{PORTAL}}"><img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a></div>
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
                     {% if user %}
-
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                         Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                        {% if config.DEBUG_TIMEOUTS %} ({{ expires_in }} seconds remaining) {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                         &nbsp;&nbsp; MENU <i class="fa fa-bars"></i>
                     </button>
@@ -111,15 +106,11 @@
                 </div>
             </div>
         </div>
-
     </div>
-
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">
-                    MENU <img src="{{movember_profile}}" width="45" height="45" />
-                </div>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">MENU <img src="{{movember_profile}}" width="45" height="45" /></div>
                 <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
             </div>
             <div id="tnthNavbarXs">
@@ -147,12 +138,8 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">Your session is about to expire</h4></div>
-      <div class="modal-body">
-        Your session will expire in approximately <span id="remaining-time"></span> seconds due to inactivity.
-      </div>
-      <div class="modal-footer">
-        <button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button>
-      </div>
+      <div class="modal-body">Your session will expire in approximately <span id="remaining-time"></span> seconds due to inactivity.</div>
+      <div class="modal-footer"><button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button></div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->

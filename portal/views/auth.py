@@ -322,9 +322,7 @@ def logout():
 
         Look for tokens this user obtained, notify the respective clients
         of the logout event and invalidate all outstanding tokens by deletion
-        Look for tokens this user obtained, and notify those clients
-        of the logout event
-
+        
         """
         if not user_id:
             return
