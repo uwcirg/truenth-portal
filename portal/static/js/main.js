@@ -249,7 +249,7 @@ var fillContent = {
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
             var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
-            console.log("date: " + performedDateTime + " cdate: " + performedDate);
+            //console.log("date: " + performedDateTime + " cdate: " + performedDate);
             var deleteInvocation = '';
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
@@ -431,17 +431,18 @@ var assembleContent = {
             //          }
             //      }
             // ];
-
-            demoArray["communication"] = [
-                {"language": {
-                    "coding": [
-                        {   "code": $("#locale").find("option:selected").val(),
-                            "display": $("#locale").find("option:selected").text(),
-                            "system": "urn:ietf:bcp:47"
-                        }
-                    ]
-                }}
-            ];
+            if ($("#locale").length > 0) {
+                demoArray["communication"] = [
+                    {"language": {
+                        "coding": [
+                            {   "code": $("#locale").find("option:selected").val(),
+                                "display": $("#locale").find("option:selected").text(),
+                                "system": "urn:ietf:bcp:47"
+                            }
+                        ]
+                    }}
+                ];
+            };
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
             demoArray["telecom"] = [
@@ -792,6 +793,7 @@ var tnthAjax = {
             url: '/api/demographics/'+userId
         }).done(function(data) {
             fillContent.dob(data);
+            //console.log(data)
             loader();
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
