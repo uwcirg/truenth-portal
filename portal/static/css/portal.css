@@ -496,7 +496,8 @@ btn {
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
-  background-color: rgba(204, 206, 204, 0.25);
+  /*background-color: rgba(204, 206, 204, 0.25);*/
+  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%) ;
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;

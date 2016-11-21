@@ -529,12 +529,13 @@ var assembleContent = {
 };
 
 var tnthAjax = {
-    "getOrgs": function(userId, noOverride) {
+    "getOrgs": function(userId, noOverride, sync) {
         loader(true);
         var self = this;
         $.ajax ({
             type: "GET",
-            url: '/api/organization'
+            url: '/api/organization',
+            async: sync? false : true
         }).done(function(data) {
             var clinicArray = [];
             $.each(data.entry,function(i,val){
@@ -606,11 +607,13 @@ var tnthAjax = {
                     //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
                     if (parentOrg) {
                         if ($(this).prop("checked")) {
-                            var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
-                            if (! consented) {
-                                var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                                console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
-                                self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
+                            var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                            if (agreementUrl && agreementUrl != "") {
+                                var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
+                                if (! consented) {
+                                    //console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
+                                     self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
+                                };
                             };
                             //if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
                                 //$("#consentContainer .consent").hide();
@@ -645,11 +648,11 @@ var tnthAjax = {
                             //sent off ajax
                             var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
                             if (! consented) {
-                                console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+                                //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
                                 self.setConsent(userId, {"org": org, "agreementUrl": agreementUrl});
                             };
                         } else {
-                            console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+                            //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
                             self.deleteConsent(userId, {"org": org});
                         };
 
@@ -660,7 +663,7 @@ var tnthAjax = {
             tnthAjax.getDemo(userId, noOverride);
             //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
             loader();
         });
     },
@@ -699,9 +702,9 @@ var tnthAjax = {
                 dataType: 'json',
                 data: JSON.stringify({"organization_id": params["org"], "agreement_url": params["agreementUrl"]})
             }).done(function(data) {
-                console.log("consent updated successfully.");
+                //console.log("consent updated successfully.");
             }).fail(function(xhr) {
-                console.log("request to updated consent failed.");
+                //console.log("request to updated consent failed.");
                 //console.log(xhr.responseText)
             });
         };
@@ -715,7 +718,7 @@ var tnthAjax = {
                 dataType: 'json',
                 data: JSON.stringify({"organization_id": parseInt(params["org"])})
             }).done(function(data) {
-                console.log("consent deleted successfully.");
+               // console.log("consent deleted successfully.");
             }).fail(function(xhr) {
                 console.log("request to delete consent failed.");
                 //console.log(xhr.responseText)
@@ -734,7 +737,7 @@ var tnthAjax = {
             if (!noOverride) fillContent.demo(data);
             loader();
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
             loader();
         });
     },
@@ -774,7 +777,7 @@ var tnthAjax = {
             fillContent.dob(data);
             loader();
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
             loader();
         });
     },
@@ -797,7 +800,7 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.proceduresContent(data,newEntry);
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
         });
     },
     "postProc": function(userId,toSend) {
@@ -809,7 +812,7 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
         }).fail(function() {
-            console.log("Problem updating procedure on server.");
+           // console.log("Problem updating procedure on server.");
         });
     },
     "deleteProc": function(procedureId) {
@@ -819,7 +822,7 @@ var tnthAjax = {
             contentType: "application/json; charset=utf-8",
         }).done(function(data) {
         }).fail(function() {
-            console.log("Problem deleting procedure on server.");
+           // console.log("Problem deleting procedure on server.");
         });
     },
     "getRoleList": function() {
@@ -840,7 +843,7 @@ var tnthAjax = {
             //self.getRoleList();
             fillContent.roles(data,isProfile);
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
 
         });
     },
@@ -869,7 +872,7 @@ var tnthAjax = {
         }).done(function(data) {
 
         }).fail(function() {
-            console.log("Problem updating role on server.");
+           // console.log("Problem updating role on server.");
 
         });
     },
@@ -880,7 +883,7 @@ var tnthAjax = {
         }).done(function(data) {
             fillContent.clinical(data);
         }).fail(function() {
-            console.log("Problem retrieving data from server.");
+           // console.log("Problem retrieving data from server.");
         });
     },
     "putClinical": function(userId, toCall, toSend, targetField) {
@@ -916,7 +919,7 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function() {
-            console.log('terms stored');
+           // console.log('terms stored');
         }).fail(function() {
             alert("There was a problem saving your answers. Please try again.");
         });
@@ -944,7 +947,7 @@ $(document).ready(function() {
             //showSearch();
         })
         .fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+          //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
             loader();
         })
         .always(function() {

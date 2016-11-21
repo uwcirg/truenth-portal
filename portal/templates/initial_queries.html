@@ -19,7 +19,7 @@
         {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed%}
           <h3 class="tnth-headline">About You</h3>
 
-          <p>Thank You! Now, please finish your registration by telling us about yourself.</p>
+          <p class="profile-item-title">Thank You! Now, please finish your registration by telling us about yourself.</p>
 
             <!--<p>First, tell us who you are:</p>-->
             {% if user and user._email %}
@@ -31,7 +31,8 @@
               {{nameGroup()}}
             {% else %}
                 {% if user and user.first_name and user.last_name %}
-                  <p>Name: {{user.first_name}} {{user.last_name}}</p>
+                  <p>Your <em>Name</em>: {{user.first_name}} {{user.last_name}}</p>
+                  <br/>
                   <input type="text" name="firstname" id="fistname" value="{{user.first_name}}" style="display:none"/>
                   <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" style="display:none"/>
                 {% endif %}
@@ -55,12 +56,26 @@
             <br />
             <p class="tnth-hide" id="continueText">Great! Click continue to start using TrueNTH.</p>
             <br />
+            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
         {% else %}
-          <br/>
-          <p> Thank you for registering.</p>
-          <p>Click continue to start using TrueNTH</p>
+          <style>
+          .reg-complete-container {
+            width: 500px; 
+            max-width: 100%; 
+            margin: 10% auto; 
+            background-color: #eee; 
+            padding: 2em 2em 2.7em 2em; 
+            text-align: center; 
+            border-radius: 8px;
+          }
+          </style>
+           <div class="reg-complete-container">
+              <h4 class="profile-item-title"> Thank you for registering.</h4>
+              <p>Click continue to start using TrueNTH</p>
+              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
+           </div>
         {% endif %}
-    <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>Continue to TrueNTH</button>
+   
   </form>
   </div>
 
@@ -70,9 +85,8 @@
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
-
-$(document).ready(function(){
-    //nameGroup rolesGroup bdGroup patientQ clinics
+function checkIncompleteFields() {
+  
     var sections = [];
     var incompleteFields = [];
     var mainSections = {
@@ -80,9 +94,9 @@ $(document).ready(function(){
         'rolesGroup': [$("input[name='user_type']")],
         'bdGroup': [$("#month"), $("#date"), $("#year")],
         'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
-        'clinics': [$("input[name='organization']")]
+        'clinics': [$("#userOrgs input[name='organization'][data-parent-id]")]
       };
-
+    var _isChecked = false;
       for (var section in mainSections) {
           var fields = mainSections[section];
           fields.forEach(function(field) {
@@ -90,8 +104,16 @@ $(document).ready(function(){
                 var type = field.attr('type');
                 switch(String(type).toLowerCase()) {
                 case 'checkbox':
+                      _isChecked = false;
+                      field.each(function() {
+                          if ($(this).is(":checked")) {
+                            _isChecked = true;
+                          };
+                      });
+                      if (!(_isChecked)) incompleteFields.push({'section': $('#'+ section), 'element':field});
+                      break;
                 case 'radio':
-                    if (!field.is(':checked')) incompleteFields.push({'section': $('#'+ section), 'element':field});
+                    if (!field.prop("checked")) incompleteFields.push({'section': $('#'+ section), 'element':field});
                     break;
                 case 'select':
                 case 'text':
@@ -99,9 +121,7 @@ $(document).ready(function(){
                     break;
                 };
               };
-
           });
-
       };
 
       incompleteFields.forEach(function(field, index) {
@@ -115,8 +135,8 @@ $(document).ready(function(){
                 incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].section.show();
                 incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].element.show();
               };
-              console.log('field index: ' + f.attr('sectionIndex'));
-              console.log('incomplete fields length: ' + incompleteFields.length);
+              //console.log('field index: ' + f.attr('sectionIndex'));
+              //console.log('incomplete fields length: ' + incompleteFields.length);
           });
 
       });
@@ -130,14 +150,24 @@ $(document).ready(function(){
 
     };
 
-    /**** debugging *****
+    /*
     incompleteFields.forEach(function(field, index) {
         console.log(field.section.attr("id") + " " + field.section.length);
 
     });
-    *******/
+    */
+    
+    //console.log("length: " + incompleteFields.length);
+
+};
 
 
+$(document).ready(function(){
+    
+    //setTimeout("checkIncompleteFields()", 500);
+    $(document).ajaxStop(function () {
+      checkIncompleteFields();
+    });
 
     /** 1st - get all current info **/
     /***done in macros now*****/
@@ -252,7 +282,7 @@ $(document).ready(function(){
       };
   });
 
-
+  /*
   $("#userOrgs input[name='organization']").each(function() {
       $(this).on("click", function() {
           var parentOrg = $(this).attr("data-parent-id");
@@ -276,7 +306,7 @@ $(document).ready(function(){
 
           
       });
-    });
+    });*/
   });
 {% endblock %}
 
