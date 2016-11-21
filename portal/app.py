@@ -210,6 +210,12 @@ def configure_logging(app):  # pragma: no cover
 def configure_metadata(app):
     """Add distribution metadata for display in templates"""
     metadata = pkginfo.Develop(os.path.join(app.root_path, ".."))
+
+    # Get git hash from version if present
+    # Todo: extend Develop instead of monkey patching
+    if '+ng' in metadata.version:
+        metadata.git_hash = metadata.version.split('+ng')[-1].split('.')[0]
+
     app.config.metadata = metadata
 
 

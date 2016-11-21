@@ -19,7 +19,11 @@
 
   {% if config.metadata.version %}
   <br />
-  <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
+    {% if config.metadata.git_hash %}
+    <div class="pull-right text-muted smaller-text">TrueNTH Version: <a target="_blank" href="https://github.com/uwcirg/true_nth_usa_portal/commit/{{ config.metadata.git_hash }}" >{{ config.metadata.version }}</a></div>
+    {% else %}
+    <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
+    {% endif %}
   {% endif %}
 {% endblock %}
 
