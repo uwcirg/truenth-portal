@@ -85,6 +85,7 @@
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
+
 function checkIncompleteFields() {
   
     var sections = [];
@@ -244,6 +245,7 @@ $(document).ready(function(){
   });
 
   $("#userOrgs").on("change", "input", function() {
+      //console.log("changed?")
       assembleContent.demo({{ user.id }});
       $("#continueText").fadeIn();
       $("#updateProfile").removeAttr("disabled");
@@ -279,7 +281,9 @@ $(document).ready(function(){
   $('#queriesForm').validator().on('submit', function (e) {
       if (e.isDefaultPrevented()) {
         alert("There's a problem with your submission. Please check your answers, then try again.");
-      };
+      } else {
+        assembleContent.demo({{ user.id }});
+      }
   });
 
   /*

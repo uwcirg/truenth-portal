@@ -322,33 +322,39 @@ var assembleContent = {
             "family": $("input[name=lastname]").val()
         };
         demoArray["birthDate"] = $("input[name=birthDate]").val();
-        if (onProfile) {
-            $.each($("#userOrgs input:checkbox:checked"),function(i,v){
-                if ($(this).attr("data-parent-id")) {
-                    $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
-                }
-            });
 
+        $.each($("#userOrgs input:checkbox:checked"),function(i,v){
+            if ($(this).attr("data-parent-id")) {
+                $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
+            };
+        });
+
+        if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
             //if ($("#noOrgs").prop("checked")) {
                // orgIDs = [{ reference: "api/organization/0" }];
             //} else {
-                orgIDs = $("#userOrgs input[name='organization']").map(function(){
+            orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     //if (!isNaN(parseInt($(this).val()))) return { reference: "api/organization/"+$(this).val() };
                     //if ($(this).prop("checked")) console.log($(this).val());
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
-                }).get();
-                var parentId;
+            }).get();
+            var parentId;
 
-                $.each($("#userOrgs input:checkbox:checked"),function(i,v){
-                    if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
-                        orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
-                        parentId = $(this).attr("data-parent-id");
-                    };
-                });
-           // };
+            $.each($("#userOrgs input:checkbox:checked"),function(i,v){
+                if ($(this).attr("data-parent-id") && $(this).attr("data-parent-id") != parentId) {
+                    orgIDs.push({reference: "api/organization/"+$(this).attr("data-parent-id")});
+                    parentId = $(this).attr("data-parent-id");
+                };
+            });
+               // };
 
             demoArray["careProvider"] = orgIDs;
+        };
+
+
+
+        if (onProfile) {
            // console.log(demoArray["careProvider"]);
 
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio

@@ -40,7 +40,7 @@
         tnthAjax.getName($("#iq_userId").val());
         ["firstname", "lastname"].forEach(function(field) {
             $("#" + field).on("blur", function() {
-                assembleContent.name($("#iq_userId").val());
+                assembleContent.demo($("#iq_userId").val());
             });
         });
       });</script>
@@ -103,7 +103,7 @@
             tnthAjax.getDob($("#iq_userId").val());
             ["month", "date", "year"].forEach(function(field) {
               $("#" + field).on("blur", function() {
-                  assembleContent.dob($("#iq_userId").val());
+                  assembleContent.demo($("#iq_userId").val());
               });
             });
           });</script>
@@ -200,7 +200,7 @@
     <script>
     $(function () {
         //tnthAjax.getConsent($("#iq_userId").val(), true);
-        tnthAjax.getOrgs($("#iq_userId").val());
+        tnthAjax.getOrgs($("#iq_userId").val(), false,true);
       });
     </script>
 
