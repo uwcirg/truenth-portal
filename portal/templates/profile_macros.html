@@ -56,6 +56,17 @@
      </script>
 {%- endmacro %}
 
+{% macro profileLocale(person) -%}
+    <div class="form-group float-input-label profile-section">
+        <label for="locale">{{ _("Language") }}</label>
+        <select class="form-control" name="locale" id="locale">
+          <option value="">Default</option>
+          <option value="en_US" {{ "selected" if person and person.locale_code == "en_US" }}>American English</option>
+          <option value="en_AU" {{ "selected" if person and person.locale_code == "en_AU" }}>Australian English</option>
+        </select>
+     </div>
+{%- endmacro %}
+
 {% macro profileName(person, isFocus=False) -%}
     <div class="form-group profile-name-label">
         <label>Name</label>
@@ -829,6 +840,7 @@
                         <div class="row">
                             <div class="col-md-push-1 col-md-5 col-xs-11">
                                 {{profileEmail(person)}}
+                                {{profileLocale(person)}}
                             </div>
                         </div>
                         <br/>
@@ -857,6 +869,7 @@
                             <div class="col-md-11 col-xs-11">
                                 {{profileEmail(person)}}
                                 {{profilePhone(person)}}
+                                {{profileLocale(person)}}
                             </div>
                         </div>
                     </div>

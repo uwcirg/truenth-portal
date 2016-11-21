@@ -432,6 +432,17 @@ var assembleContent = {
             //      }
             // ];
 
+            demoArray["communication"] = [
+                {"language": {
+                    "coding": [
+                        {   "code": $("#locale").find("option:selected").val(),
+                            "display": $("#locale").find("option:selected").text(),
+                            "system": "urn:ietf:bcp:47"
+                        }
+                    ]
+                }}
+            ];
+
             demoArray["gender"] = $("input[name=sex]:checked").val();
             demoArray["telecom"] = [
                 { "system": "email", "value": $("input[name=email]").val() },
