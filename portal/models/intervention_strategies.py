@@ -57,19 +57,19 @@ def limit_by_clinic_list(org_list, combinator='all'):
             raise ValueError("organization '{}' not found".format(org))
         except MultipleResultsFound:
             raise ValueError("multiple matches for org name {}".format(org))
-    required = set(orgs)
+    required = set((o.id for o in orgs))
     if combinator not in ('any', 'all'):
         raise ValueError("unknown value {} for combinator, must be any or all")
 
     def user_registered_with_all_clinics(intervention, user):
-        has = set(user.organizations)
+        has = set((o.id for o in user.organizations))
         if required.intersection(has) == required:
             _log(result=True, func_name='limit_by_clinic_list', user=user,
                  intervention=intervention.name)
             return True
 
     def user_registered_with_any_clinics(intervention, user):
-        has = set(user.organizations)
+        has = set((o.id for o in user.organizations))
         if not required.isdisjoint(has):
             _log(result=True, func_name='limit_by_clinic_list', user=user,
                  intervention=intervention.name)
@@ -91,10 +91,10 @@ def not_in_clinic_list(org_list):
         except MultipleResultsFound:
             raise ValueError("more than one organization named '{}'"
                              "found".format(org))
-    dont_want = set(orgs)
+    dont_want = set((o.id for o in orgs))
 
     def user_not_registered_with_clinics(intervention, user):
-        has = set(user.organizations)
+        has = set((o.id for o in user.organizations))
         if has.isdisjoint(dont_want):
             _log(result=True, func_name='not_in_clinic_list', user=user,
                  intervention=intervention.name)
