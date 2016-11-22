@@ -352,7 +352,7 @@
     </div>
     <script>$(function () {
                  {% if consent_agreements and person.has_role('patient') %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
-                tnthAjax.getOrgs({{ person.id if person }}, true);
+                tnthAjax.getOrgs({{ person.id if person }});
 
             });</script>
 {%- endmacro %}
