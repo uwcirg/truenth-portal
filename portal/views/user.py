@@ -60,9 +60,9 @@ def me():
 
 
 @user_api.route('/account', methods=('POST',))
+@oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
                 ROLE.PROVIDER])
-@oauth.require_oauth()
 def account():
     """Create a user account
 
@@ -182,9 +182,9 @@ def delete_user(user_id):
 
 
 @user_api.route('/user/<int:user_id>/access_url')
+@oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
                 ROLE.PROVIDER])
-@oauth.require_oauth()
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
