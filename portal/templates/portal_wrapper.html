@@ -6,19 +6,21 @@
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
 <script>
-    var sessionMonitor=function(a){"use strict";function g(a){var b=new Date,d=b-f;a?(h(),c.ping()):d>c.minPingInterval&&(f=b,h(),c.ping())}function h(){var a=c.sessionLifetime-c.timeBeforeWarning;window.clearTimeout(d),window.clearTimeout(e),d=window.setTimeout(c.onwarning,a),e=window.setTimeout(i,c.sessionLifetime)}function i(){$.when(c.onbeforetimeout()).always(c.ontimeout)}var d,e,b={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",url:c.pingUrl})},logout:function(){window.location.href=c.logoutUrl},onwarning:function(){var a=Math.round(c.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#jqsm-stay-logged-in").on("click",function(a){c.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",c.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=c.timeoutUrl}},c={},f=0;return $.extend(c,b,a,{extendsess:g}),$(document).on(c.activityEvents,g),g(),c};
+    var sessionMonitor=function(a){"use strict";function b(a,b){var d=new Date,e=d-i;b?(c(),h.ping()):e>h.minPingInterval&&(i=d,c(),h.ping())}function c(){i=new Date;var a=h.sessionLifetime-h.timeBeforeWarning;window.clearTimeout(e),window.clearTimeout(f),e=window.setTimeout(h.onwarning,a),f=window.setTimeout(d,h.sessionLifetime)}function d(){$.when(h.onbeforetimeout()).always(h.ontimeout)}var e,f,g={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",url:h.pingUrl})},logout:function(){window.location.href=h.logoutUrl},onwarning:function(){var a=Math.round(h.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#jqsm-stay-logged-in").on("click",function(a){h.extendsess(a,!0)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",h.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=h.timeoutUrl}},h={},i=new Date;return $.extend(h,g,a,{extendsess:b}),$(document).on(h.activityEvents,b),c(),b(),h};
 
     var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
     // Set default sessionLifetime from Flask config
     // Subtract 10 seconds to ensure the backend doesn't expire the session first
     var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+
     try {
-        CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} config.PERMANENT_SESSION_LIFETIME {% else %} "" {% endif %};
+        CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} {{config.PERMANENT_SESSION_LIFETIME}} {% else %} "" {% endif %};
         if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
         DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (10 * 1000);
     } catch(e) {
         DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
     };
+
     $(document).ready(function(){
       // Once nav is loaded, make the wrapper visible
       setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 0);
@@ -27,10 +29,10 @@
             sessionLifetime: DEFAULT_SESSION_LIFETIME,
             timeBeforeWarning: 1 * 60 * 1000,
             minPingInterval: 1 * 60 * 1000,  // 1 minute
-            activityEvents: "mouseup keydown mouseenter",
+            activityEvents: "mouseup",
             pingUrl: '{{PORTAL}}/api/ping',
             logoutUrl: '{{PORTAL}}/logout',
-            timeoutUrl: '{{PORTAL}}/logout?timeout=1',
+            timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
             onwarning: function() {$("#session-warning-modal").modal("show");}
       });
       window.sessMon = sessMon;
@@ -134,7 +136,7 @@
         </div>
     </div>
 </div>
-<div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog">
+<div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">Your session is about to expire</h4></div>
