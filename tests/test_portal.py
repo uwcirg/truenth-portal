@@ -21,6 +21,7 @@ class TestPortal(TestCase):
         """Interventions can customize the button text """
         client = self.add_client()
         intervention = INTERVENTION.DECISION_SUPPORT_P3P
+        intervention.public_access = True  # make the card avail for the test
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
@@ -37,6 +38,7 @@ class TestPortal(TestCase):
         """Interventions can further customize per user"""
         client = self.add_client()
         intervention = INTERVENTION.DECISION_SUPPORT_P3P
+        intervention.public_access = True  # make the card avail for the test
         client.intervention = intervention
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id)
