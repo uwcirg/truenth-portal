@@ -102,6 +102,14 @@ def portal_wrapper_html():
           displayed if the user has not logged in.
         required: false
         type: string
+      - name: disable_links
+        in: query
+        description:
+          If present, with any value, all links will be removed.  Useful
+          during sessions where any navigation outside of the main well
+          is discouraged.
+        required: false
+        type: string
     responses:
       200:
         description:
@@ -154,12 +162,14 @@ def portal_wrapper_html():
         expires = current_app.permanent_session_lifetime.total_seconds()
         return expires
 
+    disable_links = True if 'disable_links' in request.args else False
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
         user=user,
         movember_profile=movember_profile,
         login_url=login_url,
+        enable_links = not disable_links,
         expires_in=expires_in()
     )
     return make_response(html)
