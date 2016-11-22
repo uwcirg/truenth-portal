@@ -569,7 +569,8 @@ class User(db.Model, UserMixin):
         """
         def v_or_n(value):
             """Return None unless the value contains data"""
-            return value.rstrip() or None
+            if value:
+                return value.rstrip() or None
 
         def update_orgs():
             def allow_org_change(org, user, acting_user):
