@@ -839,15 +839,19 @@
                          <h4 id="patientInformationLoc" class="profile-item-title">Patient Information</h4>
                          <br/>
                          <div class="row">
-                            <div class="col-md-push-1 col-md-8 col-xs-11">
-                                {{profileName(person)}}
-                                {{profileBirthDate(person)}}
+                            <div class="col-md-8 col-xs-11">
+                                <div class="indent">
+                                    {{profileName(person)}}
+                                    {{profileBirthDate(person)}}
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-push-1 col-md-5 col-xs-11">
+                            <div class="col-md-5 col-xs-11">
+                                <div class="indent">
                                 {{profileEmail(person)}}
                                 {{profileLocale(person)}}
+                                </div>
                             </div>
                         </div>
                         <br/>

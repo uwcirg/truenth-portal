@@ -177,9 +177,9 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
    position: relative;
    top: -3.8px;
    display: inline-block;
-   a {
+   span {
     position: relative;
-    top: 0.8px;
+    top: 1.8px;
     }
   }
 
@@ -415,7 +415,7 @@ btn {
 }
 .form-control {
   font-size: @baseFontSize;
-  height: 39px;
+  height: 36px;
 }
 .form-group {
   .help-block {
@@ -684,6 +684,7 @@ background-color: #FFF;
 }
 #userSessionReportDetailHeader span.glyphicon-user {
   top: -0.1px;
+  padding: 0.64em;
 }
 #userSessionReportDetailHeader span.glyphicon:hover
 {
@@ -1012,6 +1013,7 @@ t
 /**override bootstrap style**/
 .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
   /*margin-top:6px;*/
+  margin: 4px;
 }
 
 div.modal-header, div.modal-footer {
@@ -1152,6 +1154,10 @@ div.input-group.date {
   max-width: 100%;
 }
 
+.indent {
+  padding: 0 1em;
+}
+
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1186,11 +1192,6 @@ div.input-group.date {
 
   .create-user-link {
     font-size: 0.95em;
-  }
-
-  #backLink a {
-  position: relative;
-  top: -1px;
   }
 
   #indexNavBar {
@@ -1242,11 +1243,13 @@ div.input-group.date {
     height: 34px;
     margin: 4px auto;
   }
+
+  table.profile-audit-log TH,
   .checkbox input[type=checkbox],
   .checkbox-inline input[type=checkbox],
   .radio input[type=radio],
   .radio-inline input[type=radio] {
-    margin-top: 2px;
+    margin-top: 4px;
   }
   table.profile-audit-log {
     font-size: 0.7em;
@@ -1288,11 +1291,15 @@ div.input-group.date {
     max-width: 100%;
   }
 
-   #profileForm #bdGroup div.row {
+  #profileForm #bdGroup div.row {
     height: 10em;
   }
   #profileForm div.name-section {
     height: 10em;
+  }
+
+  #userSessionReportDetailHeader span.glyphicon-user {
+    padding: 0.4em;
   }
 
 }
@@ -1357,7 +1364,7 @@ div.input-group.date {
     height: 10em;
   }
   .side {
-    height: 34em;
+    height: 35em;
   }
   .load-container {
     min-height: 1.5em;

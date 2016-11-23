@@ -165,7 +165,6 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
     border-left: 1px solid #ddd;
     border-top: 1px solid #ddd;
     border-radius: 4px;
-    display: inline-block;
     /*position: relative;
     top: 2px;*/
     margin-left: -4px;
@@ -203,9 +202,9 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
    position: relative;
    top: -3.8px;
    display: inline-block;
-   a {
+   span {
     position: relative;
-    top: 0.8px;
+    top: 1.8px;
     }
   }
 
@@ -719,7 +718,7 @@ opacity: 0.8;
 background-color: #FFF;
 }
 #userSessionReportDetailHeader span.glyphicon-user {
-  top: -0.1px;
+  top: -0.01px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover
 {
@@ -1047,8 +1046,8 @@ t
 }
 
 /**override bootstrap style**/
-.checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
-  margin-top:6px;
+table.profile-audit-log TH, .checkbox input[type=checkbox], .checkbox-inline input[type=checkbox], .radio input[type=radio], .radio-inline input[type=radio] {
+  margin-top:4px;
 }
 
 div.modal-header, div.modal-footer {
@@ -1178,6 +1177,10 @@ div.input-group.date {
   margin-top:-2px;
 }
 
+.indent {
+  padding: 0 1em;
+}
+
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -1211,11 +1214,6 @@ div.input-group.date {
 
   .create-user-link {
     font-size: 0.95em;
-  }
-
-  #backLink a {
-  position: relative;
-  top: -1px;
   }
 
   #indexNavBar {
@@ -1272,7 +1270,7 @@ div.input-group.date {
   .checkbox-inline input[type=checkbox],
   .radio input[type=radio],
   .radio-inline input[type=radio] {
-    margin-top: 2px;
+    margin-top: 4px;
   }
   table.profile-audit-log {
     font-size: 0.7em;
@@ -1319,6 +1317,10 @@ div.input-group.date {
   }
   #profileForm div.name-section {
     height: 10em;
+  }
+
+  #userSessionReportDetailHeader span.glyphicon-user {
+    padding: 0.4em;
   }
 
 }
@@ -1434,7 +1436,7 @@ div.input-group.date {
   }
 
   .form-group input[type=checkbox] {
-    margin-top: 5px;
+    margin-top: 4px;
   }
 
   .form-group input[type=radio] {

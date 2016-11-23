@@ -325,6 +325,13 @@ var assembleContent = {
         };
         demoArray["birthDate"] = $("input[name=birthDate]").val();
 
+        $.each($("#userOrgs input:checkbox"),function(i,v){
+            if ($(this).attr("data-parent-id")) {
+                $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
+            };
+        });
+
+
         $.each($("#userOrgs input:checkbox:checked"),function(i,v){
             if ($(this).attr("data-parent-id")) {
                 $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', true);
@@ -351,7 +358,7 @@ var assembleContent = {
             });
                // };
 
-            demoArray["careProvider"] = orgIDs;
+            if (orgIDs) demoArray["careProvider"] = orgIDs;
         };
 
 
@@ -433,7 +440,7 @@ var assembleContent = {
             //          }
             //      }
             // ];
-            if ($("#locale").length > 0) {
+            if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
                         "coding": [
