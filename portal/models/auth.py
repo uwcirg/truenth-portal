@@ -83,7 +83,10 @@ class Client(db.Model):
             # in validate_redirect_uri - so that's all we return
 
             # Whitelist any redirects to shared services
-            uris = ["https://%s" % current_app.config['SERVER_NAME'],]
+            uris = [
+                "https://%s" % current_app.config['SERVER_NAME'],
+                "http://%s" % current_app.config['SERVER_NAME'],
+            ]
             for uri in self._redirect_uris.split():
                 parsed = urlparse(uri)
                 uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
