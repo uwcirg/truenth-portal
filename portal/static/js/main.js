@@ -219,8 +219,10 @@ var fillContent = {
 
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
-            $("body").find("#userOrgs input.clinic:checkbox[value="+orgID+"]").prop('checked', true);
+            if (orgID == "0") $("#userOrgs #noOrgs").prop("checked", true);
+            else $("body").find("#userOrgs input.clinic:checkbox[value="+orgID+"]").prop('checked', true);
         });
+
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
             $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
@@ -748,11 +750,13 @@ var tnthAjax = {
             type: "GET",
             url: '/api/demographics/'+userId
         }).done(function(data) {
-            fillContent.race(data);
-            fillContent.ethnicity(data);
-            fillContent.indigenous(data);
-            fillContent.orgs(data);
-            if (!noOverride) fillContent.demo(data);
+            if (!noOverride) {
+                fillContent.race(data);
+                fillContent.ethnicity(data);
+                fillContent.indigenous(data);
+                fillContent.orgs(data);
+                fillContent.demo(data);
+            }
             loader();
         }).fail(function() {
            // console.log("Problem retrieving data from server.");

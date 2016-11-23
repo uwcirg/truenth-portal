@@ -19,7 +19,19 @@
                     {{profileEmail(False)}}
                     {{profilePhone(False)}}
                     <br/>
-                    {{profileOrg(user, 'true')}}
+                    <div class="form-group profile-section" id="userOrgs">
+                        <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
+                        <div class="indent">
+                        <div id="fillOrgs"></div>
+                        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">None of the Above</label></div>
+                        </div>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <script>$(function () {
+                        tnthAjax.getOrgs({{ user.id }}, true, true);
+                        setTimeout('$("#noOrgs").click();', 0);
+
+                    });</script>
                     {{profileSaveBtn()}}
             </div>
             <br/>
@@ -67,7 +79,7 @@ $(document).ready(function(){
     //for each org send off ajax to set consent
     function setConsents(userId) {
         var orgs = {};
-        $("#createProfileForm input[name='organization']").each(function() {
+        $("#createProfileForm input[name='organization'][data-parent-id]").each(function() {
             if ($(this).prop("checked")) {
                 var parentOrg = $(this).attr("data-parent-id");
                 if (!orgs[parentOrg]) {
@@ -169,7 +181,7 @@ $(document).ready(function(){
                     _demoArray['careProvider'] = orgIDs;
 
 
-                    console.log(_demoArray);
+                    //console.log(_demoArray);
 
 
                     //Adding demographic information
