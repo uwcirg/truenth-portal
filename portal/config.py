@@ -53,6 +53,7 @@ class BaseConfig(object):
 
     DEFAULT_LOCALE = 'en_US'
     LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
+    LR_GROUP = 20147
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
