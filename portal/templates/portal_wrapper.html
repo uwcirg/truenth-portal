@@ -25,18 +25,15 @@
       // Once nav is loaded, make the wrapper visible
       setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 0);
       // Configure and start the session timeout monitor
-      //window.location.protocol+"//"+window.location.host+
-      var _protocol = window.location.protocol;
-      var _host = window.location.host;
 
       var sessMon = sessionMonitor({
             sessionLifetime: DEFAULT_SESSION_LIFETIME,
             timeBeforeWarning: 1 * 60 * 1000,
             minPingInterval: 1 * 60 * 1000,  // 1 minute
             activityEvents: "mouseup",
-            pingUrl: _protocol+'//' + _host + '/api/ping',
-            logoutUrl: _protocol+'//' + _host + '/logout',
-            timeoutUrl: _protocol+'//' + _host + '/logout?timed_out=1',
+            pingUrl: '{{PORTAL}}/api/ping',
+            logoutUrl: '{{PORTAL}}/logout',
+            timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
             onwarning: function() {$("#session-warning-modal").modal("show");}
       });
       window.sessMon = sessMon;
