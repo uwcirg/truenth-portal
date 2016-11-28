@@ -72,6 +72,15 @@
           <option value="en_AU" {{ "selected" if person and person.locale_code == "en_AU" }}>Australian English</option>
         </select>
      </div>
+     <script>$(function () {
+
+        $('#locale').on('change', function() {
+            setTimeout(function(){
+                window.location.reload(true);
+            },1000);
+        });
+
+     });</script>
 {%- endmacro %}
 
 {% macro profileName(person, isFocus=False) -%}
