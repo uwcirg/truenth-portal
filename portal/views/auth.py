@@ -96,6 +96,7 @@ def capture_next_view_function(real_function):
         return real_function()
     return capture_next
 
+
 @auth.route('/next-after-login')
 def next_after_login():
     """Redirection to appropriate target depending on data and auth status
@@ -123,11 +124,15 @@ def next_after_login():
         return redirect(url_for('portal.landing'))
 
     # Logged in - take care of pending actions
+    if 'challenge_verified_user_id' in session:
+        # user has now finished p/w update - clear session variable
+        del session['challenge_verified_user_id']
 
     # Look for an invited user scenario - may need to merge provided
     # info (what the provider set in invited user) with the current user.
     if 'invited_verified_user_id' in session:
         invited_user_id = session['invited_verified_user_id']
+        assert user.id != invited_user_id
         auditable_event("merging invited user {} into account {}".format(
             invited_user_id, user.id), user_id=user.id)
         user.merge_with(invited_user_id)
