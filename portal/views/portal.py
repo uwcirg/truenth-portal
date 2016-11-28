@@ -187,12 +187,17 @@ def access_via_token(token):
     # after user proves themselves and logs in
     auditable_event("invited user entered using token, pending "
                     "registration", user_id=user.id)
-    session['invited_user_id'] = user.id
-    return redirect(url_for('portal.challenge_identity'))
+    return redirect(
+        url_for('portal.challenge_identity', user_id=user.id,
+                next_url=url_for('user.register', email=user.email),
+                merging_accounts=True))
 
 
 class ChallengeIdForm(FlaskForm):
     retry_count = HiddenField('retry count', default=0)
+    next_url = HiddenField('next')
+    user_id = HiddenField('user')
+    merging_accounts = HiddenField('merging_accounts')
     first_name = StringField(
         'First Name', validators=[validators.input_required()])
     last_name = StringField(
@@ -202,32 +207,49 @@ class ChallengeIdForm(FlaskForm):
 
 
 @portal.route('/challenge', methods=['GET', 'POST'])
-def challenge_identity():
-    user = get_user(session.get('invited_user_id', None))
+def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
+    """Challenge the user to verify themselves
+
+    :param user_id: the user_id to verify - invited user or the like
+    :param next_url: destination url on successful challenge completion
+    :param merging_accounts: boolean value, set true IFF on success, the
+        user account will be merged into a new account, say from a weak
+        authenicated WRITE_ONLY invite account
+
+    """
+    if request.method == 'POST':
+        form = ChallengeIdForm(request.form)
+        assert form.user_id.data
+        user = get_user(form.user_id.data)
+    else:
+        user = get_user(user_id)
+        form = ChallengeIdForm(
+            next_url=next_url, user_id=user.id,
+            merging_accounts=merging_accounts)
+
     if not user:
         abort(400, "missing invited user in identity challenge")
 
     errorMessage = ""
-    form = ChallengeIdForm(request.form)
     if not form.validate_on_submit():
-        return render_template('challenge_identity.html', form=form, errorMessage=None)
+        return render_template(
+            'challenge_identity.html', form=form, errorMessage=errorMessage)
 
     first_name = form.first_name.data
     last_name = form.last_name.data
     birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y');
-
 
     score = user.fuzzy_match(first_name=first_name,
                              last_name=last_name,
                              birthdate=birthdate)
     if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         # identity confirmed
-        email = user.email
-        user.mask_email()
-        db.session.commit()
-        del session['invited_user_id']
-        session['invited_verified_user_id'] = user.id
-        return redirect(url_for('user.register', email=email))
+        session['challenge_verified_user_id'] = user.id
+        if form.merging_accounts.data == 'True':
+            user.mask_email()
+            db.session.commit()
+            session['invited_verified_user_id'] = user.id
+        return redirect(form.next_url.data)
 
     else:
         auditable_event("Failed identity challenge tests with values:"
@@ -237,12 +259,12 @@ def challenge_identity():
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
-             errorMessage = "Unable to match identity"
+            errorMessage = "Unable to match identity"
         if form.retry_count.data > 3:
-            del session['invited_user_id']
             abort(404, "User Not Found")
 
-        return render_template('challenge_identity.html', form=form, errorMessage=errorMessage)
+        return render_template(
+            'challenge_identity.html', form=form, errorMessage=errorMessage)
 
 
 @portal.route('/initial-queries', methods=['GET','POST'])

@@ -21,6 +21,7 @@ from .views.auth import auth, capture_next_view_function
 from .views.coredata import coredata_api
 from .views.clinical import clinical_api
 from .views.demographics import demographics_api
+from .views.extend_flask_user import reset_password_view_function
 from .views.fhir import fhir_api
 from .views.filters import filters_blueprint
 from .views.group import group_api
@@ -115,6 +116,7 @@ def configure_extensions(app):
     from flask_user.views import login, register
     user_manager.init_app(
         app,
+        reset_password_view_function=reset_password_view_function,
         register_view_function=capture_next_view_function(register),
         login_view_function=capture_next_view_function(login))
 
