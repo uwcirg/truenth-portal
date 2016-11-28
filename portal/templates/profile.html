@@ -32,7 +32,7 @@
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
 <span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
-<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">Login as this Patient</span>
+<span id="loginAsPatient" class="link"><a href="/login-as/{{user.id}}">Login as this Patient</a></span>
 <!-- shown only in reduced browser size-->
 <div class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -40,7 +40,7 @@
   </button>
   <ul class="dropdown-menu">
     <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">Assess this Patient <em>for Epic 26</em></a></li>
-    <li><a href="javacript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">Login as this Patient</a></li>
+    <li><a href="/login-as/{{user.id}}" id="loginAsPatient">Login as this Patient</a></li>
   </ul>
 </div>
 
@@ -62,7 +62,7 @@
         </div>
       </div>
     </div>
-
+    <!--
     <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -81,6 +81,7 @@
         </div>
       </div>
     </div>
+    -->
 
 
 
