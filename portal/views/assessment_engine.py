@@ -1088,10 +1088,13 @@ def present_assessment(instrument_id):
         description:
           ID of the instrument, eg "epic26", "eq5d"
         required: true
-        type: string
-        enum:
-          - epic26
-          - eq5d
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: csv
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
