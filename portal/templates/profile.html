@@ -181,27 +181,6 @@ $(document).ready(function(){
     indexContent += "</ul>";
     $("#indexContainer").html(indexContent);
 
-
-    // When there's a change, check validation and if good, assembleContent
-    //$('#profileForm').on('validated.bs.validator', function(e) {
-        //e.stopPropagation();
-        //var validator = $(this).data('bs.validator');
-        //if (!validator.hasErrors()) {
-            //assembleContent.demo({{ user.id }},true);
-            //$("#errorMsg").hide()
-        //} else {
-            //$("#errorMsg").fadeIn("slow")
-
-        //};
-    //});
-
-    // Submit the form here
-    //$("#updateProfile").on("click", function(event){
-       // event.preventDefault()
-       // assembleContent.demo({{ user.id }},true);
-       // $("#confirmMsg").fadeIn();
-    //});
-
     //in profile email is validated and updated after ajax call to check unique email 
     $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');
 
