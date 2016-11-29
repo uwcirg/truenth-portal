@@ -32,7 +32,7 @@
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
 <span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
-<span id="loginAsPatient" class="link"><a href="/login-as/{{user.id}}">Login as this Patient</a></span>
+<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">Login as this Patient</span>
 <!-- shown only in reduced browser size-->
 <div class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -40,9 +40,30 @@
   </button>
   <ul class="dropdown-menu">
     <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">Assess this Patient <em>for Epic 26</em></a></li>
-    <li><a href="/login-as/{{user.id}}" id="loginAsPatient">Login as this Patient</a></li>
+    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">Login as this Patient</a></li>
   </ul>
 </div>
+
+<div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="loginAsModalLabel">Login as this Patient</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.9em">
+            <br/>
+            <p class="text-left">This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">OK</a>
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">Cancel</button>
+          </div>
+        </div>
+      </div>
+</div>
+
 
 <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
       <div class="modal-dialog" role="document">
@@ -61,10 +82,7 @@
           </div>
         </div>
       </div>
-    </div>
-
-
-
+</div>
 {% endif %}
 </nav>
 <div id="indexContainer">Index List</div>
