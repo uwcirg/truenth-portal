@@ -25,7 +25,7 @@ from ..models.coredata import Coredata
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
-from ..models.user import current_user, User
+from ..models.user import current_user, get_user, User
 from ..extensions import authomatic, db, oauth
 
 auth = Blueprint('auth', __name__)
@@ -285,16 +285,43 @@ def login(provider_name):
         return response
 
 
+@auth.route('/login-as/<user_id>')
+@roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
+def login_as(user_id):
+    """Provide direct login w/o auth to user account, but only if qualified
+
+    Special individuals may assume the identity of other users, but only
+    if the business rules validate.  For example, a provider may log in
+    as a patient who has a current consent on file for the provider's
+    organization.
+
+    If qualified, the current user's session is destroyed and the requested
+    user is logged in - passing control to 'next_after_login'
+
+    """
+    # said business rules enforced by check_role()
+    current_user().check_role('edit', user_id)
+    auditable_event("assuming identity of user {}".format(user_id),
+                    user_id=current_user().id)
+    logout(prevent_redirect=True)
+    login_user(get_user(user_id))
+    return next_after_login()
+
+
 @auth.route('/logout')
-def logout():
+def logout(prevent_redirect=False):
     """logout view function
 
     Logs user out by requesting the previously granted permission to
     use authenticated resources be deleted from the OAuth server, and
     clearing the browser session.
 
-    Optional parameter timed_out should be set to clarify the logout
-    request is the result of a stale session
+    :param prevent_redirect: set only if calling this function during
+        another process where redirection after logout is not desired
+
+    Optional query string parameter timed_out should be set to clarify the
+    logout request is the result of a stale session
 
     """
     user = current_user()
@@ -321,25 +348,23 @@ def logout():
                 format(ap.provider_id)
             requests.delete(url, headers=headers)
 
-
     def notify_clients(user_id):
         """Inform any client apps of the logout event.
 
         Look for tokens this user obtained, notify the respective clients
         of the logout event and invalidate all outstanding tokens by deletion
-        
+
         """
         if not user_id:
             return
         for token in Token.query.filter_by(user_id=user_id):
             c = Client.query.filter_by(client_id=token.client_id).first()
             c.notify({'event': 'logout', 'user_id': user_id,
-                    'refresh_token': token.refresh_token,
-                    'timed_out': timed_out})
+                      'refresh_token': token.refresh_token,
+                      'timed_out': timed_out})
             # Invalidate the access token by deletion
             db.session.delete(token)
         db.session.commit()
-
 
     if user_id:
         event = 'logout' if not timed_out else 'logout due to timeout'
@@ -349,6 +374,8 @@ def logout():
     logout_user()
     session.clear()
     notify_clients(user_id)
+    if prevent_redirect:
+        return
     return redirect('/')
 
 class InterventionEditForm(FlaskForm):
