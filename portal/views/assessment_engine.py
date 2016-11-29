@@ -1069,9 +1069,9 @@ def assessment_set(patient_id):
     return jsonify(response)
 
 
-@assessment_engine_api.route('/present-assessment/<instrument_id>')
+@assessment_engine_api.route('/present-assessment/<instrument_ids>')
 @oauth.require_oauth()
-def present_assessment(instrument_id):
+def present_assessment(instrument_ids):
     """Request that TrueNTH present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of
@@ -1083,7 +1083,7 @@ def present_assessment(instrument_id):
     produces:
       - text/html
     parameters:
-      - name: instrument_id
+      - name: instrument_ids
         in: path
         description:
           ID of the instrument, eg "epic26", "eq5d"
@@ -1116,14 +1116,21 @@ def present_assessment(instrument_id):
 
     """
     # Todo: replace with proper models
-    instruments = current_app.config['INSTRUMENTS']
+    configured_instruments = current_app.config['INSTRUMENTS']
 
-    if not instrument_id or not instrument_id in instruments:
-        abort(404, "No matching assessment found: %s" % instrument_id)
+    queued_instruments = instrument_ids.split(',')
+
+    if set(queued_instruments) - set(configured_instruments):
+        abort(
+            404,
+            "No matching assessment found: %s" % (
+                ", ".join(set(queued_instruments) - set(configured_instruments))
+            )
+        )
 
     assessment_url = "%s/surveys/new_session?project=%s" % (
         INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        instrument_id
+        ",".join(queued_instruments),
     )
 
     if 'next' in request.args:
