@@ -30,7 +30,7 @@ body {
 #fullSizeBox a[href*="register"] {
   display: none;
 }
-#fullSizeBox a[href*="go"] {
+#fullSizeBox a[href^="/go"] {
   display: none;
 }
 #fullSizeBox a[href*="google"] {
