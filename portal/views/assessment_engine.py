@@ -1069,9 +1069,9 @@ def assessment_set(patient_id):
     return jsonify(response)
 
 
-@assessment_engine_api.route('/present-assessment/<instrument_ids>')
+@assessment_engine_api.route('/present-assessment')
 @oauth.require_oauth()
-def present_assessment(instrument_ids):
+def present_assessment():
     """Request that TrueNTH present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of
@@ -1083,8 +1083,8 @@ def present_assessment(instrument_ids):
     produces:
       - text/html
     parameters:
-      - name: instrument_ids
-        in: path
+      - name: instrument_id
+        in: query
         description:
           ID of the instrument, eg "epic26", "eq5d"
         required: true
@@ -1094,7 +1094,7 @@ def present_assessment(instrument_ids):
           enum:
             - epic26
             - eq5d
-        collectionFormat: csv
+        collectionFormat: multi
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
@@ -1118,7 +1118,7 @@ def present_assessment(instrument_ids):
     # Todo: replace with proper models
     configured_instruments = current_app.config['INSTRUMENTS']
 
-    queued_instruments = instrument_ids.split(',')
+    queued_instruments = request.args.getlist('instrument_id')
 
     if set(queued_instruments) - set(configured_instruments):
         abort(
