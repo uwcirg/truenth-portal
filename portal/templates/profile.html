@@ -71,7 +71,7 @@
 
 
 <br/>
-<form id="profileForm" class="form tnth-form to-validate" role="form">
+<form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
 
 <div class="row" style="position: relative;">
     <div class="col-md-12">
@@ -96,20 +96,8 @@ function goTo(event, id) {
     $("#indexContainer").removeClass("open");
 };
 
+
 $(document).ready(function(){
-
-
-    $("#clinics input[name='organization']").each(function() {
-
-        var parentOrg = $(this).attr("data-parent-id");
-
-        if (parentOrg != "") {
-            if ($(this).is(":checked")) {
-               $("#" + parentOrg + "_consentItem").show();
-            };
-        };
-
-    });
 
     [{
         attachID: "month",
@@ -159,20 +147,16 @@ $(document).ready(function(){
         attachID: "rolesGroup",
         targetField: $("input[name='user_type']")
      }].forEach(function(o) {
-        /*
-        $("#profileForm #" + o.attachID).after('<div>' + '<i id="' + o.attachID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:4px" aria-hidden="true"></i><i id="' + o.attachID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + o.attachID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
-        */
+        /** see main.js **/
         getSaveLoaderDiv("profileForm", o.attachID);
 
         o.targetField.each(function() {
             $(this).attr("save-container-id", o.attachID);
             $(this).on("change", function() {
-                var validator = $("#profileForm").data('bs.validator');
-                if (!validator.hasErrors()) {
-                    assembleContent.demo({{ user.id }},true, $(this));
-                };
+              if (this.validity.valid) {
+                assembleContent.demo({{ user.id }},true, $(this));
+              };
             });
-
         });
     });
 
@@ -199,22 +183,27 @@ $(document).ready(function(){
 
 
     // When there's a change, check validation and if good, assembleContent
-    $('#profileForm').on('validated.bs.validator', function(e) {
-        var validator = $(this).data('bs.validator');
-        if (!validator.hasErrors()) {
-           // assembleContent.demo({{ user.id }},true);
-            $("#errorMsg").hide()
-        } else {
-            $("#errorMsg").fadeIn("slow")
-        }
-    });
+    //$('#profileForm').on('validated.bs.validator', function(e) {
+        //e.stopPropagation();
+        //var validator = $(this).data('bs.validator');
+        //if (!validator.hasErrors()) {
+            //assembleContent.demo({{ user.id }},true);
+            //$("#errorMsg").hide()
+        //} else {
+            //$("#errorMsg").fadeIn("slow")
+
+        //};
+    //});
 
     // Submit the form here
-    $("#updateProfile").on("click", function(event){
-        event.preventDefault()
-        assembleContent.demo({{ user.id }},true);
-        $("#confirmMsg").fadeIn();
-    });
+    //$("#updateProfile").on("click", function(event){
+       // event.preventDefault()
+       // assembleContent.demo({{ user.id }},true);
+       // $("#confirmMsg").fadeIn();
+    //});
+
+    //in profile email is validated and updated after ajax call to check unique email 
+    $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');
 
 });
 

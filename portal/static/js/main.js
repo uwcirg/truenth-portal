@@ -323,6 +323,7 @@ var assembleContent = {
             "given": $("input[name=firstname]").val(),
             "family": $("input[name=lastname]").val()
         };
+
         demoArray["birthDate"] = $("input[name=birthDate]").val();
 
         $.each($("#userOrgs input:checkbox"),function(i,v){
@@ -1092,6 +1093,9 @@ $(document).ready(function() {
                     }).done(function(data) {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
+                            if ($el.attr("update-on-validated") == "true" && $el.attr("user-id")) {
+                                assembleContent.demo($el.attr("user-id"),true, $el);
+                            }
                         } else {
                             $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
                         }
@@ -1107,7 +1111,7 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input and change)
+    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 
