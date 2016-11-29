@@ -646,18 +646,25 @@
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
                 	entries.forEach(function(entry, index) {
-                    //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
-                    var reportLink = '/patients/sessionReport/' + sessionUserId + '/epic26';
-                    sessionListHTML += '<tr title="Click to view report"  ' +
-                                        (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
-                                        [entry['questionnaire']['display'],
-                                         entry['status'],
-                                         String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
-                                            return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
-                                         }).join('') +
-                                         '</tr>';
-                	});
-                	$("#userSessionListTable").append(sessionListHTML);
+                        //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
+                        var reference = entry['questionnaire']['reference'];
+                        var arrRefs = String(reference).split('/');
+                        var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
+                        //console.log(arrRefs)
+                        if (instrumentId) {
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId;
+                            sessionListHTML += '<tr title="Click to view report"  ' +
+                                                (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
+                                                [entry['questionnaire']['display'],
+                                                 entry['status'],
+                                                 String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
+                                                    return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
+                                                 }).join('') +
+                                                 '</tr>';
+                        };
+                    });
+                    	$("#userSessionListTable").append(sessionListHTML);
+                    
                 } else $("#profileSessionListMainContainer").hide();
 
             }).fail(function() {
