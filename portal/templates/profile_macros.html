@@ -713,9 +713,13 @@
 	                	reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
 	                	entries[0]['group']['question'].forEach(function(entry) {
 	                		//console.log(entry['answer'])
+                            //String(q).substr(q.indexOf('.') + 1)
                             var q = entry['text'] ? entry['text'] : '';
+                            var sq = "";
+                            sq = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
+
                             var a = entry['answer'] && entry['answer'][0] && entry['answer'][0]['valueString'] ? entry['answer'][0]['valueString'] : 'undefined';
-	                		reportHTML += '<tr><td>' + String(q).substr(q.indexOf('.') + 1) + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
+	                		reportHTML += '<tr><td>' + sq + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
 	                	});
 	                	$("#userSessionReportDetailTable").append(reportHTML);
 
