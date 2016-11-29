@@ -303,9 +303,9 @@ def login_as(user_id):
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
     auditable_event("assuming identity of user {}".format(user_id),
-                    user=current_user())
+                    user_id=current_user().id)
     logout(prevent_redirect=True)
-    login(user_id)
+    login_user(get_user(user_id))
     return next_after_login()
 
 
