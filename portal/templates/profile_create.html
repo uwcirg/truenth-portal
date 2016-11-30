@@ -32,17 +32,17 @@
                     <br/>
                     <hr class="pc-hr"/>
                     <div class="form-group" id="clinicalGroup">
-                        <label id="clinicalGroupLabel">Clinical Question</label>
-                        <p>Is the prostate cancer only within the prostate?</p>
+                        <label id="clinicalGroupLabel">{{ _("Clinical Question") }}</label>
+                        <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
                         <div class="indent">
                             <div class="radio">
                               <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> Yes
+                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
                               </label>
                             </div>
                             <div class="radio">
                               <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> No (in other parts of body as well)
+                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
                               </label>
                             </div>
                         </div>

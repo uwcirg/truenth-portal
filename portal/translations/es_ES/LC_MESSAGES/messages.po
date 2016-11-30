@@ -188,7 +188,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:143
 #: portal/templates/initial_queries_macros.html:80
 #: portal/templates/profile_macros.html:22
-#: portal/templates/profile_macros.html:1065
+#: portal/templates/profile_macros.html:1058
 #: portal/templates/profile_test.html:63
 msgid "Month"
 msgstr "(translation missing)"
@@ -197,7 +197,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:144
 #: portal/templates/initial_queries_macros.html:81
 #: portal/templates/profile_macros.html:23
-#: portal/templates/profile_macros.html:1066
+#: portal/templates/profile_macros.html:1059
 #: portal/templates/profile_test.html:64
 msgid "January"
 msgstr "(translation missing)"
@@ -206,7 +206,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:145
 #: portal/templates/initial_queries_macros.html:82
 #: portal/templates/profile_macros.html:24
-#: portal/templates/profile_macros.html:1067
+#: portal/templates/profile_macros.html:1060
 #: portal/templates/profile_test.html:65
 msgid "February"
 msgstr "(translation missing)"
@@ -215,7 +215,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:146
 #: portal/templates/initial_queries_macros.html:83
 #: portal/templates/profile_macros.html:25
-#: portal/templates/profile_macros.html:1068
+#: portal/templates/profile_macros.html:1061
 #: portal/templates/profile_test.html:66
 msgid "March"
 msgstr "(translation missing)"
@@ -224,7 +224,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:147
 #: portal/templates/initial_queries_macros.html:84
 #: portal/templates/profile_macros.html:26
-#: portal/templates/profile_macros.html:1069
+#: portal/templates/profile_macros.html:1062
 #: portal/templates/profile_test.html:67
 msgid "April"
 msgstr "(translation missing)"
@@ -233,7 +233,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:148
 #: portal/templates/initial_queries_macros.html:85
 #: portal/templates/profile_macros.html:27
-#: portal/templates/profile_macros.html:1070
+#: portal/templates/profile_macros.html:1063
 #: portal/templates/profile_test.html:68
 msgid "May"
 msgstr "(translation missing)"
@@ -242,7 +242,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:149
 #: portal/templates/initial_queries_macros.html:86
 #: portal/templates/profile_macros.html:28
-#: portal/templates/profile_macros.html:1071
+#: portal/templates/profile_macros.html:1064
 #: portal/templates/profile_test.html:69
 msgid "June"
 msgstr "(translation missing)"
@@ -251,7 +251,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:150
 #: portal/templates/initial_queries_macros.html:87
 #: portal/templates/profile_macros.html:29
-#: portal/templates/profile_macros.html:1072
+#: portal/templates/profile_macros.html:1065
 #: portal/templates/profile_test.html:70
 msgid "July"
 msgstr "(translation missing)"
@@ -260,7 +260,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:151
 #: portal/templates/initial_queries_macros.html:88
 #: portal/templates/profile_macros.html:30
-#: portal/templates/profile_macros.html:1073
+#: portal/templates/profile_macros.html:1066
 #: portal/templates/profile_test.html:71
 msgid "August"
 msgstr "(translation missing)"
@@ -269,7 +269,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:152
 #: portal/templates/initial_queries_macros.html:89
 #: portal/templates/profile_macros.html:31
-#: portal/templates/profile_macros.html:1074
+#: portal/templates/profile_macros.html:1067
 #: portal/templates/profile_test.html:72
 msgid "September"
 msgstr "(translation missing)"
@@ -278,7 +278,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:153
 #: portal/templates/initial_queries_macros.html:90
 #: portal/templates/profile_macros.html:32
-#: portal/templates/profile_macros.html:1075
+#: portal/templates/profile_macros.html:1068
 #: portal/templates/profile_test.html:73
 msgid "October"
 msgstr "(translation missing)"
@@ -287,7 +287,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:154
 #: portal/templates/initial_queries_macros.html:91
 #: portal/templates/profile_macros.html:33
-#: portal/templates/profile_macros.html:1076
+#: portal/templates/profile_macros.html:1069
 #: portal/templates/profile_test.html:74
 msgid "November"
 msgstr "(translation missing)"
@@ -296,7 +296,7 @@ msgstr "(translation missing)"
 #: portal/templates/coredata.html:155
 #: portal/templates/initial_queries_macros.html:92
 #: portal/templates/profile_macros.html:34
-#: portal/templates/profile_macros.html:1077
+#: portal/templates/profile_macros.html:1070
 #: portal/templates/profile_test.html:75
 msgid "December"
 msgstr "(translation missing)"
@@ -511,14 +511,14 @@ msgstr "(translation missing)"
 msgid "Skip This"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:89 portal/templates/profile_macros.html:1013
+#: portal/templates/coredata.html:89 portal/templates/profile_macros.html:1006
 msgid ""
 "Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact\n"
 "    date, please make your best guess."
 msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:92 portal/templates/coredata.html:102
-#: portal/templates/profile_macros.html:1024
+#: portal/templates/profile_macros.html:1017
 msgid "Add a treatment"
 msgstr "(translation missing)"
 
@@ -526,47 +526,47 @@ msgstr "(translation missing)"
 msgid "Your Treatments"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:107 portal/templates/profile_macros.html:1029
+#: portal/templates/coredata.html:107 portal/templates/profile_macros.html:1022
 msgid "Select treatment"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:108 portal/templates/profile_macros.html:1030
+#: portal/templates/coredata.html:108 portal/templates/profile_macros.html:1023
 msgid "Started watchful waiting"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:109 portal/templates/profile_macros.html:1031
+#: portal/templates/coredata.html:109 portal/templates/profile_macros.html:1024
 msgid "Started active surveillance"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:110 portal/templates/profile_macros.html:1032
+#: portal/templates/coredata.html:110 portal/templates/profile_macros.html:1025
 msgid "Radical prostatectomy (nerve-sparing)"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:111 portal/templates/profile_macros.html:1033
+#: portal/templates/coredata.html:111 portal/templates/profile_macros.html:1026
 msgid "Radical prostatectomy (non-nerve-sparing)"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:112 portal/templates/profile_macros.html:1034
+#: portal/templates/coredata.html:112 portal/templates/profile_macros.html:1027
 msgid "External beam radiation therapy"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:113 portal/templates/profile_macros.html:1035
+#: portal/templates/coredata.html:113 portal/templates/profile_macros.html:1028
 msgid "Brachytherapy"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:114 portal/templates/profile_macros.html:1036
+#: portal/templates/coredata.html:114 portal/templates/profile_macros.html:1029
 msgid "Androgen deprivation therapy"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:115 portal/templates/profile_macros.html:1037
+#: portal/templates/coredata.html:115 portal/templates/profile_macros.html:1030
 msgid "None of the above"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:136 portal/templates/profile_macros.html:1058
+#: portal/templates/coredata.html:136 portal/templates/profile_macros.html:1051
 msgid "Date"
 msgstr "(translation missing)"
 
-#: portal/templates/coredata.html:169 portal/templates/profile_macros.html:1091
+#: portal/templates/coredata.html:169 portal/templates/profile_macros.html:1084
 msgid "Add Procedure"
 msgstr "(translation missing)"
 
@@ -694,8 +694,9 @@ msgstr "(translation missing)"
 #: portal/templates/initial_queries_macros.html:137
 #: portal/templates/initial_queries_macros.html:154
 #: portal/templates/initial_queries_macros.html:171
-#: portal/templates/questions.html:34 portal/templates/questions.html:47
-#: portal/templates/questions.html:60 portal/templates/questions_anon.html:29
+#: portal/templates/profile_create.html:40 portal/templates/questions.html:34
+#: portal/templates/questions.html:47 portal/templates/questions.html:60
+#: portal/templates/questions_anon.html:29
 #: portal/templates/questions_anon.html:50
 #: portal/templates/questions_anon.html:71
 msgid "Yes"
@@ -717,6 +718,7 @@ msgid "Have you been diagnosed with prostate cancer?"
 msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:150
+#: portal/templates/profile_create.html:36
 msgid "Is the prostate cancer only within the prostate?"
 msgstr "(translation missing)"
 
@@ -748,7 +750,7 @@ msgstr "(translation missing)"
 #: portal/templates/initial_queries_macros.html:228
 #: portal/templates/layout.html:88 portal/templates/layout.html:102
 #: portal/templates/patients_by_org.html:126 portal/templates/portal.html:61
-#: portal/templates/profile_macros.html:389
+#: portal/templates/profile.html:81 portal/templates/profile_macros.html:389
 msgid "Close"
 msgstr "(translation missing)"
 
@@ -937,6 +939,43 @@ msgstr "(translation missing)"
 msgid "index list"
 msgstr "(translation missing)"
 
+#: portal/templates/profile.html:34 portal/templates/profile.html:42
+msgid "Assess this Patient"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:34 portal/templates/profile.html:42
+msgid "for Epic 26"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:35 portal/templates/profile.html:43
+#: portal/templates/profile.html:52
+msgid "Login as this Patient"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:39
+msgid "Select"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:56
+msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:60
+msgid "OK"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:61
+msgid "Cancel"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:73
+msgid "Assessing Patient for EPIC-26"
+msgstr "(translation missing)"
+
+#: portal/templates/profile.html:77
+msgid "Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient."
+msgstr "(translation missing)"
+
 #: portal/templates/profile.html:88
 msgid "Index List"
 msgstr "(translation missing)"
@@ -945,17 +984,25 @@ msgstr "(translation missing)"
 msgid "Back to Home"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_create.html:11
+#: portal/templates/profile_create.html:19
 msgid "New User"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_create.html:23
+#: portal/templates/profile_create.html:35
+msgid "Clinical Question"
+msgstr "(translation missing)"
+
+#: portal/templates/profile_create.html:45
+msgid "No (in other parts of body as well)"
+msgstr "(translation missing)"
+
+#: portal/templates/profile_create.html:54
 #: portal/templates/profile_macros.html:354
-#: portal/templates/profile_macros.html:949
+#: portal/templates/profile_macros.html:942
 msgid "Clinics"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_create.html:23
+#: portal/templates/profile_create.html:54
 #: portal/templates/profile_macros.html:139
 #: portal/templates/profile_macros.html:168
 #: portal/templates/profile_macros.html:218
@@ -965,7 +1012,7 @@ msgstr "(translation missing)"
 msgid "Optional"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_create.html:26
+#: portal/templates/profile_create.html:57
 #: portal/templates/profile_macros.html:357
 msgid "None of the Above"
 msgstr "(translation missing)"
@@ -1138,83 +1185,84 @@ msgid "Patient Information"
 msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:839
-#: portal/templates/profile_macros.html:885
+#: portal/templates/profile_macros.html:878
 msgid "User Information"
 msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:847
-#: portal/templates/profile_macros.html:897
+#: portal/templates/profile_macros.html:867
+#: portal/templates/profile_macros.html:890
 msgid "Communications"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:918
+#: portal/templates/profile_macros.html:911
 msgid "PRO Assessments"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:933
+#: portal/templates/profile_macros.html:926
 msgid "Clinical Data"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:949
+#: portal/templates/profile_macros.html:942
 msgid "Organization Affiliation"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:959
+#: portal/templates/profile_macros.html:952
 msgid "Patient Detail"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:959
+#: portal/templates/profile_macros.html:952
 msgid "User Detail"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:984
+#: portal/templates/profile_macros.html:977
 msgid "User Roles"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:994
+#: portal/templates/profile_macros.html:987
 msgid "Audit Log"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1013
+#: portal/templates/profile_macros.html:1006
 msgid "Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1017
+#: portal/templates/profile_macros.html:1010
 msgid "Your treatments"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1017
+#: portal/templates/profile_macros.html:1010
 msgid "Treatments"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1119
+#: portal/templates/profile_macros.html:1112
 msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1119
+#: portal/templates/profile_macros.html:1112
 msgid "Or"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1119
+#: portal/templates/profile_macros.html:1112
 #: portal/templates/profile_test.html:111
 msgid "cancel"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1120
+#: portal/templates/profile_macros.html:1113
 msgid "There is a problem with your profile. Please correct it before saving."
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1120
+#: portal/templates/profile_macros.html:1113
 msgid "Make sure all required fields are filled out."
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1122
+#: portal/templates/profile_macros.html:1115
 #: portal/templates/profile_test.html:113
 #: portal/templates/questions_anon.html:91
 msgid "Save"
 msgstr "(translation missing)"
 
-#: portal/templates/profile_macros.html:1123
+#: portal/templates/profile_macros.html:1116
 msgid "Profile changes have been saved"
 msgstr "(translation missing)"
 
@@ -1452,4 +1500,19 @@ msgstr "(translation missing)"
 #: portal/templates/flask_user/user_profile.html:5
 msgid "User profile"
 msgstr "(translation missing)"
+
+#~ msgid "Patient Profile"
+#~ msgstr "(translation missing)"
+
+#~ msgid "User List"
+#~ msgstr "(translation missing)"
+
+#~ msgid "index list"
+#~ msgstr "(translation missing)"
+
+#~ msgid "Index List"
+#~ msgstr "(translation missing)"
+
+#~ msgid "Back to Home"
+#~ msgstr "(translation missing)"
 

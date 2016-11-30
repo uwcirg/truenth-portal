@@ -31,16 +31,16 @@
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
-<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
-<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">Login as this Patient</span>
+<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></span>
+<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">{{ _("Login as this Patient") }}</span>
 <!-- shown only in reduced browser size-->
 <div class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Select <span class="caret"></span>
+    {{ _("Select") }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">Assess this Patient <em>for Epic 26</em></a></li>
-    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">Login as this Patient</a></li>
+    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></a></li>
+    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
   </ul>
 </div>
 
@@ -49,16 +49,16 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="loginAsModalLabel">Login as this Patient</h4>
+            <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
           </div>
           <div class="modal-body" style="font-size:0.9em">
             <br/>
-            <p class="text-left">This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?</p>
+            <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
             <br/>
           </div>
           <div class="modal-footer">
-            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">OK</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">Cancel</button>
+            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
           </div>
         </div>
       </div>
@@ -70,15 +70,15 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
+            <h4 class="modal-title" id="myModalLabel">{{ _("Assessing Patient for EPIC-26") }}</h4>
           </div>
           <div class="modal-body" style="font-size:0.8em">
             <br/>
-            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
+            <p class="text-left">{{ _("Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
             <br/>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
           </div>
         </div>
       </div>
