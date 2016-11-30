@@ -1071,7 +1071,7 @@ def assessment_set(patient_id):
 
 @assessment_engine_api.route('/present-assessment')
 @oauth.require_oauth()
-def present_assessment():
+def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of
@@ -1120,6 +1120,12 @@ def present_assessment():
 
     queued_instruments = request.args.getlist('instrument_id')
 
+    # Hack to allow deprecated API to piggyback
+    # Remove when deprecated_present_assessment() is fully removed
+    if instruments is not None:
+        queued_instruments = instruments
+
+
     if set(queued_instruments) - set(configured_instruments):
         abort(
             404,
@@ -1145,6 +1151,16 @@ def present_assessment():
 
     return redirect(assessment_url, code=303)
 
+@assessment_engine_api.route('/present-assessment/<instrument_id>')
+@oauth.require_oauth()
+def deprecated_present_assessment(instrument_id):
+    current_app.logger.warning(
+        "use of depricated API %s from referer %s",
+        request.url,
+        request.headers.get('Referer'),
+    )
+
+    return present_assessment(instruments=[instrument_id,])
 
 @assessment_engine_api.route('/complete-assessment')
 @oauth.require_oauth()
