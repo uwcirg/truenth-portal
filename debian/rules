@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+
 distclean:
 	rm -Rf build debian/portal/ env
 
@@ -8,12 +10,7 @@ override_dh_virtualenv:
 	cp requirements.txt requirements.backup.txt
 	cat requirements.build.txt requirements.backup.txt > requirements.txt
 
-	dh_virtualenv \
-		--preinstall='pip>=8' \
-		--preinstall='setuptools>=12'# \
-		#--no-test
-		# Enable when dh-virtualenv >= 0.8
-		# --extra-pip-arg='--no-binary=:all:'
+	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 # Remove when dh-virtualenv >= 0.8
 override_dh_builddeb:
