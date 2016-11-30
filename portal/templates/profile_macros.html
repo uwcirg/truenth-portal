@@ -664,7 +664,7 @@
                         };
                     });
                     	$("#userSessionListTable").append(sessionListHTML);
-                    
+
                 } else $("#profileSessionListMainContainer").hide();
 
             }).fail(function() {
@@ -853,27 +853,20 @@
     {% else %}
          {% if person.has_role('patient') %}
             <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <div class="profile-item-container">
+                <div class="col-md-7 col-xs-12">
+                    <div class="profile-item-container side">
                          <h4 id="patientInformationLoc" class="profile-item-title">Patient Information</h4>
                          <br/>
-                         <div class="row">
-                            <div class="col-md-8 col-xs-11">
-                                <div class="indent">
-                                    {{profileName(person)}}
-                                    {{profileBirthDate(person)}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-5 col-xs-11">
-                                <div class="indent">
-                                {{profileEmail(person)}}
-                                {{profileLocale(person)}}
-                                </div>
-                            </div>
-                        </div>
+                         {{profileName(person)}}
+                         {{profileBirthDate(person)}}
+                    </div>
+                </div>
+                <div class="col-md-5 col-xs-12">
+                    <div class="profile-item-container side">
+                        <h4 id="communicationLoc" class="profile-item-title">Communications</h4>
                         <br/>
+                        {{profileEmail(person)}}
+                        {{profileLocale(person)}}
                     </div>
                 </div>
             </div>

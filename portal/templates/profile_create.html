@@ -3,6 +3,14 @@
 {% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 <br/>
+<style>
+.pc-hr {
+    border-top: 1px solid #ddd;
+}
+#clinicalGroupLabel {
+    margin-bottom: 1em;
+}
+</style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row" style="position: relative;">
@@ -12,13 +20,36 @@
             <hr/>
             <br/>
             <div class="profile-item-container create-account-container">
-
-                    {{profileName(False)}}
-                    {{profileBirthDate(False)}}
-                    <br/>
+                    <div class="row">
+                        <div class="col-md-9 col-xs-12">
+                            {{profileName(False)}}
+                            {{profileBirthDate(False)}}
+                            <br/>
+                        </div>
+                    </div>
                     {{profileEmail(False)}}
                     {{profilePhone(False)}}
                     <br/>
+                    <hr class="pc-hr"/>
+                    <div class="form-group" id="clinicalGroup">
+                        <label id="clinicalGroupLabel">Clinical Question</label>
+                        <p>Is the prostate cancer only within the prostate?</p>
+                        <div class="indent">
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> Yes
+                              </label>
+                            </div>
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> No (in other parts of body as well)
+                              </label>
+                            </div>
+                        </div>
+                         <div class="help-block with-errors"></div>
+                     </div>
+                     <br/>
+                     <hr class="pc-hr"/>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>Clinics <span class="text-muted smaller-text">(Optional)</span></label>
                         <div class="indent">
@@ -32,6 +63,7 @@
                         setTimeout('$("#noOrgs").click();', 0);
 
                     });</script>
+                    <br/>
                     {{profileSaveBtn()}}
             </div>
             <br/>
@@ -76,6 +108,8 @@ $(document).ready(function(){
         });
     });
 
+    ///api/patient/{patient_id}/clinical/pca_localized
+
     //for each org send off ajax to set consent
     function setConsents(userId) {
         var orgs = {};
@@ -84,12 +118,19 @@ $(document).ready(function(){
                 var parentOrg = $(this).attr("data-parent-id");
                 if (!orgs[parentOrg]) {
                     orgs[parentOrg] = true;
-                    console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
+                    //console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
                     //send off ajax for this
-                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}));
+                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}), true);
                 };
             };
         });
+    };
+
+    function setClinical(userId) {
+        var val = "unknown";
+        if ($("#pca_localized_yes").is(":checked")) val = "true";
+        else if ($("#pca_localized_no").is(":checked")) val = "false";
+        _get('/api/patient/' + userId + '/clinical/pca_localized', 'POST', JSON.stringify({value: val}), true);
     };
 
 
@@ -110,25 +151,43 @@ $(document).ready(function(){
         return orgArray;
     };
 
+    function setHelpText(elementId, message, hasError) {
+
+        var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
+
+        if (hasError) {
+            $("#" + elementId + " .help-block").text(message).css("color", WARNING_COLOR);
+
+        } else {
+            $("#" + elementId + " .help-block").text("").css("color", NORMAL_COLOR);
+        };
+
+    };
+
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
-            // handle the invalid form...
-            $("#errorMsg").fadeIn("slow");
-            return false;
+                // handle the invalid form...
+                $("#errorMsg").fadeIn("slow");
+                return false;
           } else {
 
                 hasError = false;
 
                 if ($("#current_user_email").val() === $("#email").val()) {
-                    $("#emailGroup .help-block").text("Email is already in use.").css("color", "#a94442");
+                    setHelpText("emailGroup", "Email is already in use.", true);
                 } else {
-                    $("#emailGroup .help-block").text("").css("color", "#777");
+                    setHelpText("emailGroup", "", false);
                 };
 
 
                 if ($("#userOrgs input:checkbox:checked").length == 0) {
-                    $("#userOrgs .help-block").text("You must select an organization").css("color", "#a94442");
-                } else $("#userOrgs .help-block").text("").css("color", "#777");
+                   setHelpText("userOrgs", "An organization must be selected.", true);
+                } else setHelpText("userOrgs", "", false);
+
+                if ($("#clinicalGroup input:radio:checked").length == 0) {
+                    setHelpText("clinicalGroup", "You must select Yes or No.", true);
+                } else setHelpText("clinicalGroup", "", false);
+
 
 
                 $("#createProfileForm .help-block.with-errors").each(function() {
@@ -149,8 +208,7 @@ $(document).ready(function(){
                 $('#serviceErrorMsg').html('').hide();
 
 
-                //sent in something like this for orgs
-                //{ 'organization_id': 9999 }
+                $("#updateProfile").attr("disabled", true);
 
                 _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
 
@@ -193,10 +251,12 @@ $(document).ready(function(){
                         // Both promises resolved
                         //console.log('promises resolved');
                         setConsents(_userId);
+                        setClinical(_userId);
                         $('#confirmMsg').fadeIn();
                         setTimeout("$('#confirmMsg').fadeOut();", 800);
                         setTimeout("_redirect(" + _userId + ");", 1000);
                         //$('#createProfileForm')[0].reset();
+                        $("#updateProfile").attr("disabled", false);
                         clear();
                     })
                     .catch(function(error) {
@@ -204,6 +264,7 @@ $(document).ready(function(){
                         console.log('error: ' + error);
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                         if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                        $("#updateProfile").attr("disabled", false);
 
                     });
                 }).catch(function(error) {
@@ -211,6 +272,7 @@ $(document).ready(function(){
                     console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                     if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                    $("#updateProfile").attr("disabled", false);
                 });
 
 
@@ -218,7 +280,7 @@ $(document).ready(function(){
           };
     });
 
-    function _get(apiUrl, requestType, requestData) {
+    function _get(apiUrl, requestType, requestData, sync) {
         var errorMessage = '';
         console.log('apiUrl: ' + apiUrl)
         return new Promise (function(resolve, reject) {
@@ -227,6 +289,7 @@ $(document).ready(function(){
                 url: String(apiUrl).replace('//', '/'),
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
+                async: sync ? false : true,
                 data: requestData
             }).done(function(data) {
                 resolve(data);
