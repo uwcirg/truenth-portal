@@ -25,6 +25,7 @@
         <div class="portal-item">
             <h2 class="tnth-subhead">{{ intervention.description }}</h2>
             {{ display.card_html | safe }}
+            <br style="line-height:0.5em"/>
             {% if display.link_url is none %}
             <a class="btn-lg btn-tnth-primary disabled" href="{{ display.link_url }}">
                 {{ display.link_label }}
@@ -65,7 +66,7 @@
 {% endif %}
 
 <div class="img-with-text flush-with-footer full-width">
-    <img src="{{ url_for('static', filename='img/band_man1.jpg') }}" class="img-responsive" />
+    <img src="{{ url_for('static', filename='img/man-with-canoe.jpg') }}" class="img-responsive" />
     <!--
     <div class="text-on-img text-bot">
         <h2 class="tnth-subhead">LOREM IPSUM</h2>
