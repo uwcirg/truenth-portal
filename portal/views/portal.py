@@ -2,13 +2,13 @@
 import requests
 
 from flask import current_app, Blueprint, jsonify, render_template, flash
-from flask import abort, redirect, request, session, url_for
+from flask import abort, make_response, redirect, request, session, url_for
 from flask_login import login_user
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import validators, HiddenField, StringField
+from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
 
 from .auth import next_after_login
@@ -70,7 +70,7 @@ def landing():
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
-  
+
     def validate_shortcut_alias(form, field):
         """Custom validation to confirm an alias match"""
         if len(field.data.strip()):
@@ -516,6 +516,28 @@ def questions_anon():
         login_user(user)
     return render_template('questions_anon.html', user=user,
                            interventions=INTERVENTION)
+
+class SettingsForm(FlaskForm):
+    timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
+                           validators=[validators.Required()])
+
+
+@portal.route('/settings', methods=['GET','POST'])
+@roles_required(ROLE.ADMIN)
+@oauth.require_oauth()
+def settings():
+    """settings panel for admins"""
+    form = SettingsForm(
+        request.form, timeout=request.cookies.get('SS_TIMEOUT', 600))
+    if not form.validate_on_submit():
+        return render_template('settings.html', form=form)
+
+    # make max_age outlast the browser session
+    max_age = 60 * 60 * 24 * 365 * 5
+    response = make_response(render_template('settings.html', form=form))
+    response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
+    return response
+
 
 
 @portal.route('/spec')
