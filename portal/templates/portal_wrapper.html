@@ -110,6 +110,7 @@
                         {% endif %}
                         {% if user and user.has_roles('admin') %}
                         <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
+                        <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                         {% endif %}
                         <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                     </ul>
