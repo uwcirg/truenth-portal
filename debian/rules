@@ -7,8 +7,10 @@ ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "ge" "0.7"; ech
     DH_VIRTUALENV_ARGS += --no-test
 endif
 
+
 distclean:
 	rm -Rf build debian/portal/ env
+
 
 override_dh_virtualenv:
 	# Remove this section and requirements.build.txt when dh-virtualenv >= 0.8
@@ -17,10 +19,18 @@ override_dh_virtualenv:
 
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
-# Remove when dh-virtualenv >= 0.8
+
 override_dh_builddeb:
+# Manually fix VIRTUAL_ENV path for old dh-virtualenv versions (missing fix_activate_path)
+ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "lt" "0.11"; echo $$?),0)
+	sed -i \
+	'/VIRTUAL_ENV=/c\VIRTUAL_ENV=/usr/share/python/portal' \
+	debian/portal/usr/share/python/portal/bin/activate
+endif
+
 	dh_builddeb
 	if [ -f requirements.backup.txt ]; then mv requirements.backup.txt requirements.txt; fi;
+
 
 %:
 	dh $@ --with python-virtualenv
