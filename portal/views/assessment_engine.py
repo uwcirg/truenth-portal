@@ -1069,9 +1069,9 @@ def assessment_set(patient_id):
     return jsonify(response)
 
 
-@assessment_engine_api.route('/present-assessment/<instrument_id>')
+@assessment_engine_api.route('/present-assessment')
 @oauth.require_oauth()
-def present_assessment(instrument_id):
+def present_assessment(instruments=None):
     """Request that TrueNTH present an assessment via the assessment engine
 
     Redirects to the first assessment engine instance that is capable of
@@ -1084,14 +1084,17 @@ def present_assessment(instrument_id):
       - text/html
     parameters:
       - name: instrument_id
-        in: path
+        in: query
         description:
           ID of the instrument, eg "epic26", "eq5d"
         required: true
-        type: string
-        enum:
-          - epic26
-          - eq5d
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
@@ -1113,14 +1116,27 @@ def present_assessment(instrument_id):
 
     """
     # Todo: replace with proper models
-    instruments = current_app.config['INSTRUMENTS']
+    configured_instruments = current_app.config['INSTRUMENTS']
 
-    if not instrument_id or not instrument_id in instruments:
-        abort(404, "No matching assessment found: %s" % instrument_id)
+    queued_instruments = request.args.getlist('instrument_id')
+
+    # Hack to allow deprecated API to piggyback
+    # Remove when deprecated_present_assessment() is fully removed
+    if instruments is not None:
+        queued_instruments = instruments
+
+
+    if set(queued_instruments) - set(configured_instruments):
+        abort(
+            404,
+            "No matching assessment found: %s" % (
+                ", ".join(set(queued_instruments) - set(configured_instruments))
+            )
+        )
 
     assessment_url = "%s/surveys/new_session?project=%s" % (
         INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        instrument_id
+        ",".join(queued_instruments),
     )
 
     if 'next' in request.args:
@@ -1135,6 +1151,16 @@ def present_assessment(instrument_id):
 
     return redirect(assessment_url, code=303)
 
+@assessment_engine_api.route('/present-assessment/<instrument_id>')
+@oauth.require_oauth()
+def deprecated_present_assessment(instrument_id):
+    current_app.logger.warning(
+        "use of depricated API %s from referer %s",
+        request.url,
+        request.headers.get('Referer'),
+    )
+
+    return present_assessment(instruments=[instrument_id,])
 
 @assessment_engine_api.route('/complete-assessment')
 @oauth.require_oauth()
