@@ -2,27 +2,27 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-<h3 class="tnth-headline">More About You</h3>
+<h3 class="tnth-headline">{{ _("More About You") }}</h3>
 
-<p>The TrueNTH system asks these questions in order to give you information that best fits <strong>you</strong>. You may
-    skip any question you prefer not to answer.</p>
+<p>{{ _("The TrueNTH system asks these questions in order to give you information that best fits") }} <strong>you</strong>. {{ _("You may
+    skip any question you prefer not to answer.") }}</p>
 <hr/>
 
 {% if ('race' in require) or ('ethnicity' in require) %}
 <form id="profileForm" class="form tnth-form" role="form" method="POST">
     {% if 'ethnicity' in require %}
     <div class="form-group" id="userEthnicity">
-        <label>Ethnicity <span class="text-muted smaller-text"></span></label>
+        <label>{{ _("Ethnicity") }} <span class="text-muted smaller-text"></span></label>
         <div style="margin-top: -10px">
 
             <div class="radio">
                 <label>
-                    <input type="radio" name="ethnicity" value="2135-2"> Hispanic or Latino
+                    <input type="radio" name="ethnicity" value="2135-2"> {{ _("Hispanic or Latino") }}
                 </label>
             </div>
             <div class="radio">
                 <label>
-                    <input type="radio" name="ethnicity" value="2186-5"> Not Hispanic or Latino
+                    <input type="radio" name="ethnicity" value="2186-5"> {{ _("Not Hispanic or Latino") }}
                 </label>
             </div>
         </div>
@@ -31,37 +31,37 @@
 
     {% if 'race' in require %}
     <div class="form-group" id="userRace">
-        <label>Race <span class="text-muted smaller-text"></span></label>
+        <label>{{ _("Race") }} <span class="text-muted smaller-text"></span></label>
         <div style="margin-top: -10px">
 
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="1002-5"> American Indian or Alaska Native
+                    <input type="checkbox" name="race" value="1002-5"> {{ _("American Indian or Alaska Native") }}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="2028-9"> Asian
+                    <input type="checkbox" name="race" value="2028-9"> {{ _("Asian") }}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="2054-5"> Black or African American
+                    <input type="checkbox" name="race" value="2054-5"> {{ _("Black or African American") }}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="2076-8"> Native Hawaiian or Other Pacific Islander
+                    <input type="checkbox" name="race" value="2076-8"> {{ _("Native Hawaiian or Other Pacific Islander") }}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="2106-3"> White
+                    <input type="checkbox" name="race" value="2106-3"> {{ _("White") }}
                 </label>
             </div>
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" name="race" value="2131-1"> Other
+                    <input type="checkbox" name="race" value="2131-1"> {{ _("Other") }}
                 </label>
             </div>
 
@@ -70,7 +70,7 @@
     {% endif %}
     <br/>
     <button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">Save</button> &nbsp;&nbsp;
-    <div class="btn btn-default continue-btn">Skip This <i class="fa fa-chevron-right"></i></div>
+    <div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
 
 </form>
 {% endif %}
@@ -86,33 +86,33 @@
     #procedureForm { margin-left: 0.5em;}
     .procedureDateLabel { margin-bottom: 0;}
 </style>
-<p>Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
-    date, please make your best guess.<span class="text-muted smaller-text"></span></p>
+<p>{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
+    date, please make your best guess.") }}<span class="text-muted smaller-text"></span></p>
 
-<p>Add a treatment:</p>
+<p>{{ _("Add a treatment") }}:</p>
 <div id="profileProcedureContainer">
     <div class="inner">
-        <p class="text-muted">Your Treatments:</p>
+        <p class="text-muted">{{ _("Your Treatments") }}:</p>
         <div id="userProcedures"></div>
 
     </div>
     <br/>
     <form id="procedureForm" class="form-inline event-element to-validate" data-toggle="validator">
 
-            <p class="text-muted">Add a treatment:</p>
+            <p class="text-muted">{{ _("Add a treatment") }}:</p>
             <div class="row">
                 <div class="col-md-6 col-xs-11">
                     <div class='form-group'>
                         <select class='form-control' id='tnthproc'>
-                            <option value=''>Select treatment...</option>
-                            <option value='373818007'>Started watchful waiting</option>
-                            <option value='424313000'>Started active surveillance</option>
-                            <option value='26294005'>Radical prostatectomy (nerve-sparing)</option>
-                            <option value='26294005-nns'>Radical prostatectomy (non-nerve-sparing)</option>
-                            <option value='33195004'>External beam radiation therapy</option>
-                            <option value='228748004'>Brachytherapy</option>
-                            <option value='707266006'>Androgen deprivation therapy</option>
-                            <option value='999999999'>None of the above</option>
+                            <option value=''>{{ _("Select treatment") }}...</option>
+                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
+                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
+                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
+                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
+                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
+                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
+                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
+                            <option value='999999999'>{{ _("None of the above") }}</option>
                         </select>
                         <div class="help-block with-errors"></div>
                     </div>
@@ -133,26 +133,26 @@
             -->
             <br/>
             <div id="procDateGroup" class="form-group">
-                <label class="procedureDateLabel">Date:</label>
+                <label class="procedureDateLabel">{{ _("Date") }}:</label>
                 <div class="flex">
                     <div>
                         <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="([1-9]|[12][0-9]|3[01])">
                     </div>
                     <div>
                         <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
-                            <option value="">Month...</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="">{{ _("Month") }}...</option>
+                            <option value="01">{{ _("January") }}</option>
+                            <option value="02">{{ _("February") }}</option>
+                            <option value="03">{{ _("March") }}</option>
+                            <option value="04">{{ _("April") }}</option>
+                            <option value="05">{{ _("May") }}</option>
+                            <option value="06">{{ _("June") }}</option>
+                            <option value="07">{{ _("July") }}</option>
+                            <option value="08">{{ _("August") }}</option>
+                            <option value="09">{{ _("September") }}</option>
+                            <option value="10">{{ _("October") }}</option>
+                            <option value="11">{{ _("November") }}</option>
+                            <option value="12">{{ _("December") }}</option>
                         </select>
                     </div>
                     <div>
@@ -166,14 +166,14 @@
                 </div>
             </div>
         <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
-            <i class='fa fa-plus'></i> Add Procedure
+            <i class='fa fa-plus'></i> {{ _("Add Procedure") }}
         </button>
     </form>
     <br/>
 <div>
 <br /><br />
 <!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
-<div class="btn btn-default continue-btn">Skip This <i class="fa fa-chevron-right"></i></div>
+<div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
 
 {% endif %}
 

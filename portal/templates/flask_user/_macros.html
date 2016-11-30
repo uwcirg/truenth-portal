@@ -51,11 +51,11 @@
 {%- endmacro %}
 
 {% macro back_btn(url,text) -%}
-<a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to {{text}}</small></a><br/>
+<a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> {{ _("Back to") }} {{text}}</small></a><br/>
 {%- endmacro %}
 
 {% macro back_link(url,text) -%}
-<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="back to {{text}}"></span></a></div>
+<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="{{ _('back to') }} {{text}}"></span></a></div>
 {%- endmacro %}
 
 
@@ -63,13 +63,13 @@
 <div class="col-sm-3 hidden-xs">
 
     <div class="list-group tnth-nav-list">
-        <a class="list-group-item" href="{{PORTAL}}/">Home</a>
+        <a class="list-group-item" href="{{PORTAL}}/">{{ _("Home") }}</a>
         {% if current_user.roles %}
-        <a class="list-group-item" href="{{PORTAL}}/profile">My TrueNTH Profile</a>
-        <a class="list-group-item" href="{{PORTAL}}/invite">Send an Invite</a>
+        <a class="list-group-item" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a>
+        <a class="list-group-item" href="{{PORTAL}}/invite">{{ _("Send an Invite") }}</a>
         {% endif %}
-        <a class="list-group-item" href="#">TrueBLOG</a>
-        <a class="list-group-item" href="http://www.movember.com">Movember.com</a>
+        <a class="list-group-item" href="#">{{ _("TrueBLOG") }}</a>
+        <a class="list-group-item" href="http://www.movember.com">{{ _("Movember.com") }}</a>
     </div>
     {% if current_user.roles %}
     <br />
@@ -77,10 +77,10 @@
     {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
     <div class="list-group tnth-nav-list">
         {% if current_user.has_roles('admin') %}
-        <a class="list-group-item" href="{{PORTAL}}/admin">User Administration</a>
+        <a class="list-group-item" href="{{PORTAL}}/admin">{{ _("User Administration") }}</a>
         {% endif %}
         {% if current_user.has_roles('application_developer') %}
-        <a class="list-group-item" href="{{PORTAL}}/clients">Client Applications</a>
+        <a class="list-group-item" href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a>
         {% endif %}
     </div>
     {% endif %}
@@ -93,11 +93,11 @@
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
         <div class="col-xs-6 col-lg-6 footer-container">
-            <p><small><a href="{{PORTAL}}/about">About</a> | <a href="{{PORTAL}}/contact">Contact</a> | <a href="{{PORTAL}}/legal">Legal</a></small></p>
+            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/legal">{{ _("Legal") }}</a></small></p>
         </div>
         <div class="col-xs-6 col-lg-6 footer-container">
             <div class="pull-right">
-                <a href="http://us.movember.com" title="Movember"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
+                <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
             </div>
         </div>
     </div>

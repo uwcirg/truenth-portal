@@ -73,19 +73,19 @@
         <form  action="/go" method="post">
             <section class="main">
                 <div>
-                    <h4>Do you have an Access Code?</h4>
+                    <h4>{{ _("Do you have an Access Code?") }}</h4>
                 </div>
                 <div class="row">
                     <div class="col-md-12 col-xs-12">
                     {{ render_field(form.shortcut_alias, label="Enter Access Code", tabindex=10) }}
-                     <button type="submit" class="access-button disabled" disabled id="nextLink">Next</button>
+                     <button type="submit" class="access-button disabled" disabled id="nextLink">{{ _("Next") }}</button>
                     </div>
                 </div>
                 <br/><br/>
                 <div>
-                    <h4>I do not have an Access Code</h4>
-                    <p>Continue registration without an Access Code</p>
-                    <a href="/user/register" role="button" class="access-button" id="registerLink">Register</a>
+                    <h4>{{ _("I do not have an Access Code") }}</h4>
+                    <p>{{ _("Continue registration without an Access Code") }}</p>
+                    <a href="/user/register" role="button" class="access-button" id="registerLink">{{ _("Register") }}</a>
                 </div>
             </section>
           {{ form.csrf_token }}

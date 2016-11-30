@@ -1,19 +1,19 @@
 {% macro tou(terms) -%}
     <div id="topTerms">
-        <h4 class="tnth-headline">Terms of Use</h4>
+        <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
         <hr/>
         <br/>
-        <p>Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools:</p>
+        <p>{{ _("Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools") }}:</p>
         <div class="well">
             <div id="termsText">
               {{ terms|safe if terms}}
             </div>
             <div id="termsExpand" class="tnth-hide">
-              <a href=""><i class="fa fa-plus"></i> View TrueNTH Terms</a>
+              <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div>
               <label id="agreeLabel" data-agree="false">
-                <i class="fa fa-square-o fa-lg"></i> <span>Check here to agree to these terms</span>
+                <i class="fa fa-square-o fa-lg"></i> <span>{{ _("Check here to agree to these terms") }}</span>
               </label>
             </div>
             <br/>
@@ -25,13 +25,13 @@
     <div class="row" id="nameGroup">
         <div class="col-xs-6">
           <div class="form-group float-input-label">
-            <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="First Name" type="text" required="required" data-error="First name is required"  />
+            <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}"  />
             <div class="help-block with-errors"></div>
           </div>
         </div>
         <div class="col-xs-6">
           <div class="form-group float-input-label">
-            <input class="form-control float-text init-queries-field" id="lastname" name="lastname" placeholder="Last Name" type="text" required="required" data-error="Last name is required" />
+            <input class="form-control float-text init-queries-field" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" />
             <div class="help-block with-errors"></div>
           </div>
         </div>
@@ -50,12 +50,12 @@
       <div class="form-group" id="rolesGroup">
           <div class="radio">
             <label>
-              <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> I'm a man who is concerned about prostate cancer for myself
+              <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> {{ _("I'm a man who is concerned about prostate cancer for myself") }}
             </label>
           </div>
           <div class="radio">
             <label>
-              <input type="radio" class="init-queries-field" name="user_type" id="role_caregiver" value="partner"> I'm a caregiver, spouse or partner who wants to learn more about prostate cancer
+              <input type="radio" class="init-queries-field" name="user_type" id="role_caregiver" value="partner"> {{ _("I'm a caregiver, spouse or partner who wants to learn more about prostate cancer") }}
             </label>
           </div>
       </div>
@@ -67,29 +67,29 @@
   {% macro dobGroup() -%}
       <div class="tnth-hide" id="bdGroup">
           <hr />
-          <p>When is your birthday?</p>
+          <p>{{ _("When is your birthday?") }}</p>
           <input type="hidden" name="birthDate" id="birthday" value="">
           <div class="form-group">
-            <label>Birth Date</label>
+            <label>{{ _("Birth Date") }}</label>
             <div class="row">
               <div class="col-xs-4">
                 <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
               </div>
               <div class="col-xs-4">
                 <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-birthday="true" required>
-                  <option value="">Month...</option>
-                  <option value="01">January</option>
-                  <option value="02">February</option>
-                  <option value="03">March</option>
-                  <option value="04">April</option>
-                  <option value="05">May</option>
-                  <option value="06">June</option>
-                  <option value="07">July</option>
-                  <option value="08">August</option>
-                  <option value="09">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
+                  <option value="">{{ _("Month") }}...</option>
+                  <option value="01">{{ _("January") }}</option>
+                  <option value="02">{{ _("February") }}</option>
+                  <option value="03">{{ _("March") }}</option>
+                  <option value="04">{{ _("April") }}</option>
+                  <option value="05">{{ _("May") }}</option>
+                  <option value="06">{{ _("June") }}</option>
+                  <option value="07">{{ _("July") }}</option>
+                  <option value="08">{{ _("August") }}</option>
+                  <option value="09">{{ _("September") }}</option>
+                  <option value="10">{{ _("October") }}</option>
+                  <option value="11">{{ _("November") }}</option>
+                  <option value="12">{{ _("December") }}</option>
                 </select>
               </div>
               <div class="col-xs-4">
@@ -113,16 +113,16 @@
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
-          <p>Have you had a prostate cancer biopsy?</p>
+          <p>{{ _("Have you had a prostate cancer biopsy?") }}</p>
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_no" value="false"> No
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_no" value="false"> {{ _("No") }}
               </label>
             </div>
           </div>
@@ -130,16 +130,16 @@
 
         <div id="patDiag" data-topic="pca_diag" class="tnth-hide pat-q">
           <br />
-          <p>Have you been diagnosed with prostate cancer?</p>
+          <p>{{ _("Have you been diagnosed with prostate cancer?") }}</p>
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_yes" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_no" value="false"> No
+                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_no" value="false"> {{ _("No") }}
               </label>
             </div>
           </div>
@@ -147,16 +147,16 @@
 
         <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
           <br />
-          <p>Is the prostate cancer only within the prostate?</p>
+          <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_yes" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> No (the cancer is in other parts of my body, too)
+                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (the cancer is in other parts of my body, too)") }}
               </label>
             </div>
           </div>
@@ -164,16 +164,16 @@
 
         <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
           <br />
-          <p>Have you begun prostate cancer treatment?</p>
+          <p>{{ _("Have you begun prostate cancer treatment?") }}</p>
           <div class="form-group">
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> Yes
+                <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> No
+                <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> {{ _("No") }}
               </label>
             </div>
           </div>
@@ -185,14 +185,14 @@
   {% macro clinic(consent_agreements) -%}
     <div id="clinics" class="tnth-hide">
       <hr />
-      <h3 class="tnth-headline">Your Clinic</h3>
+      <h3 class="tnth-headline">{{ _("Your Clinic") }}</h3>
 
-      <p>Where are you receiving your care?</p>
+      <p>{{ _("Where are you receiving your care?") }}</p>
 
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
           <div id="fillOrgs"></div>
-          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">I'm not receiving care at any of the above clinics</label></div>
+          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("I'm not receiving care at any of the above clinics") }}</label></div>
         </div>
       </div>
       {{consent(consent_agreements)}}
@@ -217,7 +217,7 @@
                       <div class="modal-content">
                         <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">Sharing Your Data</h4>
+                          <h4 class="modal-title">{{ _("Sharing Your Data") }}</h4>
                         </div>
                         <div class="modal-body">
                           <br/>
@@ -225,7 +225,7 @@
                           <br/>
                         </div>
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
                         </div>
                       </div>
                     </div>

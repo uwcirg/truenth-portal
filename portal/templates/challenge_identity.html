@@ -9,13 +9,13 @@
         .title { color: #6b7571;}
         .error-message { margin-left: 0; display: none;}
     </style>
-    <h4 class="tnth-headline">Identity Verification</h4>
+    <h4 class="tnth-headline">{{ _("Identity Verification") }}</h4>
 
     <hr/>
 
     <br/>
 
-    <p class="profile-item-title">To ensure your personal details are not shared with others, please enter the following data for account confirmation.</p>
+    <p class="profile-item-title">{{ _("To ensure your personal details are not shared with others, please enter the following data for account confirmation.") }}</p>
 
     <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate">
 
@@ -24,12 +24,12 @@
          <input type="hidden" id="birthdate" name="birthdate" value="{{form.birthdate.data if form.birthdate.data}}" />
 
         <div id="identityVerificationContainer">
-             <p class="title">Name</p>
+             <p class="title">{{ _("Name") }}</p>
              <hr class="hr"/>
             <div class="row">
                 <div class="col-md-5 col-xs-10">
                     <div class="form-group float-input-label">
-                        <input required="required" data-error="First name is required" class="form-control float-text" id="first_name" name="first_name" placeholder="First Name" value="{{form.first_name.data if form.first_name.data}}" type="text">
+                        <input required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="first_name" name="first_name" placeholder="{{ _('First Name') }}" value="{{form.first_name.data if form.first_name.data}}" type="text">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
@@ -37,44 +37,44 @@
             <div class="row">
                 <div class="col-md-5 col-xs-10">
                     <div class="form-group float-input-label">
-                        <input required="required" data-error="Last name is required" class="form-control float-text" id="last_name" name="last_name" placeholder="Last Name" value="{{form.last_name.data if form.last_name.data}}" type="text">
+                        <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="last_name" name="last_name" placeholder="{{ _('Last Name') }}" value="{{form.last_name.data if form.last_name.data}}" type="text">
                         <div class="help-block with-errors"></div>
                     </div>
                 </div>
             </div>
             <br/>
-            <p class="title">Birth Date</p>
+            <p class="title">{{ _("Birth Date") }}</p>
             <hr class="hr"/>
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-5 col-xs-10">
-                         <label class="label">Day</label>
+                         <label class="label">{{ _("Day") }}</label>
                         <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="\d{2}">
                     </div>
                 </div>
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
-                        <label class="label">Month</label>
+                        <label class="label">{{ _("Month") }}</label>
                         <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required="">
-                            <option value="">Month...</option>
-                            <option value="01">January</option>
-                            <option value="02">February</option>
-                            <option value="03">March</option>
-                            <option value="04">April</option>
-                            <option value="05">May</option>
-                            <option value="06">June</option>
-                            <option value="07">July</option>
-                            <option value="08">August</option>
-                            <option value="09">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
+                            <option value="">{{ _("Month") }}...</option>
+                            <option value="01">{{ _("January") }}</option>
+                            <option value="02">{{ _("February") }}</option>
+                            <option value="03">{{ _("March") }}</option>
+                            <option value="04">{{ _("April") }}</option>
+                            <option value="05">{{ _("May") }}</option>
+                            <option value="06">{{ _("June") }}</option>
+                            <option value="07">{{ _("July") }}</option>
+                            <option value="08">{{ _("August") }}</option>
+                            <option value="09">{{ _("September") }}</option>
+                            <option value="10">{{ _("October") }}</option>
+                            <option value="11">{{ _("November") }}</option>
+                            <option value="12">{{ _("December") }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
-                        <label class="label">Year</label>
+                        <label class="label">{{ _("Year") }}</label>
                         <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                 </div>
             </div>
             <hr/>
-            <button type="submit" class="btn btn-tnth-primary">Confirm Identity</button>
+            <button type="submit" class="btn btn-tnth-primary">{{ _("Confirm Identity") }}</button>
             <br/><br/>
             <div class="error-message text-muted bg-danger" {%if errorMessage %} style="display:block"{% endif%}>{{errorMessage}}</div>
         </div>

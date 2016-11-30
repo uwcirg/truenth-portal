@@ -88,38 +88,38 @@
                 <div class="tnth-btn-group">
                     {% if user %}
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
-                        Welcome{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                        {{ _("Welcome") }}{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
                         {% if config.DEBUG_TIMEOUTS %} ({{ expires_in }} seconds remaining) {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                         {% if enable_links %}
-                        &nbsp;&nbsp; MENU <i class="fa fa-bars"></i>
+                        &nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>
                         {% endif %}
                     </button>
                     {% if enable_links %}
                     <ul class="tnth-dropdown-menu">
-                        <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
+                        <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
                         {% if user and not user.has_roles('write_only') %}
-                        <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
+                        <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                         {% endif %}
-                        <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+                        <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                         {% if user and user.has_roles('application_developer') %}
-                        <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                        <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                         {% endif %}
                         {% if user and user.has_roles('provider') %}
-                        <li><a href="{{PORTAL}}/patients/">Patients</a></li>
+                        <li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>
                         {% endif %}
                         {% if user and user.has_roles('admin') %}
-                        <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                        <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
                         {% endif %}
-                        <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
+                        <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                     </ul>
                     {% endif %}
                     {% elif login_url %}
                     <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
-                        Welcome
+                        {{ _("Welcome") }}
                     </button>
                     <ul class="tnth-dropdown-menu" role="menu">
-                        <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
+                        <li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>
                     </ul>
                     {% endif %}
                 </div>
@@ -129,9 +129,9 @@
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">MENU <img src="{{movember_profile}}" width="45" height="45" /></div>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">{{ _("MENU") }} <img src="{{movember_profile}}" width="45" height="45" /></div>
                 {% if enable_links %}
-                    <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home">
+                    <a id="tnthLogoXs" href="{{PORTAL}}" title="{{ _('Return to TrueNTH home') }}">
                 {% endif %}
                 <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" />
                 {% if enable_links %}</a>{% endif %}
@@ -143,21 +143,21 @@
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
                     {% if login_url %}
-                    <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
+                    <li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>
                     {% endif %}
-                    <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
+                    <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
                     {% if user %}
-                    <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
+                    <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                     {% endif %}
-                    <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+                    <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_roles('application_developer') %}
-                    <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                    <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                     {% endif %}
                     {% if user and user.has_roles('admin') %}
-                    <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                    <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
                     {% endif %}
                     {% if user %}
-                    <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
+                    <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -168,9 +168,9 @@
 <div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
-      <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">Your session is about to expire</h4></div>
-      <div class="modal-body">Your session will expire in approximately <span id="remaining-time"></span> seconds due to inactivity.</div>
-      <div class="modal-footer"><button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">Stay Logged In</button></div>
+      <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">{{ _("Your session is about to expire") }}</h4></div>
+      <div class="modal-body">{{ _("Your session will expire in approximately") }} <span id="remaining-time"></span> {{ _("seconds due to inactivity.") }}</div>
+      <div class="modal-footer"><button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">{{ _("Stay Logged In") }}</button></div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->

@@ -3,20 +3,20 @@
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, back_btn %}
 
 
-    {{ back_btn('clients','Client Applications') }}
+    {{ back_btn('clients', _('Client Applications')) }}
 
     <h1 class="tnth-headline">TrueNTH OAuth 2.0 Credentials</h1>
 
-    <p><strong>App ID:</strong><br />{{ client.client_id }}</p>
+    <p><strong>{{ _("App ID") }}:</strong><br />{{ client.client_id }}</p>
 
-    <p><strong>App Secret:</strong><br />{{ client.client_secret }}</p>
+    <p><strong>{{ _("App Secret") }}:</strong><br />{{ client.client_secret }}</p>
 
-    <p><strong>Service Token:</strong><br />
+    <p><strong>{{ _("Service Token") }}:</strong><br />
     {% if service_token %}
         {{ service_token.access_token }}
         (expires {{ service_token.expires.strftime('%b %d, %Y') }})
     {% else %}
-        <span class="text-muted">Not yet created</span>
+        <span class="text-muted">{{ _("Not yet created") }}</span>
     {% endif %}
     </p>
 
@@ -57,17 +57,17 @@
 
         <br />
 
-        <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;&nbsp;&nbsp;&nbsp;
-        <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
+        <button type="submit" name="submit" class="btn btn-tnth-primary">{{ _("Update App Settings") }}</button> &nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">{{ _("Delete Application") }}</button> &nbsp;
 
         {# By design, only the application owner can create or update tokens #}
         {% if current_user.id == client.user_id %}
             <button type="submit" name="service_token" value="service_token"
               class="btn btn-default">
                 {% if service_token %}
-                    Update Service Token
+                    {{ _("Update Service Token") }}
                 {% else %}
-                    Create Service Token
+                    {{ _("Create Service Token") }}
                 {% endif %}
             </button>
         {% endif %}
