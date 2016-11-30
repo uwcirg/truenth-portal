@@ -2,15 +2,15 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
 
-  {{ back_btn(PORTAL,'Home') }}
+  {{ back_btn(PORTAL, _('Home')) }}
 
-  <h3 class="tnth-headline">Who We Are</h3>
+  <h3 class="tnth-headline">{{ _("Who We Are") }}</h3>
 
   <p>{{ about_tnth|safe }}</p>
 
-  <div class="thumbnail" style="height: 240px">USA Map</div>
+  <div class="thumbnail" style="height: 240px">{{ _("USA Map") }}</div>
 
-  <h3 class="tnth-headline">What Is Movember Foundation</h3>
+  <h3 class="tnth-headline">{{ _("What Is Movember Foundation") }}</h3>
 
   <p>{{ about_mo|safe }}</p>
 

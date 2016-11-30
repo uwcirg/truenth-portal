@@ -2,12 +2,12 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 
-  <h3 class="tnth-headline">Contact TrueNTH</h3>
+  <h3 class="tnth-headline">{{ _("Contact TrueNTH") }}</h3>
 
-  <p><em>Thank you for contacting us.</em></p>
+  <p><em>{{ _("Thank you for contacting us.") }}</em></p>
 
-  <p>We have sent an email to the team supporting TrueNTH.</p>
+  <p>{{ _("We have sent an email to the team supporting TrueNTH.") }}</p>
   <br/>
-  {{ back_btn('','TrueNTH Home') }}
+  {{ back_btn('',_('TrueNTH Home')) }}
 
 {% endblock %}

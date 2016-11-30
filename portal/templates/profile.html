@@ -11,24 +11,24 @@
 <div class="flex">
 <div class="profile-header">
     {% if providerPerspective == 'true' %}
-        <h4 class="tnth-headline">Patient Profile <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+        <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
     {% elif current_user.has_role('admin') %}
-        <h4 class="tnth-headline">Profile for {{ user.username }}</h4>
+        <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
     {% else %}
-         <h4 class="tnth-headline">My TrueNTH Profile</h4>
+         <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
     {% endif %}
 </div>
 {{profileImage(user)}}
 </div>
 <nav id="indexNavBar">
 {% if providerPerspective == 'true' %}
-{{ back_link('patients','Patients List') }}
+{{ back_link('patients', _('Patients List')) }}
 {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
-{{ back_link('admin','User List') }}
+{{ back_link('admin', _('User List')) }}
 {% else %}
-{{ back_link(PORTAL,'Home') }}
+{{ back_link(PORTAL, _('Home')) }}
 {% endif %}
-<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="index list"></span>
+<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
 <span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">Assess this Patient <em>for Epic 26</em></span>
@@ -85,7 +85,7 @@
 </div>
 {% endif %}
 </nav>
-<div id="indexContainer">Index List</div>
+<div id="indexContainer">{{ _("Index List") }}</div>
 
 
 <br/>
@@ -98,7 +98,7 @@
         {% if providerPerspective == 'true' %}
            <br/><br/> {{ back_btn('patients','Patients List') }}
         {% else %}
-            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> Back to Home</small></a>
+            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
         {% endif %}
     </div>
 </div>

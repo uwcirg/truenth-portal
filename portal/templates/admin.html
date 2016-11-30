@@ -3,9 +3,9 @@
 
 <div class="reduce-font-sizes">
 
-    <h3 class="tnth-headline">User Administration</h3>
+    <h3 class="tnth-headline">{{ _("User Administration") }}</h3>
 
-    <p id="profileIntro">Select any user to view details or make changes.</p>
+    <p id="profileIntro">{{ _("Select any user to view details or make changes.") }}</p>
 
     <div class="admin-table table-responsive smaller-text">
         <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
@@ -23,13 +23,13 @@
                data-show-columns="true">
             <thead>
             <tr>
-                <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">ID</th>
-                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">Username</th>
-                <th data-field="firstname" data-sortable="true">First Name</th>
-                <th data-field="lastname" data-sortable="true">Last Name</th>
-                <th data-field="email" data-sortable="true">Email</th>
-                <th data-field="roles" data-sortable="true">Roles</th>
-                <th class="text-center"><em>Delete</em> User</span></th>
+                <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
+                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("Username") }}</th>
+                <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
+                <th data-field="roles" data-sortable="true">{{ _("Roles") }}</th>
+                <th class="text-center"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">

@@ -1,12 +1,17 @@
-# Translations template for TrueNTH.
+# Spanish (Spain) translations for TrueNTH.
 # Copyright (C) 2016 UW CIRG
 # This file is distributed under the same license as the TrueNTH project.
 #
-#, fuzzy
 msgid ""
 msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2016-11-30 10:44-0800\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2016-11-28 13:27-0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es_ES\n"
+"Language-Team: es_ES <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,96 +20,96 @@ msgstr ""
 # app_text:UCSF Medical Center organization consent URL
 # app_text:IRONMAN organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668&languageId=es_ES"
 
 # app_text:UW Medicine (University of Washington) organization consent URL
 # app_text:Australian Urology Associates organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651&languageId=es_ES"
 
 # app_text:Terms of Use URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603&languageId=es_ES"
 
 # app_text:About TrueNTH URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549&languageId=es_ES"
 
 # app_text:About Movember URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565&languageId=es_ES"
 
 # app_text:Legal URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577"
-msgstr ""
+msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577&languageId=es_ES"
 
 #: portal/templates/about.html:5 portal/templates/contact.html:5
 #: portal/templates/explore.html:10 portal/templates/flask_user/_macros.html:66
 #: portal/templates/legal.html:6 portal/templates/profile.html:29
 msgid "Home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/about.html:7
 msgid "Who We Are"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/about.html:11
 msgid "USA Map"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/about.html:13
 msgid "What Is Movember Foundation"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:26 portal/templates/portal.html:16
 msgid "Welcome to TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:27 portal/templates/portal.html:17
 msgid "Tools for navigating the prostate cancer journey"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:29
 msgid "Report Symptoms"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:30
 msgid "Complete Register"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:34 portal/templates/landing.html:28
 msgid "Explore How This Works"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:34 portal/templates/landing.html:28
 msgid "Explore"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:34 portal/templates/landing.html:28
 msgid "Learn About TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/access.html:34 portal/templates/landing.html:28
 msgid "Learn"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:6 portal/templates/flask_user/_macros.html:80
 #: portal/templates/portal_wrapper.html:112
 #: portal/templates/portal_wrapper.html:157
 msgid "User Administration"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:8
 msgid "Select any user to view details or make changes."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:26 portal/templates/patients_by_org.html:67
 msgid "ID"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:27 portal/templates/patients_by_org.html:68
 msgid "Username"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:28 portal/templates/challenge_identity.html:32
 #: portal/templates/initial_queries_macros.html:28
@@ -112,7 +117,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:93
 #: portal/templates/profile_test.html:41 portal/templates/profile_test.html:42
 msgid "First Name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:29 portal/templates/challenge_identity.html:40
 #: portal/templates/initial_queries_macros.html:34
@@ -120,65 +125,63 @@ msgstr ""
 #: portal/templates/profile_macros.html:99
 #: portal/templates/profile_test.html:48 portal/templates/profile_test.html:49
 msgid "Last Name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:30 portal/templates/contact.html:21
 #: portal/templates/patients_by_org.html:71
 msgid "Email"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:31
 msgid "Roles"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:32
 msgid "Delete"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/admin.html:32
 msgid "User"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:12
 msgid "Identity Verification"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:18
-msgid ""
-"To ensure your personal details are not shared with others, please enter "
-"the following data for account confirmation."
-msgstr ""
+msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:27 portal/templates/contact.html:14
 #: portal/templates/initial_queries.html:34
 #: portal/templates/profile_macros.html:88
 msgid "Name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:32
 #: portal/templates/initial_queries_macros.html:28
 #: portal/templates/profile_macros.html:93
 #: portal/templates/profile_test.html:42
 msgid "First name is required"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:40
 #: portal/templates/initial_queries_macros.html:34
 #: portal/templates/profile_macros.html:99
 #: portal/templates/profile_test.html:49
 msgid "Last name is required"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:46
 #: portal/templates/initial_queries_macros.html:73
 #: portal/templates/profile_macros.html:14
 #: portal/templates/profile_test.html:56
 msgid "Birth Date"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:51
 msgid "Day"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:57
 #: portal/templates/challenge_identity.html:59
@@ -188,7 +191,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1065
 #: portal/templates/profile_test.html:63
 msgid "Month"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:60
 #: portal/templates/coredata.html:144
@@ -197,7 +200,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1066
 #: portal/templates/profile_test.html:64
 msgid "January"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:61
 #: portal/templates/coredata.html:145
@@ -206,7 +209,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1067
 #: portal/templates/profile_test.html:65
 msgid "February"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:62
 #: portal/templates/coredata.html:146
@@ -215,7 +218,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1068
 #: portal/templates/profile_test.html:66
 msgid "March"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:63
 #: portal/templates/coredata.html:147
@@ -224,7 +227,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1069
 #: portal/templates/profile_test.html:67
 msgid "April"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:64
 #: portal/templates/coredata.html:148
@@ -233,7 +236,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1070
 #: portal/templates/profile_test.html:68
 msgid "May"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:65
 #: portal/templates/coredata.html:149
@@ -242,7 +245,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1071
 #: portal/templates/profile_test.html:69
 msgid "June"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:66
 #: portal/templates/coredata.html:150
@@ -251,7 +254,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1072
 #: portal/templates/profile_test.html:70
 msgid "July"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:67
 #: portal/templates/coredata.html:151
@@ -260,7 +263,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1073
 #: portal/templates/profile_test.html:71
 msgid "August"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:68
 #: portal/templates/coredata.html:152
@@ -269,7 +272,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1074
 #: portal/templates/profile_test.html:72
 msgid "September"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:69
 #: portal/templates/coredata.html:153
@@ -278,7 +281,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1075
 #: portal/templates/profile_test.html:73
 msgid "October"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:70
 #: portal/templates/coredata.html:154
@@ -287,7 +290,7 @@ msgstr ""
 #: portal/templates/profile_macros.html:1076
 #: portal/templates/profile_test.html:74
 msgid "November"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:71
 #: portal/templates/coredata.html:155
@@ -296,417 +299,396 @@ msgstr ""
 #: portal/templates/profile_macros.html:1077
 #: portal/templates/profile_test.html:75
 msgid "December"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:77
 msgid "Year"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/challenge_identity.html:88
 msgid "Confirm Identity"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_add.html:5 portal/templates/client_edit.html:6
 #: portal/templates/flask_user/_macros.html:83
 #: portal/templates/portal_wrapper.html:106
 #: portal/templates/portal_wrapper.html:154
 msgid "Client Applications"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_add.html:7
 msgid "Obtain OAuth 2.0 Credentials from TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_add.html:9
-msgid ""
-"To add an application to TrueNTH, one must first register the application"
-" origin or URL.  Multiple origins may be entered, separated by white "
-"space."
-msgstr ""
+msgid "To add an application to TrueNTH, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space."
+msgstr "(translation missing)"
 
 #: portal/templates/client_add.html:18
 msgid "Register App"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:10 portal/templates/clients_list.html:27
 msgid "App ID"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:12
 msgid "App Secret"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:14 portal/templates/clients_list.html:29
 msgid "Service Token"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:19
 msgid "Not yet created"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:60
 msgid "Update App Settings"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:61
 msgid "Delete Application"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:68
 msgid "Update Service Token"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/client_edit.html:70
 msgid "Create Service Token"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:6
 msgid "TrueNTH OAuth 2.0 Client Applications"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:9
 msgid "Create A New TrueNTH Client Application"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:13
 msgid "Current Applications"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:15
 msgid "Your Current Applications"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:27
 msgid "Site URL"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:36
 msgid "Created By"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/clients_list.html:44
 msgid "You have not created an client applications."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:7 portal/templates/contact_sent.html:5
 msgid "Contact TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:8
 msgid "You can use form below or write the TrueNTH team directly at"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:16
 msgid "Please enter your name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:17
 msgid "Your Name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:23
 msgid "Your Email"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:24
 msgid "This is not a valid e-mail address, please double-check."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:29 portal/templates/invite.html:12
 #: portal/templates/invite_sent.html:18
 msgid "Subject"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:30
 msgid "What is this about?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:33
 msgid "Text"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:34
 msgid "Please add a message for TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:34
 msgid "What is on your mind?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact.html:38
 msgid "Send"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact_sent.html:7
 msgid "Thank you for contacting us."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact_sent.html:9
 msgid "We have sent an email to the team supporting TrueNTH."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/contact_sent.html:11
 #: portal/templates/portal_wrapper.html:100
 #: portal/templates/portal_wrapper.html:148
 msgid "TrueNTH Home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:5
 msgid "More About You"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:7
-msgid ""
-"The TrueNTH system asks these questions in order to give you information "
-"that best fits"
-msgstr ""
+msgid "The TrueNTH system asks these questions in order to give you information that best fits"
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:7
 msgid ""
 "You may\n"
 "    skip any question you prefer not to answer."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:15 portal/templates/profile_macros.html:218
 msgid "Ethnicity"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:20 portal/templates/profile_macros.html:222
 msgid "Hispanic or Latino"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:25 portal/templates/profile_macros.html:227
 msgid "Not Hispanic or Latino"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:34 portal/templates/profile_macros.html:168
 msgid "Race"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:39 portal/templates/profile_macros.html:173
 msgid "American Indian or Alaska Native"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:44 portal/templates/profile_macros.html:178
 msgid "Asian"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:49 portal/templates/profile_macros.html:183
 msgid "Black or African American"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:54 portal/templates/profile_macros.html:188
 msgid "Native Hawaiian or Other Pacific Islander"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:59 portal/templates/profile_macros.html:193
 msgid "White"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:64 portal/templates/profile_macros.html:120
 #: portal/templates/profile_macros.html:198
 #: portal/templates/profile_test.html:97
 msgid "Other"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:73 portal/templates/coredata.html:176
 msgid "Skip This"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:89 portal/templates/profile_macros.html:1013
 msgid ""
-"Which of the following prostate cancer treatments have you had, if any? "
-"If you don&#39;t remember the exact\n"
+"Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact\n"
 "    date, please make your best guess."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:92 portal/templates/coredata.html:102
 #: portal/templates/profile_macros.html:1024
 msgid "Add a treatment"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:95
 msgid "Your Treatments"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:107 portal/templates/profile_macros.html:1029
 msgid "Select treatment"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:108 portal/templates/profile_macros.html:1030
 msgid "Started watchful waiting"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:109 portal/templates/profile_macros.html:1031
 msgid "Started active surveillance"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:110 portal/templates/profile_macros.html:1032
 msgid "Radical prostatectomy (nerve-sparing)"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:111 portal/templates/profile_macros.html:1033
 msgid "Radical prostatectomy (non-nerve-sparing)"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:112 portal/templates/profile_macros.html:1034
 msgid "External beam radiation therapy"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:113 portal/templates/profile_macros.html:1035
 msgid "Brachytherapy"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:114 portal/templates/profile_macros.html:1036
 msgid "Androgen deprivation therapy"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:115 portal/templates/profile_macros.html:1037
 msgid "None of the above"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:136 portal/templates/profile_macros.html:1058
 msgid "Date"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/coredata.html:169 portal/templates/profile_macros.html:1091
 msgid "Add Procedure"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/error.html:25
 msgid "Sorry, this webpage may have moved."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/error.html:26
 msgid "Go to TrueNTH Home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/error.html:27
 msgid "If you continue to have problems, use the contact link below."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:12
 msgid "Explore How TrueNTH Works"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:17
-msgid ""
-"TrueNTH provides custom content and guidance to help you navigate life "
-"with prostate cancer."
-msgstr ""
+msgid "TrueNTH provides custom content and guidance to help you navigate life with prostate cancer."
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:18
-msgid ""
-"To start, you simply fill out a few standard health forms, either on your"
-" own or with your clinician. Then, you'll get  personalized graphs and a "
-"library of content tailored to your specific needs."
-msgstr ""
+msgid "To start, you simply fill out a few standard health forms, either on your own or with your clinician. Then, you'll get  personalized graphs and a library of content tailored to your specific needs."
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:19
 msgid "Chart image"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:20
 msgid "See your scores in relation to Men Like Me."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:21
-msgid ""
-"By comparing your scores to men with similar experiences, treatments, and"
-" demographics (like age), you'll have a clearer view of your health"
-msgstr ""
+msgid "By comparing your scores to men with similar experiences, treatments, and demographics (like age), you'll have a clearer view of your health"
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:22
 msgid "Content image"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:23
-msgid ""
-"Read and print out information on how to take care of your symptoms. You "
-"can fill out surveys anytime, to get the most up-to-date information."
-msgstr ""
+msgid "Read and print out information on how to take care of your symptoms. You can fill out surveys anytime, to get the most up-to-date information."
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:32
 msgid "Register Now"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:33
 msgid "or"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/explore.html:34
 msgid "Log In"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:20
 msgid "About You"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:22
-msgid ""
-"Thank You! Now, please finish your registration by telling us about "
-"yourself."
-msgstr ""
+msgid "Thank You! Now, please finish your registration by telling us about yourself."
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:34
 msgid "Your"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:57
 msgid "Great! Click continue to start using TrueNTH."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:59
 #: portal/templates/initial_queries.html:75
 msgid "Continue to TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:73
 msgid "Thank you for registering."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries.html:74
 msgid "Click continue to start using TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:3
 msgid "Terms of Use"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:6
-msgid ""
-"Thanks for signing up for TrueNTH. First, please review the terms of use "
-"to access the TrueNTH tools"
-msgstr ""
+msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:12
 msgid "View TrueNTH Terms"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:16
 msgid "Check here to agree to these terms"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:53
 #: portal/templates/questions.html:14
 msgid "I'm a man who is concerned about prostate cancer for myself"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:58
 #: portal/templates/questions.html:19
-msgid ""
-"I'm a caregiver, spouse or partner who wants to learn more about prostate"
-" cancer"
-msgstr ""
+msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:70
 msgid "When is your birthday?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:116
 #: portal/templates/questions.html:29
 msgid "Have you had a prostate cancer biopsy?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:120
 #: portal/templates/initial_queries_macros.html:137
@@ -717,7 +699,7 @@ msgstr ""
 #: portal/templates/questions_anon.html:50
 #: portal/templates/questions_anon.html:71
 msgid "Yes"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:125
 #: portal/templates/initial_queries_macros.html:142
@@ -727,253 +709,251 @@ msgstr ""
 #: portal/templates/questions_anon.html:50
 #: portal/templates/questions_anon.html:71
 msgid "No"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:133
 #: portal/templates/questions.html:44
 msgid "Have you been diagnosed with prostate cancer?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:150
 msgid "Is the prostate cancer only within the prostate?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:159
 msgid "No (the cancer is in other parts of my body, too)"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:167
 #: portal/templates/questions.html:57
 msgid "Have you begun prostate cancer treatment?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:188
 msgid "Your Clinic"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:190
 msgid "Where are you receiving your care?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:195
 msgid "I'm not receiving care at any of the above clinics"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:220
 msgid "Sharing Your Data"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/initial_queries_macros.html:228
 #: portal/templates/layout.html:88 portal/templates/layout.html:102
 #: portal/templates/patients_by_org.html:126 portal/templates/portal.html:61
 #: portal/templates/profile_macros.html:389
 msgid "Close"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:4 portal/templates/invite_sent.html:6
 msgid "Email Invite"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:5
 msgid "Send a TrueNTH email invite by filling in the form below."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:8
 msgid "To (separate multiple addresses with white space)"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:13
 msgid "Invitation to try TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:16
 msgid "Body"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:17
 msgid "TrueNTH Invitation"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite.html:19
 msgid "Send Invite"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite_sent.html:8
 msgid "Email Invite Sent"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite_sent.html:10
 msgid "To"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite_sent.html:14
 msgid "Sent"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/invite_sent.html:22
 msgid "Message"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/login_or_register.html:159
 #: portal/templates/landing.html:24 portal/templates/shortcut_alias.html:88
 msgid "Register"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/landing.html:24
 msgid "Login"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/layout.html:89 portal/templates/legal.html:8
 #: portal/templates/questions_anon.html:6
 msgid "TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patient_profile.html:6 portal/templates/profile.html:25
 msgid "Patients List"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:7
 msgid "Create a patient record"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:7
 msgid "or select a patient below to view or update details."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:34
 #: portal/templates/portal_wrapper.html:109
 msgid "Patients"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:40
 msgid "Download patient list"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:43
 msgid "Download patient assessment data"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:73
 msgid "Reports"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:76
 msgid "Next Due"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:77
 #: portal/templates/profile_macros.html:586
 msgid "Status"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/patients_by_org.html:118
 #: portal/templates/patients_by_org.html:122
 msgid "Bulk data download not yet implemented"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal.html:44
 msgid "Complete Registration"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal.html:45
-msgid ""
-"Completing your registration will allow you to return here in the future "
-"to see the information you've previously entered."
-msgstr ""
+msgid "Completing your registration will allow you to return here in the future to see the information you've previously entered."
+msgstr "(translation missing)"
 
 #: portal/templates/portal.html:46
 msgid "Registration"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal.html:57
 msgid "This feature is not yet available."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:91
 #: portal/templates/portal_wrapper.html:119
 msgid "Welcome"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:95
 #: portal/templates/portal_wrapper.html:132
 msgid "MENU"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:68
 #: portal/templates/portal_wrapper.html:102
 #: portal/templates/portal_wrapper.html:150 portal/templates/profile.html:18
 #: portal/templates/profile_test.html:18
 msgid "My TrueNTH Profile"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:104
 #: portal/templates/portal_wrapper.html:152
 msgid "About TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:114
 #: portal/templates/portal_wrapper.html:160
 msgid "Log Out of TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:122
 #: portal/templates/portal_wrapper.html:146
 msgid "Log In to TrueNTH"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:134
 msgid "Return to TrueNTH home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:171
 msgid "Your session is about to expire"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:172
 msgid "Your session will expire in approximately"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:172
 msgid "seconds due to inactivity."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/portal_wrapper.html:173
 msgid "Stay Logged In"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:14
 msgid "Patient Profile"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:16 portal/templates/profile_test.html:16
 msgid "Profile for"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:27
 msgid "User List"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:31
 msgid "index list"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:88
 msgid "Index List"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile.html:101
 msgid "Back to Home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_create.html:11
 msgid "New User"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_create.html:23
 #: portal/templates/profile_macros.html:354
 #: portal/templates/profile_macros.html:949
 msgid "Clinics"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_create.html:23
 #: portal/templates/profile_macros.html:139
@@ -983,513 +963,493 @@ msgstr ""
 #: portal/templates/profile_macros.html:354
 #: portal/templates/profile_test.html:107
 msgid "Optional"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_create.html:26
 #: portal/templates/profile_macros.html:357
 msgid "None of the Above"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:68
 msgid "Language"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:70
 msgid "American English"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:70
 #: portal/templates/profile_macros.html:71
 #: portal/templates/profile_macros.html:72
 msgid "Default"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:71
 msgid "Australian English"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:72
 msgid "Spanish"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:108
 #: portal/templates/profile_test.html:85
 msgid "Gender"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:112
 #: portal/templates/profile_test.html:89
 msgid "Male"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:116
 #: portal/templates/profile_test.html:93
 msgid "Female"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:139
 msgid "Indigenous Status"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:245
 msgid "Email Address"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:246
 msgid "Your email"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:256
 msgid "Send Email to Patient"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:258
 msgid "Select Email..."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:262
 msgid "Send Email"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:346
 #: portal/templates/profile_test.html:107
 msgid "Cell"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:381
 msgid "Sharing your data"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:508
 msgid "for"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:509
 #: portal/templates/profile_test.html:174
 msgid "Editable by admins only."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:514
 #: portal/templates/profile_test.html:177
 msgid "Admin"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:519
 #: portal/templates/profile_test.html:182
 msgid "Anon"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:524
 #: portal/templates/profile_test.html:187
 msgid "Application Developer"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:529
 msgid "Content Manager"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:534
 #: portal/templates/profile_test.html:192
 msgid "Partner"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:539
 #: portal/templates/profile_test.html:197
 #: portal/templates/sessionReport.html:11
 msgid "Patient"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:544
 msgid "Provider"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:549
 #: portal/templates/profile_test.html:202
 msgid "Test"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:554
 msgid "Write Only"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:585
 msgid "Session History"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:585
 msgid "click each row to review report"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:586
 msgid "Assessment Name"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:586
 msgid "Last Updated"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:586
 msgid "GMT Time Zone"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:746
 msgid "Clinical Questions"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:747
 msgid "Questions inquired of the patient at registration"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:766
 msgid "no answers provided"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:820
 msgid "Intervention Reports"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:825
 msgid "No Reports Available"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:839
 #: portal/templates/profile_macros.html:859
 msgid "Patient Information"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:839
 #: portal/templates/profile_macros.html:885
 msgid "User Information"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:847
 #: portal/templates/profile_macros.html:897
 msgid "Communications"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:918
 msgid "PRO Assessments"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:933
 msgid "Clinical Data"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:949
 msgid "Organization Affiliation"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:959
 msgid "Patient Detail"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:959
 msgid "User Detail"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:984
 msgid "User Roles"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:994
 msgid "Audit Log"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1013
-msgid ""
-"Which of the following prostate cancer treatments has the patient had, if"
-" any? If you don&#39;t remember the exact date, please make your best "
-"guess."
-msgstr ""
+msgid "Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1017
 msgid "Your treatments"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1017
 msgid "Treatments"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1119
-msgid ""
-"You have updated your profile. Click the Save button to submit your "
-"changes."
-msgstr ""
+msgid "You have updated your profile. Click the Save button to submit your changes."
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1119
 msgid "Or"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1119
 #: portal/templates/profile_test.html:111
 msgid "cancel"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1120
 msgid "There is a problem with your profile. Please correct it before saving."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1120
 msgid "Make sure all required fields are filled out."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1122
 #: portal/templates/profile_test.html:113
 #: portal/templates/questions_anon.html:91
 msgid "Save"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_macros.html:1123
 msgid "Profile changes have been saved"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_test.html:11
 msgid "Saving"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_test.html:102
 msgid "Email address"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/profile_test.html:111
-msgid ""
-"You've updated your profile. Click the Save button to submit your "
-"changes. Or"
-msgstr ""
+msgid "You've updated your profile. Click the Save button to submit your changes. Or"
+msgstr "(translation missing)"
 
 #: portal/templates/profile_test.html:112
-msgid ""
-"Oops, looks like there's a problem with your profile. Please correct it "
-"before saving."
-msgstr ""
+msgid "Oops, looks like there's a problem with your profile. Please correct it before saving."
+msgstr "(translation missing)"
 
 #: portal/templates/profile_test.html:171
 msgid "User Roles for"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:6
 msgid "Explore TrueNTH without registering"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:8
-msgid ""
-"You can tell us a bit about your experience with prostate cancer so we "
-"can personalize this website for you."
-msgstr ""
+msgid "You can tell us a bit about your experience with prostate cancer so we can personalize this website for you."
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:10
 msgid "First, tell us who you are"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:27
 msgid "Thanks, please answer a few questions about your experience"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:71
 msgid "Prostate Cancer Resources"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:72
 msgid "We have resources to help you learn about prostate cancer."
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:73
 msgid "View now"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:78
 msgid "Continue"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions.html:80
 msgid "Skip to general information about prostate cancer"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:9
 msgid "Explore on Your Own"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:10
-msgid ""
-"You can access all TrueNTH content, but we won't be able to personalize "
-"it for you."
-msgstr ""
+msgid "You can access all TrueNTH content, but we won't be able to personalize it for you."
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:16
 msgid "What Are You Looking For?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:20
 msgid "Browse TrueNTH Content"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:27
-msgid ""
-"Would you like to explore treatment decision-making for early stage "
-"prostate cancer?"
-msgstr ""
+msgid "Would you like to explore treatment decision-making for early stage prostate cancer?"
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:30
 #: portal/templates/questions_anon.html:51
 #: portal/templates/questions_anon.html:72
 msgid "Great, we suggest viewing"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:30
 msgid "Decision Support"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:40
 msgid "Which option is best for me?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:48
-msgid ""
-"Have you been treated for prostate cancer and would you like to learn "
-"about taking care of side effects and symptoms at home?"
-msgstr ""
+msgid "Have you been treated for prostate cancer and would you like to learn about taking care of side effects and symptoms at home?"
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:51
 msgid "Self Management"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:61
 msgid "How do I cope with symptoms?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:69
 msgid "Would you like to view some other web information on prostate cancer?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:72
 #: portal/templates/questions_anon.html:80
 msgid "Web Resources"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:81
 msgid "Helpful links about prostate cancer"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:88
 msgid "Tell Us What Else You'd Like to See"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/questions_anon.html:89
-msgid ""
-"We're working hard to provide helpful information to men with prostate "
-"cancer. What would you like to know about that's not on the TrueNTH "
-"website?"
-msgstr ""
+msgid "We're working hard to provide helpful information to men with prostate cancer. What would you like to know about that's not on the TrueNTH website?"
+msgstr "(translation missing)"
 
 #: portal/templates/sessionReport.html:10
 msgid "Assessment Report Detail"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/sessionReport.html:14
 msgid "Back to Patient Profile"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/sessionReport.html:14
 msgid "Back to Truenth Home"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/sessionReport.html:18
 msgid "Unable to load report"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/shortcut_alias.html:76
 msgid "Do you have an Access Code?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/shortcut_alias.html:81
 msgid "Next"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/shortcut_alias.html:86
 msgid "I do not have an Access Code"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/shortcut_alias.html:87
 msgid "Continue registration without an Access Code"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:54
 msgid "Back to"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:58
 msgid "back to"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:69
 msgid "Send an Invite"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:71
 msgid "TrueBLOG"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:72
 msgid "Movember.com"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:96
 msgid "About"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:96
 msgid "Contact"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:96
 msgid "Legal"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/_macros.html:100
 msgid "Movember"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/change_password.html:6
 #: portal/templates/flask_user/user_profile.html:11
 msgid "Change password"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/change_username.html:6
 #: portal/templates/flask_user/user_profile.html:8
 msgid "Change username"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/forgot_password.html:9
 msgid "Forgot Your Password?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/invite.html:5
 msgid "Invite User"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/login.html:52
 #: portal/templates/flask_user/login_or_register.html:104
 #: portal/templates/flask_user/login_or_register.html:152
 msgid "Forgot your Password?"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/login_or_register.html:127
 msgid "Sign in"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/manage_emails.html:5
 msgid "Manage Emails"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/resend_confirm_email.html:5
 msgid "Resend Confirmation Email"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/reset_password.html:5
 msgid "Reset Password"
-msgstr ""
+msgstr "(translation missing)"
 
 #: portal/templates/flask_user/user_profile.html:5
 msgid "User profile"
-msgstr ""
+msgstr "(translation missing)"
 
