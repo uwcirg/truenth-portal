@@ -1,6 +1,11 @@
 #!/usr/bin/make -f
 
+DH_VIRTUALENV_VERSION = $(shell dh_virtualenv --version | cut -d ' ' -f 2)
 DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+
+ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "ge" "0.7"; echo $$?),0)
+    DH_VIRTUALENV_ARGS += --no-test
+endif
 
 distclean:
 	rm -Rf build debian/portal/ env
