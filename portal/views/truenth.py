@@ -168,6 +168,8 @@ def portal_wrapper_html():
         expires = current_app.permanent_session_lifetime.total_seconds()
         return expires
 
+    cookie_timeout = request.cookies.get('SS_TIMEOUT')
+
     disable_links = True if 'disable_links' in request.args else False
     html = render_template(
         'portal_wrapper.html',
@@ -177,7 +179,7 @@ def portal_wrapper_html():
         login_url=login_url,
         branded_logo=branded_logo(),
         enable_links = not disable_links,
-        expires_in=expires_in()
+        expires_in= cookie_timeout if cookie_timeout else expires_in()
     )
     return make_response(html)
 
