@@ -187,10 +187,10 @@ def access_via_token(token):
     # after user proves themselves and logs in
     auditable_event("invited user entered using token, pending "
                     "registration", user_id=user.id)
-    return redirect(
-        url_for('portal.challenge_identity', user_id=user.id,
-                next_url=url_for('user.register', email=user.email),
-                merging_accounts=True))
+    session['challenge.user_id'] = user.id
+    session['challenge.next_url'] = url_for('user.register', email=user.email)
+    session['challenge.merging_accounts'] = True
+    return redirect(url_for('portal.challenge_identity'))
 
 
 class ChallengeIdForm(FlaskForm):
@@ -210,6 +210,10 @@ class ChallengeIdForm(FlaskForm):
 def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
     """Challenge the user to verify themselves
 
+    Can't expose the parameters for security reasons - use the session,
+    namespace each variable i.e. session['challenge.user_id'] unless
+    calling as a function.
+
     :param user_id: the user_id to verify - invited user or the like
     :param next_url: destination url on successful challenge completion
     :param merging_accounts: boolean value, set true IFF on success, the
@@ -217,6 +221,13 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
         authenicated WRITE_ONLY invite account
 
     """
+    if request.method == 'GET':
+        # Pull parameters from session if not defined
+        if not (user_id and next_url):
+            user_id = session['challenge.user_id']
+            next_url = session['challenge.next_url']
+            merging_accounts = session.get('challenge.merging_accounts', False)
+
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
         assert form.user_id.data
