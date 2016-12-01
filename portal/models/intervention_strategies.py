@@ -183,7 +183,7 @@ def update_card_html_on_completion():
             link_label = 'Begin questionnaire'
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
-               instrument_id='epic26',
+               instrument_id=['epic26', 'eproms_add'],
             )
         if authored:
             card_html = """
