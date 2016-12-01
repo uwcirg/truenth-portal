@@ -7,7 +7,7 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..models.role import ROLE
-from ..models.user import current_user, get_user
+from ..models.user import User, current_user, get_user
 from ..models.user_consent import UserConsent
 from ..models.organization import Organization, OrgTree
 from ..models.app_text import app_text, ConsentATMA
@@ -43,7 +43,13 @@ def patients_root():
             UserConsent.deleted_id == None,
             UserConsent.expires > now)).with_entities(UserConsent.user_id)
         consented_users = [u[0] for u in consent_query]
-        org.users = [user for user in org.users if
+        #top org should have all users from its child orgs
+        if org.id == top_level_id:
+            user_query = User.query.filter(User.id.in_(consented_users)).all()
+            org.users = [user for user in user_query if
+                     user.has_role(ROLE.PATIENT) and user.deleted_id is None]
+        else:
+            org.users = [user for user in org.users if
                      user.has_role(ROLE.PATIENT) and
                      user.id in consented_users and
                      user.deleted_id is None]
