@@ -658,7 +658,7 @@
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
                                                  entry['status'],
-                                                 String(entries[0]['authored']).replace(/[tz]/gi, " ")].map(function(o) {
+                                                 String(entry['authored']).replace(/[tz]/gi, " ")].map(function(o) {
                                                     return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
                                                  }).join('') +
                                                  '</tr>';
