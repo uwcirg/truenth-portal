@@ -687,10 +687,11 @@ class User(db.Model, UserMixin):
                 # Admin and service accounts have carte blanche
                 return True
             if role.name == ROLE.PROVIDER:
-                # Providers get carte blanche on members of the
-                # same organization
-                user_orgs = set(self.organizations)
-                others_orgs = set(User.query.get(other_id).organizations)
+                # Providers get carte blanche on members with a signed
+                # consent for the same parent organization
+                user_orgs = set((c.id for c in self.organizations))
+                others_orgs = set(
+                    (c.organization_id for c in other.valid_consents))
                 if user_orgs.intersection(others_orgs):
                     return True
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
