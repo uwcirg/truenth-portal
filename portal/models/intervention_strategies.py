@@ -181,8 +181,10 @@ def update_card_html_on_completion():
             </p>
             """.format(user.display_name)
             link_label = 'Begin questionnaire'
-            link_url = url_for('assessment_engine_api.present_assessment',
-                               instrument_id='epic26')
+            link_url = url_for(
+                'assessment_engine_api.present_assessment',
+               instrument_id='epic26',
+            )
         if authored:
             card_html = """
             <h2 class="tnth-subhead">Thank you,</h2>
