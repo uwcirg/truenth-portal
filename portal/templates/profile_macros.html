@@ -204,7 +204,7 @@
         $(function () {
             //$("#userRace input:checkbox").each(function() {
              //   $(this).on("click", function() {
-                	//console.log("value: " + $(this).val());
+                    //console.log("value: " + $(this).val());
                //     assembleContent.demo({{ person.id if person }},true);
                // });
             //});
@@ -304,19 +304,30 @@
                 var subject = '';
                 var body = '';
                 var return_url = '';
+                var clinicName = (function() {
+                var orgs = $("input[name='organization']:checked");
+                var parentName = "";
+                    if (orgs.length > 0 ) {
+                        orgs.each(function() {
+                            if ($(this).attr("data-parent-name") && !parentName) parentName = $(this).attr("data-parent-name");
+                        });
+                    };
+                   var cn = parentName ? parentName: "your clinic";
+                    return cn;
+                })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
                     {# javascript variables are not available at template
                        rendering time.  insert a placeholder and then
                        replace once the variable is available. #}
                     body = '{{ app_text('profileSendEmail invite email_body',
-                            'url_placeholder') | safe }}';
+                            'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
                     body = body.replace(/url_placeholder/g, return_url);
-                    subject = '{{ app_text('profileSendEmail invite email_subject') }}'
+                    subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                 }
                 else { // reminder
-                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}';
-                    subject = '{{ app_text('profileSendEmail reminder email_subject') }}'
+                    body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
+                    subject = '{{ app_text('profileSendEmail reminder email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                 }
                 if (body != '') {
                     $.ajax ({
@@ -578,66 +589,20 @@
 
 {% macro profileSessionList(person, current_user) -%}
 
-	<div class="form-group profile-section" id="userSessionsListContainer">
+    <div class="form-group profile-section" id="userSessionsListContainer">
 
-		<input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
-		<table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
-		    <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-		    <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small>( {{ _("GMT Time Zone") }} )</small></th></tr>
-		</table>
-	</div>
-    {% if current_user.has_role('provider') %}
-        <!--
-        <a href="javascript:void(0)" id="assessPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#assessmentModal">Assess this patient for the EPIC-26</a>
-        <a href="javascript:void(0)" id="loginAsPatient" class="btn btn-tnth-primary" data-toggle="modal" data-target="#loginAsModal">Log in as this patient</a>
-        -->
-    {% endif %}
-    <!--
-    <div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">Assessing Patient for EPIC-26</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.8em">
-            <br/>
-            <p class="text-left">Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
-          </div>
-        </div>
-      </div>
+        <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
+        <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
+            <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
+            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small>( {{ _("GMT Time Zone") }} )</small></th></tr>
+        </table>
     </div>
-
-    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="loginAsModalLabel">Log in as the Patient</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.8em">
-            <br/>
-            <p class="text-left">Not yet implemented. This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials.</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    -->
-
     <script>
         $(function () {
-    	var sessionListHTML = "";
-    	var sessionUserId = $("#_session_user_id").val();
+        var sessionListHTML = "";
+        var sessionUserId = $("#_session_user_id").val();
 
-    	$.ajax ({
+        $.ajax ({
                 type: "GET",
                 url: '/api/patient/' + sessionUserId + '/assessment',
                 contentType: "application/json; charset=utf-8",
@@ -647,7 +612,7 @@
                 //console.log(data);
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
-                	entries.forEach(function(entry, index) {
+                    entries.forEach(function(entry, index) {
                         //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
                         var reference = entry['questionnaire']['reference'];
                         var arrRefs = String(reference).split('/');
@@ -666,7 +631,7 @@
                                                  '</tr>';
                         };
                     });
-                    	$("#userSessionListTable").append(sessionListHTML);
+                        $("#userSessionListTable").append(sessionListHTML);
 
                 } else $("#profileSessionListMainContainer").hide();
 
@@ -684,7 +649,7 @@
 
         <div id="userSessionReportDetail" cellpadding="2">
             <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
-            	<input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
+                <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
                 <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
                 <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" >
                 </table>
@@ -696,56 +661,56 @@
 
             if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
 
-	    	var sessionListHTML = "";
-	    	var sessionUserId = $("#_report_user_id").val();
+            var sessionListHTML = "";
+            var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
-	    	$.ajax ({
-	                type: "GET",
-	                url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
-	                contentType: "application/json; charset=utf-8",
-	                dataType: 'json'
-	            }).done(function(data) {
-	                //console.log(data)
+            $.ajax ({
+                    type: "GET",
+                    url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json'
+                }).done(function(data) {
+                    //console.log(data)
                     $(".report-error-message").hide();
-	                $("#userSessionReportDetailTable").html('');
-	                if (data.entry && data.entry.length > 0) {
-	                	var entries = data['entry'];
+                    $("#userSessionReportDetailTable").html('');
+                    if (data.entry && data.entry.length > 0) {
+                        var entries = data['entry'];
                         var entry;
                         entries.forEach(function(item) {
                             if (!entry && (item["authored"] == sessionAuthoredDate)) entry = item;
                         });
 
                         if (!entry) entry = entries[0];
-	                	var reportHTML = '<caption><hr/><span class="profile-item-title">' +
+                        var reportHTML = '<caption><hr/><span class="profile-item-title">' +
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         String(entry['authored']).replace(/[tz]/gi, " ") +
                                         ' GMT</span><hr/></caption>';
-	                	reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
-	                	entry['group']['question'].forEach(function(entry) {
-	                		//console.log(entry['answer'])
+                        reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
+                        entry['group']['question'].forEach(function(entry) {
+                            //console.log(entry['answer'])
                             //String(q).substr(q.indexOf('.') + 1)
                             var q = entry['text'] ? entry['text'] : '';
                             var sq = "";
                             sq = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
 
                             var a = entry['answer'] && entry['answer'][0] && entry['answer'][0]['valueString'] ? entry['answer'][0]['valueString'] : 'undefined';
-	                		reportHTML += '<tr><td>' + sq + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
-	                	});
-	                	$("#userSessionReportDetailTable").append(reportHTML);
+                            reportHTML += '<tr><td>' + sq + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
+                        });
+                        $("#userSessionReportDetailTable").append(reportHTML);
 
-	                }
-	                //console.log(data);
+                    }
+                    //console.log(data);
 
-	            }).fail(function(xhr) {
-	                console.log("Problem retrieving session data from server.");
+                }).fail(function(xhr) {
+                    console.log("Problem retrieving session data from server.");
                     $(".report-error-message").show();
                     $(".report-error-message").append("<br/>" + xhr.responseText);
 
-	            });
+                });
 
-	    });
-	    </script>
+        });
+        </script>
 
 {%- endmacro %}
 
@@ -915,14 +880,14 @@
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
-     	<div class="row" id="profileSessionListMainContainer">
+        <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
                      <h4 id="proAssessmentsLoc" class="profile-item-title">{{ _("PRO Assessments") }}</h4>
-					{{profileSessionList(person, current_user)}}
-				</div>
-			</div>
-		</div>
+                    {{profileSessionList(person, current_user)}}
+                </div>
+            </div>
+        </div>
     {% endif %}
 
     {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
