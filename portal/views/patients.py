@@ -81,11 +81,11 @@ def profile_create():
     return render_template("profile_create.html", user = user, consent_agreements=consent_agreements)
 
 
-@patients.route('/sessionReport/<int:user_id>/<instrument_id>')
+@patients.route('/sessionReport/<int:user_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
-def sessionReport(user_id, instrument_id):
+def sessionReport(user_id, instrument_id, authored_date):
     user = get_user(user_id)
-    return render_template("sessionReport.html",user=user, current_user = current_user(), instrument_id=instrument_id)
+    return render_template("sessionReport.html",user=user, current_user = current_user(), instrument_id=instrument_id, authored_date=authored_date)
 
 
 @patients.route('/patient_profile/<int:patient_id>')

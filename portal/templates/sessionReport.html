@@ -4,7 +4,6 @@
 {% from "profile_macros.html" import profileAssessment %}
 
 <br/>
-
 <div  id="userSessionReportDetailHeader" class="tnth-headline report-custom-header gradient">
 	<span class="left">
 	<h4>{{ _("Assessment Report Detail") }}</h4>
@@ -20,7 +19,7 @@
 	<div class="row" style="position: relative;">
 	    <div class="col-md-12">
 	    	
-	       	{{profileAssessment(user, instrument_id)}}
+	       	{{profileAssessment(user, instrument_id, authored_date)}}
 	 
 	        <br />
 	        <!--

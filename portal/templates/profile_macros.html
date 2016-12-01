@@ -636,6 +636,7 @@
         $(function () {
     	var sessionListHTML = "";
     	var sessionUserId = $("#_session_user_id").val();
+
     	$.ajax ({
                 type: "GET",
                 url: '/api/patient/' + sessionUserId + '/assessment',
@@ -651,14 +652,15 @@
                         var reference = entry['questionnaire']['reference'];
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
+                        var authoredDate = String(entry['authored']);
                         //console.log(arrRefs)
                         if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId;
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
                                                  entry['status'],
-                                                 String(entry['authored']).replace(/[tz]/gi, " ")].map(function(o) {
+                                                 authoredDate.replace(/[tz]/gi, " ")].map(function(o) {
                                                     return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
                                                  }).join('') +
                                                  '</tr>';
@@ -678,11 +680,12 @@
 {%- endmacro %}
 
 
-{% macro profileAssessment(person, instrument_id) -%}
+{% macro profileAssessment(person, instrument_id, authored_date) -%}
 
         <div id="userSessionReportDetail" cellpadding="2">
             <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
             	<input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
+                <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
                 <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" >
                 </table>
             <br />
@@ -695,6 +698,7 @@
 
 	    	var sessionListHTML = "";
 	    	var sessionUserId = $("#_report_user_id").val();
+            var sessionAuthoredDate = $("#_report_authored_date").val();
 	    	$.ajax ({
 	                type: "GET",
 	                url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
@@ -706,13 +710,19 @@
 	                $("#userSessionReportDetailTable").html('');
 	                if (data.entry && data.entry.length > 0) {
 	                	var entries = data['entry'];
+                        var entry;
+                        entries.forEach(function(item) {
+                            if (!entry && (item["authored"] == sessionAuthoredDate)) entry = item;
+                        });
+
+                        if (!entry) entry = entries[0];
 	                	var reportHTML = '<caption><hr/><span class="profile-item-title">' +
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
-                                        String(entries[0]['authored']).replace(/[tz]/gi, " ") +
+                                        String(entry['authored']).replace(/[tz]/gi, " ") +
                                         ' GMT</span><hr/></caption>';
 	                	reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
-	                	entries[0]['group']['question'].forEach(function(entry) {
+	                	entry['group']['question'].forEach(function(entry) {
 	                		//console.log(entry['answer'])
                             //String(q).substr(q.indexOf('.') + 1)
                             var q = entry['text'] ? entry['text'] : '';
