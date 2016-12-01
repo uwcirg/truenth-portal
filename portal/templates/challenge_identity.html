@@ -17,7 +17,7 @@
 
     <p class="profile-item-title">{{ _("To ensure your personal details are not shared with others, please enter the following data for account confirmation.") }}</p>
 
-    <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate">
+    <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate" role="form" data-toggle="validator">
 
          {{ form.hidden_tag() }}
 
@@ -45,17 +45,17 @@
             <br/>
             <p class="title">{{ _("Birth Date") }}</p>
             <hr class="hr"/>
-            <div class="form-group">
+            <div class="form-group" id="bdGroup">
                 <div class="row">
                     <div class="col-md-5 col-xs-10">
                          <label class="label">{{ _("Day") }}</label>
-                        <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="\d{2}">
+                        <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" data-birthday="true" required pattern="\d[\d]?">
                     </div>
                 </div>
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
                         <label class="label">{{ _("Month") }}</label>
-                        <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required="">
+                        <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
                             <option value="">{{ _("Month") }}...</option>
                             <option value="01">{{ _("January") }}</option>
                             <option value="02">{{ _("February") }}</option>
@@ -75,12 +75,13 @@
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
                         <label class="label">{{ _("Year") }}</label>
-                        <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
+                        <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" pattern = "\d{4}" required>
                     </div>
                 </div>
                 <div class="row field">
                      <div class="col-md-5 col-xs-10">
                         <div class="help-block with-errors"></div>
+                        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
                      </div>
                 </div>
             </div>
@@ -107,7 +108,6 @@ $(document).ready(function() {
 
     $('#challengeForm').validator().on('submit', function (e) {
           if (!e.isDefaultPrevented()) {
-
                 if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
                     $("#birthdate").val($("#month").val() + "-" + $("#date").val() + "-" + $("#year").val());
                 }
