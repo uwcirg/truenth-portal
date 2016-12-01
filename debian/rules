@@ -21,7 +21,7 @@ override_dh_virtualenv:
 
 
 override_dh_builddeb:
-# Fix references to build environment
+# Manually fix VIRTUAL_ENV path for old dh-virtualenv versions (missing fix_activate_path)
 # Todo: move to more appropriate step
 ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "lt" "0.11"; echo $$?),0)
 	sed \
