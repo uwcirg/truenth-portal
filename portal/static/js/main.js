@@ -625,7 +625,7 @@ var tnthAjax = {
                             if (parentOrg) {
                                 var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
                                 if (agreementUrl && agreementUrl != "") {
-                                    console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
+                                    //console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
                                     self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
                                 };
                             };
@@ -654,40 +654,9 @@ var tnthAjax = {
                                 //$(this).prop("checked", false);
                             //});
                         }
-                    //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-                    //else $("#noOrgs").attr("checked", false);
                     } else {
                         self.deleteConsent(userId, {"org": parentOrg});
                     };
-
-                    //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
-                    // var parentOrg = $(this).attr("data-parent-id");
-                    // var parentName = $(this).attr("data-parent-name")
-                    // if (parentOrg) {
-                    //     if ($(this).prop("checked")) {
-                    //         var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                    //         if (agreementUrl && agreementUrl != "") {
-                    //             //var consented = self.hasConsent(userId, parentOrg);
-                    //             //console.log( consented)
-
-                    //             //if (! consented) {
-                    //                 console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
-                    //                  self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
-                    //             //};
-                    //         };
-                    //         //if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
-                    //             //$("#consentContainer .consent").hide();
-                    //             //if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
-                    //            // else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
-                    //             //$("#" + parentOrg + "_consentItem").show();
-                    //             //console.log($("#" + parentOrg + "_consentItem"))
-                    //         //};
-
-                    //     } else {
-                    //         self.deleteConsent(userId, {"org": parentOrg});
-                    //         //$("#consentContainer .consent").hide();
-                    //     };
-                    // };
 
                     if ($("#createProfileForm").length == 0) {
                         $("#userOrgs").find(".help-block").text("");
@@ -697,8 +666,6 @@ var tnthAjax = {
                     };
 
                 });
-
-                //if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
             });
 
             // $("#consentContainer input.consent-checkbox").each(function() {
