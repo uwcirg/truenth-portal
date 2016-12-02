@@ -281,6 +281,7 @@ class OrgTree(object):
         :raises: ValueError if not found - unexpected
 
         """
+        organization_id = int(organization_id)
         if organization_id not in self.lookup_table:
             raise ValueError("{} not found in OrgTree".format(organization_id))
         return self.lookup_table[organization_id]

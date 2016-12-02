@@ -77,6 +77,6 @@ def get_audit(user_id):
     current_user().check_role(permission='view', other_id=user_id)
     audits = Audit.query.filter(or_(
         Audit.user_id==user_id,
-        Audit.comment.like('%on user {}%'.format(user_id))))
+        Audit.comment.like('% user {}%'.format(user_id))))
     results = [audit.as_fhir() for audit in audits]
     return jsonify(audits=results)

@@ -7,7 +7,7 @@ from ..audit import auditable_event
 from ..extensions import db, oauth, user_manager
 from ..models.audit import Audit
 from ..models.group import Group
-from ..models.organization import Organization
+from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
@@ -107,8 +107,9 @@ def account():
     user = User()
     db.session.add(user)
     db.session.commit()
-    auditable_event("new account {} generated".format(user.id),
+    auditable_event("new account generated for {}".format(user),
                     user_id=current_user().id)
+    needing_consents = set()
     if request.json and 'organizations' in request.json:
         # confirm org exists
         for org in request.json['organizations']:
@@ -118,9 +119,22 @@ def account():
                 abort(400, "Organization {} not found".format(org_id))
             # add org to users account
             user.organizations.append(org)
-        db.session.commit()
-        auditable_event("added {} to {}".format(org, user),
-                        user_id=current_user().id)
+            auditable_event("adding {} to {}".format(org, user),
+                           user_id=current_user().id)
+            needing_consents.add(OrgTree().find(org_id).top_level())
+
+    for org_id in needing_consents:
+        # providers need an implicit consent agreement for edit permission
+        # on this new account
+        audit = Audit(
+            user_id=current_user().id,
+            comment="Adding implicit consent agreement for organization "
+            "{} to {}".format( org_id, user))
+        consent = UserConsent(
+            user_id=user.id, organization_id=org_id, audit=audit,
+            agreement_url='http://dev.null')
+        db.session.add(consent)
+    db.session.commit()
     return jsonify(user_id=user.id)
 
 
