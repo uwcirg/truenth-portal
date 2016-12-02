@@ -54,20 +54,64 @@
                         <label>{{ _("Clinics") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
                         <div class="indent">
                         <div id="fillOrgs"></div>
+                        <!--
                         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
                         </div>
+                        -->
                         <div class="help-block with-errors"></div>
                     </div>
                     <script>$(function () {
-                        tnthAjax.getOrgs({{ user.id }}, true, true);
-                        setTimeout('$("#noOrgs").click();', 0);
+                        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+                        $.ajax ({
+                            type: "GET",
+                            url: '/api/organization'
+                        }).done(function(data) {
+                            var clinicArray = [];
+                            $.each(data.entry,function(i,val){
+                                if (val.partOf) {
+                                    // Child clinic
+                                    var getParent = val.partOf.reference.split("/").pop();
+                                    jQuery.map(clinicArray, function(obj) {
+                                        if(obj.id === parseInt(getParent))
+                                            obj.children.push({"id": val.id, "name": val.name});
+                                    });
+                                } else {
+                                    // Parent clinic
+                                    clinicArray.push({ id: val.id, name: val.name, children: []});
+                                }
+                            });
+                            $.each(clinicArray, function(i,val) {
+                                // Fill in parent clinic
+                                if (val.name != "none of the above" && (val.children.length > 0)) {
+                                    $("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
+                                    //$("#fillOrgs").append("<legend>"+val.name+"</legend>");
+                                }
+                                // Fill in each child clinic
+                                if (val.children.length > 0) {
+                                    $.each(val.children, function(n,subval) {
+                                        var childClinic = '<div class="checkbox"><label>' +
+                                            '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
+                                            subval.id +'" data-parent-id="'+val.id+'"  data-parent-name="' + val.name + '"/>'+
+                                            subval.name +
+                                            '</label></div>';
+                                       $("#fillOrgs").append(childClinic);
+                                    });
+                                }
+
+                            });
+                        }).fail(function() {
+                            console.log("Problem retrieving data from server.");
+                        });
+                        //tnthAjax.getOrgs({{ user.id }}, true, true);
+                        //setTimeout('$("#noOrgs").click();', 0);
 
                     });</script>
                     <br/>
                     {{profileSaveBtn()}}
             </div>
             <br/>
-            <div class="left-indent-bottom">
+            <br/>
+            <div>
                 {{ back_btn('patients','Patients List')}}
                 <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
             </div>
