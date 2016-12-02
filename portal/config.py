@@ -43,7 +43,7 @@ class BaseConfig(object):
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
-    PROVIDER_BULK_DATA_ACCESS = False
+    PROVIDER_BULK_DATA_ACCESS = True
     PATIENTS_BY_PROVIDER_ADDL_FIELDS = [] # 'status', 'reports'
 
     FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
