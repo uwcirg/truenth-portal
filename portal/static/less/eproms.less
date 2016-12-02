@@ -30,6 +30,7 @@
 @sectionTitleColor: #526960;
 @sectionBorderColor: #E0E6E3;
 @rowBackgroundColor: #7d826e;
+@toolTipColor: #575a4d;
 
 
 html {
@@ -1108,26 +1109,26 @@ color: #777
 }
 
 .tooltip > .tooltip-inner{
-    background-color: #979a8d;
-    border: 1px solid #979a8d;
+    background-color: @toolTipColor;
+    border: 1px solid @toolTipColor;
     padding: 0.3em;
     width: 150%;
-    font-size: 0.85em;
+    font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
-    border-top-color: #979a8d;
+    border-top-color: @toolTipColor;
 }
 
 .tooltip.right .tooltip-arrow {
-    border-right-color: #979a8d;
+    border-right-color: @toolTipColor;
 }
 
 .tooltip.bottom .tooltip-arrow {
-    border-bottom-color: #979a8d;
+    border-bottom-color: @toolTipColor;
 }
 
 .tooltip.left .tooltip-arrow {
-    border-left-color: #979a8d;
+    border-left-color: @toolTipColor;
 }
 
 #consentContainer {

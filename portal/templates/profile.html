@@ -32,7 +32,7 @@
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
 <span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></span>
-<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link">{{ _("Login as this Patient") }}</span>
+<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
 <!-- shown only in reduced browser size-->
 <div class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -116,6 +116,7 @@ function goTo(event, id) {
 
 
 $(document).ready(function(){
+    $('#loginAsPatient a').tooltip();
 
     [{
         attachID: "month",

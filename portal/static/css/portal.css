@@ -959,23 +959,23 @@ sub.pointer:hover {
   color: #777;
 }
 .tooltip > .tooltip-inner {
-  background-color: #979a8d;
-  border: 1px solid #979a8d;
+  background-color: #575a4d;
+  border: 1px solid #575a4d;
   padding: 0.3em;
   width: 150%;
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
-  border-top-color: #979a8d;
+  border-top-color: #575a4d;
 }
 .tooltip.right .tooltip-arrow {
-  border-right-color: #979a8d;
+  border-right-color: #575a4d;
 }
 .tooltip.bottom .tooltip-arrow {
-  border-bottom-color: #979a8d;
+  border-bottom-color: #575a4d;
 }
 .tooltip.left .tooltip-arrow {
-  border-left-color: #979a8d;
+  border-left-color: #575a4d;
 }
 #consentContainer .consent {
   display: none;
