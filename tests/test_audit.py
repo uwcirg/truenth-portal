@@ -8,6 +8,7 @@ from portal.models.audit import Audit
 from portal.models.organization import Organization
 from portal.models.reference import Reference
 from portal.models.role import ROLE
+from portal.models.user_consent import UserConsent
 
 log_login_idp = "2016-02-23 09:49:25,733: {} performed: login user via NEW IdP facebook".format(TEST_USER_ID)
 log_login_google = "2016-02-23 09:52:57,806: {} performed: login via google".format(TEST_USER_ID)
@@ -61,8 +62,11 @@ class TestAudit(TestCase):
         provider.organizations.append(org)
         self.test_user.organizations.append(org)
         audit = Audit(user_id=TEST_USER_ID, comment='just test data')
+        consent = UserConsent(user_id=TEST_USER_ID, organization_id=org.id,
+                              audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
             db.session.add(audit)
+            db.session.add(consent)
             db.session.commit()
         provider = db.session.merge(provider)
         self.login(provider.id)
