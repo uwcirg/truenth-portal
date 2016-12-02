@@ -174,7 +174,7 @@ transform(-1000px, 0);*/
 }
 #indexNavBar #backLink span {
   position: relative;
-  top: 1.8px;
+  top: 1.7px;
 }
 
 #indexNavBar .link-xs {
@@ -1122,7 +1122,7 @@ div.input-group.date {
   #indexNavBar span.glyphicon {
     margin-left: -2px;
   }
-  
+
   #indexNavBar span.index-list {
     display: inline-block;
   }

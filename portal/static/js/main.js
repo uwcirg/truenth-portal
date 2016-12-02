@@ -226,10 +226,10 @@ var fillContent = {
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
             $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
-        }
+        };
         if ($('#userOrgs input.clinic:checked').size()) {
             $("#terms").fadeIn();
-        }
+        };
     },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
@@ -566,6 +566,9 @@ var tnthAjax = {
             async: sync? false : true
         }).done(function(data) {
             var clinicArray = [];
+
+            $("#fillOrgs").attr("userId", userId);
+
             $.each(data.entry,function(i,val){
                 if (val.partOf) {
                     // Child clinic
@@ -611,49 +614,48 @@ var tnthAjax = {
             $("#userOrgs input[name='organization']").each(function() {
                 $(this).on("click", function() {
 
+                    var parentOrg = $(this).attr("data-parent-id");
+                    var parentName = $(this).attr("data-parent-name");
+                    var userId = $("#fillOrgs").attr("userId");
+
                     if ($(this).prop("checked")){
                         if ($(this).attr("id") !== "noOrgs") {
                             //console.log("set no org here")
                             $("#noOrgs").prop('checked',false);
+                            if (parentOrg) {
+                                var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                                if (agreementUrl && agreementUrl != "") {
+                                    //console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
+                                    self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
+                                };
+                            };
+
                         } else {
+                            var pOrg, prevOrg;
                             $("#userOrgs input[name='organization']").each(function() {
                                 //console.log("in id: " + $(this).attr("id"))
-                               if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
+                               if ($(this).attr("id") !== "noOrgs") {
+
+                                    //remove consent for this org
+                                    if (prevOrg != $(this).attr("data-parent-id")) {
+                                        pOrg = $(this).attr("data-parent-id");
+                                        if (parseInt(pOrg) > 0) {
+                                           self.deleteConsent(userId, {"org": pOrg});
+                                        };
+                                        prevOrg = pOrg;
+                                    };
+
+                                     $(this).prop('checked',false);
+
+                                };
                             });
+                            //remove all consents
                             //$("#consentContainer input.consent-checkbox").each(function() {
                                 //$(this).prop("checked", false);
                             //});
                         }
-                    //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-                    //else $("#noOrgs").attr("checked", false);
-                    };
-
-
-
-                    var parentOrg = $(this).attr("data-parent-id");
-                    var parentName = $(this).attr("data-parent-name");
-                    //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
-                    if (parentOrg) {
-                        if ($(this).prop("checked")) {
-                            var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                            if (agreementUrl && agreementUrl != "") {
-                                var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
-                                if (! consented) {
-                                    //console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
-                                     self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
-                                };
-                            };
-                            //if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
-                                //$("#consentContainer .consent").hide();
-                                //if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
-                               // else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
-                                //$("#" + parentOrg + "_consentItem").show();
-                                //console.log($("#" + parentOrg + "_consentItem"))
-                            //};
-
-                        } else {
-                            //$("#consentContainer .consent").hide();
-                        };
+                    } else {
+                        self.deleteConsent(userId, {"org": parentOrg});
                     };
 
                     if ($("#createProfileForm").length == 0) {
@@ -664,29 +666,27 @@ var tnthAjax = {
                     };
 
                 });
-
-                //if ($("#aboutForm").length == 0) $("#" + $(this).attr("data-parent-id") + "_consentItem").show();
             });
 
-            $("#consentContainer input.consent-checkbox").each(function() {
-                   $(this).on("click", function() {
-                        var org = $(this).attr("id").split("_")[0];
-                        var agreementUrl = $("#" + org + "_agreement_url").val();
-                        if ($(this).is(":checked")) {
-                            //sent off ajax
-                            var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
-                            if (! consented) {
-                                //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
-                                self.setConsent(userId, {"org": org, "agreementUrl": agreementUrl});
-                            };
-                        } else {
-                            //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
-                            self.deleteConsent(userId, {"org": org});
-                        };
+            // $("#consentContainer input.consent-checkbox").each(function() {
+            //        $(this).on("click", function() {
+            //             var org = $(this).attr("id").split("_")[0];
+            //             var agreementUrl = $("#" + org + "_agreement_url").val();
+            //             if ($(this).is(":checked")) {
+            //                 //sent off ajax
+            //                 var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
+            //                 if (! consented) {
+            //                     //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+            //                     self.setConsent(userId, {"org": org, "agreementUrl": agreementUrl});
+            //                 };
+            //             } else {
+            //                 //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
+            //                 self.deleteConsent(userId, {"org": org});
+            //             };
 
-                   });
+            //        });
 
-             });
+            //  });
 
             tnthAjax.getDemo(userId, noOverride);
             //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures
@@ -696,7 +696,8 @@ var tnthAjax = {
         });
     },
     "getConsent": function(userId, sync) {
-        $.ajax ({
+       if (!userId) return false;
+       $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
             async: (sync ? false : true)
@@ -723,35 +724,66 @@ var tnthAjax = {
     },
     "setConsent": function(userId, params) {
         if (userId && params) {
-            $.ajax ({
-                type: "POST",
-                url: '/api/user/' + userId + '/consent',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                data: JSON.stringify({"organization_id": params["org"], "agreement_url": params["agreementUrl"]})
-            }).done(function(data) {
-                //console.log("consent updated successfully.");
-            }).fail(function(xhr) {
-                //console.log("request to updated consent failed.");
-                //console.log(xhr.responseText)
-            });
+            var consented = this.hasConsent(userId, params["org"]);
+            if (!consented) {
+                $.ajax ({
+                    type: "POST",
+                    url: '/api/user/' + userId + '/consent',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: 'json',
+                    data: JSON.stringify({"organization_id": params["org"], "agreement_url": params["agreementUrl"]})
+                }).done(function(data) {
+                    //console.log("consent updated successfully.");
+                }).fail(function(xhr) {
+                    //console.log("request to updated consent failed.");
+                    //console.log(xhr.responseText)
+                });
+            };
         };
     },
     deleteConsent: function(userId, params) {
         if (userId && params) {
-            $.ajax ({
-                type: "DELETE",
-                url: '/api/user/' + userId + '/consent',
-                contentType: "application/json; charset=utf-8",
-                dataType: 'json',
-                data: JSON.stringify({"organization_id": parseInt(params["org"])})
-            }).done(function(data) {
-               // console.log("consent deleted successfully.");
-            }).fail(function(xhr) {
-                console.log("request to delete consent failed.");
-                //console.log(xhr.responseText)
-            });
+            var consented = this.hasConsent(userId, params["org"]);
+            if (consented) {
+                $.ajax ({
+                    type: "DELETE",
+                    url: '/api/user/' + userId + '/consent',
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    dataType: 'json',
+                    data: JSON.stringify({"organization_id": parseInt(params["org"])})
+                }).done(function(data) {
+                   // console.log("consent deleted successfully.");
+                }).fail(function(xhr) {
+                    //console.log("request to delete consent failed.");
+                    //console.log(xhr.responseText)
+                });
+            };
         };
+    },
+    hasConsent: function(userId, parentOrg) {
+        if (!userId && !parentOrg) return false;
+
+        var isConsented = false;
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+"/consent",
+            async: false
+        }).done(function(data) {
+            if (data.consent_agreements) {
+                var d = data["consent_agreements"];
+                d.forEach(function(item) {
+                    var orgId = item.organization_id;
+                    if (!isConsented && orgId == parentOrg) {
+                        isConsented = true;
+                    };
+                });
+            };
+
+        }).fail(function() {
+            return false;
+         });
+        return isConsented;
     },
     "getDemo": function(userId, noOverride) {
         $.ajax ({
