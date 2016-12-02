@@ -655,7 +655,13 @@ var tnthAjax = {
                             //});
                         }
                     } else {
-                        self.deleteConsent(userId, {"org": parentOrg});
+                        //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
+                        var childOrgs = $("#userOrgs input[name='organization'][data-parent-id ='" + parentOrg + "']");
+                        var allUnchecked = true;
+                        childOrgs.each(function() {
+                            if ($(this).prop("checked")) allUnchecked = false;
+                        });
+                        if (allUnchecked) self.deleteConsent(userId, {"org": parentOrg});
                     };
 
                     if ($("#createProfileForm").length == 0) {
@@ -745,26 +751,30 @@ var tnthAjax = {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"]);
             if (consented) {
-                $.ajax ({
-                    type: "DELETE",
-                    url: '/api/user/' + userId + '/consent',
-                    contentType: "application/json; charset=utf-8",
-                    cache: false,
-                    dataType: 'json',
-                    data: JSON.stringify({"organization_id": parseInt(params["org"])})
-                }).done(function(data) {
-                   // console.log("consent deleted successfully.");
-                }).fail(function(xhr) {
-                    //console.log("request to delete consent failed.");
-                    //console.log(xhr.responseText)
+                //delete all consents for the org
+                consented.forEach(function(orgId) {
+                    $.ajax ({
+                        type: "DELETE",
+                        url: '/api/user/' + userId + '/consent',
+                        contentType: "application/json; charset=utf-8",
+                        cache: false,
+                        async: false,
+                        dataType: 'json',
+                        data: JSON.stringify({"organization_id": parseInt(orgId)})
+                    }).done(function(data) {
+                        //console.log("consent deleted successfully.");
+                    }).fail(function(xhr) {
+                        //console.log("request to delete consent failed.");
+                        //console.log(xhr.responseText)
+                    });
                 });
             };
         };
     },
     hasConsent: function(userId, parentOrg) {
         if (!userId && !parentOrg) return false;
-
-        var isConsented = false;
+        var consentedOrgIds = [];
+        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
@@ -774,8 +784,10 @@ var tnthAjax = {
                 var d = data["consent_agreements"];
                 d.forEach(function(item) {
                     var orgId = item.organization_id;
-                    if (!isConsented && orgId == parentOrg) {
-                        isConsented = true;
+
+                    if (orgId == parentOrg) {
+                        //console.log("consented orgid: " + orgId)
+                        consentedOrgIds.push(orgId);
                     };
                 });
             };
@@ -783,7 +795,8 @@ var tnthAjax = {
         }).fail(function() {
             return false;
          });
-        return isConsented;
+        //console.log(consentedOrgIds)
+        return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     },
     "getDemo": function(userId, noOverride) {
         $.ajax ({

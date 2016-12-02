@@ -146,14 +146,6 @@ $(document).ready(function(){
     var hasError = false;
     var errorMessage = '';
 
-    $("#userOrgs input[name='organization']").each(function() {
-        $(this).on("click", function() {
-            $("#userOrgs").find(".help-block").text("");
-        });
-    });
-
-    ///api/patient/{patient_id}/clinical/pca_localized
-
     //for each org send off ajax to set consent
     function setConsents(userId) {
         var orgs = {};
