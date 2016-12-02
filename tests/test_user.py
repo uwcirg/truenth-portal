@@ -8,12 +8,14 @@ from sqlalchemy import and_
 from tests import TestCase, TEST_USER_ID, FIRST_NAME
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.fhir import Coding, UserEthnicity, UserIndigenous
 from portal.models.organization import Organization
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship, UserTimezone
+from portal.models.user_consent import UserConsent
 from portal.models.user import UserIndigenousStatusExtension
 from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
@@ -450,7 +452,12 @@ class TestUser(TestCase):
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
+        audit = Audit(comment='test data', user_id=TEST_USER_ID)
+        consent = UserConsent(
+            user_id=member_of.id, organization_id=org.id,
+            audit=audit, agreement_url='http://example.org')
         with SessionScope(db):
+            db.session.add(consent)
             db.session.commit()
         user, org, u2, member_of = map(
             db.session.merge, (user, org, u2, member_of))
