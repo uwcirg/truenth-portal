@@ -1,0 +1,3 @@
+# Fixes below error on TravisCI
+# dpkg-shlibdeps: error: no dependency information found for /opt/python/2.7.12/lib/libpython2.7.so.1.0
+libpython2.7 1.0 libpython2.7
