@@ -13,18 +13,14 @@
 </style>
 
 <div id="fullSizeBox" class="box-min-500">
-    <img src="{{ url_for('static', filename='img/bg_canoe.jpg') }}" class="img-responsive hidden-xs" />
+    <img  src="{{ url_for('static', filename='img/spacer.jpg') }}" style="visibility: hidden" class="img-responsive hidden-xs"/>
 
     <div id="fullSizeContainer">
-
         <div class="text-center"><a href="/"><img id="fullSizeLogo" src="{{ url_for('static', filename='img/logo_wordmark.png') }}" alt="TrueNTH" /></a></div>
-
         <div id="wellContainer">
-
             <div class="tnth-well well">
-
+                <div class="tnth-well-close"><a href="/"><i class="fa fa-close text-muted"></i></a></div>
                 <div id="wellContent">
-
                     <div class="btn-set">
                         <a href="{{ url_for('auth.login', provider_name='facebook') }}"
                            class="btn btn-social btn-facebook btn-block">
@@ -35,18 +31,15 @@
                             <i class="fa fa-google"></i> Log in with Google
                         </a>
                     </div>
-
                     <form action="" method="POST" class="form" role="form">
                         {{ form.hidden_tag() }}
 
                         {# Username or Email field #}
                         {% set field = form.username if user_manager.enable_username else form.email %}
-                        {{ render_field(form.username, label="Username or email address", label_visible=false, tabindex=10) }}
-
+                        {{ render_field(field, label="Email address", label_visible=false, tabindex=10, infoText="Note: If you had a username before, please use your email address now. Your password remains unchanged.") }}
                         {# Password field #}
                         {% set field = form.password %}
                         {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
-
                         {# Submit button #}
                         {{ render_submit_field(form.submit, tabindex=180, label="Log In", btnSize="btn-lg") }}
                     </form>
@@ -58,13 +51,32 @@
                     </div>
                     {% endif %}
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+
+{% endblock %}
+{% block document_ready %}
+$("document").ready(function() {
+    $("#fullSizeBox").closest("div.col-lg-12").css("padding", "0");
+    var qs = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+    })(window.location.search.substr(1).split('&'));
+
+    //console.log(qs["email"])
+
+    if (qs["email"]) $("#email").val(qs["email"]);
+});
 
 {% endblock %}

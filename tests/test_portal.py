@@ -1,17 +1,16 @@
 """Unit test module for portal views"""
 
 from datetime import datetime
-from flask.ext.webtest import SessionScope
+from flask_webtest import SessionScope
 from flask_swagger import swagger
 from swagger_spec_validator import validate_spec_url
 import tempfile
 
 from portal.extensions import db
-from portal.models.intervention import Intervention, INTERVENTION
-from portal.models.intervention import UserIntervention
+from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.role import ROLE
 from portal.models.user import User
-from portal.models.message import EmailInvite
+from portal.models.message import EmailMessage
 from tests import TestCase, TEST_USER_ID
 
 
@@ -20,34 +19,92 @@ class TestPortal(TestCase):
 
     def test_card_html(self):
         """Interventions can customize the button text """
-        client = self.add_test_client()
-        intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).one()
+        client = self.add_client()
+        intervention = INTERVENTION.DECISION_SUPPORT_P3P
+        intervention.public_access = True  # make the card avail for the test
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
         self.add_required_clinical_data()
+        self.bless_with_basics()
         self.login()
         rv = self.app.get('/home')
 
         self.assertIn('Custom Label', rv.data)
+        intervention = db.session.merge(intervention)
         self.assertIn(intervention.card_html, rv.data)
+
+    def test_user_card_html(self):
+        """Interventions can further customize per user"""
+        client = self.add_client()
+        intervention = INTERVENTION.DECISION_SUPPORT_P3P
+        intervention.public_access = True  # make the card avail for the test
+        client.intervention = intervention
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id)
+        ui.card_html = "<b>Bold Card Text</b>"
+        ui.link_label = "Custom User Label"
+        ui.link_url = 'http://example.com/?test=param1'
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.add_required_clinical_data()
+        self.bless_with_basics()
+        user = db.session.merge(self.test_user)
+        self.login()
+
+        rv = self.app.get('/home')
+
+        ui = db.session.merge(ui)
+        self.assertIn(ui.card_html, rv.data)
+        self.assertIn(ui.link_label, rv.data)
+        self.assertIn(ui.link_url, rv.data)
+        intervention = db.session.merge(intervention)
+        self.assertIn(intervention.display_for_user(user).link_label, rv.data)
+
+    def test_provider_html(self):
+        """Interventions can customize the provider text """
+        client = self.add_client()
+        intervention = INTERVENTION.sexual_recovery
+        client.intervention = intervention
+        ui = UserIntervention(user_id=TEST_USER_ID,
+                              intervention_id=intervention.id)
+        ui.provider_html = "Custom text for <i>provider</i>"
+        with SessionScope(db):
+            db.session.add(ui)
+            db.session.commit()
+
+        self.bless_with_basics()
+        self.login()
+        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.PATIENT)
+
+        # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the
+        # 'reports' field
+        self.app.application.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
+            'reports',]
+        rv = self.app.get('/patients/')
+
+        ui = db.session.merge(ui)
+        self.assertIn(ui.provider_html, rv.data)
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""
-        client = self.add_test_client()
-        intervention = Intervention.query.filter_by(
-            name=INTERVENTION.SEXUAL_RECOVERY).one()
+        client = self.add_client()
+        intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         intervention.public_access = False
 
         self.add_required_clinical_data()
+        self.bless_with_basics()
         self.login()
         rv = self.app.get('/home')
 
         self.assertNotIn('Sexual Recovery', rv.data)
 
         # now give just the test user access
+        intervention = db.session.merge(intervention)
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id,
                               access="granted")
@@ -61,8 +118,8 @@ class TestPortal(TestCase):
     def test_admin_list(self):
         """Test admin view lists all users"""
         # Generate a few users with a smattering of roles
-        u1 = self.add_user(username='u1')
-        u2 = self.add_user(username='u2')
+        u1 = self.add_user(username='u1@foo.bar')
+        u2 = self.add_user(username='u2@bar.foo')
         self.promote_user(u1, role_name=ROLE.ADMIN)
         self.promote_user(u2, role_name=ROLE.APPLICATION_DEVELOPER)
 
@@ -92,7 +149,7 @@ class TestPortal(TestCase):
         """Email invites - test view for sent messages"""
         sent_at = datetime.strptime("2000/01/01 12:31:00",
                 "%Y/%m/%d %H:%M:%S")
-        message = EmailInvite(subject='a subject', user_id=TEST_USER_ID,
+        message = EmailMessage(subject='a subject', user_id=TEST_USER_ID,
                 sender="testuser@email.com",
                 body='Welcome to testing', sent_at=sent_at,
                 recipients="one@ex1.com two@two.org")

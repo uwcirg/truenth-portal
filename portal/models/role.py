@@ -21,6 +21,8 @@ class Role(db.Model):
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.Text)
 
+    def __str__(self):
+        return "Role {}".format(self.name)
 
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
@@ -40,10 +42,15 @@ STATIC_ROLES = IterableUserDict({
     'patient':
         'Default role for all patients, may only view their own '
         'patient data',
+    'provider':
+        'Health care provider at a TrueNTH-collaborating clinic',
     'service':
         'Reserved for automated service accounts needing API access',
     'test':
         'Designates a testing user',
+    'write_only':
+        'Limited access account, write only, cannot view data from '
+        'previous sessions',
 })
 
 
@@ -52,6 +59,7 @@ def enum(**items):
     return type('Enum', (), items)
 
 ROLE = enum(**{unicode(r).upper():r for r in STATIC_ROLES})
+ALL_BUT_WRITE_ONLY = [r for r in STATIC_ROLES if r != 'write_only']
 
 
 def add_static_roles():

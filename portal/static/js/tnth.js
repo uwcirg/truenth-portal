@@ -13,7 +13,7 @@
   // =========================
 
   var backdrop = '.tnth-dropdown-backdrop'
-  var toggle   = '[data-toggle="dropdown"]'
+  var toggle   = '[data-toggle="tnth-dropdown"]'
   var Dropdown = function (element) {
     $(element).on('click.bs.tnth-dropdown', this.toggle)
   }
@@ -150,9 +150,18 @@
 }(jQuery);
 
 // Run dropdown
-$('.tnth-dropdown-toggle').dropdown()
+$('.tnth-dropdown-toggle').dropdown();
 
 // Simple show/hide for XS menu
 $('.tnth-navbar-toggle').click(function(){
   $('#tnthNavbarXs').slideToggle('fast');
 });
+
+$(document).ready(function(){
+  // Once nav is loaded, make the wrapper visible
+  setTimeout('$("#tnthNavWrapper").css("visibility","visible")', 0);
+
+});
+
+var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+

@@ -1,0 +1,377 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
+<br/>
+<style>
+.pc-hr {
+    border-top: 1px solid #ddd;
+}
+#clinicalGroupLabel {
+    margin-bottom: 1em;
+}
+</style>
+<form id="createProfileForm" class="form tnth-form to-validate" role="form">
+    <input type="hidden" id="current_user_email" value="{{user.email}}" />
+    <div class="row" style="position: relative;">
+        <div class="col-md-12">
+            <hr>
+            <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
+            <hr/>
+            <br/>
+            <div class="profile-item-container create-account-container">
+                    <div class="row">
+                        <div class="col-md-9 col-xs-12">
+                            {{profileName(False)}}
+                            {{profileBirthDate(False)}}
+                            <br/>
+                        </div>
+                    </div>
+                    {{profileEmail(False)}}
+                    {{profilePhone(False)}}
+                    <br/>
+                    <hr class="pc-hr"/>
+                    <div class="form-group" id="clinicalGroup">
+                        <label id="clinicalGroupLabel">{{ _("Clinical Question") }}</label>
+                        <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
+                        <div class="indent">
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
+                              </label>
+                            </div>
+                            <div class="radio">
+                              <label>
+                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
+                              </label>
+                            </div>
+                        </div>
+                         <div class="help-block with-errors"></div>
+                     </div>
+                     <br/>
+                     <hr class="pc-hr"/>
+                    <div class="form-group profile-section" id="userOrgs">
+                        <label>{{ _("Clinics") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+                        <div class="indent">
+                        <div id="fillOrgs"></div>
+                        <!--
+                        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
+                        </div>
+                        -->
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <script>$(function () {
+                        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+                        $.ajax ({
+                            type: "GET",
+                            url: '/api/organization'
+                        }).done(function(data) {
+                            var clinicArray = [];
+                            $.each(data.entry,function(i,val){
+                                if (val.partOf) {
+                                    // Child clinic
+                                    var getParent = val.partOf.reference.split("/").pop();
+                                    jQuery.map(clinicArray, function(obj) {
+                                        if(obj.id === parseInt(getParent))
+                                            obj.children.push({"id": val.id, "name": val.name});
+                                    });
+                                } else {
+                                    // Parent clinic
+                                    clinicArray.push({ id: val.id, name: val.name, children: []});
+                                }
+                            });
+                            $.each(clinicArray, function(i,val) {
+                                // Fill in parent clinic
+                                if (val.name != "none of the above" && (val.children.length > 0)) {
+                                    $("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
+                                    //$("#fillOrgs").append("<legend>"+val.name+"</legend>");
+                                }
+                                // Fill in each child clinic
+                                if (val.children.length > 0) {
+                                    $.each(val.children, function(n,subval) {
+                                        var childClinic = '<div class="checkbox"><label>' +
+                                            '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
+                                            subval.id +'" data-parent-id="'+val.id+'"  data-parent-name="' + val.name + '"/>'+
+                                            subval.name +
+                                            '</label></div>';
+                                       $("#fillOrgs").append(childClinic);
+                                    });
+                                }
+
+                            });
+                        }).fail(function() {
+                            console.log("Problem retrieving data from server.");
+                        });
+                        //tnthAjax.getOrgs({{ user.id }}, true, true);
+                        //setTimeout('$("#noOrgs").click();', 0);
+
+                    });</script>
+                    <br/>
+                    <br/>
+                    {{profileSaveBtn()}}
+            </div>
+            <br/>
+            <div>
+                {{ back_btn('patients','Patients List')}}
+                <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            </div>
+        </div>
+    </div>
+
+    {% if consent_agreements %}
+        <div id="_consentContainer">
+          {% for org in consent_agreements %}
+            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].agreement_url}}" />
+          {% endfor %}
+        </div>
+    {% endif %}
+
+</form>
+<a id="redirectLink" href="">&nbsp;</a>
+
+{% endblock %}
+
+{% block document_ready %}
+
+function _redirect(userId) {
+    if (userId) {
+        $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
+        $("#redirectLink")[0].click();
+    };
+};
+
+$(document).ready(function(){
+
+    var _userId = '', _demoArray = {}, _orgArray = {};
+    var hasError = false;
+    var errorMessage = '';
+
+    //for each org send off ajax to set consent
+    function setConsents(userId) {
+        var orgs = {};
+        $("#createProfileForm input[name='organization'][data-parent-id]").each(function() {
+            if ($(this).prop("checked")) {
+                var parentOrg = $(this).attr("data-parent-id");
+                if (!orgs[parentOrg]) {
+                    orgs[parentOrg] = true;
+                    //console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
+                    //send off ajax for this
+                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}), true);
+                };
+            };
+        });
+    };
+
+    function setClinical(userId) {
+        var val = "unknown";
+        if ($("#pca_localized_yes").is(":checked")) val = "true";
+        else if ($("#pca_localized_no").is(":checked")) val = "false";
+        _get('/api/patient/' + userId + '/clinical/pca_localized', 'POST', JSON.stringify({value: val}), true);
+    };
+
+
+    function getOrgs(type) {
+        var orgArray = {};
+        switch(type) {
+            case 'account':
+            	//console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
+            	//var orgId = $('#userOrgs input:checkbox:checked').val();
+                //orgArray['organization_id'] = (orgId == '' ? '0': orgId);
+                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    return { organization_id: $(this).val() };
+                }).get();
+                orgArray['organizations'] = orgIDs;
+                break;
+
+        };
+        return orgArray;
+    };
+
+    function setHelpText(elementId, message, hasError) {
+
+        var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
+
+        if (hasError) {
+            $("#" + elementId + " .help-block").text(message).css("color", WARNING_COLOR);
+
+        } else {
+            $("#" + elementId + " .help-block").text("").css("color", NORMAL_COLOR);
+        };
+
+    };
+
+    $('#createProfileForm').validator().on('submit', function (e) {
+          if (e.isDefaultPrevented()) {
+                // handle the invalid form...
+                $("#errorMsg").fadeIn("slow");
+                return false;
+          } else {
+
+                hasError = false;
+
+                if ($("#emailGroup").hasClass("has-error")) {
+                    hasError = true;
+                } else {
+
+                    if ($("#current_user_email").val() === $("#email").val()) {
+                        setHelpText("emailGroup", "Email is already in use.", true);
+                    } else {
+                        setHelpText("emailGroup", "", false);
+                    };
+                };
+
+
+                if ($("#userOrgs input:checkbox:checked").length == 0) {
+                   setHelpText("userOrgs", "An organization must be selected.", true);
+                } else setHelpText("userOrgs", "", false);
+
+                if ($("#clinicalGroup input:radio:checked").length == 0) {
+                    setHelpText("clinicalGroup", "You must select Yes or No.", true);
+                } else setHelpText("clinicalGroup", "", false);
+
+
+
+                $("#createProfileForm .help-block.with-errors").each(function() {
+                    if (!hasError) { if ($(this).text() != "") hasError = true };
+                });
+
+                if (hasError) {
+                    $("#errorMsg").fadeIn("slow");
+                    return false;
+                } else {
+                    $("#errorMsg").hide();
+                    hasError = false;
+                };
+
+                // everything looks good!
+                e.preventDefault();
+                $('#errorMsg').hide();
+                $('#serviceErrorMsg').html('').hide();
+
+
+                $("#updateProfile").attr("disabled", true);
+
+                _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
+
+                .then(function(responseData) {
+
+                    _userId = responseData['user_id'];
+                    console.log('user: ' + _userId);
+
+                    _demoArray['resourceType'] = 'Patient';
+                    _demoArray['name'] = {
+                        'given': $('input[name=firstname]').val(),
+                        'family': $('input[name=lastname]').val()
+                    };
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['telecom'] = [
+                        { 'system': 'email', 'value': $('input[name=email]').val() },
+                        { 'system': 'phone', 'value': $('input[name=phone]').val() }
+                    ];
+
+                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
+                    }).get();
+                    if (typeof orgIDs === 'undefined'){
+                        orgIDs = [0]  // special value for `none of the above`
+                    }
+
+
+                    _demoArray['careProvider'] = orgIDs;
+
+
+                    //console.log(_demoArray);
+
+
+                    //Adding demographic information
+                    //Adding roles of patient and write_only for user
+                    Promise.all([
+                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}]}))])
+                    .then(function(results) {
+                        // Both promises resolved
+                        //console.log('promises resolved');
+                        setConsents(_userId);
+                        setClinical(_userId);
+                        $('#confirmMsg').fadeIn();
+                        setTimeout("$('#confirmMsg').fadeOut();", 800);
+                        setTimeout("_redirect(" + _userId + ");", 1000);
+                        //$('#createProfileForm')[0].reset();
+                        $("#updateProfile").attr("disabled", false);
+                        clear();
+                    })
+                    .catch(function(error) {
+                        // One or more promises was rejected
+                        console.log('error: ' + error);
+                        errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                        $("#updateProfile").attr("disabled", false);
+
+                    });
+                }).catch(function(error) {
+                    //Display Error Here
+                    console.log('error: ' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                    $("#updateProfile").attr("disabled", false);
+                });
+
+
+
+          };
+    });
+
+    function _get(apiUrl, requestType, requestData, sync) {
+        var errorMessage = '';
+        console.log('apiUrl: ' + apiUrl)
+        return new Promise (function(resolve, reject) {
+            $.ajax ({
+                type: (requestType ? requestType : 'GET'),
+                url: String(apiUrl).replace('//', '/'),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                async: sync ? false : true,
+                data: requestData
+            }).done(function(data) {
+                resolve(data);
+            }).fail(function(xhr) {
+                errorMessage = 'Error processing request: ' + apiUrl;
+                console.log(requestData);
+                console.log(errorMessage);
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+                reject(Error(errorMessage));
+            });
+
+        });
+
+    };
+
+
+    function clear() {
+        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
+            var currentElement = $('#' + fieldName);
+            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
+            switch(_tagName.toLowerCase()) {
+                case 'input':
+                    currentElement.val('');
+                    break;
+                case 'select':
+                    currentElement.find('option').prop('selected', false);
+                    break;
+                default:
+                    currentElement.val('');
+            };
+
+            $('#month').find('option').prop('selected', false);
+
+        });
+
+    };
+
+    clear();
+
+});
+
+
+{% endblock %}

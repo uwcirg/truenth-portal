@@ -1,7 +1,6 @@
 """Configuration"""
 import os
-from flask.ext.script import Server
-from flask import Config
+from flask_script import Server
 
 
 class BaseConfig(object):
@@ -12,61 +11,70 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
-    LOG_FOLDER = os.path.join('/var/log', __package__)
+    LOG_FOLDER = os.environ.get(
+        'LOG_FOLDER',
+        os.path.join('/var/log', __package__)
+    )
     LOG_LEVEL = 'DEBUG'
 
     MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
-    MAIL_DEFAULT_SENDER = '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu'
+    MAIL_DEFAULT_SENDER = '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu>'
     CONTACT_SENDTO_EMAIL = MAIL_USERNAME
     ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
+    SS_TIMEOUT = 15 * 60  # seconds for session cookie, reset on ping
+    PERMANENT_SESSION_LIFETIME = SS_TIMEOUT
     PIWIK_DOMAINS = ""
     PIWIK_SITEID = 0
+    PORTAL_STYLESHEET = 'css/portal.css'
     PROJECT = "portal"
-    PROJECT_ROOT =\
-            os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    SHOW_EXPLORE = True
+    SHOW_PROFILE_MACROS = ['ethnicity', 'race']
+    SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = 'override this secret key'
+    SESSION_PERMANENT = True
+    SESSION_TYPE = 'redis'
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
     USER_AFTER_CONFIRM_ENDPOINT = USER_AFTER_LOGIN_ENDPOINT
+    USER_ENABLE_USERNAME = False  # using email as username
+    USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
+    USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
+    PROVIDER_BULK_DATA_ACCESS = True
+    PATIENTS_BY_PROVIDER_ADDL_FIELDS = [] # 'status', 'reports'
+
+    FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
+    FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
+    GOOGLE_CONSUMER_KEY = os.environ.get('GOOGLE_CONSUMER_KEY', '')
+    GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
+
+    DEFAULT_LOCALE = 'en_US'
+    LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
+    LR_GROUP = 20147
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
     SQLALCHEMY_ECHO = False
 
-
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
     TESTING = True
+    SERVER_NAME = 'localhost:5005'
+    LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_DATABASE_URI =\
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
         'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+    )
+
     WTF_CSRF_ENABLED = False
 
 
-def early_app_config_access():
-    """Workaround to bootstrap configuration problems
-
-    Some extensions require config values before the flask app can be
-    initialized.  Expose the same configuration used by the app by
-    direct access.
-
-    Avoid use of this approach, as the app has its own config with a
-    chain of overwrites.  i.e. use app.config whenever possible.
-
-    """
-    root_path = os.path.join(os.path.dirname(__file__), "..")
-    _app_config = Config(root_path=root_path)
-    _app_config.from_pyfile(os.path.join(\
-            os.path.dirname(__file__), 'application.cfg'))
-    return _app_config
-
-
-class ConfigServer(Server):
+class ConfigServer(Server):  # pragma: no cover
     """Correctly read Flask configuration values when running Flask
 
     Flask-Script 2.0.5 does not read host and port specified in

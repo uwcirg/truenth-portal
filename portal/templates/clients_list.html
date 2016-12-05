@@ -3,13 +3,18 @@
 
 
 
-    <h1 class="tnth-headline">TrueNTH OAuth 2.0 Client Applications</h1>
+    <h1 class="tnth-headline">{{ _("TrueNTH OAuth 2.0 Client Applications") }}</h1>
 
     <div style="margin: 2em 1em 3em">
-        <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">Create A New TrueNTH Client Application</a>
+        <a class="btn-tnth-primary btn" href="{{ url_for('.client') }}">{{ _("Create A New TrueNTH Client Application") }}</a>
     </div>
 
-    <h4>Your Current Applications</h4>
+    {% if current_user.has_role('admin')%}
+        <h4>{{ _("Current Applications") }}</h4>
+    {% else %}
+        <h4>{{ _("Your Current Applications") }}</h4>
+    {% endif %}
+
     {% if clients %}
     <ul>
         {% for client in clients %}
@@ -19,12 +24,24 @@
                       <b>{{ client.intervention.description }}</b>
                 {% endif %}
 
-                <a href="{{ url_for('.client_edit', client_id=client.client_id) }}">App ID: {{ client.client_id }}<br />Site URL: {{ client._redirect_uris }}</a>
+                <a href="{{ url_for('.client_edit', client_id=client.client_id) }}">{{ _("App ID") }}: {{ client.client_id }}<br />{{ _("Site URL") }}: {{ client._redirect_uris }}</a>
+                {% if client.lookup_service_token() %}
+                    <br /> {{ _("Service Token") }}:
+                    {{ client.lookup_service_token().access_token }}
+                    (expires {{
+                    client.lookup_service_token().expires.strftime('%b %d, %Y') }})
+                {% endif %}
+
+                {% if current_user.has_role('admin')%}
+                    <br /> {{ _("Created By") }}:
+                    {{ client.user.first_name }}
+                    {{ client.user.last_name }}
+                {% endif %}
             </li>
         {% endfor %}
     </ul>
     {% else %}
-    <p>You have not created an client applications.</p>
+    <p>{{ _("You have not created an client applications.") }}</p>
     {% endif %}
 
 

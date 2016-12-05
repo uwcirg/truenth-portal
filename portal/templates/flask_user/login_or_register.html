@@ -10,7 +10,7 @@
         <div class="col-sm-5">
             <h4>Register for TrueNTH</h4>
 
-            <p>Do you have a Google or Facebook account? You can register with either of those or create a TrueNTH username and password. <i class="fa fa-question-circle"></i> </p>
+            <p>Do you have a Google or Facebook account? You can register with either of those or create a TrueNTH account. <i class="fa fa-question-circle"></i> </p>
 
             <div class="row" style="margin-top: 2em">
                 <div class="col-xs-6 text-center">
@@ -34,7 +34,7 @@
 
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(form.username, tabindex=220) }}
+                {{ render_field(field, tabindex=220) }}
 
 
                 {% if user_manager.enable_email and user_manager.enable_username %}
@@ -85,7 +85,7 @@
 
                 {# Username or Email field #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(form.username, label="Username or email address", label_visible=false, tabindex=10) }}
+                {{ render_field(field, label="Email address", label_visible=false, tabindex=10) }}
 
                 {# Password field #}
                 {% set field = form.password %}

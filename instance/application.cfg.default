@@ -1,0 +1,12 @@
+# Configuration values for application.  Don't commit private copy!
+DEBUG = True
+LOG_FOLDER = '/var/log/path_of_choice'
+SECRET_KEY = 'generate some random secret string'
+FB_CONSUMER_KEY = '<App ID from Facebook>'
+FB_CONSUMER_SECRET = '<App Secret from Facebook>'
+GOOGLE_CONSUMER_KEY = '<App ID from Google>'
+GOOGLE_CONSUMER_SECRET = '<App Secret from Google>'
+PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json'
+SQLALCHEMY_DATABASE_URI = 'postgresql://user:password@localhost/dbname'
+SERVER_NAME = '<the name and port number of the server (e.g.: 'myapp.dev:5000')>'
+CONTACT_SENDTO_EMAIL = '<email address(es) that should receive contact form submissions>'

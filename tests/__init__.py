@@ -7,25 +7,30 @@ options:
     nosetests --help
 
 """
-
-from flask.ext.testing import TestCase as Base
-from flask.ext.webtest import SessionScope
+from datetime import datetime
+from flask_testing import TestCase as Base
+from flask_webtest import SessionScope
+from sqlalchemy.exc import IntegrityError
 
 from portal.app import create_app
 from portal.config import TestConfig
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.auth import Client
-from portal.models.fhir import CC, ValueQuantity
-from portal.models.fhir import Observation, UserObservation
-from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import CC
 from portal.models.fhir import add_static_concepts
-from portal.models.intervention import add_static_interventions
+from portal.models.intervention import add_static_interventions, INTERVENTION
+from portal.models.organization import Organization, add_static_organization
+from portal.models.organization import OrgTree
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
+from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
+from portal.models.user_consent import UserConsent
+from portal.site_persistence import SitePersistence
 
 TEST_USER_ID = 1
-TEST_USERNAME = 'testy'
+TEST_USERNAME = 'testy@example.com'
 FIRST_NAME = 'First'
 LAST_NAME = 'Last'
 IMAGE_URL = 'http://examle.com/photo.jpg'
@@ -41,44 +46,43 @@ class TestCase(Base):
 
     def init_data(self):
         """Push minimal test data in test database"""
-        test_user_id = self.add_user(username=TEST_USERNAME,
-                first_name=FIRST_NAME, last_name=LAST_NAME,
-                image_url=IMAGE_URL)
-        if test_user_id != TEST_USER_ID:
+        try:
+            test_user = self.add_user(username=TEST_USERNAME,
+                    first_name=FIRST_NAME, last_name=LAST_NAME,
+                    image_url=IMAGE_URL)
+        except IntegrityError:
+            db.session.rollback()
+            test_user = User.query.filter_by(username=TEST_USERNAME).one()
+            print "found existing test_user at {}".format(test_user.id)
+
+        if test_user.id != TEST_USER_ID:
             print "apparent cruft from last run (test_user_id: %d)"\
-                    % test_user_id
+                    % test_user.id
             print "try again..."
             self.tearDown()
             self.setUp()
         else:
-            self.test_user = User.query.get(TEST_USER_ID)
+            self.test_user = test_user
 
     def add_user(self, username, first_name="", last_name="", image_url=None):
-        """Create a user with default role
-
-        Returns the newly created user id
-
-        """
+        """Create a user and add to test db, and return it"""
         test_user = User(username=username, first_name=first_name,
                 last_name=last_name, image_url=image_url)
-
         with SessionScope(db):
             db.session.add(test_user)
             db.session.commit()
+        return db.session.merge(test_user)
 
-        test_user = db.session.merge(test_user)
-        self.promote_user(user_id=test_user.id,
-                role_name=ROLE.PATIENT)
-        test_user = db.session.merge(test_user)
-        return test_user.id
-
-    def promote_user(self, user_id=TEST_USER_ID, role_name=None):
+    def promote_user(self, user=None, role_name=None):
         """Bless a user with role needed for a test"""
+        if not user:
+            user = self.test_user
+        user = db.session.merge(user)
         assert (role_name)
         role_id = db.session.query(Role.id).\
                 filter(Role.name==role_name).first()[0]
         with SessionScope(db):
-            db.session.add(UserRoles(user_id=user_id, role_id=role_id))
+            db.session.add(UserRoles(user_id=user.id, role_id=role_id))
             db.session.commit()
 
     def login(self, user_id=TEST_USER_ID):
@@ -93,7 +97,7 @@ class TestCase(Base):
         return self.app.get('/login/TESTING?user_id={0}'.format(user_id),
                 follow_redirects=True)
 
-    def add_test_client(self):
+    def add_client(self):
         """Prep db with a test client for test user"""
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         client_id = 'test_client'
@@ -124,11 +128,31 @@ class TestCase(Base):
 
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
-        truthiness = ValueQuantity(value=True,
-                                   units='boolean').add_if_not_found(True)
-        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX:
+        for cc in CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized:
             self.test_user.save_constrained_observation(
-                codeable_concept=cc, value_quantity=truthiness)
+                codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
+                audit=Audit(user_id=TEST_USER_ID))
+
+    def bless_with_basics(self):
+        """Bless test user with basic requirements for coredata"""
+        self.test_user = db.session.merge(self.test_user)
+        self.test_user.birthdate = datetime.utcnow()
+
+        # Register with a clinic
+        org = Organization.query.filter(
+            Organization.partOf_id != None).first()
+        self.test_user.organizations.append(org)
+
+        # Agree to Terms of Use and sign consent
+        audit = Audit(user_id=TEST_USER_ID)
+        tou = ToU(audit=audit, text="filler text")
+        parent_org = OrgTree().find(org.id).top_level()
+        consent = UserConsent(user_id=TEST_USER_ID, organization_id=parent_org,
+                              audit=audit, agreement_url='http://fake.org')
+        with SessionScope(db):
+            db.session.add(tou)
+            db.session.add(consent)
+            db.session.commit()
 
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW
@@ -144,26 +168,38 @@ class TestCase(Base):
     def setUp(self):
         """Reset all tables before testing."""
 
+        db.drop_all()  # clean up from previous tests
         db.create_all()
         with SessionScope(db):
             # concepts take forever, only load the quick ones.
             # add directly (via self.add_concepts()) if test needs them
             add_static_concepts(only_quick=True)
             add_static_interventions()
+            add_static_organization()
             add_static_relationships()
             add_static_roles()
             db.session.commit()
+            SitePersistence().import_(include_interventions=True)
         self.init_data()
 
         self.app = self.__app.test_client()
 
     def tearDown(self):
-        """Clean db session and drop all tables."""
+        """Clean db session.
 
+        Database drop_all is done at setup due to app context challenges with
+        LiveServerTestCase (it cleans up its context AFTER tearDown()
+        is called)
+
+        """
         db.session.remove()
-        db.drop_all()
+        db.engine.dispose()
 
-        # lazyprops can't survive a db purge - reset via delattr
+        # lazyprops can't survive a db purge - purge cached attributes
         for attr in dir(CC):
             if attr.startswith('_lazy'):
                 delattr(CC, attr)
+        for attr in dir(INTERVENTION):
+            if attr.startswith('_lazy'):
+                delattr(INTERVENTION, attr)
+        OrgTree.invalidate_cache()

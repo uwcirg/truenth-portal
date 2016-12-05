@@ -1,13 +1,16 @@
 *.egg-info
+*.eggs
 *.sqlite
 *.pyc
 *~
 *.swp
+.coverage
 application.cfg
-bin
+site.cfg
 env
 lib
 local
 include
 man
 pip-selfcheck.json
+log

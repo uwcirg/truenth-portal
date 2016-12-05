@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+
+  {{ back_btn(PORTAL, _('Home')) }}
+
+    <h1 class="tnth-headline">{{ _("TrueNTH") }}</h1>
+
+<p>{{ content|safe }}</p>
+
+    <!--
+    <p>
+      This Privacy Policy applies solely to the True NTH USA website and not to third party websites reached through a link in the True NTH USA website.
+
+    </p><p>
+    We will not sell Personal Information or Health Information about you to third parties.
+
+  </p><p>
+    We collect information to help us understand how our users use the True NTH USA website. We collect and use data in log files that includes which pages of the True NTH USA website you use, which links you follow from the True NTH USA website, and the type of browser and operating system you are using.
+
+  </p><p>
+    We may use cookies that uniquely identify your web browser to improve the quality of the True NTH USA website. We do not use cookies to target advertisements to you. We do not use Service Providers that target advertisements to you.
+
+  </p><p>
+    We may use information about you and Health Information that you enter for research and to improve the True NTH USA website, but only information that does not identify you (for example, the total number of people using True NTH USA from a particular health care institution, or how users rate the helpfulness of the website).
+
+  </p><p>
+    Information we collect is stored on servers managed by the University of Washington. We use standard security procedures and practices to protect information from unauthorized access, use, or disclosure. However, no data sent over the Internet can be guaranteed to be 100% secure.
+  </p>
+  -->
+
+{% endblock %}

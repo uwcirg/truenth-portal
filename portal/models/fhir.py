@@ -1,13 +1,18 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
+import dateutil
+from flask import current_app
 import json
+import pytz
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
-import urllib
+import requests
 
 from ..extensions import db
 from .lazy import lazyprop
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
+from ..system_uri import NHHD_291036
+from ..views.fhir import valueset_nhhd_291036
 
 
 def as_fhir(obj):
@@ -19,9 +24,36 @@ def as_fhir(obj):
     if hasattr(obj, 'as_fhir'):
         return obj.as_fhir()
     if isinstance(obj, datetime):
+        # Make SURE we only communicate unaware or UTC timezones
+        tz = getattr(obj, 'tzinfo', None)
+        if tz and tz != pytz.utc:
+            current_app.logger.error("Datetime export of NON-UTC timezone")
         return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
     if isinstance(obj, date):
         return obj.strftime('%Y-%m-%d')
+
+
+class FHIR_datetime(object):
+    """Utility class/namespace for working with FHIR datetimes"""
+
+    @staticmethod
+    def as_fhir(obj):
+        return as_fhir(obj)
+
+    @staticmethod
+    def parse(data):
+        """Parse input string to generate a UTC datetime instance"""
+        dt = dateutil.parser.parse(data)
+        if dt.tzinfo:
+            # Convert to UTC if necessary
+            if dt.tzinfo != pytz.utc:
+                dt = dt.astimezone(pytz.utc)
+        return dt
+
+    @staticmethod
+    def now():
+        """Generates a FHIR compliant datetime string for current moment"""
+        return datetime.utcnow().isoformat()+'Z'
 
 
 class CodeableConceptCoding(db.Model):
@@ -83,7 +115,8 @@ class CodeableConcept(db.Model):
         # at a particular Coding will be the ONLY CodeableConcept for that
         # particular Coding.
         coding_ids = [c.id for c in self.codings]
-        assert coding_ids
+        if not coding_ids:
+            current_app.logger.error("no coding_ids found for {}".format(self))
         found = CodeableConceptCoding.query.filter(
             CodeableConceptCoding.coding_id.in_(coding_ids)).first()
         if not found:
@@ -154,6 +187,12 @@ class Coding(db.Model):
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
 
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
     @lazyprop
     def BIOPSY(self):
         coding = Coding.query.filter_by(
@@ -171,6 +210,14 @@ class ClinicalConstants(object):
         return cc
 
     @lazyprop
+    def PCaLocalized(self):
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
     def TX(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131').one()
@@ -178,6 +225,17 @@ class ClinicalConstants(object):
         assert coding in cc.codings
         return cc
 
+    @lazyprop
+    def TRUE_VALUE(self):
+        value_quantity = ValueQuantity(
+            value='true', units='boolean').add_if_not_found(True)
+        return value_quantity
+
+    @lazyprop
+    def FALSE_VALUE(self):
+        value_quantity = ValueQuantity(
+            value='false', units='boolean').add_if_not_found(True)
+        return value_quantity
 
 CC = ClinicalConstants()
 
@@ -193,8 +251,8 @@ class ValueQuantity(db.Model):
     def __str__(self):
         """Print friendly format for logging, etc."""
         components = ','.join([str(x) for x in
-                               self.value, self.units, self.system,
-                               self.code if x is not None])
+                               (self.value, self.units, self.system,
+                               self.code) if x is not None])
         return "ValueQuantity " + components
 
     def as_fhir(self):
@@ -231,30 +289,41 @@ class ValueQuantity(db.Model):
 class Observation(db.Model):
     __tablename__ = 'observations'
     id = db.Column(db.Integer, primary_key=True)
-    issued = db.Column(db.DateTime, default=datetime.now)
+    issued = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(80))
     codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'),
                                    nullable=False)
     value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
                                  nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
 
+    audit = db.relationship('Audit', cascade="save-update")
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
+    performers = db.relationship('Performer', lazy='dynamic',
+                                 cascade="save-update",
+                                 secondary="observation_performers",
+                                 backref=db.backref('observations'))
 
     def __str__(self):
         """Print friendly format for logging, etc."""
         return "Observation {0.codeable_concept} {0.value_quantity} "\
-                "at {0.issued} with status {0.status} ".format(self)
+                "at {0.issued} by {0.performers} with status {0.status} ".\
+                format(self)
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
+        if self.audit:
+            fhir['meta'] = self.audit.as_fhir()
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
             fhir['status'] = self.status
         fhir['code'] = self.codeable_concept.as_fhir()
         fhir.update(self.value_quantity.as_fhir())
+        if self.performers:
+            fhir['performer'] = [p.as_fhir() for p in self.performers]
         return fhir
 
     def add_if_not_found(self, commit_immediately=False):
@@ -313,6 +382,17 @@ class UserObservation(db.Model):
         return self
 
 
+class UserIndigenous(db.Model):
+    __tablename__ = 'user_indigenous'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                        nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('user_id', 'coding_id',
+        name='_indigenous_user_coding'),)
+
+
 class UserEthnicity(db.Model):
     __tablename__ = 'user_ethnicities'
     id = db.Column(db.Integer, primary_key=True)
@@ -339,7 +419,8 @@ class QuestionnaireResponse(db.Model):
         return context.current_parameters['document']['status']
 
     def default_authored(context):
-        return context.current_parameters['document']['authored']
+        return FHIR_datetime.parse(
+            context.current_parameters['document']['authored'])
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
@@ -383,10 +464,18 @@ def fetch_HL7_V3_Namespace(valueSet):
     """Pull and parse the published FHIR ethnicity namespace"""
     src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.json'.format(
         valueSet=valueSet)
-    response = urllib.urlopen(src_url)
-    data = json.loads(response.read())
+    response = requests.get(src_url)
+    load = response.text
+    data = json.loads(load)
     return parse_concepts(data['codeSystem']['concept'],
                           system='http://hl7.org/fhir/v3/{}'.format(valueSet))
+
+def fetch_local_valueset(valueSet):
+    """Pull and parse the named valueSet from our local definition"""
+    response = valueset_nhhd_291036()
+    data = json.loads(response.data)
+    return parse_concepts(data['codeSystem']['concept'],
+                          system='{}/{}'.format(TRUENTH_VALUESET,valueSet))
 
 
 def add_static_concepts(only_quick=False):
@@ -394,7 +483,7 @@ def add_static_concepts(only_quick=False):
 
     Idempotent - run anytime to push any new concepts into existing dbs
 
-    @param only_quick: For unit tests needing quick loads, set true
+    :param only_quick: For unit tests needing quick loads, set true
         unless the test needs the slow to load race and ethnicity data.
 
     """
@@ -402,10 +491,13 @@ def add_static_concepts(only_quick=False):
                              display='biopsy')
     PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
                               display='PCa diagnosis')
+    PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
+                              display='PCa localized diagnosis')
     TX = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131',
                          display='treatment begun')
 
-    concepts = [BIOPSY, PCaDIAG, TX]
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized, TX]
+    concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')
@@ -413,3 +505,7 @@ def add_static_concepts(only_quick=False):
         if not Coding.query.filter_by(code=concept.code,
                                       system=concept.system).first():
             db.session.add(concept)
+
+    for clinical_concepts in CC:
+        if not clinical_concepts in db.session():
+            db.session.add(clinical_concepts)

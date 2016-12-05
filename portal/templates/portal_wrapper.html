@@ -1,9 +1,73 @@
+<style>
+#tnthNavWrapper {
+    visibility: hidden; /** initially hide wrapper during load to avoid flashes of unstyled content **/
+}
+</style>
 <link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/topnav.css') }}">
 <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
+<script>
+    function _readCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            };
+            return null;
+    };
+    var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
+
+    var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
+    // Set default sessionLifetime from Flask config
+    // Subtract 10 seconds to ensure the backend doesn't expire the session first
+    var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+    var cookieTimeout = _readCookie("SS_TIMEOUT");
+    cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
+
+    if (cookieTimeout && cookieTimeout > 0) {
+        DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
+    } else {
+        try {
+            CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} {{config.PERMANENT_SESSION_LIFETIME}} {% else %} "" {% endif %};
+            if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
+            DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
+        } catch(e) {
+            DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+        };
+    };
+
+    $(document).ready(function(){
+      // Once nav is loaded, make the wrapper visible - delay displaying to avoid
+      setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 10);
+
+      // Configure and start the session timeout monitor
+
+      var sessMon = sessionMonitor({
+            sessionLifetime: DEFAULT_SESSION_LIFETIME,
+            timeBeforeWarning: 1 * 60 * 1000,
+            minPingInterval: 1 * 60 * 1000,  // 1 minute
+            activityEvents: "mouseup",
+            pingUrl: '{{PORTAL}}/api/ping',
+            logoutUrl: '{{PORTAL}}/logout',
+            timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
+            onwarning: function() {$("#session-warning-modal").modal("show");}
+      });
+      window.sessMon = sessMon;
+       // Configure the session timeout warning modal
+      $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+              .on("click", "#stay-logged-in", sessMon.extendsess)
+              .on("click", "#log-out", sessMon.logout)
+              .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+      });
+</script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
     var _paq = _paq || [];
-    _paq.push(["setDomains", {{ split_string(config.PIWIK_DOMAINS)|safe }}]);
+
+    {% if config.PIWIK_DOMAINS %}
+    _paq.push(["setDomains", {{ config.PIWIK_DOMAINS|safe }}]);
+    {% endif %}
 
     {% if user %}
     _paq.push(["setUserId", "{{ user.id }}"]);
@@ -21,78 +85,122 @@
 </script>
 <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
 {% endif %}
+{% if not enable_links %}
+<style>
+    #tnthNavXs .tnth-nav-btn{ display: none; }
+</style>
+{% endif %}
 <div id="tnthNavWrapper">
-
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
             <div id="tnthLogo">
-                <a href="{{PORTAL}}"><img src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" /></a>
+                {% if enable_links %}<a href="{{PORTAL}}">{% endif %}
+                    <img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" />
+                {% if enable_links %}</a>{% endif %}
+                {% if branded_logo %}
+                    <img src={{ branded_logo }}></img>
+                {% endif %}
             </div>
             <div id="tnthTopLinks">
                 <div class="tnth-btn-group">
-                    {% if username %}
-                    <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                        Welcome{% if username != "Anonymous" %}, {{ username }}{% endif %}
+                    {% if user %}
+                    <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
+                        {{ _("Welcome") }}{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                        {% if config.DEBUG_TIMEOUTS %} 
+                        ({{ expires_in }} seconds remaining) 
+                        {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
+                        {% if enable_links %}
+                        &nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>
+                        {% endif %}
                     </button>
-                    <ul class="tnth-dropdown-menu" role="menu">
-                        <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
-                        <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
-                        <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+                    {% if enable_links %}
+                    <ul class="tnth-dropdown-menu">
+                        <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                        {% if user and not user.has_roles('write_only') %}
+                        <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
+                        {% endif %}
+                        <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                         {% if user and user.has_roles('application_developer') %}
-                        <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                        <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
+                        {% endif %}
+                        {% if user and user.has_roles('provider') %}
+                        <li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>
                         {% endif %}
                         {% if user and user.has_roles('admin') %}
-                        <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                        <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
+                        <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                         {% endif %}
-                        <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
+                        <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                     </ul>
+                    {% endif %}
                     {% elif login_url %}
-                    <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="dropdown">
-                        Welcome
+                    <button type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
+                        {{ _("Welcome") }}
                     </button>
                     <ul class="tnth-dropdown-menu" role="menu">
-                        <li><a href="{{ login_url }}">Log In to TrueNTH</a></li>
+                        <li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>
                     </ul>
                     {% endif %}
                 </div>
-                <!--
-                <a class="tnth-white tnth-nav-btn" href="{{PORTAL}}" title="Return to TrueNTH Home">
-                    <div id="tnthHomeBtn"></div>
-                </a>
-                -->
             </div>
         </div>
-
     </div>
-
     <div id="tnthNavXs">
         <div class="tnth-container-fluid">
             <div class="tnth-navbar-header">
-                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not username %}tnth-navbar-no-profile{% endif %}">
-                    MENU <img src="{{movember_profile}}" width="45" height="45" />
-                </div>
-                <a id="tnthLogoXs" href="{{PORTAL}}" title="Return to TrueNTH home"><img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" /></a>
+                <div class="tnth-white tnth-navbar-toggle tnth-nav-btn {% if not user %}tnth-navbar-no-profile{% endif %}">{{ _("MENU") }} <img src="{{movember_profile}}" width="45" height="45" /></div>
+                {% if enable_links %}
+                    <a id="tnthLogoXs" href="{{PORTAL}}" title="{{ _('Return to TrueNTH home') }}">
+                {% endif %}
+                <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" />
+                {% if enable_links %}</a>{% endif %}
+                {% if branded_logo %}
+                    <img src={{ branded_logo }}></img>
+                {% endif %}
             </div>
+            {% if enable_links %}
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs">
-                    <li><a href="{{PORTAL}}">TrueNTH Home</a></li>
-                    {% if username %}
-                    <li><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
+                    {% if login_url %}
+                    <li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>
                     {% endif %}
-                    <li><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+                    <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                    {% if user %}
+                    <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
+                    {% endif %}
+                    <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_roles('application_developer') %}
-                    <li><a href="{{PORTAL}}/clients">Client Applications</a></li>
+                    <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                     {% endif %}
                     {% if user and user.has_roles('admin') %}
-                    <li><a href="{{PORTAL}}/admin">User Administration</a></li>
+                    <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
                     {% endif %}
-                    {% if username %}
-                    <li><a href="{{PORTAL}}/logout">Log Out of TrueNTH</a></li>
+                    {% if user %}
+                    <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                     {% endif %}
                 </ul>
             </div>
+            {% endif %}
         </div>
     </div>
-
 </div>
+<div id="session-warning-modal" class="modal fade" tabindex="-1" role="dialog" style="display: none">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title" id="sessWarnLabel">{{ _("Your session is about to expire") }}</h4></div>
+      <div class="modal-body">{{ _("Your session will expire in approximately") }} <span id="remaining-time"></span> {{ _("seconds due to inactivity.") }}</div>
+      <div class="modal-footer"><button id="log-out" class="btn btn-default" type="button" data-dismiss="modal">Log Out</button><button id="stay-logged-in" class="btn btn-warning" type="button" data-dismiss="modal">{{ _("Stay Logged In") }}</button></div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--
+When calling the wrapper, you can avoid the remainder of the page moving down after the page loads by setting the
+height of the containing div. In this example, #mainNav is the containing div:
+#mainNav { height: 71px; }
+@media (min-width: 768px) {
+    #mainNav {
+        height: 135px;
+    }
+}
+-->

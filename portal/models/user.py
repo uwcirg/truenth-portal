@@ -2,20 +2,33 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort, request, session
-from flask.ext.user import UserMixin, _call_or_get
+from flask import abort
+from flask_user import UserMixin, _call_or_get
+import pytz
+from sqlalchemy import text
+from sqlalchemy.orm import synonym
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
-from flask.ext.login import current_user as flask_login_current_user
+from flask_login import current_user as flask_login_current_user
+from fuzzywuzzy import fuzz
 
-from ..audit import auditable_event
 from ..extensions import db
 from .fhir import as_fhir, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
+from .intervention import UserIntervention
+from .performer import Performer
+from .organization import Organization
+import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
+from .telecom import Telecom
+import random
+
+INVITE_PREFIX = "__invite__"
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -29,14 +42,15 @@ class Extension:
         self.user, self.extension = user, extension
 
     @abstractproperty
-    def children(self):
+    def children(self):  # pragma: no cover
         pass
 
     def as_fhir(self):
-        codes = [{'system': c.system, 'code': c.code} for c in self.children]
-        return {'url': self.extension_url,
-                'valueCodeableConcept': {'coding': codes }
-               }
+        if self.children.count():
+            return {'url': self.extension_url,
+                    'valueCodeableConcept': {
+                        'coding': [c.as_fhir() for c in self.children]}
+                   }
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
@@ -62,6 +76,16 @@ class Extension:
             self.children.remove(concept)
 
 
+class UserIndigenousStatusExtension(Extension):
+    # Used in place of us-core-race and us-core-ethnicity for
+    # Australian configurations.
+    extension_url = TRUENTH_EXTENSTION_NHHD_291036
+
+    @property
+    def children(self):
+        return self.user.indigenous
+
+
 class UserEthnicityExtension(Extension):
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
@@ -80,7 +104,86 @@ class UserRaceExtension(Extension):
         return self.user.races
 
 
-user_extension_classes = (UserEthnicityExtension, UserRaceExtension)
+class UserTimezone(Extension):
+    extension_url =\
+       "http://hl7.org/fhir/StructureDefinition/user-timezone"
+
+    def as_fhir(self):
+        timezone = self.user.timezone
+        if not timezone or timezone == 'None':
+            timezone = 'UTC'
+        return {'url': self.extension_url,
+                'timezone': timezone}
+
+    def apply_fhir(self):
+        assert self.extension['url'] == self.extension_url
+        if not 'timezone' in self.extension:
+            abort(400, "Extension missing 'timezone' field")
+        timezone = self.extension['timezone']
+
+        # Confirm it's a recognized timezone
+        try:
+            pytz.timezone(timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            abort(400, "Unknown Timezone: '{}'".format(timezone))
+        self.user.timezone = timezone
+
+    @property
+    def children(self):
+        raise NotImplementedError
+
+
+def permanently_delete_user(username):
+    """Given a username (email), purge the user from the system
+
+    Includes wiping out audit rows, observations, etc.
+
+    """
+    from .audit import Audit
+    from .tou import ToU
+    from .intervention import UserIntervention
+    from .user_consent import UserConsent
+
+    actor = raw_input("\n\nWARNING!!!\n\n"
+                      " This will permanently destroy user: {}\n"
+                      " and all their related data.\n\n"
+                      " If you want to contiue, enter a valid user\n"
+                      " email as the acting party for our records: ".\
+                      format(username))
+    acting_user = User.query.filter_by(username=actor).first()
+    if not acting_user or actor == username:
+        raise ValueError("Actor must be a current user other than the target")
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        raise ValueError("No such user: {}".format(username))
+    comment = "purged all trace of {}".format(user)  # while format works
+
+    # purge all the types with user foreign keys, then the user itself
+    UserIntervention.query.filter_by(user_id=user.id).delete()
+    consent_audits = Audit.query.join(
+        UserConsent, UserConsent.audit_id==Audit.id).filter(
+        UserConsent.user_id==user.id)
+    UserConsent.query.filter_by(user_id=user.id).delete()
+    for ca in consent_audits:
+        db.session.delete(ca)
+    tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+    for t in tous:
+        db.session.delete(t)
+    for o in user.observations:
+        db.session.delete(o)
+    Audit.query.filter_by(user_id=user.id).delete()
+
+    # the rest should die on cascade rules
+    db.session.delete(user)
+    db.session.commit()
+
+    # record this event
+    db.session.add(Audit(user_id=acting_user.id, comment=comment))
+    db.session.commit()
+
+
+user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
+                          UserTimezone, UserIndigenousStatusExtension)
 
 def user_extension_map(user, extension):
     """Map the given extension to the User
@@ -88,12 +191,14 @@ def user_extension_map(user, extension):
     FHIR uses extensions for elements beyond base set defined.  Lookup
     an adapter to handle the given extension for the user.
 
-    @param user: the user to apply to or read the extension from
-    @param extension: a dictionary with at least a 'url' key defining
+    :param user: the user to apply to or read the extension from
+    :param extension: a dictionary with at least a 'url' key defining
         the extension.  Should include a 'valueCodeableConcept' structure
         when being used in an apply context (i.e. direct FHIR data)
-    @returns adapter implementing apply_fhir and as_fhir methods
-    @raises ValueError if the extension isn't recognized
+
+    :returns: adapter implementing apply_fhir and as_fhir methods
+
+    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
 
     """
     for kls in user_extension_classes:
@@ -106,11 +211,10 @@ def user_extension_map(user, extension):
 class User(db.Model, UserMixin):
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), default="Anonymous")
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
-    registered = db.Column(db.DateTime, default=datetime.now)
-    email = db.Column(db.String(120), unique=True)
+    registered = db.Column(db.DateTime, default=datetime.utcnow)
+    _email = db.Column('email', db.String(120), unique=True)
     phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
@@ -119,6 +223,14 @@ class User(db.Model, UserMixin):
             server_default='1')
     locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
+    deleted_id = db.Column(
+        db.ForeignKey('audit.id', use_alter=True,
+                      name='user_deleted_audit_id_fk'), nullable=True)
+
+    # We use email like many traditional systems use username.
+    # Create a synonym to simplify integration with other libraries (i.e.
+    # flask-user).  Effectively makes the attribute email avail as username
+    username = synonym('email')
 
     # Only used for local accounts
     password = db.Column(db.String(255))
@@ -126,15 +238,49 @@ class User(db.Model, UserMixin):
     confirmed_at = db.Column(db.DateTime())
 
     auth_providers = db.relationship('AuthProvider', lazy='dynamic')
+    _consents = db.relationship('UserConsent', lazy='dynamic')
+    indigenous = db.relationship(Coding, lazy='dynamic',
+            secondary="user_indigenous")
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
+    groups = db.relationship('Group', secondary='user_groups',
+            backref=db.backref('users', lazy='dynamic'))
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
             secondary="user_observations", backref=db.backref('users'))
+    organizations = db.relationship('Organization', lazy='dynamic',
+            secondary="user_organizations", backref=db.backref('users'))
+    procedures = db.relationship('Procedure', lazy='dynamic',
+            backref=db.backref('user'))
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
-    locale = db.relationship(CodeableConcept, cascade="save-update")
+    _locale = db.relationship(CodeableConcept, cascade="save-update")
+    deleted = db.relationship('Audit', cascade="save-update",
+                              foreign_keys=[deleted_id])
+
+    # FIXME kludge for random demo data
+    due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
+    random_due_date_status = 'due'
+
+    def __str__(self):
+        """Print friendly format for logging, etc."""
+        return "user {0.id}".format(self)
+
+    def __setattr__(self, name, value):
+        """Make sure deleted users aren't being updated"""
+        if not name.startswith('_'):
+            if getattr(self, 'deleted'):
+                raise ValueError("can not update {} on deleted {}".format(
+                    name, self))
+        return super(User, self).__setattr__(name, value)
+
+    @property
+    def valid_consents(self):
+        """Access to consents that have neither been deleted or expired"""
+        now = datetime.utcnow()
+        return self._consents.filter(
+            text("expires>:now and deleted_id is null")).params(now=now)
 
     @property
     def display_name(self):
@@ -143,7 +289,66 @@ class User(db.Model, UserMixin):
         else:
             return self.username
 
-    def add_observation(self, fhir):
+    @property
+    def locale(self):
+        if self._locale and self._locale.codings and (len(self._locale.codings) > 0):
+            return self._locale.codings[0]
+        return None
+
+    @property
+    def locale_code(self):
+        if self.locale:
+            return self.locale.code
+        return None
+
+    @property
+    def locale_name(self):
+        if self.locale:
+            return self.locale.display
+        return None
+
+    @locale.setter
+    def locale(self, code, name):
+        # IETF BCP 47 standard uses hyphens, but we instead store w/ underscores,
+        # to better integrate with babel/LR URLs/etc
+        data = {"coding": [{'code': code, 'display': name,
+                  'system': "urn:ietf:bcp:47"}]}
+        self._locale = CodeableConcept.from_fhir(data)
+
+    @hybrid_property
+    def email(self):
+        # Called in different contexts - only compare string
+        # value if it's a base string type, as opposed to when
+        # its being used in a query statement (email.ilike('foo'))
+        if isinstance(self._email, basestring):
+            if self._email.startswith(INVITE_PREFIX):
+                return self._email[len(INVITE_PREFIX):]
+
+        return self._email
+
+    @email.setter
+    def email(self, email):
+        self._email = email
+
+    def mask_email(self, prefix=INVITE_PREFIX):
+        """Mask temporary account email to avoid collision with registered
+
+        Temporary user accounts created for the purpose of invites get
+        in the way of the user creating a registered account.  Add a hidden
+        prefix to the email address in the temporary account to avoid
+        collision.
+
+        """
+        if not self._email.startswith(prefix):
+            self._email = prefix + self._email
+
+    def add_organization(self, organization_name):
+        """Shortcut to add a clinic/organization by name"""
+        org = Organization.query.filter_by(name=organization_name).one()
+        if org not in self.organizations:
+            self.organizations.append(org)
+
+    def add_observation(self, fhir, audit):
         if not 'coding' in fhir['code']:
             return 400, "requires at least one CodeableConcept"
         if not 'valueQuantity' in fhir:
@@ -159,11 +364,16 @@ class User(db.Model, UserMixin):
 
         issued = fhir.get('issued') and\
                 parser.parse(fhir.get('issued')) or None
-        observation = Observation(status=fhir.get('status'),
-                issued=issued,
-                codeable_concept_id=cc.id,
-                value_quantity_id=vq.id).add_if_not_found(True)
-
+        observation = Observation(
+            audit=audit,
+            status=fhir.get('status'),
+            issued=issued,
+            codeable_concept_id=cc.id,
+            value_quantity_id=vq.id).add_if_not_found(True)
+        if 'performer' in fhir:
+            for p in fhir['performer']:
+                performer = Performer.from_fhir(p)
+                observation.performers.append(performer)
         UserObservation(user_id=self.id,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
@@ -213,7 +423,6 @@ class User(db.Model, UserMixin):
         db.session.add(service_user)
         add_role(service_user, ROLE.SERVICE)
         self.add_relationship(service_user, RELATIONSHIP.SPONSOR)
-        auditable_event("Service account created by", user_id=self.id)
         return service_user
 
     def fetch_values_for_concept(self, codeable_concept):
@@ -224,7 +433,8 @@ class User(db.Model, UserMixin):
         return [obs.value_quantity for obs in self.observations if\
                 obs.codeable_concept_id == codeable_concept.id]
 
-    def save_constrained_observation(self, codeable_concept, value_quantity):
+    def save_constrained_observation(self, codeable_concept, value_quantity,
+                                    audit):
         """Add or update the value for given concept as observation
 
         We can store any number of observations for a patient, and
@@ -244,7 +454,8 @@ class User(db.Model, UserMixin):
 
         if existing:
             if existing[0].value_quantity_id == value_quantity.id:
-                # perfect match -- done
+                # perfect match -- update audit info
+                existing[0].audit = audit
                 return
             else:
                 # We don't want multiple observations for this concept
@@ -252,11 +463,12 @@ class User(db.Model, UserMixin):
                 self.observations.remove(existing[0])
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
-                                  value_quantity_id=value_quantity.id)
+                                  value_quantity_id=value_quantity.id,
+                                  audit=audit)
         self.observations.append(observation.add_if_not_found())
 
     def clinical_history(self, requestURL=None):
-        now = datetime.now()
+        now = datetime.utcnow()
         fhir = {"resourceType": "Bundle",
                 "title": "Clinical History",
                 "link": [{"rel": "self", "href": requestURL},],
@@ -268,6 +480,18 @@ class User(db.Model, UserMixin):
                     "updated": as_fhir(now),
                     "author": [{"name": "Truenth Portal"},],
                     "content": ob.as_fhir()})
+        return fhir
+
+    def procedure_history(self, requestURL=None):
+        now = datetime.utcnow()
+        fhir = {"resourceType": "Bundle",
+                "title": "Procedure History",
+                "link": [{"rel": "self", "href": requestURL},],
+                "updated": as_fhir(now),
+                "entry": []}
+
+        for proc in self.procedures:
+            fhir['entry'].append({"resource": proc.as_fhir()})
         return fhir
 
     def as_fhir(self):
@@ -292,6 +516,13 @@ class User(db.Model, UserMixin):
                 ids.append(provider.as_fhir())
             return ids
 
+        def careProviders():
+            """build and return list of careProviders (AKA clinics)"""
+            orgs = []
+            for o in self.organizations:
+                orgs.append(reference.Reference.organization(o.id).as_fhir())
+            return orgs
+
         d = {}
         d['resourceType'] = "Patient"
         d['identifier'] = identifiers()
@@ -305,14 +536,11 @@ class User(db.Model, UserMixin):
         if self.gender:
             d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
-        if self.locale:
-            d['communication'] = [{"language": self.locale.as_fhir()}]
-        d['telecom'] = []
+        if self._locale:
+            d['communication'] = [{"language": self._locale.as_fhir()}]
+        telecom = Telecom(email=self.email, phone=self.phone)
+        d['telecom'] = telecom.as_fhir()
         d['photo'] = []
-        if self.email:
-            d['telecom'].append({'system': 'email', 'value': self.email})
-        if self.phone:
-            d['telecom'].append({'system': 'phone', 'value': self.phone})
         if self.image_url:
             d['photo'].append({'url': self.image_url})
         extensions = []
@@ -323,64 +551,115 @@ class User(db.Model, UserMixin):
                 extensions.append(data)
         if extensions:
             d['extension'] = extensions
+        d['careProvider'] = careProviders()
+        if self.deleted_id:
+            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
         return d
 
-    def update_username(self, force=False):
-        """Update username from self.first_name, self.last_name
+    def update_from_fhir(self, fhir, acting_user):
+        """Update the user's demographics from the given FHIR
 
-        @param force: Default behavior only updates if username is
-        currently 'Anonymous'.  Set force=True to override.
+        If a field is defined, it is the final definition for the respective
+        field, resulting in a deletion of existing values in said field
+        that are not included.
+
+        :param fhir: JSON defining portions of the user demographics to change
+        :param acting_user: user requesting the change
 
         """
-        if not force and self.username != 'Anonymous':
-            return
-        # Find a unique username
-        similar = User.query.filter(and_(User.username.like('{0} {1}%'.format(
-            self.first_name, self.last_name)), User.id != self.id))
-        if not similar.count():
-            self.username = '{0} {1}'.format(self.first_name, self.last_name)
-        else:
-            n = similar.count()
-            while True:
-                # start with the len and keep incrementing till we don't match
-                attempt = '{0} {1} {2}'.format(
-                    self.first_name, self.last_name, n)
-                if attempt not in [sim.username for sim in similar]:
-                    self.username = attempt
-                    break
-                else:
-                    n += 1
-
-    def update_from_fhir(self, fhir):
         def v_or_n(value):
             """Return None unless the value contains data"""
-            return value.rstrip() or None
+            if value:
+                return value.rstrip() or None
+
+        def update_orgs():
+            def allow_org_change(org, user, acting_user):
+                """don't allow non-admin providers to change top level orgs
+
+                as per
+                https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
+                raise exception if non-admin provider is attempting to
+                change their top level orgs
+
+                """
+                if org.partOf_id is None:  # top-level orgs
+                    if not acting_user.has_role(ROLE.ADMIN) and\
+                       user.has_role(ROLE.PROVIDER):
+                        raise ValueError("non-admin providers can't change "
+                                         "their high-level orgs")
+                return True
+
+            remove_if_not_requested = {org.id: org for org in
+                                       self.organizations}
+            for item in fhir['careProvider']:
+                org = reference.Reference.parse(item)
+                if org.id in remove_if_not_requested:
+                    remove_if_not_requested.pop(org.id)
+                if org not in self.organizations:
+                    allow_org_change(org, user=self, acting_user=acting_user)
+                    self.organizations.append(org)
+            for org in remove_if_not_requested.values():
+                allow_org_change(org, user=self, acting_user=acting_user)
+                self.organizations.remove(org)
 
         if 'name' in fhir:
-            self.first_name = v_or_n(fhir['name']['given']) or self.first_name
-            self.last_name = v_or_n(fhir['name']['family']) or self.last_name
-            self.update_username()
+            self.first_name = v_or_n(
+                fhir['name'].get('given')) or self.first_name
+            self.last_name = v_or_n(
+                fhir['name'].get('family')) or self.last_name
         if 'birthDate' in fhir and fhir['birthDate'].strip():
             self.birthdate = datetime.strptime(fhir['birthDate'],
                     '%Y-%m-%d')
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
-            for e in fhir['telecom']:
-                if e['system'] == 'email':
-                    self.email = v_or_n(e['value'])
-                if e['system'] == 'phone':
-                    self.phone = v_or_n(e['value'])
+            telecom = Telecom.from_fhir(fhir['telecom'])
+            self.email = telecom.email
+            self.phone = telecom.phone
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
-                    self.locale = CodeableConcept.from_fhir(e['language'])
+                    self._locale = CodeableConcept.from_fhir(e.get('language'))
         if 'extension' in fhir:
             # a number of elements live in extension - handle each in turn
             for e in fhir['extension']:
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
+        if 'careProvider' in fhir:
+            update_orgs()
         db.session.add(self)
+
+    def merge_with(self, other_id):
+        """merge details from other user into self
+
+        Part of an account generation or login flow - scenarios include
+        a provider setting up an account (typically the *other_id*) and
+        then a user logs into an existing account or registers a new (self)
+        and now we need to pull the data set up by the provider into the
+        new account.
+
+        """
+        other = User.query.get(other_id)
+        if not other:
+            abort(404, 'other_id {} not found'.format(other_id))
+
+        for attr in ('email', 'first_name', 'last_name', 'birthdate',
+                     'gender', 'phone', 'locale_id', 'timezone'):
+            if not getattr(other, attr):
+                continue
+            if not getattr(self, attr):
+                setattr(self, attr, getattr(other, attr))
+            # value present in both.  assume user just set to best value
+
+        for relationship in ('organizations', '_consents', 'procedures',
+                             'observations', 'relationships', 'roles',
+                             'races', 'ethnicities', 'groups'):
+            self_entity = getattr(self, relationship)
+            other_entity = getattr(other, relationship)
+            append_list = [item for item in other_entity if item not in
+                           self_entity]
+            for item in append_list:
+                self_entity.append(item)
 
     def check_role(self, permission, other_id):
         """check user for adequate role
@@ -389,24 +668,108 @@ class User(db.Model, UserMixin):
         otherwise, must be self or have a relationship granting permission
         to "verb" the other user.
 
-        returns true if permission should be granted, otherwise raise a 401
+        returns true if permission should be granted, raises 404 if the
+        other_id can't be found, otherwise raise a 401
 
         """
+        assert(permission in ('view', 'edit'))  # limit vocab for now
         if self.id == other_id:
             return True
+        try:
+            int(other_id)
+        except ValueError:
+            abort(400, "Non Integer value for User ID: {}".format(other_id))
+        other = User.query.get(other_id)
+        if not other:
+            abort(404, "User not found {}".format(other_id))
         for role in self.roles:
             if role.name in (ROLE.ADMIN, ROLE.SERVICE):
+                # Admin and service accounts have carte blanche
                 return True
-        # TODO: address permission details, etc.
+            if role.name == ROLE.PROVIDER:
+                # Providers get carte blanche on members with a signed
+                # consent for the same parent organization
+                user_orgs = set((c.id for c in self.organizations))
+                others_orgs = set(
+                    (c.organization_id for c in other.valid_consents))
+                if user_orgs.intersection(others_orgs):
+                    return True
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
 
+    def provider_html(self):
+        """Helper used from templates to display any custom provider text
+
+        Interventions can add personalized HTML for care providers
+        to consume on the /patients list.  Look up any values for this user
+        on all interventions.
+
+        """
+        uis = UserIntervention.query.filter(and_(
+            UserIntervention.user_id == self.id,
+            UserIntervention.provider_html != None))
+        if uis.count() == 0:
+            return ""
+        if uis.count() == 1:
+            return uis[0].provider_html
+        else:
+            return '<div>' + '</div><div>'.join(
+                [ui.provider_html for ui in uis]) + '</div>'
+
+    def fuzzy_match(self, first_name, last_name, birthdate):
+        """Returns probability score [0-100] of it being the same user"""
+        # remove case issues as it confuses the match
+        scores = []
+        scores.append(fuzz.ratio(self.first_name.lower(), first_name.lower()))
+        scores.append(fuzz.ratio(self.last_name.lower(), last_name.lower()))
+
+        # birthdate is trickier - raw delta doesn't make sense.  treat
+        # it like a string, assuming only typos for a mismatch
+        scores.append(fuzz.ratio(self.birthdate.strftime('%d%m%Y'),
+                                 birthdate.strftime('%d%m%Y')))
+        return sum(scores) / len(scores)
+
+
+    def delete_user(self, acting_user):
+        """Mark user deleted from the system
+
+        Due to audit constraints, we do NOT actually delete the user, but
+        mark the user as deleted.  See `permanently_delete_user` for
+        more serious alternative.
+
+        :param self: user to mark deleted
+        :param acting_user: individual executing the command, for audit trail
+
+        """
+        from .audit import Audit
+        from .auth import Client, Token
+
+        if self == acting_user:
+            raise ValueError("can't delete self")
+        if self is None or acting_user is None:
+            raise ValueError("both user and acting_user must be well defined")
+
+        # Don't allow deletion of users with client applications
+        clients = Client.query.filter_by(user_id=self.id)
+        if clients.count():
+            raise ValueError("Users owning client applications can not "
+                             "be deleted.  Delete client apps first: {}".format(
+                                 [client.id for client in clients]))
+
+        self.active = False
+        self.deleted = Audit(user_id=acting_user.id,
+                             comment="marking deleted {}".format(self))
+
+        # purge any outstanding access tokens
+        Token.query.filter_by(user_id=self.id).delete()
+        db.session.commit()
+
 
 def add_authomatic_user(authomatic_user, image_url):
     """Given the result from an external IdP, create a new user"""
-    user = User(username=authomatic_user.name,
+    user = User(
             first_name=authomatic_user.first_name,
             last_name=authomatic_user.last_name,
             birthdate=authomatic_user.birth_date,
@@ -427,7 +790,7 @@ def add_anon_user():
     a real user at a later time in the session.
 
     """
-    user = User(username='Anonymous')
+    user = User()
     db.session.add(user)
     add_role(user, ROLE.ANON)
     return user
@@ -457,6 +820,8 @@ def current_user():
 
     returns current user object, or None if not logged in (local or remote)
     """
+    from flask import request, session
+
     uid = None
     if 'id' in session:
         # Locally logged in
@@ -490,7 +855,8 @@ class UserRoles(db.Model):
         """Print friendly format for logging, etc."""
         return "UserRole {0.user_id}:{0.role_id}".format(self)
 
-def flag_test():
+
+def flag_test():  # pragma: no test
     """Find all non-service users and flag as test"""
 
     users = User.query.filter(

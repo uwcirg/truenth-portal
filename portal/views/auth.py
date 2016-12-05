@@ -5,35 +5,30 @@ import hashlib
 import hmac
 import json
 import requests
-from urlparse import urlparse, parse_qs
 from authomatic.adapters import WerkzeugAdapter
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
-from flask.ext.login import login_user, logout_user
-from flask.ext.user import roles_required
-from flask.ext.user.signals import user_logged_in, user_registered
-from flask_wtf import Form
+from flask_login import login_user, logout_user
+from flask_user import roles_required
+from flask_user.signals import user_logged_in, user_registered
+from flask_wtf import FlaskForm
 from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField
+from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.intervention import Intervention, INTERVENTION
-from ..models.intervention import STATIC_INTERVENTIONS
+from ..models.auth import validate_client_origin
+from ..models.coredata import Coredata
+from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
 from ..extensions import authomatic, db, oauth
-from ..template_helpers import split_string
 
 auth = Blueprint('auth', __name__)
-
-
-@auth.context_processor
-def utility_processor():
-    return dict(split_string=split_string)
 
 
 @auth.route('/deauthorized', methods=('POST',))
@@ -87,37 +82,96 @@ def flask_user_registered_event(app, user, **extra):
 user_logged_in.connect(flask_user_login_event)
 user_registered.connect(flask_user_registered_event)
 
+def capture_next_view_function(real_function):
+    """closure to hang onto real view function to use after saving 'next'"""
+    real_function = real_function
+
+    def capture_next():
+        """Alternate view function plugged in to capture 'next' in session"""
+        if request.args.get('next'):
+            session['next'] = request.args.get('next')
+            current_app.logger.debug(
+                "store-session['next']: <{}> before {}()".format(
+                    session['next'], real_function.func_name))
+        return real_function()
+    return capture_next
+
 
 @auth.route('/next-after-login')
 def next_after_login():
-    """Redirect to appropriate target depending on client auth status
+    """Redirection to appropriate target depending on data and auth status
 
-    When client applications request OAuth tokens, we sometimes need
-    to postpone the action of authorizing the client while the user
-    logs in to TrueNTH.
+    Multiple authorization paths in, some needing up front information before
+    returning, this attempts to handle such state decisions.  In other words,
+    this function represents the state machine to control initial flow.
 
-    After completing authentication with TrueNTH, this handles
-    redirecting the browser to the appropriate target (either resume
-    the client auth in process or the root).
+    When client applications (interventions) request OAuth tokens, we sometimes
+    need to postpone the action of authorizing the client while the user logs
+    in to TrueNTH.
+
+    After completing authentication with TrueNTH, additional data may need to
+    be obtained, such as a TOU agreement.  In such a case, the user will be
+    directed to initial_queries, then back here for redirection to the
+    appropriate 'next'.
 
     Implemented as a view method for integration with flask-user config.
 
     """
-    # If client auth was pushed aside, resume now
-    if current_user() and 'pending_authorize_args' in session:
+    # Without a current_user - can't continue, send back to root for login
+    user = current_user()
+    if not user:
+        current_app.logger.debug("next_after_login: [no user] -> landing")
+        return redirect(url_for('portal.landing'))
+
+    # Logged in - take care of pending actions
+    if 'challenge_verified_user_id' in session:
+        # user has now finished p/w update - clear session variable
+        del session['challenge_verified_user_id']
+
+    # Look for an invited user scenario - may need to merge provided
+    # info (what the provider set in invited user) with the current user.
+    if 'invited_verified_user_id' in session:
+        invited_user_id = session['invited_verified_user_id']
+        assert user.id != invited_user_id
+        auditable_event("merging invited user {} into account {}".format(
+            invited_user_id, user.id), user_id=user.id)
+        user.merge_with(invited_user_id)
+        invited_user = User.query.get(invited_user_id)
+        invited_user.delete_user(acting_user=user)
+        db.session.commit()
+        del session['invited_verified_user_id']
+
+    # Present intial questions (TOU et al) if not already obtained
+    if not Coredata().initial_obtained(user):
+        current_app.logger.debug("next_after_login: [need data] -> "
+                                 "initial_queries")
+        return redirect(url_for('portal.initial_queries'))
+
+    # Clients/interventions trying to obtain an OAuth token for protected
+    # access need to be put in a pending state, if the user isn't already
+    # authenticated with the portal.  It's now time to resume that process;
+    # pop the pending state from the session and resume, if found.
+    if 'pending_authorize_args' in session:
         args = session['pending_authorize_args']
-        current_app.logger.debug("redirecting to interrupted " +
-            "client authorization: %s", str(args))
+        current_app.logger.debug("next_after_login: [resume pending] ->"
+                                 "authorize: {}".format(args))
         del session['pending_authorize_args']
         return redirect(url_for('auth.authorize', **args))
-    elif current_user() and 'next' in session:
+
+    # 'next' is typically set on the way in when gathering authentication.
+    # It's stored in the session to survive the various redirections needed
+    # for external auth, etc.  If found in the session, pop and redirect
+    # as defined.
+    if 'next' in session:
         next_url = session['next']
         del session['next']
-        current_app.logger.debug(
-            "redirecting to session['next'] %s", next_url)
+        current_app.logger.debug("next_after_login: [have session['next']] "
+                                 "-> {}".format(next_url))
         return redirect(next_url)
-    else:
-        return redirect('/')
+
+    # No better place to go, send user home
+    current_app.logger.debug("next_after_login: [no state] -> home")
+    return redirect(url_for('portal.home'))
 
 
 @auth.route('/login/<provider_name>/')
@@ -135,7 +189,7 @@ def login(provider_name):
         session['id'] = user_id
         user = current_user()
         login_user(user)
-        return redirect('/')
+        return next_after_login()
 
     def picture_url(result):
         """Using OAuth result, fetch the user's picture URL"""
@@ -154,8 +208,9 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
-        current_app.logger.debug('retaining next url %s',
-                                 session['next'])
+        current_app.logger.debug(
+            "store-session['next'] <{}> from login/{}".format(
+                session['next'], provider_name))
         # The existance of any args (including 'next') breaks the authomatic
         # login flow.  Clear out before passing on
         from werkzeug.datastructures import ImmutableMultiDict
@@ -163,13 +218,22 @@ def login(provider_name):
 
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
-    result = authomatic.login(adapter, provider_name)
+    result = authomatic.authomatic.login(adapter, provider_name)
 
     if current_user():
+        if current_user().deleted:
+            abort(400, "deleted user - operation not permitted")
         return next_after_login()
     if result:
         if result.error:
-            current_app.logger.error(result.error.message)
+            reload_count = session.get('force_reload_count', 0)
+            if reload_count > 2:
+                current_app.logger.warn("Failed 3 attempts: {}".format(
+                    result.error.message))
+                abort(500, "unable to authorize with provider {}".format(
+                    provider_name))
+            session['force_reload_count'] = reload_count + 1
+            current_app.logger.info(result.error.message)
             # Work around for w/ Safari and cookies set to current site only
             # forcing a reload brings the local cookies back into view
             # (they're missing with such a setting on returning from
@@ -221,17 +285,48 @@ def login(provider_name):
         return response
 
 
+@auth.route('/login-as/<user_id>')
+@roles_required(ROLE.PROVIDER)
+@oauth.require_oauth()
+def login_as(user_id):
+    """Provide direct login w/o auth to user account, but only if qualified
+
+    Special individuals may assume the identity of other users, but only
+    if the business rules validate.  For example, a provider may log in
+    as a patient who has a current consent on file for the provider's
+    organization.
+
+    If qualified, the current user's session is destroyed and the requested
+    user is logged in - passing control to 'next_after_login'
+
+    """
+    # said business rules enforced by check_role()
+    current_user().check_role('edit', user_id)
+    auditable_event("assuming identity of user {}".format(user_id),
+                    user_id=current_user().id)
+    logout(prevent_redirect=True)
+    login_user(get_user(user_id))
+    return next_after_login()
+
+
 @auth.route('/logout')
-def logout():
+def logout(prevent_redirect=False):
     """logout view function
 
     Logs user out by requesting the previously granted permission to
     use authenticated resources be deleted from the OAuth server, and
     clearing the browser session.
 
+    :param prevent_redirect: set only if calling this function during
+        another process where redirection after logout is not desired
+
+    Optional query string parameter timed_out should be set to clarify the
+    logout request is the result of a stale session
+
     """
     user = current_user()
     user_id = user.id if user else None
+    timed_out = request.args.get('timed_out', False)
 
     def delete_facebook_authorization(user_id):
         """Remove OAuth authorization for TrueNTH on logout
@@ -253,12 +348,11 @@ def logout():
                 format(ap.provider_id)
             requests.delete(url, headers=headers)
 
-
     def notify_clients(user_id):
         """Inform any client apps of the logout event.
 
-        Look for tokens this user obtained, and notify those clients
-        of the logout event
+        Look for tokens this user obtained, notify the respective clients
+        of the logout event and invalidate all outstanding tokens by deletion
 
         """
         if not user_id:
@@ -266,34 +360,46 @@ def logout():
         for token in Token.query.filter_by(user_id=user_id):
             c = Client.query.filter_by(client_id=token.client_id).first()
             c.notify({'event': 'logout', 'user_id': user_id,
-                    'refresh_token': token.refresh_token})
+                      'refresh_token': token.refresh_token,
+                      'timed_out': timed_out})
             # Invalidate the access token by deletion
             db.session.delete(token)
         db.session.commit()
 
-
     if user_id:
-        auditable_event("logout", user_id=user_id)
+        event = 'logout' if not timed_out else 'logout due to timeout'
+        auditable_event(event, user_id=user_id)
         # delete_facebook_authorization()  #Not using at this time
 
     logout_user()
     session.clear()
     notify_clients(user_id)
+    if prevent_redirect:
+        return
     return redirect('/')
 
-class InterventionEditForm(Form):
+class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""
     public_access = BooleanField('Public Access', default=True)
     card_html = TextField('Card HTML')
-    card_url = TextField('Card URL')
+    link_label = TextField('Link Label')
+    link_url = TextField('Link URL')
+    status_text = TextField('Status Text')
 
     def __init__(self, *args, **kwargs):
         """As a nested form, CSRF is handled by the parent"""
         kwargs['csrf_enabled'] = False
         super(InterventionEditForm, self).__init__(*args, **kwargs)
 
+    def validate_link_url(form, field):
+        """Custom validation to allow null and known origins only"""
+        if len(field.data.strip()):
+            try:
+                validate_client_origin(field.data)
+            except Unauthorized:
+                raise validators.ValidationError("Invalid URL (unknown origin)")
 
-class ClientEditForm(Form):
+class ClientEditForm(FlaskForm):
     """wtform class for validation during client edits"""
     intervention_names = [(k, v) for k, v in STATIC_INTERVENTIONS.items()]
 
@@ -311,11 +417,14 @@ class ClientEditForm(Form):
     def validate_application_role(form, field):
         """Custom validation to confirm only one app per role"""
         selected = field.data
-        # the default role isn't assigned or limited
-        if selected == INTERVENTION.DEFAULT:
+        if not selected or selected == 'None':
             return True
 
-        intervention = Intervention.query.filter_by(name=selected).first()
+        # the default role isn't assigned or limited
+        if selected == INTERVENTION.DEFAULT.name:
+            return True
+
+        intervention = getattr(INTERVENTION, selected)
 
         # if the selected intervention already has a client, make sure
         # it's the client being edited or raise a validation error
@@ -334,6 +443,7 @@ class ClientEditForm(Form):
 
 @auth.route('/client', methods=('GET', 'POST'))
 @roles_required(ROLE.APPLICATION_DEVELOPER)
+@oauth.require_oauth()
 def client():
     """client registration
 
@@ -389,7 +499,7 @@ def client():
 
     """
     user = current_user()
-    form = ClientEditForm(application_role=INTERVENTION.DEFAULT)
+    form = ClientEditForm(application_role=INTERVENTION.DEFAULT.name)
     if not form.validate_on_submit():
         return render_template('client_add.html', form=form)
     client = Client(
@@ -405,9 +515,9 @@ def client():
         client), user_id=user.id)
 
     # if user selected a role besides the default, set it.
-    if form.application_role.data != INTERVENTION.DEFAULT:
+    if form.application_role.data != INTERVENTION.DEFAULT.name:
         selected = form.application_role.data
-        intervention = Intervention.query.filter_by(name=selected).first()
+        intervention = getattr(INTERVENTION, selected)
         auditable_event("client {0} assuming role {1}".format(
             client.client_id, selected), user_id=user.id)
         intervention.client_id = client.client_id
@@ -417,6 +527,7 @@ def client():
 
 @auth.route('/client/<client_id>', methods=('GET', 'POST'))
 @roles_required(ROLE.APPLICATION_DEVELOPER)
+@oauth.require_oauth()
 def client_edit(client_id):
     """client edit
 
@@ -505,8 +616,8 @@ def client_edit(client_id):
             current_role.client_id = None
             auditable_event("client {0} releasing role {1}".format(
                 client.client_id, current_role.description), user_id=user.id)
-        if selected != INTERVENTION.DEFAULT:
-            intervention = Intervention.query.filter_by(name=selected).first()
+        if selected != INTERVENTION.DEFAULT.name:
+            intervention = getattr(INTERVENTION, selected)
             if intervention.client_id != client.client_id:
                 intervention.client_id = client.client_id
                 auditable_event("client {0} assuming role {1}".format(
@@ -533,7 +644,8 @@ def client_edit(client_id):
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
-        token = create_service_token(client=client, user=service_user)
+        auditable_event("Service account created by", user_id=user.id)
+        create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
             client.client_id), user_id=user.id)
         redirect_target = url_for('.client_edit', client_id=client.client_id)
@@ -551,7 +663,8 @@ def client_edit(client_id):
 
 
 @auth.route('/clients')
-@roles_required(ROLE.APPLICATION_DEVELOPER)
+@roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN])
+@oauth.require_oauth()
 def clients_list():
     """clients list
 
@@ -586,7 +699,10 @@ def clients_list():
 
     """
     user = current_user()
-    clients = Client.query.filter_by(user_id=user.id).all()
+    if user.has_role(ROLE.ADMIN):
+        clients = Client.query.all()
+    else:
+        clients = Client.query.filter_by(user_id=user.id).all()
     return render_template('clients_list.html', clients=clients)
 
 
@@ -643,6 +759,8 @@ def token_status():
     """
     token_type, access_token = request.headers.get('Authorization').split()
     token = Token.query.filter_by(access_token=access_token).first()
+    if not token:
+        abort(404, "token not found")
     expires_in = token.expires - datetime.utcnow()
     return jsonify(access_token=access_token,
             refresh_token=token.refresh_token, token_type=token_type,
@@ -674,7 +792,7 @@ def oauth_errors():
               description: Known details of error situation.
 
     """
-    current_app.logger.error(request.args.get('error'))
+    current_app.logger.warn(request.args.get('error'))
     return jsonify(error=request.args.get('error')), 400
 
 
@@ -842,7 +960,7 @@ def authorize(*args, **kwargs):
         # has completed.
         current_app.logger.debug('Postponing oauth client authorization' +
             ' till user authenticates with CS: %s', str(request.args))
-        session['pending_authorize_args'] = request.args 
+        session['pending_authorize_args'] = request.args
 
         return redirect('/')
     # See "hardwired" note in docstring above

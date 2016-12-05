@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field %}
+
+    <h3 class="tnth-headline">TrueNTH Settings</h3><br />
+
+    <p>Most settings are controlled via configuration files on the server
+    and don't yet have embedded controls for making changes.  Exceptions
+    are listed below.</p>
+
+    <form action="/settings" method="post">
+        {{ form.hidden_tag() }}
+
+        {{ render_field(form.timeout, tabindex=5) }}
+
+        <button type="submit" class="btn btn-tnth-primary">Save Settings</button>
+    </form>
+
+{% endblock %}

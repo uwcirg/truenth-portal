@@ -1,0 +1,120 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import render_field %}
+
+    <style>
+        .label {color: #777; font-size: 0.9em; margin-left: -8px; position: relative; top:-3px;}
+        .field {margin-top: 1.2em;}
+        .hr {margin-top: -8px;}
+        .title { color: #6b7571;}
+        .error-message { margin-left: 0; display: none;}
+    </style>
+    <h4 class="tnth-headline">{{ _("Identity Verification") }}</h4>
+
+    <hr/>
+
+    <br/>
+
+    <p class="profile-item-title">{{ _("To ensure your personal details are not shared with others, please enter the following data for account confirmation.") }}</p>
+
+    <form  id="challengeForm" action="/challenge" method="post" class="form tnth-form to-validate" role="form" data-toggle="validator">
+
+         {{ form.hidden_tag() }}
+
+         <input type="hidden" id="birthdate" name="birthdate" value="{{form.birthdate.data if form.birthdate.data}}" />
+
+        <div id="identityVerificationContainer">
+             <p class="title">{{ _("Name") }}</p>
+             <hr class="hr"/>
+            <div class="row">
+                <div class="col-md-5 col-xs-10">
+                    <div class="form-group float-input-label">
+                        <input required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="first_name" name="first_name" placeholder="{{ _('First Name') }}" value="{{form.first_name.data if form.first_name.data}}" type="text">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5 col-xs-10">
+                    <div class="form-group float-input-label">
+                        <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="last_name" name="last_name" placeholder="{{ _('Last Name') }}" value="{{form.last_name.data if form.last_name.data}}" type="text">
+                        <div class="help-block with-errors"></div>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <p class="title">{{ _("Birth Date") }}</p>
+            <hr class="hr"/>
+            <div class="form-group" id="bdGroup">
+                <div class="row">
+                    <div class="col-md-5 col-xs-10">
+                         <label class="label">{{ _("Day") }}</label>
+                        <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" data-birthday="true" required pattern="\d[\d]?">
+                    </div>
+                </div>
+                <div class="row field">
+                    <div class="col-md-5 col-xs-10">
+                        <label class="label">{{ _("Month") }}</label>
+                        <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                            <option value="">{{ _("Month") }}...</option>
+                            <option value="01">{{ _("January") }}</option>
+                            <option value="02">{{ _("February") }}</option>
+                            <option value="03">{{ _("March") }}</option>
+                            <option value="04">{{ _("April") }}</option>
+                            <option value="05">{{ _("May") }}</option>
+                            <option value="06">{{ _("June") }}</option>
+                            <option value="07">{{ _("July") }}</option>
+                            <option value="08">{{ _("August") }}</option>
+                            <option value="09">{{ _("September") }}</option>
+                            <option value="10">{{ _("October") }}</option>
+                            <option value="11">{{ _("November") }}</option>
+                            <option value="12">{{ _("December") }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row field">
+                    <div class="col-md-5 col-xs-10">
+                        <label class="label">{{ _("Year") }}</label>
+                        <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" pattern = "\d{4}" required>
+                    </div>
+                </div>
+                <div class="row field">
+                     <div class="col-md-5 col-xs-10">
+                        <div class="help-block with-errors"></div>
+                        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+                     </div>
+                </div>
+            </div>
+            <hr/>
+            <button type="submit" class="btn btn-tnth-primary">{{ _("Confirm Identity") }}</button>
+            <br/><br/>
+            <div class="error-message text-muted bg-danger" {%if errorMessage %} style="display:block"{% endif%}>{{errorMessage}}</div>
+        </div>
+
+    </form>
+
+{% endblock %}
+
+{% block document_ready %}
+$(document).ready(function() {
+
+    var fmBirthDate = "{{form.birthdate.data if form.birthdate.data}}";
+    if (fmBirthDate) {
+        var arrDate = String(fmBirthDate).split("-");
+        $("#month").val(arrDate[0]);
+        $("#date").val(arrDate[1]);
+        $("#year").val(arrDate[2]);
+    };
+
+    $('#challengeForm').validator().on('submit', function (e) {
+          if (!e.isDefaultPrevented()) {
+                if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
+                    $("#birthdate").val($("#month").val() + "-" + $("#date").val() + "-" + $("#year").val());
+                }
+
+          };
+    });
+
+
+});
+{% endblock %}

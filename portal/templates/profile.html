@@ -1,362 +1,208 @@
 {% extends "layout.html" %}
 {% block main %}
-{% from "flask_user/_macros.html" import back_btn %}
+{% from "flask_user/_macros.html" import back_btn, back_link %}
+{% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 
-{% if current_user.has_role('admin') and HTTP_REFERER in request.environ and request.environ.HTTP_REFERER.endswith("admin") %}
-{{ back_btn('admin','User List') }}
+<!-- <div id="loadingIndicator" class="loading-indicator">
+    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
+</div> -->
+
+<br/>
+<div class="flex">
+<div class="profile-header">
+    {% if providerPerspective == 'true' %}
+        <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+    {% elif current_user.has_role('admin') %}
+        <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+    {% else %}
+         <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+    {% endif %}
+</div>
+{{profileImage(user)}}
+</div>
+<nav id="indexNavBar">
+{% if providerPerspective == 'true' %}
+{{ back_link('patients', _('Patients List')) }}
+{% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+{{ back_link('admin', _('User List')) }}
+{% else %}
+{{ back_link(PORTAL, _('Home')) }}
 {% endif %}
+<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
+{% if current_user.has_role('provider') and user.has_role('patient') %}
 
-<div id="loadingIndicator" class="loading-indicator">
-    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i><br />
-    <p class="lead">Saving...</p>
+<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></span>
+<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
+<!-- shown only in reduced browser size-->
+<div class="btn-group link-xs">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    {{ _("Select") }} <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></a></li>
+    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
+  </ul>
 </div>
 
-<h3 class="tnth-headline">
-{% if current_user.has_role('admin')%}
-Profile for {{ user.username }}
-{% else %}
-My TrueNTH Profile
-{% endif %}
-</h3>
+<div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.9em">
+            <br/>
+            <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
+          </div>
+        </div>
+      </div>
+</div>
 
-<form id="profileForm" class="form tnth-form" role="form">
+
+<div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">{{ _("Assessing Patient for EPIC-26") }}</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-left">{{ _("Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
+            <br/>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
+          </div>
+        </div>
+      </div>
+</div>
+{% endif %}
+</nav>
+<div id="indexContainer">{{ _("Index List") }}</div>
+
+
+<br/>
+<form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
 
 <div class="row" style="position: relative;">
-    <div class="col-md-9">
-
-        {% if user.image_url %}
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="profile-img hidden-xs">
-                    <img src="{{ user.image_url }}" />
-                </div>
-            </div>
-        </div>
+    <div class="col-md-12">
+        {{profile(user, current_user, consent_agreements)}}
+        <br/>
+        {% if providerPerspective == 'true' %}
+           <br/><br/> {{ back_btn('patients','Patients List') }}
+        {% else %}
+            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
         {% endif %}
-
-        <input type="hidden" name="birthDate" id="birthday" value="{{ user.birthdate if user.birthdate }}">
-        <div class="form-group" style="margin-bottom: 0">
-            <label>Name</label>
-        </div>
-        <div class="row">
-            <div class="col-xs-6">
-                <div class="form-group float-input-label">
-                    <input required="required" data-error="First name is required" class="form-control float-text" id="firstname" name="firstname" placeholder="" value="{{ user.first_name if user.first_name }}" type="text" />
-                    <div class="help-block with-errors"></div>
-                </div>
-            </div>
-            <div class="col-xs-6">
-                <div class="form-group float-input-label">
-                    <input required="required" data-error="Last name is required" class="form-control float-text" name="lastname" placeholder="Last Name" value="{{ user.last_name if user.last_name }}" type="text" />
-                    <div class="help-block with-errors"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group" id="bdGroup">
-            <label>Birth Date</label>
-            <div class="row">
-                <div class="col-xs-4">
-                    <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
-                        <option value="">Month...</option>
-                        <option value="01">January</option>
-                        <option value="02">February</option>
-                        <option value="03">March</option>
-                        <option value="04">April</option>
-                        <option value="05">May</option>
-                        <option value="06">June</option>
-                        <option value="07">July</option>
-                        <option value="08">August</option>
-                        <option value="09">September</option>
-                        <option value="10">October</option>
-                        <option value="11">November</option>
-                        <option value="12">December</option>
-                    </select>
-                </div>
-                <div class="col-xs-4">
-                    <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-                </div>
-                <div class="col-xs-4">
-                    <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
-                </div>
-            </div>
-            <span id="bdError" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
-        </div>
-        <div class="form-group">
-            <label>Gender</label>
-            <div style="margin-top: -10px">
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if user.gender == "male"}}/>
-                    Male
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexF" value="female" required {{ "checked" if user.gender == "female"}}/>
-                    Female
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" name="sex" id="sexO" value="other" required {{ "checked" if user.gender == "other"}}/>
-                    Other
-                </label>
-            </div>
-        </div>
-        <div class="form-group float-input-label" id="emailGroup">
-            <label for="email">Email address</label>
-            <input type="text" class="form-control" id="email" name="email" place-holder="Your email" value="{{ user.email if user.email }}" data-customemail="true" required>
-            <div class="help-block with-errors"></div>
-        </div>
-        <div class="form-group float-input-label">
-            <label for="phone">Cell phone <span class="text-muted smaller-text">(Optional)</span></label>
-            <input type="text" class="form-control" id="phone" name="phone" placeholder="XXX-XXX-XXXX" value="{{ user.phone if user.phone }}">
-        </div>
-
-        <p id="saveMsg" class="text-muted text-center bg-warning" style="display: none"><small>You've updated your profile. Click the "Save" button to submit your changes. Or <a href="">cancel</a>.</small></p>
-        <p id="errorMsg" class="text-muted text-center bg-danger" style="display: none"><small>Oops, looks like there's a problem with your profile. Please correct it before saving.</small></p>
-        <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">Save</button>
-
     </div>
-
-        <!--
-        <div class="col-md-4 pos-bottom-md">
-        <div id="patientQuestions">
-            <div class="form-group">
-                <label>Have you had a prostate cancer biopsy?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input class="history-q" type="radio" name="biopsy" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="biopsy" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you been diagnosed with prostate cancer?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="pca_diag" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>Have you begun prostate cancer treatment?</label>
-                <div>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="true" />
-                        Yes
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="tx" value="false" />
-                        No
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="visible-lg"><br /></div>
-        </div>
-        -->
 </div>
-
-
-<hr />
-
-{% if current_user.has_role('admin') and not user.has_role('service') %}
-<h3>User Roles for {{ user.username }}</h3>
-<div id="userRoles">
-    <div class="form-group">
-        <p>Editable by admins only.</p>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="admin"> Admin
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="anon"> Anon
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="application_developer"> Application Developer
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="partner"> Partner
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="patient"> Patient
-            </label>
-        </div>
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" value="test"> Test
-            </label>
-        </div>
-    </div>
-
-</div>
-{% endif %}
-
 </form>
 
 {% endblock %}
+
 {% block document_ready %}
+
+function goTo(event, id) {
+    event.stopPropagation();
+    window.location = "#" + id;
+    $("#indexContainer").removeClass("open");
+};
+
+
 $(document).ready(function(){
+    $('#loginAsPatient a').tooltip();
 
-    /*** Field Validation ***/
-    $('#profileForm').validator({
-        custom: {
-            birthday: function() {
-                var m = parseInt($("#month").val());
-                var d = parseInt($("#date").val());
-                var y = parseInt($("#year").val());
-                // If all three have been entered, run check
-                var goodDate = false;
-                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
-                if (m && d && y) {
-                    var today = new Date();
-                    // Check to see if this is a real date
-                    var date = new Date(y,m-1,d);
-                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                        goodDate = true;
-                        // Only allow if birthdate is before today
-                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                            goodDate = false;
-                            errorMsg = "Your birthdate must be in the past.";
-                        }
-                    }
-                    if (y.toString().length < 3) {
-                        goodDate = false;
-                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
-                    }
-                    // After tests display errors if necessary
-                    if (goodDate) {
-                        $("#bdError").hide();
-                        // Set date if YYYY-MM-DD
-                        $("#birthday").val(y+"-"+m+"-"+d);
-                    } else {
-                        $("#bdError").html(errorMsg).show();
-                        $("#birthday").val("");
-                    }
-                } else {
-                    // If NaN then the values haven't been entered yet, so we
-                    // validate as true until other fields are entered
-                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                        return true;
-                    } else if (isNaN(d)) {
-                        errorMsg = "Please enter a date.";
-                    }
-                    $("#bdError").html(errorMsg).show();
-                    $("#birthday").val("");
-                }
-                if (goodDate) {
-                    return true;
-                } else {
-                    return false;
-                }
+    [{
+        attachID: "month",
+        targetField: $("#month")
+     },
+     {
+        attachID: "date",
+        targetField: $("#date")
+     },
+     {
+        attachID: "year",
+        targetField: $("#year")
+     },
+     {
+        attachID: "firstname",
+        targetField: $("#firstname")
+     },
+     {
+        attachID: "lastname",
+        targetField: $("#lastname")
+     },
+     {
+        attachID: "email",
+        targetField: $("#email")
+     },
+     {
+        attachID: "phone",
+        targetField: $("#phone")
+     },
+     {
+        attachID: "locale",
+        targetField: $("#locale")
+     },
+     {
+        attachID: "genderGroup",
+        targetField: $("input[name='sex']")
+     },
+     {
+        attachID: "userRace",
+        targetField: $("input[name='race']")
+     },
+     {
+        attachID: "userEthnicity",
+        targetField: $("input[name='ethnicity']")
+     },
+     {
+        attachID: "rolesGroup",
+        targetField: $("input[name='user_type']")
+     }].forEach(function(o) {
+        /** see main.js **/
+        getSaveLoaderDiv("profileForm", o.attachID);
 
-            },
-            customemail: function($el) {
-                if ($el.val() == "") {
-                    return false;
-                }
-                var emailReg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return emailReg.test( $el.val() );
-            }
-        },
-        errors: {
-            birthday: "Sorry, this isn't a valid date. Please try again.",
-            customemail: "This isn't a valid e-mail address, please double-check."
-        },
-        disable: false
+        o.targetField.each(function() {
+            $(this).attr("save-container-id", o.attachID);
+            $(this).on("change", function() {
+              if (this.validity.valid) {
+                assembleContent.demo({{ user.id }},true, $(this));
+              };
+            });
+        });
     });
-    // If there's any change to form fields, the note that
-    $("#profileForm :input").change(function() {
-        $(this).closest('form').attr('data-changed', true)
+
+    if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
+
+    $("html").click(function(event){
+        $("#indexContainer").removeClass('open');
     });
-    $('#profileForm').on('validated.bs.validator', function(e) {
-        var validator = $(this).data('bs.validator');
-        // If the form has a change, then show save or error messages
-        if ($(this).data('changed')) {
-            if (!validator.hasErrors()) {
-                $("#saveMsg").fadeIn("slow")
-                $("#errorMsg").hide()
-            } else {
-                $("#saveMsg").hide()
-                $("#errorMsg").fadeIn("slow")
-            }
-        }
-    })
-    /*** End -- Field Validation ***/
 
-    // Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
-    var currentBd = $("#birthday").val();
-    if (currentBd) {
-        var bdArray = currentBd.split("-");
-        $("#year").val(bdArray[0]);
-        $("#month").val(bdArray[1]);
-        $("#date").val(bdArray[2]);
-    }
+    $("#indexNavBar span.index-list").click(function(event) {
+        event.stopPropagation();
+        $('#indexContainer').toggleClass('open');
 
-    // Submit the form here
-    $("#updateProfile").on("click", function(event){
-        event.preventDefault()
-
-        $("#profileForm").addClass("loading");
-        $("#loadingIndicator").show();
-
-        // Grab profile field values
-        var getBirthday = $("input[name=birthDate]").val()
-        var getFirstname = $("input[name=firstname]").val()
-        var getLastname = $("input[name=lastname]").val()
-        var getSex = $("input[name=sex]:checked").val()
-        var getEmail = $("input[name=email]").val()
-        var getPhone = $("input[name=phone]").val()
-
-        // Put form data into FHIR array
-        var demoArray = {};
-        demoArray["resourceType"] = "Patient"
-        demoArray["birthDate"] = getBirthday
-        demoArray["gender"] = getSex
-        demoArray["name"] = {
-            "given": getFirstname,
-            "family": getLastname
-        };
-        demoArray["telecom"] = [
-            { "system": "email", "value": getEmail },
-            { "system": "phone", "value": getPhone }
-        ];
-        /** Send the AJAX **/
-        $.ajax ({
-            type: "PUT",
-            url: '/api/demographics/{{ user.id }}',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify(demoArray)
-        }).done(function() {
-            $("#saveMsg").hide()
-            setTimeout(function(){
-                $("#profileIntro").html("<strong>Your changes have been saved.</strong> Return to the <a href='/'>main portal page</a> {% if current_user.has_roles('admin') %} or <a href='/admin'> user administration</a>{% endif %}.");
-                $("#profileForm").removeClass("loading");
-                $("#loadingIndicator").fadeOut();
-            }, 1200);
-        }).fail(function() {
-            alert("There was a problem updating your profile. Please try again.");
-            $("#loadingIndicator").fadeOut();
-            $("#profileForm").removeClass("loading");
-        }); 
     });
+
+
+    var t = $("#profileForm").find("h4.profile-item-title");
+    var indexContent = "<ul style='padding:0; margin:0; list-style-type:square'>";
+        t.each(function() {
+        indexContent += "<li style='margin-bottom:4px; cursor:pointer' onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
+    });
+    indexContent += "</ul>";
+    $("#indexContainer").html(indexContent);
+
+    //in profile email is validated and updated after ajax call to check unique email
+    $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');
+
 });
 
 /** Remove patientQuestion functionality for now
@@ -374,6 +220,7 @@ $.each(getQs, function(i,val){
         console.log("Problem retrieving data from server.")
     });
 });
+
 $("#patientQuestions input").on("change", function(){
     var toCall = $(this).attr("name");
     var theVal = $(this).val();
@@ -391,36 +238,21 @@ $("#patientQuestions input").on("change", function(){
     });
 });
 **/
-// GET and PUT user roles
-$.ajax ({
-    type: "GET",
-    url: '/api/user/{{ user.id }}/roles'
-}).done(function(data) {
-    $.each(data.roles,function(i,val){
-        $("#userRoles input:checkbox[value="+val.name+"]").prop('checked', true);
-    })
-}).fail(function() {
-    console.log("Problem retrieving data from server.")
-});
 
-$("#userRoles input:checkbox").on("click",function(){
-    var roles = []
-    roles.push({name: $(this).val()})
-    var toSend = {"roles": roles}
-    // If role is checked, type is PUT, otherwise DELETE
-    var ajaxType = "DELETE"
-    if ($(this).prop('checked')) {
-        ajaxType = "PUT"
-    }
-    $.ajax ({
-        type: ajaxType,
-        url: '/api/user/{{ user.id }}/roles',
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json',
-        data: JSON.stringify(toSend)
-    }).done(function(data) {
-    }).fail(function() {
-        console.log("Problem updating role on server.")
-    })
-})
+/** Get and Put roles **/
+function setRoles() {
+    tnthAjax.getRoles({{ user.id }}, true);
+    $("#rolesGroup input:checkbox").on("click",function(){
+
+        var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+            return { name: $(this).val() };
+        }).get();
+        var toSend = {"roles": roles};
+        tnthAjax.putRoles({{user.id}},toSend);
+
+    });
+};
+/* done in on change event for role now*/
+//setRoles();
+
 {% endblock %}

@@ -1,12 +1,13 @@
 """Unit test module for fhir model"""
 from datetime import datetime
-from flask.ext.webtest import SessionScope
+from dateutil import parser, tz
+from flask_webtest import SessionScope
+import pytz
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
-from portal.models.fhir import QuestionnaireResponse
-
+from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
 
 class TestFHIR(TestCase):
     """FHIR model tests"""
@@ -108,3 +109,15 @@ class TestFHIR(TestCase):
         qr_str = "test format: {}".format(qr)
         self.assertIn(str(qr.user_id), qr_str)
         self.assertIn(str(qr.status), qr_str)
+
+    def test_tz_aware_conversion(self):
+        eastern = pytz.timezone('US/Eastern')
+        aware = datetime(2016, 7, 15, 9, 20, 37, 0, eastern)
+        parsed = FHIR_datetime.parse(aware.strftime("%Y-%m-%dT%H:%M:%S%z"))
+        self.assertEquals(aware, parsed)
+        self.assertEquals(pytz.utc, parsed.tzinfo)
+
+    def test_tz_unaware_conversion(self):
+        unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
+        parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
+        self.assertEquals(unaware, parsed)
