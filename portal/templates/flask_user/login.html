@@ -36,12 +36,10 @@
 
                         {# Username or Email field #}
                         {% set field = form.username if user_manager.enable_username else form.email %}
-                        {{ render_field(field, label="Email address", label_visible=false, tabindex=10) }}
-
+                        {{ render_field(field, label="Email address", label_visible=false, tabindex=10, infoText="Note: If you had a username before, please use your email address now. Your password remains unchanged.") }}
                         {# Password field #}
                         {% set field = form.password %}
                         {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
-
                         {# Submit button #}
                         {{ render_submit_field(form.submit, tabindex=180, label="Log In", btnSize="btn-lg") }}
                     </form>

@@ -1,4 +1,4 @@
-{% macro render_field(field, label=None, label_visible=true, right_url=None, right_label=None, helpText=false) -%}
+{% macro render_field(field, label=None, label_visible=true, right_url=None, right_label=None, helpText=false, infoText="") -%}
     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
         {% if field.type != 'HiddenField' and label_visible %}
             {% if not label %}{% set label=field.label.text %}{% endif %}
@@ -16,6 +16,7 @@
                 {% endif %}
             {% endif %}
         </div>
+        <div id="loginEmailReminderText" class="text-muted">{{infoText|safe}}</div>
     </div>
 {%- endmacro %}
 
