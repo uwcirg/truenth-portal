@@ -78,7 +78,7 @@ before_deploy:
         },
         "version": {
             "name": "%s",
-            "gpgSign": false
+            "gpgSign": true
         },
         "files": [
             {
