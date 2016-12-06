@@ -24,8 +24,7 @@
     {% if display.access %}
         <div class="portal-item">
             <h2 class="tnth-subhead">{{ intervention.description }}</h2>
-            {{ display.card_html | safe }}
-            <br style="line-height:0.5em"/>
+            <div style="padding:0.1em 0">{{ display.card_html | safe }}</div>
             {% if display.link_url is none %}
             <a class="btn-lg btn-tnth-primary disabled" href="{{ display.link_url }}">
                 {{ display.link_label }}
