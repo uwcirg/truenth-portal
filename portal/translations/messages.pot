@@ -39,7 +39,7 @@ msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&artic
 msgstr ""
 
 #: portal/templates/about.html:5 portal/templates/contact.html:5
-#: portal/templates/explore.html:10 portal/templates/flask_user/_macros.html:66
+#: portal/templates/explore.html:10 portal/templates/flask_user/_macros.html:67
 #: portal/templates/legal.html:6 portal/templates/profile.html:29
 msgid "Home"
 msgstr ""
@@ -88,9 +88,9 @@ msgstr ""
 msgid "Learn"
 msgstr ""
 
-#: portal/templates/admin.html:6 portal/templates/flask_user/_macros.html:80
-#: portal/templates/portal_wrapper.html:112
-#: portal/templates/portal_wrapper.html:157
+#: portal/templates/admin.html:6 portal/templates/flask_user/_macros.html:81
+#: portal/templates/portal_wrapper.html:131
+#: portal/templates/portal_wrapper.html:177
 msgid "User Administration"
 msgstr ""
 
@@ -185,7 +185,7 @@ msgstr ""
 #: portal/templates/coredata.html:143
 #: portal/templates/initial_queries_macros.html:80
 #: portal/templates/profile_macros.html:22
-#: portal/templates/profile_macros.html:1058
+#: portal/templates/profile_macros.html:1033
 #: portal/templates/profile_test.html:63
 msgid "Month"
 msgstr ""
@@ -194,7 +194,7 @@ msgstr ""
 #: portal/templates/coredata.html:144
 #: portal/templates/initial_queries_macros.html:81
 #: portal/templates/profile_macros.html:23
-#: portal/templates/profile_macros.html:1059
+#: portal/templates/profile_macros.html:1034
 #: portal/templates/profile_test.html:64
 msgid "January"
 msgstr ""
@@ -203,7 +203,7 @@ msgstr ""
 #: portal/templates/coredata.html:145
 #: portal/templates/initial_queries_macros.html:82
 #: portal/templates/profile_macros.html:24
-#: portal/templates/profile_macros.html:1060
+#: portal/templates/profile_macros.html:1035
 #: portal/templates/profile_test.html:65
 msgid "February"
 msgstr ""
@@ -212,7 +212,7 @@ msgstr ""
 #: portal/templates/coredata.html:146
 #: portal/templates/initial_queries_macros.html:83
 #: portal/templates/profile_macros.html:25
-#: portal/templates/profile_macros.html:1061
+#: portal/templates/profile_macros.html:1036
 #: portal/templates/profile_test.html:66
 msgid "March"
 msgstr ""
@@ -221,7 +221,7 @@ msgstr ""
 #: portal/templates/coredata.html:147
 #: portal/templates/initial_queries_macros.html:84
 #: portal/templates/profile_macros.html:26
-#: portal/templates/profile_macros.html:1062
+#: portal/templates/profile_macros.html:1037
 #: portal/templates/profile_test.html:67
 msgid "April"
 msgstr ""
@@ -230,7 +230,7 @@ msgstr ""
 #: portal/templates/coredata.html:148
 #: portal/templates/initial_queries_macros.html:85
 #: portal/templates/profile_macros.html:27
-#: portal/templates/profile_macros.html:1063
+#: portal/templates/profile_macros.html:1038
 #: portal/templates/profile_test.html:68
 msgid "May"
 msgstr ""
@@ -239,7 +239,7 @@ msgstr ""
 #: portal/templates/coredata.html:149
 #: portal/templates/initial_queries_macros.html:86
 #: portal/templates/profile_macros.html:28
-#: portal/templates/profile_macros.html:1064
+#: portal/templates/profile_macros.html:1039
 #: portal/templates/profile_test.html:69
 msgid "June"
 msgstr ""
@@ -248,7 +248,7 @@ msgstr ""
 #: portal/templates/coredata.html:150
 #: portal/templates/initial_queries_macros.html:87
 #: portal/templates/profile_macros.html:29
-#: portal/templates/profile_macros.html:1065
+#: portal/templates/profile_macros.html:1040
 #: portal/templates/profile_test.html:70
 msgid "July"
 msgstr ""
@@ -257,7 +257,7 @@ msgstr ""
 #: portal/templates/coredata.html:151
 #: portal/templates/initial_queries_macros.html:88
 #: portal/templates/profile_macros.html:30
-#: portal/templates/profile_macros.html:1066
+#: portal/templates/profile_macros.html:1041
 #: portal/templates/profile_test.html:71
 msgid "August"
 msgstr ""
@@ -266,7 +266,7 @@ msgstr ""
 #: portal/templates/coredata.html:152
 #: portal/templates/initial_queries_macros.html:89
 #: portal/templates/profile_macros.html:31
-#: portal/templates/profile_macros.html:1067
+#: portal/templates/profile_macros.html:1042
 #: portal/templates/profile_test.html:72
 msgid "September"
 msgstr ""
@@ -275,7 +275,7 @@ msgstr ""
 #: portal/templates/coredata.html:153
 #: portal/templates/initial_queries_macros.html:90
 #: portal/templates/profile_macros.html:32
-#: portal/templates/profile_macros.html:1068
+#: portal/templates/profile_macros.html:1043
 #: portal/templates/profile_test.html:73
 msgid "October"
 msgstr ""
@@ -284,7 +284,7 @@ msgstr ""
 #: portal/templates/coredata.html:154
 #: portal/templates/initial_queries_macros.html:91
 #: portal/templates/profile_macros.html:33
-#: portal/templates/profile_macros.html:1069
+#: portal/templates/profile_macros.html:1044
 #: portal/templates/profile_test.html:74
 msgid "November"
 msgstr ""
@@ -293,7 +293,7 @@ msgstr ""
 #: portal/templates/coredata.html:155
 #: portal/templates/initial_queries_macros.html:92
 #: portal/templates/profile_macros.html:34
-#: portal/templates/profile_macros.html:1070
+#: portal/templates/profile_macros.html:1045
 #: portal/templates/profile_test.html:75
 msgid "December"
 msgstr ""
@@ -302,14 +302,14 @@ msgstr ""
 msgid "Year"
 msgstr ""
 
-#: portal/templates/challenge_identity.html:88
+#: portal/templates/challenge_identity.html:89
 msgid "Confirm Identity"
 msgstr ""
 
 #: portal/templates/client_add.html:5 portal/templates/client_edit.html:6
-#: portal/templates/flask_user/_macros.html:83
-#: portal/templates/portal_wrapper.html:106
-#: portal/templates/portal_wrapper.html:154
+#: portal/templates/flask_user/_macros.html:84
+#: portal/templates/portal_wrapper.html:125
+#: portal/templates/portal_wrapper.html:174
 msgid "Client Applications"
 msgstr ""
 
@@ -446,8 +446,8 @@ msgid "We have sent an email to the team supporting TrueNTH."
 msgstr ""
 
 #: portal/templates/contact_sent.html:11
-#: portal/templates/portal_wrapper.html:100
-#: portal/templates/portal_wrapper.html:148
+#: portal/templates/portal_wrapper.html:119
+#: portal/templates/portal_wrapper.html:168
 msgid "TrueNTH Home"
 msgstr ""
 
@@ -513,7 +513,7 @@ msgstr ""
 msgid "Skip This"
 msgstr ""
 
-#: portal/templates/coredata.html:89 portal/templates/profile_macros.html:1006
+#: portal/templates/coredata.html:89 portal/templates/profile_macros.html:981
 msgid ""
 "Which of the following prostate cancer treatments have you had, if any? "
 "If you don&#39;t remember the exact\n"
@@ -521,7 +521,7 @@ msgid ""
 msgstr ""
 
 #: portal/templates/coredata.html:92 portal/templates/coredata.html:102
-#: portal/templates/profile_macros.html:1017
+#: portal/templates/profile_macros.html:992
 msgid "Add a treatment"
 msgstr ""
 
@@ -529,47 +529,47 @@ msgstr ""
 msgid "Your Treatments"
 msgstr ""
 
-#: portal/templates/coredata.html:107 portal/templates/profile_macros.html:1022
+#: portal/templates/coredata.html:107 portal/templates/profile_macros.html:997
 msgid "Select treatment"
 msgstr ""
 
-#: portal/templates/coredata.html:108 portal/templates/profile_macros.html:1023
+#: portal/templates/coredata.html:108 portal/templates/profile_macros.html:998
 msgid "Started watchful waiting"
 msgstr ""
 
-#: portal/templates/coredata.html:109 portal/templates/profile_macros.html:1024
+#: portal/templates/coredata.html:109 portal/templates/profile_macros.html:999
 msgid "Started active surveillance"
 msgstr ""
 
-#: portal/templates/coredata.html:110 portal/templates/profile_macros.html:1025
+#: portal/templates/coredata.html:110 portal/templates/profile_macros.html:1000
 msgid "Radical prostatectomy (nerve-sparing)"
 msgstr ""
 
-#: portal/templates/coredata.html:111 portal/templates/profile_macros.html:1026
+#: portal/templates/coredata.html:111 portal/templates/profile_macros.html:1001
 msgid "Radical prostatectomy (non-nerve-sparing)"
 msgstr ""
 
-#: portal/templates/coredata.html:112 portal/templates/profile_macros.html:1027
+#: portal/templates/coredata.html:112 portal/templates/profile_macros.html:1002
 msgid "External beam radiation therapy"
 msgstr ""
 
-#: portal/templates/coredata.html:113 portal/templates/profile_macros.html:1028
+#: portal/templates/coredata.html:113 portal/templates/profile_macros.html:1003
 msgid "Brachytherapy"
 msgstr ""
 
-#: portal/templates/coredata.html:114 portal/templates/profile_macros.html:1029
+#: portal/templates/coredata.html:114 portal/templates/profile_macros.html:1004
 msgid "Androgen deprivation therapy"
 msgstr ""
 
-#: portal/templates/coredata.html:115 portal/templates/profile_macros.html:1030
+#: portal/templates/coredata.html:115 portal/templates/profile_macros.html:1005
 msgid "None of the above"
 msgstr ""
 
-#: portal/templates/coredata.html:136 portal/templates/profile_macros.html:1051
+#: portal/templates/coredata.html:136 portal/templates/profile_macros.html:1026
 msgid "Date"
 msgstr ""
 
-#: portal/templates/coredata.html:169 portal/templates/profile_macros.html:1084
+#: portal/templates/coredata.html:169 portal/templates/profile_macros.html:1059
 msgid "Add Procedure"
 msgstr ""
 
@@ -768,7 +768,7 @@ msgstr ""
 #: portal/templates/initial_queries_macros.html:228
 #: portal/templates/layout.html:88 portal/templates/layout.html:102
 #: portal/templates/patients_by_org.html:126 portal/templates/portal.html:61
-#: portal/templates/profile.html:81 portal/templates/profile_macros.html:389
+#: portal/templates/profile.html:81 portal/templates/profile_macros.html:400
 msgid "Close"
 msgstr ""
 
@@ -843,7 +843,7 @@ msgid "or select a patient below to view or update details."
 msgstr ""
 
 #: portal/templates/patients_by_org.html:34
-#: portal/templates/portal_wrapper.html:109
+#: portal/templates/portal_wrapper.html:128
 msgid "Patients"
 msgstr ""
 
@@ -864,7 +864,7 @@ msgid "Next Due"
 msgstr ""
 
 #: portal/templates/patients_by_org.html:77
-#: portal/templates/profile_macros.html:586
+#: portal/templates/profile_macros.html:597
 msgid "Status"
 msgstr ""
 
@@ -891,55 +891,59 @@ msgstr ""
 msgid "This feature is not yet available."
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:91
-#: portal/templates/portal_wrapper.html:119
+#: portal/templates/portal_wrapper.html:108
+#: portal/templates/portal_wrapper.html:139
 msgid "Welcome"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:95
-#: portal/templates/portal_wrapper.html:132
+#: portal/templates/portal_wrapper.html:114
+#: portal/templates/portal_wrapper.html:152
 msgid "MENU"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:68
-#: portal/templates/portal_wrapper.html:102
-#: portal/templates/portal_wrapper.html:150 portal/templates/profile.html:18
+#: portal/templates/flask_user/_macros.html:69
+#: portal/templates/portal_wrapper.html:121
+#: portal/templates/portal_wrapper.html:170 portal/templates/profile.html:18
 #: portal/templates/profile_test.html:18
 msgid "My TrueNTH Profile"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:104
-#: portal/templates/portal_wrapper.html:152
+#: portal/templates/portal_wrapper.html:123
+#: portal/templates/portal_wrapper.html:172
 msgid "About TrueNTH"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:114
-#: portal/templates/portal_wrapper.html:160
-msgid "Log Out of TrueNTH"
-msgstr ""
-
-#: portal/templates/portal_wrapper.html:122
-#: portal/templates/portal_wrapper.html:146
-msgid "Log In to TrueNTH"
+#: portal/templates/portal_wrapper.html:132
+msgid "Settings"
 msgstr ""
 
 #: portal/templates/portal_wrapper.html:134
+#: portal/templates/portal_wrapper.html:180
+msgid "Log Out of TrueNTH"
+msgstr ""
+
+#: portal/templates/portal_wrapper.html:142
+#: portal/templates/portal_wrapper.html:166
+msgid "Log In to TrueNTH"
+msgstr ""
+
+#: portal/templates/portal_wrapper.html:154
 msgid "Return to TrueNTH home"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:171
+#: portal/templates/portal_wrapper.html:191
 msgid "Your session is about to expire"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:172
+#: portal/templates/portal_wrapper.html:192
 msgid "Your session will expire in approximately"
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:172
+#: portal/templates/portal_wrapper.html:192
 msgid "seconds due to inactivity."
 msgstr ""
 
-#: portal/templates/portal_wrapper.html:173
+#: portal/templates/portal_wrapper.html:193
 msgid "Stay Logged In"
 msgstr ""
 
@@ -1023,8 +1027,8 @@ msgid "No (in other parts of body as well)"
 msgstr ""
 
 #: portal/templates/profile_create.html:54
-#: portal/templates/profile_macros.html:354
-#: portal/templates/profile_macros.html:942
+#: portal/templates/profile_macros.html:365
+#: portal/templates/profile_macros.html:917
 msgid "Clinics"
 msgstr ""
 
@@ -1032,14 +1036,14 @@ msgstr ""
 #: portal/templates/profile_macros.html:139
 #: portal/templates/profile_macros.html:168
 #: portal/templates/profile_macros.html:218
-#: portal/templates/profile_macros.html:346
-#: portal/templates/profile_macros.html:354
+#: portal/templates/profile_macros.html:357
+#: portal/templates/profile_macros.html:365
 #: portal/templates/profile_test.html:107
 msgid "Optional"
 msgstr ""
 
-#: portal/templates/profile_create.html:57
-#: portal/templates/profile_macros.html:357
+#: portal/templates/profile_create.html:58
+#: portal/templates/profile_macros.html:368
 msgid "None of the Above"
 msgstr ""
 
@@ -1104,196 +1108,200 @@ msgstr ""
 msgid "Send Email"
 msgstr ""
 
-#: portal/templates/profile_macros.html:346
+#: portal/templates/profile_macros.html:357
 #: portal/templates/profile_test.html:107
 msgid "Cell"
 msgstr ""
 
-#: portal/templates/profile_macros.html:381
+#: portal/templates/profile_macros.html:358
+msgid "XXX-XXX-XXXX"
+msgstr ""
+
+#: portal/templates/profile_macros.html:392
 msgid "Sharing your data"
 msgstr ""
 
-#: portal/templates/profile_macros.html:508
+#: portal/templates/profile_macros.html:519
 msgid "for"
 msgstr ""
 
-#: portal/templates/profile_macros.html:509
+#: portal/templates/profile_macros.html:520
 #: portal/templates/profile_test.html:174
 msgid "Editable by admins only."
 msgstr ""
 
-#: portal/templates/profile_macros.html:514
+#: portal/templates/profile_macros.html:525
 #: portal/templates/profile_test.html:177
 msgid "Admin"
 msgstr ""
 
-#: portal/templates/profile_macros.html:519
+#: portal/templates/profile_macros.html:530
 #: portal/templates/profile_test.html:182
 msgid "Anon"
 msgstr ""
 
-#: portal/templates/profile_macros.html:524
+#: portal/templates/profile_macros.html:535
 #: portal/templates/profile_test.html:187
 msgid "Application Developer"
 msgstr ""
 
-#: portal/templates/profile_macros.html:529
+#: portal/templates/profile_macros.html:540
 msgid "Content Manager"
 msgstr ""
 
-#: portal/templates/profile_macros.html:534
+#: portal/templates/profile_macros.html:545
 #: portal/templates/profile_test.html:192
 msgid "Partner"
 msgstr ""
 
-#: portal/templates/profile_macros.html:539
+#: portal/templates/profile_macros.html:550
 #: portal/templates/profile_test.html:197
-#: portal/templates/sessionReport.html:11
+#: portal/templates/sessionReport.html:10
 msgid "Patient"
 msgstr ""
 
-#: portal/templates/profile_macros.html:544
+#: portal/templates/profile_macros.html:555
 msgid "Provider"
 msgstr ""
 
-#: portal/templates/profile_macros.html:549
+#: portal/templates/profile_macros.html:560
 #: portal/templates/profile_test.html:202
 msgid "Test"
 msgstr ""
 
-#: portal/templates/profile_macros.html:554
+#: portal/templates/profile_macros.html:565
 msgid "Write Only"
 msgstr ""
 
-#: portal/templates/profile_macros.html:585
+#: portal/templates/profile_macros.html:596
 msgid "Session History"
 msgstr ""
 
-#: portal/templates/profile_macros.html:585
+#: portal/templates/profile_macros.html:596
 msgid "click each row to review report"
 msgstr ""
 
-#: portal/templates/profile_macros.html:586
+#: portal/templates/profile_macros.html:597
 msgid "Assessment Name"
 msgstr ""
 
-#: portal/templates/profile_macros.html:586
+#: portal/templates/profile_macros.html:597
 msgid "Last Updated"
 msgstr ""
 
-#: portal/templates/profile_macros.html:586
+#: portal/templates/profile_macros.html:597
 msgid "GMT Time Zone"
 msgstr ""
 
-#: portal/templates/profile_macros.html:746
+#: portal/templates/profile_macros.html:721
 msgid "Clinical Questions"
 msgstr ""
 
-#: portal/templates/profile_macros.html:747
+#: portal/templates/profile_macros.html:722
 msgid "Questions inquired of the patient at registration"
 msgstr ""
 
-#: portal/templates/profile_macros.html:766
+#: portal/templates/profile_macros.html:741
 msgid "no answers provided"
 msgstr ""
 
-#: portal/templates/profile_macros.html:820
+#: portal/templates/profile_macros.html:795
 msgid "Intervention Reports"
 msgstr ""
 
-#: portal/templates/profile_macros.html:825
+#: portal/templates/profile_macros.html:800
 msgid "No Reports Available"
 msgstr ""
 
-#: portal/templates/profile_macros.html:839
-#: portal/templates/profile_macros.html:859
+#: portal/templates/profile_macros.html:814
+#: portal/templates/profile_macros.html:834
 msgid "Patient Information"
 msgstr ""
 
-#: portal/templates/profile_macros.html:839
-#: portal/templates/profile_macros.html:878
+#: portal/templates/profile_macros.html:814
+#: portal/templates/profile_macros.html:853
 msgid "User Information"
 msgstr ""
 
-#: portal/templates/profile_macros.html:847
-#: portal/templates/profile_macros.html:867
-#: portal/templates/profile_macros.html:890
+#: portal/templates/profile_macros.html:822
+#: portal/templates/profile_macros.html:842
+#: portal/templates/profile_macros.html:865
 msgid "Communications"
 msgstr ""
 
-#: portal/templates/profile_macros.html:911
+#: portal/templates/profile_macros.html:886
 msgid "PRO Assessments"
 msgstr ""
 
-#: portal/templates/profile_macros.html:926
+#: portal/templates/profile_macros.html:901
 msgid "Clinical Data"
 msgstr ""
 
-#: portal/templates/profile_macros.html:942
+#: portal/templates/profile_macros.html:917
 msgid "Organization Affiliation"
 msgstr ""
 
-#: portal/templates/profile_macros.html:952
+#: portal/templates/profile_macros.html:927
 msgid "Patient Detail"
 msgstr ""
 
-#: portal/templates/profile_macros.html:952
+#: portal/templates/profile_macros.html:927
 msgid "User Detail"
 msgstr ""
 
-#: portal/templates/profile_macros.html:977
+#: portal/templates/profile_macros.html:952
 msgid "User Roles"
 msgstr ""
 
-#: portal/templates/profile_macros.html:987
+#: portal/templates/profile_macros.html:962
 msgid "Audit Log"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1006
+#: portal/templates/profile_macros.html:981
 msgid ""
 "Which of the following prostate cancer treatments has the patient had, if"
 " any? If you don&#39;t remember the exact date, please make your best "
 "guess."
 msgstr ""
 
-#: portal/templates/profile_macros.html:1010
+#: portal/templates/profile_macros.html:985
 msgid "Your treatments"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1010
+#: portal/templates/profile_macros.html:985
 msgid "Treatments"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1112
+#: portal/templates/profile_macros.html:1087
 msgid ""
 "You have updated your profile. Click the Save button to submit your "
 "changes."
 msgstr ""
 
-#: portal/templates/profile_macros.html:1112
+#: portal/templates/profile_macros.html:1087
 msgid "Or"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1112
+#: portal/templates/profile_macros.html:1087
 #: portal/templates/profile_test.html:111
 msgid "cancel"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1113
+#: portal/templates/profile_macros.html:1088
 msgid "There is a problem with your profile. Please correct it before saving."
 msgstr ""
 
-#: portal/templates/profile_macros.html:1113
+#: portal/templates/profile_macros.html:1088
 msgid "Make sure all required fields are filled out."
 msgstr ""
 
-#: portal/templates/profile_macros.html:1115
+#: portal/templates/profile_macros.html:1090
 #: portal/templates/profile_test.html:113
 #: portal/templates/questions_anon.html:91
 msgid "Save"
 msgstr ""
 
-#: portal/templates/profile_macros.html:1116
+#: portal/templates/profile_macros.html:1091
 msgid "Profile changes have been saved"
 msgstr ""
 
@@ -1435,19 +1443,19 @@ msgid ""
 "website?"
 msgstr ""
 
-#: portal/templates/sessionReport.html:10
+#: portal/templates/sessionReport.html:9
 msgid "Assessment Report Detail"
 msgstr ""
 
-#: portal/templates/sessionReport.html:14
+#: portal/templates/sessionReport.html:13
 msgid "Back to Patient Profile"
 msgstr ""
 
-#: portal/templates/sessionReport.html:14
+#: portal/templates/sessionReport.html:13
 msgid "Back to Truenth Home"
 msgstr ""
 
-#: portal/templates/sessionReport.html:18
+#: portal/templates/sessionReport.html:17
 msgid "Unable to load report"
 msgstr ""
 
@@ -1467,39 +1475,39 @@ msgstr ""
 msgid "Continue registration without an Access Code"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:54
+#: portal/templates/flask_user/_macros.html:55
 msgid "Back to"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:58
+#: portal/templates/flask_user/_macros.html:59
 msgid "back to"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:69
+#: portal/templates/flask_user/_macros.html:70
 msgid "Send an Invite"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:71
+#: portal/templates/flask_user/_macros.html:72
 msgid "TrueBLOG"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:72
+#: portal/templates/flask_user/_macros.html:73
 msgid "Movember.com"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:96
+#: portal/templates/flask_user/_macros.html:97
 msgid "About"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:96
+#: portal/templates/flask_user/_macros.html:97
 msgid "Contact"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:96
+#: portal/templates/flask_user/_macros.html:97
 msgid "Legal"
 msgstr ""
 
-#: portal/templates/flask_user/_macros.html:100
+#: portal/templates/flask_user/_macros.html:101
 msgid "Movember"
 msgstr ""
 
@@ -1521,7 +1529,7 @@ msgstr ""
 msgid "Invite User"
 msgstr ""
 
-#: portal/templates/flask_user/login.html:52
+#: portal/templates/flask_user/login.html:50
 #: portal/templates/flask_user/login_or_register.html:104
 #: portal/templates/flask_user/login_or_register.html:152
 msgid "Forgot your Password?"
