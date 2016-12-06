@@ -69,7 +69,7 @@ pytest==3.0.5
 python-dateutil==2.6.0
 python-editor==1.0.3
 python-Levenshtein==0.12.0
-pytz==2016.7
+pytz==2016.10
 PyYAML==3.12
 recommonmark==0.4.0
 redis==2.10.5
