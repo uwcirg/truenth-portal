@@ -722,12 +722,15 @@ class User(db.Model, UserMixin):
         """Returns probability score [0-100] of it being the same user"""
         # remove case issues as it confuses the match
         scores = []
-        scores.append(fuzz.ratio(self.first_name.lower(), first_name.lower()))
-        scores.append(fuzz.ratio(self.last_name.lower(), last_name.lower()))
+        fname = self.first_name or ''
+        lname = self.last_name or ''
+        scores.append(fuzz.ratio(fname.lower(), first_name.lower()))
+        scores.append(fuzz.ratio(lname.lower(), last_name.lower()))
 
         # birthdate is trickier - raw delta doesn't make sense.  treat
         # it like a string, assuming only typos for a mismatch
-        scores.append(fuzz.ratio(self.birthdate.strftime('%d%m%Y'),
+        dob = self.birthdate or datetime.utcnow()
+        scores.append(fuzz.ratio(dob.strftime('%d%m%Y'),
                                  birthdate.strftime('%d%m%Y')))
         return sum(scores) / len(scores)
 
@@ -838,7 +841,8 @@ def current_user():
 
 
 def get_user(uid):
-    return User.query.get(uid)
+    if uid:
+        return User.query.get(uid)
 
 
 class UserRoles(db.Model):

@@ -224,22 +224,23 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
     if request.method == 'GET':
         # Pull parameters from session if not defined
         if not (user_id and next_url):
-            user_id = session['challenge.user_id']
-            next_url = session['challenge.next_url']
+            user_id = session.get('challenge.user_id')
+            next_url = session.get('challenge.next_url')
             merging_accounts = session.get('challenge.merging_accounts', False)
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
         assert form.user_id.data
         user = get_user(form.user_id.data)
+        if not user:
+            abort(400, "missing user in identity challenge")
     else:
         user = get_user(user_id)
+        if not user:
+            abort(400, "missing user in identity challenge")
         form = ChallengeIdForm(
             next_url=next_url, user_id=user.id,
             merging_accounts=merging_accounts)
-
-    if not user:
-        abort(400, "missing invited user in identity challenge")
 
     errorMessage = ""
     if not form.validate_on_submit():
