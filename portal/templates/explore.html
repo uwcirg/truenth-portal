@@ -7,36 +7,45 @@
   {% set loggedIn = true %}
 {% endif %}
 
-  {{ back_btn(PORTAL,_('Home')) }}
-
-    <h1 class="tnth-headline">{{ _("Explore How TrueNTH Works") }}</h1>
-
-    <div class="row">
-      <div class="col-xs-12">
-
-        <p>{{ _("TrueNTH provides custom content and guidance to help you navigate life with prostate cancer.") }}</p>
-        <p>{{ _("To start, you simply fill out a few standard health forms, either on your own or with your clinician. Then, you'll get  personalized graphs and a library of content tailored to your specific needs.") }}</p>
-        <div class="thumbnail" style="height: 200px">{{ _("Chart image") }}</div>
-        <p><strong>{{ _("See your scores in relation to Men Like Me.") }}</strong></p>
-        <p>{{ _("By comparing your scores to men with similar experiences, treatments, and demographics (like age), you'll have a clearer view of your health") }}</p>
-        <div class="thumbnail" style="height: 200px">{{ _("Content image") }}</div>
-        <p>{{ _("Read and print out information on how to take care of your symptoms. You can fill out surveys anytime, to get the most up-to-date information.") }}</p>
-        <br />
-      </div>
-    </div>
-
-    {% if not loggedIn %}
     <div class="row">
       <div class="col-sm-8 col-sm-offset-2">
-        <div class="well well-lg" style="text-align: center">
-          <a class="btn-lg btn-tnth-primary" href="/user/register">{{ _("Register Now") }}</a>
-          <span style="margin: 0 1em">{{ _("or") }}</span>
-          <a class="btn-lg btn-tnth-primary" href="/user/sign-in">{{ _("Log In") }}</a>
-        </div>
+        <h4 class="tnth-headline profile-item-title">{{ _("Welcome to TrueNTH") }}</h4>
+        <p><em>{{_("Explore How TrueNTH Works")}}</em></p>
       </div>
     </div>
-    {% endif %}
 
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2">
+
+        <p>{{ _("A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers.") }}</p>
+        <p>{{ _("Coming soon … discover tools designed to help those affected by prostate cancer.") }}</p>
+      </div>
+    <div>
+
+   {% if not loggedIn %}
+      <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+          <div class="well well-lg" style="text-align: center;">
+            <a class="btn-lg btn-tnth-primary" href="/user/register">{{ _("Register Now") }}</a>
+            <span style="margin: 0 1em">{{ _("or") }}</span>
+            <a class="btn-lg btn-tnth-primary" href="/user/sign-in">{{ _("Log In") }}</a>
+          </div>
+        </div>
+      </div>
+   {% endif %}
+
+    <div class="row">
+      <div class="col-sm-8 col-sm-offset-2">
+        <ul>
+          <li>Explore values and preferences related to treatment decision making</li>
+          <li>Track symptoms and learn what you can do to improve them</li>
+          <li>Get advice on exercise, diet, sexual health, and wellbeing</li>
+          <li>Connect with others and navigate the prostate cancer journey together</li>
+        </ul>
+      </div>
+    </div>
+
+    {{ back_btn(PORTAL,_('Home')) }}
 
 
 
