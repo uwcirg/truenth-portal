@@ -578,9 +578,7 @@
                 var toSend = {"roles": roles};
                 //console.log('update role: ' + toSend);
                 tnthAjax.putRoles({{person.id}},toSend);
-
              });
-
         });
     });
     </script>
@@ -714,6 +712,51 @@
 
 {%- endmacro %}
 
+{% macro profileClinicalPCALocalized(person, current_user) -%}
+ <div class="row">
+        <div class="col-md-12">
+            <div class="profile-item-container">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Question") }}</h4>
+                <p class="text-muted">{{ _("Question inquired of the patient at account creation") }}</p>
+                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <div id="pcaLocalizedContainer" class="well" style="margin-top: 1em; padding: 0.7em 2em 1em 2em">
+                     <div id="patMeta" data-topic="pca_localized" class="pat-q">
+                      <br />
+                      <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
+                      <div class="form-group">
+                        <div class="radio">
+                          <label>
+                            <input type="radio" class="init-queries-field" save-container-id="pcaLocalizedContainer" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
+                          </label>
+                        </div>
+                        <div class="radio">
+                          <label>
+                            <input type="radio" class="init-queries-field" save-container-id="pcaLocalizedContainer" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (the cancer is in other parts of my body, too)") }}
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+<script>
+    {% if person %}
+        $(function () {
+            tnthAjax.getClinical({{ person.id }});
+            $("#pca_localized_yes").on("click", function() {
+                tnthAjax.putClinical({{person.id}},"pca_localized","true", $(this));
+            });
+            $("#pca_localized_no").on("click", function() {
+                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+            });
+            getSaveLoaderDiv("profileForm", "pcaLocalizedContainer");
+        });
+    {% endif %}
+
+</script>
+{%- endmacro %}
+
 {% macro profileClinicalQuestions(person, current_user) -%}
     <div class="row">
         <div class="col-md-12">
@@ -767,10 +810,20 @@
 
                       } else {
                         if (toCall == "biopsy") {
+                          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+                              $("input[name='" + fieldName + "']").each(function() {
+                                  $(this).prop("checked", false);
+                              });
+                          });
                           tnthAjax.putClinical({{person.id}},"pca_diag","false");
                           tnthAjax.putClinical({{person.id}},"pca_localized","false");
                           tnthAjax.putClinical({{person.id}},"tx","false");
                         } else if (toCall == "pca_diag") {
+                          ["pca_localized", "tx"].forEach(function(fieldName) {
+                              $("input[name='" + fieldName + "']").each(function() {
+                                  $(this).prop("checked", false);
+                              });
+                          });
                           tnthAjax.putClinical({{person.id}},"pca_localized","false");
                           tnthAjax.putClinical({{person.id}},"tx","false");
                         }
@@ -892,6 +945,10 @@
 
     {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
+    {% endif %}
+
+    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
+        {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}} 
     {% endif %}
 
     {% if person.has_role('patient') %}

@@ -163,6 +163,10 @@ $(document).ready(function(){
         targetField: $("input[name='ethnicity']")
      },
      {
+        attachID: "userEthnicity",
+        targetField: $("input[name='ethnicity']")
+     },
+     {
         attachID: "rolesGroup",
         targetField: $("input[name='user_type']")
      }].forEach(function(o) {
@@ -188,7 +192,6 @@ $(document).ready(function(){
     $("#indexNavBar span.index-list").click(function(event) {
         event.stopPropagation();
         $('#indexContainer').toggleClass('open');
-
     });
 
 
