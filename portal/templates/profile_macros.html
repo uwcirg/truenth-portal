@@ -947,8 +947,8 @@
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
-    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
-        {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}} 
+    {% if (person.has_role("patient")) and (person.id != current_user.id and current_user.has_role('provider'))%}
+        {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}}
     {% endif %}
 
     {% if person.has_role('patient') %}
