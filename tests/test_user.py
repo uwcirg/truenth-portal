@@ -218,6 +218,14 @@ class TestUser(TestCase):
         ur_str = "test format {}".format(ur)
         self.assertIn('Relationship', ur_str)
 
+    def test_account_creation_with_null_org(self):
+        service_user = self.add_service_user()
+        self.login(user_id=service_user.id)
+        data = {'organizations': [{'organization_id':None}]}
+        rv = self.app.post('/api/account', data=json.dumps(data),
+                           content_type='application/json')
+        self.assert400(rv)
+
     def test_account_creation(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
