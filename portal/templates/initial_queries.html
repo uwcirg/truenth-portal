@@ -25,8 +25,6 @@
             {% if user and user._email %}
                 <input type="hidden" name="email" id="email" value="{{user._email}}" />
             {% endif %}
-
-
             {% if 'name' in still_needed %}
               {{nameGroup()}}
             {% else %}
@@ -60,12 +58,12 @@
         {% else %}
           <style>
           .reg-complete-container {
-            width: 500px; 
-            max-width: 100%; 
-            margin: 10% auto; 
-            background-color: #eee; 
-            padding: 2em 2em 2.7em 2em; 
-            text-align: center; 
+            width: 500px;
+            max-width: 100%;
+            margin: 10% auto;
+            background-color: #eee;
+            padding: 2em 2em 2.7em 2em;
+            text-align: center;
             border-radius: 8px;
           }
           </style>
@@ -75,7 +73,7 @@
               <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
            </div>
         {% endif %}
-   
+
   </form>
   </div>
 
@@ -87,7 +85,7 @@ var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 
 
 function checkIncompleteFields() {
-  
+
     var sections = [];
     var incompleteFields = [];
     var mainSections = {
@@ -157,14 +155,14 @@ function checkIncompleteFields() {
 
     });
     */
-    
+
     //console.log("length: " + incompleteFields.length);
 
 };
 
 
 $(document).ready(function(){
-    
+
     //setTimeout("checkIncompleteFields()", 500);
     $(document).ajaxStop(function () {
       checkIncompleteFields();
@@ -218,7 +216,6 @@ $(document).ready(function(){
         };
     });
 
-
   $(".pat-q input:radio").on("click",function(){
       var thisItem = $(this);
       var toCall = thisItem.attr("name")
@@ -232,10 +229,20 @@ $(document).ready(function(){
         }
       } else {
         if (toCall == "biopsy") {
+          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+              $("input[name='" + fieldName + "']").each(function() {
+                  $(this).prop("checked", false);
+              });
+          });
           tnthAjax.putClinical({{user.id}},"pca_diag","false");
           tnthAjax.putClinical({{user.id}},"pca_localized","false");
           tnthAjax.putClinical({{user.id}},"tx","false");
         } else if (toCall == "pca_diag") {
+          ["pca_localized", "tx"].forEach(function(fieldName) {
+              $("input[name='" + fieldName + "']").each(function() {
+                  $(this).prop("checked", false);
+              });
+          });
           tnthAjax.putClinical({{user.id}},"pca_localized","false");
           tnthAjax.putClinical({{user.id}},"tx","false");
         }
@@ -308,7 +315,7 @@ $(document).ready(function(){
 
           $("#userOrgs").find(".help-block").text("");
 
-          
+
       });
     });*/
   });
