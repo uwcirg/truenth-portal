@@ -94,6 +94,17 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations[0].name, org_name)
         self.assertEquals(user.organizations[1].name, org2_name)
 
+    def test_demographics_bad_dob(self):
+        data = {"resourceType": "Patient",
+                "birthDate": '10/20/1980'
+               }
+
+        self.login()
+        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
+
     def test_demographics_missing_ref(self):
         # reference clinic must exist or expect a 400
         data = {"careProvider": [{"reference": "Organization/1"}],

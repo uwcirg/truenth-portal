@@ -607,9 +607,14 @@ class User(db.Model, UserMixin):
                 fhir['name'].get('given')) or self.first_name
             self.last_name = v_or_n(
                 fhir['name'].get('family')) or self.last_name
-        if 'birthDate' in fhir and fhir['birthDate'].strip():
-            self.birthdate = datetime.strptime(fhir['birthDate'],
-                    '%Y-%m-%d')
+        if 'birthDate' in fhir:
+            try:
+                fhir['birthDate'].strip()
+                self.birthdate = datetime.strptime(
+                    fhir['birthDate'], '%Y-%m-%d')
+            except (AttributeError, ValueError):
+                abort(400, "birthDate '{}' doesn't match expected format "
+                      "'%Y-%m-%d'".format(fhir['birthDate']))
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
