@@ -1,8 +1,7 @@
 """Unit test module for auth"""
 import datetime
 from tests import TestCase, TEST_USER_ID
-from flask.ext.webtest import SessionScope
-import json
+from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token
@@ -19,6 +18,11 @@ class AuthomaticMock(object):
 class TestAuth(TestCase):
     """Auth API tests"""
 
+    def test_require_tld(self):
+        """we need the require_tld arg in validators.url for localhost"""
+        import validators
+        self.assertTrue(validators.url('http://localhost', require_tld=False))
+
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
         rv = self.app.get('/logout')
@@ -27,19 +31,20 @@ class TestAuth(TestCase):
     def test_nouser_creates_anon(self):
         """A request for the questions page results in anon user"""
         rv = self.app.get('/questions')
-        anon_user = User.query.filter_by(username='Anonymous').first()
+        self.assert200(rv)
+        anon_user = User.query.filter_by(username=None).first()
         self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
 
     def test_local_user_add(self):
         """Add a local user via flask_user forms"""
-        data = {'username': 'OneTestUser',
+        data = {
                 'password': 'one2Three',
                 'retype_password': 'one2Three',
                 'email': 'otu@example.com',
                }
         rv = self.app.post('/user/register', data=data)
         self.assertEquals(rv.status_code, 302)
-        new_user = User.query.filter_by(username=data['username']).first()
+        new_user = User.query.filter_by(username=data['email']).first()
         self.assertEquals(new_user.active, True)
 
     def test_client_add(self):
@@ -64,12 +69,12 @@ class TestAuth(TestCase):
 
     def test_client_edit(self):
         """Test editing a client application"""
-        client = self.add_test_client()
+        client = self.add_client()
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com',
                          application_origins=client.application_origins,
-                         application_role=INTERVENTION.DEFAULT))
+                         application_role=INTERVENTION.DEFAULT.name))
         self.assertEquals(302, rv.status_code)
 
         client = Client.query.get('test_client')
@@ -96,7 +101,7 @@ class TestAuth(TestCase):
 
     def test_callback_validation(self):
         """Confirm only valid urls can be set"""
-        client = self.add_test_client()
+        client = self.add_client()
         self.login()
         rv = self.app.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='badprotocol.com',
@@ -108,7 +113,7 @@ class TestAuth(TestCase):
 
     def test_service_account_creation(self):
         """Confirm we can create a service account and token"""
-        client = self.add_test_client()
+        client = self.add_client()
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 
@@ -139,7 +144,7 @@ class TestAuth(TestCase):
 
     def test_service_account_promotion(self):
         """Confirm we can not promote a service account """
-        client = self.add_test_client()
+        self.add_client()
         test_user = User.query.get(TEST_USER_ID)
         service_user = test_user.add_service_account()
 

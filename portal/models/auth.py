@@ -3,7 +3,6 @@ import base64
 import hashlib
 import hmac
 import json
-import requests
 import time
 from flask import abort, current_app
 from datetime import datetime, timedelta
@@ -12,7 +11,6 @@ from urlparse import urlparse
 
 from ..extensions import db, oauth
 from .relationship import RELATIONSHIP
-from .role import ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user
@@ -65,10 +63,10 @@ class Client(db.Model):
         the default
 
         """
-        from .intervention import Intervention, INTERVENTION
+        from .intervention import INTERVENTION
         if self.intervention:
             return self.intervention
-        return Intervention.query.filter_by(name=INTERVENTION.DEFAULT).one()
+        return INTERVENTION.DEFAULT
 
     def __str__(self):
         """print details needed in audit logs"""
@@ -83,7 +81,12 @@ class Client(db.Model):
             # but in practice, this is too high of a bar (at least for
             # Liferay).  Only comparing by origin (scheme:hostname:port)
             # in validate_redirect_uri - so that's all we return
-            uris = []
+
+            # Whitelist any redirects to shared services
+            uris = [
+                "https://%s" % current_app.config['SERVER_NAME'],
+                "http://%s" % current_app.config['SERVER_NAME'],
+            ]
             for uri in self._redirect_uris.split():
                 parsed = urlparse(uri)
                 uris.append('{uri.scheme}://{uri.netloc}'.format(uri=parsed))
@@ -321,18 +324,19 @@ def validate_client_origin(origin):
     For CORS, limit the requesting origin to the list we know about,
     namely any origins belonging to our OAuth clients.
 
-    @raises: 401 if we don't find a match.
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't find a match.
 
     """
     if not origin:
-        current_app.logger.error("Can't validate missing origin")
-        abort(401)
+        current_app.logger.warning("Can't validate missing origin")
+        abort(401, "Can't validate missing origin")
 
     for client in Client.query.all():
         if client.validate_redirect_uri(origin):
             return True
-    current_app.logger.error("Failed to validate origin: %s", origin)
-    abort(401)
+    current_app.logger.warning("Failed to validate origin: %s", origin)
+    abort(401, "Failed to validate origin %s" % origin)
+
 
 class Mock(object):
     pass

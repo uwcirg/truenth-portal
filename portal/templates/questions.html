@@ -3,20 +3,20 @@
 
     <div class="well">
 
-    <h3 class="tnth-headline">Explore TrueNTH without registering</h3>
+    <h3 class="tnth-headline">{{ _("Explore TrueNTH without registering") }}</h3>
 
-    <p>You can tell us a bit about your experience with prostate cancer so we can personalize this website for you.</p>
+    <p>{{ _("You can tell us a bit about your experience with prostate cancer so we can personalize this website for you.") }}</p>
 
-    <p class="lead">First, tell us who you are:</p>
+    <p class="lead">{{ _("First, tell us who you are") }}:</p>
 
     <div class="radio">
         <label>
-            <input type="radio" name="identity" value="patient" /> I'm a man who is concerned about prostate cancer for myself
+            <input type="radio" name="identity" value="patient" /> {{ _("I'm a man who is concerned about prostate cancer for myself") }}
         </label>
     </div>
     <div class="radio">
         <label>
-            <input type="radio" name="identity" value="caregiver" /> I'm a caregiver, spouse or partner who wants to learn more about prostate cancer
+            <input type="radio" name="identity" value="caregiver" /> {{ _("I'm a caregiver, spouse or partner who wants to learn more about prostate cancer") }}
         </label>
     </div>
     <Br /><Br />
@@ -24,43 +24,43 @@
 
         <div class="hide-initial" id="patientQ">
 
-            <p class="lead">Thanks, please answer a few questions about your experience:</p>
+            <p class="lead">{{ _("Thanks, please answer a few questions about your experience") }}:</p>
 
-            <p><strong>Have you had a prostate cancer biopsy?</strong></p>
+            <p><strong>{{ _("Have you had a prostate cancer biopsy?") }}</strong></p>
 
             <div data-topic="biopsy">
                 <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default">
-                        <input type="radio" name="biopsy" data-value="true" autocomplete="off"> Yes
+                        <input type="radio" name="biopsy" data-value="true" autocomplete="off"> {{ _("Yes") }}
                     </label>
                     <label class="btn btn-default">
-                        <input type="radio" name="biopsy" data-value="false" autocomplete="off"> No
+                        <input type="radio" name="biopsy" data-value="false" autocomplete="off"> {{ _("No") }}
                     </label>
                 </div>
             </div>
 
             <div data-topic="pca_diag">
                 <br />
-                <p><strong>Have you been diagnosed with prostate cancer?</strong></p>
+                <p><strong>{{ _("Have you been diagnosed with prostate cancer?") }}</strong></p>
                 <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default">
-                        <input type="radio" name="pca_diag" data-value="true" autocomplete="off"> Yes
+                        <input type="radio" name="pca_diag" data-value="true" autocomplete="off"> {{ _("Yes") }}
                     </label>
                     <label class="btn btn-default">
-                        <input type="radio" name="pca_diag" data-value="false" autocomplete="off"> No
+                        <input type="radio" name="pca_diag" data-value="false" autocomplete="off"> {{ _("No") }}
                     </label>
                 </div>
             </div>
 
             <div data-topic="tx">
                 <br />
-                <p><strong>Have you begun prostate cancer treatment?</strong></p>
+                <p><strong>{{ _("Have you begun prostate cancer treatment?") }}</strong></p>
                 <div class="btn-group" data-toggle="buttons">
                     <label class="btn btn-default">
-                        <input type="radio" name="tx" data-value="true" autocomplete="off"> Yes
+                        <input type="radio" name="tx" data-value="true" autocomplete="off"> {{ _("Yes") }}
                     </label>
                     <label class="btn btn-default">
-                        <input type="radio" name="tx" data-value="false" autocomplete="off"> No
+                        <input type="radio" name="tx" data-value="false" autocomplete="off"> {{ _("No") }}
                     </label>
                 </div>
             </div>
@@ -68,16 +68,16 @@
         </div>
 
         <div class="hide-initial" id="otherNote">
-            <p class="lead">Prostate Cancer Resources</p>
-            <p>We have resources to help you learn about prostate cancer.</p>
-            <p><a  class="btn btn-tnth-primary" href="">View now...</a></p>
+            <p class="lead">{{ _("Prostate Cancer Resources") }}</p>
+            <p>{{ _("We have resources to help you learn about prostate cancer.") }}</p>
+            <p><a  class="btn btn-tnth-primary" href="">{{ _("View now") }}...</a></p>
 
         </div>
 
         <br /><br />
-        <a class="btn btn-tnth-primary hide-initial" id="continueBtn" href="/home">Continue <i class="fa fa-chevron-right"></i></a>
+        <a class="btn btn-tnth-primary hide-initial" id="continueBtn" href="/home">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></a>
             &nbsp;&nbsp;&nbsp;
-        <a href="questions_anon" id="skipTo" class="btn btn-sm btn-default">Skip to general information about prostate cancer</a>
+        <a href="questions_anon" id="skipTo" class="btn btn-sm btn-default">{{ _("Skip to general information about prostate cancer") }}</a>
 
         <!--
         <p>Skip these questions and see general information on prostate cancer.</p>

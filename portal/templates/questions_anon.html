@@ -3,31 +3,31 @@
 
 <div class="well">
 
-    <h3 class="tnth-headline">TrueNTH</h3>
+    <h3 class="tnth-headline">{{ _("TrueNTH") }}</h3>
 
     <hr />
-    <h4>Explore on Your Own</h4>
-    <p>You can access all TrueNTH content, but we won't be able to personalize it for you.</p>
+    <h4>{{ _("Explore on Your Own") }}</h4>
+    <p>{{ _("You can access all TrueNTH content, but we won't be able to personalize it for you.") }}</p>
     <br />
 
     <div class="row">
         <div class="col-xs-6">
 
-            <h4>What Are You Looking For?</h4>
+            <h4>{{ _("What Are You Looking For?") }}</h4>
 
         </div>
         <div class="col-xs-6">
-            <h4>Browse TrueNTH Content</h4>
+            <h4>{{ _("Browse TrueNTH Content") }}</h4>
         </div>
     </div>
 
     <div class="row">
         <div class="col-xs-6">
 
-            <p><strong>Would you like to explore treatment decision-making for early stage prostate cancer?</strong></p>
+            <p><strong>{{ _("Would you like to explore treatment decision-making for early stage prostate cancer?") }}</strong></p>
             <div>
-                <div class="btn btn-default pat-q" name="decision" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="decision" data-value="false">No</div><br />
-                <p style="display: none; margin-top: 1em; font-style: italic">Great, we suggest viewing <strong>Decision Support</strong>.</p>
+                <div class="btn btn-default pat-q" name="decision" data-value="true">{{ _("Yes") }}</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="decision" data-value="false">{{ _("No") }}</div><br />
+                <p style="display: none; margin-top: 1em; font-style: italic">{{ _("Great, we suggest viewing") }} <strong>{{ _("Decision Support") }}</strong>.</p>
             </div>
             <br />
 
@@ -37,7 +37,7 @@
             <a id="decision" href="{{ intervention.card_url }}"
                class="btn btn-block btn-default btn-lg" style="white-space: normal">
                 {{ intervention.card_html }}<br />
-                <small>Which option is best for me?</small>
+                <small>{{ _("Which option is best for me?") }}</small>
             </a>
         </div>
     </div>
@@ -45,10 +45,10 @@
     <div class="row">
         <div class="col-xs-6">
 
-            <p><strong>Have you been treated for prostate cancer and would you like to learn about taking care of side effects and symptoms at home?</strong></p>
+            <p><strong>{{ _("Have you been treated for prostate cancer and would you like to learn about taking care of side effects and symptoms at home?") }}</strong></p>
             <div>
-                <div class="btn btn-default pat-q" name="management" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="management" data-value="false">No</div><br />
-                <p style="display: none; margin-top: 1em;  font-style: italic">Great, we suggest viewing <strong>Self Management</strong>.</p>
+                <div class="btn btn-default pat-q" name="management" data-value="true">{{ _("Yes") }}</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="management" data-value="false">{{ _("No") }}</div><br />
+                <p style="display: none; margin-top: 1em;  font-style: italic">{{ _("Great, we suggest viewing") }} <strong>{{ _("Self Management") }}</strong>.</p>
             </div>
             <br />
 
@@ -58,7 +58,7 @@
             <a id="management" href="{{ intervention.card_url }}"
                class="btn btn-block btn-default btn-lg" style="white-space: normal">
                 {{ intervention.card_html }}<br />
-                <small>How do I cope with symptoms?</small>
+                <small>{{ _("How do I cope with symptoms?") }}</small>
             </a>
         </div>
     </div>
@@ -66,10 +66,10 @@
     <div class="row">
         <div class="col-xs-6">
 
-            <p><strong>Would you like to view some other web information on prostate cancer?</strong></p>
+            <p><strong>{{ _("Would you like to view some other web information on prostate cancer?") }}</strong></p>
             <div>
-                <div class="btn btn-default pat-q" name="links" data-value="true">Yes</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="links" data-value="false">No</div><br />
-                <p style="display: none; margin-top: 1em; font-style: italic">Great, we suggest viewing <strong>Web Resources</strong>.</p>
+                <div class="btn btn-default pat-q" name="links" data-value="true">{{ _("Yes") }}</div> &nbsp;&nbsp;&nbsp; <div class="btn btn-default pat-q" name="links" data-value="false">{{ _("No") }}</div><br />
+                <p style="display: none; margin-top: 1em; font-style: italic">{{ _("Great, we suggest viewing") }} <strong>{{ _("Web Resources") }}</strong>.</p>
             </div>
             <br />
 
@@ -77,18 +77,18 @@
         <div class="col-xs-6">
             <a id="links" href='/home'
                class="btn btn-block btn-default btn-lg" style="white-space: normal">
-                Web Resources<br />
-                <small>Helpful links about prostate cancer</small>
+                {{ _("Web Resources") }}<br />
+                <small>{{ _("Helpful links about prostate cancer") }}</small>
             </a>
         </div>
     </div>
 
     <div id="tellUsMore" style="display: none">
         <br /><br />
-        <h4>Tell Us What Else You'd Like to See</h4>
-        <p>We're working hard to provide helpful information to men with prostate cancer. What would you like to know about that's not on the TrueNTH website?</p>
+        <h4>{{ _("Tell Us What Else You'd Like to See") }}</h4>
+        <p>{{ _("We're working hard to provide helpful information to men with prostate cancer. What would you like to know about that's not on the TrueNTH website?") }}</p>
         <textarea id="tellUsText" class="form-control" rows="3"></textarea>
-        <div style="margin-top: 1em" id="tellUsSave" class="btn btn-default">Save</div>
+        <div style="margin-top: 1em" id="tellUsSave" class="btn btn-default">{{ _("Save") }}</div>
     </div>
 
 

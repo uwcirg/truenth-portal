@@ -1,36 +1,73 @@
 {% extends "layout.html" %}
 {% block main %}
 
+{#
+{% if not user.has_role('write_only') %}
 <div class="portal-item">
-    <h2 class="tnth-subhead">Explore TrueNTH</h2>
-    <p>Discover the tools to guide you through the Cancer journey.</p>
-    <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">Learn More</a>
+    <h2 class="tnth-subhead">{{ _("Explore TrueNTH") }}</h2>
+    <p>{{ _("Discover online tools to guide you through the cancer journey.") }}</p>
+    <a class="btn-lg btn-tnth-primary" href="{{PORTAL}}/explore">{{ _("Learn More") }}</a>
 </div>
+{% endif %}
+#}
 
-
-{# This should only appear if user has access to SR #}
-{% set intervention = interventions.sexual_recovery %}
-{% if intervention.user_has_access(user) %}
+{% if user.has_role('write_only') %}
 <div class="portal-item">
-    <h2 class="tnth-subhead">Sexual Recovery</h2>
-    <p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
+    <h2 class="tnth-subhead">{{ _("Welcome to TrueNTH") }}</h2>
+    {{ _("Tools for navigating the prostate cancer journey") }}
 </div>
-{% else %}
+{% endif %}
 
-    {% set intervention = interventions.decision_support_p3p %}
-    {% if intervention.user_has_access(user) %}
-<div class="portal-item">
-    <h2 class="tnth-subhead">Decision Support (P3P)</h2>
-    <p>You're unique, and you have your own set of values and preferences. Learn which treatment options might best suit your specific needs and concerns, and watch examples of how patients discuss similar concerns with their urology doctors.</p>
-    <a class="btn-lg btn-tnth-primary" href="{{ intervention.card_url }}">{{ intervention.card_html }}</a>
-</div>
+{# present each intervention in turn if configured for user #}
+{% for intervention in interventions %}
+    {% set display = intervention.display_for_user(user) %}
+    {% if display.access %}
+        <div class="portal-item">
+            <h2 class="tnth-subhead">{{ intervention.description }}</h2>
+            <div style="padding:0.2em 0">
+                {{ display.card_html | safe }}
+            </div>
+            {% if display.link_url is none %}
+            <a class="btn-lg btn-tnth-primary disabled" href="{{ display.link_url }}">
+                {{ display.link_label }}
+            </a>
+            {% else %}
+            <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                {{ display.link_label }}
+            </a>
+            {% endif %}
+        </div>
     {% endif %}
+{% endfor %}
 
+{% if user.has_role('write_only') %}
+    <div class="portal-item">
+        <h2 class="tnth-subhead">{{ _("Complete Registration") }}</h2>
+        <p>{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
+        <a href="javascript:void(0)" class="btn-lg btn-tnth-primary" data-toggle="modal" data-target="#registrationModal">{{ _("Registration") }}</a>
+    </div>
+    <div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color:#79815D; color: #FFF">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">{{ app_text('portal registration') }}</h4>
+          </div>
+          <div class="modal-body" style="font-size:0.8em">
+            <br/>
+            <p class="text-center">{{ _("This feature is not yet available.") }}</p>
+            <br/>
+          </div>
+          <div class="modal-footer" style="background-color:#79815D; color: #FFF">
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endif %}
 
 <div class="img-with-text flush-with-footer full-width">
-    <img src="{{ url_for('static', filename='img/band_man1.jpg') }}" class="img-responsive" />
+    <img src="{{ url_for('static', filename='img/man-with-canoe.jpg') }}" class="img-responsive" />
     <!--
     <div class="text-on-img text-bot">
         <h2 class="tnth-subhead">LOREM IPSUM</h2>
@@ -40,3 +77,5 @@
 </div>
 
 {% endblock %}
+
+

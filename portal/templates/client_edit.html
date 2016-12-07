@@ -3,20 +3,20 @@
 {% from "flask_user/_macros.html" import render_field, render_checkbox_field, back_btn %}
 
 
-    {{ back_btn('clients','Client Applications') }}
+    {{ back_btn('clients', _('Client Applications')) }}
 
     <h1 class="tnth-headline">TrueNTH OAuth 2.0 Credentials</h1>
 
-    <p><strong>App ID:</strong><br />{{ client.client_id }}</p>
+    <p><strong>{{ _("App ID") }}:</strong><br />{{ client.client_id }}</p>
 
-    <p><strong>App Secret:</strong><br />{{ client.client_secret }}</p>
+    <p><strong>{{ _("App Secret") }}:</strong><br />{{ client.client_secret }}</p>
 
-    <p><strong>Service Token:</strong><br />
+    <p><strong>{{ _("Service Token") }}:</strong><br />
     {% if service_token %}
         {{ service_token.access_token }}
-        {{ service_token.expires_in }}
+        (expires {{ service_token.expires.strftime('%b %d, %Y') }})
     {% else %}
-        <span class="text-muted">Not yet created</span>
+        <span class="text-muted">{{ _("Not yet created") }}</span>
     {% endif %}
     </p>
 
@@ -32,27 +32,45 @@
         helpText="Provide a Callback URL to receive POST requests for signifcant events, such as a user logout from sessions where a valid OAuth token for this application was obtained.  The POST will include a 'signed_request' in the same format as a Facebook signed_request, with at least <b>event</b> and <b>user_id</b> values defined." ) }}
 
         {% if form.intervention_or_default.name != 'default' %}
-            {{ render_field(form.intervention_or_default.card_url,
-            tabindex=30, helpText="Hyperlink back to the intervention, namely where specifically to point the user to.") }}
+            <p>The following settings control intervention display parameters
+            site wide (settings can be overridden per user via the
+            interventions API)</p>
 
             {{ render_field(form.intervention_or_default.card_html,
-            tabindex=40, helpText="Text or HTML shown on the card for this intervention.") }}
+            tabindex=30, helpText="Text or HTML shown on the card for this
+            intervention, other than the button / link settings that follow.") }}
+
+            {{ render_field(form.intervention_or_default.link_label,
+            tabindex=40, helpText="Label for the UI widget users click
+            on to access this intervention.") }}
+
+            {{ render_field(form.intervention_or_default.link_url,
+            tabindex=50, helpText="Hyperlink back to the intervention, namely where specifically to point the user to.") }}
+
+            {{ render_field(form.intervention_or_default.status_text,
+            tabindex=60, helpText="Additional status text for user
+            notification.") }}
 
             {{ render_checkbox_field(form.intervention_or_default.public_access,
-            tabindex=50, helpText="Whether the card should be displayed to all users (checked), or only to those who have been granted access to the intervention via the interventions API (unchecked).") }}
+            tabindex=70, helpText="Whether the card should be displayed to all users (checked), or only to those who have been granted access to the intervention via the interventions API (unchecked).") }}
         {% endif %}
 
         <br />
 
-        <button type="submit" name="submit" class="btn btn-tnth-primary">Update App Settings</button> &nbsp;&nbsp;&nbsp;&nbsp;
-        <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">Delete Application</button> &nbsp;
-        <button type="submit" name="service_token" value="service_token" class="btn btn-default">
-        {% if service_token %}
-            Update Service Token
-        {% else %}
-            Create Service Token
+        <button type="submit" name="submit" class="btn btn-tnth-primary">{{ _("Update App Settings") }}</button> &nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="confirmDel" type="button" class="btn btn-default" data-placement="top" title="Delete This App">{{ _("Delete Application") }}</button> &nbsp;
+
+        {# By design, only the application owner can create or update tokens #}
+        {% if current_user.id == client.user_id %}
+            <button type="submit" name="service_token" value="service_token"
+              class="btn btn-default">
+                {% if service_token %}
+                    {{ _("Update Service Token") }}
+                {% else %}
+                    {{ _("Create Service Token") }}
+                {% endif %}
+            </button>
         {% endif %}
-        </button>
     </form>
 
     {% macro render_field(field) %}

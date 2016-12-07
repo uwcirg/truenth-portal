@@ -11,12 +11,12 @@ additional configuration of most objects defined herein.
 
 
 # SQLAlchemy provides the database object relational mapping (ORM)
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 # Flask-User
-from flask.ext.user import UserManager, SQLAlchemyAdapter
+from flask_user import UserManager, SQLAlchemyAdapter
 from .models.user import User
 db_adapter = SQLAlchemyAdapter(db, User)
 user_manager = UserManager(db_adapter)
@@ -24,7 +24,7 @@ user_manager = UserManager(db_adapter)
 # Flask-OAuthLib provides OAuth between the Portal and the Interventions
 from functools import wraps
 from flask import abort, request
-from flask.ext.login import login_user
+from flask_login import login_user
 from flask_oauthlib.provider import OAuth2Provider
 from .models.user import current_user
 
@@ -55,7 +55,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
 
             """
             @wraps(eff)
-            def decorated(*args, **kwargs):
+            def decorated(*args, **kwargs):  # pragma: no cover
                 """decorate the 'eff' function"""
                 # TESTING backdoor
                 if self.app.config.get('TESTING'):
@@ -101,38 +101,56 @@ oauth = OAuthOrAlternateAuth()
 # identity providers such as Facebook
 from authomatic import Authomatic
 from authomatic.providers import oauth2
-from .config import early_app_config_access
 
-app_config = early_app_config_access()
-authomatic = Authomatic(
-    config={
-        'facebook': {
-            'class_': oauth2.Facebook,
-            'consumer_key': app_config['FB_CONSUMER_KEY'],
-            'consumer_secret': app_config['FB_CONSUMER_SECRET'],
-            'scope': ['public_profile', 'email'],
-        },
-        'google': {
-            'class_': oauth2.Google,
-            'consumer_key': app_config['GOOGLE_CONSUMER_KEY'],
-            'consumer_secret': app_config['GOOGLE_CONSUMER_SECRET'],
-            'scope': ['profile', 'email'],
-        },
-    },
-    secret=app_config['SECRET_KEY'],
-    debug=True,
-)
+class _delay_init(object):
+    """We can't initialize authomatic till the app config is ready"""
+
+    def __init__(self):
+        self._authomatic = None
+
+    @property
+    def authomatic(self):
+        return self._authomatic
+
+    def init_app(self, app):
+        if self._authomatic:
+            return
+        self._authomatic = Authomatic(
+            config={
+                'facebook': {
+                    'class_': oauth2.Facebook,
+                    'consumer_key': app.config['FB_CONSUMER_KEY'],
+                    'consumer_secret': app.config['FB_CONSUMER_SECRET'],
+                    'scope': ['public_profile', 'email'],
+                },
+                'google': {
+                    'class_': oauth2.Google,
+                    'consumer_key': app.config['GOOGLE_CONSUMER_KEY'],
+                    'consumer_secret': app.config['GOOGLE_CONSUMER_SECRET'],
+                    'scope': ['profile', 'email'],
+                },
+            },
+            secret=app.config['SECRET_KEY'],
+            debug=True,
+            logger=app.logger
+        )
+
+
+authomatic = _delay_init()
 
 
 # Flask-Mail is used for email communication
-from flask.ext.mail import Mail
+from flask_mail import Mail
 mail = Mail()
 
+# Flask-Session provides server side sessions
+from flask_session import Session
+session = Session()
 
 # Celery (Distributed Task Queue) is used for any asynchronous tasks
-from flask.ext.celery import Celery
+from flask_celery import Celery
 celery = Celery()
 
 # Bable is used for i18n
-from flask.ext.babel import Babel
+from flask_babel import Babel
 babel = Babel()

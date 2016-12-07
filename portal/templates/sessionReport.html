@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileAssessment %}
+
+<br/>
+<div  id="userSessionReportDetailHeader" class="tnth-headline report-custom-header gradient">
+	<span class="left">
+	<h4>{{ _("Assessment Report Detail") }}</h4>
+	<h4 class="text-muted">{{ _("Patient") }} #{{user.id}} - {{user.first_name}}  {{user.last_name}}</h4>
+	</span>
+	<span class="right">
+		<a href="{%if current_user.has_role('provider')%}{{url_for('patients.patient_profile', patient_id=user.id) }}{%else%}{{url_for('portal.profile', user_id=user.id)}}{%endif%}" class="btn btn-xs btn-tnth-back" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Patient Profile') }}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a><a href="{{PORTAL}}/home" data-toggle="tooltip" data-placement="top" title="{{ _('Back to Truenth Home') }}"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+	</span>
+	
+</div>
+<div class="report-error-message">{{ _("Unable to load report") }}</div>
+<div class="container">
+	<div class="row" style="position: relative;">
+	    <div class="col-md-12">
+	    	
+	       	{{profileAssessment(user, instrument_id, authored_date)}}
+	 
+	        <br />
+	        <!--
+	        <a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to Profile</small></a>
+	        <br/>
+	        -->
+	        <!--
+	        <a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to Home</small></a>
+	        -->
+	    </div>
+	</div>
+</div>
+
+
+{% endblock %}
+
+{% block document_ready %}
+
+$(document).ready(function(){
+
+});
+
+
+{% endblock %}

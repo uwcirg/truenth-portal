@@ -1,22 +1,25 @@
-{% macro render_field(field, label=None, label_visible=true, right_url=None, right_label=None, helpText=false) -%}
+{% macro render_field(field, label=None, label_visible=true, right_url=None, right_label=None, helpText=false, infoText="") -%}
     <div class="form-group {% if field.errors %}has-error{% endif %} {{ kwargs.pop('class_', '') }}">
         {% if field.type != 'HiddenField' and label_visible %}
             {% if not label %}{% set label=field.label.text %}{% endif %}
             <label for="{{ field.id }}" class="control-label">{{ label|safe }}</label>
         {% endif %}
         {{ field(class_='form-control', placeholder=label, **kwargs) }}
-        {% if field.errors %}
-            {% for e in field.errors %}
-                <span class="help-block">{{ e }}</span>
-            {% endfor %}
-        {% else %}
-            {% if helpText %}
-            <span class="help-block">{{ helpText|safe }}</span>
+        <div class="help-block with-errors" id="error{{ field.id }}">
+            {% if field.errors %}
+                {% for e in field.errors %}
+                    <span>{{ e }}</span>
+                {% endfor %}
+            {% else %}
+                {% if helpText %}
+                    <div class="text-muted" style="margin-left: 8px;font-size:0.87em">{{ helpText|safe }}</div>
+                {% endif %}
             {% endif %}
-        {% endif %}
+        </div>
+        <div id="loginEmailReminderText" class="text-muted">{{infoText|safe}}</div>
     </div>
 {%- endmacro %}
- 
+
 {% macro render_checkbox_field(field, label=None, helpText=false) -%}
     {% if not label %}{% set label=field.label.text %}{% endif %}
     <div class="checkbox">
@@ -28,7 +31,7 @@
         {% endif %}
     </div>
 {%- endmacro %}
- 
+
 {% macro render_radio_field(field) -%}
     {% for value, label, checked in field.iter_choices() %}
         <div class="radio">
@@ -43,26 +46,31 @@
 {% macro render_submit_field(field, label=None, tabindex=None, btnSize=false) -%}
     {% if not label %}{% set label=field.label.text %}{% endif %}
     {#<button type="submit" class="form-control btn btn-tnth-primary">{{label}}</button>#}
-    <input type="submit" class="btn btn-default btn-tnth-primary {{ btnSize }}" value="{{label}}"
+    <input type="submit" class="btn btn-tnth-primary {{ btnSize }}" value="{{label}}"
            {% if tabindex %}tabindex="{{ tabindex }}"{% endif %}
            >
 {%- endmacro %}
 
 {% macro back_btn(url,text) -%}
-<a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> Back to {{text}}</small></a><br/>
+<a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><small><i class="fa fa-chevron-left"></i> {{ _("Back to") }} {{text}}</small></a><br/>
 {%- endmacro %}
+
+{% macro back_link(url,text) -%}
+<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="{{ _('back to') }} {{text}}"></span></a></div>
+{%- endmacro %}
+
 
 {% macro left_nav(current_user) -%}
 <div class="col-sm-3 hidden-xs">
 
     <div class="list-group tnth-nav-list">
-        <a class="list-group-item" href="{{PORTAL}}/">Home</a>
+        <a class="list-group-item" href="{{PORTAL}}/">{{ _("Home") }}</a>
         {% if current_user.roles %}
-        <a class="list-group-item" href="{{PORTAL}}/profile">My TrueNTH Profile</a>
-        <a class="list-group-item" href="{{PORTAL}}/invite">Send an Invite</a>
+        <a class="list-group-item" href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a>
+        <a class="list-group-item" href="{{PORTAL}}/invite">{{ _("Send an Invite") }}</a>
         {% endif %}
-        <a class="list-group-item" href="#">TrueBLOG</a>
-        <a class="list-group-item" href="http://www.movember.com">Movember.com</a>
+        <a class="list-group-item" href="#">{{ _("TrueBLOG") }}</a>
+        <a class="list-group-item" href="http://www.movember.com">{{ _("Movember.com") }}</a>
     </div>
     {% if current_user.roles %}
     <br />
@@ -70,10 +78,10 @@
     {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
     <div class="list-group tnth-nav-list">
         {% if current_user.has_roles('admin') %}
-        <a class="list-group-item" href="{{PORTAL}}/admin">User Administration</a>
+        <a class="list-group-item" href="{{PORTAL}}/admin">{{ _("User Administration") }}</a>
         {% endif %}
         {% if current_user.has_roles('application_developer') %}
-        <a class="list-group-item" href="{{PORTAL}}/clients">Client Applications</a>
+        <a class="list-group-item" href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a>
         {% endif %}
     </div>
     {% endif %}
@@ -85,12 +93,12 @@
 {% macro footer(splash_style=false) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
-        <div class="col-xs-6 col-lg-5 col-lg-offset-1 footer-container">
-            <p><small><a href="{{PORTAL}}/about">About</a> | <a href="{{PORTAL}}/contact">Contact</a> | <a href="{{PORTAL}}/terms-of-use">Legal</a></small></p>
+        <div class="col-xs-6 col-lg-6 footer-container">
+            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/legal">{{ _("Legal") }}</a></small></p>
         </div>
-        <div class="col-xs-6 col-lg-5 footer-container">
+        <div class="col-xs-6 col-lg-6 footer-container">
             <div class="pull-right">
-                <a href="http://us.movember.com" title="Movember"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
+                <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
             </div>
         </div>
     </div>

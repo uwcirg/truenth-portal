@@ -1,8 +1,8 @@
 """Model classes for message data"""
 from datetime import datetime
 from flask import current_app
-from flask.ext.mail import Message
-from flask.ext.mail import email_dispatched
+from flask_mail import Message
+from flask_mail import email_dispatched
 
 from ..extensions import db, mail
 
@@ -16,13 +16,13 @@ def log_message(message, app):
 email_dispatched.connect(log_message)
 
 
-class EmailInvite(db.Model):
-    __tablename__ = 'email_invites'
+class EmailMessage(db.Model):
+    __tablename__ = 'email_messages'
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(255), nullable=False)
     recipients = db.Column(db.Text, nullable=False)
     sender = db.Column(db.String(255), nullable=False)
-    sent_at = db.Column(db.DateTime, default=datetime.now)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
         ondelete='CASCADE'))
@@ -33,3 +33,7 @@ class EmailInvite(db.Model):
                 recipients=self.recipients.split())
         message.html = self.body
         mail.send(message)
+
+    def __str__(self):
+        return "EmailMessage subj:{} sent_at:{}".format(self.subject,
+                                                        self.sent_at)

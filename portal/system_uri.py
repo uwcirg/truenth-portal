@@ -1,9 +1,28 @@
 """Namespace module to house system URIs for use in FHIR"""
 
-# Used for local clinical codes
-TRUENTH_CLINICAL_CODE_SYSTEM = 'http://us.truenth.org/clinical-codes'
+# Our common, unique namespace
+TRUENTH_NAMESPACE = 'http://us.truenth.org'
 
+# Used for local clinical codes
+TRUENTH_CLINICAL_CODE_SYSTEM = '{}/clinical-codes'.format(TRUENTH_NAMESPACE)
 
 # Auth identities - typically used with suffix for provider (i.e. google)
 # or to name identity type (i.e. TrueNTH-username)
-TRUENTH_IDENTITY_SYSTEM = 'http://us.truenth.org/identity-codes'
+TRUENTH_IDENTITY_SYSTEM = '{}/identity-codes'.format(TRUENTH_NAMESPACE)
+SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)
+
+TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(
+    TRUENTH_NAMESPACE)
+
+# Local valuesets, where a decent published FHIR match could not be found
+TRUENTH_VALUESET = '{}/fhir/valueset'.format(TRUENTH_NAMESPACE)
+
+# Australian Institute of Health and Welfare's
+# "National Health Data Dictionary 2012 version 16"
+# Spec: http://www.aihw.gov.au/WorkArea/DownloadAsset.aspx?id=10737422824
+# METeOR identifier: 291036
+NHHD_291036 = "AU-NHHD-METeOR-id-291036"
+TRUENTH_VALUESET_NHHD_291036 = "{}/{}".format(TRUENTH_VALUESET, NHHD_291036)
+TRUENTH_EXTENSTION_NHHD_291036 = "{}/{}".format(
+    TRUENTH_STRUCTURE_DEFINITION, NHHD_291036)
+

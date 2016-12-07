@@ -2,11 +2,11 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field, back_btn %}
 
-    {{ back_btn('clients','Client Applications') }}
+    {{ back_btn('clients', _('Client Applications')) }}
 
-    <h3 class="tnth-headline">Obtain OAuth 2.0 Credentials from TrueNTH</h3><br />
+    <h3 class="tnth-headline">{{ _("Obtain OAuth 2.0 Credentials from TrueNTH") }}</h3><br />
 
-    <p>To add an application to TrueNTH, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space.</p>
+    <p>{{ _("To add an application to TrueNTH, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space.") }}</p>
 
     <form action="/client" method="post">
         {{ form.hidden_tag() }}
@@ -15,7 +15,7 @@
 
         {{ render_field(form.application_origins, tabindex=10) }}
 
-        <button type="submit" class="btn btn-tnth-primary">Register App</button>
+        <button type="submit" class="btn btn-tnth-primary">{{ _("Register App") }}</button>
     </form>
 
 {% endblock %}
