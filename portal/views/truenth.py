@@ -156,12 +156,18 @@ def portal_wrapper_html():
             url_for('static', filename='img/movember_profile_thumb.png'),
         ))
 
-    def branded_logo():
-        """return path to branded logo if called for"""
+    def branded_logos():
+        """return path to branded logos if called for in tuple (lg, small)"""
         if 'brand' in request.args:
             brand_name = request.args.get('brand')
-            return url_for('static', filename="img/{}.png".format(brand_name),
-                           _external=True)
+            return (
+                url_for('static',
+                        filename="img/{}.png".format(brand_name),
+                        _external=True),
+                url_for('static',
+                        filename="img/{}-small.png".format(brand_name),
+                        _external=True)
+            )
 
     def expires_in():
         """compute remaining seconds on session"""
@@ -177,7 +183,7 @@ def portal_wrapper_html():
         user=user,
         movember_profile=movember_profile,
         login_url=login_url,
-        branded_logo=branded_logo(),
+        branded_logos=branded_logos(),
         enable_links = not disable_links,
         expires_in= cookie_timeout if cookie_timeout else expires_in()
     )

@@ -43,3 +43,7 @@ msgstr "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&arti
 msgid "Cell"
 msgstr "Mobile"
 
+#: portal/templates/profile_macros.html:358
+msgid "XXX-XXX-XXXX"
+msgstr "XXXX-XXX-XXX"
+

@@ -65,11 +65,11 @@ pycparser==2.17
 pycrypto==2.6.1
 pyflakes==1.3.0
 Pygments==2.1.3
-pytest==3.0.4
+pytest==3.0.5
 python-dateutil==2.6.0
 python-editor==1.0.3
 python-Levenshtein==0.12.0
-pytz==2016.7
+pytz==2016.10
 PyYAML==3.12
 recommonmark==0.4.0
 redis==2.10.5
@@ -81,7 +81,7 @@ simplegeneric==0.8.1
 six==1.10.0
 snowballstemmer==1.2.1
 speaklater==1.3
-Sphinx==1.4.9
+Sphinx==1.5
 sphinx-rtd-theme==0.1.9
 SQLAlchemy==1.1.4
 swagger-spec-validator==2.0.2

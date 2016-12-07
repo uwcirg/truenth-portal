@@ -97,8 +97,8 @@
                 {% if enable_links %}<a href="{{PORTAL}}">{% endif %}
                     <img class="tnth-topnav-wordmark" src="{{PORTAL}}{{ url_for('static', filename='img/logo_wordmark_topnav2.png') }}" />
                 {% if enable_links %}</a>{% endif %}
-                {% if branded_logo %}
-                    <img src={{ branded_logo }}></img>
+                {% if branded_logos %}
+                    <img src={{ branded_logos[0] }}></img>
                 {% endif %}
             </div>
             <div id="tnthTopLinks">
@@ -155,8 +155,8 @@
                 {% endif %}
                 <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" />
                 {% if enable_links %}</a>{% endif %}
-                {% if branded_logo %}
-                    <img src={{ branded_logo }}></img>
+                {% if branded_logos %}
+                    <img src={{ branded_logos[1] }}></img>
                 {% endif %}
             </div>
             {% if enable_links %}
