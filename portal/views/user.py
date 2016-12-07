@@ -114,7 +114,7 @@ def account():
         # confirm org exists
         for org in request.json['organizations']:
             org_id = org['organization_id']
-            org = Organization.query.get(org_id)
+            org = Organization.query.get(org_id) if org_id else None
             if not org:
                 abort(400, "Organization {} not found".format(org_id))
             # add org to users account
