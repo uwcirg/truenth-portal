@@ -29,6 +29,17 @@ ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "lt" "0.11"; ec
 		's|/home/travis/build/ivan-c/true_nth_usa_portal/debian/portal/|/|g' \
 		debian/portal/usr/share/python/portal/bin/activate*
 
+	find \
+		debian/portal/usr/share/python/portal/lib/ \
+		\( -name "*.pth" -o \
+		-name "*.egg-link" \) \
+		-exec \
+			sed \
+				--in-place \
+				--expression 's|/home/travis/build/ivan-c/true_nth_usa_portal/debian/portal/|/|g' \
+				--expression 's|/home/travis/build/ivan-c/true_nth_usa_portal|/usr/share/python/portal|g' \
+				{} \; \
+		-print
 endif
 
 	dh_builddeb
