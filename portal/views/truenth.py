@@ -165,7 +165,7 @@ def portal_wrapper_html():
                         filename="img/{}.png".format(brand_name),
                         _external=True),
                 url_for('static',
-                        filename="img/{}-small.png".format(brand_name),
+                        filename="img/{}_sm.png".format(brand_name),
                         _external=True)
             )
 
