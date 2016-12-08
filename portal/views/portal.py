@@ -428,18 +428,6 @@ def profile(user_id):
                 'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
     return render_template('profile.html', user=user, consent_agreements=consent_agreements)
 
-@portal.route('/profile-test', defaults={'user_id': None})
-@portal.route('/profile-test/<int:user_id>')
-@oauth.require_oauth()
-def profile_test(user_id):
-    """profile test view function"""
-    user = current_user()
-    if user_id:
-        user.check_role("edit", other_id=user_id)
-        user = get_user(user_id)
-    return render_template('profile_test.html', user=user)
-
-
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
