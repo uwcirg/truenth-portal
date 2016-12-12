@@ -215,7 +215,7 @@ def configure_metadata(app):
 
     # Get git hash from version if present
     # Todo: extend Develop instead of monkey patching
-    if '+ng' in metadata.version:
+    if metadata.version and '+ng' in metadata.version:
         metadata.git_hash = metadata.version.split('+ng')[-1].split('.')[0]
 
     app.config.metadata = metadata
