@@ -209,6 +209,7 @@ def user_extension_map(user, extension):
 
 
 class User(db.Model, UserMixin):
+    ## PLEASE maintain merge_with() as user model changes ##
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64))
@@ -245,6 +246,8 @@ class User(db.Model, UserMixin):
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
             backref=db.backref('users', lazy='dynamic'))
+    questionnaire_responses = db.relationship('QuestionnaireResponse',
+            lazy='dynamic')
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
@@ -258,6 +261,10 @@ class User(db.Model, UserMixin):
     _locale = db.relationship(CodeableConcept, cascade="save-update")
     deleted = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deleted_id])
+
+    ###
+    ## PLEASE maintain merge_with() as user model changes ##
+    ###
 
     # FIXME kludge for random demo data
     due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
@@ -637,11 +644,11 @@ class User(db.Model, UserMixin):
     def merge_with(self, other_id):
         """merge details from other user into self
 
-        Part of an account generation or login flow - scenarios include
-        a provider setting up an account (typically the *other_id*) and
-        then a user logs into an existing account or registers a new (self)
-        and now we need to pull the data set up by the provider into the
-        new account.
+        Part of an account generation or login flow.  Scenarios include
+        a provider or an intervention setting up a weakly authenticated
+        account (typically the *other_id*) for the invitation process.
+        Once the user logs into an existing account or registers a new (self)
+        we need to pull the data set up by the provider into this user account.
 
         """
         other = User.query.get(other_id)
@@ -658,11 +665,19 @@ class User(db.Model, UserMixin):
 
         for relationship in ('organizations', '_consents', 'procedures',
                              'observations', 'relationships', 'roles',
-                             'races', 'ethnicities', 'groups'):
+                             'races', 'ethnicities', 'groups',
+                             'questionnaire_responses'):
             self_entity = getattr(self, relationship)
             other_entity = getattr(other, relationship)
-            append_list = [item for item in other_entity if item not in
-                           self_entity]
+            if relationship == 'roles':
+                # We don't copy over the roles used to mark the weak account
+                append_list = [item for item in other_entity if item not in
+                               self_entity and item.name not in
+                               ('write_only',
+                                'promote_without_identity_challenge')]
+            else:
+                append_list = [item for item in other_entity if item not in
+                               self_entity]
             for item in append_list:
                 self_entity.append(item)
 
