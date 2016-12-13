@@ -76,7 +76,7 @@ def auditlog_addevent():
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
-    Get html for the portal site UI wrapper (top-level nav elements, etc)
+    Get html for the portal site UI wrapper (top-level nav elements, timeout code, piwik analytics, etc)
 
     CORS headers will only be included when the request includes well defined
     Origin header.
