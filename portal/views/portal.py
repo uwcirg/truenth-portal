@@ -154,17 +154,21 @@ def access_via_token(token):
     if current_user():
         abort(500, "Already logged in - can't continue")
 
+    def verify_token(valid_seconds):
+        is_valid, has_expired, user_id =\
+                user_manager.token_manager.verify_token(token, valid_seconds)
+        if has_expired:
+            flash('Your access token has expired.', 'error')
+            return redirect(url_for('portal.landing'))
+        if not is_valid:
+            flash('Your access token is invalid.', 'error')
+            return redirect(url_for('portal.landing'))
+        return user_id
+
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
-    is_valid, has_expired, user_id = user_manager.token_manager.verify_token(
-        token, valid_seconds)
-    if has_expired:
-        flash('Your access token has expired.', 'error')
-        return redirect(url_for('portal.landing'))
-    if not is_valid:
-        flash('Your access token is invalid.', 'error')
-        return redirect(url_for('portal.landing'))
+    user_id = verify_token(valid_seconds)
 
     # Valid token - confirm user id looks legit
     user = get_user(user_id)
@@ -176,6 +180,17 @@ def access_via_token(token):
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
     if ROLE.WRITE_ONLY in has:
+        # write only users with special role skip the challenge protocol
+        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
+            # only give such tokens 5 minutes - recheck validity
+            verify_token(valid_seconds=5*60)
+            auditable_event("promoting user without challeng via token, "
+                            "pending registration", user_id=user.id)
+            user.mask_email()
+            db.session.commit()
+            session['invited_verified_user_id'] = user.id
+            return redirect(url_for('user.register', email=user.email))
+
         # legit - log in and redirect
         auditable_event("login using access_via_token", user_id=user.id)
         session['id'] = user.id
