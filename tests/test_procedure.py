@@ -75,6 +75,18 @@ class TestProcedure(TestCase):
         self.assertEquals(proc.code.codings[0].code, '80146002')
         self.assertEquals(proc.start_time, dateutil.parser.parse("2013-04-05"))
 
+    def test_procedure_bad_date(self):
+        with open(os.path.join(os.path.dirname(__file__),
+                               'procedure-example.json'), 'r') as fhir_data:
+            data = json.load(fhir_data)
+        data['performedDateTime'] = '1843-07-01'  # can't handle pre 1900
+        self.login()
+        rv = self.app.post(
+            '/api/procedure', content_type='application/json',
+            data=json.dumps(data))
+
+        self.assert400(rv)
+
     def test_procedurePOST(self):
         with open(os.path.join(os.path.dirname(__file__),
                                'procedure2-example.json'), 'r') as fhir_data:

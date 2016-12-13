@@ -111,6 +111,8 @@ def post_procedure():
 
     audit = Audit(user_id=current_user().id)
     procedure = Procedure.from_fhir(request.json, audit)
+    if procedure.start_time.year < 1900:
+        abort(400, "Invalid datetime; pre 1900")
 
     # check the permission now that we know the subject
     patient_id = procedure.user_id
