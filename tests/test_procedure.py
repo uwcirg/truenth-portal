@@ -84,7 +84,12 @@ class TestProcedure(TestCase):
         rv = self.app.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
+        self.assert400(rv)
 
+        data['performedDateTime'] = '1943-17-01'  # month 17 doesn't fly
+        rv = self.app.post(
+            '/api/procedure', content_type='application/json',
+            data=json.dumps(data))
         self.assert400(rv)
 
     def test_procedurePOST(self):

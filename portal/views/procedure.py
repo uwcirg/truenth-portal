@@ -110,7 +110,10 @@ def post_procedure():
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
     audit = Audit(user_id=current_user().id)
-    procedure = Procedure.from_fhir(request.json, audit)
+    try:
+        procedure = Procedure.from_fhir(request.json, audit)
+    except ValueError as e:
+        abort(400, str(e))
     if procedure.start_time.year < 1900:
         abort(400, "Invalid datetime; pre 1900")
 
