@@ -52,7 +52,7 @@
   width: 100%;
   max-width: 100%;
   background-color: #1A1919;
-  background-image: url('../img/truenth_forest_background.jpg');
+  background-image: url('../img/header_background.jpg');
   height: 135px;
   background-size: cover;
   margin: 0;
@@ -68,7 +68,7 @@
   margin: 0;
   width: 100%;
   background-color: #83885F;
-  background-image: url('../img/truenth_forest_background.jpg');
+  background-image: url('../img/header_background.jpg');
   background-size: auto 81px;
   background-repeat: no-repeat;
   padding: 10px 15px;
