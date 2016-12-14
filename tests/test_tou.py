@@ -20,6 +20,11 @@ class TestTou(TestCase):
         results = "{}".format(tou)
         self.assertTrue(tou_url in results)
 
+    def test_get_tou(self):
+        rv = self.app.get('/api/tou')
+        self.assert200(rv)
+        self.assertTrue('<p>When you agree to the Terms of Use' in rv.data)
+
     def test_accept(self):
         self.login()
         data = {'agreement_url': tou_url}
