@@ -145,7 +145,7 @@ class TestCase(Base):
 
         # Agree to Terms of Use and sign consent
         audit = Audit(user_id=TEST_USER_ID)
-        tou = ToU(audit=audit, text="filler text")
+        tou = ToU(audit=audit, agreement_url='http://not.really.org')
         parent_org = OrgTree().find(org.id).top_level()
         consent = UserConsent(user_id=TEST_USER_ID, organization_id=parent_org,
                               audit=audit, agreement_url='http://fake.org')

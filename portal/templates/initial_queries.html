@@ -263,7 +263,7 @@ $(document).ready(function(){
         var theTerms = {};
         //theTerms["text"] = $(this).attr('data-terms');
         // Grab the current text of the Terms of Use
-        theTerms["text"] = $("#termsText").text();
+        theTerms["agreement_url"] = "http://TODO.FIXME";
         // Post terms agreement via API
         tnthAjax.postTerms(theTerms);
         // Update UI

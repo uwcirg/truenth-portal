@@ -76,10 +76,10 @@ def post_user_accepted_tou(user_id):
           id: acceptedToU
           description: Details of accepted ToU
           required:
-            - text
+            - agreement_url
           properties:
-            text:
-              description: Full text agreed to
+            agreement_url:
+              description: URL for Terms of Use text
               type: string
     responses:
       200:
@@ -121,10 +121,10 @@ def accept_tou(user_id=None):
           id: acceptedToU
           description: Details of accepted ToU
           required:
-            - text
+            - agreement_url
           properties:
-            text:
-              description: Full text agreed to
+            agreement_url:
+              description: URL for Terms of Use text
               type: string
     responses:
       200:
@@ -141,10 +141,10 @@ def accept_tou(user_id=None):
         user=get_user(user_id)
     else:
         user = current_user()
-    if not request.json or 'text' not in request.json:
-        abort(400, "Requires JSON with the ToU 'text'")
+    if not request.json or 'agreement_url' not in request.json:
+        abort(400, "Requires JSON with the ToU 'agreement_url'")
     audit = Audit(user_id = user.id, comment = "ToU accepted")
-    tou = ToU(audit=audit, text=request.json['text'])
+    tou = ToU(audit=audit, agreement_url=request.json['agreement_url'])
     db.session.add(tou)
     db.session.commit()
     # Note: skipping auditable_event, as there's a audit row created above
