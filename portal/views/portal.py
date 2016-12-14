@@ -1,6 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-import requests
-
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask_login import login_user
@@ -14,7 +12,7 @@ from datetime import datetime
 from .auth import next_after_login
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.app_text import app_text
+from ..models.app_text import app_text, VersionedResource
 from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
@@ -312,22 +310,16 @@ def initial_queries():
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        response = requests.get(app_text(ToU_ATMA.name_key()))
-        terms = response.text
+        asset, url = VersionedResource.fetch_elements(
+            app_text(ToU_ATMA.name_key()))
+        terms = {'asset': asset, 'agreement_url': url}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
-            consent_url = app_text(ConsentATMA.name_key(organization=org))
-            response = requests.get(consent_url)
-            if response.json:
-                consent_agreements[org.id] = {
-                    'asset': response.json()['asset'],
-                    'agreement_url': ConsentATMA.permanent_url(
-                        version=response.json()['version'],
-                        generic_url=consent_url)}
-            else:
-                consent_agreements[org.id] = {
-                    'asset': response.text, 'agreement_url': consent_url}
+            asset, url = VersionedResource.fetch_elements(
+                app_text(ConsentATMA.name_key(organization=org)))
+            consent_agreements[org.id] = {
+                    'asset': asset, 'agreement_url': url}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -429,19 +421,14 @@ def profile(user_id):
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org))
-        response = requests.get(consent_url)
-        if response.json:
-            consent_agreements[org.id] = {
+        asset, url = VersionedResource.fetch_elements(
+            app_text(ConsentATMA.name_key(organization=org)))
+        consent_agreements[org.id] = {
                 'organization_name': org.name,
-                'asset': response.json()['asset'],
-                'agreement_url': ConsentATMA.permanent_url(
-                    version=response.json()['version'],
-                    generic_url=consent_url)}
-        else:
-            consent_agreements[org.id] = {
-                'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
-    return render_template('profile.html', user=user, consent_agreements=consent_agreements)
+                'asset': asset,
+                'agreement_url': url}
+    return render_template(
+        'profile.html', user=user, consent_agreements=consent_agreements)
 
 @portal.route('/legal')
 def legal():

@@ -6,8 +6,10 @@
         <p>{{ _("Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools") }}:</p>
         <div class="well">
             <div id="termsText">
-              {{ terms|safe if terms}}
+              {{ terms['asset']|safe if terms}}
             </div>
+            <meta id="termsURL"
+                  data-url="{{ terms['agreement_url']|safe if terms}}"/>
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
