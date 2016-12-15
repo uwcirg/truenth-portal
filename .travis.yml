@@ -62,8 +62,11 @@ before_deploy:
   - pip install make-deb
   - yes | make-deb
   - git checkout debian/rules
-
   - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
+
+  - docker build --file docker/build --tag "portal_builddeb:test" .
+  - docker cp $(docker ps --latest --quiet):/tmp/artifacts /tmp
+  - cp /tmp/artifacts/* ../
 
   # Build bintray descriptor file dynamically
   - >
@@ -95,9 +98,6 @@ before_deploy:
     }
     ' "$PORTAL_VERSION"
     > "${TRAVIS_BUILD_DIR}/bintray.json"
-  - docker build --file docker/build --tag "portal_builddeb:test" .
-  - docker cp $(docker ps --latest --quiet):/tmp/artifacts /tmp
-  - cp /tmp/artifacts/* ../
 
 # Only deploy from default virtual env TravisCI job
 deploy:
