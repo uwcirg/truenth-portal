@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
+import requests
 
 from .auth import next_after_login
 from ..audit import auditable_event
