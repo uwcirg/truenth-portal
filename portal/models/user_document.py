@@ -46,7 +46,7 @@ class UserDocument(db.Model):
             raise ValueError("user not found")
         if not data['document_type']:
             raise ValueError('must provide document type')
-        if upload_file.filename == '':
+        if not (upload_file.filename and upload_file.filename.strip()):
             raise ValueError("invalid filename")
         filename = secure_filename(upload_file.filename)
         filetype = filename.rsplit('.', 1)[1]
@@ -54,7 +54,7 @@ class UserDocument(db.Model):
             raise ValueError("filetype must be one of: " + ", ".join(data['allowed_extensions']))
         file_uuid = uuid4()
         try:
-            upload_file.save(os.path.join(current_app.root_path,"uploads",str(file_uuid)))
+            upload_file.save(os.path.join(current_app.root_path,current_app.config.get("FILE_UPLOAD_DIR"),str(file_uuid)))
         except:
             raise ValueError("could not save file")
 

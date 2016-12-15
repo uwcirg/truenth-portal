@@ -52,6 +52,7 @@ class BaseConfig(object):
     GOOGLE_CONSUMER_SECRET = os.environ.get('GOOGLE_CONSUMER_SECRET', '')
 
     DEFAULT_LOCALE = 'en_US'
+    FILE_UPLOAD_DIR = 'uploads'
     LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
     LR_GROUP = 20147
 

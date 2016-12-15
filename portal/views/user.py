@@ -1261,12 +1261,10 @@ def upload_user_document(user_id):
         required: true
         type: integer
         format: int64
-      - in: body
-        name: body
-        schema:
-          id: file
-          required:
-            - file
+    properties:
+      file:
+        type: file
+        description: File to upload
     responses:
       200:
         description: successful operation

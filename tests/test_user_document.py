@@ -1,8 +1,9 @@
-"""Unit test module for terms of use logic"""
-import json
+"""Unit test module for user document logic"""
 from flask_webtest import SessionScope
 from tempfile import NamedTemporaryFile
 from StringIO import StringIO
+from flask import current_app
+import os
 
 from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
@@ -16,10 +17,20 @@ class TestUserDocument(TestCase):
         #tests whether we can successfully post a patient report -type user doc file
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
+        test_contents = "This is a test."
         tmpfile = NamedTemporaryFile(suffix='.pdf')
+        tmpfile.write(test_contents)
+        tmpfile.seek(0)
         tmpfileIO = StringIO(tmpfile.read())
         rv = self.app.post('/api/user/{}/patient_report'.format(service_user.id),
-            content_type='multipart/form-data', 
-            data=dict({'file': (tmpfileIO, tmpfile.name)}))
+                            content_type='multipart/form-data', 
+                            data=dict({'file': (tmpfileIO, tmpfile.name)}))
         self.assert200(rv)
         tmpfile.close()
+        udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
+        fpath = os.path.join(current_app.root_path,
+                            current_app.config.get("FILE_UPLOAD_DIR"),
+                            str(udoc.uuid))
+        with open(fpath, 'r') as udoc_file:
+            self.assertEqual(udoc_file.read(),test_contents)
+        os.remove(fpath)
