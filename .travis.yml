@@ -64,7 +64,7 @@ before_deploy:
   - git checkout debian/rules
   - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
 
-  - docker build --file docker/build --tag "portal_builddeb:test" .
+  - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
   - cp /tmp/artifacts/* ../
 
