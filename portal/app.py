@@ -26,6 +26,7 @@ from .views.fhir import fhir_api
 from .views.filters import filters_blueprint
 from .views.group import group_api
 from .views.intervention import intervention_api
+from .views.patient import patient_api
 from .views.patients import patients
 from .views.procedure import procedure_api
 from .views.portal import portal, page_not_found, server_error
@@ -47,6 +48,7 @@ DEFAULT_BLUEPRINTS = (
     group_api,
     intervention_api,
     org_api,
+    patient_api,
     patients,
     procedure_api,
     portal,
