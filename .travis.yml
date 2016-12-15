@@ -1,15 +1,8 @@
 language: python
 python: "2.7"
-dist: trusty
-sudo: required
 cache: pip
 addons:
   postgresql: "9.4"
-  apt:
-    packages:
-      - dh-virtualenv
-      - libc6-i386
-      - debhelper
 git:
   depth: 2000
 
