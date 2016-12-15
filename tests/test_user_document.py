@@ -18,15 +18,18 @@ class TestUserDocument(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         test_contents = "This is a test."
-        tmpfile = NamedTemporaryFile(suffix='.pdf')
-        tmpfile.write(test_contents)
-        tmpfile.seek(0)
-        tmpfileIO = StringIO(tmpfile.read())
-        rv = self.app.post('/api/user/{}/patient_report'.format(service_user.id),
-                            content_type='multipart/form-data', 
-                            data=dict({'file': (tmpfileIO, tmpfile.name)}))
-        self.assert200(rv)
-        tmpfile.close()
+        with NamedTemporaryFile(
+            prefix='udoc_test_',
+            suffix='.pdf',
+            delete=True,
+        ) as temp_pdf:
+            temp_pdf.write(test_contents)
+            temp_pdf.seek(0)
+            tempfileIO = StringIO(temp_pdf.read())
+            rv = self.app.post('/api/user/{}/patient_report'.format(service_user.id),
+                                content_type='multipart/form-data', 
+                                data=dict({'file': (tempfileIO, temp_pdf.name)}))
+            self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
         fpath = os.path.join(current_app.root_path,
                             current_app.config.get("FILE_UPLOAD_DIR"),
