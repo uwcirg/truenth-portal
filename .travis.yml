@@ -61,8 +61,7 @@ before_deploy:
   # Use make-deb to update changelog so version is correct in package filename
   - pip install make-deb
   - yes | make-deb
-  - git add debian/changelog
-  - git stash --keep-index
+  - git checkout debian/rules
 
   - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
 
