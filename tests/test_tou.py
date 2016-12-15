@@ -23,7 +23,7 @@ class TestTou(TestCase):
     def test_get_tou(self):
         rv = self.app.get('/api/tou')
         self.assert200(rv)
-        self.assertTrue('<p>When you agree to the Terms of Use' in rv.data)
+        self.assertTrue('url' in rv.json)
 
     def test_accept(self):
         self.login()

@@ -1,9 +1,8 @@
 """Views for Terms of Use"""
-import requests
 from flask import abort, jsonify, Blueprint, request
 
 from ..extensions import db, oauth
-from ..models.app_text import app_text, ToU_ATMA
+from ..models.app_text import app_text, ToU_ATMA, VersionedResource
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
 from ..models.tou import ToU
@@ -13,8 +12,8 @@ tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
 
 
 @tou_api.route('/tou')
-def get_current_tou():
-    """Return current ToU asset (html)
+def get_current_tou_url():
+    """Return current ToU URL
 
     ---
     tags:
@@ -25,12 +24,12 @@ def get_current_tou():
     responses:
       200:
         description:
-          Returns html for current Terms of Use, with respect to current
-          system configuration.
+          Returns URL for current Terms of Use, with respect to current
+          system configuration in simple json {url:"http..."}
 
     """
-    response = requests.get(app_text(ToU_ATMA.name_key()))
-    return response.text
+    _, url = VersionedResource.fetch_elements(app_text(ToU_ATMA.name_key()))
+    return jsonify(url=url)
 
 
 @tou_api.route('/user/<int:user_id>/tou')
