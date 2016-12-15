@@ -13,6 +13,7 @@ from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
+from ..models.user_document import UserDocument
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -1235,3 +1236,75 @@ def unique_email():
         if user_id != result.id:
             return jsonify(unique=False)
     return jsonify(unique=True)
+
+@user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
+@oauth.require_oauth()
+def upload_user_document(user_id):
+    """Add a WiserCare Patient Report for the user
+
+    File must be included in the POST call, and must be a valid PDF file.
+    File will be stored on server using uuid as filename; file metadata (including
+    reference uuid) will be stored in the db.
+
+    ---
+    tags:
+      - User
+      - User Document
+      - Patient Report
+    operationId: post_patient_report
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          id: file
+          required:
+            - file
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request incudes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+        
+    if ('file' not in request.files) or not request.files['file']:
+        abort(400, "no file found")
+        
+    data = {'user_id': user_id, 'document_type': "PatientReport", 'allowed_extensions': ['pdf']}
+    try:
+        doc = UserDocument.from_post(request.files['file'],data)
+    except ValueError as e:
+        abort(400, str(e))
+
+    db.session.add(doc)
+    db.session.commit()
+
+    return jsonify(message="ok")

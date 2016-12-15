@@ -1,0 +1,63 @@
+"""User Document module"""
+from datetime import datetime
+from validators import url as url_validation
+from werkzeug.utils import secure_filename
+from uuid import uuid4
+from flask import current_app
+import os
+
+from ..extensions import db
+from .fhir import FHIR_datetime
+from .user import User
+
+class UserDocument(db.Model):
+    """ORM class for user document upload data
+
+    Capture and store uploaded user documents (e.g. WiserCare Patient Report, user avatar image, etc).
+
+    """
+    __tablename__ = 'user_documents'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    document_type = db.Column(db.Text, nullable=False)
+    filename = db.Column(db.Text, nullable=False)
+    filetype = db.Column(db.Text, nullable=False)
+    uuid = db.Column(db.Text, nullable=False)
+    uploaded_at = db.Column(db.DateTime, nullable=False)
+
+    def __str__(self):
+        return self.filename
+
+    def as_json(self):
+        d = {}
+        d['user_id'] = self.user_id
+        d['document_type'] = self.description
+        d['uploaded_at'] = FHIR_datetime.as_fhir(self.uploaded_at)
+        d['filename'] = self.filename
+        d['filetype'] = self.filetype
+        d['uuid'] = self.uuid
+
+        return d
+
+    @classmethod
+    def from_post(cls, upload_file, data):
+        user = User.query.get(data['user_id'])
+        if not user:
+            raise ValueError("user not found")
+        if not data['document_type']:
+            raise ValueError('must provide document type')
+        if upload_file.filename == '':
+            raise ValueError("invalid filename")
+        filename = secure_filename(upload_file.filename)
+        filetype = filename.rsplit('.', 1)[1]
+        if filetype.lower() not in data['allowed_extensions']:
+            raise ValueError("filetype must be one of: " + ", ".join(data['allowed_extensions']))
+        file_uuid = uuid4()
+        try:
+            upload_file.save(os.path.join(current_app.root_path,"uploads",str(file_uuid)))
+        except:
+            raise ValueError("could not save file")
+
+        return cls(user_id=data['user_id'],document_type=data['document_type'],filename=filename,
+                    filetype=filetype,uuid=file_uuid,uploaded_at=datetime.utcnow())
+
