@@ -1,0 +1,46 @@
+FROM debian:jessie
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN echo '\n\
+Package: dh-virtualenv\n\
+Pin: release a=testing\n\
+Pin-Priority: 750\n\
+\n'\
+> /etc/apt/preferences.d/dh-virtualenv.pref
+
+RUN echo '\n\
+Package: *\n\
+Pin: release a=testing\n\
+Pin-Priority: 75\n\
+\n'\
+> /etc/apt/preferences.d/testing.pref
+
+RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
+
+RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
+	debhelper \
+	dh-virtualenv\
+	fakeroot \
+	git \
+	libc6-i386 \
+	libffi-dev \
+	libpq-dev \
+	locales \
+	python-dev \
+	python-pip
+
+RUN dpkg-reconfigure locales && \
+    locale-gen C.UTF-8 && \
+    /usr/sbin/update-locale LANG=C.UTF-8
+
+RUN pip install make-deb
+
+RUN git clone -b feature/deb-packaging_docker-build https://github.com/ivan-c/true_nth_usa_portal.git /root/portal
+
+WORKDIR /root/portal
+
+RUN yes | make-deb
+RUN git checkout debian/rules
+
+RUN dpkg-buildpackage -us -uc
