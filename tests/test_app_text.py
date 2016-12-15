@@ -3,9 +3,29 @@ from flask import render_template
 from flask_webtest import SessionScope
 
 from portal.extensions import db
-from portal.models.app_text import AppText, ConsentATMA, app_text
+from portal.models.app_text import AppText, app_text, VersionedResource
 from tests import TestCase
 
+
+from urlparse import urlparse, parse_qsl
+from urllib import unquote_plus
+
+class Url(object):
+    '''A url object that can be compared with other url orbjects
+    without regard to the vagaries of encoding, escaping, and ordering
+    of parameters in query strings.'''
+
+    def __init__(self, url):
+        parts = urlparse(url)
+        _query = frozenset(parse_qsl(parts.query))
+        _path = unquote_plus(parts.path)
+        parts = parts._replace(query=_query, path=_path)
+        self.parts = parts
+
+    def __eq__(self, other):
+        return self.parts == other.parts
+
+    def __hash__(self): return hash(self.parts)
 
 class TestAppText(TestCase):
 
@@ -25,12 +45,13 @@ class TestAppText(TestCase):
         self.assertRaises(ValueError, render_template, 'landing.html')
 
     def test_permanent_url(self):
-        sample = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668'
+        sample = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668&version=latest'
         version = '1.3'
         expected = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=52668&version=1.3'
 
-        result = ConsentATMA.permanent_url(generic_url=sample, version=version)
-        self.assertEquals(result, expected)
+        result = VersionedResource.permanent_url(
+            generic_url=sample, version=version)
+        self.assertTrue(Url(result) == Url(expected))
 
     def test_config_value_in_custom_text(self):
         self.app.application.config['CT_TEST'] = 'found!'

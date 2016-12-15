@@ -1,5 +1,4 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-import requests
 import random
 from datetime import datetime
 from flask import abort, Blueprint, render_template
@@ -10,7 +9,7 @@ from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..models.user_consent import UserConsent
 from ..models.organization import Organization, OrgTree
-from ..models.app_text import app_text, ConsentATMA
+from ..models.app_text import app_text, ConsentATMA, VersionedResource
 from ..extensions import oauth
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -113,16 +112,10 @@ def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org))
-        response = requests.get(consent_url)
-        if response.json:
-            consent_agreements[org.id] = {
+        asset, url = VersionedResource.fetch_elements(
+            app_text(ConsentATMA.name_key(organization=org)))
+        consent_agreements[org.id] = {
                 'organization_name': org.name,
-                'asset': response.json()['asset'],
-                'agreement_url': ConsentATMA.permanent_url(
-                    version=response.json()['version'],
-                    generic_url=consent_url)}
-        else:
-            consent_agreements[org.id] = {
-                'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
+                'asset': asset,
+                'agreement_url': url}
     return consent_agreements

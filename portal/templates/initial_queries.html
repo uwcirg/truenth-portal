@@ -261,9 +261,7 @@ $(document).ready(function(){
   $("#agreeLabel").on("click",function(){
       if ($(this).attr("data-agree") == "false") {
         var theTerms = {};
-        //theTerms["text"] = $(this).attr('data-terms');
-        // Grab the current text of the Terms of Use
-        theTerms["text"] = $("#termsText").text();
+        theTerms["agreement_url"] = $("#termsURL").data().url;
         // Post terms agreement via API
         tnthAjax.postTerms(theTerms);
         // Update UI
