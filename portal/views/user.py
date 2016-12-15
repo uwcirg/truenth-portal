@@ -13,6 +13,7 @@ from ..models.relationship import Relationship
 from ..models.user import current_user, get_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
+from ..models.user_document import UserDocument
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -1235,3 +1236,87 @@ def unique_email():
         if user_id != result.id:
             return jsonify(unique=False)
     return jsonify(unique=True)
+
+@user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
+@oauth.require_oauth()
+def upload_user_document(user_id):
+    """Add a WiserCare Patient Report for the user
+
+    File must be included in the POST call, and must be a valid PDF file.
+    File will be stored on server using uuid as filename; file metadata (including
+    reference uuid) will be stored in the db.
+
+    ---
+    tags:
+      - User
+      - User Document
+      - Patient Report
+    operationId: post_patient_report
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    properties:
+      file:
+        type: file
+        description: File to upload
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request incudes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    def posted_filename(request):
+        """Return file regardless of POST convention
+
+        Depending on POST convention, filename is either the key or
+        the second part of the file tuple, not always available as 'file'.
+
+        :return: the posted file
+        """
+        if not request.files or len(request.files) != 1:
+            abort(400, "no file found - POST single file")
+        key = request.files.keys()[0]  # either 'file' or actual filename
+        filedata = request.files[key]
+        return filedata
+
+    file = posted_filename(request)
+    data = {'user_id': user_id, 'document_type': "PatientReport",
+            'allowed_extensions': ['pdf']}
+    try:
+        doc = UserDocument.from_post(file, data)
+    except ValueError as e:
+        abort(400, str(e))
+
+    db.session.add(doc)
+    db.session.commit()
+    auditable_event("patient report {} posted for user {}".format(
+        doc.uuid, user_id), user_id=current_user().id)
+    return jsonify(message="ok")
