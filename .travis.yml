@@ -16,6 +16,7 @@ git:
 services:
   - postgresql
   - redis-server
+  - docker
 env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
@@ -95,7 +96,7 @@ before_deploy:
     }
     ' "$PORTAL_VERSION"
     > "${TRAVIS_BUILD_DIR}/bintray.json"
-  - dpkg-buildpackage -us -uc
+  - docker build --file docker/build --tag "portal_builddeb:test" .
 
 # Only deploy from default virtual env TravisCI job
 deploy:
