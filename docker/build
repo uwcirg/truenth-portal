@@ -36,7 +36,7 @@ RUN dpkg-reconfigure locales && \
 
 RUN pip install make-deb
 
-RUN git clone -b feature/deb-packaging https://github.com/ivan-c/true_nth_usa_portal.git /root/portal
+RUN git clone --branch feature/deb-packaging https://github.com/ivan-c/true_nth_usa_portal.git /root/portal
 
 WORKDIR /root/portal
 
