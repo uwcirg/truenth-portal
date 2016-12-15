@@ -73,6 +73,7 @@ class TestConfig(BaseConfig):
     )
 
     WTF_CSRF_ENABLED = False
+    FILE_UPLOAD_DIR = 'test_uploads'
 
 
 class ConfigServer(Server):  # pragma: no cover
