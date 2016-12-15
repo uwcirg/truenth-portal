@@ -1,6 +1,5 @@
 """User Document module"""
 from datetime import datetime
-from validators import url as url_validation
 from werkzeug.utils import secure_filename
 from uuid import uuid4
 from flask import current_app

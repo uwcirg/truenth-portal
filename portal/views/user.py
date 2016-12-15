@@ -1292,10 +1292,10 @@ def upload_user_document(user_id):
         user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-        
+
     if ('file' not in request.files) or not request.files['file']:
         abort(400, "no file found")
-        
+
     data = {'user_id': user_id, 'document_type': "PatientReport", 'allowed_extensions': ['pdf']}
     try:
         doc = UserDocument.from_post(request.files['file'],data)

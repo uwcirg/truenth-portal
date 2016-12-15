@@ -1,11 +1,10 @@
 """Unit test module for user document logic"""
-from flask_webtest import SessionScope
 from tempfile import NamedTemporaryFile
 from StringIO import StringIO
 from flask import current_app
 import os
 
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase
 from portal.extensions import db
 from portal.models.user_document import UserDocument
 
