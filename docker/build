@@ -36,6 +36,8 @@ RUN dpkg-reconfigure locales && \
 
 RUN pip install make-deb
 
+RUN mkdir -p /tmp/artifacts
+
 RUN git clone --branch feature/deb-packaging https://github.com/ivan-c/true_nth_usa_portal.git /root/portal
 
 WORKDIR /root/portal
@@ -44,3 +46,4 @@ RUN yes | make-deb
 RUN git checkout debian/rules
 
 RUN dpkg-buildpackage -us -uc
+RUN cp /root/portal_* /tmp/artifacts
