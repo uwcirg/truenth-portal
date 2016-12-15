@@ -1293,16 +1293,30 @@ def upload_user_document(user_id):
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
 
-    if ('file' not in request.files) or not request.files['file']:
-        abort(400, "no file found")
+    def posted_filename(request):
+        """Return file regardless of POST convention
 
-    data = {'user_id': user_id, 'document_type': "PatientReport", 'allowed_extensions': ['pdf']}
+        Depending on POST convention, filename is either the key or
+        the second part of the file tuple, not always available as 'file'.
+
+        :return: the posted file
+        """
+        if not request.files or len(request.files) != 1:
+            abort(400, "no file found - POST single file")
+        key = request.files.keys()[0]  # either 'file' or actual filename
+        filedata = request.files[key]
+        return filedata
+
+    file = posted_filename(request)
+    data = {'user_id': user_id, 'document_type': "PatientReport",
+            'allowed_extensions': ['pdf']}
     try:
-        doc = UserDocument.from_post(request.files['file'],data)
+        doc = UserDocument.from_post(file, data)
     except ValueError as e:
         abort(400, str(e))
 
     db.session.add(doc)
     db.session.commit()
-
+    auditable_event("patient report {} posted for user {}".format(
+        doc.uuid, user_id), user_id=current_user().id)
     return jsonify(message="ok")
