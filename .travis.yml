@@ -65,7 +65,7 @@ before_deploy:
   - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
 
   - docker build --file docker/build --tag "portal_builddeb:test" .
-  - docker cp $(docker ps --latest --quiet):/tmp/artifacts /tmp
+  - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
   - cp /tmp/artifacts/* ../
 
   # Build bintray descriptor file dynamically
