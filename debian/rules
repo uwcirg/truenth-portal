@@ -1,11 +1,6 @@
 #!/usr/bin/make -f
 
-DH_VIRTUALENV_VERSION = $(shell dpkg-query --showformat='$${Version}' --show dh-virtualenv)
 DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
-
-ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "ge" "0.7"; echo $$?),0)
-    DH_VIRTUALENV_ARGS += --no-test
-endif
 
 
 distclean:
@@ -18,33 +13,6 @@ override_dh_virtualenv:
 	cat requirements.build.txt requirements.backup.txt > requirements.txt
 
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
-
-
-override_dh_builddeb:
-# Manually fix VIRTUAL_ENV path for old dh-virtualenv versions (missing fix_activate_path)
-# Todo: move to more appropriate step
-ifeq ($(shell dpkg --compare-versions "$(DH_VIRTUALENV_VERSION)" "lt" "0.11"; echo $$?),0)
-	sed \
-		--in-place \
-		's|/home/travis/build/ivan-c/true_nth_usa_portal/debian/portal/|/|g' \
-		debian/portal/usr/share/python/portal/bin/activate*
-
-	find \
-		debian/portal/usr/share/python/portal/lib/ \
-		\( -name "*.pth" -o \
-		-name "*.egg-link" \) \
-		-exec \
-			sed \
-				--in-place \
-				--expression 's|/home/travis/build/ivan-c/true_nth_usa_portal/debian/portal/|/|g' \
-				--expression 's|/home/travis/build/ivan-c/true_nth_usa_portal|/usr/share/python/portal|g' \
-				{} \; \
-		-print
-endif
-
-	dh_builddeb
-	if [ -f requirements.backup.txt ]; then mv requirements.backup.txt requirements.txt; fi;
-
 
 %:
 	dh $@ --with python-virtualenv
