@@ -75,7 +75,7 @@ before_deploy:
             "public_stats": false
         },
         "version": {
-            "name": "%s",
+            "name": "$PORTAL_VERSION",
             "gpgSign": true
         },
         "files": [
@@ -91,7 +91,7 @@ before_deploy:
         ],
         "publish": true
     }
-    ' "$PORTAL_VERSION"
+    ' | envsubst
     > "${TRAVIS_BUILD_DIR}/bintray.json"
 
 # Only deploy from default virtual env TravisCI job
