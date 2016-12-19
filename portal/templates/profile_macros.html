@@ -1,7 +1,7 @@
 {% from "initial_queries_macros.html" import patientQGroup %}
 
 {% macro profileImage(person) -%}
-    {% if person.image_url %}
+    {% if person and person.image_url %}
         <div class="profile-img hidden-xs">
             <img src="{{ person and person.image_url }}" />
         </div>
@@ -14,11 +14,10 @@
         <label>{{ _("Birth Date") }}</label>
         <div class="row">
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-
+                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" data-birthday="true" required />
             </div>
             <div class="col-md-4 col-xs-10">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" error-field="errorbirthday" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -36,7 +35,7 @@
 
             </div>
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-birthday="true" error-field="errorbirthday" required />
 
             </div>
         </div>
@@ -243,7 +242,7 @@
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup">
         <label for="email">{{ _("Email Address") }}</label>
-        <input type="text" class="form-control" id="email" name="email" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email }}" data-customemail="true" required>
+        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" save-container-id="email" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
@@ -378,7 +377,7 @@
 {%- endmacro %}
 
 {% macro consent(person, consent_agreements, current_user) -%}
-    {% if consent_agreements %}
+    {% if person and consent_agreements %}
         <div id="consentContainer">
             {% for org in consent_agreements %}
               <div id="{{org}}_consentItem" class="consent">
@@ -567,12 +566,13 @@
             </div>
         </div>
     {% endif %}
-    <script>$(function () {
-
-    tnthAjax.getRoles({{ person.id }}, true);
-    $("#rolesGroup input[name='user_type']").each(function() {
-        $(this).on("click", function() {
-            var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+    {% if person %}
+    <script>
+    $(function () {
+        tnthAjax.getRoles({{ person.id }}, true);
+        $("#rolesGroup input[name='user_type']").each(function() {
+            $(this).on("click", function() {
+                var roles = $("#rolesGroup input:checkbox:checked").map(function(){
                     return { name: $(this).val() };
                 }).get();
                 var toSend = {"roles": roles};
@@ -582,6 +582,7 @@
         });
     });
     </script>
+    {% endif %}
 
 {%- endmacro %}
 
@@ -718,7 +719,7 @@
             <div class="profile-item-container">
                 <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Question") }}</h4>
                 <p class="text-muted">{{ _("Question inquired of the patient at account creation") }}</p>
-                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
                 <div id="pcaLocalizedContainer" class="well" style="margin-top: 1em; padding: 0.7em 2em 1em 2em">
                      <div id="patMeta" data-topic="pca_localized" class="pat-q">
                       <br />
@@ -763,7 +764,7 @@
             <div class="profile-item-container">
                 <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Questions") }}</h4>
                 <h4 class="text-muted">{{ _("Questions inquired of the patient at registration") }}</h4>
-                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
                 <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
                     {{patientQGroup(current_user)}}
                 </div>
@@ -847,7 +848,7 @@
                 <div class="profile-item-container">
                     <h4 id="interventionReportsLoc" class="profile-item-title">{{ _("Intervention Reports") }}</h4>
                     <div>
-                        {% if person.provider_html() %}
+                        {% if person and person.provider_html() %}
                             {{person.provider_html() | safe}}
                         {% else %}
                             <div class="text-mute">{{ _("No Reports Available") }}</div>
@@ -951,7 +952,7 @@
         {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}}
     {% endif %}
 
-    {% if person.has_role('patient') %}
+    {% if person and person.has_role('patient') %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -964,7 +965,7 @@
         </div>
     {% endif %}
 
-    {% if person.has_role('patient') %}
+    {% if person and person.has_role('patient') %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
     {% endif %}
 
@@ -977,7 +978,7 @@
         </div>
     </div>
 
-    {%if person.has_role('patient')%}
+    {%if person and person.has_role('patient')%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1035,11 +1036,11 @@
     #procedureForm { margin-left: 0.5em;}
     .procedureDateLabel { margin-bottom: 0;}
 </style>
-<p>{%if current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
+<p>{%if current_user and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
     date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p>
 <div id="profileProcedureContainer">
     <div class="inner">
-        <p class="text-muted">{%if current_user.id == person.id%}{{ _("Your treatments") }}{%else%}{{ _("Treatments") }}{%endif%}:</p>
+        <p class="text-muted">{%if current_user and (current_user.id == person.id) %}{{ _("Your treatments") }}{%else%}{{ _("Treatments") }}{%endif%}:</p>
         <div id="userProcedures"></div>
 
     </div>
@@ -1083,10 +1084,10 @@
                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
                 <div class="flex">
                     <div>
-                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="([1-9]|[12][0-9]|3[01])">
+                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" required="" pattern="([1-9]|[12][0-9]|3[01])">
                     </div>
                     <div>
-                        <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
+                        <select class="form-control" name="procMonth" id="procMonth" required="">
                             <option value="">{{ _("Month") }}...</option>
                             <option value="01">{{ _("January") }}</option>
                             <option value="02">{{ _("February") }}</option>
@@ -1103,7 +1104,7 @@
                         </select>
                     </div>
                     <div>
-                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
+                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"  required="" pattern="\d{4}">
                     </div>
                 </div>
                 <div class="row">
@@ -1119,12 +1120,12 @@
     <br/>
 <div>
 <script>
-    var subjectId = {{ person.id }};
-    var currentUserId = {{ current_user.id }};
+    var subjectId = {{ person.id if person}};
+    var currentUserId = {{ current_user.id if current_user}};
 
 $(document).ready(function(){
 
-    tnthAjax.getProc({{ person.id }}, false);
+    tnthAjax.getProc({{ person.id if person}}, false);
 
 /**
     // Class for both "done" and "skip" buttons

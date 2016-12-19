@@ -10,12 +10,16 @@
 <br/>
 <div class="flex">
 <div class="profile-header">
-    {% if providerPerspective == 'true' %}
-        <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
-    {% elif current_user.has_role('admin') %}
-        <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+    {% if user and user.username %}
+      {% if providerPerspective == 'true' %}
+          <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+      {% elif current_user.has_role('admin') %}
+          <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+      {% else %}
+           <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+      {% endif %}
     {% else %}
-         <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+       <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
     {% endif %}
 </div>
 {{profileImage(user)}}
@@ -90,18 +94,17 @@
 
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
-
-<div class="row" style="position: relative;">
-    <div class="col-md-12">
-        {{profile(user, current_user, consent_agreements)}}
-        <br/>
-        {% if providerPerspective == 'true' %}
-           <br/><br/> {{ back_btn('patients','Patients List') }}
-        {% else %}
-            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
-        {% endif %}
-    </div>
-</div>
+  <div class="row" style="position: relative;">
+      <div class="col-md-12">
+          {{profile(user, current_user, consent_agreements)}}
+          <br/>
+          {% if providerPerspective == 'true' %}
+             <br/><br/> {{ back_btn('patients','Patients List') }}
+          {% else %}
+              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
+          {% endif %}
+      </div>
+  </div>
 </form>
 
 {% endblock %}
@@ -114,21 +117,29 @@ function goTo(event, id) {
     $("#indexContainer").removeClass("open");
 };
 
+{% if user.has_role('patient')  and (user.id != current_user.id) %}
+  
+  var patientId = {{user.id}};
+
+{% endif %}
 
 $(document).ready(function(){
     $('#loginAsPatient a').tooltip();
 
     [{
         attachID: "month",
-        targetField: $("#month")
+        targetField: $("#month"),
+        customErrorField: $("#errorbirthday")
      },
      {
         attachID: "date",
-        targetField: $("#date")
+        targetField: $("#date"),
+        customErrorField: $("#errorbirthday")
      },
      {
         attachID: "year",
-        targetField: $("#year")
+        targetField: $("#year"),
+        customErrorField: $("#errorbirthday")
      },
      {
         attachID: "firstname",
@@ -139,8 +150,7 @@ $(document).ready(function(){
         targetField: $("#lastname")
      },
      {
-        attachID: "email",
-        targetField: $("#email")
+        attachID: "email"
      },
      {
         attachID: "phone",
@@ -163,26 +173,35 @@ $(document).ready(function(){
         targetField: $("input[name='ethnicity']")
      },
      {
-        attachID: "userEthnicity",
-        targetField: $("input[name='ethnicity']")
-     },
-     {
         attachID: "rolesGroup",
         targetField: $("input[name='user_type']")
      }].forEach(function(o) {
         /** see main.js **/
-        getSaveLoaderDiv("profileForm", o.attachID);
+        if (o.attachID) getSaveLoaderDiv("profileForm", o.attachID);
+        if (o.targetField) {
+          o.targetField.each(function() {
+              $(this).attr("save-container-id", o.attachID);
+              var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+              $(this).on(triggerEvent, function() {
+                if (this.validity.valid) {
+                  var hasError = false;
+                  if ($(this).attr("error-field")) {
+                    var customErrorField = $("#" + $(this).attr("error-field"));
+                    if (customErrorField.length > 0) {
+                      if (customErrorField.text() != "") hasError = true;
+                      else hasError = false;
+                    } else hasError = false;
+                  }; 
 
-        o.targetField.each(function() {
-            $(this).attr("save-container-id", o.attachID);
-            $(this).on("change", function() {
-              if (this.validity.valid) {
-                assembleContent.demo({{ user.id }},true, $(this));
-              };
-            });
-        });
+                  //console.log("hasError: " + hasError + " customText: " + customErrorField.text())             
+                  if (!hasError) assembleContent.demo({{ user.id }},true, $(this));
+                };
+              });
+          });
+        };
     });
 
+  
     if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
 
     $("html").click(function(event){

@@ -102,6 +102,15 @@ $(document).ready(function() {
         var validColor = "#777";
 
         if (dTest && mTest && yTest) {
+
+            if (parseInt(y) < 1900) {
+                deField.text("Year must be after 1900.").css("color", errorColor);
+                return false;
+            } else {
+                deField.text("").css("color", "validColor");
+            };
+
+
             if (parseInt(m) === 2) { //month of February
                 if (isLeapYear(parseInt(y))) {
                     if (parseInt(d) > 29)  {
@@ -128,10 +137,10 @@ $(document).ready(function() {
             if (fd.attr("type") == "text") return fd.val();
             else return fd.find("option:selected").val();
         }).join("/");
-        console.log("passedDate: " + passedDate);
+        //console.log("passedDate: " + passedDate);
         $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
         dateFormatted = tnthDates.swap_mm_dd(passedDate);
-        console.log("formatted date: " + dateFormatted);
+        //console.log("formatted date: " + dateFormatted);
         $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
         checkSubmit("button[id^='tnthproc-submit']");
 
@@ -156,7 +165,7 @@ $(document).ready(function() {
     dateFields.forEach(function(fn) {
         $("#" + fn).on("change", function() {
             var isValid = checkDate();
-            console.log("isValid: " +  isValid)
+            //console.log("isValid: " +  isValid)
             if (isValid) {
                 setDate();
             }; 
