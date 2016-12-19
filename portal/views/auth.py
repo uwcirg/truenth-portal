@@ -376,7 +376,7 @@ def logout(prevent_redirect=False):
     notify_clients(user_id)
     if prevent_redirect:
         return
-    return redirect('/')
+    return redirect('/' if not timed_out else '/?timed_out=1')
 
 class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""

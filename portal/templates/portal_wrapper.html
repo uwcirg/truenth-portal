@@ -42,24 +42,26 @@
       setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 10);
 
       // Configure and start the session timeout monitor
+      {% if user %}
+          var sessMon = sessionMonitor({
+                sessionLifetime: DEFAULT_SESSION_LIFETIME,
+                timeBeforeWarning: 1 * 60 * 1000,
+                minPingInterval: 1 * 60 * 1000,  // 1 minute
+                activityEvents: "mouseup",
+                pingUrl: '{{PORTAL}}/api/ping',
+                logoutUrl: '{{PORTAL}}/logout',
+                timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
+                onwarning: function() {$("#session-warning-modal").modal("show");}
+          });
+          window.sessMon = sessMon;
+           // Configure the session timeout warning modal
+          $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+                  .on("click", "#stay-logged-in", sessMon.extendsess)
+                  .on("click", "#log-out", sessMon.logout)
+                  .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+       {% endif %}
+     });
 
-      var sessMon = sessionMonitor({
-            sessionLifetime: DEFAULT_SESSION_LIFETIME,
-            timeBeforeWarning: 1 * 60 * 1000,
-            minPingInterval: 1 * 60 * 1000,  // 1 minute
-            activityEvents: "mouseup",
-            pingUrl: '{{PORTAL}}/api/ping',
-            logoutUrl: '{{PORTAL}}/logout',
-            timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
-            onwarning: function() {$("#session-warning-modal").modal("show");}
-      });
-      window.sessMon = sessMon;
-       // Configure the session timeout warning modal
-      $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-              .on("click", "#stay-logged-in", sessMon.extendsess)
-              .on("click", "#log-out", sessMon.logout)
-              .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-      });
 </script>
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
@@ -106,8 +108,8 @@
                     {% if user %}
                     <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                         {{ _("Welcome") }}{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
-                        {% if config.DEBUG_TIMEOUTS %} 
-                        ({{ expires_in }} seconds remaining) 
+                        {% if config.DEBUG_TIMEOUTS %}
+                        ({{ expires_in }} seconds remaining)
                         {% endif %}
                         <img src="{{movember_profile}}" width="50" height="50" />
                         {% if enable_links %}
