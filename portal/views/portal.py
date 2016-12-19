@@ -64,7 +64,9 @@ def landing():
     if current_user():
         current_app.logger.debug("landing (found user) -> next_after_login")
         return next_after_login()
-    return render_template('landing.html', user=None, no_nav="true")
+
+    timed_out = request.args.get('timed_out', False)
+    return render_template('landing.html', user=None, no_nav="true", timed_out = timed_out)
 
 
 class ShortcutAliasForm(FlaskForm):

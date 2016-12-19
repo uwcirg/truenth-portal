@@ -7,6 +7,16 @@
     #mainDiv {
         background: none;
     }
+    #timeOutMessageContainer {
+        margin: 1em auto;
+        padding: 0.5em 1em;
+        font-weight: bold;
+        background-color: #ddd;
+        color:#a94442;
+        border-radius: 4px;
+        width: 400px;
+        max-width: 100%
+    }
 </style>
 <div id="fullSizeBox" class="box-min-500">
     <img  src="{{ url_for('static', filename='img/spacer.jpg') }}" class="tnth-image img-responsive hidden-xs" style="visibility:hidden"/>
@@ -17,13 +27,18 @@
         <div id="wellContainer">
             <div class="tnth-splash">
                 <div id="wellContent">
-                  <div class="headline">
+                    <div class="headline">
                         <div style="margin-bottom: 1em">{{ app_text('landing title') }}</div>
                         {{ app_text('landing sub-title') }}
                     </div>
                     <a href="/go" class="btn feature-btn feature-btn-primary">{{ _("Register") }}</a> &nbsp;&nbsp; <a href="/user/sign-in" class="btn feature-btn feature-btn-primary">{{ _("Login") }}</a>
-
+                    {% if timed_out %}
+                        <div id="timeOutMessageContainer">
+                            You have been logged out due to inactivity. Please log in again to continue.
+                        </div>
+                    {% endif %}
                 </div>
+
                 <div class="tnth-splash-bottom">
                     <a href="/explore" class="tnth-splash-bottom-link"><span class="hidden-xs">{{ _("Explore How This Works") }}</span><span class="hidden-sm hidden-md hidden-lg">{{ _("Explore") }}</span></a><span class="tnth-splash-bottom-link separator"></span><a href="/about" class="tnth-splash-bottom-link"><span class="hidden-xs">{{ _("Learn About TrueNTH") }}</span><span class="hidden-sm hidden-md hidden-lg">{{ _("Learn") }}</span></a>
                 </div>
