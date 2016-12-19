@@ -324,7 +324,9 @@ var assembleContent = {
             "family": $("input[name=lastname]").val()
         };
 
-        demoArray["birthDate"] = $("input[name=birthDate]").val();
+
+        var bdFieldVal = $("input[name=birthDate]").val();
+        if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
         $.each($("#userOrgs input:checkbox"),function(i,v){
             if ($(this).attr("data-parent-id")) {
@@ -1166,7 +1168,7 @@ $(document).ready(function() {
                     }
                     // After tests display errors if necessary
                     if (goodDate) {
-                        $("#errorbirthday").hide();
+                        $("#errorbirthday").html("").hide();
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
                         // If we are on initial-queries, then we'll want to display the patientQ div
@@ -1187,6 +1189,7 @@ $(document).ready(function() {
                     $("#birthday").val("");
                 }
                 if (goodDate) {
+                    $("#errorbirthday").html("").hide();
                     return true;
                 } else {
                     return false;
@@ -1213,7 +1216,7 @@ $(document).ready(function() {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
                             if ($el.attr("update-on-validated") == "true" && $el.attr("user-id")) {
                                 assembleContent.demo($el.attr("user-id"),true, $el);
-                            }
+                            };
                         } else {
                             $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
                         }
