@@ -58,10 +58,10 @@
         {% else %}
           <style>
           .reg-complete-container {
-            width: 500px;
+            width: 100%;
             max-width: 100%;
             margin: 10% auto;
-            background-color: #eee;
+            background-color: #f8f8f9;
             padding: 2em 2em 2.7em 2em;
             text-align: center;
             border-radius: 8px;
@@ -70,6 +70,7 @@
            <div class="reg-complete-container">
               <h4 class="profile-item-title"> {{ _("Thank you for registering.") }}</h4>
               <p>{{ _("Click continue to start using TrueNTH") }}</p>
+              <br/>
               <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
            </div>
         {% endif %}
@@ -226,7 +227,18 @@ $(document).ready(function(){
         thisItem.parents(".pat-q").next().fadeIn();
         if (toCall == "tx") {
           $("#clinics").fadeIn();
-        }
+          $('html, body').animate({
+            scrollTop: $('#clinics').offset().top
+          }, 500);
+        } else {
+          var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
+          var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
+          if (nextItem.length > 0) {
+            $('html, body').animate({
+              scrollTop: nextItem.offset().top
+            }, 500);
+          };
+        };
       } else {
         if (toCall == "biopsy") {
           ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
@@ -248,6 +260,9 @@ $(document).ready(function(){
         }
         thisItem.parents(".pat-q").nextAll().fadeOut();
         $("#clinics").fadeIn();
+        $('html, body').animate({
+            scrollTop: $('#clinics').offset().top
+        }, 500);
       };
   });
 
