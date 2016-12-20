@@ -13,20 +13,22 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import Coding, CodeableConcept, FHIR_datetime
 from portal.models.procedure import Procedure
+from portal.models.procedure_codes import known_treatment_started
+from portal.models.procedure_codes import known_treatment_not_started
 from portal.models.reference import Reference
 
 
 class TestProcedure(TestCase):
 
-    def prep_db_for_procedure(self):
+    def prep_db_for_procedure(self, code='367336001', display='Chemotherapy'):
         # First push some procedure data into the db for the test user
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID)
             procedure = Procedure(audit=audit)
             coding = Coding(system='http://snomed.info/sct',
-                            code='367336001',
-                            display='Chemotherapy')
-            code = CodeableConcept(codings=[coding,])
+                            code=code,
+                            display=display).add_if_not_found()
+            code = CodeableConcept(codings=[coding,]).add_if_not_found()
             procedure.code = code
             procedure.user = self.test_user
             procedure.start_time = datetime.utcnow()
@@ -145,3 +147,39 @@ class TestProcedure(TestCase):
         self.assert200(rv)
         self.assertRaises(NoResultFound, Procedure.query.one)
         self.assertEquals(self.test_user.procedures.count(), 0)
+
+    def test_treatment_started(self):
+        # list of codes indicating 'treatment started' - handle accordingly
+        started_codes = (
+            ('26294005', 'Radical prostatectomy (nerve-sparing)'),
+            ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)'),
+            ('33195004', 'External beam radiation therapy'),
+            ('228748004', 'Brachytherapy'),
+            ('707266006', 'Androgen deprivation therapy')
+        )
+
+        # prior to setting any procedures, should return false
+        self.assertFalse(known_treatment_started(self.test_user))
+
+        for code, display in started_codes:
+            self.prep_db_for_procedure(code, display)
+            self.test_user = db.session.merge(self.test_user)
+            self.assertTrue(known_treatment_started(self.test_user))
+            self.test_user.procedures.delete()  # reset for next iteration
+
+    def test_treatment_not_started(self):
+        # list of codes indicating 'treatment not started' - handle accordingly
+        not_started_codes = (
+            ('373818007', 'Started watchful waiting'),
+            ('424313000', 'Started active surveillance'),
+            ('999999999', 'None of the above')
+        )
+
+        # prior to setting any procedures, should return false
+        self.assertFalse(known_treatment_not_started(self.test_user))
+
+        for code, display in not_started_codes:
+            self.prep_db_for_procedure(code, display)
+            self.test_user = db.session.merge(self.test_user)
+            self.assertTrue(known_treatment_not_started(self.test_user))
+            self.test_user.procedures.delete()  # reset for next iteration
