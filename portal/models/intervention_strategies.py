@@ -303,7 +303,7 @@ def observation_check(display, boolean_value):
     def user_has_matching_observation(intervention, user):
         obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
         if obs and obs[0].value_quantity == vq:
-            _log(result=True, func_name='diag_no_tx', user=user,
+            _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
             return True

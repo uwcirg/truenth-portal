@@ -811,22 +811,20 @@
 
                       } else {
                         if (toCall == "biopsy") {
-                          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+                          ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                               $("input[name='" + fieldName + "']").each(function() {
                                   $(this).prop("checked", false);
                               });
                           });
                           tnthAjax.putClinical({{person.id}},"pca_diag","false");
                           tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                          tnthAjax.putClinical({{person.id}},"tx","false");
                         } else if (toCall == "pca_diag") {
-                          ["pca_localized", "tx"].forEach(function(fieldName) {
+                          ["pca_localized"].forEach(function(fieldName) {
                               $("input[name='" + fieldName + "']").each(function() {
                                   $(this).prop("checked", false);
                               });
                           });
                           tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                          tnthAjax.putClinical({{person.id}},"tx","false");
                         }
                         thisItem.parents(".pat-q").nextAll().fadeOut();
                       };

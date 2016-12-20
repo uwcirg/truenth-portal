@@ -110,8 +110,6 @@ var fillContent = {
             var clinicalItem = val.content.code.coding[0].display;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
-            } else if (clinicalItem == "treatment begun") {
-                clinicalItem = "tx";
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
             }

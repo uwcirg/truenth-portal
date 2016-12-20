@@ -232,11 +232,6 @@ class ClinicalConstants(object):
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141')
 
     @lazyprop
-    def TX(self):
-        return codeable_concept_with_coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131')
-
-    @lazyprop
     def TRUE_VALUE(self):
         value_quantity = ValueQuantity(
             value='true', units='boolean').add_if_not_found(True)
@@ -504,10 +499,8 @@ def add_static_concepts(only_quick=False):
                               display='PCa diagnosis')
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
-    TX = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131',
-                         display='treatment begun')
 
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized, TX]
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')

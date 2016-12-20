@@ -147,7 +147,7 @@ class ClinicalData(CoredataPoint):
             return len(user.roles) > 0
 
         required = {item: False for item in (
-            CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized)}
+            CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized)}
 
         for obs in user.observations:
             if obs.codeable_concept in required:
