@@ -2,9 +2,7 @@
 
 from .fhir import codeable_concept_with_coding
 from .lazy import lazyprop
-
-
-SNOMED='http://snomed.info/sct'
+from ..system_uri import SNOMED
 
 
 def known_treatment_started(user):
