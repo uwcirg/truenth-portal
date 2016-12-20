@@ -287,7 +287,7 @@ $(document).ready(function(){
                     //Adding roles of patient and write_only for user
                     Promise.all([
                         _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
-                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}]}))])
+                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}, {'name': 'write_only'}]}))])
                     .then(function(results) {
                         // Both promises resolved
                         //console.log('promises resolved');
