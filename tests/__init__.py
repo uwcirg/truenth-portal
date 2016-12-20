@@ -17,11 +17,12 @@ from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.auth import Client
-from portal.models.fhir import CC
+from portal.models.fhir import CC, Coding, CodeableConcept
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
 from portal.models.organization import Organization, add_static_organization
 from portal.models.organization import OrgTree
+from portal.models.procedure import Procedure
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
@@ -132,6 +133,22 @@ class TestCase(Base):
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID))
+
+    def add_procedure(self, code='367336001', display='Chemotherapy'):
+        "Add procedure data into the db for the test user"
+        with SessionScope(db):
+            audit = Audit(user_id=TEST_USER_ID)
+            procedure = Procedure(audit=audit)
+            coding = Coding(system='http://snomed.info/sct',
+                            code=code,
+                            display=display).add_if_not_found()
+            code = CodeableConcept(codings=[coding,]).add_if_not_found()
+            procedure.code = code
+            procedure.user = self.test_user
+            procedure.start_time = datetime.utcnow()
+            procedure.end_time = datetime.utcnow()
+            db.session.add(procedure)
+            db.session.commit()
 
     def bless_with_basics(self):
         """Bless test user with basic requirements for coredata"""

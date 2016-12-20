@@ -20,30 +20,14 @@ from portal.models.reference import Reference
 
 class TestProcedure(TestCase):
 
-    def prep_db_for_procedure(self, code='367336001', display='Chemotherapy'):
-        # First push some procedure data into the db for the test user
-        with SessionScope(db):
-            audit = Audit(user_id=TEST_USER_ID)
-            procedure = Procedure(audit=audit)
-            coding = Coding(system='http://snomed.info/sct',
-                            code=code,
-                            display=display).add_if_not_found()
-            code = CodeableConcept(codings=[coding,]).add_if_not_found()
-            procedure.code = code
-            procedure.user = self.test_user
-            procedure.start_time = datetime.utcnow()
-            procedure.end_time = datetime.utcnow()
-            db.session.add(procedure)
-            db.session.commit()
-
     def test_procedureGET_404(self):
-        self.prep_db_for_procedure()
+        self.add_procedure()
         self.login()
         rv = self.app.get('/api/patient/666/procedure')
         self.assert404(rv)
 
     def test_procedureGET(self):
-        self.prep_db_for_procedure()
+        self.add_procedure()
         self.login()
         rv = self.app.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
@@ -140,7 +124,7 @@ class TestProcedure(TestCase):
         self.assertEquals(proc.start_time, st)
 
     def test_procedureDELETE(self):
-        self.prep_db_for_procedure()
+        self.add_procedure()
         proc_id = Procedure.query.one().id
         self.login()
         rv = self.app.delete('/api/procedure/{}'.format(proc_id))
@@ -162,7 +146,7 @@ class TestProcedure(TestCase):
         self.assertFalse(known_treatment_started(self.test_user))
 
         for code, display in started_codes:
-            self.prep_db_for_procedure(code, display)
+            self.add_procedure(code, display)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_started(self.test_user))
             self.test_user.procedures.delete()  # reset for next iteration
@@ -179,7 +163,7 @@ class TestProcedure(TestCase):
         self.assertFalse(known_treatment_not_started(self.test_user))
 
         for code, display in not_started_codes:
-            self.prep_db_for_procedure(code, display)
+            self.add_procedure(code, display)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_not_started(self.test_user))
             self.test_user.procedures.delete()  # reset for next iteration
