@@ -113,12 +113,15 @@ var fillContent = {
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
             }
-            $('div[data-topic='+clinicalItem+']').fadeIn().next().fadeIn();
+            var ci = $('div[data-topic="'+clinicalItem+'"]');
+            if (ci.length > 0) ci.fadeIn().next().fadeIn();
             var clinicalValue = val.content.valueQuantity.value;
-            var $radios = $('input:radio[name='+clinicalItem+']');
-            if($radios.is(':checked') === false) {
-                $radios.filter('[value='+clinicalValue+']').prop('checked', true);
-            }
+            var $radios = $('input:radio[name="'+clinicalItem+'"]');
+            if ($radios.length > 0) {
+                if($radios.is(':checked') === false) {
+                    $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                }
+            };
             // Display clinics if any value is false (except localized) or if all are answered
             if ((clinicalValue == "false" && clinicalItem != "pca_localized") || i == 3) {
                 $("#clinics").fadeIn();
