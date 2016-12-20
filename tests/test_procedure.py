@@ -165,6 +165,7 @@ class TestProcedure(TestCase):
             self.prep_db_for_procedure(code, display)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_started(self.test_user))
+            self.test_user.procedures.delete()  # reset for next iteration
 
     def test_treatment_not_started(self):
         # list of codes indicating 'treatment not started' - handle accordingly
@@ -181,3 +182,4 @@ class TestProcedure(TestCase):
             self.prep_db_for_procedure(code, display)
             self.test_user = db.session.merge(self.test_user)
             self.assertTrue(known_treatment_not_started(self.test_user))
+            self.test_user.procedures.delete()  # reset for next iteration
