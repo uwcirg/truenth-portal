@@ -151,8 +151,9 @@ class Client(db.Model):
 
         context = {
             "id": res.task_id,
-            "data": kwargs['data'],
             "url": self.callback_url,
+            "formdata": formdata,
+            "data": data,
         }
         current_app.logger.debug(str(context))
 
