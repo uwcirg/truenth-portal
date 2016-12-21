@@ -2,7 +2,6 @@
 from datetime import datetime, timedelta
 import dateutil
 from flask import current_app
-from flask_webtest import SessionScope
 import json
 import os
 import pytz
@@ -11,11 +10,12 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import Coding, CodeableConcept, FHIR_datetime
+from portal.models.fhir import FHIR_datetime
 from portal.models.procedure import Procedure
 from portal.models.procedure_codes import known_treatment_started
 from portal.models.procedure_codes import known_treatment_not_started
 from portal.models.reference import Reference
+from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 
 
 class TestProcedure(TestCase):
@@ -135,35 +135,48 @@ class TestProcedure(TestCase):
     def test_treatment_started(self):
         # list of codes indicating 'treatment started' - handle accordingly
         started_codes = (
-            ('26294005', 'Radical prostatectomy (nerve-sparing)'),
-            ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)'),
-            ('33195004', 'External beam radiation therapy'),
-            ('228748004', 'Brachytherapy'),
-            ('707266006', 'Androgen deprivation therapy')
+            ('3', 'Radical prostatectomy (nerve-sparing)', ICHOM),
+            ('3-nns', 'Radical prostatectomy (non-nerve-sparing)', ICHOM),
+            ('4', 'External beam radiation therapy', ICHOM),
+            ('5', 'Brachytherapy', ICHOM),
+            ('6', 'ADT', ICHOM),
+            ('7', 'Focal therapy', ICHOM),
+            ('26294005', 'Radical prostatectomy (nerve-sparing)', SNOMED),
+            ('26294005-nns', 'Radical prostatectomy (non-nerve-sparing)',
+             SNOMED),
+            ('33195004', 'External beam radiation therapy', SNOMED),
+            ('228748004', 'Brachytherapy', SNOMED),
+            ('707266006', 'Androgen deprivation therapy', SNOMED)
         )
 
         # prior to setting any procedures, should return false
         self.assertFalse(known_treatment_started(self.test_user))
 
-        for code, display in started_codes:
-            self.add_procedure(code, display)
+        for code, display, system in started_codes:
+            self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            self.assertTrue(known_treatment_started(self.test_user))
+            self.assertTrue(known_treatment_started(self.test_user),
+                           "treatment {} didn't show as started".format(
+                           (system, code)))
             self.test_user.procedures.delete()  # reset for next iteration
 
     def test_treatment_not_started(self):
         # list of codes indicating 'treatment not started' - handle accordingly
         not_started_codes = (
-            ('373818007', 'Started watchful waiting'),
-            ('424313000', 'Started active surveillance'),
-            ('999999999', 'None of the above')
+            ('1', 'Watchful waiting', ICHOM),
+            ('2', 'Active surveillance', ICHOM),
+            ('373818007', 'Started watchful waiting', SNOMED),
+            ('424313000', 'Started active surveillance', SNOMED),
+            ('999', 'None', TRUENTH_CLINICAL_CODE_SYSTEM)
         )
 
         # prior to setting any procedures, should return false
         self.assertFalse(known_treatment_not_started(self.test_user))
 
-        for code, display in not_started_codes:
-            self.add_procedure(code, display)
+        for code, display, system in not_started_codes:
+            self.add_procedure(code, display, system)
             self.test_user = db.session.merge(self.test_user)
-            self.assertTrue(known_treatment_not_started(self.test_user))
+            self.assertTrue(known_treatment_not_started(self.test_user),
+                            "treatment '{}' didn't show as not started".format(
+                                (system, code)))
             self.test_user.procedures.delete()  # reset for next iteration

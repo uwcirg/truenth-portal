@@ -29,6 +29,7 @@ from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
 from portal.models.user_consent import UserConsent
 from portal.site_persistence import SitePersistence
+from portal.system_uri import SNOMED
 
 TEST_USER_ID = 1
 TEST_USERNAME = 'testy@example.com'
@@ -134,12 +135,13 @@ class TestCase(Base):
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID))
 
-    def add_procedure(self, code='367336001', display='Chemotherapy'):
+    def add_procedure(self, code='367336001', display='Chemotherapy',
+                     system=SNOMED):
         "Add procedure data into the db for the test user"
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID)
             procedure = Procedure(audit=audit)
-            coding = Coding(system='http://snomed.info/sct',
+            coding = Coding(system=system,
                             code=code,
                             display=display).add_if_not_found()
             code = CodeableConcept(codings=[coding,]).add_if_not_found()
