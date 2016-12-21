@@ -184,29 +184,6 @@ class Coding(db.Model):
         return self
 
 
-def codeable_concept_with_coding(system, code, display=None):
-    """Lookup codeable_concept which includes the given coding(system, code)
-
-    If no such coding is found, a new one will be generated IFF display
-    is provided.
-
-    If no codeable_concept is found for the given coding, one will be
-    generated, stored in the db, and returned
-
-    NB - a CodeableConcept may have any number of codings, but for any
-    given coding, exactly one CodeableConcept should contain it.
-
-    """
-    if display:
-        coding = Coding(
-            system=system, code=code, display=display).add_if_not_found()
-    else:
-        coding = Coding.query.filter_by(system=system, code=code).one()
-    cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
-    assert coding in cc.codings
-    return cc
-
-
 """ TrueNTH Clinical Codes """
 class ClinicalConstants(object):
 
@@ -218,18 +195,27 @@ class ClinicalConstants(object):
 
     @lazyprop
     def BIOPSY(self):
-        return codeable_concept_with_coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111')
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
     @lazyprop
     def PCaDIAG(self):
-        return codeable_concept_with_coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121')
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
     @lazyprop
     def PCaLocalized(self):
-        return codeable_concept_with_coding(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141')
+        coding = Coding.query.filter_by(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
 
     @lazyprop
     def TRUE_VALUE(self):
@@ -493,6 +479,8 @@ def add_static_concepts(only_quick=False):
         unless the test needs the slow to load race and ethnicity data.
 
     """
+    from .procedure_codes import TxStartedConstants, TxNotStartedConstants
+
     BIOPSY = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111',
                              display='biopsy')
     PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
@@ -513,3 +501,6 @@ def add_static_concepts(only_quick=False):
     for clinical_concepts in CC:
         if not clinical_concepts in db.session():
             db.session.add(clinical_concepts)
+
+    for concept in TxStartedConstants(): pass  # looping is adequate
+    for concept in TxNotStartedConstants(): pass  # looping is adequate
