@@ -144,7 +144,7 @@ class TestCase(Base):
                             display=display).add_if_not_found()
             code = CodeableConcept(codings=[coding,]).add_if_not_found()
             procedure.code = code
-            procedure.user = self.test_user
+            procedure.user = db.session.merge(self.test_user)
             procedure.start_time = datetime.utcnow()
             procedure.end_time = datetime.utcnow()
             db.session.add(procedure)

@@ -183,10 +183,8 @@ class TestIntervention(TestCase):
         cp_id = cp.id
 
         with SessionScope(db):
-            d = {'function': 'observation_check',
-                 'kwargs': [{'name': 'display', 'value':
-                             CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]}
+            d = {'function': 'tx_begun',
+                 'kwargs': [{'name': 'boolean_value', 'value': 'false'}]}
             strat = AccessStrategy(
                 name="has not stared treatment",
                 intervention_id = cp_id,
@@ -199,25 +197,14 @@ class TestIntervention(TestCase):
         # Prior to declaring TX, user shouldn't have access
         self.assertFalse(cp.display_for_user(user).access)
 
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
         # Declaring they started TX, should grant access
         self.assertTrue(cp.display_for_user(user).access)
-
-        # Say user starts treatment, should lose access
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
-        with SessionScope(db):
-            db.session.commit()
-        user, cp = map(db.session.merge, (user, cp))
-
-        self.assertFalse(cp.display_for_user(user).access)
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -531,11 +518,9 @@ class TestIntervention(TestCase):
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',
-                  'value': 'observation_check'},
+                  'value': 'tx_begun'},
                  {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]},
+                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
                  # Has Localized PCa (strat 4)
                  {'name': 'strategy_4',
                   'value': 'observation_check'},
@@ -559,9 +544,8 @@ class TestIntervention(TestCase):
         # only first two strats true so far, therfore, should be False
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))
@@ -633,11 +617,9 @@ class TestIntervention(TestCase):
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',
-                  'value': 'observation_check'},
+                  'value': 'tx_begun'},
                  {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]},
+                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
                  # Has Localized PCa (strat 4)
                  {'name': 'strategy_4',
                   'value': 'observation_check'},
@@ -667,9 +649,8 @@ class TestIntervention(TestCase):
         # only first two strats true so far, therfore, should be False
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))

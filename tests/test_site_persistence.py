@@ -39,9 +39,8 @@ class TestSitePersistence(TestCase):
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
 
         # Fulfill conditions
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID))
