@@ -148,8 +148,12 @@ class Client(db.Model):
         # Use celery asynchronous task 'post_request'
         kwargs = {'url': self.callback_url, 'data': formdata}
         res = post_request.apply_async(kwargs=kwargs)
-        context = {"id": res.task_id, "url": kwargs['url'],
-                "data": kwargs['data']}
+
+        context = {
+            "id": res.task_id,
+            "data": kwargs['data'],
+            "url": self.callback_url,
+        }
         current_app.logger.debug(str(context))
 
     def lookup_service_token(self):
