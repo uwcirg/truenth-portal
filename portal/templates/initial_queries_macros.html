@@ -25,13 +25,13 @@
 
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup">
-        <div class="col-xs-6">
+        <div class="col-md-4 col-xs-6">
           <div class="form-group float-input-label">
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}"  />
             <div class="help-block with-errors"></div>
           </div>
         </div>
-        <div class="col-xs-6">
+        <div class="col-md-4 col-xs-6">
           <div class="form-group float-input-label">
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" />
             <div class="help-block with-errors"></div>
@@ -112,7 +112,7 @@
           });</script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}
-    <div id="patientQ">
+    <div id="patientQ" class="tnth-hide">
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
