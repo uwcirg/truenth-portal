@@ -44,6 +44,7 @@ before_install:
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
   - pip install --upgrade pip setuptools
+  - export PORTAL_VERSION="$(python setup.py --version)"
 
 install:
   - pip install tox
@@ -52,12 +53,6 @@ script:
   - tox
 
 before_deploy:
-  # Use make-deb to update changelog so version is correct in package filename
-  - pip install make-deb
-  - yes | make-deb
-  - git checkout debian/rules
-  - export PORTAL_VERSION="$(grep portal debian/changelog | awk -F"[()]" '{print $2}')"
-
   - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
   - docker run "portal_builddeb:test"
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
