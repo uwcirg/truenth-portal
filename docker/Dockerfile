@@ -38,6 +38,8 @@ RUN set -ex && \
 
 
 COPY portal.wsgi /var/www/
+COPY portal.conf /etc/apache2/sites-available
+RUN a2ensite portal
 
 EXPOSE 80
 
