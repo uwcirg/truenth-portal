@@ -74,9 +74,9 @@ def post_procedure():
     all synonymous codes from different systems, only one code need be defined
     in the submission, say just the ICHOM system and code value.
 
-    Valuesets available at {} and {} list respective code values known
-    to the system for procedures indicating a patient has or has not
-    begun treatment.
+    Valuesets available at {tx_started} and {tx_not_started} list
+    respective code values known to the system for procedures indicating a
+    patient has or has not begun treatment.
 
     Raises 401 if logged-in user lacks permission to edit referenced
     patient.
@@ -116,10 +116,11 @@ def post_procedure():
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
 
-    """.format((
-        url_for(procedure_value_sets, valueset='tx-started', _external=True),
-        url_for(procedure_value_sets, valueset='tx-not-started',
-                _external=True)))
+    """.format(**{'tx_started': url_for(
+            '.procedure_value_sets', valueset='tx-started', _external=True),
+         'tx_not_started': url_for(
+             '.procedure_value_sets', valueset='tx-not-started',
+             _external=True)})
 
     # patient_id must first be parsed from the JSON subject field
     # standard role check is below after parse
