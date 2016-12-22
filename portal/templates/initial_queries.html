@@ -265,15 +265,11 @@ $(document).ready(function(){
           //$("#clinics").hide();
 
         } else {
-          // If partner, they skip questions, fadeIn Clinics
+          // If partner, skip all questions
           $("#patientQ").hide();
           $("#bdGroup").hide();
-          if ($("#clinics").length > 0 ) {
-            $("#clinics").fadeIn();
-            $('html, body').animate({
-              scrollTop: $('#clinics').offset().top
-            }, 500);
-          } else fc.getNextField($(this).attr("sectionIndex"));
+          $("#noOrgs").click();
+          continueOn();
         };
         if (fc.allFieldsCompleted()) continueOn();
     };
@@ -324,7 +320,7 @@ $(document).ready(function(){
               $('html, body').animate({
                   scrollTop: $('#clinics').offset().top
               }, 500);
-            } else fc.getNextField(thisItem.attr("sectionIndex"));
+            } else continueOn();
           };
 
           if (fc.allFieldsCompleted()) continueOn();
