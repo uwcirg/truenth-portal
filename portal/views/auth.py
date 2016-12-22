@@ -87,7 +87,14 @@ def capture_next_view_function(real_function):
     real_function = real_function
 
     def capture_next():
-        """Alternate view function plugged in to capture 'next' in session"""
+        """Alternate view function plugged in to capture 'next' in session
+
+        NB if already logged in - this will bounce user to home
+
+        """
+        if current_user():
+            return redirect(url_for('portal.home'))
+
         if request.args.get('next'):
             session['next'] = request.args.get('next')
             current_app.logger.debug(
