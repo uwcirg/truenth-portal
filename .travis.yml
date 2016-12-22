@@ -43,7 +43,7 @@ before_install:
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
-  - pip install --upgrade pip
+  - pip install --upgrade pip setuptools
 
 install:
   - pip install tox
