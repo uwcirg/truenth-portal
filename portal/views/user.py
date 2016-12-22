@@ -276,7 +276,9 @@ def user_consents(user_id):
     Returns the list of consent agreements between the requested user
     and the respective organizations.
 
-    NB does not include expired or deleted consents.
+    NB does include deleted and expired consents.  Deleted consents  will
+    include audit details regarding the deletion.  The expires timestamp in UTC
+    is also returned for all consents.
 
     ---
     tags:
@@ -348,7 +350,7 @@ def user_consents(user_id):
         user = get_user(user_id)
 
     return jsonify(consent_agreements=[c.as_json() for c in
-                                       user.valid_consents])
+                                       user.all_consents])
 
 
 @user_api.route('/user/<int:user_id>/consent', methods=('POST',))
