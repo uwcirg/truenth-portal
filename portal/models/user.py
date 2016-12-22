@@ -283,6 +283,11 @@ class User(db.Model, UserMixin):
         return super(User, self).__setattr__(name, value)
 
     @property
+    def all_consents(self):
+        """Access to all consents including deleted and expired"""
+        return self._consents
+
+    @property
     def valid_consents(self):
         """Access to consents that have neither been deleted or expired"""
         now = datetime.utcnow()

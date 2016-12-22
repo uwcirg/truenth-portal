@@ -47,7 +47,7 @@ class UserConsent(db.Model):
         d['expires'] = FHIR_datetime.as_fhir(self.expires)
         d['agreement_url'] = self.agreement_url
         if self.deleted_id:
-            d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
+            d['deleted'] = self.deleted.as_fhir()
 
         return d
 

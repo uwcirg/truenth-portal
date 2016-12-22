@@ -62,6 +62,7 @@ class TestUserConsent(TestCase):
         self.test_user = db.session.merge(self.test_user)
         self.assertEqual(self.test_user.valid_consents.count(), 2)
         self.login()
+
         rv = self.app.delete('/api/user/{}/consent'.format(TEST_USER_ID),
                              content_type='application/json',
                              data=json.dumps(data))
@@ -69,3 +70,8 @@ class TestUserConsent(TestCase):
         self.assertEqual(self.test_user.valid_consents.count(), 1)
         self.assertEqual(self.test_user.valid_consents[0].organization_id,
                          org2_id)
+
+        # We no longer omit deleted consent rows, but rather, include
+        # their audit data.
+        rv = self.app.get('/api/user/{}/consent'.format(TEST_USER_ID))
+        self.assertTrue('deleted' in json.dumps(rv.json))
