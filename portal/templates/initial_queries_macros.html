@@ -164,24 +164,6 @@
             </div>
           </div>
         </div>
-
-        <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
-          <br />
-          <p>{{ _("Have you begun prostate cancer treatment?") }}</p>
-          <div class="form-group">
-            <div class="radio">
-              <label>
-                <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> {{ _("Yes") }}
-              </label>
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> {{ _("No") }}
-              </label>
-            </div>
-          </div>
-        </div>
-
       </div>
       <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
   {%- endmacro %}

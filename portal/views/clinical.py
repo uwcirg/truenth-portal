@@ -116,41 +116,6 @@ def pca_localized(patient_id):
                                      codeable_concept=CC.PCaLocalized)
 
 
-@clinical_api.route('/patient/<int:patient_id>/clinical/tx')
-@oauth.require_oauth()
-def treatment(patient_id):
-    """Simplified API for getting clinical treatment begun status w/o FHIR
-
-    Returns 'true', 'false' or 'unknown' for the patient's clinical treatment
-    begun value in JSON, i.e. '{"value": true}'
-    ---
-    tags:
-      - Clinical
-    operationId: getTx
-    produces:
-      - application/json
-    parameters:
-      - name: patient_id
-        in: path
-        description: TrueNTH patient ID
-        required: true
-        type: integer
-        format: int64
-    responses:
-      200:
-        description:
-          Returns 'true', 'false' or 'unknown' for the patient's clinical
-          treatment begun status in JSON
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
-
-    """
-    return clinical_api_shortcut_get(patient_id=patient_id,
-                                     codeable_concept=CC.TX)
-
-
 @clinical_api.route('/patient/<int:patient_id>/clinical/biopsy',
                     methods=('POST', 'PUT'))
 @oauth.require_oauth()
@@ -316,61 +281,6 @@ def pca_localized_set(patient_id):
     """
     return clinical_api_shortcut_set(patient_id=patient_id,
                                      codeable_concept=CC.PCaLocalized)
-
-
-@clinical_api.route('/patient/<int:patient_id>/clinical/tx',
-                    methods=('POST', 'PUT'))
-@oauth.require_oauth()
-def tx_set(patient_id):
-    """Simplified API for setting clinical treatment status w/o FHIR
-
-    Requires a simple JSON doc to set treatment status: '{"value": true}'
-
-    Raises 401 if logged-in user lacks permission to edit requested
-    patient.
-
-    ---
-    operationId: setTx
-    tags:
-      - Clinical
-    produces:
-      - application/json
-    parameters:
-      - name: patient_id
-        in: path
-        description: TrueNTH patient ID
-        required: true
-        type: integer
-        format: int64
-      - in: body
-        name: body
-        schema:
-          id: Tx
-          required:
-            - value
-          properties:
-            value:
-              type: boolean
-              description: the patient's treatment status
-    responses:
-      200:
-        description: successful operation
-        schema:
-          id: response
-          required:
-            - message
-          properties:
-            message:
-              type: string
-              description: Result, typically "ok"
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
-
-    """
-    return clinical_api_shortcut_set(patient_id=patient_id,
-                                     codeable_concept=CC.TX)
 
 
 @clinical_api.route('/patient/<int:patient_id>/clinical')

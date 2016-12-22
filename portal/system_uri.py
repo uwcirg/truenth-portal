@@ -1,6 +1,7 @@
 """Namespace module to house system URIs for use in FHIR"""
 
-SNOMED='http://snomed.info/sct'
+SNOMED = 'http://snomed.info/sct'
+ICHOM = 'http://www.ichom.org/medical-conditions/localized-prostate-cancer/'
 
 # Our common, unique namespace
 TRUENTH_NAMESPACE = 'http://us.truenth.org'

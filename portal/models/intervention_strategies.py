@@ -25,6 +25,8 @@ from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept, QuestionnaireResponse
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
+from .procedure_codes import known_treatment_started
+from .procedure_codes import known_treatment_not_started
 from .role import Role
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
@@ -275,6 +277,26 @@ def update_card_html_on_completion():
     return update_user_card_html
 
 
+def tx_begun(boolean_value):
+    """Returns strategy function testing if user is known to have started Tx
+
+    :param boolean_value: true for known treatment started (i.e. procedure
+        indicating tx has begun), false for known treatment not started,
+        (i.e. watchful waiting, etc.)
+
+    """
+    if boolean_value == 'true':
+        check_func = known_treatment_started
+    elif boolean_value == 'false':
+        check_func = known_treatment_not_started
+    else:
+        raise ValueError("expected 'true' or 'false' for boolean_value")
+
+    def user_has_desired_tx(intervention, user):
+        return check_func(user)
+    return user_has_desired_tx
+
+
 def observation_check(display, boolean_value):
     """Returns strategy function for a particular observation and logic value
 
@@ -303,7 +325,7 @@ def observation_check(display, boolean_value):
     def user_has_matching_observation(intervention, user):
         obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
         if obs and obs[0].value_quantity == vq:
-            _log(result=True, func_name='diag_no_tx', user=user,
+            _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
             return True

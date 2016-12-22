@@ -204,33 +204,6 @@ class TestClinical(TestCase):
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
-    def test_clinical_tx(self):
-        """Shortcut API - just treatment w/o FHIR overhead"""
-        self.login()
-        rv = self.app.post('/api/patient/%s/clinical/tx' % TEST_USER_ID,
-                           content_type='application/json',
-                           data=json.dumps({'value': True}))
-        self.assert200(rv)
-        result = json.loads(rv.data)
-        self.assertEquals(result['message'], 'ok')
-
-        # Can we get it back in FHIR?
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(rv.data)
-        coding = data['entry'][0]['content']['code']['coding'][0] 
-        vq = data['entry'][0]['content']['valueQuantity'] 
-
-        self.assertEquals(coding['code'], '131')
-        self.assertEquals(coding['display'], 'treatment begun')
-        self.assertEquals(coding['system'],
-                          'http://us.truenth.org/clinical-codes')
-        self.assertEquals(vq['value'], 'true')
-
-        # Access the direct tx api
-        rv = self.app.get('/api/patient/%s/clinical/tx' % TEST_USER_ID)
-        data = json.loads(rv.data)
-        self.assertEquals(data['value'], 'true')
-
     def test_weight(self):
         with open(os.path.join(os.path.dirname(__file__),
                                'weight_example.json'), 'r') as fhir_data:

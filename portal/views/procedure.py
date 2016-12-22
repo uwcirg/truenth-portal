@@ -1,10 +1,12 @@
-from flask import abort, jsonify, Blueprint, request
+from flask import abort, jsonify, Blueprint, request, url_for
+from collections import defaultdict
 
 from ..audit import auditable_event
 from ..extensions import db, oauth
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
 from ..models.procedure import Procedure
+from ..models.procedure_codes import TxStartedConstants, TxNotStartedConstants
 
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
@@ -17,6 +19,11 @@ def procedure(patient_id):
     Returns a patient's procedures data as a FHIR
     bundle of procedures (http://www.hl7.org/fhir/procedure.html)
     in JSON.
+
+    NB a procedure code may enumerate multiple coding values, from different
+    coding systems.  Clients will typically react on (code, system) values of
+    interest.
+
     ---
     tags:
       - Procedure
@@ -63,6 +70,14 @@ def post_procedure():
         Performed datetime, either a single moment as
             **performedDateTime** or a range in **performedPeriod**
 
+    NB although the system will maintain CodeableConcepts with codings for
+    all synonymous codes from different systems, only one code need be defined
+    in the submission, say just the ICHOM system and code value.
+
+    Valuesets available at {tx_started} and {tx_not_started} list
+    respective code values known to the system for procedures indicating a
+    patient has or has not begun treatment.
+
     Raises 401 if logged-in user lacks permission to edit referenced
     patient.
 
@@ -101,7 +116,12 @@ def post_procedure():
           if missing valid OAuth token or logged-in user lacks permission
           to edit referenced patient
 
-    """
+    """.format(**{'tx_started': url_for(
+            '.procedure_value_sets', valueset='tx-started', _external=True),
+         'tx_not_started': url_for(
+             '.procedure_value_sets', valueset='tx-not-started',
+             _external=True)})
+
     # patient_id must first be parsed from the JSON subject field
     # standard role check is below after parse
 
@@ -174,3 +194,61 @@ def procedure_delete(procedure_id):
     db.session.commit()
     auditable_event("deleted {}".format(procedure), user_id=current_user().id)
     return jsonify(message='deleted procedure')
+
+
+@procedure_api.route('/procedure/valueset/<valueset>')
+def procedure_value_sets(valueset):
+    """Returns Valueset for treatment started codes
+
+    ---
+    tags:
+      - Procedure
+      - Valueset
+    operationId: procedure_value_sets
+    produces:
+      - application/json
+    parameters:
+      - name: valueset
+        in: path
+        description: Named valueset (either 'tx-started' or 'tx-not-started')
+        required: true
+        type: string
+    responses:
+      200:
+        description:
+          Returns FHIR like Valueset (https://www.hl7.org/FHIR/valueset.html)
+          for requested coding type.
+
+    """
+    options = ('tx-started', 'tx-not-started')
+    if valueset not in options:
+        abort(400, 'unknown valueset, supported options: {}'.format(options))
+
+    if valueset == 'tx-started':
+        condition = 'has'
+        constants_class = TxStartedConstants
+    else:
+        condition = 'has not'
+        constants_class = TxNotStartedConstants
+
+    valueset = {
+        "resourceType": "ValueSet",
+        "title": valueset,
+        "description": (
+            "List of procedure codes known to indicate treatment {} "
+            "stared.".format(condition)),
+        "url": request.url,
+        "compose": {"include": []}
+    }
+
+    code_by_system = defaultdict(list)
+    for concept in constants_class():
+        for code in concept.codings:
+            code_by_system[code.system].append(code)
+
+    for system in code_by_system.keys():
+        item = {"system": system,
+                "concept": [c.as_fhir() for c in code_by_system[system]]}
+        valueset["compose"]["include"].append(item)
+
+    return jsonify(**valueset)

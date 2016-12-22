@@ -52,19 +52,6 @@
                 </div>
             </div>
 
-            <div data-topic="tx">
-                <br />
-                <p><strong>{{ _("Have you begun prostate cancer treatment?") }}</strong></p>
-                <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-default">
-                        <input type="radio" name="tx" data-value="true" autocomplete="off"> {{ _("Yes") }}
-                    </label>
-                    <label class="btn btn-default">
-                        <input type="radio" name="tx" data-value="false" autocomplete="off"> {{ _("No") }}
-                    </label>
-                </div>
-            </div>
-
         </div>
 
         <div class="hide-initial" id="otherNote">
@@ -122,7 +109,7 @@ $(document).ready(function(){
             if (theVal == "true") {
                 $("div[data-topic='"+toCall+"']").next().fadeIn("slow");
                 // If last question, then always display continue
-                if (toCall == "tx") {
+                if (toCall == "pca_diag") {
                     $("#continueBtn").fadeIn();
                 }
             } else {
@@ -137,7 +124,7 @@ $(document).ready(function(){
 
     /**
 
-    var getQs = [ "biopsy", "pca_diag", "tx"];
+    var getQs = [ "biopsy", "pca_diag"];
     $.each(getQs, function(i,val){
         $.ajax ({
             type: "GET",
@@ -171,7 +158,7 @@ $(document).ready(function(){
             if (theVal == "true") {
                 $("div[data-topic='"+toCall+"']").next().fadeIn("slow");
                 // If last question, then always display continue
-                if (toCall == "tx") {
+                if (toCall == "pca_diag") {
                     $("#continueBtn").fadeIn();
                 }
             } else {

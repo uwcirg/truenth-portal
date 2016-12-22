@@ -93,7 +93,7 @@ function checkIncompleteFields() {
         'nameGroup': [$("#firstname"), $("#lastname")],
         'rolesGroup': [$("input[name='user_type']")],
         'bdGroup': [$("#month"), $("#date"), $("#year")],
-        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
+        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']")],
         'clinics': [$("#userOrgs input[name='organization'][data-parent-id]")]
       };
     var _isChecked = false;
@@ -225,38 +225,29 @@ $(document).ready(function(){
       tnthAjax.putClinical({{user.id}},toCall,toSend);
       if (toSend == "true" || toCall ==  "pca_localized") {
         thisItem.parents(".pat-q").next().fadeIn();
-        if (toCall == "tx") {
-          $("#clinics").fadeIn();
+        var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
+        var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
+        if (nextItem.length > 0) {
           $('html, body').animate({
-            scrollTop: $('#clinics').offset().top
+            scrollTop: nextItem.offset().top
           }, 500);
-        } else {
-          var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
-          var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
-          if (nextItem.length > 0) {
-            $('html, body').animate({
-              scrollTop: nextItem.offset().top
-            }, 500);
-          };
         };
       } else {
         if (toCall == "biopsy") {
-          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+          ["pca_diag", "pca_localized"].forEach(function(fieldName) {
               $("input[name='" + fieldName + "']").each(function() {
                   $(this).prop("checked", false);
               });
           });
           tnthAjax.putClinical({{user.id}},"pca_diag","false");
           tnthAjax.putClinical({{user.id}},"pca_localized","false");
-          tnthAjax.putClinical({{user.id}},"tx","false");
         } else if (toCall == "pca_diag") {
-          ["pca_localized", "tx"].forEach(function(fieldName) {
+          ["pca_localized"].forEach(function(fieldName) {
               $("input[name='" + fieldName + "']").each(function() {
                   $(this).prop("checked", false);
               });
           });
           tnthAjax.putClinical({{user.id}},"pca_localized","false");
-          tnthAjax.putClinical({{user.id}},"tx","false");
         }
         thisItem.parents(".pat-q").nextAll().fadeOut();
         $("#clinics").fadeIn();
