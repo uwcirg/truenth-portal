@@ -179,8 +179,4 @@ class TestProcedure(TestCase):
             self.assertTrue(known_treatment_not_started(self.test_user),
                             "treatment '{}' didn't show as not started".format(
                                 (system, code)))
-            #self.test_user.procedures.delete()  # reset for next iteration
-
-        self.login()
-        rv = self.app.get('api/patient/1/procedure')
-        print json.dumps(rv.json, indent=2)
+            self.test_user.procedures.delete()  # reset for next iteration
