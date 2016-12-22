@@ -1,4 +1,4 @@
-from flask import abort, jsonify, Blueprint, request, url_for
+from flask import abort, jsonify, Blueprint, request
 from collections import defaultdict
 
 from ..audit import auditable_event
