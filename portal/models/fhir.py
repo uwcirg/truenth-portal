@@ -65,8 +65,8 @@ class CodeableConceptCoding(db.Model):
         'codeable_concepts.id'), nullable=False)
     coding_id =  db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    # Maintain a unique relationship between each codeable concepts
-    # and the its of codings.  Therefore, a CodeableConcept always
+    # Maintain a unique relationship between each codeable concept
+    # and it list of codings.  Therefore, a CodeableConcept always
     # contains the superset of all codings given for the concept.
     db.UniqueConstraint('codeable_concept_id', 'coding_id',
                         name='unique_codeable_concept_coding')
@@ -114,18 +114,26 @@ class CodeableConcept(db.Model):
         # we're imposing a constraint, where any CodeableConcept pointing
         # at a particular Coding will be the ONLY CodeableConcept for that
         # particular Coding.
-        coding_ids = [c.id for c in self.codings]
+        coding_ids = [c.id for c in self.codings if c.id]
         if not coding_ids:
-            current_app.logger.error("no coding_ids found for {}".format(self))
-        found = CodeableConceptCoding.query.filter(
-            CodeableConceptCoding.coding_id.in_(coding_ids)).first()
-        if not found:
+            raise ValueError("Can't add CodeableConcept without any codings")
+        query = CodeableConceptCoding.query.filter(
+            CodeableConceptCoding.coding_id.in_(coding_ids)).distinct(
+                CodeableConceptCoding.codeable_concept_id)
+        if query.count() > 1:
+            raise ValueError(
+                "DB problem - multiple CodeableConcepts {} found for "
+                "codings: {}".format(
+                    [cc.codeable_concept_id for cc in query],
+                    [str(c) for c in self.codings]))
+        if not query.count():
             # First time for this (set) of codes, add new rows
             db.session.add(self)
             if commit_immediately:
                 db.session.commit()
         else:
             # Build a union of all codings found, old and new
+            found = query.first()
             old = CodeableConcept.query.get(found.codeable_concept_id)
             self.text = self.text if self.text else old.text
             self.codings = list(set(old.codings).union(set(self.codings)))
@@ -154,7 +162,7 @@ class Coding(db.Model):
         for i in ("system", "code", "display"):
             if i in data:
                 cc.__setattr__(i, data[i])
-        return cc.add_if_not_found()
+        return cc.add_if_not_found(True)
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
@@ -164,7 +172,7 @@ class Coding(db.Model):
                 d[i] = getattr(self, i)
         return d
 
-    def add_if_not_found(self):
+    def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
         Queries for similar, existing CodeableConcept (matches on
@@ -179,6 +187,8 @@ class Coding(db.Model):
                 code=self.code).first()
         if not match:
             db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
         elif self is not match:
             self = db.session.merge(match)
         return self

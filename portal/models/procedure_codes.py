@@ -57,85 +57,89 @@ class TxStartedConstants(object):
     def RadicalProstatectomy(self):
         sno = Coding(
             system=SNOMED, code='26294005',
-            display='Radical prostatectomy (nerve-sparing)').add_if_not_found()
+            display='Radical prostatectomy (nerve-sparing)'
+        ).add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='3',
-            display='Radical prostatectomy (nerve-sparing)').add_if_not_found()
+            display='Radical prostatectomy (nerve-sparing)'
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom], text='Radical prostatectomy (nerve-sparing'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
 
     @lazyprop
     def RadicalProstatectomyNNS(self):
         sno = Coding(
             system=SNOMED, code='26294005-nns',
             display='Radical prostatectomy (non-nerve-sparing)'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='3-nns',
             display='Radical prostatectomy (non-nerve-sparing)'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='Radical prostatectomy (non-nerve-sparing').add_if_not_found()
+            text='Radical prostatectomy (non-nerve-sparing'
+        ).add_if_not_found(True)
 
     @lazyprop
     def ExternalBeamRadiationTherapy(self):
         sno = Coding(
             system=SNOMED, code='33195004',
             display='External beam radiation therapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='4',
             display='External beam radiation therapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='External beam radiation therapy').add_if_not_found()
+            text='External beam radiation therapy').add_if_not_found(True)
 
     @lazyprop
     def Brachytherapy(self):
         sno = Coding(
             system=SNOMED, code='228748004', display='Brachytherapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         ichom = Coding(
-            system=ICHOM, code='5', display='Brachytherapy').add_if_not_found()
+            system=ICHOM, code='5',
+            display='Brachytherapy').add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='Brachytherapy').add_if_not_found()
+            text='Brachytherapy').add_if_not_found(True)
 
     @lazyprop
     def AndrogenDeprivationTherapy(self):
         sno = Coding(
             system=SNOMED, code='707266006',
-            display='Androgen deprivation therapy').add_if_not_found()
+            display='Androgen deprivation therapy').add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='6', display='Androgen deprivation therapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom],
-            text='Androgen deprivation therapy').add_if_not_found()
+            text='Androgen deprivation therapy').add_if_not_found(True)
 
     @lazyprop
     def FocalTherapy(self):
         ichom = Coding(
             system=ICHOM, code='7', display='Focal therapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[ichom,], text='Focal therapy'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
 
     @lazyprop
     def OtherProcedure(self):
         sno = Coding(
             system=SNOMED, code='118877007',
-            display='Procedure on prostate').add_if_not_found()
+            display='Procedure on prostate').add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='888', display='Other (free text)'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(
             codings=[sno, ichom], text='Other procedure on prostate'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
 
 
 class TxNotStartedConstants(object):
@@ -156,26 +160,27 @@ class TxNotStartedConstants(object):
     def StartedWatchfulWaiting(self):
         sno = Coding(
             system=SNOMED, code='373818007',
-            display='Started watchful waiting').add_if_not_found()
+            display='Started watchful waiting').add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='1', display='Watchful waiting'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(codings=[sno, ichom], text='Watchful waiting'
-                              ).add_if_not_found()
+                              ).add_if_not_found(True)
 
     @lazyprop
     def StartedActiveSurveillance(self):
         sno = Coding(
             system=SNOMED, code='424313000',
-            display='Started active surveillance').add_if_not_found()
+            display='Started active surveillance').add_if_not_found(True)
         ichom = Coding(
             system=ICHOM, code='2', display='Active surveillance'
-        ).add_if_not_found()
+        ).add_if_not_found(True)
         return CodeableConcept(codings=[sno, ichom], text='Active surveillance'
-                             ).add_if_not_found()
+                             ).add_if_not_found(True)
 
     @lazyprop
     def NoneOfTheAbove(self):
         tnth = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='999',
-            display='None').add_if_not_found()
-        return CodeableConcept(codings=[tnth], text='None').add_if_not_found()
+            display='None').add_if_not_found(True)
+        return CodeableConcept(codings=[tnth],
+                               text='None').add_if_not_found(True)

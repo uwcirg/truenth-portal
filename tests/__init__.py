@@ -143,8 +143,8 @@ class TestCase(Base):
             procedure = Procedure(audit=audit)
             coding = Coding(system=system,
                             code=code,
-                            display=display).add_if_not_found()
-            code = CodeableConcept(codings=[coding,]).add_if_not_found()
+                            display=display).add_if_not_found(True)
+            code = CodeableConcept(codings=[coding,]).add_if_not_found(True)
             procedure.code = code
             procedure.user = db.session.merge(self.test_user)
             procedure.start_time = datetime.utcnow()
