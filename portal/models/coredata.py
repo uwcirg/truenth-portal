@@ -121,7 +121,7 @@ class OrgData(CoredataPoint):
 
         Special "none of the above" org still counts.
         """
-        if user.has_role(ROLE.PROVIDER):
+        if user.has_role(ROLE.PROVIDER) or user.has_role(ROLE.PARTNER):
             return True
         if user.organizations.count() > 0:
             return True
