@@ -118,7 +118,7 @@ function goTo(event, id) {
 };
 
 {% if user.has_role('patient')  and (user.id != current_user.id) %}
-  
+
   var patientId = {{user.id}};
 
 {% endif %}
@@ -191,9 +191,9 @@ $(document).ready(function(){
                       if (customErrorField.text() != "") hasError = true;
                       else hasError = false;
                     } else hasError = false;
-                  }; 
+                  };
 
-                  //console.log("hasError: " + hasError + " customText: " + customErrorField.text())             
+                  //console.log("hasError: " + hasError + " customText: " + customErrorField.text())
                   if (!hasError) assembleContent.demo({{ user.id }},true, $(this));
                 };
               });
@@ -201,7 +201,7 @@ $(document).ready(function(){
         };
     });
 
-  
+
     if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
 
     $("html").click(function(event){
