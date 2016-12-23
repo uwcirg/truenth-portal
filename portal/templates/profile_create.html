@@ -10,16 +10,25 @@
 #clinicalGroupLabel {
     margin-bottom: 1em;
 }
+.required {
+    color: #a09f9f ;
+}
 </style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
-    <div class="row" style="position: relative;">
+    <div class="row">
         <div class="col-md-12">
             <hr>
             <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
             <hr/>
             <br/>
             <div class="profile-item-container create-account-container">
+                    <div class="row">
+                        <div class="col-md-9 col-xs-12 required">
+                          <div>( * ) required fields</div>
+                          <br/><br/>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-9 col-xs-12">
                             {{profileName(False)}}
@@ -36,14 +45,10 @@
                         <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
                         <div class="indent">
                             <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-                              </label>
+                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true" style="position:relative; top:-2"> {{ _("Yes") }}
                             </div>
                             <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
-                              </label>
+                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false" style="position:relative; top:-2"> {{ _("No (in other parts of body as well)") }}
                             </div>
                         </div>
                          <div class="help-block with-errors"></div>
@@ -51,7 +56,7 @@
                      <br/>
                      <hr class="pc-hr"/>
                     <div class="form-group profile-section" id="userOrgs">
-                        <label>{{ _("Clinics") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+                        <label>{{ _("Clinics") }}</label>
                         <div class="indent">
                         <div id="fillOrgs"></div>
                         <!--
@@ -145,6 +150,10 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _orgArray = {};
     var hasError = false;
     var errorMessage = '';
+
+    ["div.profile-name-label", "#bdGroup", "#emailGroup", "#clinicalGroup", "#userOrgs"].forEach(function(item) {
+        $(item + " label").append("<span class='required'>&nbsp;*</span>");
+    })
 
     //for each org send off ajax to set consent
     function setConsents(userId) {

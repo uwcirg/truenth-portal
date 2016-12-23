@@ -232,6 +232,41 @@ var fillContent = {
             $("#terms").fadeIn();
         };
     },
+    "consentList" : function(data) {
+        if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
+            var content = "<table class='table table-bordered table-hover table-condensed table-responsive' style='max-width:100%'>";
+            ['Organization', 'Consented', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title) {
+                content += "<TH class='consentlist-header'>" + title + "</TH>";
+            });
+            var dataArray = data["consent_agreements"].reverse();
+            dataArray.forEach(function(item) {
+                if (!(/null/.test(item.agreement_url))) {
+                    var orgName = $("#fillOrgs input[name='organization'][parent_org='true'][value='" + item.organization_id + "']").attr("org_name");
+                     //console.log(item.organization_id + ": " + orgName)
+                    var expired = tnthDates.getDateDiff(item.expires);
+                    var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
+                    var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
+                    var sDisplay = "";
+                    switch(consentStatus) {
+                        case "deleted":
+                            sDisplay = "<span class='text-danger'>&#10007;</span><br/><span class='text-danger' style='font-size: 0.85em'>(withdrawn on " + deleteDate.replace("T", " ") + " GMT)</span>";
+                            break;
+                        case "expired":
+                            sDisplay = "<span class='text-warning'>&#10007; <br><span>(expired)</span>"
+                            break;
+                        case "active":
+                            sDisplay = "<span class='text-success'>&#10003;</span>";
+                            break;
+                    };
+
+                    content += "<tr><td class='consentlist-cell'>" + (orgName != "" && orgName != undefined? orgName : item.organization_id) + "</td><td class='consentlist-cell' style='padding-left:1.2em'>" + sDisplay + "</td><td class='consentlist-cell'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></td><td class='consentlist-cell'>" + (item.signed).replace("T", " ") + "</td><td class='consentlist-cell'>" + (item.expires).replace("T", " ") + "</td></tr>";
+                };
+            });
+            content += "</table>";
+            $("#profileConsentList").html(content);
+        } else $("#profileConsentList").html("<p class='text-muted'>No consent found for this user.</p>");
+        $("#profileConsentList").animate({opacity: 1});
+    },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
@@ -689,6 +724,7 @@ var tnthAjax = {
                         getSaveLoaderDiv("profileForm", "userOrgs");
                         $(this).attr("save-container-id", "userOrgs");
                         assembleContent.demo(userId,true, $(this), true);
+                        if (typeof reloadConsentList != "undefined") reloadConsentList();
                         //need to delete consent after ? otherwise get unauthorized error
                         tnthAjax.handleConsent();
                     //};
@@ -744,10 +780,12 @@ var tnthAjax = {
                     };
                 });
             };
+           fillContent.consentList(data);
            loader();
            return true;
         }).fail(function() {
             console.log("Problem retrieving data from server.");
+            fillContent.consentList(null);
             loader();
             return false;
         });
@@ -803,14 +841,16 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: false
+            async: false,
+            cache: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
                 d.forEach(function(item) {
                     var orgId = item.organization_id;
-
-                    if (orgId == parentOrg) {
+                    //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
+                    var expired = tnthDates.getDateDiff(item.expires);
+                    if (orgId == parentOrg && !item.deleted && !(expired > 0)) {
                         //console.log("consented orgid: " + orgId)
                         consentedOrgIds.push(orgId);
                     };
@@ -845,17 +885,18 @@ var tnthAjax = {
                     var pOrg, prevOrg;
                     $("#userOrgs input[name='organization']").each(function() {
                         //console.log("in id: " + $(this).attr("id"))
-                       if ($(this).attr("id") !== "noOrgs") {
 
+                       if ($(this).attr("id") !== "noOrgs") {
+                             //console.log("prevOg: " + prevOrg + " current org: " +  $(this).attr("data-parent-id"))
                             //remove consent for this org
                             if (prevOrg != $(this).attr("data-parent-id")) {
                                 pOrg = $(this).attr("data-parent-id");
-                                if (parseInt(pOrg) > 0) {
+                                if (pOrg && (parseInt(pOrg) > 0)) {
                                    self.deleteConsent(userId, {"org": pOrg});
                                 };
-                                prevOrg = pOrg;
                             };
                         };
+                        prevOrg = $(this).attr("data-parent-id");
                     });
                     //remove all consents
                     //$("#consentContainer input.consent-checkbox").each(function() {

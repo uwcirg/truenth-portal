@@ -39,7 +39,7 @@
 
             </div>
         </div>
-        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+        <span id="errorbirthday" class="help-block" style="display: none"></span>
      </div>
      <script>
         $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
@@ -361,7 +361,7 @@
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div class="form-group profile-section" id="userOrgs">
-        <label>{{ _("Clinics") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{_("Clinics")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <div class="indent">
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
@@ -404,6 +404,30 @@
                 </div>
             {% endfor %}
         </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro profileConsent(person) -%}
+    {% if person %}
+    <div id="profileConsentList"></div>
+    <script>
+        /**** this function can be used when this section becomes editable ****/
+        function reloadConsentList() {
+            var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+            $("#profileConsentList").animate({opacity: 0}, function() {
+                    $(this).html(eventLoading).css('opacity',1);
+                    // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+                    // more obvious when the updated list loads
+                    setTimeout(function(){
+                        tnthAjax.getConsent({{person.id}});
+                    },1000);
+
+            });
+        };
+        $(function () {
+            setTimeout("tnthAjax.getConsent({{person.id}});", 500);
+        });
+    </script>
     {% endif %}
 {%- endmacro %}
 
@@ -795,8 +819,6 @@
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
-
-
             {% endif %}
 
             {% if person %}
@@ -975,6 +997,17 @@
             </div>
         </div>
     </div>
+
+    {% if person %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title">{{ _("Consent History") }}</h4>
+                    {{profileConsent(person)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     {%if person and person.has_role('patient')%}
         <div class="row">

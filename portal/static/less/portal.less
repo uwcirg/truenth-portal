@@ -79,7 +79,7 @@ a.btn {
 #loginEmailReminderText
 {
   margin-left: 8px;
-  font-size: 0.87em; 
+  font-size: 0.87em;
   text-align: left;
   padding: 0.1em auto;
   color: #5a5a5a;
@@ -1132,6 +1132,22 @@ color: #777
   top:-2px;
 }
 
+#profileConsentList {
+  font-size: 0.95em;
+  max-width: 100%;
+  padding: 0.1em;
+  .consentlist-header {
+    background-color: @rowBackgroundColor;
+    color: #FFF;
+    font-weight: normal;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+  .consentlist-cell{
+    background-color: #fbf9f9;
+  }
+}
+
 #identityVerificationContainer {
   padding: 2em 1.5em;
   margin: 1em auto;
@@ -1274,6 +1290,9 @@ div.input-group.date {
     margin-top: 4px;
   }
   table.profile-audit-log {
+    font-size: 0.7em;
+  }
+  #profileConsentList {
     font-size: 0.7em;
   }
   .create-account-container {
