@@ -34,6 +34,7 @@ RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
     /usr/sbin/update-locale LANG=C.UTF-8
 
+RUN pip install --upgrade pip setuptools
 RUN pip install make-deb
 
 RUN mkdir -p /tmp/artifacts
