@@ -1,14 +1,17 @@
 #!/usr/bin/make -f
 
-export DH_PIP_EXTRA_ARGS = --no-binary=:all:
-export DH_UPGRADE_PIP
-export DH_UPGRADE_SETUPTOOLS
+DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+
 
 distclean:
 	rm -Rf build debian/portal/ env
 
-override_dh_auto_test:
-	echo test
+
+override_dh_virtualenv:
+	cp requirements.txt requirements.backup.txt
+	cat requirements.build.txt requirements.backup.txt > requirements.txt
+
+	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
 %:
-	dh $@ --buildsystem dh_virtualenv
+	dh $@ --with python-virtualenv
