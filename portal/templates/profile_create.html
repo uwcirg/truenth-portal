@@ -24,12 +24,6 @@
             <br/>
             <div class="profile-item-container create-account-container">
                     <div class="row">
-                        <div class="col-md-9 col-xs-12 required">
-                          <div>( * ) required fields</div>
-                          <br/><br/>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-9 col-xs-12">
                             {{profileName(False)}}
                             {{profileBirthDate(False)}}
@@ -45,10 +39,14 @@
                         <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
                         <div class="indent">
                             <div class="radio">
-                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true" style="position:relative; top:-2"> {{ _("Yes") }}
+                                <label>
+                                    <input type="radio" name="pca_localized" id="pca_localized_yes" value="true" style="position:relative; top:-2"> {{ _("Yes") }}
+                                </label>
                             </div>
                             <div class="radio">
-                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false" style="position:relative; top:-2"> {{ _("No (in other parts of body as well)") }}
+                                <label>
+                                    <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
+                                </label>
                             </div>
                         </div>
                          <div class="help-block with-errors"></div>
@@ -150,10 +148,6 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _orgArray = {};
     var hasError = false;
     var errorMessage = '';
-
-    ["div.profile-name-label", "#bdGroup", "#emailGroup", "#clinicalGroup", "#userOrgs"].forEach(function(item) {
-        $(item + " label").append("<span class='required'>&nbsp;*</span>");
-    })
 
     //for each org send off ajax to set consent
     function setConsents(userId) {
