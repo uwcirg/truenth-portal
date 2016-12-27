@@ -650,52 +650,8 @@ var tnthAjax = {
             $("#userOrgs input[name='organization']").each(function() {
                 $(this).on("click", function() {
 
-                    //var parentOrg = $(this).attr("data-parent-id");
-                    //var parentName = $(this).attr("data-parent-name");
                     var userId = $("#fillOrgs").attr("userId");
-
-                    // if ($(this).prop("checked")){
-                    //     if ($(this).attr("id") !== "noOrgs") {
-                    //         //console.log("set no org here")
-                    //         if (parentOrg) {
-                    //             var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                    //             if (agreementUrl && agreementUrl != "") {
-                    //                 //console.log("org: " + parentOrg + " agreement: " + agreementUrl+ " userId? " + userId);
-                    //                 self.setConsent(userId, {"org": parentOrg, "agreementUrl": agreementUrl});
-                    //             };
-                    //         };
-
-                    //     } else {
-                    //         var pOrg, prevOrg;
-                    //         $("#userOrgs input[name='organization']").each(function() {
-                    //             //console.log("in id: " + $(this).attr("id"))
-                    //            if ($(this).attr("id") !== "noOrgs") {
-
-                    //                 //remove consent for this org
-                    //                 if (prevOrg != $(this).attr("data-parent-id")) {
-                    //                     pOrg = $(this).attr("data-parent-id");
-                    //                     if (parseInt(pOrg) > 0) {
-                    //                        self.deleteConsent(userId, {"org": pOrg});
-                    //                     };
-                    //                     prevOrg = pOrg;
-                    //                 };
-                    //             };
-                    //         });
-                    //         //remove all consents
-                    //         //$("#consentContainer input.consent-checkbox").each(function() {
-                    //             //$(this).prop("checked", false);
-                    //         //});
-                    //     }
-                    // } else {
-                    //     //delete only when all the child orgs from the parent org are unchecked as consent agreement is with the parent org
-                    //     var childOrgs = $("#userOrgs input[name='organization'][data-parent-id ='" + parentOrg + "']");
-                    //     var allUnchecked = true;
-                    //     childOrgs.each(function() {
-                    //         if ($(this).prop("checked")) allUnchecked = false;
-                    //     });
-                    //     if (allUnchecked) self.deleteConsent(userId, {"org": parentOrg});
-                    // };
-
+                    var parentOrg = $(this).attr("data-parent-id");
 
                     if ($(this).prop("checked")){
                         if ($(this).attr("id") !== "noOrgs") {
@@ -711,10 +667,7 @@ var tnthAjax = {
 
                                 };
                             });
-                            //remove all consents
-                            //$("#consentContainer input.consent-checkbox").each(function() {
-                                //$(this).prop("checked", false);
-                            //});
+                            
                         };
                     };
 
@@ -730,29 +683,8 @@ var tnthAjax = {
                     //};
 
 
-
                 });
             });
-
-            // $("#consentContainer input.consent-checkbox").each(function() {
-            //        $(this).on("click", function() {
-            //             var org = $(this).attr("id").split("_")[0];
-            //             var agreementUrl = $("#" + org + "_agreement_url").val();
-            //             if ($(this).is(":checked")) {
-            //                 //sent off ajax
-            //                 var consented = self.getConsent(userId, true); //make sure there isn't consent for this already
-            //                 if (! consented) {
-            //                     //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
-            //                     self.setConsent(userId, {"org": org, "agreementUrl": agreementUrl});
-            //                 };
-            //             } else {
-            //                 //console.log("org: " + org + " agreement: " + agreementUrl+ " userId? " + userId);
-            //                 self.deleteConsent(userId, {"org": org});
-            //             };
-
-            //        });
-
-            //  });
 
             tnthAjax.getDemo(userId, noOverride);
             //tnthAjax.getProc(userId);//TODO add html for that, see #userProcedures
@@ -825,6 +757,8 @@ var tnthAjax = {
                         dataType: 'json',
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
+                        var parentOrgEl = $("#fillOrgs input[parent_org='true'][value='" + orgId + "']");
+                        if (parentOrgEl.length > 0) parentOrgEl.attr("hasConsent", "false");
                         console.log("consent deleted successfully.");
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
@@ -835,8 +769,19 @@ var tnthAjax = {
         };
     },
     hasConsent: function(userId, parentOrg) {
-        if (!userId && !parentOrg) return false;
+        
+        if (!userId) return false;
+        if (!parentOrg) return false;
+
         var consentedOrgIds = [];
+        var parentOrgEl = $("#fillOrgs input[parent_org='true'][value='" + parentOrg + "']");
+        if (parentOrgEl.length > 0) {
+            if (parentOrgEl.attr("hasConsent") == "true") {
+                consentedOrgIds.push(parentOrg);
+                //console.log("GET HERE: " + consentedOrgIds.length)
+                return consentedOrgIds;
+            } else if (parentOrgEl.attr("hasConsent") == "false") return false;
+        };
         //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
         $.ajax ({
             type: "GET",
@@ -846,18 +791,22 @@ var tnthAjax = {
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
-                d.forEach(function(item) {
-                    var orgId = item.organization_id;
-                    //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
-                    var expired = tnthDates.getDateDiff(item.expires);
-                    if (orgId == parentOrg && !item.deleted && !(expired > 0)) {
-                        //console.log("consented orgid: " + orgId)
-                        consentedOrgIds.push(orgId);
-                    };
-                });
+                if (d.length > 0) {
+                    d.forEach(function(item) {
+                        var orgId = item.organization_id;
+                        //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
+                        var expired = tnthDates.getDateDiff(item.expires);
+                        if (orgId == parentOrg && !item.deleted && !(expired > 0)) {
+                            //console.log("consented orgid: " + orgId)
+                            parentOrgEl.attr("hasConsent", "true");
+                            consentedOrgIds.push(orgId);
+                        };
+                    });
+                } else parentOrgEl.attr("hasConsent", "false");
             };
 
         }).fail(function() {
+            parentOrgEl.attr("hasConsent", "false");
             return false;
          });
         //console.log(consentedOrgIds)

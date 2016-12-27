@@ -14,10 +14,10 @@
         <label>{{ _("Birth Date") }}</label>
         <div class="row">
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" data-birthday="true" required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" data-birthday="true" data-error="Birthday must be valid and in required format." required />
             </div>
             <div class="col-md-4 col-xs-10">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" error-field="errorbirthday" required>
+                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -35,10 +35,10 @@
 
             </div>
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-birthday="true" error-field="errorbirthday" required />
-
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-birthday="true" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
+        <div class="help-block with-errors"></div>
         <span id="errorbirthday" class="help-block" style="display: none"></span>
      </div>
      <script>
