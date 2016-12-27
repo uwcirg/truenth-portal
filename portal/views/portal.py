@@ -92,7 +92,12 @@ def specific_clinic_entry():
     Store the clinic in the session for association with the user once
     registered and redirect to the standard landing page.
 
+    NB if already logged in - this will bounce user to home
+
     """
+    if current_user():
+        return redirect(url_for('portal.home'))
+
     form = ShortcutAliasForm(request.form)
 
     if not form.validate_on_submit():
