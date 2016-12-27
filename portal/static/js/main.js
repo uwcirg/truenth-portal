@@ -353,6 +353,7 @@ var fillContent = {
 
 var assembleContent = {
     "demo": function(userId,onProfile, targetField, sync) {
+
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["name"] = {
@@ -493,10 +494,18 @@ var assembleContent = {
             };
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
-            demoArray["telecom"] = [
-                { "system": "email", "value": $("input[name=email]").val() },
-                { "system": "phone", "value": $("input[name=phone]").val() }
-            ];
+
+            demoArray["telecom"] = [];
+
+            var emailVal = $("input[name=email]").val();
+            if (emailVal.trim() != "") {
+                demoArray["telecom"].push({ "system": "email", "value": emailVal });
+            };
+            demoArray["telecom"].push({ "system": "phone", "value": $("input[name=phone]").val() });
+            //demoArray["telecom"] = [
+                //{ "system": "email", "value": $("input[name=email]").val() },
+                //{ "system": "phone", "value": $("input[name=phone]").val() }
+            //];
            //console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
@@ -698,7 +707,8 @@ var tnthAjax = {
        $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: (sync ? false : true)
+            async: (sync ? false : true),
+            cache: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
@@ -745,6 +755,7 @@ var tnthAjax = {
     deleteConsent: function(userId, params) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"]);
+            //console.log("has consent: " + consented)
             if (consented) {
                 //delete all consents for the org
                 consented.forEach(function(orgId) {
@@ -757,31 +768,22 @@ var tnthAjax = {
                         dataType: 'json',
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
-                        var parentOrgEl = $("#fillOrgs input[parent_org='true'][value='" + orgId + "']");
-                        if (parentOrgEl.length > 0) parentOrgEl.attr("hasConsent", "false");
-                        console.log("consent deleted successfully.");
+                        //console.log("consent deleted successfully.");
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
                     });
                 });
+
             };
         };
     },
     hasConsent: function(userId, parentOrg) {
-        
+        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
         if (!userId) return false;
         if (!parentOrg) return false;
 
         var consentedOrgIds = [];
-        var parentOrgEl = $("#fillOrgs input[parent_org='true'][value='" + parentOrg + "']");
-        if (parentOrgEl.length > 0) {
-            if (parentOrgEl.attr("hasConsent") == "true") {
-                consentedOrgIds.push(parentOrg);
-                //console.log("GET HERE: " + consentedOrgIds.length)
-                return consentedOrgIds;
-            } else if (parentOrgEl.attr("hasConsent") == "false") return false;
-        };
         //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
         $.ajax ({
             type: "GET",
@@ -798,15 +800,13 @@ var tnthAjax = {
                         var expired = tnthDates.getDateDiff(item.expires);
                         if (orgId == parentOrg && !item.deleted && !(expired > 0)) {
                             //console.log("consented orgid: " + orgId)
-                            parentOrgEl.attr("hasConsent", "true");
                             consentedOrgIds.push(orgId);
                         };
                     });
-                } else parentOrgEl.attr("hasConsent", "false");
+                }
             };
 
         }).fail(function() {
-            parentOrgEl.attr("hasConsent", "false");
             return false;
          });
         //console.log(consentedOrgIds)
@@ -818,7 +818,7 @@ var tnthAjax = {
             var parentOrg = $(this).attr("data-parent-id");
             var parentName = $(this).attr("data-parent-name");
             var userId = $("#fillOrgs").attr("userId");
-
+            //console.log("parent org: " + parentOrg)
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
                     //console.log("set no org here")
@@ -1172,10 +1172,15 @@ $(document).ready(function() {
                     // If NaN then the values haven't been entered yet, so we
                     // validate as true until other fields are entered
                     if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                        $("#errorbirthday").html('All fields must be complete.').hide();
                         return true;
                     } else if (isNaN(d)) {
-                        errorMsg = "Please enter a date.";
-                    }
+                        errorMsg = "Please enter a valid date.";
+                    } else if (isNaN(m)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
+                    } else if (isNaN(y)) {
+                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
+                    };
                     $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
                 }
@@ -1226,7 +1231,6 @@ $(document).ready(function() {
     }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
-
 
 var tnthDates = {
     /***
@@ -1599,13 +1603,17 @@ function convertGMTToLocalTime(dateString, format) {
 })();
 
 function getSaveLoaderDiv(parentID, containerID) {
-    $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+    var el = $("#" + parentID + " #" + containerID).parent().find('.load-container');
+    if (el.length == 0) $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
 };
 
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 };
 
+function hasValue(val) {
+    return val != null && val != "" && val != "undefined";
+}
 //Promise polyfill - IE doesn't support Promise - so need this
 !function(e){function n(){}function t(e,n){return function(){e.apply(n,arguments)}}function o(e){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(e,this)}function i(e,n){for(;3===e._state;)e=e._value;return 0===e._state?void e._deferreds.push(n):(e._handled=!0,void o._immediateFn(function(){var t=1===e._state?n.onFulfilled:n.onRejected;if(null===t)return void(1===e._state?r:u)(n.promise,e._value);var o;try{o=t(e._value)}catch(i){return void u(n.promise,i)}r(n.promise,o)}))}function r(e,n){try{if(n===e)throw new TypeError("A promise cannot be resolved with itself.");if(n&&("object"==typeof n||"function"==typeof n)){var i=n.then;if(n instanceof o)return e._state=3,e._value=n,void f(e);if("function"==typeof i)return void s(t(i,n),e)}e._state=1,e._value=n,f(e)}catch(r){u(e,r)}}function u(e,n){e._state=2,e._value=n,f(e)}function f(e){2===e._state&&0===e._deferreds.length&&o._immediateFn(function(){e._handled||o._unhandledRejectionFn(e._value)});for(var n=0,t=e._deferreds.length;n<t;n++)i(e,e._deferreds[n]);e._deferreds=null}function c(e,n,t){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof n?n:null,this.promise=t}function s(e,n){var t=!1;try{e(function(e){t||(t=!0,r(n,e))},function(e){t||(t=!0,u(n,e))})}catch(o){if(t)return;t=!0,u(n,o)}}var a=setTimeout;o.prototype["catch"]=function(e){return this.then(null,e)},o.prototype.then=function(e,t){var o=new this.constructor(n);return i(this,new c(e,t,o)),o},o.all=function(e){var n=Array.prototype.slice.call(e);return new o(function(e,t){function o(r,u){try{if(u&&("object"==typeof u||"function"==typeof u)){var f=u.then;if("function"==typeof f)return void f.call(u,function(e){o(r,e)},t)}n[r]=u,0===--i&&e(n)}catch(c){t(c)}}if(0===n.length)return e([]);for(var i=n.length,r=0;r<n.length;r++)o(r,n[r])})},o.resolve=function(e){return e&&"object"==typeof e&&e.constructor===o?e:new o(function(n){n(e)})},o.reject=function(e){return new o(function(n,t){t(e)})},o.race=function(e){return new o(function(n,t){for(var o=0,i=e.length;o<i;o++)e[o].then(n,t)})},o._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},o._unhandledRejectionFn=function(e){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)},o._setImmediateFn=function(e){o._immediateFn=e},o._setUnhandledRejectionFn=function(e){o._unhandledRejectionFn=e},"undefined"!=typeof module&&module.exports?module.exports=o:e.Promise||(e.Promise=o)}(this);
 
