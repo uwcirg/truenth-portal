@@ -97,7 +97,7 @@
 
     </div>
     <br/>
-    <form id="procedureForm" class="form-inline event-element to-validate" data-toggle="validator">
+    <form id="procedureForm" class="form-inline event-element">
 
             <p class="text-muted">{{ _("Add a treatment") }}:</p>
             <div class="row">
@@ -136,10 +136,10 @@
                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
                 <div class="flex">
                     <div>
-                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" required="" pattern="([1-9]|[12][0-9]|3[01])">
+                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" maxlength="2">
                     </div>
                     <div>
-                        <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
+                        <select class="form-control" name="procMonth" id="procMonth">
                             <option value="">{{ _("Month") }}...</option>
                             <option value="01">{{ _("January") }}</option>
                             <option value="02">{{ _("February") }}</option>
@@ -156,11 +156,11 @@
                         </select>
                     </div>
                     <div>
-                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"  required="" pattern="\d{4}">
+                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
                     </div>
                 </div>
                 <div class="row">
-                     <div class="col-md-5 col-xs-10">
+                     <div class="col-md-9 col-xs-10">
                         <div id="procDateErrorContainer" class="help-block with-errors"></div>
                      </div>
                 </div>
@@ -181,7 +181,7 @@
 {% endblock %}
 
 {% block document_ready %}
-    var subjectId = {{ user.id }}; 
+    var subjectId = {{ user.id }};
     var currentUserId = subjectId;
 
 $(document).ready(function(){
