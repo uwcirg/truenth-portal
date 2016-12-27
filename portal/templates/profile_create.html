@@ -10,10 +10,13 @@
 #clinicalGroupLabel {
     margin-bottom: 1em;
 }
+.required {
+    color: #a09f9f ;
+}
 </style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
-    <div class="row" style="position: relative;">
+    <div class="row">
         <div class="col-md-12">
             <hr>
             <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
@@ -36,14 +39,14 @@
                         <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
                         <div class="indent">
                             <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-                              </label>
+                                <label>
+                                    <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
+                                </label>
                             </div>
                             <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
-                              </label>
+                                <label>
+                                    <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
+                                </label>
                             </div>
                         </div>
                          <div class="help-block with-errors"></div>
@@ -51,7 +54,7 @@
                      <br/>
                      <hr class="pc-hr"/>
                     <div class="form-group profile-section" id="userOrgs">
-                        <label>{{ _("Clinics") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+                        <label>{{ _("Clinics") }}</label>
                         <div class="indent">
                         <div id="fillOrgs"></div>
                         <!--

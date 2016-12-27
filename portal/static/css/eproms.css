@@ -1039,6 +1039,24 @@ sub.pointer:hover {
   position: relative;
   top: -2px;
 }
+
+#profileConsentList {
+  font-size: 0.95em;
+  max-width: 100%;
+  padding: 0.1em;
+}
+#profileConsentList .consentlist-header {
+  background-color: #7d826e;
+  color: #FFF;
+  font-weight: normal;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+#profileConsentList .consentlist-cell{
+  background-color: #fbf9f9;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
 #identityVerificationContainer {
   padding: 2em 1.5em;
   margin: 1em auto;
@@ -1161,6 +1179,10 @@ div.input-group.date {
     margin-top: 4px;
   }
   table.profile-audit-log {
+    font-size: 0.7em;
+  }
+
+  #profileConsentList {
     font-size: 0.7em;
   }
   .create-account-container {
