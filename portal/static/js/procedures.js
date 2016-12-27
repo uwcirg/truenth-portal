@@ -55,6 +55,8 @@ $.fn.extend({
 }); // $.fn.extend({
 
 var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+var procDateReg =  /(0[1-9]|1\d|2\d|3[01])/;
+var procYearReg = /(19|20)\d{2}/;
 
 $(document).ready(function() {
 
@@ -92,24 +94,20 @@ $(document).ready(function() {
 
     function checkDate() {
         var d = $("#procDay").val(), m = $("#procMonth").val(), y = $("#procYear").val();
-        var dTest = /([1-9]|[12][0-9]|3[01])/.test(d);
+        if (!isNaN(parseInt(d))) {
+            if (parseInt(d) > 0 && parseInt(d) < 10) d = "0" + d;
+        };
+
+        var dTest = procDateReg.test(d);
         var mTest = (m != "");
-        var yTest =  /\d{4}/.test(y);
-        var errorText = "Please match the requested format.";
+        var yTest = procYearReg.test(y);
+        var errorText = "The procedure date must be valid and in required format.";
         var dgField = $("#procDateGroup");
         var deField = $("#procDateErrorContainer");
         var errorColor = "#a94442";
         var validColor = "#777";
 
         if (dTest && mTest && yTest) {
-
-            if (parseInt(y) < 1900) {
-                deField.text("Year must be after 1900.").css("color", errorColor);
-                return false;
-            } else {
-                deField.text("").css("color", "validColor");
-            };
-
 
             if (parseInt(m) === 2) { //month of February
                 if (isLeapYear(parseInt(y))) {
@@ -126,9 +124,21 @@ $(document).ready(function() {
                 };
                 deField.text("").css("color", validColor);
                 return true;
-            } else return true;
+            } else {
+                deField.text("").css("color", validColor)
+                return true;
+            };
 
-        } else return false;
+        } else {
+            errorText = "";
+            if ((d != "") && (y != "") && (m != "")) {
+                if (!dTest) errorText += "Procedure day is not valid.";
+                if (!mTest) errorText += (errorText != "" ? "<br/>": "")  +  "Procedure month is not valid.";
+                if (!yTest) errorText += (errorText != "" ? "<br/>": "") + "Procedure year is not valid.";
+                deField.html(errorText).css("color", errorColor);
+            };
+            return false;
+        };
     };
 
     function setDate() {
@@ -163,12 +173,13 @@ $(document).ready(function() {
     var dateFields = ["procDay", "procMonth", "procYear"];
 
     dateFields.forEach(function(fn) {
-        $("#" + fn).on("change", function() {
+        var triggerEvent = $("#" + fn).attr("type") == "text" ? "blur": "change";
+        $("#" + fn).on(triggerEvent, function() {
             var isValid = checkDate();
             //console.log("isValid: " +  isValid)
             if (isValid) {
                 setDate();
-            }; 
+            };
         });
     });
 
