@@ -31,8 +31,8 @@
                 {% if user and user.first_name and user.last_name %}
                   <p>{{ _("Your") }} <em>{{ _("Name") }}</em>: {{user.first_name}} {{user.last_name}}</p>
                   <br/>
-                  <input type="text" name="firstname" id="fistname" value="{{user.first_name}}" style="display:none"/>
-                  <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" style="display:none"/>
+                  <input type="hidden" name="firstname" id="fistname" value="{{user.first_name}}"/>
+                  <input type="hidden" name="lastname" id="lastname" value="{{user.last_name}}"/>
                 {% endif %}
             {% endif %}
             {% if 'role' in still_needed %}
@@ -89,7 +89,6 @@ var fc, incompleteFields = [], mainSections = {}, _isChecked = false, rolesGroup
 var FieldsChecker = function(mainSections) {
   this.mainSections = mainSections;
   this.incompleteFields = [];
-  this.skipped = false;
 };
 
 FieldsChecker.prototype.getIncompleteFields = function() {
@@ -102,30 +101,14 @@ FieldsChecker.prototype.setIncompleteFields = function() {
     var ms = this.mainSections;
     self.reset();
     for (var section in ms) {
-      var fields = ms[section].fields;
-      fields.forEach(function(field) {
-          if (field.length > 0) {
-            var type = field.attr('type');
-            switch(String(type).toLowerCase()) {
-            case 'checkbox':
-                  _isChecked = false;
-                  field.each(function() {
-                      if ($(this).is(":checked")) {
-                        _isChecked = true;
-                      };
-                  });
-                  if (!(_isChecked)) self.incompleteFields.push({'sectionId': section, 'section': $('#'+ section), 'element':field});
-                  break;
-            case 'radio':
-                if (!field.is(":checked")) self.incompleteFields.push({'sectionId': section,'section': $('#'+ section), 'element':field});
-                break;
-            case 'select':
-            case 'text':
-                if (field.val() == '') self.incompleteFields.push({'sectionId': section,'section': $('#' + section), 'element': field});
-                break;
+      if (!self.sectionCompleted(section)) {
+          var fields = ms[section].fields;
+          fields.forEach(function(field) {
+            if (field.length > 0) {
+            self.incompleteFields.push({'sectionId': section, 'section': $('#'+ section), 'element':field});
             };
-          };
-      });
+          });
+      };
     };
 
     self.incompleteFields.forEach(function(field, index) {
@@ -151,8 +134,9 @@ FieldsChecker.prototype.reset = function() {
     self.incompleteFields = [];
 };
 
-FieldsChecker.prototype.getNextField = function(currentIndex) {
+FieldsChecker.prototype.getNextField = function(currentIndex, field) {
     currentIndex = parseInt(currentIndex);
+    var self = this;
     if (!isNaN(currentIndex) && currentIndex >= 0) {
       if ((currentIndex + 1) <= (this.incompleteFields.length - 1)) {
           this.incompleteFields[currentIndex + 1].section.show();
@@ -162,18 +146,97 @@ FieldsChecker.prototype.getNextField = function(currentIndex) {
               scrollTop: el.offset().top
            }, 500);
       };
-    };
+    } else {
+      if (field) {
+          var parentContainer = field.closest("[parent-section='true']");
+          //console.log("parentContainer:")
+          //console.log(parentContainer)
+          if (parentContainer.length > 0) {
+              var nexts = parentContainer.nextAll("[parent-section='true']");
+              var found = false;
+              nexts.each(function() {
+                var parentId = $(this).attr("id");
+                //console.log('parentId: ' + parentId)
+                if (!found && !self.sectionCompleted(parentId)) {
+                    var section = $(this);
+                    section.fadeIn();
+                    $('html, body').animate({
+                        scrollTop: section.offset().top
+                    }, 500);
+                    section.children().first().fadeIn();
+                    //console.log("found: " + section.attr("id"))
+                    found = true;
+                } else $(this).fadeIn();
+              });
+          };
+      };
+    }
 };
+
+FieldsChecker.prototype.sectionCompleted = function(sectionId) {
+  var isComplete = true;
+  if (this.mainSections && this.mainSections[sectionId]) {
+  //console.log(sectionId)
+    var fields = this.mainSections[sectionId].fields;
+    //console.log(fields)
+    if (fields) {
+        fields.forEach(function(field) {
+          if (field.length > 0 && (field.attr("skipped") != "true")) {
+            var type = field.attr('type');
+            switch(String(type).toLowerCase()) {
+            case 'checkbox':
+                  _isChecked = false;
+                  field.each(function() {
+                      if ($(this).is(":checked")) {
+                        _isChecked = true;
+                      };
+                  });
+                  if (!(_isChecked)) isComplete = false;
+                  break;
+            case 'radio':
+                if (!field.is(":checked")) isComplete = false;
+                break;
+            case 'select':
+            case 'text':
+                if (field.val() == '') isComplete = false;
+                break;
+            };
+          };
+      });
+    };
+  };
+  return isComplete;
+};
+
 
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
+  if (this.incompleteFields.length == 0) this.showAll();
   return this.incompleteFields.length == 0;
 };
 
+FieldsChecker.prototype.showAll = function() {
+  var mainSections = this.mainSections;
+  if (mainSections) {
+    for (sec in mainSections) {
+      var mf = $("#" + sec);
+      if (mf.attr("skipped") == "true") continue;
+      mf.fadeIn();
+      mainSections[sec].fields.forEach(function(field) {
+          if (field.attr("skipped") != "true") field.fadeIn();
+      });
+    };
+  };
+};
 
 function continueOn() {
   $("#continueText").fadeIn();
   $("#updateProfile").removeAttr("disabled");
+};
+
+function stopContinue() {
+  $("#continueText").fadeOut();
+  $("#updateProfile").attr("disabled", true);
 };
 
 function initIncompleteFields() {
@@ -186,7 +249,7 @@ function initIncompleteFields() {
 
     fe.each(function() {
         var f = $(this);
-        var triggerEvent = ($(f).attr("type") == "text" ? "change" : "click");
+        var triggerEvent = ($(f).attr("type") == "text" ? "blur" : "click");
         if (f.get(0).nodeName.toLowerCase() == "select") triggerEvent = "change";
         var customEvent = mainSections[field.sectionId].event;
 
@@ -195,14 +258,12 @@ function initIncompleteFields() {
         }
         else {
             f.on(triggerEvent, function() {
-                var isComplete = fc.allFieldsCompleted();
-                if (isComplete) {
-                   continueOn();
-                }
-                else {
-                  //incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].section.show();
-                  //incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].element.show();
+                if ($(this).value != "") {
                   fc.getNextField($(this).attr('sectionIndex'));
+                  var isComplete = fc.allFieldsCompleted();
+                  if (isComplete) {
+                     continueOn();
+                  }
                 };
                 //console.log('field index: ' + f.attr('sectionIndex'));
                 //console.log('incomplete fields length: ' + incompleteFields.length);
@@ -242,35 +303,53 @@ $(document).ready(function(){
         var toSend = {"roles": roles};
         tnthAjax.putRoles({{user.id}},toSend);
         if (theVal == "patient") {
-          // If patient, then we always show bdGroup
-          if ($("#bdGroup").length > 0) {
-            $("#bdGroup").fadeIn();
-          };
-          // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-          if ($("#year").val() != "") {
-            $("#year").blur();
-            if ($('#patientQ').length > 0) {
-              $('#patientQ').fadeIn();
-              $('html, body').animate({
-                scrollTop: $('#patientQ').offset().top
-              }, 500);
-            } else fc.getNextField($(this).attr("sectionIndex"));
-          } else {
-            if ($("#bdGroup").length > 0 ) {
-              $('html, body').animate({
-                scrollTop: $('#bdGroup').offset().top
-              }, 500);
-            } else fc.getNextField($(this).attr("sectionIndex"));
-          };
-          //$("#clinics").hide();
+            // If patient, then we always show bdGroup
+            if ($("#bdGroup").length > 0) {
+              $("#bdGroup").fadeIn();
+            };
+            // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
+            if ($("#year").val() != "") {
+              $("#year").blur();
+              if ($('#patientQ').length > 0) {
+                $('#patientQ').fadeIn();
+                $('html, body').animate({
+                  scrollTop: $('#patientQ').offset().top
+                }, 500);
+                if(fc.sectionCompleted('patientQ')) {
+                  fc.getNextField(null, $(this));
+                };
+              };
+           } else {
+              if ($("#bdGroup").length > 0) {
+                $('html, body').animate({
+                  scrollTop: $('#bdGroup').offset().top
+                }, 500);
+                if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
+              } else fc.getNextField($(this).attr("sectionIndex"), $(this));
+              
+           };
+            //$("#clinics").hide();
+
+            $("#patientQ").attr("skipped", "false");
+            $("#bdGroup").attr("skipped", "false");
+            $("#clinics").attr("skipped", "false");
+
+
+            if (fc.allFieldsCompleted()) {
+              continueOn();
+            } else {
+              stopContinue();
+            };
 
         } else {
           // If partner, skip all questions
-          $("#patientQ").hide();
-          $("#bdGroup").hide();
-          continueOn();
+          if (theVal == "partner") {
+            $("#patientQ").attr("skipped", "true").hide();
+            $("#bdGroup").attr("skipped", "true").hide();
+            $("#clinics").attr("skipped", "true").hide();
+            continueOn();
+          };
         };
-        if (fc.allFieldsCompleted()) continueOn();
     };
 
     var patientQClickEvent = function(){
@@ -281,25 +360,37 @@ $(document).ready(function(){
           tnthAjax.putClinical({{user.id}},toCall,toSend);
           if (toSend == "true" || toCall ==  "pca_localized") {
             thisItem.parents(".pat-q").next().fadeIn();
+            $("#clinics").hide(); //this is hard coded, ARGHHH!!
             var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
             var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
             if (nextItem.length > 0) {
-              $('html, body').animate({
-                scrollTop: nextItem.offset().top
-              }, 500);
-            } else {
-              if ($("#clinics").length > 0) {
-                $("#clinics").fadeIn();
                 $('html, body').animate({
-                  scrollTop: $('#clinics').offset().top
+                  scrollTop: nextItem.offset().top
                 }, 500);
-              } else fc.getNextField(thisItem.attr("sectionIndex"));
+                nextItem.find("input[type='radio']").each(function() {
+                  $(this).attr("skipped", "false");
+                });
+                //console.log( thisItem.closest(".pat-q").nextAll())
+                //console.log(thisItem)
+                thisItem.closest(".pat-q").nextAll().each(function() {
+                    var dataTopic = $(this).attr("data-topic");
+                    $(this).find("input[name='" + dataTopic + "']").each(function() {
+                        $(this).attr("skipped", "false");
+                    });
+                });
+
+                if (fc.sectionCompleted('patientQ')) fc.getNextField(null, $(this)); 
+
+            } else {
+    
+                fc.getNextField(null, $(this));
             };
           } else {
             if (toCall == "biopsy") {
               ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
+                      $(this).attr("skipped", "true");
                   });
               });
               if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
@@ -308,29 +399,37 @@ $(document).ready(function(){
               ["pca_localized"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
+                      $(this).attr("skipped", "true");
                   });
               });
               if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
               //tnthAjax.putClinical({{user.id}},"tx","false");
             }
             thisItem.parents(".pat-q").nextAll().fadeOut();
+            /********** to skip all questions ********/
+            /**hate this part, need to hard-code here****/
             if ($("#clinics").length > 0) {
               $("#clinics").fadeIn();
               $('html, body').animate({
                   scrollTop: $('#clinics').offset().top
               }, 500);
-            } else continueOn();
+              return true;
+            } else {
+              continueOn();
+              return true;
+            };
           };
 
-          if (fc.allFieldsCompleted()) continueOn();
+          if (fc.allFieldsCompleted()) {
+            continueOn();
+          } else stopContinue();
       };
 
     var userOrgChangeEvent = function() {
       //console.log("changed?")
       assembleContent.demo({{ user.id }});
-      //if (fc.allFieldsCompleted()) {
-        continueOn();
-      //};
+      if ($(this).prop("checked")) continueOn();
+      else stopContinue();
     };
 
 
@@ -419,7 +518,7 @@ $(document).ready(function(){
                       if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
                       else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
                       $("#" + parentOrg + "_consentItem").show();
-                      console.log($("#" + parentOrg + "_consentItem"))
+                      //console.log($("#" + parentOrg + "_consentItem"))
                   };
               } else {
                   $("#consentContainer .consent").hide();
