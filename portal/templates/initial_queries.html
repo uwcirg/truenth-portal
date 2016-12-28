@@ -197,8 +197,11 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                 if (!field.is(":checked")) isComplete = false;
                 break;
             case 'select':
+                if (field.val() == '') isComplete = false;
+                break;
             case 'text':
                 if (field.val() == '') isComplete = false;
+                else if (!(field.get(0).validity.valid)) isComplete = false;
                 break;
             };
           };
@@ -258,7 +261,7 @@ function initIncompleteFields() {
         }
         else {
             f.on(triggerEvent, function() {
-                if ($(this).value != "") {
+                if ($(this).value != "" && this.validity.valid) {
                   fc.getNextField($(this).attr('sectionIndex'));
                   var isComplete = fc.allFieldsCompleted();
                   if (isComplete) {
@@ -308,15 +311,17 @@ $(document).ready(function(){
               $("#bdGroup").fadeIn();
             };
             // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-            if ($("#year").val() != "") {
-              $("#year").blur();
-              if ($('#patientQ').length > 0) {
-                $('#patientQ').fadeIn();
-                $('html, body').animate({
-                  scrollTop: $('#patientQ').offset().top
-                }, 500);
-                if(fc.sectionCompleted('patientQ')) {
-                  fc.getNextField(null, $(this));
+            if ($("#year").length > 0 && ($("#year").val() != "")) {
+              if ($("#year").get(0).validity.valid) {
+                $("#year").blur();
+                if ($('#patientQ').length > 0) {
+                  $('#patientQ').fadeIn();
+                  $('html, body').animate({
+                    scrollTop: $('#patientQ').offset().top
+                  }, 500);
+                  if(fc.sectionCompleted('patientQ')) {
+                    fc.getNextField(null, $(this));
+                  };
                 };
               };
            } else {
@@ -413,6 +418,7 @@ $(document).ready(function(){
               $('html, body').animate({
                   scrollTop: $('#clinics').offset().top
               }, 500);
+              if (fc.sectionCompleted('clinics')) continueOn();
               return true;
             } else {
               continueOn();
@@ -428,8 +434,13 @@ $(document).ready(function(){
     var userOrgChangeEvent = function() {
       //console.log("changed?")
       assembleContent.demo({{ user.id }});
-      if ($(this).prop("checked")) continueOn();
-      else stopContinue();
+      if ($(this).prop("checked")) {
+        if (fc.allFieldsCompleted()) {
+          continueOn();
+        } else {
+          stopContinue();
+        };
+      } else stopContinue();
     };
 
 
@@ -460,7 +471,7 @@ $(document).ready(function(){
 
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
-          alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed.");
+          alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid.");
         } else {
           assembleContent.demo({{ user.id }});
         }
@@ -489,7 +500,7 @@ $(document).ready(function(){
                       event: patientQClickEvent
                     },
       'clinics':    {
-                      fields: [$("#userOrgs input[name='organization'][data-parent-id]")],
+                      fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
                       event: userOrgChangeEvent
                     }
     };
