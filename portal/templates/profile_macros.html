@@ -361,16 +361,16 @@
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div class="form-group profile-section" id="userOrgs">
-        <label>{{_("Clinics")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <div class="indent">
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
         </div>
-        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
+        {% if consent_agreements %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
     <script>$(function () {
-                 {% if consent_agreements and person.has_role('patient') %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
+                 {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
                 tnthAjax.getOrgs({{ person.id if person }});
 
             });</script>
