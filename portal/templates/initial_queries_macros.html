@@ -1,5 +1,5 @@
 {% macro tou(terms) -%}
-    <div id="topTerms">
+    <div id="topTerms" parent-section="true">
         <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
         <hr/>
         <br/>
@@ -24,7 +24,7 @@
   {%- endmacro %}
 
   {% macro nameGroup() -%}
-    <div class="row" id="nameGroup">
+    <div class="row" id="nameGroup" parent-section="true">
         <div class="col-md-4 col-xs-6">
           <div class="form-group float-input-label">
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}"  />
@@ -49,7 +49,7 @@
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
-      <div class="form-group" id="rolesGroup">
+      <div class="form-group" id="rolesGroup" parent-section="true">
           <div class="radio">
             <label>
               <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> {{ _("I'm a man who is concerned about prostate cancer for myself") }}
@@ -67,7 +67,7 @@
   {{tou()}}
 
   {% macro dobGroup() -%}
-      <div class="tnth-hide" id="bdGroup">
+      <div class="tnth-hide" id="bdGroup" parent-section="true">
           <hr />
           <p>{{ _("When is your birthday?") }}</p>
           <input type="hidden" name="birthDate" id="birthday" value="">
@@ -112,7 +112,7 @@
           });</script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}
-    <div id="patientQ" class="tnth-hide">
+    <div id="patientQ" class="tnth-hide" parent-section="true">
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
@@ -168,7 +168,7 @@
       <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
-    <div id="clinics" class="tnth-hide">
+    <div id="clinics" class="tnth-hide" parent-section="true">
       <hr />
       <h3 class="tnth-headline">{{ _("Your Clinic") }}</h3>
 
