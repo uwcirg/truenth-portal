@@ -239,9 +239,23 @@ var fillContent = {
                 content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
             var dataArray = data["consent_agreements"].reverse();
+            var orgs = {};
+            $.ajax ({
+                type: "GET",
+                url: '/api/organization',
+                async: false
+            }).done(function(data) {
+                if (data) {
+                    data.entry.forEach(function(entry) {
+                        orgs[entry["id"]] = entry["name"];
+                    });
+                };
+            });
+
             dataArray.forEach(function(item) {
                 if (!(/null/.test(item.agreement_url))) {
-                    var orgName = $("#fillOrgs input[name='organization'][parent_org='true'][value='" + item.organization_id + "']").attr("org_name");
+                    //var orgName = $("#fillOrgs input[name='organization'][parent_org='true'][value='" + item.organization_id + "']").attr("org_name");
+                    var orgName = orgs[item.organization_id] ? orgs[item.organization_id]: item.organization_id;
                      //console.log(item.organization_id + ": " + orgName)
                     var expired = tnthDates.getDateDiff(item.expires);
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
