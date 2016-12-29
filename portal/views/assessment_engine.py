@@ -1101,6 +1101,11 @@ def present_assessment(instruments=None):
         required: true
         type: string
         format: url
+      - name: subject_id
+        in: query
+        description: User ID to Collect QuestionnaireResponses as
+        required: false
+        type: integer
     responses:
       303:
         description: successful operation
@@ -1134,8 +1139,11 @@ def present_assessment(instruments=None):
             )
         )
 
-    assessment_url = "{AE_URL}/surveys/new_session?project={instruments}".format(
+    assessment_url = "{AE_URL}/surveys/new_session?{subject}project={instruments}".format(
         AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
+        subject="subject_id=%s&" % (
+            request.args.get("subject_id") if "subject_id" in request.args else "",
+        ),
         instruments=",".join(queued_instruments),
     )
 
