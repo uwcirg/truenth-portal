@@ -1,7 +1,7 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
 import dateutil
-from flask import current_app
+from flask import abort, current_app
 import json
 import pytz
 from sqlalchemy import UniqueConstraint
@@ -41,9 +41,21 @@ class FHIR_datetime(object):
         return as_fhir(obj)
 
     @staticmethod
-    def parse(data):
-        """Parse input string to generate a UTC datetime instance"""
-        dt = dateutil.parser.parse(data)
+    def parse(data, error_subject=None):
+        """Parse input string to generate a UTC datetime instance
+
+        :param data: the datetime string to parse
+        :param error_subject: Subject string to use in error message
+
+        :return: UTC datetime instance from given data
+
+        """
+        try:
+            dt = dateutil.parser.parse(data)
+        except ValueError:
+            msg = "Unable to parse {}: {}".format(error_subject, data)
+            current_app.logger.warn(msg)
+            abort(400, msg)
         if dt.tzinfo:
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:

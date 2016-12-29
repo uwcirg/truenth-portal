@@ -14,8 +14,11 @@ from sqlalchemy.dialects.postgresql import ENUM
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 
+from .audit import Audit
+
+
 from ..extensions import db
-from .fhir import as_fhir, Observation, UserObservation
+from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .intervention import UserIntervention
 from .performer import Performer
@@ -139,9 +142,7 @@ def permanently_delete_user(username):
     Includes wiping out audit rows, observations, etc.
 
     """
-    from .audit import Audit
     from .tou import ToU
-    from .intervention import UserIntervention
     from .user_consent import UserConsent
 
     actor = raw_input("\n\nWARNING!!!\n\n"
@@ -227,6 +228,9 @@ class User(db.Model, UserMixin):
     deleted_id = db.Column(
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deleted_audit_id_fk'), nullable=True)
+    deceased_id = db.Column(
+        db.ForeignKey('audit.id', use_alter=True,
+                      name='user_deceased_audit_id_fk'), nullable=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -261,6 +265,8 @@ class User(db.Model, UserMixin):
     _locale = db.relationship(CodeableConcept, cascade="save-update")
     deleted = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deleted_id])
+    deceased = db.relationship('Audit', cascade="save-update",
+                              foreign_keys=[deceased_id])
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
@@ -535,6 +541,20 @@ class User(db.Model, UserMixin):
                 orgs.append(reference.Reference.organization(o.id).as_fhir())
             return orgs
 
+        def deceased():
+            """FHIR spec suggests ONE of deceasedBoolean or deceasedDateTime"""
+            if not self.deceased_id:
+                return {"deceasedBoolean": False}
+
+            # We maintain an audit row from when the user was marked
+            # as deceased.  If "time of death" is in the content, the
+            # audit timestamp is good - otherwise, return the boolean
+            audit = self.deceased
+            if "time of death" in audit.comment:
+                return {"deceasedDateTime":
+                        FHIR_datetime.as_fhir(audit.timestamp)}
+            return {"deceasedBoolean": True}
+
         d = {}
         d['resourceType'] = "Patient"
         d['identifier'] = identifiers()
@@ -545,6 +565,7 @@ class User(db.Model, UserMixin):
             d['name']['family'] = self.last_name
         if self.birthdate:
             d['birthDate'] = as_fhir(self.birthdate)
+        d.update(deceased())
         if self.gender:
             d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
@@ -614,6 +635,39 @@ class User(db.Model, UserMixin):
                 allow_org_change(org, user=self, acting_user=acting_user)
                 self.organizations.remove(org)
 
+        def update_deceased(fhir):
+            if 'deceasedDateTime' in fhir:
+                dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
+                                         error_subject='deceasedDataTime')
+                if self.deceased_id:
+                    # only update if the datetime is different
+                    if dt == self.deceased.timestamp:
+                        return  # short circuit out of here
+                # Given a time, store and mark as "time of death"
+                audit = Audit(
+                    user_id=current_user().id, timestamp=dt,
+                    comment="time of death for user {}".format(self.id))
+                self.deceased = audit
+            elif 'deceasedBoolean' in fhir:
+                if fhir['deceasedBoolean'] == False:
+                    if self.deceased_id:
+                        # Remove deceased record from the user, but maintain
+                        # the old audit row.
+                        self.deceased_id = None
+                        audit = Audit(
+                            user_id=current_user().id,
+                            comment=("Remove existing deceased from "
+                                     "user {}".format(self.id)))
+                        db.session.add(audit)
+                    else:
+                        # still marked with an audit, but without the special
+                        # comment syntax and using default (current) time.
+                        audit = Audit(
+                            user_id=current_user().id,
+                            comment=("Marking user {} as "
+                                     "deceased".format(self.id)))
+                        self.deceased = audit
+
         if 'name' in fhir:
             self.first_name = v_or_n(
                 fhir['name'].get('given')) or self.first_name
@@ -627,6 +681,7 @@ class User(db.Model, UserMixin):
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
+        update_deceased(fhir)
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
@@ -660,14 +715,20 @@ class User(db.Model, UserMixin):
         if not other:
             abort(404, 'other_id {} not found'.format(other_id))
 
+        # direct attributes on user
+        # intentionally skip {registered, password, confirmed_at,
+        # reset_password_token}
         for attr in ('email', 'first_name', 'last_name', 'birthdate',
-                     'gender', 'phone', 'locale_id', 'timezone'):
+                     'gender', 'phone', 'locale_id', 'timezone',
+                     'image_url', 'active', 'deleted_id', 'deceased_id',
+                    ):
             if not getattr(other, attr):
                 continue
             if not getattr(self, attr):
                 setattr(self, attr, getattr(other, attr))
             # value present in both.  assume user just set to best value
 
+        # n-to-n relationships on user
         for relationship in ('organizations', '_consents', 'procedures',
                              'observations', 'relationships', 'roles',
                              'races', 'ethnicities', 'groups',
