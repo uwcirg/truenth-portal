@@ -1039,11 +1039,17 @@ sub.pointer:hover {
   position: relative;
   top: -2px;
 }
-
 #profileConsentList {
   font-size: 0.95em;
   max-width: 100%;
   padding: 0.1em;
+}
+#profileConsentList a {
+  text-decoration:underline;
+}
+
+#profileConsentList a:hover {
+  color: #3c763d;
 }
 #profileConsentList .consentlist-header {
   background-color: #7d826e;
@@ -1054,9 +1060,15 @@ sub.pointer:hover {
 }
 #profileConsentList .consentlist-cell{
   background-color: #fbf9f9;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
+  padding-left: 0.6em;
+  padding-right: 0.6em;
 }
+.btn-delete-consent, .btn-add-consent {
+  color: #79815d;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
 #identityVerificationContainer {
   padding: 2em 1.5em;
   margin: 1em auto;
@@ -1183,7 +1195,7 @@ div.input-group.date {
   }
 
   #profileConsentList {
-    font-size: 0.7em;
+    font-size: 0.6em;
   }
   .create-account-container {
     padding: 3.5em 3em;

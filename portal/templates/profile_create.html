@@ -99,12 +99,20 @@
                                             '</label></div>';
                                        $("#fillOrgs").append(childClinic);
                                     });
-                                }
+                                };
 
+                            });
+
+                            $("#userOrgs input[name='organization']").each(function() {
+                                $(this).on("click", function() {
+                                    $("#userOrgs").find(".help-block").html("");
+                                });
                             });
                         }).fail(function() {
                             console.log("Problem retrieving data from server.");
                         });
+
+
                         //tnthAjax.getOrgs({{ user.id }}, true, true);
                         //setTimeout('$("#noOrgs").click();', 0);
 
@@ -148,6 +156,13 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _orgArray = {};
     var hasError = false;
     var errorMessage = '';
+
+
+    $("input[name='pca_localized']").each(function() {
+        $(this).on("click", function() {
+            $("#clinicalGroup").find(".help-block").html("");
+        });
+    });
 
     //for each org send off ajax to set consent
     function setConsents(userId) {
@@ -195,10 +210,10 @@ $(document).ready(function(){
         var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
 
         if (hasError) {
-            $("#" + elementId + " .help-block").text(message).css("color", WARNING_COLOR);
+            $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
 
         } else {
-            $("#" + elementId + " .help-block").text("").css("color", NORMAL_COLOR);
+            $("#" + elementId).find(".help-block").text("").css("color", NORMAL_COLOR);
         };
 
     };
