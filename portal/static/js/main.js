@@ -232,14 +232,12 @@ var fillContent = {
             $("#terms").fadeIn();
         };
     },
-    "consentList" : function(data) {
+    "consentList" : function(data, userId, errorMessage) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
-            var content = "<table class='table table-bordered table-hover table-condensed table-responsive' style='max-width:100%'>";
-            ['Organization', 'Consented', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title) {
-                content += "<TH class='consentlist-header'>" + title + "</TH>";
-            });
             var dataArray = data["consent_agreements"].reverse();
             var orgs = {};
+            var hasConsent = false;
+
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -252,6 +250,12 @@ var fillContent = {
                 };
             });
 
+            var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
+            var content = "<table class='table table-bordered table-hover table-condensed table-responsive' style='max-width:100%'>";
+            [(editable ? '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>' : "n/a"), 'Organization', 'Consented', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
+                if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
+            });
+            
             dataArray.forEach(function(item) {
                 if (!(/null/.test(item.agreement_url))) {
                     //var orgName = $("#fillOrgs input[name='organization'][parent_org='true'][value='" + item.organization_id + "']").attr("org_name");
@@ -259,6 +263,7 @@ var fillContent = {
                      //console.log(item.organization_id + ": " + orgName)
                     var expired = tnthDates.getDateDiff(item.expires);
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
+                    //console.log("consent: " + consentStatus)
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "";
                     switch(consentStatus) {
@@ -272,13 +277,73 @@ var fillContent = {
                             sDisplay = "<span class='text-success'>&#10003;</span>";
                             break;
                     };
+                    var buttonText = "";
+                    if (editable) {
+                        var triggerAction = (/chrome/i.test( navigator.userAgent )) ? "focus": "focus click";
+                        hasConsent = tnthAjax.hasConsent(userId, item.organization_id);
+                        if (!(hasConsent)) buttonText = '<button type="button" title="Consent Addition Confirmation" data-toggle="popover" data-trigger="' + triggerAction + '" orgId="' + item.organization_id + '" agreementUrl="' + item.agreement_url + '" class="btn btn-default btn-sm btn-add-consent"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>';
+                        else if (consentStatus == "active") buttonText = '<button type="button" title="Consent Deletion Confirmation" data-toggle="popover" data-trigger="' + triggerAction + '" orgId="' + item.organization_id + '" class="btn btn-default btn-sm btn-delete-consent"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>';
+                    };
 
-                    content += "<tr><td class='consentlist-cell'>" + (orgName != "" && orgName != undefined? orgName : item.organization_id) + "</td><td class='consentlist-cell' style='padding-left:1.2em'>" + sDisplay + "</td><td class='consentlist-cell'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></td><td class='consentlist-cell'>" + (item.signed).replace("T", " ") + "</td><td class='consentlist-cell'>" + (item.expires).replace("T", " ") + "</td></tr>";
+                    content += "<tr>";
+
+                    [ 
+                        {
+                            content: (editable ? buttonText: "n/a"),
+                            class: "text-center"
+                        }, 
+                        {
+                            content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
+                        },
+                        {
+                            content: sDisplay,
+                            class: "indent"
+                        }, 
+                        {
+                            content: "<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a>",
+                            class: "text-center"
+                        }, 
+                        {
+                            content: (item.signed).replace("T", " ")
+                        },  
+                        {
+                            content: (item.expires).replace("T", " ")
+                        }
+                    ].forEach(function(cell) {
+                        if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell.class? (" " + cell.class): "") + "' >" + cell.content + "</td>";
+                    });
+                    content += "</tr>";
+                    //content += "<tr><td class='consentlist-cell text-center'>" + buttonText + "</td><td class='consentlist-cell'>" + (orgName != "" && orgName != undefined? orgName : item.organization_id) + "</td><td class='consentlist-cell' style='padding-left:1.2em'>" + sDisplay + "</td><td class='consentlist-cell'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></td><td class='consentlist-cell'>" + (item.signed).replace("T", " ") + "</td><td class='consentlist-cell'>" + (item.expires).replace("T", " ") + "</td></tr>";
                 };
             });
             content += "</table>";
+            
             $("#profileConsentList").html(content);
-        } else $("#profileConsentList").html("<p class='text-muted'>No consent found for this user.</p>");
+
+            if (editable) {
+                $("#profileConsentList .btn-delete-consent").each(function() {
+                    $(this).popover({
+                        html: true,
+                        placement: "right",
+                        container: "body",
+                        content: "Are you sure you want to remove consent between the patient and this organization?<br/><br/><button type='button' onclick='event.preventDefault(); event.stopPropagation(); tnthAjax.deleteConsent(" + userId + ", {org:" + $(this).attr("orgId") + "}); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\"); reloadConsentList();' class='btn-default btn-delete-consent-yes'>Yes</button>&nbsp;&nbsp;<button type='button' class='btn-default btn-consent-cancel' onclick='event.preventDefault(); event.stopPropagation(); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\");'>No</button>"
+                    });
+                });
+                $("#profileConsentList .btn-add-consent").each(function() {
+                    $(this).popover({
+                        html: true,
+                        placement: "right",
+                        container: "body",
+                        content: "Are you sure you want to reinstate consent between the patient and this organization?<br/><br/><button type='button' onclick='event.preventDefault(); event.stopPropagation(); tnthAjax.setConsent(" + userId + ", {org:" + $(this).attr("orgId") + ", agreementUrl:\"" + $(this).attr("agreementUrl") + "\"}); reloadConsentList();' class='btn-default btn-add-consent-yes'>Yes</button>&nbsp;&nbsp;<button type='button' class='btn-default btn-consent-cancel' onclick='event.preventDefault(); event.stopPropagation(); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\");'>No</button>"
+                    });
+                });
+
+                 $('body').on('click', '.btn-consent-cancel', function() {
+                        $(this).parents("div.popover").trigger('click');
+                 });
+            };
+
+        } else $("#profileConsentList").html(errorMessage ? ("<p class='text-danger' style='font-size:0.9em'>" + errorMessage + "<br/>No consent available for this user.</p>") : "<p class='text-muted'>No consent found for this user.</p>");
         $("#profileConsentList").animate({opacity: 1});
     },
     "proceduresContent": function(data,newEntry) {
@@ -690,13 +755,12 @@ var tnthAjax = {
 
                                 };
                             });
-                            
+
                         };
                     };
 
-
                     //if ($("#createProfileForm").length == 0) {
-                        $("#userOrgs").find(".help-block").text("");
+                        $("#userOrgs").find("div.help-block").html("");
                         getSaveLoaderDiv("profileForm", "userOrgs");
                         $(this).attr("save-container-id", "userOrgs");
                         assembleContent.demo(userId,true, $(this), true);
@@ -736,12 +800,12 @@ var tnthAjax = {
                     };
                 });
             };
-           fillContent.consentList(data);
+           fillContent.consentList(data, userId);
            loader();
            return true;
-        }).fail(function() {
+        }).fail(function(xhr) {
             console.log("Problem retrieving data from server.");
-            fillContent.consentList(null);
+            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""));
             loader();
             return false;
         });

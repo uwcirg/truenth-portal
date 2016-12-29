@@ -407,11 +407,12 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profileConsent(person) -%}
+{% macro profileConsent(person, current_user) -%}
     {% if person %}
     <div id="profileConsentList"></div>
     <script>
-        /**** this function can be used when this section becomes editable ****/
+        var consentEditable = {% if current_user.has_role('provider') or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
             var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
             $("#profileConsentList").animate({opacity: 0}, function() {
@@ -1003,7 +1004,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title">{{ _("Consent History") }}</h4>
-                    {{profileConsent(person)}}
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>

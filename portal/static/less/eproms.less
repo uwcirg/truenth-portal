@@ -1170,16 +1170,28 @@ color: #777
   font-size: 0.95em;
   max-width: 100%;
   padding: 0.1em;
+  a {
+    text-decoration:underline;
+  }
+  a:hover {
+    color: #3c763d;
+  }
   .consentlist-header {
     background-color: @rowBackgroundColor;
     color: #FFF;
     font-weight: normal;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+    padding-left: 0.6em;
+    padding-right: 0.6em;
   }
   .consentlist-cell{
     background-color: #fbf9f9;
   }
+}
+
+.btn-delete-consent, .btn-add-consent {
+  color: #79815d;
+  font-size: 0.9em;
+  font-weight: bold;
 }
 
 #identityVerificationContainer {
@@ -1309,7 +1321,7 @@ div.input-group.date {
     font-size: 0.7em;
   }
   #profileConsentList {
-    font-size: 0.7em
+    font-size: 0.6em
   }
   .create-account-container {
     padding: 3.5em 3em;
