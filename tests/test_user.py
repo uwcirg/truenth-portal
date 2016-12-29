@@ -612,6 +612,8 @@ class TestUser(TestCase):
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
+            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a')
+            other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
             user.merge_with(other.id)
@@ -622,3 +624,4 @@ class TestUser(TestCase):
             self.assertEquals(user.gender, 'male')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
+            self.assertTrue(user.deceased)

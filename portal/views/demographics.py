@@ -26,6 +26,9 @@ def demographics(patient_id):
     list.  This includes 'race' and 'ethnicity'.  See example usage
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
+    A deceased patient will include ONE of 'deceasedBoolean' or
+    'deceasedDateTime' - preferring deceasedDateTime if it is known.
+
     At some point this may be extended to return a more role specific FHIR
     resource.  At this time, all users, regardless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's roles.
@@ -90,6 +93,9 @@ def demographics_set(patient_id):
     To link a patient with a clinic, use the 'careProvider' entity.  The
     clinic must already be a registered organization.  See the
     [organization endpoints](/dist/#!/Organization).
+
+    For deceased patients, include ONE of 'deceasedBoolean' or
+    'deceasedDateTime' - preferring deceasedDateTime if it is known.
 
     At some point this may be extended to consume a more role specific FHIR
     resource.  At this time, all users, regarless of role, work with the

@@ -24,6 +24,7 @@ class TestDemographics(TestCase):
         tz = [ext for ext in fhir['extension'] if
               ext['url'].endswith('timezone')]
         self.assertEquals('UTC', tz[0]['timezone'])
+        self.assertEquals(False, fhir['deceasedBoolean'])
 
     def test_demographics404(self):
         self.login()
@@ -43,10 +44,12 @@ class TestDemographics(TestCase):
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
+        dod = '2027-12-31T09:10:00'
         gender = 'Male'
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "birthDate": dob,
+                "deceasedDateTime": dod,
                 "gender": gender,
                 "telecom": [{
                     "system": "phone",
@@ -79,6 +82,7 @@ class TestDemographics(TestCase):
 
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['birthDate'], dob)
+        self.assertEquals(fhir['deceasedDateTime'], dod)
         self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)

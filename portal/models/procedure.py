@@ -66,11 +66,14 @@ class Procedure(db.Model):
         p = cls(audit=audit)
         p.user_id = Reference.parse(data['subject']).id
         if 'performedDateTime' in data:
-            p.start_time = FHIR_datetime.parse(data['performedDateTime'])
+            p.start_time = FHIR_datetime.parse(
+                data['performedDateTime'], error_subject='performedDateTime')
         else:
             period = data['performedPeriod']
-            p.start_time = FHIR_datetime.parse(period['start'])
-            p.end_time = FHIR_datetime.parse(period['end'])
+            p.start_time = FHIR_datetime.parse(
+                period['start'], error_subject='performedPeriod.start')
+            p.end_time = FHIR_datetime.parse(
+                period['end'], error_subject='performedPeriod.end')
         p.code = CodeableConcept.from_fhir(data['code'])
         return p
 
