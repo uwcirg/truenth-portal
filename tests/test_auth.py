@@ -157,3 +157,30 @@ class TestAuth(TestCase):
         self.assertRaises(RoleError, add_role, service_user,
                           ROLE.APPLICATION_DEVELOPER)
         self.assertEquals(len(service_user.roles), 1)
+
+    def test_token_status(self):
+        with SessionScope(db):
+            client = Client(
+                client_id='test-id', client_secret='test-secret',
+                user_id=TEST_USER_ID)
+            token = Token(
+                access_token='test-token', client=client, user_id=TEST_USER_ID,
+                token_type='bearer',
+                expires=(datetime.datetime.utcnow() +
+                         datetime.timedelta(seconds=30)))
+            db.session.add(client)
+            db.session.add(token)
+            db.session.commit()
+
+        token = db.session.merge(token)
+        rv = self.app.get(
+            "/oauth/token-status",
+            headers={'Authorization': 'Bearer {}'.format(token.access_token)})
+        self.assert200(rv)
+        data = rv.json
+        self.assertAlmostEquals(30, data['expires_in'], delta=5)
+
+    def test_token_status_wo_header(self):
+        """Call for token_status w/o token should return 401"""
+        rv = self.app.get("/oauth/token-status")
+        self.assert401(rv)
