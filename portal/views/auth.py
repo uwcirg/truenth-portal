@@ -764,7 +764,10 @@ def token_status():
               description: The authorized scopes.
 
     """
-    token_type, access_token = request.headers.get('Authorization').split()
+    authorization = request.headers.get('Authorization')
+    if not authorization:
+        abort(401, "Authorization header required")
+    token_type, access_token = authorization.split()
     token = Token.query.filter_by(access_token=access_token).first()
     if not token:
         abort(404, "token not found")
