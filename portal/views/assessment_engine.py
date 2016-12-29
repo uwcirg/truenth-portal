@@ -1134,9 +1134,9 @@ def present_assessment(instruments=None):
             )
         )
 
-    assessment_url = "%s/surveys/new_session?project=%s" % (
-        INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        ",".join(queued_instruments),
+    assessment_url = "{AE_URL}/surveys/new_session?project={instruments}".format(
+        AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
+        instruments=",".join(queued_instruments),
     )
 
     if 'next' in request.args:
