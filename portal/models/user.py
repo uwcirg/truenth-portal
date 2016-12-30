@@ -659,14 +659,14 @@ class User(db.Model, UserMixin):
                             comment=("Remove existing deceased from "
                                      "user {}".format(self.id)))
                         db.session.add(audit)
-                    else:
-                        # still marked with an audit, but without the special
-                        # comment syntax and using default (current) time.
-                        audit = Audit(
-                            user_id=current_user().id,
-                            comment=("Marking user {} as "
-                                     "deceased".format(self.id)))
-                        self.deceased = audit
+                else:
+                    # still marked with an audit, but without the special
+                    # comment syntax and using default (current) time.
+                    audit = Audit(
+                        user_id=current_user().id,
+                        comment=("Marking user {} as "
+                                 "deceased".format(self.id)))
+                    self.deceased = audit
 
         if 'name' in fhir:
             self.first_name = v_or_n(

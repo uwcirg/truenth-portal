@@ -141,8 +141,30 @@ var fillContent = {
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
             // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
-            $("#patBiopsy").fadeIn();
+            //$("#patBiopsy").fadeIn();
+        };
+        if (data.deceasedDateTime) {
+            if(hasValue(data.deceasedDateTime)) {
+                var dArray = (data.deceasedDateTime.split("T"))[0].split("-");
+                $("#deathYear").val(dArray[0]);
+                $("#deathMonth").val(dArray[1]);
+                $("#deathDay").val(dArray[2]);
+                $("#deathDate").val(dArray[0] + "-" + dArray[1] + "-" + dArray[2]);
+                $("#boolDeath").prop("checked", true);
+            } else {
+                $("#deathYear").val("");
+                $("#deathMonth").val("");
+                $("#deathDay").val("");
+                $("#deathDate").val("");
+                $("#boolDeath").prop("checked", false);
+            };
         }
+
+        if (data.deceasedBoolean) {
+            if (String(data.deceasedBoolean).toLowerCase() == "true") {
+                $("#boolDeath").prop("checked", true);
+            } else $("#boolDeath").prop("checked", false);
+        };
         // TODO - add email and phone for profile page use
         // Only on profile page
         this.ethnicity(data);
@@ -255,7 +277,7 @@ var fillContent = {
             [(editable ? '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>' : "n/a"), 'Organization', 'Consented', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
             });
-            
+
             dataArray.forEach(function(item) {
                 if (!(/null/.test(item.agreement_url))) {
                     //var orgName = $("#fillOrgs input[name='organization'][parent_org='true'][value='" + item.organization_id + "']").attr("org_name");
@@ -287,25 +309,25 @@ var fillContent = {
 
                     content += "<tr>";
 
-                    [ 
+                    [
                         {
                             content: (editable ? buttonText: "n/a"),
                             class: "text-center"
-                        }, 
+                        },
                         {
                             content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
                         },
                         {
                             content: sDisplay,
                             class: "indent"
-                        }, 
+                        },
                         {
                             content: "<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a>",
                             class: "text-center"
-                        }, 
+                        },
                         {
                             content: (item.signed).replace("T", " ")
-                        },  
+                        },
                         {
                             content: (item.expires).replace("T", " ")
                         }
@@ -317,7 +339,7 @@ var fillContent = {
                 };
             });
             content += "</table>";
-            
+
             $("#profileConsentList").html(content);
 
             if (editable) {
@@ -480,7 +502,17 @@ var assembleContent = {
             if (orgIDs) demoArray["careProvider"] = orgIDs;
         };
 
+        if (hasValue($("#deathDate").val())) {
+            demoArray["deceasedDateTime"] = $("#deathDate").val();
+        };
 
+        if (!hasValue($("#deathDate").val())) {
+            if ($("#boolDeath").length > 0) {
+                if ($("#boolDeath").prop("checked")) {
+                    demoArray["deceasedBoolean"] = true;
+                } else demoArray["deceasedBoolean"] = false;
+            };
+        };
 
         if (onProfile) {
            // console.log(demoArray["careProvider"]);
@@ -1241,7 +1273,7 @@ $(document).ready(function() {
                         // Set date if YYYY-MM-DD
                         $("#birthday").val(y+"-"+m+"-"+d);
                         // If we are on initial-queries, then we'll want to display the patientQ div
-                        $("#patientQ, #patBiopsy").fadeIn();
+                        //$("#patientQ, #patBiopsy").fadeIn();
                     } else {
                         $("#errorbirthday").html(errorMsg).show();
                         $("#birthday").val("");
