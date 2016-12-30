@@ -13,5 +13,22 @@ override_dh_virtualenv:
 
 	dh_virtualenv $(DH_VIRTUALENV_ARGS)
 
+override_dh_builddeb:
+# Manually fix paths erroneously pointing to build environment
+# Todo: move to more appropriate step
+
+	find \
+		debian/portal/opt/venvs/portal/lib/ \
+		-name easy-install.pth \
+		-exec \
+			sed \
+				--in-place \
+				--expression 's|$(PWD)/debian/portal/opt/venvs/|/opt/venvs/|g' \
+				{} \; \
+		-print
+
+	dh_builddeb
+
+
 %:
 	dh $@ --with python-virtualenv
