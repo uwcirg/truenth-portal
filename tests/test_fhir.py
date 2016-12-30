@@ -109,7 +109,7 @@ class TestFHIR(TestCase):
         db.session.add(qr)
         db.session.commit()
         qr_str = "test format: {}".format(qr)
-        self.assertIn(str(qr.user_id), qr_str)
+        self.assertIn(str(qr.subject_id), qr_str)
         self.assertIn(str(qr.status), qr_str)
 
     def test_tz_aware_conversion(self):
