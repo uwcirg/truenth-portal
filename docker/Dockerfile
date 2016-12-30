@@ -36,10 +36,11 @@ RUN set -ex && \
         chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
     done
 
-
+ENV PROJECT_DIR /opt/venvs/portal/
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
 RUN a2ensite portal
+
 
 EXPOSE 80
 
