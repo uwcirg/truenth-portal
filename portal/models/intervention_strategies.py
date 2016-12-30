@@ -158,7 +158,7 @@ def most_recent_survey(user):
     QuestionnaireResponse, else None
     """
     qr = QuestionnaireResponse.query.filter(and_(
-        QuestionnaireResponse.user_id == user.id,
+        QuestionnaireResponse.subject_id == user.id,
         QuestionnaireResponse.status == 'completed')).order_by(
             QuestionnaireResponse.authored).limit(
                 1).with_entities(QuestionnaireResponse.authored).first()

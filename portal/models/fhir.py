@@ -426,7 +426,7 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'))
+    subject_id = db.Column(db.ForeignKey('users.id'))
     document = db.Column(JSONB)
 
     # Fields derived from document content
@@ -446,7 +446,7 @@ class QuestionnaireResponse(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "QuestionnaireResponse {0.id} for user {0.user_id} "\
+        return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
 

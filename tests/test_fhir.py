@@ -102,7 +102,7 @@ class TestFHIR(TestCase):
 
     def test_qr_format(self):
         qr = QuestionnaireResponse(
-            user_id=TEST_USER_ID,
+            subject_id=TEST_USER_ID,
             status='in-progress',
             authored=datetime.utcnow(),
         )

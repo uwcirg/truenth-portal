@@ -329,7 +329,7 @@ class TestIntervention(TestCase):
         # Add a fake assessment and see a change
         with SessionScope(db):
             questionnaire_response = QuestionnaireResponse(
-                user_id=user.id,
+                subject_id=user.id,
                 authored='2007-01-10 16:19:23',
                 status='completed',
             )
