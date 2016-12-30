@@ -328,10 +328,12 @@ class TestIntervention(TestCase):
 
         # Add a fake assessment and see a change
         with SessionScope(db):
-            a = QuestionnaireResponse(
-                user_id=user.id, authored='2007-01-10 16:19:23',
-                status='completed')
-            db.session.add(a)
+            questionnaire_response = QuestionnaireResponse(
+                user_id=user.id,
+                authored='2007-01-10 16:19:23',
+                status='completed',
+            )
+            db.session.add(questionnaire_response)
             db.session.commit()
 
         user, ae = map(db.session.merge, (self.test_user, ae))

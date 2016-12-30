@@ -101,9 +101,11 @@ class TestFHIR(TestCase):
         self.assertIn(c2.display, cc_str)
 
     def test_qr_format(self):
-        qr = QuestionnaireResponse(user_id=TEST_USER_ID,
-                                   status='in-progress',
-                                   authored=datetime.utcnow())
+        qr = QuestionnaireResponse(
+            user_id=TEST_USER_ID,
+            status='in-progress',
+            authored=datetime.utcnow(),
+        )
         db.session.add(qr)
         db.session.commit()
         qr_str = "test format: {}".format(qr)
