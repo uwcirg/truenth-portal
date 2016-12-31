@@ -562,7 +562,7 @@ def assessment(patient_id, instrument_id):
     patient = get_user(patient_id)
     if patient.deleted:
         abort(400, "deleted user - operation not permitted")
-    questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter_by(subject_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
 
     if instrument_id is not None:
         questionnaire_responses = questionnaire_responses.filter(
@@ -1057,7 +1057,7 @@ def assessment_set(patient_id):
     })
 
     questionnaire_response = QuestionnaireResponse(
-        user_id=patient_id,
+        subject_id=patient_id,
         document=request.json,
     )
 
@@ -1101,6 +1101,11 @@ def present_assessment(instruments=None):
         required: true
         type: string
         format: url
+      - name: subject_id
+        in: query
+        description: User ID to Collect QuestionnaireResponses as
+        required: false
+        type: integer
     responses:
       303:
         description: successful operation
@@ -1134,9 +1139,12 @@ def present_assessment(instruments=None):
             )
         )
 
-    assessment_url = "%s/surveys/new_session?project=%s" % (
-        INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        ",".join(queued_instruments),
+    assessment_url = "{AE_URL}/surveys/new_session?{subject}project={instruments}".format(
+        AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
+        subject="subject_id=%s&" % (
+            request.args.get("subject_id") if "subject_id" in request.args else "",
+        ),
+        instruments=",".join(queued_instruments),
     )
 
     if 'next' in request.args:

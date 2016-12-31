@@ -620,6 +620,7 @@
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
             <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small>( {{ _("GMT Time Zone") }} )</small></th></tr>
         </table>
+        <div id="profileSessionListError" style="color: #a94442"></div>
     </div>
     <script>
         $(function () {
@@ -656,12 +657,14 @@
                         };
                     });
                         $("#userSessionListTable").append(sessionListHTML);
+                        $("#userSessionListTable").show();
 
                 } else $("#profileSessionListMainContainer").hide();
 
             }).fail(function() {
                 console.log("Problem retrieving session data from server.");
-                $("profileSessionListMainContainer").hide();
+                $("#userSessionListTable").hide();
+                $("#profileSessionListError").html("Problem retrieving session data from server.");
             });
 
     });
