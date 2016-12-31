@@ -78,10 +78,11 @@
           </div>
           <div class="modal-body" style="font-size:0.8em">
             <br/>
-            <p class="text-left">{{ _("Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
+            <p class="text-left">{{ _("This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
             <br/>
           </div>
           <div class="modal-footer">
+             <a href="/api/present-assessment?instrument_id=epic26&amp;subject_id={{user.id}}" class="btn btn-default" style="font-size:0.7em">{{ _("Continue") }}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
           </div>
         </div>
