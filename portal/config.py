@@ -8,7 +8,7 @@ class BaseConfig(object):
     ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
     CELERY_IMPORTS = ('portal.tasks', )
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     LOG_FOLDER = os.environ.get(
