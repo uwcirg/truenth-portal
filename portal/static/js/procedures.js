@@ -107,7 +107,20 @@ $(document).ready(function() {
         var errorColor = "#a94442";
         var validColor = "#777";
 
-        if (dTest && mTest && yTest) {
+        if (dTest && mTest && yTest) {  
+
+            var date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+            var today = new Date();
+            //console.log("dy: " + date.getFullYear() + " y: " + parseInt(y) + " dm: " + (date.getMonth() + 1) + " m: " + parseInt(m) + " dd: " + date.getDate() + " d: " + parseInt(d))
+            if (date.getFullYear() == parseInt(y) && ((date.getMonth() + 1) == parseInt(m)) && date.getDate() == parseInt(d)) {
+                if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                    deField.text("The procedure date must be in the past.").css("color", errorColor);
+                    return false;
+                };
+            } else {
+                deField.text(errorText).css("color", errorColor);
+                return false;
+            };
 
             if (parseInt(m) === 2) { //month of February
                 if (isLeapYear(parseInt(y))) {
