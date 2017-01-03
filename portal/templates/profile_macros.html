@@ -883,6 +883,115 @@
     </div>
 {%- endmacro %}
 
+{% macro profileDeceased(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container">
+                <h4 id="deathLoc" class="profile-item-title">{{ _("Deceased Status") }}</h4>
+                <br/>
+                <input type="hidden" id="deathDate" value="" />
+                <div class="checkbox" id="boolDeathGroup">
+                    <label>
+                        <input type="checkbox" name="boolDeath" id="boolDeath" value="1" save-container-id="boolDeathGroup">{{ _("Has the patient passed away?") }}
+                    </label>
+                </div>
+                <hr/>
+                <div class="form-group">
+                    <label class="text-muted">{{ _("Deceased Date") }}</label>
+                </div>
+                <div class="row" style="margin-top:-8px">
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group profile-section">
+                            <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDay" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                             <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-10">
+                        <div class="form-group profile-section">
+                            <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonth" required>
+                                <option value="">{{ _("Month") }}...</option>
+                                <option value="01">{{ _("January") }}</option>
+                                <option value="02">{{ _("February") }}</option>
+                                <option value="03">{{ _("March") }}</option>
+                                <option value="04">{{ _("April") }}</option>
+                                <option value="05">{{ _("May") }}</option>
+                                <option value="06">{{ _("June") }}</option>
+                                <option value="07">{{ _("July") }}</option>
+                                <option value="08">{{ _("August") }}</option>
+                                <option value="09">{{ _("September") }}</option>
+                                <option value="10">{{ _("October") }}</option>
+                                <option value="11">{{ _("November") }}</option>
+                                <option value="12">{{ _("December") }}</option>
+                            </select>
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group profile-section">
+                            <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYear" required />
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="errorDeathDate" style="color:#a94442"><div>
+                <br/>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(
+            function() {
+                getSaveLoaderDiv("profileForm", "boolDeathGroup");
+                $("#boolDeath").on("change", function() {
+                    if (!($(this).is(":checked"))) {
+                        $("#deathYear").val("");
+                        $("#deathDay").val("");
+                        $("#deathMonth").val("");
+                        $("#deathDate").val("");
+                    }
+                    assembleContent.demo({{person.id}}, true, $(this));
+                });
+
+                ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
+                    getSaveLoaderDiv("profileForm", fn);
+                    var fd = $("#" + fn);
+                    var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
+                    fd.on(triggerEvent, function() {
+                         var d = $("#deathDay");
+                         var m = $("#deathMonth");
+                         var y = $("#deathYear");
+                         if (d.val() != "" && m.val() != "" && y.val() != "") {
+                            if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                                var today = new Date();
+                                // Check to see if this is a real date
+                                var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
+                                var date = new Date(iy,im-1,iid);
+                                var errorMsg = "";
+
+                                if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                                    if (iy < 1900) errorMsg = "Year must be after 1900";
+                                    // Only allow if birthdate is before today
+                                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                                        errorMsg = "The date must not be in the future.";
+                                    };
+                                } else errorMsg = "Invalid Date. Please enter a valid date.";
+
+                                if (errorMsg == "") {
+                                    $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                                    $("#boolDeath").prop("checked", true);
+                                    $("#errorDeathDate").text("");
+                                    assembleContent.demo({{person.id}}, true, $(this));
+                                } else {
+                                    $("#errorDeathDate").text(errorMsg);
+                                };
+                            };
+                        };
+                    });
+                });
+            }
+        );
+    </script>
+{%- endmacro %}
 {% macro profile(person, current_user, consent_agreements) -%}
 
     {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
@@ -1037,6 +1146,9 @@
                 </div>
             </div>
         </div>
+    {% endif %}
+    {% if (person and current_user) and person.has_role('patient') and current_user.has_role('provider') %}
+        {{profileDeceased(person, current_user)}}
     {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
