@@ -105,7 +105,7 @@
 {% macro profileGender(person) -%}
     <div class="form-group profile-section" id="genderGroup">
         <label id="genderLabel">{{ _("Gender") }}</label>
-        <div class="profile-radio-list">
+        <div id="profile-gender-list" class="profile-radio-list">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
@@ -410,6 +410,7 @@
 {% macro profileConsent(person, current_user) -%}
     {% if person %}
     <div id="profileConsentList"></div>
+    <!--<a id="consentBackLink" style="visibility:hidden" href="/patients"></a>-->
     <script>
         var consentEditable = {% if current_user.has_role('provider') or current_user.has_role('admin') %}true{% else %}false{% endif %};
         /**** this function is used when this section becomes editable ****/

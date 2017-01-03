@@ -116,11 +116,11 @@ transform(-1000px, 0);*/
   font-size: 1em;
   padding: 0.5em 0.8em;
   background: #fff;
-  background-image: -webkit-linear-gradient(top, #fff, #eee);
-  background-image: -moz-linear-gradient(top, #fff, #eee);
-  background-image: -ms-linear-gradient(top, #fff, #eee);
-  background-image: -o-linear-gradient(top, #fff, #eee);
-  background-image: linear-gradient(to bottom, #fff, #eee);
+  background-image: -webkit-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -moz-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -ms-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -o-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: linear-gradient(to bottom, #fff, #eee, #d4d4d4);
   -webkit-box-shadow: 1px 1px 1px 0px #777;
   -moz-box-shadow: 1px 1px 1px 0px #777;
   box-shadow: 1px 1px 1px 0px #777;
@@ -135,11 +135,11 @@ transform(-1000px, 0);*/
 #indexNavBar span.link {
   margin-left: 0.3em;
   background: #fff;
-  background-image: -webkit-linear-gradient(top, #fff, #eee);
-  background-image: -moz-linear-gradient(top, #fff, #eee);
-  background-image: -ms-linear-gradient(top, #fff, #eee);
-  background-image: -o-linear-gradient(top, #fff, #eee);
-  background-image: linear-gradient(to bottom, #fff, #eee);
+  background-image: -webkit-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -moz-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -ms-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: -o-linear-gradient(top, #fff, #eee, #d4d4d4);
+  background-image: linear-gradient(to bottom, #fff, #eee, #d4d4d4);
   -webkit-border-radius: 8;
   -moz-border-radius: 8;
   border-radius: 8px;
@@ -1183,7 +1183,7 @@ div.input-group.date {
   }
 
   #profileConsentList {
-    font-size: 0.6em;
+    font-size: 0.5em;
   }
 
   .create-account-container {
@@ -1229,6 +1229,9 @@ div.input-group.date {
   }
   #userSessionReportDetailHeader span.glyphicon-user {
     padding: 0.4em;
+  }
+  button.btn-delete-consent {
+    padding: 2px;
   }
 }
 @media (max-width: 730) {
