@@ -587,6 +587,91 @@ def assessment(patient_id, instrument_id):
 
     return jsonify(bundle)
 
+@assessment_engine_api.route('/patient/assessments')
+def get_assessments():
+    """
+    Return multiple patient's responses to all questionnaires
+
+
+    ---
+    operationId: getQuestionnaireResponses
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: assessments_bundle
+          required:
+            - type
+          properties:
+            type:
+                description:
+                  Indicates the purpose of this bundle- how it was
+                  intended to be used.
+                type: string
+                enum:
+                  - document
+                  - message
+                  - transaction
+                  - transaction-response
+                  - batch
+                  - batch-response
+                  - history
+                  - searchset
+                  - collection
+            link:
+              description:
+                A series of links that provide context to this bundle.
+              items:
+                properties:
+                  relation:
+                    description:
+                      A name which details the functional use for
+                      this link - see [[http://www.iana.org/assignments/link-relations/link-relations.xhtml]].
+                  url:
+                    description: The reference details for the link.
+            total:
+                description:
+                  If a set of search matches, this is the total number of
+                  matches for the search (as opposed to the number of
+                  results in this bundle).
+                type: integer
+            entry:
+              type: array
+              items:
+                $ref: "#/definitions/FHIRPatient"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+
+    annotated_questionnaire_responses = []
+    questionnaire_responses = QuestionnaireResponse.query.all()
+
+    for questionnaire_response in questionnaire_responses:
+        subject = questionnaire_response.subject
+        questionnaire_response.document["subject"] = subject.as_fhir()
+
+        annotated_questionnaire_responses.append(questionnaire_response.document)
+
+    bundle = {
+        'resourceType':'Bundle',
+        'updated':FHIR_datetime.now(),
+        'total':len(annotated_questionnaire_responses),
+        'type': 'searchset',
+        'link': {
+            'rel':'self',
+            'href':request.url,
+        },
+        'entry':annotated_questionnaire_responses,
+    }
+
+    return jsonify(bundle)
 
 @assessment_engine_api.route('/patient/<int:patient_id>/assessment',
                              methods=('POST', 'PUT'))
