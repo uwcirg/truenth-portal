@@ -22,7 +22,8 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..extensions import db
-from .fhir import CC, Coding, CodeableConcept, QuestionnaireResponse
+from .fhir import CC, Coding, CodeableConcept
+from .fhir import localized_PCa, most_recent_survey
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .procedure_codes import known_treatment_started
@@ -140,29 +141,6 @@ def allow_if_not_in_intervention(intervention_name):
             return True
 
     return user_not_in_intervention
-
-
-def localized_PCa(user):
-    """Look up user's value for localized PCa"""
-    codeable_concept = CC.PCaLocalized
-    value_quantities = user.fetch_values_for_concept(codeable_concept)
-    if value_quantities:
-        assert len(value_quantities) == 1
-        return value_quantities[0].value == 'true'
-    return False
-
-def most_recent_survey(user):
-    """Look up timestamp for most recently completed QuestionnaireResponse
-
-    Returns authored (timestamp) of the most recent
-    QuestionnaireResponse, else None
-    """
-    qr = QuestionnaireResponse.query.filter(and_(
-        QuestionnaireResponse.subject_id == user.id,
-        QuestionnaireResponse.status == 'completed')).order_by(
-            QuestionnaireResponse.authored).limit(
-                1).with_entities(QuestionnaireResponse.authored).first()
-    return qr[0] if qr else None
 
 
 def update_card_html_on_completion():
