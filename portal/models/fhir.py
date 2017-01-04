@@ -4,7 +4,7 @@ import dateutil
 from flask import abort, current_app
 import json
 import pytz
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
@@ -526,3 +526,27 @@ def add_static_concepts(only_quick=False):
 
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate
+
+
+def localized_PCa(user):
+    """Look up user's value for localized PCa"""
+    codeable_concept = CC.PCaLocalized
+    value_quantities = user.fetch_values_for_concept(codeable_concept)
+    if value_quantities:
+        assert len(value_quantities) == 1
+        return value_quantities[0].value == 'true'
+    return False
+
+
+def most_recent_survey(user):
+    """Look up timestamp for most recently completed QuestionnaireResponse
+
+    Returns authored (timestamp) of the most recent
+    QuestionnaireResponse, else None
+    """
+    qr = QuestionnaireResponse.query.filter(and_(
+        QuestionnaireResponse.subject_id == user.id,
+        QuestionnaireResponse.status == 'completed')).order_by(
+            QuestionnaireResponse.authored).limit(
+                1).with_entities(QuestionnaireResponse.authored).first()
+    return qr[0] if qr else None
