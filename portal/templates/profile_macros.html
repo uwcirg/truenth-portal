@@ -249,13 +249,14 @@
 
 
 {% macro profileSendEmail(person) -%}
+    {% if person %}
     <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
         <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
             <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
             <label>{{ _("Send Email to Patient") }}</label>
             <select  id="profileEmailSelect" class="form-control bd-element">
                 <option value="">{{ _("Select Email...") }}</option>
-                <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
+                {% if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{% endif %}
                 <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
             </select>
             <button id="btnProfileSendEmail" class="btn btn-lg btn-tnth-primary disabled">{{ _("Send Email") }}</button>
@@ -349,6 +350,7 @@
 
 
      });</script>
+     {% endif %}
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
