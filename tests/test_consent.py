@@ -1,4 +1,5 @@
 """Unit test module for user consent"""
+from dateutil import parser
 from flask_webtest import SessionScope
 import json
 
@@ -43,6 +44,24 @@ class TestUserConsent(TestCase):
         self.assertEqual(self.test_user.valid_consents.count(), 1)
         self.assertEqual(self.test_user.valid_consents[0].organization_id,
                          org1.id)
+
+    def test_post_user_consent_dates(self):
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        acceptance_date = "2007-10-30"
+        data = {'organization_id': org1.id,
+                'agreement_url': self.url,
+                'acceptance_date': acceptance_date}
+
+        self.login()
+        rv = self.app.post('/api/user/{}/consent'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert200(rv)
+        self.assertEqual(self.test_user.valid_consents.count(), 1)
+        self.assertEqual(self.test_user.valid_consents[0].organization_id,
+                         org1.id)
+        self.assertEqual(self.test_user.valid_consents[0].audit.timestamp,
+                         parser.parse(acceptance_date))
 
     def test_delete_user_consent(self):
         org1, org2 = [org for org in Organization.query.filter(
