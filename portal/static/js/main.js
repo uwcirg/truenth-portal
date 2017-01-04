@@ -254,7 +254,7 @@ var fillContent = {
             $("#terms").fadeIn();
         };
     },
-    "consentList" : function(data, userId, errorMessage) {
+    "consentList" : function(data, userId, errorMessage, errorCode) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
             var dataArray = data["consent_agreements"].reverse();
             var orgs = {};
@@ -273,7 +273,7 @@ var fillContent = {
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-            var content = "<table class='table table-bordered table-hover table-condensed table-responsive' style='max-width:100%'>";
+            var content = "<table class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             [(editable ? '<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>' : "n/a"), 'Organization', 'Consented', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
             });
@@ -304,7 +304,7 @@ var fillContent = {
                         var triggerAction = (/chrome/i.test( navigator.userAgent )) ? "focus": "focus click";
                         hasConsent = tnthAjax.hasConsent(userId, item.organization_id);
                         if (!(hasConsent)) buttonText = '<button type="button" title="Consent Addition Confirmation" data-toggle="popover" data-trigger="' + triggerAction + '" orgId="' + item.organization_id + '" agreementUrl="' + item.agreement_url + '" class="btn btn-default btn-sm btn-add-consent"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span></button>';
-                        else if (consentStatus == "active") buttonText = '<button type="button" title="Consent Deletion Confirmation" data-toggle="popover" data-trigger="' + triggerAction + '" orgId="' + item.organization_id + '" class="btn btn-default btn-sm btn-delete-consent"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>';
+                        else if (consentStatus == "active") buttonText = '<button type="button" title="Consent Deletion Confirmation" data-toggle="popover" data-trigger="' + triggerAction + '" orgId="' + item.organization_id + '" class="btn btn-default btn-sm btn-delete-consent">withdraw</button>';
                     };
 
                     content += "<tr>";
@@ -348,7 +348,7 @@ var fillContent = {
                         html: true,
                         placement: "right",
                         container: "body",
-                        content: "Are you sure you want to remove consent between the patient and this organization?<br/><br/><button type='button' onclick='event.preventDefault(); event.stopPropagation(); tnthAjax.deleteConsent(" + userId + ", {org:" + $(this).attr("orgId") + "}); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\"); reloadConsentList();' class='btn-default btn-delete-consent-yes'>Yes</button>&nbsp;&nbsp;<button type='button' class='btn-default btn-consent-cancel' onclick='event.preventDefault(); event.stopPropagation(); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\");'>No</button>"
+                        content: "Are you sure you want to remove consent between the patient and this organization?<br/><br/><p class='text-danger'>You will not be able to view/edit this patient's record if you decide to proceed.</p><br/><button type='button' onclick='event.preventDefault(); event.stopPropagation(); tnthAjax.deleteConsent(" + userId + ", {org:" + $(this).attr("orgId") + "}); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\"); reloadConsentList();' class='btn-default btn-delete-consent-yes'>Yes</button>&nbsp;&nbsp;<button type='button' class='btn-default btn-consent-cancel' onclick='event.preventDefault(); event.stopPropagation(); $(\"#profileConsentList .btn-delete-consent\").popover(\"hide\");'>No</button>"
                     });
                 });
                 $("#profileConsentList .btn-add-consent").each(function() {
@@ -365,7 +365,19 @@ var fillContent = {
                  });
             };
 
-        } else $("#profileConsentList").html(errorMessage ? ("<p class='text-danger' style='font-size:0.9em'>" + errorMessage + "<br/>No consent available for this user.</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+        } else {
+            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger' style='font-size:0.9em'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+            if (parseInt(errorCode) == 401) {
+                var msg = " You do not have permission to edit this patient record.";
+                //if ($("#consentBackLink").length > 0) {
+                    //msg += "<br/>Redirecting...";
+               // };
+                $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
+                //if ($("#consentBackLink").length > 0) {
+                    //setTimeout('$("#consentBackLink")[0].click();', 2000);
+                //};
+            }
+        };
         $("#profileConsentList").animate({opacity: 1});
     },
     "proceduresContent": function(data,newEntry) {
@@ -837,7 +849,7 @@ var tnthAjax = {
            return true;
         }).fail(function(xhr) {
             console.log("Problem retrieving data from server.");
-            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""));
+            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
             loader();
             return false;
         });
@@ -1294,6 +1306,7 @@ $(document).ready(function() {
                     $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
                 }
+                //console.log("good Date: " + goodDate)
                 if (goodDate) {
                     $("#errorbirthday").html("").hide();
                     return true;
