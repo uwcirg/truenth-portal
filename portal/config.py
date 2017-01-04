@@ -38,6 +38,10 @@ class BaseConfig(object):
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
+    SESSION_REDIS = os.environ.get(
+        'SESSION_REDIS',
+        None
+    )
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
