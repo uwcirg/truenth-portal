@@ -75,10 +75,10 @@
             <label>{{ _("Birth Date") }}</label>
             <div class="row">
               <div class="col-md-3 col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" pattern="\d[\d]?" data-error="The birth day field is required and must be valid format" required />
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="The birth day field is required and must be valid format" required />
               </div>
               <div class="col-md-3 col-xs-4">
-                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-birthday="true" data-error="-- A birth month must be selected" required>
+                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="-- A birth month must be selected" required>
                   <option value="">{{ _("Month") }}...</option>
                   <option value="01">{{ _("January") }}</option>
                   <option value="02">{{ _("February") }}</option>
@@ -95,20 +95,15 @@
                 </select>
               </div>
               <div class="col-md-3 col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-birthday="true" data-error="The birth year is required and must be in valid format" required />
+                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="The birth year is required and must be in valid format" required />
               </div>
             </div>
             <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>
-            <span id="errorbirthday" class="help-block tnth-hide" style="margin-top: 1em; padding-left: 1em">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+            <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
         </div>
       </div>
        <script>$(function () {
             tnthAjax.getDob($("#iq_userId").val());
-            ["month", "date", "year"].forEach(function(field) {
-              $("#" + field).on("blur", function() {
-                  if (($("#month").val() != "") && ($("#date").val() != "") && ($("#year").val() != "")) assembleContent.demo($("#iq_userId").val());
-              });
-            });
           });</script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}

@@ -140,6 +140,8 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
     if (!isNaN(currentIndex) && currentIndex >= 0) {
       if ((currentIndex + 1) <= (this.incompleteFields.length - 1)) {
           this.incompleteFields[currentIndex + 1].section.show();
+          //console.log("next Index? " + currentIndex + 1);
+          //console.log(this.incompleteFields[currentIndex + 1].section)
           var el = this.incompleteFields[currentIndex + 1].element;
            el.fadeIn();
            $('html, body').animate({
@@ -166,7 +168,9 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
                     section.children().first().fadeIn();
                     //console.log("found: " + section.attr("id"))
                     found = true;
-                } else $(this).fadeIn();
+                } else {
+                  if (self.sectionCompleted(parentId)) $(this).fadeIn();
+                };
               });
           };
       };
@@ -214,8 +218,9 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
 
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
-  if (this.incompleteFields.length == 0) this.showAll();
-  return this.incompleteFields.length == 0;
+  var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
+  if (completed) this.showAll();
+  return completed;
 };
 
 FieldsChecker.prototype.showAll = function() {
@@ -299,6 +304,45 @@ function initIncompleteFields() {
 
 $(document).ready(function(){
 
+
+    var bdChangeEvent = function() {
+       var d = $("#date");
+       var m = $("#month");
+       var y = $("#year");
+       if (d.val() != "" && m.val() != "" && y.val() != "") {
+          if (this.validity.valid) {
+              var today = new Date();
+              // Check to see if this is a real date
+              var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
+              var date = new Date(iy,im-1,iid);
+              var errorMsg = "";
+
+              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                  if (iy < 1900) errorMsg = "Year must be after 1900";
+                  // Only allow if birthdate is before today
+                  if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                      errorMsg = "The date must not be in the future.";
+                  };
+              } else errorMsg = "Invalid Date. Please enter a valid date.";
+
+              if (errorMsg == "") {
+                  $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
+                  $("#errorbirthday").text("").hide();
+                  assembleContent.demo($("#iq_userId").val());
+                  //fc.getNextField($(this).attr('sectionIndex'));
+                  var isComplete = fc.allFieldsCompleted();
+                  if (isComplete) {
+                     continueOn();
+                  } else fc.getNextField(null, $("#year"));
+              } else {
+                  $("#errorbirthday").text(errorMsg).show();
+                  stopContinue();
+              };
+          };
+      };
+    };
+
+
     var rolesGroupClickEvent = function(){
         var roles = [];
         var theVal = $(this).val();
@@ -311,28 +355,13 @@ $(document).ready(function(){
               $("#bdGroup").fadeIn();
             };
             // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-            if ($("#year").length > 0 && ($("#year").val() != "")) {
-              if ($("#year").get(0).validity.valid) {
-                $("#year").blur();
-                if ($('#patientQ').length > 0) {
-                  $('#patientQ').fadeIn();
-                  $('html, body').animate({
-                    scrollTop: $('#patientQ').offset().top
-                  }, 500);
-                  if(fc.sectionCompleted('patientQ')) {
-                    fc.getNextField(null, $(this));
-                  };
-                };
-              };
-           } else {
-              if ($("#bdGroup").length > 0) {
-                $('html, body').animate({
-                  scrollTop: $('#bdGroup').offset().top
-                }, 500);
-                if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
-              } else fc.getNextField($(this).attr("sectionIndex"), $(this));
-              
-           };
+
+            if ($("#bdGroup").length > 0) {
+              $('html, body').animate({
+                scrollTop: $('#bdGroup').offset().top
+              }, 500);
+              if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
+            } else fc.getNextField($(this).attr("sectionIndex"), $(this));
             //$("#clinics").hide();
 
             $("#patientQ").attr("skipped", "false");
@@ -384,10 +413,9 @@ $(document).ready(function(){
                     });
                 });
 
-                if (fc.sectionCompleted('patientQ')) fc.getNextField(null, $(this)); 
+                if (fc.sectionCompleted('patientQ')) fc.getNextField(null, $(this));
 
             } else {
-    
                 fc.getNextField(null, $(this));
             };
           } else {
@@ -467,7 +495,12 @@ $(document).ready(function(){
     });
 
     //if term of use form not present - need to show the form
-    if ($("#topTerms").length == 0)  $("#aboutForm").fadeIn();
+    if ($("#topTerms").length == 0)  {
+        $("#aboutForm").fadeIn();
+        if ($("#aboutForm").length == 0) {
+          continueOn();
+        };
+    };
 
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
@@ -493,7 +526,7 @@ $(document).ready(function(){
                     },
       'bdGroup':    {
                       fields: [$("#month"), $("#date"), $("#year")],
-                      event: null
+                      event: bdChangeEvent
                     },
       'patientQ':   {
                       fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']")],
