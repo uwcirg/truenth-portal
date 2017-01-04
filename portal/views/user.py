@@ -6,6 +6,7 @@ from flask_user import roles_required
 from ..audit import auditable_event
 from ..extensions import db, oauth, user_manager
 from ..models.audit import Audit
+from ..models.fhir import FHIR_datetime
 from ..models.group import Group
 from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE, Role
@@ -391,12 +392,18 @@ def set_user_consents(user_id):
               description:
                 Organization identifier defining with whom the consent
                 agreement applies
+            acceptance_date:
+              type: string
+              format: date-time
+              description:
+                optional UTC date-time for when the agreement expires,
+                defaults to utcnow
             expires:
               type: string
               format: date-time
               description:
-                UTC date-time for when the agreement expires, defaults to
-                utcnow plus 5 years
+                optional UTC date-time for when the agreement expires,
+                defaults to utcnow plus 5 years
             agreement_url:
               type: string
               description: URL pointing to agreement text
@@ -428,15 +435,20 @@ def set_user_consents(user_id):
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     request.json['user_id'] = user_id
+    audit = Audit(user_id=current_user().id,
+                  comment="Adding consent agreement")
     try:
         consent = UserConsent.from_json(request.json)
         if request.json.get('expires'):
-            consent.expires = request.json.get('expires')
+            consent.expires = FHIR_datetime.parse(
+                request.json.get('expires'), error_subject='expires')
+        if request.json.get('acceptance_date'):
+            audit.timestamp = FHIR_datetime.parse(
+                request.json.get('acceptance_date'),
+                error_subject='acceptance_date')
     except ValueError as e:
         abort(400, str(e))
 
-    audit = Audit(user_id=current_user().id,
-                  comment="Adding consent agreement")
     consent.audit = audit
     db.session.add(consent)
     db.session.commit()
