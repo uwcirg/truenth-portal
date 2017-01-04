@@ -653,9 +653,13 @@ def get_assessments():
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.all()
 
+    patient_fields = ("careProvider", "identifier")
+
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
-        questionnaire_response.document["subject"] = subject.as_fhir()
+        questionnaire_response.document["subject"] = {
+            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+        }
 
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
