@@ -1,6 +1,6 @@
 """Model classes for retaining FHIR data"""
-from datetime import date, datetime
-import dateutil
+from datetime import date, datetime, timedelta
+from dateutil import parser
 from flask import abort, current_app
 import json
 import pytz
@@ -51,7 +51,7 @@ class FHIR_datetime(object):
 
         """
         try:
-            dt = dateutil.parser.parse(data)
+            dt = parser.parse(data)
         except ValueError:
             msg = "Unable to parse {}: {}".format(error_subject, data)
             current_app.logger.warn(msg)
@@ -539,15 +539,92 @@ def localized_PCa(user):
     return False
 
 
-def most_recent_survey(user):
+def most_recent_survey(user, instrument_id=None):
     """Look up timestamp for most recently completed QuestionnaireResponse
 
-    Returns authored (timestamp) of the most recent
-    QuestionnaireResponse, else None
+    :param user: Patient to whom completed QuestionnaireResponses belong
+    :param instrument_id: Optional parameter to limit type of
+        QuestionnaireResponse in lookup.
+    :return: authored (timestamp) of the most recent QuestionnaireResponse,
+        else None
+
     """
-    qr = QuestionnaireResponse.query.filter(and_(
+    query = QuestionnaireResponse.query.filter(and_(
         QuestionnaireResponse.subject_id == user.id,
-        QuestionnaireResponse.status == 'completed')).order_by(
-            QuestionnaireResponse.authored).limit(
-                1).with_entities(QuestionnaireResponse.authored).first()
+        QuestionnaireResponse.status == 'completed'))
+    if instrument_id:
+        query = query.filter(
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id))
+
+    query = query.order_by(
+        QuestionnaireResponse.authored).limit(
+            1).with_entities(QuestionnaireResponse.authored)
+    qr = query.first()
     return qr[0] if qr else None
+
+
+def assessment_status(user, consented_organization=None):
+    """Return status string based on localized and recently completed surveys
+
+    As per issue
+    https://www.pivotaltracker.com/n/projects/1225464/stories/135853115
+
+    This includes hardcoded business rules that may need to become part
+    of site persistence.
+
+    :param user: The user in question - patient on whom to check status
+    :param consented_organization: which organization (id) the user must
+        have consented with - from which the consent date is considered
+    :return: a string defining the assessment status, such as "Expired"
+
+    """
+    # First lookup the consent on file between the user and the consented_org
+    # used to determine the age and status of a user's assessments
+    # Skipping this requriement for demo - using user's first consent
+    consent_date = user.valid_consents[0].audit.timestamp
+
+    today = datetime.utcnow()
+    def status_per_instrument(instrument_id, thresholds):
+        """Returns status for one instrument
+
+        :param instrument_id: the instument in question
+        :param thresholds: series of day counts and status strings.
+            NB - these must be ordered with increasing values.
+
+        :return: matching status string from constraints
+        """
+        completion = most_recent_survey(user, instrument_id)
+        if completion:
+            return "Completed"
+        delta = today - consent_date
+        for days_allowed, message in thresholds:
+            if delta < timedelta(days=days_allowed+1):
+                return message
+        return "Expired"
+
+    if localized_PCa(user):
+        thresholds = (
+            (7, "Due"),
+            (90, "Overdue"),
+        )
+        epic_status = status_per_instrument('epic26', thresholds)
+        eproms_status = status_per_instrument('eproms_add', thresholds)
+        if epic_status == eproms_status:
+            # Same state - return like value
+            return epic_status
+        else:
+            if "Expired" in (epic_status, eproms_status):
+                # One expired, but not both
+                return "Partially Completed"
+            return "In Progress"
+
+    else:
+        # assuming metastaic - although it's possible the user just didn't
+        # answer the localized question
+        thresholds = (
+            (1, "Due"),
+            (30, "Overdue")
+        )
+        return status_per_instrument('eortc', thresholds)
