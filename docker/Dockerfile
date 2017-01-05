@@ -39,7 +39,10 @@ RUN set -ex && \
 ENV PROJECT_DIR /opt/venvs/portal/
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
+COPY manage.py /opt/venvs/portal/bin
 RUN a2ensite portal
+
+RUN /opt/venvs/portal/bin/python /opt/venvs/portal/bin/manage.py initdb
 
 
 EXPOSE 80
