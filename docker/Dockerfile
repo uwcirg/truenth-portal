@@ -18,7 +18,6 @@ RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
     /usr/sbin/update-locale LANG=C.UTF-8
 
-RUN mkdir -p /tmp/shared_service_log
 ENV \
     PROJECT_DIR="/opt/venvs/portal" \
     LOG_FOLDER="/tmp/shared_service_log" \
@@ -26,9 +25,11 @@ ENV \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:5s480OFh@172.17.0.2/postgres" \
     CELERY_BROKER_URL="redis://172.17.0.3:6379/0" \
     SESSION_REDIS="172.17.0.3:6379"
+COPY manage.py ${PROJECT_DIR}/bin
+RUN mkdir -p ${LOG_FOLDER}
+
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
-COPY manage.py ${PROJECT_DIR}/bin
 RUN a2ensite portal
 
 RUN ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb
