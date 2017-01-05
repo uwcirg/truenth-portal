@@ -38,7 +38,7 @@ RUN set -ex && \
 
 RUN mkdir -p /tmp/shared_service_log
 ENV \
-    PROJECT_DIR="/opt/venvs/portal/" \
+    PROJECT_DIR="/opt/venvs/portal" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/da53ab8e627f850e44af31cad169826b2bbcbb49/site_persistence_file.json" \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:5s480OFh@172.17.0.2/postgres" \
@@ -46,11 +46,10 @@ ENV \
     SESSION_REDIS="172.17.0.3:6379"
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
-COPY manage.py /opt/venvs/portal/bin
+COPY manage.py ${PROJECT_DIR}/bin
 RUN a2ensite portal
 
-RUN /opt/venvs/portal/bin/python /opt/venvs/portal/bin/manage.py initdb
-
+RUN ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb
 
 EXPOSE 80
 
