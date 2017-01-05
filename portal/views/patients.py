@@ -12,6 +12,7 @@ from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..models.user_consent import UserConsent
 
+
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/')
