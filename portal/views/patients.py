@@ -11,6 +11,7 @@ from ..models.user_consent import UserConsent
 from ..models.organization import Organization, OrgTree
 from ..models.app_text import app_text, ConsentATMA, VersionedResource
 from ..extensions import oauth
+from  ..models.fhir import localized_PCa
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -104,8 +105,9 @@ def patient_profile(patient_id):
     if not patient:
         abort(404, "Patient {} Not Found".format(patient_id))
     consent_agreements = get_orgs_consent_agreements()
+    pca_localized_status = localized_PCa(patient)
 
-    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements)
+    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements, pca_localized_status = pca_localized_status if pca_localized_status else None)
 
 
 def get_orgs_consent_agreements():
