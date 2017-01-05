@@ -12,12 +12,13 @@ def reset_password_view_function(token):
         token,
         current_app.user_manager.reset_password_expiration)
 
-    # Some early users were not forced to set DOB and name fields.
-    # As they will fail the challenge without data to compare, provide
-    # a back door.
-    user = get_user(user_id)
-    if not all((user.birthdate, user.first_name, user.last_name)):
-        return reset_password(token)
+    if current_app.config.get("NO_CHALLENGE_WO_DATA"):
+        # Some early users were not forced to set DOB and name fields.
+        # As they will fail the challenge without data to compare, provide
+        # a back door.
+        user = get_user(user_id)
+        if not all((user.birthdate, user.first_name, user.last_name)):
+            return reset_password(token)
 
     # Once the user has passed the challenge, let the flask_user
     # reset_password() function to the real work
