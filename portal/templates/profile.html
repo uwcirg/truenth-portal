@@ -82,7 +82,7 @@
             <br/>
           </div>
           <div class="modal-footer">
-             <a href="/api/present-assessment?instrument_id=epic26&amp;subject_id={{user.id}}" class="btn btn-default" style="font-size:0.7em">{{ _("Continue") }}</a>
+             <a href="/api/present-assessment?instrument_id=epic26&subject_id={{user.id}}" class="btn btn-default" style="font-size:0.7em">{{ _("Continue") }}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
           </div>
         </div>
@@ -170,7 +170,7 @@ function adjustAssessmentInstrument(status) {
           var modalBody =  '<br/><p class="text-left">This will launch ' + instrumentId.toUpperCase() + ' instrument for staff entry. In this use case, control of the website should not be given to the patient.</p><br/>';
           $(this).find(".modal-body").html(modalBody);
           var link = $(this).find(".modal-footer a");
-          link.attr("href", "/api/present-assessment?instrument_id="+instrumentId.replace('-','')+"&amp;subject_id={{user.id}}");
+          link.attr("href", "/api/present-assessment?instrument_id="+instrumentId.replace('-','')+"&subject_id={{user.id}}");
       });
   };
 
