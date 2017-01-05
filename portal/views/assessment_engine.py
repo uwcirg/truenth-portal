@@ -3,6 +3,7 @@ from flask import abort, Blueprint, current_app, jsonify, request, redirect
 from flask import session
 from flask_swagger import swagger
 import jsonschema
+from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
@@ -597,6 +598,19 @@ def get_assessments():
     operationId: getQuestionnaireResponses
     tags:
       - Assessment Engine
+    parameters:
+      - name: instrument_id
+        in: query
+        description:
+          ID of the instrument, eg "epic26", "eq5d"
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
     produces:
       - application/json
     responses:
@@ -651,7 +665,16 @@ def get_assessments():
     """
 
     annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.all()
+    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+
+    if "instrument_id" in request.args:
+        instrument_filters = (
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id)
+            for instrument_id in request.args.getlist('instrument_id')
+        )
+        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
 
     patient_fields = ("careProvider", "identifier")
 
