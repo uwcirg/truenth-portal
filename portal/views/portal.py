@@ -197,11 +197,9 @@ def access_via_token(token):
             session['invited_verified_user_id'] = user.id
             return redirect(url_for('user.register', email=user.email))
 
-        # legit - log in and redirect
-        auditable_event("login using access_via_token", user_id=user.id)
-        session['id'] = user.id
-        login_user(user)
-        return next_after_login()
+        # fall into else case below, at least for todays demo
+        # TODO: determine if there's a legit reason to login WRITE_ONLY
+        # w/o redirecting to challenge in this case
 
     # Without WRITE_ONLY, we don't log the user in, but preserve the
     # invited user id, should we need to merge associated details
