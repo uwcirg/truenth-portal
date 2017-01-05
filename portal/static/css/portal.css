@@ -169,14 +169,24 @@ transform(-1000px, 0);*/
   margin-left: 8px;
   display: none;
 }
+#patientAssessmentDownload {
+  padding: 0.6em;
+}
+#patientsInstrumentList div.checkbox label {
+  font-size: 0.8em;
+}
 .orglist-download-container {
   display: flex;
-  justify-content: flex-end;
+  font-size: 0.9em;
+  color: #57675B;
   flex-wrap: wrap;
 }
 .orglist-download-container div {
   margin-left: 0.2em;
   margin-bottom: 0.5em;
+}
+.orglist-download-container a {
+  color: #57675B;
 }
 a {
   color: #57675B;
@@ -1203,7 +1213,7 @@ div.input-group.date {
     width: 100%;
     max-width: 100%;
   }
-  .orglist-download-container {
+  .download-wrapper, .download-break {
     display: none;
   }
   div.search,
