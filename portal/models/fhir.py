@@ -571,7 +571,7 @@ def assessment_status(user, consented_organization=None):
     This includes hardcoded business rules that may need to become part
     of site persistence.
 
-    :param user: The user in question - patient to check status on
+    :param user: The user in question - patient on whom to check status
     :param consented_organization: which organization (id) the user must
         have consented with - from which the consent date is considered
     :return: a string defining the assessment status, such as "Expired"
@@ -588,42 +588,45 @@ def assessment_status(user, consented_organization=None):
         if relativedelta(survey_date, consent_date) > ninety:
             return True
 
+    def status_per_instrument(instrument_id, thresholds):
+        """Returns status for one instrument
+
+        :param instrument_id: the instument in question
+        :param thresholds: series of day counts and status strings.
+            NB - these must be ordered with increasing values.
+
+        :return: matching status string from constraints
+        """
+        completion = most_recent_survey(user, instrument_id)
+        if completion:
+            return "Completed"
+        delta = relativedelta(today, consent_date)
+        for day_delta, message in thresholds:
+            if delta < relativedelta(days=day_delta+1):
+                return message
+        return "Expired"
+
     if localized_PCa(user):
-        epic = most_recent_survey(user, 'epic26')
-        eproms_add = most_recent_survey(user, 'eproms_add')
-        if epic and eproms_add:
-            # Both completed - return results based on when
-            if expired(epic) and expired(eproms_add):
-                return "Expired"
-            if expired(epic) or expired(eproms_add):
-                return "Partially Completed"
-            else:
-                return "Completed"
-        if epic or eproms_add:
-            # Only one completed
-            return "Partially Completed"
+        thresholds = (
+            (7, "Due"),
+            (90, "Overdue"),
+        )
+        epic_status = status_per_instrument('epic26', thresholds)
+        eproms_status = status_per_instrument('eproms_add', thresholds)
+        if epic_status == eproms_status:
+            # Same state - return like value
+            return epic_status
         else:
-            # Neither completed - results depend on how long
-            # ago they consented
-            delta = relativedelta(today, consent_date)
-            if delta < relativedelta(days=8):
-                return "Due"
-            if delta < relativedelta(days=91):
-                return "Overdue"
-            else:
-                return "Expired"
+            if "Expired" in (epic_status, eproms_status):
+                # One expired, but not both
+                return "Partially Completed"
+            return "In Progress"
 
     else:
         # assuming metastaic - although it's possible the user just didn't
         # answer the localized question
-        eortc = most_recent_survey(user, 'eortc')
-        if eortc:
-            return "Completed"
-        else:
-            delta = relativedelta(today, consent_date)
-            if delta < relativedelta(days=2):
-                return "Due"
-            if delta < relativedelta(days=31):
-                return "Overdue"
-            else:
-                return "Expired"
+        thresholds = (
+            (1, "Due"),
+            (30, "Overdue")
+        )
+        return status_per_instrument('eortc', thresholds)
