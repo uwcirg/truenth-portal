@@ -12,7 +12,6 @@ from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..models.user_consent import UserConsent
 
-
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/')
@@ -91,8 +90,9 @@ def patient_profile(patient_id):
     if not patient:
         abort(404, "Patient {} Not Found".format(patient_id))
     consent_agreements = get_orgs_consent_agreements()
+    pca_localized_status = localized_PCa(patient)
 
-    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements)
+    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements, pca_localized_status = pca_localized_status if pca_localized_status else None)
 
 
 def get_orgs_consent_agreements():
