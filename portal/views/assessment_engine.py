@@ -589,6 +589,7 @@ def assessment(patient_id, instrument_id):
     return jsonify(bundle)
 
 @assessment_engine_api.route('/patient/assessment')
+@oauth.require_oauth()
 def get_assessments():
     """
     Return multiple patient's responses to all questionnaires
