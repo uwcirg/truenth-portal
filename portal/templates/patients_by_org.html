@@ -5,8 +5,58 @@
 <h4 class="tnth-headline">Patient List</h4>
 <br/>
 <div><a  href="{{ url_for('patients.profile_create') }}"><button class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button></a> {{ _("or select a patient below to view or update details.") }}</div>
-
+<a href="" id="_downloadLink" target="_blank" style="visibility: hidden"></a>
 <hr/>
+
+{% if config.PROVIDER_BULK_DATA_ACCESS %}
+    <div class="download-wrapper">
+      <div class="orglist-download-container">
+          <div>
+            <a href="javascript:void(0);" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Download patient assessment data") }}</a>
+          </div>
+      </div>
+    </div>
+    <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="dataDownloadLabel">{{ _("Download assessment data") }}</h4>
+              </div>
+              <div class="modal-body" style="padding: 1em">
+                  <div class="form-group">
+                    <label><em class="text-muted">{{ _("Instrument(s) to download data from:")}}</em></label>
+                    <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
+                      <!-- this part is hard-coded? should it be dynamically generated -->
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" name="instrument" value="epic26">{{ _("Epic 26") }}
+                          </label>
+                      </div>
+                       <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="instrument" value="eproms_add">{{ _("EPROMS Additional Questions") }}
+                            </label>
+                      </div>
+                      <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="instrument" value="eortc">{{ _("EORTC") }}
+                            </label>
+                      </div>
+                      <div id="_downloadMessage" style="color:#a94442"></div>
+                    </div>
+                  </div>
+                  <br/>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Download") }}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
+              </div>
+            </div>
+          </div>
+    </div>
+    <hr class="download-break"/>
+{% endif %}
 
 {% if org_list_by_parent|length > 1 %}
 <div class="small orgLinks">
@@ -25,7 +75,6 @@
 </div>
 {% endif %}
 
-
 <hr />
 {% for parent_id in org_list_by_parent %}
   {% set orgCount = 1 %}
@@ -34,17 +83,6 @@
           <h4 id="location{{org.id}}">{{ org.name }} {{ _("Patients") }}</h4>
 
           <div id="adminTableToolbar{{org.id}}" class="admin-toolbar">
-          {% if config.PROVIDER_BULK_DATA_ACCESS %}
-            <div class="orglist-download-container">
-                <div>
-                <a href="javascript:void(0)" id="patientDataDownload{{org.id}}" class="btn btn-default" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Download patient list") }}</a>
-                </div>
-                <div>
-                <a href="javascript:void(0)" id="patientAssessmentDownload{{org.id}}" class="btn btn-default" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Download patient assessment data") }}</a>
-                </div>
-            </div>
-
-          {% endif %}
           <span id="tableCount{{org.id}}"></span></div>
           <table id="adminTable{{org.id}}"
                  data-table-id="adminTable{{org.id}}"
@@ -110,25 +148,6 @@
 {% endfor %}
 
 </div>
-        <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">{{ _("Bulk data download not yet implemented") }}</h4>
-              </div>
-              <div class="modal-body" style="font-size:0.8em">
-                <br/>
-                <p class="text-left">{{ _("Bulk data download not yet implemented") }}</p>
-                <br/>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
 
 {% endblock %}
 {% block document_ready %}
@@ -141,5 +160,29 @@ $(".tnth-admin-table").bootstrapTable({
         return rowInfo;
     }
 });
+$(document).ready(function() {
+  $(document).delegate("#patientsDownloadButton", "click", function(event){
+    var instruments = "";
+    $("input[name='instrument'").each(function() {
+        if ($(this).is(":checked")) {
+          instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
+        };
+    });
+    if (instruments != "") {
+        //alert(instruments)
+        $("#_downloadMessage").text("");
+        $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments);
+        $("#_downloadLink")[0].click();
+        //$("#dataDownloadModal").modal("hide");
+    } else {
+        $("#_downloadMessage").text("Please choose at least one instrument.");
+    };
+  });
+
+  $("input[name='instrument']").on("click", function() {
+      if ($(this).is(":checked")) $("#_downloadMessage").text("");
+  });
+});
+
 {% endblock %}
 

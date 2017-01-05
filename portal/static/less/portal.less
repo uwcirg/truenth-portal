@@ -206,16 +206,27 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 
 }
 
+#patientAssessmentDownload {
+  padding: 0.6em;
+}
+
+#patientsInstrumentList div.checkbox label {
+  font-size: 0.8em;
+}
+
 .orglist-download-container {
   display: flex;
-  justify-content: flex-end;
+  font-size: 0.9em;
+  color: #57675B;
   flex-wrap: wrap;
   div {
     margin-left: 0.2em;
     margin-bottom: 0.5em;
   }
+  a {
+    color: #57675B;
+  }
 }
-
 
 a {
   color: @linkColor;
@@ -1326,7 +1337,7 @@ div.input-group.date {
     }
   }
 
-  .orglist-download-container {
+  .download-wrapper, .download-break {
     display: none;
   }
 
