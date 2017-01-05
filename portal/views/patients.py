@@ -55,6 +55,7 @@ def patients_root():
 
         for user in org.users:
             user.assessment_status = assessment_status(user)
+            user.consent_date = (user.valid_consents[0].audit.timestamp).strftime('%m-%d-%Y') if user.valid_consents else None
 
         #store patients by org into top level org list so we can list them by top-level org
         #before we were sorting by org only
