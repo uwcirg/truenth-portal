@@ -89,10 +89,12 @@ def capture_next_view_function(real_function):
     def capture_next():
         """Alternate view function plugged in to capture 'next' in session
 
-        NB if already logged in - this will bounce user to home
+        NB if already logged in - this will bounce user to home, unless
+        the user has role write_only, as such users may be logging in
+        or registering new accounts, to be merged with the write_only one.
 
         """
-        if current_user():
+        if current_user() and not current_user().has_role(ROLE.WRITE_ONLY):
             return redirect(url_for('portal.home'))
 
         if request.args.get('next'):
