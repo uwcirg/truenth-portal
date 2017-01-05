@@ -201,6 +201,7 @@ def access_via_token(token):
         auditable_event("login using access_via_token", user_id=user.id)
         session['id'] = user.id
         login_user(user)
+        user.mask_email()  # user may shortly choose to register
         return next_after_login()
 
     # Without WRITE_ONLY, we don't log the user in, but preserve the
