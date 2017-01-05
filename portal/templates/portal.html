@@ -11,7 +11,7 @@
 {% endif %}
 #}
 
-{% if user.has_role('write_only') %}
+{% if config.get("SHOW_WELCOME") and user.has_role('write_only') %}
 <div class="portal-item">
     <h2 class="tnth-subhead">{{ _("Welcome to TrueNTH") }}</h2>
     {{ _("Tools for navigating the prostate cancer journey") }}
