@@ -35,7 +35,7 @@
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
 {% if current_user.has_role('provider') and user.has_role('patient') %}
 
-<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></span>
+<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient for ") }} <em class="assessmentLabel">{{ _("Epic 26") }}</em></span>
 <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
 <!-- shown only in reduced browser size-->
 <div class="btn-group link-xs">
@@ -43,7 +43,7 @@
     {{ _("Select") }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></a></li>
+    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient for ") }} <em class="assessmentLabel">{{ _("Epic 26") }}</em></a></li>
     <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
   </ul>
 </div>
@@ -78,7 +78,7 @@
           </div>
           <div class="modal-body" style="font-size:0.9em">
             <br/>
-            <p class="text-left">{{ _("This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
+            <p class="text-left">{{ _("This will launch the EPIC-26 instrument for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
             <br/>
           </div>
           <div class="modal-footer">
@@ -112,10 +112,68 @@
 
 {% block document_ready %}
 
+
 function goTo(event, id) {
     event.stopPropagation();
     window.location = "#" + id;
     $("#indexContainer").removeClass("open");
+};
+
+function adjustAssessmentInstrument(status) {
+  var assessLabel = "", instrumentId = "";
+  var CRV_LABEL = "CRV Bank", CRV_INSTRUMENT = "epic-26", IRONMAN_LABEL="IRONMAN Bank", IRONMAN_INSTRUMENT="eortc";
+  if (hasValue(status)) {
+      if (status) {
+        assessLabel = CRV_LABEL;
+        instrumentId = CRV_INSTRUMENT;
+      } else {
+        assessLabel = IRONMAN_LABEL;
+        instrumentId = IRONMAN_INSTRUMENT;
+      };
+
+  } else {
+    $.ajax ({
+        type: "GET",
+        async: false,
+        url: "/api/patient/{{ user.id }}/clinical/pca_localized"
+    }).done(function(data) {
+      if (data) {
+        var va = data.value ? String(data.value).toLowerCase(): "";
+        //console.log(data)
+
+        if (hasValue(va)) {
+           switch(va) {
+            case "true":
+              assessLabel = CRV_LABEL;
+              instrumentId = CRV_INSTRUMENT;
+              break;
+            case "false":
+              assessLabel = IRONMAN_LABEL;
+              instrumentId = IRONMAN_INSTRUMENT;
+              break;
+           };
+          
+        };
+        
+      };
+    }).fail(function() {
+        console.log("Problem retrieving data from server.")
+    });
+  };
+
+  //console.log("label: " + assessLabel + " instrumentId: " + instrumentId)
+   
+  if (hasValue(assessLabel) && hasValue(instrumentId)) {       
+      $("#indexNavBar .assessmentLabel").each(function() { $(this).text(assessLabel); });
+      $("#assessmentModal").on('show.bs.modal', function (e) {
+          $(this).find(".modal-title").text("Assess patient for " + assessLabel);
+          var modalBody =  '<br/><p class="text-left">This will launch ' + instrumentId.toUpperCase() + ' instrument for staff entry. In this use case, control of the website should not be given to the patient.</p><br/>';
+          $(this).find(".modal-body").html(modalBody);
+          var link = $(this).find(".modal-footer a");
+          link.attr("href", "/api/present-assessment?instrument_id="+instrumentId.replace('-','')+"&amp;subject_id={{user.id}}");
+      });
+  };
+
 };
 
 {% if user.has_role('patient')  and (user.id != current_user.id) %}
@@ -124,9 +182,21 @@ function goTo(event, id) {
 
 {% endif %}
 
+var pcaLocalizedStatus;
+
+{% if pca_localized_status is not none %} 
+
+pcaLocalizedStatus = {% if pca_localized_status %}true{%else%}false{%endif%};
+
+{% endif %}
+
+
 $(document).ready(function(){
     $('#loginAsPatient a').tooltip();
 
+    //initialize pca localized modal, NOTE, will not need to make extra ajax call if pca_localized_status is set initially
+    adjustAssessmentInstrument(pcaLocalizedStatus);
+    
     [{
         attachID: "month",
         targetField: $("#month"),
