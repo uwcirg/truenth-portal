@@ -36,7 +36,14 @@ RUN set -ex && \
         chown -R "$APACHE_RUN_USER:$APACHE_RUN_GROUP" "$dir"; \
     done
 
-ENV PROJECT_DIR /opt/venvs/portal/
+RUN mkdir -p /tmp/shared_service_log
+ENV \
+    PROJECT_DIR="/opt/venvs/portal/" \
+    LOG_FOLDER="/tmp/shared_service_log" \
+    PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/da53ab8e627f850e44af31cad169826b2bbcbb49/site_persistence_file.json" \
+    SQLALCHEMY_DATABASE_URI="postgresql://postgres:5s480OFh@172.17.0.2/postgres" \
+    CELERY_BROKER_URL="redis://172.17.0.3:6379/0" \
+    SESSION_REDIS="172.17.0.3:6379"
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
 COPY manage.py /opt/venvs/portal/bin
