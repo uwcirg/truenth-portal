@@ -1,17 +1,16 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-import random
 from datetime import datetime
 from flask import abort, Blueprint, render_template
 from flask_user import roles_required
 from sqlalchemy import and_
 
+from ..extensions import oauth
+from ..models.app_text import app_text, ConsentATMA, VersionedResource
+from ..models.fhir import assessment_status
+from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
 from ..models.user_consent import UserConsent
-from ..models.organization import Organization, OrgTree
-from ..models.app_text import app_text, ConsentATMA, VersionedResource
-from ..extensions import oauth
-from ..models.fhir import assessment_status 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
