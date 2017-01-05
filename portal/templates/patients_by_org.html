@@ -111,8 +111,7 @@
                       <th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>
               {% endif %}
               {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <th data-field="next_due" data-sortable="true">{{ _("Next Due") }}</th>
-                      <th data-field="status" data-sortable="true">{{ _("Status") }}</th>
+                      <th data-field="status" data-sortable="true">{{ _("Assessment Status") }}</th>
               {% endif %}
                   </tr>
               </thead>
@@ -129,10 +128,7 @@
                     {% endif %}
                     {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td>
-                        {{ user.due_date }}
-                      </td>
-                      <td>
-                        {{ user.random_due_date_status }}
+                        {{ user.assessment_status }}
                       </td>
                 {% endif %}
                   </tr>
