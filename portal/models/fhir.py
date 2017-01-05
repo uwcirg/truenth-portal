@@ -1,7 +1,6 @@
 """Model classes for retaining FHIR data"""
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil import parser
-from dateutil.relativedelta import relativedelta
 from flask import abort, current_app
 import json
 import pytz
@@ -551,13 +550,16 @@ def most_recent_survey(user, instrument_id=None):
     """
     query = QuestionnaireResponse.query.filter(and_(
         QuestionnaireResponse.subject_id == user.id,
-        QuestionnaireResponse.status == 'completed')).order_by(
-            QuestionnaireResponse.authored).limit(
-                1).with_entities(QuestionnaireResponse.authored)
+        QuestionnaireResponse.status == 'completed'))
     if instrument_id:
-        query.filter(QuestionnaireResponse.document[
-                            ("questionnaire", "reference")
-                        ].astext.endswith(instrument_id))
+        query = query.filter(
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id))
+
+    query = query.order_by(
+        QuestionnaireResponse.authored).limit(
+            1).with_entities(QuestionnaireResponse.authored)
     qr = query.first()
     return qr[0] if qr else None
 
@@ -580,14 +582,9 @@ def assessment_status(user, consented_organization=None):
     # First lookup the consent on file between the user and the consented_org
     # used to determine the age and status of a user's assessments
     # Skipping this requriement for demo - using user's first consent
-    consent_date = user.valid_consents()[0].timestamp
+    consent_date = user.valid_consents[0].audit.timestamp
 
     today = datetime.utcnow()
-    def expired(survey_date):
-        ninety = relativedelta(days=90)
-        if relativedelta(survey_date, consent_date) > ninety:
-            return True
-
     def status_per_instrument(instrument_id, thresholds):
         """Returns status for one instrument
 
@@ -600,9 +597,9 @@ def assessment_status(user, consented_organization=None):
         completion = most_recent_survey(user, instrument_id)
         if completion:
             return "Completed"
-        delta = relativedelta(today, consent_date)
-        for day_delta, message in thresholds:
-            if delta < relativedelta(days=day_delta+1):
+        delta = today - consent_date
+        for days_allowed, message in thresholds:
+            if delta < timedelta(days=days_allowed+1):
                 return message
         return "Expired"
 
