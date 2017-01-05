@@ -6,7 +6,7 @@ from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.app_text import app_text, ConsentATMA, VersionedResource
-from ..models.fhir import assessment_status
+from ..models.fhir import assessment_status, localized_PCa
 from ..models.organization import Organization, OrgTree
 from ..models.role import ROLE
 from ..models.user import User, current_user, get_user
