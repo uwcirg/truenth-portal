@@ -29,7 +29,6 @@ from .role import Role, ROLE
 from ..system_uri import TRUENTH_IDENTITY_SYSTEM
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import Telecom
-import random
 
 INVITE_PREFIX = "__invite__"
 
@@ -272,9 +271,7 @@ class User(db.Model, UserMixin):
     ## PLEASE maintain merge_with() as user model changes ##
     ###
 
-    # FIXME kludge for random demo data
-    due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
-    random_due_date_status = 'due'
+    assessment_status = 'undetermined'
 
     def __str__(self):
         """Print friendly format for logging, etc."""

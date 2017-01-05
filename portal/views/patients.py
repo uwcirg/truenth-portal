@@ -11,6 +11,7 @@ from ..models.user_consent import UserConsent
 from ..models.organization import Organization, OrgTree
 from ..models.app_text import app_text, ConsentATMA, VersionedResource
 from ..extensions import oauth
+from ..models.fhir import assessment_status 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
@@ -53,22 +54,8 @@ def patients_root():
                      user.id in consented_users and
                      user.deleted_id is None]
 
-        #todo iterate on users? here to add due_date stuff
-        # FIXME kludge for random demo data
         for user in org.users:
-            user.due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
-            timedelta_days = user.due_date - datetime.today()
-            timedelta_days = timedelta_days.days
-            if timedelta_days < 0:
-                desc = 'overdue'
-            elif timedelta_days < 30:
-                desc = 'due'
-            else:
-                desc = 'not due'
-
-            user.random_due_date_status = desc
-            user.due_date = user.due_date.strftime('%d %b %Y')
-            user.due_date = user.due_date.lstrip('0') # remove any leading 0 from day
+            user.assessment_status = assessment_status(user)
 
         #store patients by org into top level org list so we can list them by top-level org
         #before we were sorting by org only
