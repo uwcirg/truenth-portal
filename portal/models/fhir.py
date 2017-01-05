@@ -1,6 +1,7 @@
 """Model classes for retaining FHIR data"""
 from datetime import date, datetime
-import dateutil
+from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from flask import abort, current_app
 import json
 import pytz
@@ -51,7 +52,7 @@ class FHIR_datetime(object):
 
         """
         try:
-            dt = dateutil.parser.parse(data)
+            dt = parser.parse(data)
         except ValueError:
             msg = "Unable to parse {}: {}".format(error_subject, data)
             current_app.logger.warn(msg)
@@ -538,15 +539,91 @@ def localized_PCa(user):
     return False
 
 
-def most_recent_survey(user):
+def most_recent_survey(user, instrument_id=None):
     """Look up timestamp for most recently completed QuestionnaireResponse
 
-    Returns authored (timestamp) of the most recent
-    QuestionnaireResponse, else None
+    :param user: Patient to whom completed QuestionnaireResponses belong
+    :param instrument_id: Optional parameter to limit type of
+        QuestionnaireResponse in lookup.
+    :return: authored (timestamp) of the most recent QuestionnaireResponse,
+        else None
+
     """
-    qr = QuestionnaireResponse.query.filter(and_(
+    query = QuestionnaireResponse.query.filter(and_(
         QuestionnaireResponse.subject_id == user.id,
         QuestionnaireResponse.status == 'completed')).order_by(
             QuestionnaireResponse.authored).limit(
-                1).with_entities(QuestionnaireResponse.authored).first()
+                1).with_entities(QuestionnaireResponse.authored)
+    if instrument_id:
+        query.filter(QuestionnaireResponse.document[
+                            ("questionnaire", "reference")
+                        ].astext.endswith(instrument_id))
+    qr = query.first()
     return qr[0] if qr else None
+
+
+def assessment_status(user, consented_organization=None):
+    """Return status string based on localized and recently completed surveys
+
+    As per issue
+    https://www.pivotaltracker.com/n/projects/1225464/stories/135853115
+
+    This includes hardcoded business rules that may need to become part
+    of site persistence.
+
+    :param user: The user in question - patient to check status on
+    :param consented_organization: which organization (id) the user must
+        have consented with - from which the consent date is considered
+    :return: a string defining the assessment status, such as "Expired"
+
+    """
+    # First lookup the consent on file between the user and the consented_org
+    # used to determine the age and status of a user's assessments
+    # Skipping this requriement for demo - using user's first consent
+    consent_date = user.valid_consents()[0].timestamp
+
+    today = datetime.utcnow()
+    def expired(survey_date):
+        ninety = relativedelta(days=90)
+        if relativedelta(survey_date, consent_date) > ninety:
+            return True
+
+    if localized_PCa(user):
+        epic = most_recent_survey(user, 'epic26')
+        eproms_add = most_recent_survey(user, 'eproms_add')
+        if epic and eproms_add:
+            # Both completed - return results based on when
+            if expired(epic) and expired(eproms_add):
+                return "Expired"
+            if expired(epic) or expired(eproms_add):
+                return "Partially Completed"
+            else:
+                return "Completed"
+        if epic or eproms_add:
+            # Only one completed
+            return "Partially Completed"
+        else:
+            # Neither completed - results depend on how long
+            # ago they consented
+            delta = relativedelta(today, consent_date)
+            if delta < relativedelta(days=8):
+                return "Due"
+            if delta < relativedelta(days=91):
+                return "Overdue"
+            else:
+                return "Expired"
+
+    else:
+        # assuming metastaic - although it's possible the user just didn't
+        # answer the localized question
+        eortc = most_recent_survey(user, 'eortc')
+        if eortc:
+            return "Completed"
+        else:
+            delta = relativedelta(today, consent_date)
+            if delta < relativedelta(days=2):
+                return "Due"
+            if delta < relativedelta(days=31):
+                return "Overdue"
+            else:
+                return "Expired"
