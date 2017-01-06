@@ -14,10 +14,10 @@
         <label>{{ _("Birth Date") }}</label>
         <div class="row">
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" data-birthday="true" data-error="Birthday must be valid and in required format." required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="((0)?[1-9]|1\d|2\d|3[01])" maxlength="2" data-error="Birthday must be valid and in required format." required />
             </div>
             <div class="col-md-4 col-xs-10">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
+                <select class="form-control bd-element" name="birthdayMonth" id="month" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -32,14 +32,13 @@
                     <option value="11">{{ _("November") }}</option>
                     <option value="12">{{ _("December") }}</option>
                 </select>
-
             </div>
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" data-birthday="true" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
-        <span id="errorbirthday" class="help-block" style="display: none"></span>
+        <span id="errorbirthday" class="help-block" style="display: none; color:#a94442"></span>
      </div>
      <script>
         $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
@@ -50,14 +49,28 @@
                 $("#month").val(bdArray[1]);
                 $("#date").val(bdArray[2]);
             };
-            {% if person %}
-                $("#year, #month, #date").on("change", function() {
-                    if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
-                        $("#birthday").val($("#year").val() + "-" + $("#month").val() + "-" + $("#date").val());
-                    }
+
+            ["year", "month", "date"].forEach(function(fn) {
+                var field = $("#" + fn);
+                var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
+                field.on(triggerEvent, function() {
+                    var y = $("#year"), m = $("#month"), d = $("#date");
+
+                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
+
+                        var isValid = tnthDates.validateBirthDate(m.val(), d.val(), y.val() );
+                        //console.log("valid? " + isValid)
+                        if (isValid) {
+                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                        } else {
+                            $("#birthday").val("");
+                            return false;
+                        };
+                    };
                     //assembleContent.demo({{person.id}}, true);
                 });
-            {% endif %}
+            });
+
         });
      </script>
 {%- endmacro %}
@@ -1294,7 +1307,7 @@ $(document).ready(function(){
 
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>{{ _("You have updated your profile. Click the Save button to submit your changes.") }} {{ _("Or") }} <a href="">{{ _("cancel") }}</a>.</small></p>
-    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>{{ _("There is a problem with your profile. Please correct it before saving.") }}<br/>{{ _("Make sure all required fields are filled out.") }}</small></p>
+    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>{{ _("There is a problem with your profile. Please correct it before saving.") }}<br/>{{ _("Make sure all required fields are filled out and all entries are valid.") }}</small></p>
     <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">{{ _("Save") }}</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>{{ _("Profile changes have been saved") }}</em></span>
