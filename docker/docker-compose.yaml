@@ -8,13 +8,13 @@ services:
     ports:
       - "8080:80"
     links:
-      - postgres
+      - db
       - redis
   redis:
     image: redis
     ports:
       - "6379"
-  postgres:
+  db:
     image: postgres
     ports:
       - "5432"

@@ -22,7 +22,7 @@ ENV \
     PROJECT_DIR="/opt/venvs/portal" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/da53ab8e627f850e44af31cad169826b2bbcbb49/site_persistence_file.json" \
-    SQLALCHEMY_DATABASE_URI="postgresql://postgres:@postgres/postgres" \
+    SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
     CELERY_BROKER_URL="redis://redis:6379/0" \
     SESSION_REDIS="redis:6379"
 COPY manage.py ${PROJECT_DIR}/bin
