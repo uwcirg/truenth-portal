@@ -152,7 +152,7 @@ def update_card_html_on_completion():
         authored = most_recent_survey(user)
         localized = localized_PCa(user)
         status = assessment_status(user)
-        if not authored and status in ('Due', 'Overdue', 'In Progress'):
+        if status in ('Due', 'Overdue', 'In Progress'):
             if localized:
                 intro = """<p>
                 The questionnaire you are about to complete asks about your health.
@@ -189,7 +189,7 @@ def update_card_html_on_completion():
                 'assessment_engine_api.present_assessment',
                instrument_id=instrument_id,
             )
-        elif authored and status == "Completed":
+        elif status == "Completed":
             if localized:
                 intro = """<p>
                 By contributing your information to this
