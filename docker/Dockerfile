@@ -27,6 +27,7 @@ ENV \
     SESSION_REDIS="redis:6379"
 COPY manage.py ${PROJECT_DIR}/bin
 RUN mkdir -p ${LOG_FOLDER}
+RUN chown www-data:www-data ${LOG_FOLDER}
 
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
