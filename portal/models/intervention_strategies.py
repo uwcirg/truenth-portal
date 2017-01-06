@@ -23,7 +23,7 @@ import sys
 
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
-from .fhir import localized_PCa, most_recent_survey
+from .fhir import assessment_status, localized_PCa, most_recent_survey
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .procedure_codes import known_treatment_started
@@ -151,13 +151,14 @@ def update_card_html_on_completion():
         # namely, alters card_html and links depending on survey state
         authored = most_recent_survey(user)
         localized = localized_PCa(user)
-        if not authored:
+        status = assessment_status(user)
+        if status in ('Due', 'Overdue', 'In Progress'):
             if localized:
                 intro = """<p>
                 The questionnaire you are about to complete asks about your health.
                 Many of the questions relate to symptoms people with prostate
                 cancer may experience in their journey, as well as some general
-                health questions. It should take approximately 15 minutes
+                health questions. It should take approximately 15 minutes.
                 </p>"""
             else:
                 intro = """<p>
@@ -181,12 +182,14 @@ def update_card_html_on_completion():
             </p>
             """.format(user.display_name, intro=intro)
             link_label = 'Begin questionnaire'
+            if status == 'In Progress':
+                link_label = 'Continue quesionnaire in progress'
             instrument_id = ['epic26', 'eproms_add'] if localized else 'eortc'
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
                instrument_id=instrument_id,
             )
-        if authored:
+        elif status == "Completed":
             if localized:
                 intro = """<p>
                 By contributing your information to this
@@ -211,10 +214,6 @@ def update_card_html_on_completion():
             the next questionnaire is to be completed.
             <a href={change_email_url}>Change email address</a>
             </p><p>
-            <a class="btn-lg btn-tnth-primary disabled"
-                href=""> Next questionnaire to be completed {next_survey_date}
-            </a>
-            </p><p>
             Your most recently completed questionnaire was on
             {most_recent_survey_date}.
             You can view previous responses below.
@@ -226,6 +225,17 @@ def update_card_html_on_completion():
                        most_recent_survey_date=authored)
             link_label = 'View previous questionnaire'
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
+        else:
+            # Should only land here in expired or partially completed state
+            if status not in ("Expired", "Partially Completed"):
+                current_app.logger.error("Unexpected state {} for user {} "
+                             "authored: {} localized: {}".format(
+                                 status, user.id, authored, localized))
+            card_html = (
+                "<p>The assessment is no longer available. "
+                "A research staff member will contact you for assistance.</p>")
+            link_label = "N/A"
+            link_url = None
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
