@@ -110,10 +110,10 @@
               {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>
               {% endif %}
+                      <th data-field="consent_date" data-sortable="true" class="text-center">{{ _("Consent Date (GMT)")}}</th>
               {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <th data-field="status" data-sortable="true">{{ _("Assessment Status") }}</th>
+                      <th data-field="status" data-sortable="true" class="text-center">{{ _("Assessment Status") }}</th>
               {% endif %}
-                      <th data-field="consent_date" data-sortable="true">{{ _("Consent Date")}}</th>
                   </tr>
               </thead>
               <tbody data-link="row" class="rowlink">
@@ -127,12 +127,12 @@
                     {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
                       <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
                     {% endif %}
+                       <td class="text-center">{{ user.consent_date if user.consent_date}}</td>
                     {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td>
+                      <td class="text-center">
                         {{ user.assessment_status }}
                       </td>
                     {% endif %}
-                      <td>{{ user.consent_date if user.consent_date}}</td>
                   </tr>
               {% endfor %}
               </tbody>
