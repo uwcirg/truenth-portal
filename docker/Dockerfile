@@ -32,8 +32,6 @@ COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
 RUN a2ensite portal
 
-RUN ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb
-
 EXPOSE 80
 
-CMD . /etc/apache2/envvars && /usr/sbin/apache2 -D FOREGROUND
+CMD . /etc/apache2/envvars && ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb && /usr/sbin/apache2 -D FOREGROUND
