@@ -50,7 +50,7 @@
             {% endif %}
 
             {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$",
-  helpText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
+  infoText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
 
             {% if user_manager.enable_retype_password %}
             {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240) }}
