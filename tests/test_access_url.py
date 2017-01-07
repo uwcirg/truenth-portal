@@ -38,7 +38,9 @@ class TestAccessUrl(TestCase):
 
         rv = self.app.get(access_url)
 
-        # onetime should now be "logged-in" - can we get /api/me?
-        results = self.app.get('/api/me')
-        self.assert200(results)
-        self.assertEquals(results.json['email'], 'one@time.com')
+        # Hack - workaround for test_client being monkeypatched to self.app
+        # See https://github.com/uwcirg/true_nth_usa_portal/blob/develop/tests/__init__.py#L204
+        self.app.config = self.app.application.config
+
+        # User should be redirected to confirm identity
+        self.assert_redirects(rv, url_for('portal.challenge_identity'))
