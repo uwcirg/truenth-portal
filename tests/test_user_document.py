@@ -25,7 +25,7 @@ class TestUserDocument(TestCase):
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
             tempfileIO = StringIO(temp_pdf.read())
-            rv = self.app.post('/api/user/{}/patient_report'.format(service_user.id),
+            rv = self.client.post('/api/user/{}/patient_report'.format(service_user.id),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)

@@ -21,14 +21,14 @@ class TestTou(TestCase):
         self.assertTrue(tou_url in results)
 
     def test_get_tou(self):
-        rv = self.app.get('/api/tou')
+        rv = self.client.get('/api/tou')
         self.assert200(rv)
         self.assertTrue('url' in rv.json)
 
     def test_accept(self):
         self.login()
         data = {'agreement_url': tou_url}
-        rv = self.app.post('/api/tou/accepted',
+        rv = self.client.post('/api/tou/accepted',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert200(rv)
@@ -40,7 +40,7 @@ class TestTou(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'agreement_url': tou_url}
-        rv = self.app.post('/api/user/{}/tou/accepted'.format(TEST_USER_ID),
+        rv = self.client.post('/api/user/{}/tou/accepted'.format(TEST_USER_ID),
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert200(rv)
@@ -56,6 +56,6 @@ class TestTou(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.app.get('/api/user/{}/tou'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/tou'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(rv.json['accepted'], True)

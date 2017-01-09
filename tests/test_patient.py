@@ -8,7 +8,7 @@ class TestPatient(TestCase):
     def test_email_search(self):
         self.promote_user(role_name=ROLE.PATIENT)
         self.login()
-        rv = self.app.get(
+        rv = self.client.get(
             '/api/patient?email={}'.format(TEST_USERNAME),
             follow_redirects=True)
         # Known patient but w/o patient role should 404
@@ -17,7 +17,7 @@ class TestPatient(TestCase):
 
     def test_email_search_non_patient(self):
         self.login()
-        rv = self.app.get(
+        rv = self.client.get(
             '/api/patient?email={}'.format(TEST_USERNAME),
             follow_redirects=True)
         # Known patient but w/o patient role should 404
@@ -27,7 +27,7 @@ class TestPatient(TestCase):
         dummy = self.add_user(username='dummy@example.com')
         self.promote_user(user=dummy, role_name=ROLE.PATIENT)
         self.login()
-        rv = self.app.get(
+        rv = self.client.get(
             '/api/patient?email={}'.format('dummy@example.com'),
             follow_redirects=True)
         # w/o permission, should see a 404 not a 401 on search

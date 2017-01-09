@@ -35,7 +35,7 @@ class TestAudit(TestCase):
         "no audit for user should still function"
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.get('/api/user/{}/audit'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(0, len(rv.json['audits']))
 
@@ -47,7 +47,7 @@ class TestAudit(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.get('/api/user/{}/audit'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
         self.assertEquals(rv.json['audits'][0]['by'],
@@ -70,7 +70,7 @@ class TestAudit(TestCase):
             db.session.commit()
         provider = db.session.merge(provider)
         self.login(provider.id)
-        rv = self.app.get('/api/user/{}/audit'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
         self.assertEquals(rv.json['audits'][0]['by'],

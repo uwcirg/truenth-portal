@@ -23,13 +23,13 @@ class TestProcedure(TestCase):
     def test_procedureGET_404(self):
         self.add_procedure()
         self.login()
-        rv = self.app.get('/api/patient/666/procedure')
+        rv = self.client.get('/api/patient/666/procedure')
         self.assert404(rv)
 
     def test_procedureGET(self):
         self.add_procedure()
         self.login()
-        rv = self.app.get('/api/patient/%s/procedure' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/procedure' % TEST_USER_ID)
 
         data = json.loads(rv.data)
         self.assertEquals('367336001',
@@ -67,13 +67,13 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
         data['performedDateTime'] = '1843-07-01'  # can't handle pre 1900
         self.login()
-        rv = self.app.post(
+        rv = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
         self.assert400(rv)
 
         data['performedDateTime'] = '1943-17-01'  # month 17 doesn't fly
-        rv = self.app.post(
+        rv = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
         self.assert400(rv)
@@ -84,7 +84,7 @@ class TestProcedure(TestCase):
             data = json.load(fhir_data)
 
         self.login()
-        rv = self.app.post(
+        rv = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
 
@@ -108,7 +108,7 @@ class TestProcedure(TestCase):
         data['performedPeriod']['end'] = end_time
 
         self.login()
-        rv = self.app.post(
+        rv = self.client.post(
             '/api/procedure', content_type='application/json',
             data=json.dumps(data))
 
@@ -127,7 +127,7 @@ class TestProcedure(TestCase):
         self.add_procedure()
         proc_id = Procedure.query.one().id
         self.login()
-        rv = self.app.delete('/api/procedure/{}'.format(proc_id))
+        rv = self.client.delete('/api/procedure/{}'.format(proc_id))
         self.assert200(rv)
         self.assertRaises(NoResultFound, Procedure.query.one)
         self.assertEquals(self.test_user.procedures.count(), 0)
