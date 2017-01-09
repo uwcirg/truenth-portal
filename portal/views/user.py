@@ -1283,14 +1283,20 @@ def user_documents(user_id):
               items:
                 type: object
                 required:
+                  - id
                   - user_id
                   - document_type
                   - uploaded_at
                   - filename
                   - filetype
                 properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: identifier for the user document
                   user_id:
-                    type: string
+                    type: integer
+                    format: int64
                     description:
                       User identifier defining with whom the document belongs to
                   document_type:

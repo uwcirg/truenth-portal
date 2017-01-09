@@ -29,6 +29,7 @@ class UserDocument(db.Model):
 
     def as_json(self):
         d = {}
+        d['id'] = self.id
         d['user_id'] = self.user_id
         d['document_type'] = self.document_type
         d['uploaded_at'] = FHIR_datetime.as_fhir(self.uploaded_at)
