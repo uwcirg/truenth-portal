@@ -1251,6 +1251,79 @@ def unique_email():
             return jsonify(unique=False)
     return jsonify(unique=True)
 
+@user_api.route('/user/<int:user_id>/user_documents')
+@oauth.require_oauth()
+def user_documents(user_id):
+    """Returns simple JSON defining user documents
+
+    Returns the list of the user's user documents.
+    ---
+    tags:
+      - User
+      - User Document
+    operationId: get_user_documents
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the list of user documents for the requested user.
+        schema:
+          id: user_documents
+          properties:
+            documents:
+              type: array
+              items:
+                type: object
+                required:
+                  - user_id
+                  - document_type
+                  - uploaded_at
+                  - filename
+                  - filetype
+                properties:
+                  user_id:
+                    type: string
+                    description:
+                      User identifier defining with whom the document belongs to
+                  document_type:
+                    type: string
+                    description:
+                      Type of document uploaded (e.g. WiserCare Patient Report,
+                      user avatar image, etc)
+                  uploaded_at:
+                    type: string
+                    format: date-time
+                    description:
+                      Original UTC date-time from the moment the document was
+                      uploaded to the portal
+                  filename:
+                    type: string
+                    description: Filename of the uploaded document file
+                  filetype:
+                    type: string
+                    description: Filetype of the uploaded document file
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to view requested user_id
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='view', other_id=user_id)
+        user = get_user(user_id)
+
+    return jsonify(user_documents=[d.as_json() for d in
+                                       user.documents])
+
 @user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
 @oauth.require_oauth()
 def upload_user_document(user_id):
