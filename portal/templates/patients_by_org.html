@@ -27,22 +27,13 @@
                   <div class="form-group">
                     <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
                     <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
-                      <!-- this part is hard-coded? should it be dynamically generated -->
+                      {% for instrument_code in config["INSTRUMENTS"] %}
                       <div class="checkbox">
                           <label>
-                              <input type="checkbox" name="instrument" value="epic26">{{ _("Epic 26") }}
+                              <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
                           </label>
                       </div>
-                      <div class="checkbox">
-                          <label>
-                              <input type="checkbox" name="instrument" value="eproms_add">{{ _("EPROMS Additional Questions") }}
-                          </label>
-                      </div>
-                      <div class="checkbox">
-                          <label>
-                              <input type="checkbox" name="instrument" value="eortc">{{ _("EORTC") }}
-                          </label>
-                      </div>
+                      {% endfor %}
                       <div id="_downloadMessage" style="color:#a94442"></div>
                     </div>
                   </div>
