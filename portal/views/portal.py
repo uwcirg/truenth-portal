@@ -271,8 +271,9 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
     birthdate = datetime.strptime(form.birthdate.data, '%m-%d-%Y');
 
     score = user.fuzzy_match(first_name=first_name,
-                             last_name=last_name)
-    if (user.birthdate.strftime('%d%m%Y') == birthdate.strftime('%d%m%Y')) and (score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85)):
+                             last_name=last_name,
+                             birthdate=birthdate)
+    if score > current_app.config.get('IDENTITY_CHALLENGE_THRESHOLD', 85):
         # identity confirmed
         session['challenge_verified_user_id'] = user.id
         if form.merging_accounts.data == 'True':

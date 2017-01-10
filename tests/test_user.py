@@ -5,6 +5,7 @@ import json
 import re
 import urllib
 from sqlalchemy import and_
+from datetime import datetime
 from tests import TestCase, TEST_USER_ID, FIRST_NAME
 
 from portal.extensions import db
@@ -593,18 +594,19 @@ class TestUser(TestCase):
         self.assertEquals(score, 100)  # should be perfect match
 
         score = user.fuzzy_match(first_name=user.first_name,
-                                 last_name=user.last_name)
-        self.assertEquals(score, 100)  # should still be perfect match w/o birthday
+                                 last_name=user.last_name,
+                                 birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
+        self.assertEquals(score, 0)  # incorrect birthdate returns 0
 
         score = user.fuzzy_match(first_name=user.first_name + 's',
                                  last_name='O' + user.last_name,
                                  birthdate=user.birthdate)
-        self.assertTrue(score > 90)  # should be close
+        self.assertTrue(score > 88)  # should be close
 
         score = user.fuzzy_match(first_name=user.first_name,
                                  last_name='wrong',
                                  birthdate=user.birthdate)
-        self.assertTrue(score < 67)  # 2/3 correct
+        self.assertTrue(score < 51)  # Name 1/2 correct
 
     def test_merge(self):
         with SessionScope(db):
