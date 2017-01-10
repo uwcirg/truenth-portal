@@ -802,7 +802,7 @@ class User(db.Model, UserMixin):
             return '<div>' + '</div><div>'.join(
                 [ui.provider_html for ui in uis]) + '</div>'
 
-    def fuzzy_match(self, first_name, last_name, birthdate):
+    def fuzzy_match(self, first_name, last_name, birthdate=None):
         """Returns probability score [0-100] of it being the same user"""
         # remove case issues as it confuses the match
         scores = []
@@ -813,9 +813,11 @@ class User(db.Model, UserMixin):
 
         # birthdate is trickier - raw delta doesn't make sense.  treat
         # it like a string, assuming only typos for a mismatch
-        dob = self.birthdate or datetime.utcnow()
-        scores.append(fuzz.ratio(dob.strftime('%d%m%Y'),
-                                 birthdate.strftime('%d%m%Y')))
+        # birthdate is also an optional inclusion
+        if (birthdate):
+            dob = self.birthdate or datetime.utcnow()
+            scores.append(fuzz.ratio(dob.strftime('%d%m%Y'),
+                                     birthdate.strftime('%d%m%Y')))
         return sum(scores) / len(scores)
 
 

@@ -592,6 +592,10 @@ class TestUser(TestCase):
                                  birthdate=user.birthdate)
         self.assertEquals(score, 100)  # should be perfect match
 
+        score = user.fuzzy_match(first_name=user.first_name,
+                                 last_name=user.last_name)
+        self.assertEquals(score, 100)  # should still be perfect match w/o birthday
+
         score = user.fuzzy_match(first_name=user.first_name + 's',
                                  last_name='O' + user.last_name,
                                  birthdate=user.birthdate)
