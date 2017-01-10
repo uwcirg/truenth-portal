@@ -12,7 +12,7 @@ class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
         self.login()
-        rv = self.app.get('/api/demographics')
+        rv = self.client.get('/api/demographics')
 
         fhir = json.loads(rv.data)
         self.assertEquals(len(fhir['identifier']), 2)
@@ -29,7 +29,7 @@ class TestDemographics(TestCase):
     def test_demographics404(self):
         self.login()
         self.promote_user(role_name=ROLE.ADMIN)
-        rv = self.app.get('/api/demographics/666')
+        rv = self.client.get('/api/demographics/666')
         self.assert404(rv)
 
     def test_demographicsPUT(self):
@@ -76,7 +76,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -104,7 +104,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -116,7 +116,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -142,7 +142,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -181,7 +181,7 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -209,6 +209,6 @@ class TestDemographics(TestCase):
                }
 
         with self.assertRaises(ValueError):
-            self.app.put('/api/demographics/%s' % TEST_USER_ID,
+            self.client.put('/api/demographics/%s' % TEST_USER_ID,
                          content_type='application/json',
                          data=json.dumps(data))

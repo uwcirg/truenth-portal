@@ -54,7 +54,7 @@ class TestAppText(TestCase):
         self.assertTrue(Url(result) == Url(expected))
 
     def test_config_value_in_custom_text(self):
-        self.app.application.config['CT_TEST'] = 'found!'
+        self.app.config['CT_TEST'] = 'found!'
         with SessionScope(db):
             embed_config_value = AppText(
                 name='embed config value',

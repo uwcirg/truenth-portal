@@ -7,11 +7,11 @@ from tests import TestCase, TEST_USER_ID
 class TestAssessmentEngine(TestCase):
 
     def test_assessment_PUT(self):
-        swagger_spec = swagger(self.app.application)
+        swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
         self.login()
-        rv = self.app.put('/api/patient/{}/assessment'.format(TEST_USER_ID),
+        rv = self.client.put('/api/patient/{}/assessment'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)

@@ -1,6 +1,5 @@
 """Unit test module for fhir model"""
 from datetime import datetime
-from dateutil import parser, tz
 from flask_webtest import SessionScope
 import pytz
 from tests import TestCase, TEST_USER_ID

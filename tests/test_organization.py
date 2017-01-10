@@ -74,7 +74,7 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
 
         # use api to obtain FHIR
-        rv = self.app.get('/api/organization/{}'.format(org.id))
+        rv = self.client.get('/api/organization/{}'.format(org.id))
         self.assert200(rv)
 
     def test_organization_list(self):
@@ -82,7 +82,7 @@ class TestOrganization(TestCase):
 
         # use api to obtain FHIR bundle
         self.login()
-        rv = self.app.get('/api/organization')
+        rv = self.client.get('/api/organization')
         self.assert200(rv)
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
@@ -107,7 +107,7 @@ class TestOrganization(TestCase):
         org = db.session.merge(org)
         org_id = org.id
 
-        rv = self.app.put('/api/organization/{}'.format(org_id),
+        rv = self.client.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
@@ -131,7 +131,7 @@ class TestOrganization(TestCase):
         # prior to adding the parent (partOf) org
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.post('/api/organization',
+        rv = self.client.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert400(rv)
@@ -144,7 +144,7 @@ class TestOrganization(TestCase):
         # use api to delete one and confirm the other remains
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.delete('/api/organization/{}'.format(org2_id))
+        rv = self.client.delete('/api/organization/{}'.format(org2_id))
         self.assert200(rv)
         self.assertEquals(Organization.query.get(org2_id), None)
         orgs = Organization.query.all()
@@ -176,7 +176,7 @@ class TestOrganization(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         before = Organization.query.count()
-        rv = self.app.post('/api/organization',
+        rv = self.client.post('/api/organization',
                            content_type='application/json',
                            data=json.dumps(data))
         self.assert200(rv)
@@ -189,7 +189,7 @@ class TestOrganization(TestCase):
                            use='secondary')
         org = Organization.query.filter_by(name='Gastroenterology').one()
         data['identifier'].append(alias.as_fhir())
-        rv = self.app.put('/api/organization/{}'.format(org.id),
+        rv = self.client.put('/api/organization/{}'.format(org.id),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)

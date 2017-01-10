@@ -35,7 +35,7 @@ class TestGroup(TestCase):
 
         # use api to obtain
         self.login()
-        rv = self.app.get('/api/group/{}'.format(grp.name))
+        rv = self.client.get('/api/group/{}'.format(grp.name))
         self.assert200(rv)
         self.assertEquals(rv.json['group']['name'], 'test')
 
@@ -49,7 +49,7 @@ class TestGroup(TestCase):
 
         # use api to obtain list
         self.login()
-        rv = self.app.get('/api/group/')
+        rv = self.client.get('/api/group/')
         self.assert200(rv)
         bundle = rv.json
         self.assertEquals(len(bundle['groups']), 2)
@@ -59,7 +59,7 @@ class TestGroup(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.post('/api/group/',
+        rv = self.client.post('/api/group/',
                           content_type='application/json',
                           data=json.dumps(grp.as_json()))
         self.assert200(rv)
@@ -79,7 +79,7 @@ class TestGroup(TestCase):
         self.login()
 
         improved_grp = Group(name='changed_name', description='Updated')
-        rv = self.app.put('/api/group/{}'.format('test_grp_name'),
+        rv = self.client.put('/api/group/{}'.format('test_grp_name'),
                           content_type='application/json',
                           data=json.dumps(improved_grp.as_json()))
         self.assert200(rv)
@@ -91,7 +91,7 @@ class TestGroup(TestCase):
 
     def test_user_no_groups(self):
         self.login()
-        rv = self.app.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['groups']), 0)
 
@@ -104,7 +104,7 @@ class TestGroup(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.app.get('/api/user/{}/groups'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/groups'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['groups']), 2)
 
@@ -123,7 +123,7 @@ class TestGroup(TestCase):
 
         # put only the 2nd group, should end up being the only one for the user
         self.login()
-        rv = self.app.put('/api/user/{}/groups'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/groups'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps({'groups': [grp2.as_json()]}))
         self.assert200(rv)
