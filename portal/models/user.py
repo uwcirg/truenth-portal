@@ -812,10 +812,10 @@ class User(db.Model, UserMixin):
         scores.append(fuzz.ratio(lname.lower(), last_name.lower()))
 
         # birthdate is trickier - raw delta doesn't make sense.  treat
-        # it like a string, assuming only typos for a mismatch
+        # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
-        scores.append(fuzz.ratio(dob.strftime('%d%m%Y'),
-                                 birthdate.strftime('%d%m%Y')))
+        if (dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
+            return 0
         return sum(scores) / len(scores)
 
 
