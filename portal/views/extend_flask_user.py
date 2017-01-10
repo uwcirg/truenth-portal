@@ -3,6 +3,7 @@ from flask import current_app, url_for, session
 from flask_user.views import reset_password
 
 from .portal import challenge_identity
+from ..models.user import get_user
 
 
 def reset_password_view_function(token):
@@ -10,6 +11,14 @@ def reset_password_view_function(token):
     is_valid, has_expired, user_id = current_app.user_manager.verify_token(
         token,
         current_app.user_manager.reset_password_expiration)
+
+    if current_app.config.get("NO_CHALLENGE_WO_DATA"):
+        # Some early users were not forced to set DOB and name fields.
+        # As they will fail the challenge without data to compare, provide
+        # a back door.
+        user = get_user(user_id)
+        if not all((user.birthdate, user.first_name, user.last_name)):
+            return reset_password(token)
 
     # Once the user has passed the challenge, let the flask_user
     # reset_password() function to the real work
