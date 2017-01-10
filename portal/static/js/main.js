@@ -122,10 +122,6 @@ var fillContent = {
                     $radios.filter('[value='+clinicalValue+']').prop('checked', true);
                 }
             };
-            // Display clinics if any value is false (except localized) or if all are answered
-            if ((clinicalValue == "false" && clinicalItem != "pca_localized") || i == 3) {
-                $("#clinics").fadeIn();
-            }
         })
     },
     "demo": function(data) {
@@ -582,27 +578,6 @@ var assembleContent = {
                     )
                 };
             };
-
-
-            // demoArray["extension"] = [
-
-            //     {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
-            //         "valueCodeableConcept": {
-            //             "coding": ethnicityIDs ? ethnicityIDs : []
-            //         }
-            //     },
-            //     {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
-            //         "valueCodeableConcept": {
-            //             "coding": raceIDs ? raceIDs : []
-            //         }
-            //     }
-            //      ,
-            //      {   "url": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
-            //          "valueCodeableConcept": {
-            //              "coding": indigenousIDs ? indigenousIDs: []
-            //          }
-            //      }
-            // ];
             if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
@@ -625,10 +600,6 @@ var assembleContent = {
                 demoArray["telecom"].push({ "system": "email", "value": emailVal });
             };
             demoArray["telecom"].push({ "system": "phone", "value": $("input[name=phone]").val() });
-            //demoArray["telecom"] = [
-                //{ "system": "email", "value": $("input[name=email]").val() },
-                //{ "system": "phone", "value": $("input[name=phone]").val() }
-            //];
            //console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
@@ -1223,96 +1194,41 @@ $(document).ready(function() {
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
 
-    // Handling "none of the above" clinic choice
-
-    // $("#userOrgs input[name='organization']").each(function() {
-    //     $(this).prop("checked", false);
-    // });
-
-    // $("#userOrgs").on("click", ".clinic", function(){
-    //     console.log("id: " + $(this).attr("id") + " checked: " + $(this).prop("checked"))
-    //     if ($(this).prop("checked")){
-    //         if ($(this).attr("id") !== "noOrgs") {
-    //             //console.log("set no org here")
-    //             $("#noOrgs").prop('checked',false);
-    //         } else {
-    //             $("#userOrgs input[name='organization']").each(function() {
-    //                 //console.log("in id: " + $(this).attr("id"))
-    //                if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
-    //             });
-    //             $("#consentContainer input.consent-checkbox").each(function() {
-    //                 $(this).prop("checked", false);
-    //             });
-    //         }
-    //         //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-    //         //else $("#noOrgs").attr("checked", false);
-    //     };
-    // });
-
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
         custom: {
-            birthday: function() {
+            birthday: function($el) {
                 var m = parseInt($("#month").val());
                 var d = parseInt($("#date").val());
                 var y = parseInt($("#year").val());
                 // If all three have been entered, run check
-                var goodDate = false;
-                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
-                if (m && d && y) {
-                    var today = new Date();
-                    // Check to see if this is a real date
-                    var date = new Date(y,m-1,d);
-                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                        goodDate = true;
-                        // Only allow if birthdate is before today
-                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                            goodDate = false;
-                            errorMsg = "Your birthdate must be in the past.";
-                        }
-                    }
-                    if (y.toString().length < 3) {
-                        goodDate = false;
-                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
-                    }
-                    if (y < 1900) {
-                        goodDate = false;
-                        errorMsg = "Year of birth must be after 1900.";
-                    }
-                    // After tests display errors if necessary
-                    if (goodDate) {
-                        $("#errorbirthday").html("").hide();
-                        // Set date if YYYY-MM-DD
-                        $("#birthday").val(y+"-"+m+"-"+d);
-                        // If we are on initial-queries, then we'll want to display the patientQ div
-                        //$("#patientQ, #patBiopsy").fadeIn();
-                    } else {
-                        $("#errorbirthday").html(errorMsg).show();
-                        $("#birthday").val("");
-                    }
-                } else {
-                    // If NaN then the values haven't been entered yet, so we
-                    // validate as true until other fields are entered
-                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                        $("#errorbirthday").html('All fields must be complete.').hide();
-                        return true;
-                    } else if (isNaN(d)) {
-                        errorMsg = "Please enter a valid date.";
-                    } else if (isNaN(m)) {
-                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
-                    } else if (isNaN(y)) {
-                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
-                    };
+                var goodDate = true;
+                var errorMsg = "";
+                // If NaN then the values haven't been entered yet, so we
+                // validate as true until other fields are entered
+                if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                    $("#errorbirthday").html('All fields must be complete.').hide();
+                    goodDate = false;
+                } else if (isNaN(d)) {
+                    errorMsg = "Please enter a valid date.";
+                } else if (isNaN(m)) {
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
+                } else if (isNaN(y)) {
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
+                };
+
+                if (hasValue(errorMsg)) {
                     $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
+                    goodDate = false;
                 }
-                //console.log("good Date: " + goodDate)
+                //}
+                //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
                 if (goodDate) {
                     $("#errorbirthday").html("").hide();
-                    return true;
-                } else {
-                    return false;
-                }
+                };
+
+                return goodDate;
             },
             customemail: function($el) {
                 if ($el.val() == "") {
@@ -1356,6 +1272,43 @@ $(document).ready(function() {
 });
 
 var tnthDates = {
+    /** validateBirthDate  check whether the date is a sensible date.
+     ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
+     ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
+    "validateBirthDate": function(m, d, y) {
+        if (hasValue(m) && hasValue(d) && hasValue(y)) {
+
+            var m = parseInt(m);
+            var d = parseInt(d);
+            var y = parseInt(y);
+
+            if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+                var today = new Date();
+                // Check to see if this is a real date
+                var date = new Date(y,m-1,d);
+                if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                    $("#errorbirthday").html("Invalid date. Please try again.").show();
+                    return false;
+                }
+                else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                    $("#errorbirthday").html("Birthday must not be in the future. Please try again.").show();
+                    return false; //shouldn't be in the future
+                }
+                else if (y < 1900) {
+                    $("#errorbirthday").html("Date must not be before 1900. Please try again.").show();
+                    return false;
+                };
+
+                $("#errorbirthday").html("").hide();
+
+                return true;
+
+            } else return false;
+
+        } else {
+            return false;
+        };
+    },
     /***
      * changeFormat - changes date format, particularly for submitting to server
      * @param currentDate - date to change
@@ -1739,5 +1692,4 @@ function hasValue(val) {
 }
 //Promise polyfill - IE doesn't support Promise - so need this
 !function(e){function n(){}function t(e,n){return function(){e.apply(n,arguments)}}function o(e){if("object"!=typeof this)throw new TypeError("Promises must be constructed via new");if("function"!=typeof e)throw new TypeError("not a function");this._state=0,this._handled=!1,this._value=void 0,this._deferreds=[],s(e,this)}function i(e,n){for(;3===e._state;)e=e._value;return 0===e._state?void e._deferreds.push(n):(e._handled=!0,void o._immediateFn(function(){var t=1===e._state?n.onFulfilled:n.onRejected;if(null===t)return void(1===e._state?r:u)(n.promise,e._value);var o;try{o=t(e._value)}catch(i){return void u(n.promise,i)}r(n.promise,o)}))}function r(e,n){try{if(n===e)throw new TypeError("A promise cannot be resolved with itself.");if(n&&("object"==typeof n||"function"==typeof n)){var i=n.then;if(n instanceof o)return e._state=3,e._value=n,void f(e);if("function"==typeof i)return void s(t(i,n),e)}e._state=1,e._value=n,f(e)}catch(r){u(e,r)}}function u(e,n){e._state=2,e._value=n,f(e)}function f(e){2===e._state&&0===e._deferreds.length&&o._immediateFn(function(){e._handled||o._unhandledRejectionFn(e._value)});for(var n=0,t=e._deferreds.length;n<t;n++)i(e,e._deferreds[n]);e._deferreds=null}function c(e,n,t){this.onFulfilled="function"==typeof e?e:null,this.onRejected="function"==typeof n?n:null,this.promise=t}function s(e,n){var t=!1;try{e(function(e){t||(t=!0,r(n,e))},function(e){t||(t=!0,u(n,e))})}catch(o){if(t)return;t=!0,u(n,o)}}var a=setTimeout;o.prototype["catch"]=function(e){return this.then(null,e)},o.prototype.then=function(e,t){var o=new this.constructor(n);return i(this,new c(e,t,o)),o},o.all=function(e){var n=Array.prototype.slice.call(e);return new o(function(e,t){function o(r,u){try{if(u&&("object"==typeof u||"function"==typeof u)){var f=u.then;if("function"==typeof f)return void f.call(u,function(e){o(r,e)},t)}n[r]=u,0===--i&&e(n)}catch(c){t(c)}}if(0===n.length)return e([]);for(var i=n.length,r=0;r<n.length;r++)o(r,n[r])})},o.resolve=function(e){return e&&"object"==typeof e&&e.constructor===o?e:new o(function(n){n(e)})},o.reject=function(e){return new o(function(n,t){t(e)})},o.race=function(e){return new o(function(n,t){for(var o=0,i=e.length;o<i;o++)e[o].then(n,t)})},o._immediateFn="function"==typeof setImmediate&&function(e){setImmediate(e)}||function(e){a(e,0)},o._unhandledRejectionFn=function(e){"undefined"!=typeof console&&console&&console.warn("Possible Unhandled Promise Rejection:",e)},o._setImmediateFn=function(e){o._immediateFn=e},o._setUnhandledRejectionFn=function(e){o._unhandledRejectionFn=e},"undefined"!=typeof module&&module.exports?module.exports=o:e.Promise||(e.Promise=o)}(this);
-
 
