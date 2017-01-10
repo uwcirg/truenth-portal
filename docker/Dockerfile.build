@@ -56,7 +56,7 @@ RUN mkdir -p /tmp/artifacts
 
 # Todo: allow branch to be overridden
 CMD \
-	git clone --branch feature/deb-packaging https://github.com/ivan-c/true_nth_usa_portal.git /root/portal && \
+	git clone --branch develop https://github.com/ivan-c/true_nth_usa_portal.git /root/portal && \
 	cd /root/portal && \
 	yes | make-deb && \
 	git checkout debian/rules && \
