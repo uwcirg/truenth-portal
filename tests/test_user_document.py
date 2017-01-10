@@ -1,16 +1,35 @@
 """Unit test module for user document logic"""
 from tempfile import NamedTemporaryFile
 from StringIO import StringIO
+from datetime import datetime
 from flask import current_app
+from flask_webtest import SessionScope
 import os
 
-from tests import TestCase
+from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
 from portal.models.user_document import UserDocument
 
 
 class TestUserDocument(TestCase):
     """User Document tests"""
+
+    def test_get_user_documents(self):
+        #tests whether we can successfully get the list of user documents for a user
+        ud1 = UserDocument(document_type="TestFile", uploaded_at=datetime.utcnow(),
+                          filename="test_file_1.txt", filetype="txt", uuid="012345")
+        ud2 = UserDocument(document_type="TestFile", uploaded_at=datetime.utcnow(),
+                          filename="test_file_2.txt", filetype="txt", uuid="098765")
+        self.test_user.documents.append(ud1)
+        self.test_user.documents.append(ud2)
+        with SessionScope(db):
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+        self.login()
+        rv = self.app.get('/api/user/{}/user_documents'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['user_documents']), 2)
+
 
     def test_post_patient_report(self):
         #tests whether we can successfully post a patient report -type user doc file

@@ -266,6 +266,7 @@ class User(db.Model, UserMixin):
                               foreign_keys=[deleted_id])
     deceased = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deceased_id])
+    documents = db.relationship('UserDocument', lazy='dynamic')
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
