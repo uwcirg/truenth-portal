@@ -7,7 +7,7 @@ services:
       dockerfile: docker/Dockerfile
     ports:
       - "8080:80"
-    links:
+    depends_on:
       - db
       - redis
   redis:
