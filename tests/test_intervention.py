@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
+from tests.test_assessment_status import mock_qr
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -310,6 +311,7 @@ class TestIntervention(TestCase):
         """Test strategy with side effects - card_html update"""
         ae  = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
+        self.bless_with_basics()
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',
@@ -326,15 +328,8 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
-        # Add a fake assessment and see a change
-        with SessionScope(db):
-            questionnaire_response = QuestionnaireResponse(
-                subject_id=user.id,
-                authored='2007-01-10 16:19:23',
-                status='completed',
-            )
-            db.session.add(questionnaire_response)
-            db.session.commit()
+        # Add a fake assessments and see a change
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(

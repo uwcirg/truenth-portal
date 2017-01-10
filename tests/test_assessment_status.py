@@ -8,27 +8,23 @@ from portal.models.fhir import CC, QuestionnaireResponse, assessment_status
 from tests import TestCase, TEST_USER_ID
 
 
-eortc_document = {
-"questionnaire": {
-    "display": "Additional questions",
-    "reference":
-    "https://eproms-demo.cirg.washington.edu/api/questionnaires/eortc"
-      }
-}
-epic_document = {
-"questionnaire": {
-    "display": "Additional questions",
-    "reference":
-    "https://eproms-demo.cirg.washington.edu/api/questionnaires/epic26"
-      }
-}
-eproms_document = {
-"questionnaire": {
-    "display": "Additional questions",
-    "reference":
-    "https://eproms-demo.cirg.washington.edu/api/questionnaires/eproms_add"
-      }
-}
+def mock_qr(user_id, instrument_id):
+    today = datetime.utcnow()
+    qr_document = {
+        "questionnaire": {
+            "display": "Additional questions",
+            "reference":
+            "https://{}/api/questionnaires/{}".format(
+                'SERVER_NAME', instrument_id)
+        }
+    }
+    qr = QuestionnaireResponse(
+        subject_id=TEST_USER_ID, status='completed',
+        authored=today,
+        document=qr_document)
+    with SessionScope(db):
+        db.session.add(qr)
+        db.session.commit()
 
 
 class TestAssessment(TestCase):
@@ -42,19 +38,8 @@ class TestAssessment(TestCase):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        today = datetime.utcnow()
-        eproms = QuestionnaireResponse(
-            subject_id=TEST_USER_ID, status='completed',
-            authored=today,
-            document=eproms_document)
-        epic = QuestionnaireResponse(
-            subject_id=TEST_USER_ID, status='completed',
-            authored=today,
-            document=epic_document)
-        with SessionScope(db):
-            db.session.add(eproms)
-            db.session.add(epic)
-            db.session.commit()
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
 
         self.test_user = db.session.merge(self.test_user)
         assessment_status(self.test_user)
@@ -64,14 +49,7 @@ class TestAssessment(TestCase):
         # User finished one, time remains for other
         self.bless_with_basics()  # pick up a consent, etc.
         self.mark_localized()
-        today = datetime.utcnow()
-        eproms = QuestionnaireResponse(
-            subject_id=TEST_USER_ID, status='completed',
-            authored=today,
-            document=eproms_document)
-        with SessionScope(db):
-            db.session.add(eproms)
-            db.session.commit()
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
 
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "In Progress")
@@ -79,13 +57,7 @@ class TestAssessment(TestCase):
     def test_metastatic_on_time(self):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
-        eortc = QuestionnaireResponse(
-            subject_id=TEST_USER_ID, status='completed',
-            authored=datetime.utcnow(),
-            document=eortc_document)
-        with SessionScope(db):
-            db.session.add(eortc)
-            db.session.commit()
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
 
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "Completed")
