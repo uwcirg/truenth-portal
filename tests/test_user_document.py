@@ -26,10 +26,9 @@ class TestUserDocument(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.app.get('/api/user/{}/user_documents'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/user_documents'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['user_documents']), 2)
-
 
     def test_post_patient_report(self):
         #tests whether we can successfully post a patient report -type user doc file
