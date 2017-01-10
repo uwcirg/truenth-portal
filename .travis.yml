@@ -33,6 +33,9 @@ matrix:
         sauce_connect: true
 
 before_install:
+  # Only deploy from develop and master branches, and not previously configured
+  - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then export DEPLOY=true;fi
+
   # Set TOXENV default (if not overridden by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
@@ -93,7 +96,9 @@ before_deploy:
 deploy:
   on:
     all_branches: true
-    condition: $TOXENV = py27
+    condition:
+      - $TOXENV = py27
+      - $DEPLOY = true
   provider: bintray
   file: "bintray.json"
   user: "ivan-c"
