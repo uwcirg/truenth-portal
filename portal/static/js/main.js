@@ -122,10 +122,6 @@ var fillContent = {
                     $radios.filter('[value='+clinicalValue+']').prop('checked', true);
                 }
             };
-            // Display clinics if any value is false (except localized) or if all are answered
-            if ((clinicalValue == "false" && clinicalItem != "pca_localized") || i == 3) {
-                $("#clinics").fadeIn();
-            }
         })
     },
     "demo": function(data) {
@@ -1252,25 +1248,36 @@ $(document).ready(function() {
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
         custom: {
-            birthday: function() {
+            birthday: function($el) {
                 var m = parseInt($("#month").val());
                 var d = parseInt($("#date").val());
                 var y = parseInt($("#year").val());
                 // If all three have been entered, run check
-                var goodDate = false;
-                var errorMsg = "Sorry, this isn't a valid date. Please try again.";
+                var goodDate = true;
+                var errorMsg = "";
+
+                /** the custom validation check here is causing some weird errors - not allowing user to proceed even fields are valid
+                commenting this out for now and use custom check via on change event of birthday field(s) */
+
+                /****************
                 if (m && d && y) {
                     var today = new Date();
                     // Check to see if this is a real date
                     var date = new Date(y,m-1,d);
-                    if (date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
-                        goodDate = true;
+
+
+                    if (!(date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d)) {
+                        goodDate = false;
+                        errorMsg = "Sorry, this isn't a valid date. Please try again.";
+                    } else {
                         // Only allow if birthdate is before today
                         if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
                             goodDate = false;
                             errorMsg = "Your birthdate must be in the past.";
-                        }
+                        } else goodDate = true;
                     }
+
+
                     if (y.toString().length < 3) {
                         goodDate = false;
                         errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
@@ -1291,28 +1298,32 @@ $(document).ready(function() {
                         $("#birthday").val("");
                     }
                 } else {
+                **************/
                     // If NaN then the values haven't been entered yet, so we
                     // validate as true until other fields are entered
-                    if (isNaN(y) || (isNaN(d) && isNaN(y))) {
-                        $("#errorbirthday").html('All fields must be complete.').hide();
-                        return true;
-                    } else if (isNaN(d)) {
-                        errorMsg = "Please enter a valid date.";
-                    } else if (isNaN(m)) {
-                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
-                    } else if (isNaN(y)) {
-                        errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
-                    };
+                if (isNaN(y) || (isNaN(d) && isNaN(y))) {
+                    $("#errorbirthday").html('All fields must be complete.').hide();
+                    goodDate = false;
+                } else if (isNaN(d)) {
+                    errorMsg = "Please enter a valid date.";
+                } else if (isNaN(m)) {
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid month.";
+                } else if (isNaN(y)) {
+                    errorMsg += (hasValue(errorMsg)?"<br/>": "") + "Please enter a valid year.";
+                };
+
+                if (hasValue(errorMsg)) {
                     $("#errorbirthday").html(errorMsg).show();
                     $("#birthday").val("");
+                    goodDate = false;
                 }
-                //console.log("good Date: " + goodDate)
+                //}
+                //console.log("good Date: " + goodDate + " errorMessage; " + errorMsg)
                 if (goodDate) {
                     $("#errorbirthday").html("").hide();
-                    return true;
-                } else {
-                    return false;
-                }
+                };
+
+                return goodDate;
             },
             customemail: function($el) {
                 if ($el.val() == "") {
@@ -1356,6 +1367,43 @@ $(document).ready(function() {
 });
 
 var tnthDates = {
+    /** validateBirthDate  check whether the date is a sensible date.
+     ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
+     ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
+    "validateBirthDate": function(m, d, y) {
+        if (hasValue(m) && hasValue(d) && hasValue(y)) {
+
+            var m = parseInt(m);
+            var d = parseInt(d);
+            var y = parseInt(y);
+
+            if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
+                var today = new Date();
+                // Check to see if this is a real date
+                var date = new Date(y,m-1,d);
+                if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
+                    $("#errorbirthday").html("Invalid date. Please try again.").show();
+                    return false;
+                }
+                else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                    $("#errorbirthday").html("Birthday must not be in the future. Please try again.").show();
+                    return false; //shouldn't be in the future
+                }
+                else if (y < 1900) {
+                    $("#errorbirthday").html("Date must not be before 1900. Please try again.").show();
+                    return false;
+                };
+
+                $("#errorbirthday").html("").hide();
+
+                return true;
+
+            } else return false;
+
+        } else {
+            return false;
+        };
+    },
     /***
      * changeFormat - changes date format, particularly for submitting to server
      * @param currentDate - date to change
