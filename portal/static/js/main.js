@@ -578,27 +578,6 @@ var assembleContent = {
                     )
                 };
             };
-
-
-            // demoArray["extension"] = [
-
-            //     {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity",
-            //         "valueCodeableConcept": {
-            //             "coding": ethnicityIDs ? ethnicityIDs : []
-            //         }
-            //     },
-            //     {   "url": "http://hl7.org/fhir/StructureDefinition/us-core-race",
-            //         "valueCodeableConcept": {
-            //             "coding": raceIDs ? raceIDs : []
-            //         }
-            //     }
-            //      ,
-            //      {   "url": "http://us.truenth.org/fhir/StructureDefinition/AU-NHHD-METeOR-id-291036",
-            //          "valueCodeableConcept": {
-            //              "coding": indigenousIDs ? indigenousIDs: []
-            //          }
-            //      }
-            // ];
             if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
@@ -621,10 +600,6 @@ var assembleContent = {
                 demoArray["telecom"].push({ "system": "email", "value": emailVal });
             };
             demoArray["telecom"].push({ "system": "phone", "value": $("input[name=phone]").val() });
-            //demoArray["telecom"] = [
-                //{ "system": "email", "value": $("input[name=email]").val() },
-                //{ "system": "phone", "value": $("input[name=phone]").val() }
-            //];
            //console.log("demoArray", demoArray);
         }
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
@@ -1219,32 +1194,6 @@ $(document).ready(function() {
     // Reveal footer after load to avoid any flashes will above content loads
     $("#homeFooter").show();
 
-    // Handling "none of the above" clinic choice
-
-    // $("#userOrgs input[name='organization']").each(function() {
-    //     $(this).prop("checked", false);
-    // });
-
-    // $("#userOrgs").on("click", ".clinic", function(){
-    //     console.log("id: " + $(this).attr("id") + " checked: " + $(this).prop("checked"))
-    //     if ($(this).prop("checked")){
-    //         if ($(this).attr("id") !== "noOrgs") {
-    //             //console.log("set no org here")
-    //             $("#noOrgs").prop('checked',false);
-    //         } else {
-    //             $("#userOrgs input[name='organization']").each(function() {
-    //                 //console.log("in id: " + $(this).attr("id"))
-    //                if ($(this).attr("id") !== "noOrgs") $(this).prop('checked',false);
-    //             });
-    //             $("#consentContainer input.consent-checkbox").each(function() {
-    //                 $(this).prop("checked", false);
-    //             });
-    //         }
-    //         //if ($(this).attr("id") == "noOrgs")  $("input[name='organization']:not(#noOrgs)").attr('checked',false);
-    //         //else $("#noOrgs").attr("checked", false);
-    //     };
-    // });
-
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
         custom: {
@@ -1255,52 +1204,8 @@ $(document).ready(function() {
                 // If all three have been entered, run check
                 var goodDate = true;
                 var errorMsg = "";
-
-                /** the custom validation check here is causing some weird errors - not allowing user to proceed even fields are valid
-                commenting this out for now and use custom check via on change event of birthday field(s) */
-
-                /****************
-                if (m && d && y) {
-                    var today = new Date();
-                    // Check to see if this is a real date
-                    var date = new Date(y,m-1,d);
-
-
-                    if (!(date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d)) {
-                        goodDate = false;
-                        errorMsg = "Sorry, this isn't a valid date. Please try again.";
-                    } else {
-                        // Only allow if birthdate is before today
-                        if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                            goodDate = false;
-                            errorMsg = "Your birthdate must be in the past.";
-                        } else goodDate = true;
-                    }
-
-
-                    if (y.toString().length < 3) {
-                        goodDate = false;
-                        errorMsg = "Please make sure you use a full 4-digit number for your birth year.";
-                    }
-                    if (y < 1900) {
-                        goodDate = false;
-                        errorMsg = "Year of birth must be after 1900.";
-                    }
-                    // After tests display errors if necessary
-                    if (goodDate) {
-                        $("#errorbirthday").html("").hide();
-                        // Set date if YYYY-MM-DD
-                        $("#birthday").val(y+"-"+m+"-"+d);
-                        // If we are on initial-queries, then we'll want to display the patientQ div
-                        //$("#patientQ, #patBiopsy").fadeIn();
-                    } else {
-                        $("#errorbirthday").html(errorMsg).show();
-                        $("#birthday").val("");
-                    }
-                } else {
-                **************/
-                    // If NaN then the values haven't been entered yet, so we
-                    // validate as true until other fields are entered
+                // If NaN then the values haven't been entered yet, so we
+                // validate as true until other fields are entered
                 if (isNaN(y) || (isNaN(d) && isNaN(y))) {
                     $("#errorbirthday").html('All fields must be complete.').hide();
                     goodDate = false;
