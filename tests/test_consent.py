@@ -28,7 +28,7 @@ class TestUserConsent(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
         self.login()
-        rv = self.app.get('/api/user/{}/consent'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['consent_agreements']), 2)
 
@@ -37,7 +37,7 @@ class TestUserConsent(TestCase):
         data = {'organization_id': org1.id, 'agreement_url': self.url}
 
         self.login()
-        rv = self.app.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
@@ -53,7 +53,7 @@ class TestUserConsent(TestCase):
                 'acceptance_date': acceptance_date}
 
         self.login()
-        rv = self.app.post('/api/user/{}/consent'.format(TEST_USER_ID),
+        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
@@ -82,7 +82,7 @@ class TestUserConsent(TestCase):
         self.assertEqual(self.test_user.valid_consents.count(), 2)
         self.login()
 
-        rv = self.app.delete('/api/user/{}/consent'.format(TEST_USER_ID),
+        rv = self.client.delete('/api/user/{}/consent'.format(TEST_USER_ID),
                              content_type='application/json',
                              data=json.dumps(data))
         self.assert200(rv)
@@ -92,5 +92,5 @@ class TestUserConsent(TestCase):
 
         # We no longer omit deleted consent rows, but rather, include
         # their audit data.
-        rv = self.app.get('/api/user/{}/consent'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assertTrue('deleted' in json.dumps(rv.json))

@@ -2,6 +2,7 @@
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
+from tests.test_assessment_status import mock_qr
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -30,7 +31,7 @@ class TestIntervention(TestCase):
         self.login(user_id=service_user.id)
 
         data = {'user_id': TEST_USER_ID, 'access': 'granted'}
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert401(rv)
@@ -51,7 +52,7 @@ class TestIntervention(TestCase):
                 'provider_html': "unique HTML for /patients view"
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
@@ -75,7 +76,7 @@ class TestIntervention(TestCase):
                 'access': 'enabled',
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -91,7 +92,7 @@ class TestIntervention(TestCase):
                 'link_url': 'http://un-safe.com',
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -310,6 +311,7 @@ class TestIntervention(TestCase):
         """Test strategy with side effects - card_html update"""
         ae  = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
+        self.bless_with_basics()
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',
@@ -326,15 +328,8 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
-        # Add a fake assessment and see a change
-        with SessionScope(db):
-            questionnaire_response = QuestionnaireResponse(
-                subject_id=user.id,
-                authored='2007-01-10 16:19:23',
-                status='completed',
-            )
-            db.session.add(questionnaire_response)
-            db.session.commit()
+        # Add a fake assessments and see a change
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
@@ -366,13 +361,13 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert200(rv)
 
         # fetch it back and compare
-        rv = self.app.get('/api/intervention/sexual_recovery/access_rule')
+        rv = self.client.get('/api/intervention/sexual_recovery/access_rule')
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEqual(len(data['rules']), 1)
@@ -392,7 +387,7 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert200(rv)
@@ -405,7 +400,7 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert400(rv)
@@ -681,7 +676,7 @@ class TestIntervention(TestCase):
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
         self.login()
-        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json.keys()), 1)
@@ -702,7 +697,7 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json.keys()), 7)
@@ -729,7 +724,7 @@ class TestIntervention(TestCase):
                     'Review results at <a href="http://www.example.com">here</a>'
                }
         self.login()
-        rv = self.app.post('/api/intervention/{}/communicate'.format(
+        rv = self.client.post('/api/intervention/{}/communicate'.format(
                 INTERVENTION.DECISION_SUPPORT_P3P.name),
                 content_type='application/json',
                 data=json.dumps(data))

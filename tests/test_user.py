@@ -27,12 +27,12 @@ class TestUser(TestCase):
         self.login()
 
         # bad email param should raise 400
-        rv = self.app.get('/api/unique_email?email=h2@1')
+        rv = self.client.get('/api/unique_email?email=h2@1')
         self.assert400(rv)
 
         email = 'john+test@example.com'
         request = '/api/unique_email?email={}'.format(urllib.quote(email))
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -41,7 +41,7 @@ class TestUser(TestCase):
         self.test_user.email = email
         with SessionScope(db):
             db.session.commit()
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -49,7 +49,7 @@ class TestUser(TestCase):
         # but a second user should see false
         second = self.add_user(username='second@foo.com')
         self.login(second.id)
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], False)
@@ -58,7 +58,7 @@ class TestUser(TestCase):
         request = '/api/unique_email?email={}&user_id={}'.format(
             urllib.quote(email), TEST_USER_ID)
         self.promote_user(second, ROLE.ADMIN)
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -175,7 +175,7 @@ class TestUser(TestCase):
         user_id, actor_id = user.id, actor.id
         self.promote_user(user=actor, role_name=ROLE.ADMIN)
         self.login(user_id=actor_id)
-        rv = self.app.delete('/api/user/{}'.format(user_id))
+        rv = self.client.delete('/api/user/{}'.format(user_id))
         self.assert200(rv)
         user = db.session.merge(user)
         self.assertTrue(user.deleted_id)
@@ -196,14 +196,14 @@ class TestUser(TestCase):
         data = {"resourceType": "Patient",
                 "extension": [{"url": UserTimezone.extension_url,
                                "timezone": "bogus"}]}
-        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+        rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert400(rv)
 
         # Valid setting should work
         data['extension'][0]['timezone'] = 'US/Eastern'
-        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+        rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
@@ -222,14 +222,14 @@ class TestUser(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'organizations': [{'organization_id':None}]}
-        rv = self.app.post('/api/account', data=json.dumps(data),
+        rv = self.client.post('/api/account', data=json.dumps(data),
                            content_type='application/json')
         self.assert400(rv)
 
     def test_account_creation(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        rv = self.app.post('/api/account')
+        rv = self.client.post('/api/account')
 
         self.assert200(rv)
         self.assertTrue(rv.json['user_id'] > 0)
@@ -245,7 +245,7 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        rv = self.app.put('/api/demographics/{}'.format(user_id),
+        rv = self.client.put('/api/demographics/{}'.format(user_id),
                 content_type='application/json',
                 data=json.dumps(data))
         new_user = User.query.get(user_id)
@@ -254,7 +254,7 @@ class TestUser(TestCase):
         self.assertEquals(new_user.username, None)
         self.assertEquals(len(new_user.roles), 0)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
-        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+        rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
@@ -274,7 +274,7 @@ class TestUser(TestCase):
         data = {'organizations': [{'organization_id': org_id},
                                   {'organization_id': org2_id}]}
         self.login(user_id=provider_id)
-        rv = self.app.post('/api/account',
+        rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -292,7 +292,7 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        rv = self.app.put('/api/demographics/{}'.format(user_id),
+        rv = self.client.put('/api/demographics/{}'.format(user_id),
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
@@ -302,7 +302,7 @@ class TestUser(TestCase):
         self.assertEquals(new_user.username, None)
         self.assertEquals(len(new_user.roles), 0)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
-        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+        rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
@@ -340,7 +340,7 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.PATIENT)
         self.promote_user(role_name=ROLE.PROVIDER)
         self.login()
-        rv = self.app.get('/api/user/{0}/roles'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), 2)
@@ -350,12 +350,12 @@ class TestUser(TestCase):
 
     def test_unauth_role(self):
         self.login()
-        rv = self.app.get('/api/user/66/roles')
+        rv = self.client.get('/api/user/66/roles')
         self.assert404(rv)
 
     def test_all_roles(self):
         self.login()
-        rv = self.app.get('/api/roles')
+        rv = self.client.get('/api/roles')
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), len(STATIC_ROLES))
@@ -369,7 +369,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -387,7 +387,7 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -409,7 +409,7 @@ class TestUser(TestCase):
                 ]}
 
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -427,7 +427,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -446,7 +446,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -487,7 +487,7 @@ class TestUser(TestCase):
 
     def test_all_relationships(self):
         # obtain list of all relationships
-        rv = self.app.get('/api/relationships')
+        rv = self.client.get('/api/relationships')
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
@@ -510,7 +510,7 @@ class TestUser(TestCase):
         # make sure we get relationships for both subject and predicate
         self.create_fake_relationships()
         self.login()
-        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
@@ -521,7 +521,7 @@ class TestUser(TestCase):
                                   'with': other_user.id},]
                }
         self.login()
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -540,7 +540,7 @@ class TestUser(TestCase):
         self.assertEquals(len(self.test_user.relationships), 1)
 
         self.login()
-        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
         data = rv.json
 
@@ -551,7 +551,7 @@ class TestUser(TestCase):
         data['relationships'] = [r for r in data['relationships'] if
                                  r['user'] == self.test_user.id]
         self.assertEquals(len(data['relationships']), 1)
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -567,7 +567,7 @@ class TestUser(TestCase):
                                   'with': TEST_USER_ID},]
                }
         self.login()
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)

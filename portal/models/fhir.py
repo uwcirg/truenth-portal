@@ -583,6 +583,8 @@ def assessment_status(user, consented_organization=None):
     # First lookup the consent on file between the user and the consented_org
     # used to determine the age and status of a user's assessments
     # Skipping this requriement for demo - using user's first consent
+    if not user.valid_consents.count():
+        return 'Expired'
     consent_date = user.valid_consents[0].audit.timestamp
 
     today = datetime.utcnow()
