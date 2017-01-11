@@ -461,7 +461,7 @@ def terms_and_conditions():
     """ Legal/terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     response = requests.get(app_text(ToU_ATMA.name_key()))
-    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html', content=response.text)
+    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html', content=response.json()['asset'])
 
 @portal.route('/about')
 def about():
