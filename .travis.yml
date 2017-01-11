@@ -57,7 +57,9 @@ script:
 
 before_deploy:
   - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
-  - docker run "portal_builddeb:test"
+
+  # Build artifacts from current repo and branch (else "develop")
+  - docker run -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "portal_builddeb:test"
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
   - cp /tmp/artifacts/* ../
 
