@@ -90,7 +90,7 @@ deploy:
     condition:
       - $TOXENV = py27
       - $DEPLOY = true
-      - -v $BINTRAY_API_KEY
+      - -v BINTRAY_API_KEY
   provider: bintray
   file: "bintray.json"
   user: "ivan-c"
