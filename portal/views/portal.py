@@ -66,29 +66,25 @@ def landing():
         return next_after_login()
 
     timed_out = request.args.get('timed_out', False)
-    gil = current_app.config.get('GIL', None)
+    gil = current_app.config.get('GIL')
     return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out = timed_out)
 
 #from GIL
 @portal.route('/symptom-tracker')
 def symptom_tracker():
-    user = current_user()
-    return render_template('gil/symptom-tracker.html', user = user if user else None)
+    return render_template('gil/symptom-tracker.html', user = current_user())
 
 @portal.route('/decision-support')
 def decision_support():
-    user = current_user()
-    return render_template('gil/decision-support.html', user = user if user else None)
+    return render_template('gil/decision-support.html', user = current_user())
 
 @portal.route('/what-is-prostate-cancer')
 def prostate_cancer_facts():
-    user = current_user()
-    return render_template('gil/what-is-prostate-cancer.html', user = user if user else None)
+    return render_template('gil/what-is-prostate-cancer.html', user = current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
-    user = current_user()
-    return render_template('gil/terms-and-conditions.html', user = user if user else None)
+    return render_template('gil/terms-and-conditions.html', user = current_user())
 
 
 class ShortcutAliasForm(FlaskForm):
@@ -461,20 +457,18 @@ def profile(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
-    gil = current_app.config.get('GIL', None)
+    gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
-    user = current_user()
-    return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user = user if user else None)
+    return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user = current_user())
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
     about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
     about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
-    gil = current_app.config.get('GIL', None)
-    user = current_user
+    gil = current_app.config.get('GIL')
     return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth.text,
-                           about_mo=about_mo.text, user = user if user else None)
+                           about_mo=about_mo.text, user = current_user())
 
 @portal.route('/explore')
 def explore():
@@ -496,9 +490,9 @@ def contact():
     if request.method == 'GET':
         sendername = user.display_name if user else ''
         email = user.email if user else ''
-        gil = current_app.config.get('GIL', None)
+        gil = current_app.config.get('GIL')
         return render_template('contact.html' if not gil else 'gil/contact.html', sendername=sendername,
-                               email=email, user = user if user else None)
+                               email=email, user = user)
 
     sender = request.form.get('email')
     sendername = request.form.get('sendername')
