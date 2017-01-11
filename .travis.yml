@@ -27,6 +27,9 @@ matrix:
         sauce_connect: true
 
 before_install:
+  # Set Github env vars
+  - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
+
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then export DEPLOY=true;fi
 
