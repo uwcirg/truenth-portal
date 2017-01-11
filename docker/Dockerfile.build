@@ -8,8 +8,7 @@
 # $ docker run "portal_builddeb:test"
 
 # Build the image (override defaults)
-# $ docker run --tty -e REPO_SLUG='ivan-c/true_nth_usa_portal' -e BRANCH='feature/deb-packaging_dockerize-portal_comp
-ose' "portal_builddeb:test"
+# $ docker run --tty -e REPO_SLUG='ivan-c/true_nth_usa_portal' -e BRANCH='feature/deb-packaging_dockerize-portal_compose' "portal_builddeb:test"
 
 # Copy the debian package from the image to the container host
 # $ docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
