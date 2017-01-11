@@ -83,8 +83,7 @@ before_deploy:
         ],
         "publish": true
     }
-    ' | envsubst
-    > "${TRAVIS_BUILD_DIR}/bintray.json"
+    ' | envsubst | tee "${TRAVIS_BUILD_DIR}/bintray.json"
 
 # Only deploy from default virtual env TravisCI job
 deploy:
