@@ -4,6 +4,8 @@ sudo: required
 cache: pip
 addons:
   postgresql: "9.4"
+
+# setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
 git:
   depth: 2000
 
