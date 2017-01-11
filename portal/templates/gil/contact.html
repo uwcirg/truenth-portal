@@ -1,0 +1,86 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{super()}}
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url(./images/Contact-Background.jpg)">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">Contact Us</h1>
+          <p class="page-intro__sub">Please connect with us, ask questions, share your story, and make suggestions for how we can do better.</p>
+          <div class="button-callout">
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown">
+        <div class="module">
+          <div class="contact-form-wrap">
+            <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
+            <h3 class="module__heading">Contact Form</h3>
+            <p class="module__body">Use this form to get in touch with TrueNTH USA.</p>
+            <form id="contactForm" class="module__form" action="" method="post">
+              <input type="hidden" name="sendername" id="sendername" value="" />
+              <div class="field-group field-group__half">
+                <div class="field field__text">
+                  <label>First Name</label>
+                  <input class="field__input input-first-name" type="text" placeholder="First Name" id="first-name" name="first-name"/>
+                </div>
+                <div class="field field__text">
+                  <label>Last Name</label>
+                  <input class="field__input input-last-name" type="text" placeholder="Last Name" id="last-name" name="last-name"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__text">
+                  <label>Your Email</label>
+                  <input class="field__input input-email" type="email" placeholder="Email Address" id="email" name="email"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__text">
+                  <label>Subject</label>
+                  <input class="field__input input-email" type="text" placeholder="Subject" id="subject" name="subject"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__textarea">
+                  <label class="field__label">Message</label>
+                  <textarea class="field__textarea" id="body" name="body"></textarea>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__select">
+                  <label class="field__label">About You</label>
+                  <select id="about" name="about" class="field__select">
+                    <option value="">Select</option>
+                    <option value="I've been diagnosed with Prostate Cancer">I've been diagnosed with Prostate Cancer</option>
+                    <option value="I want to learn more about Prostate Cancer">I want to learn more about Prostate Cancer</option>
+                  </select>
+                </div>
+              </div>
+              <div class="field-group">
+                <div id="submitButton" class="button-wrap button-wrap--centered"><a class="icon-box__button icon-box__button--main"><span>Submit<figure></figure></span></a></div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+  <script>
+      $(document).ready(function(){
+        $("#first-name, #last-name").each(function() {
+            $(this).on("blur", function() {
+                var name = $("#first-name").val();
+                name += (name != "" ? " " : "") + $("#last-name").val();
+                $("#sendername").val(name.trim());
+            });
+        });
+        $("#submitButton").on("click", function() {
+            if ($("#sendername").val() != "" && $("#body").val() != "" && $("#email").val() != "") {
+                $("#contactForm").submit();
+            };
+        });
+      });
+  </script>
+{% endblock %}

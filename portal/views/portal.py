@@ -66,7 +66,25 @@ def landing():
         return next_after_login()
 
     timed_out = request.args.get('timed_out', False)
-    return render_template('landing.html', user=None, no_nav="true", timed_out = timed_out)
+    gil = current_app.config.get('GIL')
+    return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out)
+
+#from GIL
+@portal.route('/symptom-tracker')
+def symptom_tracker():
+    return render_template('gil/symptom-tracker.html', user=current_user())
+
+@portal.route('/decision-support')
+def decision_support():
+    return render_template('gil/decision-support.html', user=current_user())
+
+@portal.route('/what-is-prostate-cancer')
+def prostate_cancer_facts():
+    return render_template('gil/what-is-prostate-cancer.html', user=current_user())
+
+@portal.route('/terms-and-conditions')
+def terms_and_conditions():
+    return render_template('gil/terms-and-conditions.html', user=current_user())
 
 
 class ShortcutAliasForm(FlaskForm):
@@ -439,16 +457,18 @@ def profile(user_id):
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
+    gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
-    return render_template('legal.html', content=response.text)
+    return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user=current_user())
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
     about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
     about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
-    return render_template('about.html', about_tnth=about_tnth.text,
-                           about_mo=about_mo.text)
+    gil = current_app.config.get('GIL')
+    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth.text,
+                           about_mo=about_mo.text, user=current_user())
 
 @portal.route('/explore')
 def explore():
@@ -470,8 +490,9 @@ def contact():
     if request.method == 'GET':
         sendername = user.display_name if user else ''
         email = user.email if user else ''
-        return render_template('contact.html', sendername=sendername,
-                               email=email)
+        gil = current_app.config.get('GIL')
+        return render_template('contact.html' if not gil else 'gil/contact.html', sendername=sendername,
+                               email=email, user=user)
 
     sender = request.form.get('email')
     sendername = request.form.get('sendername')

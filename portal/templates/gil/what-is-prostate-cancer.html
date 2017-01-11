@@ -1,0 +1,241 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{ super() }}
+      <div class="page-intro page-intro--dark page-intro--top-img page-intro--prostate-facts" style="background-image: url({{url_for('static', filename='img/PCF2-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">What is <span class="page-intro__main--accent">Prostate Cancer?</span></h1>
+          <p class="page-intro__sub">Prostate Cancer is when cancer starts in the prostate. Cancer is a disease in which cells in the body grow out of control. Many men with prostate cancer die of other causes without ever having any symptoms from the cancer.</p>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-gray">
+        <div class="module">
+          <div class="accent-heading accent-heading--no-border">CURRENT U.S. STATISTICS</div>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--half-width">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <p class="mini-box__copy">Prostate cancer is the most common non-skin cancer in the United States, affecting 1 in 7 men.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <p class="mini-box__copy">In 2015, approximately 220,800 men will be diagnosed with prostate cancer, and more than 27,540 men will die from the disease.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <p class="mini-box__copy">It is estimated that there are nearly 3 million U.S. men currently living with prostate cancer.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <p class="mini-box__copy">African American men are 56% more likely to develop prostate cancer compared with Caucasian men and nearly 2.5 times as likely to die from the disease.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown">
+        <div class="module">
+          <div class="accent-heading accent-heading--no-border">Education</div>
+          <p class="module__heading">What is the <span class="module__heading--accent">Prostate</span>?</p>
+          <p class="module__body module__body--left">The prostate is a part of the male reproductive system and is located just below the bladder and in front of the rectum. It produces fluid that makes up a part of semen.</p>
+          <div class="module__img"><img src="{{url_for('static', filename='img/what-is-the-prostate-graphic.png')}}"></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
+        <div class="module">
+          <p class="module__heading">What are the <span class="module__heading--accent">Risk Factors</span> for<br/> Prostate Cancer?</p>
+          <p class="module__body module__body--left">There are some risk factors that increase your chances of getting prostate cancer:</p>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--half-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Age</h5>
+                <p class="mini-box__copy">The older a man is, the greater his risk for getting prostate cancer.</p>
+              </div>
+              <div class="mini-box">
+                <h5 class="mini-box__head">Race</h5>
+                <p class="mini-box__copy">Prostate cancer is more common in African-American men, tends to start at younger ages, and grow faster than in other racial or ethnic groups.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Family History</h5>
+                <p class="mini-box__copy">Certain genes, passed from parent to child, that you inherited from your parents may affect your prostate cancer risk. A man that has a father, brother, or son who has had prostate cancer is two to three times more likely to develop the disease himself.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
+        <div class="module">
+          <p class="module__heading">What are the <span class="module__heading--accent">Symptoms</span> of<br/> Prostate Cancer?</p>
+          <p class="module__body module__body--left">Most men will not experience any symptoms, especially when the prostate cancer is caught at early stages. Some men do have symptoms for prostate cancer which might include:</p>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head mini-box__head--centered">POSSIBLE SYMPTOMS</h5>
+                <ul class="mini-box__list">
+                  <li>Difficulty starting urination</li>
+                  <li>Weak or interrupted flow of urine</li>
+                  <li>Frequent urination (especially at night)</li>
+                  <li>Difficulty emptying bladder completely</li>
+                  <li>Pain in the back, hips or pelvis that doesn’t go away</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="module__body module__body--left"><strong>If you have any symptoms that worry you, be sure to see your doctor right away.</strong> Keep in mind that these symptoms may be caused by conditions other than prostate cancer.</div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
+        <div class="module">
+          <p class="module__heading">What <span class="module__heading--accent">Screening Tests</span> Are There for <br/>Prostate Cancer?</p>
+          <p class="module__body module__body--left">Cancer screening means looking for cancer before it causes symptoms. However, most prostate cancers grow slowly or not at all. </p>
+          <p class="module__body module__body--left">Two tests are commonly used to screen for prostate cancer: </p>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head">DIGITAL RECTAL EXAM (DRE)</h5>
+                <p class="mini-box__copy">A doctor or nurse inserts a gloved, lubricated finger into the rectum to estimate the size of the prostate and feel for lumps or other abnormalities.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head">PROSTATE SPECIFIC ANTIGEN (PSA) TEST</h5>
+                <p class="mini-box__copy">Measures the level of PSA in the blood. PSA is a substance made by the prostate. The levels of PSA in the blood can be higher in men who have prostate cancer. The PSA level may also be elevated in other conditions that affect the prostate.</p>
+                <p class="mini-box__copy">Because many factors can affect PSA levels, your doctor is the best person to interpret your PSA test results. Only a biopsy can diagnose prostate cancer for sure.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-olive">
+        <div class="module">
+          <div class="accent-heading accent-heading--no-border">Diagnosis</div>
+          <p class="module__heading">How Is Prostate Cancer <span class="module__heading--accent">Diagnosed?</span></p>
+          <p class="module__body module__body--left">If your prostate specific antigen (PSA) test or digital rectal exam (DRE) is abnormal, doctors may do more tests to find or diagnose prostate cancer. A biopsy is the main tool for diagnosing prostate cancer. A biopsy is when a small piece of tissue is removed from the prostate and looked at under a microscope to see if there are cancer cells.</p>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Gleason Score</h5>
+                <p class="mini-box__copy">If there is cancer a Gleason score assigned. It indicates how likely it is to spread. The score ranges from 2 to 10. The lower the score, the less likely it is that the cancer will spread.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
+            <div class="mini-boxes__item mini-boxes__item-col">
+              <div class="mini-box">
+                <h5 class="mini-box__head">PROSTATE SPECIFIC ANTIGEN (PSA) TEST</h5>
+                <p class="mini-box__copy">The staging of prostate cancer is important in choosing treatment options and predicting a man’s outlook for survival (prognosis). Staging is based on:</p>
+                <ul class="mini-box__list--inline mini-box__list">
+                  <li>The prostate biopsy results (including the Gleason score)</li>
+                  <li>The blood PSA level at the time of diagnosis</li>
+                  <li>The results of any other exams or tests that were done to find out how far the cancer has spread</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-blue">
+        <div class="module">
+          <div class="accent-heading accent-heading--no-border">Treatment</div>
+          <p class="module__heading">How Is Prostate Cancer <span class="module__heading--accent">Treated?</span></p>
+          <p class="module__body module__body--left">Men have different stages of prostate cancer and have different treatment options available to them:</p>
+          <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Active Surveillance</h5>
+                <p class="mini-box__copy">Closely monitoring prostate cancer to determine if treatment is needed.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Surgery</h5>
+                <p class="mini-box__copy">Procedure to remove the prostate called prostatectomy.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">RADIATION THERAPY</h5>
+                <p class="mini-box__copy">Use of high-energy rays to destroy cancer cells. There are two types of radiation therapy:</p>
+                <h6 class="mini-box__subhead">External Radiation Therapy</h6>
+                <p class="mini-box__copy">A machine outside the body directs radiation at the cancer cells.</p>
+                <h6 class="mini-box__subhead">Internal Radiation Therapy (brachytherapy)</h6>
+                <p class="mini-box__copy">Radioactive seeds or pellets are surgically placed into or near the cancer to destroy the cancer cells.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">SYSTEMIC THERAPY</h5>
+                <p class="mini-box__copy">Use of medications to fight cancer cells throughout the body.</p>
+                <h6 class="mini-box__subhead">Hormone Therapy</h6>
+                <p class="mini-box__copy">Lowering levels of hormones to help slow the growth of cancer.</p>
+                <h6 class="mini-box__subhead">Chemotherapy</h6>
+                <p class="mini-box__copy">Using special drugs to shrink or kill the cancer.</p>
+                <h6 class="mini-box__subhead">Immunotherapy</h6>
+                <p class="mini-box__copy">Medications that use the power of the immune system to target cancer cells.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">CRYOTHERAPY</h5>
+                <p class="mini-box__copy">Placing a special probe inside or near the prostate cancer to freeze and kill the cancer cells.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">BIOLOGICAL THERAPY</h5>
+                <p class="mini-box__copy">Works with your body’s immune system to help it fight cancer or to control side effects from other cancer treatments.</p>
+              </div>
+            </div>
+          </div>
+          <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">High-intensity focused ultrasound (HIFU)</h5>
+                <p class="mini-box__copy">This therapy directs high-energy sound waves (ultrasound) at the cancer to kill cancer cells.</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">COMPLIMENTARY AND <br/>ALTERNATIVE MEDICINE</h5>
+                <p class="mini-box__copy">Medicines and health practices that are not standard cancer treatments.<br/><br/></p>
+                <p class="mini-box__copy--smaller">Meditation, yoga, and supplements like vitamins and herbs are some examples. Many kinds of complementary and alternative medicine have not been tested scientifically and may not be safe. Talk to your doctor about the risks and benefits before you start any kind of complementary or alternative medicine.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown-light">
+        <div class="module">
+          <div class="accent-heading accent-heading--no-border">ADDITIONAL RESOURCES</div>
+          <p class="module__body module__body--left">
+            <strong>Centers for Disease Control and Prevention</strong><br/> Information about Prostate Cancer
+<br /> <a href="https://www.cdc.gov/cancer/prostate/">https://www.cdc.gov/cancer/prostate/</a>
+          </p>
+          <p class="module__body module__body--left">
+            <strong>Prostate Cancer Foundation</strong><br/ >Understanding Prostate Cancer
+<br/><a target="_blank" href="https://www.pcf.org/understanding-prostate-cancer/">https://www.pcf.org/understanding-prostate-cancer</a>
+          </p>
+          <p class="module__body module__body--left">
+            <strong>UsTOO</strong><br /> Education & Support for Prostate Cancer Patients & their Caregivers
+<br /> <a target="_blank" href="http://www.ustoo.org">http://www.ustoo.org</a>
+          </p>
+          <p class="module__body module__body--left">
+            <strong>UsTOO</strong><br/> Online Prostate Cancer Discussion Forum and Community
+<a target="_blank" href="https://www.inspire.com/groups/us-too-prostate-cancer/">https://www.inspire.com/groups/us-too-prostate-cancer/</a>
+          </p>
+          <div class="mini-boxes mini-boxes--theme-g"></div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+

@@ -83,6 +83,67 @@ body {
   left: 0;
   font-size: 0.90em;
 }
+#accessCodeWrapper {
+  height: 100%;
+  width: 100%;
+  min-height: 400px;
+  overflow: hidden;
+  margin: auto;
+}
+.access-button {
+  opacity: 1;
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
+  /*border-color: rgb(221, 221, 221);
+    background-color: rgb(52, 152, 219);*/
+  border-color: #E0E6E3;
+  background-color: #606a73;
+  background-image: none;
+  color: #ffffff;
+  font-weight: normal;
+  padding: 6px 10px;
+  border-width: 0px;
+  border-radius: 3px;
+  border-style: solid;
+  background-size: auto;
+  background-repeat: repeat;
+  background-position: center center;
+  font-size: 14px;
+  font-style: normal;
+  font-family: Arial;
+  text-align: center;
+  width: 140px;
+  height: 32px;
+  /*transform: rotate(0deg) translate(87px, 302px) rotate(0deg);*/
+}
+.access-button:hover {
+  color: #fff;
+  background-color: #2a4531;
+  border-color: #1c2f21;
+}
+#accessCodeWrapper {
+  margin: 0 auto;
+  width: 600px;
+  max-width: 100%;
+  min-height: 500px;
+}
+#accessCodeWrapper .main {
+  padding: 4em;
+}
+#shortcut_alias {
+  width: 140px;
+  max-width: 100%;
+  height: 34px;
+}
+#accessCodeWrapper .disabled {
+  background-color: #999;
+  opacity: 0.65;
+}
+#registerLink {
+  position: relative;
+  top: -1.1px;
+  width: 140px;
+  display: inline-block;
+}
 #indexContainer {
   padding: 1.8em 2em;
   position: absolute;
@@ -227,10 +288,13 @@ a.btn {
 }
 .smaller-text .form-control {
   font-size: 0.85em;
-  height: 1.7em;
+  height: 1.6em;
 }
 .smaller-text .btn {
-  font-size: 0.85em;
+  font-size: 0.8em;
+}
+.small-text {
+  font-size: 0.96em;
 }
 .loading {
   opacity: 0.3;
@@ -728,6 +792,7 @@ table.profile-audit-log TH,
   -moz-box-shadow: 10px 10px 10px -9px #eff2ef;
   box-shadow: 10px 10px 10px -9px #eff2ef;
   padding: 0.5em;
+  font-size: 1em;
   transition: all 300ms ease-in;
 }
 .profile-header {
