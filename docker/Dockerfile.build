@@ -54,9 +54,14 @@ RUN pip install make-deb
 
 RUN mkdir -p /tmp/artifacts
 
-# Todo: allow branch to be overridden
+# Allow branch to be overridden with environmental variable
+ENV BRANCH=${BRANCH:-develop}
+
+# Allow repo to be overridden with environmental variable
+ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+
 CMD \
-	git clone --branch develop https://github.com/ivan-c/true_nth_usa_portal.git /root/portal && \
+	git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
 	cd /root/portal && \
 	yes | make-deb && \
 	git checkout debian/rules && \
