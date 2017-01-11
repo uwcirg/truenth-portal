@@ -17,4 +17,5 @@ log
 
 .settings/
 .project/
-.pydevproject/
+.pydevproject
+.project
