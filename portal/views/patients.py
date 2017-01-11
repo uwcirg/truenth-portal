@@ -1,6 +1,6 @@
 """Patient view functions (i.e. not part of the API or auth)"""
 from datetime import datetime
-from flask import abort, Blueprint, render_template
+from flask import abort, Blueprint, render_template, current_app
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -53,8 +53,11 @@ def patients_root():
                      user.id in consented_users and
                      user.deleted_id is None]
 
+        additional_field = current_app.config.get('PATIENTS_BY_PROVIDER_ADDL_FIELDS')
         for user in org.users:
-            user.assessment_status = assessment_status(user)
+            if (additional_field and 'status' in additional_field):
+                #only load this conditionally, no need to load if not specified in config, as it is also conditionally rendered in the html
+                user.assessment_status = assessment_status(user) 
             user.consent_date = (user.valid_consents[0].audit.timestamp).strftime('%m-%d-%Y') if user.valid_consents else None
 
         #store patients by org into top level org list so we can list them by top-level org
