@@ -16,6 +16,5 @@ pip-selfcheck.json
 log
 
 .settings/
-.project/
 .pydevproject
 .project
