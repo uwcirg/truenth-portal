@@ -1458,6 +1458,7 @@ div.input-group.date {
 @media (max-width: 1300px) {
  #fullSizeBox {
     height: 680px;
+  }
 }
 
 @media (min-width: 1400px) {
