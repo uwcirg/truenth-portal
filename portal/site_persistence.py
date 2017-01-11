@@ -4,7 +4,7 @@ from flask import current_app
 import json
 import os
 import requests
-from sqlalchemy import exc
+from sqlalchemy import exc, and_
 import tempfile
 
 from app import SITE_CFG
@@ -143,7 +143,7 @@ class SitePersistence(object):
 
         self.__write__(d)
 
-    def import_(self, include_interventions):
+    def import_(self, include_interventions, keep_unmentioned):
         """If persistence file is found, import the data
 
         :param include_interventions: if True, intervention data in the
@@ -151,9 +151,13 @@ class SitePersistence(object):
             existing intervention state).  if False, intervention data
             will be ignored.
 
+        :param keep_unmentioned: if True, unmentioned data, such as
+            an organization or intervention in the current database
+            but not in the persistence file, will be left in place.
+            if False, any unmentioned data will be purged as part of
+            the import process.
+
         """
-
-
         data = self.__read__()
         self.__verify_header__(data)
 
@@ -237,10 +241,24 @@ class SitePersistence(object):
             db.session.commit()
 
         # Delete any orgs not named
-        for org in Organization.query.filter(~Organization.id.in_(orgs_seen)):
-            current_app.logger.info("Deleting organization not mentioned in "
-                                 "site_persistence: {}".format(org))
-            db.session.delete(org)
+        if not keep_unmentioned:
+            # partOf self reference demands these are taken down in order
+            # first the children naming a partOf reference
+            for org in Organization.query.filter(and_(
+                ~Organization.id.in_(orgs_seen),
+                Organization.partOf_id != None)):
+                current_app.logger.info(
+                    "Deleting organization not mentioned in "
+                    "site_persistence: {}".format(org))
+                db.session.delete(org)
+            # then the parents
+            for org in Organization.query.filter(and_(
+                ~Organization.id.in_(orgs_seen),
+                Organization.partOf_id == None)):
+                current_app.logger.info(
+                    "Deleting organization not mentioned in "
+                    "site_persistence: {}".format(org))
+                db.session.delete(org)
 
         # Intervention details
         if include_interventions:
@@ -252,12 +270,13 @@ class SitePersistence(object):
             db.session.commit()  # strategies may use interventions, must exist
 
             # Delete any interventions not named
-            for intervention in Intervention.query.filter(
-                ~Intervention.name.in_(interventions_seen)):
-                current_app.logger.info(
-                    "Deleting Intervention not mentioned in "
-                    "site_persistence: {}".format(intervention))
-                db.session.delete(intervention)
+            if not keep_unmentioned:
+                for intervention in Intervention.query.filter(
+                    ~Intervention.name.in_(interventions_seen)):
+                    current_app.logger.info(
+                        "Deleting Intervention not mentioned in "
+                        "site_persistence: {}".format(intervention))
+                    db.session.delete(intervention)
 
         # Access rules next
         max_strat_id = 0
@@ -268,11 +287,13 @@ class SitePersistence(object):
             strategies_seen.append(s['id'])
 
         # Delete any strategies not named
-        for strategy in AccessStrategy.query.filter(
-            ~AccessStrategy.id.in_(strategies_seen)):
-            current_app.logger.info("Deleting AccessStrategy not mentioned in "
-                                 "site_persistence: {}".format(strategy))
-            db.session.delete(strategy)
+        if not keep_unmentioned:
+            for strategy in AccessStrategy.query.filter(
+                ~AccessStrategy.id.in_(strategies_seen)):
+                current_app.logger.info(
+                    "Deleting AccessStrategy not mentioned in "
+                    "site_persistence: {}".format(strategy))
+                db.session.delete(strategy)
 
         # App Text shouldn't be order dependent, now is good.
         apptext_seen = []
@@ -281,11 +302,13 @@ class SitePersistence(object):
             apptext_seen.append(a['name'])
 
         # Delete any AppTexts not named
-        for apptext in AppText.query.filter(
-            ~AppText.name.in_(apptext_seen)):
-            current_app.logger.info("Deleting AppText not mentioned in "
-                                 "site_persistence: {}".format(repr(apptext)))
-            db.session.delete(apptext)
+        if not keep_unmentioned:
+            for apptext in AppText.query.filter(
+                ~AppText.name.in_(apptext_seen)):
+                current_app.logger.info(
+                    "Deleting AppText not mentioned in "
+                    "site_persistence: {}".format(repr(apptext)))
+                db.session.delete(apptext)
 
         # Config isn't order dependent, now is good.
         assert len(objs_by_type[SITE_CFG]) < 2
