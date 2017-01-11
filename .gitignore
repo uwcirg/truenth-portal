@@ -14,3 +14,7 @@ include
 man
 pip-selfcheck.json
 log
+
+.settings/
+.project/
+.pydevproject/

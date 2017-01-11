@@ -82,11 +82,6 @@ def decision_support():
 def prostate_cancer_facts():
     return render_template('gil/what-is-prostate-cancer.html', user=current_user())
 
-@portal.route('/terms-and-conditions')
-def terms_and_conditions():
-    return render_template('gil/terms-and-conditions.html', user=current_user())
-
-
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
 
@@ -460,6 +455,13 @@ def legal():
     gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
     return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user=current_user())
+
+@portal.route('/terms-and-conditions')
+def terms_and_conditions():
+    """ Legal/terms-and-conditions of use page"""
+    gil = current_app.config.get('GIL')
+    response = requests.get(app_text(ToU_ATMA.name_key()))
+    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html', content=response.text)
 
 @portal.route('/about')
 def about():
