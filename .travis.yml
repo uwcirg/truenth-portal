@@ -62,7 +62,7 @@ before_deploy:
         "package": {
             "name": "true_nth_usa_portal",
             "repo": "true_nth",
-            "subject": "ivan-c",
+            "subject": "$GH_USERNAME",
             "public_download_numbers": false,
             "public_stats": false
         },
@@ -96,5 +96,5 @@ deploy:
       - -v BINTRAY_API_KEY
   provider: bintray
   file: "bintray.json"
-  user: "ivan-c"
+  user: $GH_USERNAME
   key: $BINTRAY_API_KEY
