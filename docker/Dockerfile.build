@@ -2,14 +2,14 @@
 # This Dockerfile will build an image that can be used to create a debian package from latest code in the develop branch. The completed debian package will need to be copied off the image after creation (see below invocation)
 
 # Build the image for creating the package
-# docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
+# $ docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
 
 # Build the image
-# docker run "portal_builddeb:test"
+# $ docker run "portal_builddeb:test"
 
 # Copy the debian package from the image to the container host
-# docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
-# cp /tmp/artifacts/*.deb ./
+# $ docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
+# $ cp /tmp/artifacts/*.deb ./
 
 FROM debian:jessie
 
