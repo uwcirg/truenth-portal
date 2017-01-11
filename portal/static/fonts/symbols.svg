@@ -1,0 +1,33 @@
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <font id="symbols" horiz-adv-x="512">
+    <font-face font-family="symbols"
+      units-per-em="512" ascent="512"
+      descent="0" />
+    <missing-glyph horiz-adv-x="0" />
+    <glyph glyph-name="arrow-left"
+      unicode="&#xEA01;"
+      horiz-adv-x="512" d=" M496 278.989849L496 245.0311500000001L156 245.0311500000001L156 162L16 261.862681L156 362L156 278.989849z" />
+    <glyph glyph-name="arrow-right"
+      unicode="&#xEA02;"
+      horiz-adv-x="512" d=" M16 278.989849L16 245.0311500000001L356 245.0311500000001L356 162L496 261.862681L356 362L356 278.989849z" />
+    <glyph glyph-name="caret-down"
+      unicode="&#xEA03;"
+      horiz-adv-x="512" d=" M281.333333 152.540284L512 380.397737L486.227012 406L256 177.298057L25.772988 406L0 380.397737L230.227012 151.695794L255.905845 126L281.867143 151.602263z" />
+    <glyph glyph-name="caret-tooltip"
+      unicode="&#xEA04;"
+      horiz-adv-x="512" d=" M248 416L496 416L248 -0.666667L248 416zM248 416L0 416L248 -0.666667L248 416z" />
+    <glyph glyph-name="check"
+      unicode="&#xEA05;"
+      horiz-adv-x="512" d=" M52.5 318.194245L0 265.152655L192.290163 72L244.920373 124.866276L504 385.1337240000001L451.369789 438L192.277344 177.745429z" />
+    <glyph glyph-name="close-x"
+      unicode="&#xEA06;"
+      horiz-adv-x="512" d=" M416 125L285.090909 256L416 386.909091L386.909091 416L256 285.090909L125.090909 416L96 386.909091L226.909091 256L96 125.090909L125.090909 96L256 226.909091L386.909091 96z" />
+    <glyph glyph-name="hamburger"
+      unicode="&#xEA07;"
+      horiz-adv-x="512" d=" M0 448L512 448L512 381.098592L0 381.098592L0 448zM0 291.450704L512 291.450704L512 224.549296L0 224.549296L0 291.450704zM0 134.901408L512 134.901408L512 68L0 68L0 134.901408z" />
+  </font>
+</defs>
+</svg>
