@@ -149,6 +149,9 @@ def demographics_set(patient_id):
     except MissingReference, e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))
+    except ValueError, e:
+        current_app.logger.debug("Demographics PUT failed: {}".format(e))
+        abort(400, str(e))
     db.session.commit()
     auditable_event("updated demographics on user {0} from input {1}".format(
         patient_id, json.dumps(request.json)), user_id=current_user().id)

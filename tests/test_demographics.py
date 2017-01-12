@@ -80,6 +80,7 @@ class TestDemographics(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
 
+        self.assert200(rv)
         fhir = json.loads(rv.data)
         self.assertEquals(fhir['birthDate'], dob)
         self.assertEquals(fhir['deceasedDateTime'], dod)

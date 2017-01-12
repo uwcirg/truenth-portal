@@ -60,6 +60,10 @@ class FHIR_datetime(object):
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:
                 dt = dt.astimezone(pytz.utc)
+        # As we use datetime.strftime for display, and it can't handle dates
+        # older than 1900, treat all such dates as an error
+        if dt < datetime.strptime('1900-01-01', '%Y-%m-%d'):
+            raise ValueError("Dates prior to year 1900 not supported")
         return dt
 
     @staticmethod
