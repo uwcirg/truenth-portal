@@ -4,13 +4,13 @@
 # Build the image for creating the package
 # $ docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
 
-# Build the image
+# Run the container (build the package)
 # $ docker run "portal_builddeb:test"
 
-# Build the image (override defaults)
-# $ docker run --tty -e REPO_SLUG='ivan-c/true_nth_usa_portal' -e BRANCH='feature/deb-packaging_dockerize-portal_compose' "portal_builddeb:test"
+# Run the container (override defaults)
+# $ docker run --tty -e REPO_SLUG='USERNAME/true_nth_usa_portal' -e BRANCH='feature/feature-branch-name' "portal_builddeb:test"
 
-# Copy the debian package from the image to the container host
+# Copy the debian package from the container to the host
 # $ docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
 # $ cp /tmp/artifacts/*.deb ./
 
