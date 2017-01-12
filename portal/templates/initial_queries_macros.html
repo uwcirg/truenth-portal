@@ -159,8 +159,39 @@
             </div>
           </div>
         </div>
+        <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
+          <br />
+          <p>{{ _("Have you begun prostate cancer treatment?") }}</p>
+          <div class="form-group">
+            <div class="radio">
+                <label>
+                  <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> {{ _("Yes") }}
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> {{ _("No") }}
+                </label>
+            </div>
+          </div>
+        </div>
+        <br/>
       </div>
-      <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
+      <script>$(function () {
+
+        tnthAjax.getClinical($("#iq_userId").val());
+        tnthAjax.getTreatment($("#iq_userId").val());
+
+        $("input[name='tx']").each(function() {
+             $(this).on("click", function() {
+                if ($(this).val() == "true") {
+                    tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+                } else {
+                    tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+                };
+             });
+        });
+      });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
     <div id="clinics" class="tnth-hide" parent-section="true">

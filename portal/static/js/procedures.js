@@ -206,7 +206,7 @@ $(document).ready(function() {
         if (passedDate && passedDate != '' && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
             $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
             dateFormatted = tnthDates.swap_mm_dd(passedDate);
-            console.log("formatted date: " + dateFormatted);
+            //console.log("formatted date: " + dateFormatted);
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
             checkSubmit("button[id^='tnthproc-submit']");
         }

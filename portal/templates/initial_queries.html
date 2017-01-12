@@ -9,6 +9,17 @@
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
   </div> -->
   <input type="hidden" id="iq_userId" value="{{user.id}}" />
+  <style>
+      .reg-complete-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 10% auto;
+        background-color: #f8f8f9;
+        padding: 2em 2em 2.7em 2em;
+        text-align: center;
+        border-radius: 8px;
+      }
+  </style>
 
   {% if 'tou' in still_needed %}
     {{tou(terms)}}
@@ -56,17 +67,6 @@
             <br />
             <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
         {% else %}
-          <style>
-          .reg-complete-container {
-            width: 100%;
-            max-width: 100%;
-            margin: 10% auto;
-            background-color: #f8f8f9;
-            padding: 2em 2em 2.7em 2em;
-            text-align: center;
-            border-radius: 8px;
-          }
-          </style>
            <div class="reg-complete-container">
               <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
               <p>{{ _("Click continue to start using TrueNTH") }}</p>
@@ -151,25 +151,29 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
     } else {
       if (field) {
           var parentContainer = field.closest("[parent-section='true']");
+          var found = false;
           //console.log("parentContainer:")
           //console.log(parentContainer)
           if (parentContainer.length > 0) {
               var nexts = parentContainer.nextAll("[parent-section='true']");
-              var found = false;
               nexts.each(function() {
                 var parentId = $(this).attr("id");
                 //console.log('parentId: ' + parentId)
-                if (!found && !self.sectionCompleted(parentId)) {
-                    var section = $(this);
-                    section.fadeIn();
-                    $('html, body').animate({
-                        scrollTop: section.offset().top
-                    }, 500);
-                    section.children().first().fadeIn();
-                    //console.log("found: " + section.attr("id"))
-                    found = true;
-                } else {
-                  if (self.sectionCompleted(parentId)) $(this).fadeIn();
+                if (!found) {
+                  if (!self.sectionCompleted(parentId)) {
+                      var section = $(this);
+                      section.fadeIn();
+                      $('html, body').animate({
+                          scrollTop: section.offset().top
+                      }, 500);
+                      section.children().first().fadeIn();
+                      console.log("found: " + section.attr("id"))
+                      found = true;
+                  };
+
+                  if (!found) {
+                      if (self.sectionCompleted(parentId)) $(this).fadeIn();
+                  };
                 };
               });
           };
@@ -362,6 +366,7 @@ $(document).ready(function(){
               }, 500);
               if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
             } else fc.getNextField($(this).attr("sectionIndex"), $(this));
+
             //$("#clinics").hide();
 
             $("#patientQ").attr("skipped", "false");
@@ -386,15 +391,22 @@ $(document).ready(function(){
         };
     };
 
+
+
     var patientQClickEvent = function(){
           var thisItem = $(this);
           var toCall = thisItem.attr("name")
           // Get value from div - either true or false
           var toSend = thisItem.val();
-          tnthAjax.putClinical({{user.id}},toCall,toSend);
+          //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
+          if (toCall != "tx") {
+            tnthAjax.putClinical({{user.id}},toCall,toSend);
+          };
           if (toSend == "true" || toCall ==  "pca_localized") {
+
             thisItem.parents(".pat-q").next().fadeIn();
             $("#clinics").hide(); //this is hard coded, ARGHHH!!
+
             var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
             var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
             if (nextItem.length > 0) {
@@ -420,7 +432,7 @@ $(document).ready(function(){
             };
           } else {
             if (toCall == "biopsy") {
-              ["pca_diag", "pca_localized"].forEach(function(fieldName) {
+              ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
                       $(this).attr("skipped", "true");
@@ -428,15 +440,23 @@ $(document).ready(function(){
               });
               if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
               if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
+              if ($("input[name='tx']").length > 0) {
+                tnthAjax.deleteTreatment({{user.id}});
+              };
             } else if (toCall == "pca_diag") {
-              ["pca_localized"].forEach(function(fieldName) {
+              ["pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
                       $(this).attr("skipped", "true");
                   });
               });
               if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
               //tnthAjax.putClinical({{user.id}},"tx","false");
+              if ($("input[name='tx']").length > 0) {
+                tnthAjax.deleteTreatment({{user.id}});
+              };
             }
             thisItem.parents(".pat-q").nextAll().fadeOut();
             /********** to skip all questions ********/
@@ -529,7 +549,7 @@ $(document).ready(function(){
                       event: bdChangeEvent
                     },
       'patientQ':   {
-                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']")],
+                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                       event: patientQClickEvent
                     },
       'clinics':    {
