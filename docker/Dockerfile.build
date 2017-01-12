@@ -1,0 +1,74 @@
+# .deb building Dockerfile
+# This Dockerfile will build an image that can be used to create a debian package from latest code in the develop branch. The completed debian package will need to be copied off the image after creation (see below invocation)
+
+# Build the image for creating the package
+# $ docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
+
+# Run the container (build the package)
+# $ docker run "portal_builddeb:test"
+
+# Run the container (override defaults)
+# $ docker run --tty -e REPO_SLUG='USERNAME/true_nth_usa_portal' -e BRANCH='feature/feature-branch-name' "portal_builddeb:test"
+
+# Copy the debian package from the container to the host
+# $ docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
+# $ cp /tmp/artifacts/*.deb ./
+
+
+
+FROM debian:jessie
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# Use newest version of dh-virtualenv from testing release
+# Todo: try specifying version in `apt-get install` invocation
+RUN echo '\n\
+Package: dh-virtualenv\n\
+Pin: release a=testing\n\
+Pin-Priority: 750\n\
+\n'\
+> /etc/apt/preferences.d/dh-virtualenv.pref
+
+RUN echo '\n\
+Package: *\n\
+Pin: release a=testing\n\
+Pin-Priority: 75\n\
+\n'\
+> /etc/apt/preferences.d/testing.pref
+
+RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
+
+RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
+	debhelper \
+	dh-virtualenv\
+	fakeroot \
+	git \
+	libc6-i386 \
+	libffi-dev \
+	libpq-dev \
+	locales \
+	python-dev \
+	python-pip
+
+RUN dpkg-reconfigure locales && \
+    locale-gen C.UTF-8 && \
+    /usr/sbin/update-locale LANG=C.UTF-8
+
+RUN pip install --upgrade pip setuptools
+RUN pip install make-deb
+
+RUN mkdir -p /tmp/artifacts
+
+# Allow branch to be overridden with environmental variable
+ENV BRANCH=${BRANCH:-develop}
+
+# Allow repo to be overridden with environmental variable
+ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+
+CMD \
+	git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
+	cd /root/portal && \
+	yes | make-deb && \
+	git checkout debian/rules && \
+	dpkg-buildpackage -us -uc && \
+	mv /root/portal_* /tmp/artifacts
