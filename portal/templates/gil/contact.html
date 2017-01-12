@@ -2,7 +2,7 @@
 {% block main %}
     <main class="main">
       {{super()}}
-      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url(./images/Contact-Background.jpg)">
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
         <div class="page-intro__content">
           <h1 class="page-intro__main">Contact Us</h1>
           <p class="page-intro__sub">Please connect with us, ask questions, share your story, and make suggestions for how we can do better.</p>
