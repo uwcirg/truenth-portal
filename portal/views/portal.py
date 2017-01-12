@@ -362,7 +362,7 @@ def home():
 
     # Enforce flow - expect authorized user for this view
     if not user:
-        abort (500, "unexpected lack of user in /home")
+        return redirect(url_for('portal.landing'))
 
     # Enforce flow - don't expect 'next' params here
     if 'next' in session and session['next']:
