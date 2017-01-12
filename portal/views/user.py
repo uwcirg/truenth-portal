@@ -281,6 +281,9 @@ def user_consents(user_id):
     include audit details regarding the deletion.  The expires timestamp in UTC
     is also returned for all consents.
 
+    Consents include a number of options, each of which will only be in the
+    returned JSON if defined.
+
     ---
     tags:
       - User
@@ -339,6 +342,19 @@ def user_consents(user_id):
                   agreement_url:
                     type: string
                     description: URL pointing to agreement text
+                  staff_editable:
+                    type: boolean
+                    description:
+                      True if consenting to enable account editing by staff
+                  include_in_reports:
+                    type: boolean
+                    description:
+                      True if consenting to share data in reports
+                  send_reminders:
+                    type: boolean
+                    description:
+                      True if consenting to receive reminders when
+                      assessments are due
       401:
         description:
           if missing valid OAuth token or if the authorized user lacks
@@ -407,6 +423,19 @@ def set_user_consents(user_id):
             agreement_url:
               type: string
               description: URL pointing to agreement text
+            staff_editable:
+              type: boolean
+              description:
+                set True if consenting to enable account editing by staff
+            include_in_reports:
+              type: boolean
+              description:
+                set True if consenting to share data in reports
+            send_reminders:
+              type: boolean
+              description:
+                set True if consenting to receive reminders when
+                assessments are due
     responses:
       200:
         description: successful operation

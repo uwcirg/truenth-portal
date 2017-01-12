@@ -13,6 +13,23 @@ from tests import TestCase, TEST_USER_ID
 class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
 
+    def test_content_options(self):
+        audit = Audit(user_id=TEST_USER_ID)
+        org1, _ = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
+        uc = UserConsent(
+            user_id=TEST_USER_ID, organization=org1,
+            audit=audit, agreement_url='http://no.com')
+        uc.include_in_reports = True
+        with SessionScope(db):
+            db.session.add(uc)
+            db.session.commit()
+
+        uc = UserConsent.query.first()
+        self.assertTrue(uc.include_in_reports)
+        self.assertFalse(uc.staff_editable)
+        self.assertFalse(uc.send_reminders)
+
     def test_user_consent(self):
         org1, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
@@ -22,6 +39,10 @@ class TestUserConsent(TestCase):
                           audit=audit)
         uc2 = UserConsent(organization=org2, agreement_url=self.url,
                           audit=audit)
+        uc1.staff_editable = True
+        uc1.send_reminders = False
+        uc2.staff_editable = True
+        uc2.send_reminders = False
         self.test_user._consents.append(uc1)
         self.test_user._consents.append(uc2)
         with SessionScope(db):
@@ -31,10 +52,15 @@ class TestUserConsent(TestCase):
         rv = self.client.get('/api/user/{}/consent'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['consent_agreements']), 2)
+        self.assertTrue('send_reminders' not in
+                        rv.json['consent_agreements'][0])
+        self.assertTrue('staff_editable' not in
+                        rv.json['consent_agreements'][0])
 
     def test_post_user_consent(self):
         org1 = Organization.query.filter(Organization.id > 0).first()
-        data = {'organization_id': org1.id, 'agreement_url': self.url}
+        data = {'organization_id': org1.id, 'agreement_url': self.url,
+                'staff_editable': True, 'send_reminders': False}
 
         self.login()
         rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
@@ -42,8 +68,10 @@ class TestUserConsent(TestCase):
                           data=json.dumps(data))
         self.assert200(rv)
         self.assertEqual(self.test_user.valid_consents.count(), 1)
-        self.assertEqual(self.test_user.valid_consents[0].organization_id,
-                         org1.id)
+        consent = self.test_user.valid_consents[0]
+        self.assertEqual(consent.organization_id, org1.id)
+        self.assertTrue(consent.staff_editable)
+        self.assertFalse(consent.send_reminders)
 
     def test_post_user_consent_dates(self):
         org1 = Organization.query.filter(Organization.id > 0).first()
