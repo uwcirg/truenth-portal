@@ -62,7 +62,6 @@ def intentional_error():  # pragma: no cover
 def landing():
     """landing page view function - present register / login options"""
     if current_user():
-        print("REALLY")
         current_app.logger.debug("landing (found user) -> next_after_login")
         return next_after_login()
 
