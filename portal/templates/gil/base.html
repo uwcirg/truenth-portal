@@ -236,7 +236,6 @@
           var loader = function(show) {
               if (show) {
                   $("#loadingIndicator").show();
-                  $("#mainHolder").hide();
               } else {
                   showMain();
                   setTimeout('$("#loadingIndicator").fadeOut();', 200);
@@ -255,7 +254,7 @@
           };
 
          $(document).ready(function(){
-            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").on("click", function(e) {
+            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").on("click", function(e) {
               e.stopPropagation();
               loader(true);
             });
