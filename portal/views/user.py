@@ -1,6 +1,6 @@
 """User API view functions"""
 from flask import abort, Blueprint, jsonify, url_for
-from flask import request
+from flask import request, make_response
 from flask_user import roles_required
 
 from ..audit import auditable_event
@@ -1358,6 +1358,77 @@ def user_documents(user_id):
 
     return jsonify(user_documents=[d.as_json() for d in
                                        user.documents])
+
+
+@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>/download')
+@oauth.require_oauth()
+def download_user_document(user_id,doc_id):
+    """Download a user document beloinging to a user
+
+    Used to download the file contents of a user document.
+
+    ---
+    tags:
+      - User
+      - User Document
+    operationId: download_user_document
+    produces:
+      - application/pdf
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: doc_id
+        in: path
+        description: User Document ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description:
+          Returns the file contents of the requested user document
+      400:
+        description: if the request incudes invalid data or references
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id or doc_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    download_ud = None
+    for ud in user.documents:
+        if ud.id == doc_id:
+            download_ud = ud
+            break
+    if not download_ud:
+        abort(404, "matching user document not found")
+
+    file_contents = None
+    try:
+        file_contents = ud.get_file_contents()
+    except ValueError as e:
+        abort(400, str(e))
+
+    response = make_response(file_contents)
+    response.headers["Content-Type"] = 'application/{}'.format(ud.filetype)
+    response.headers["Content-Disposition"] = 'attachment; filename={}'.format(ud.filename)
+
+    return response
+
+
 
 @user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
 @oauth.require_oauth()

@@ -63,3 +63,16 @@ class UserDocument(db.Model):
         return cls(user_id=data['user_id'],document_type=data['document_type'],filename=filename,
                     filetype=filetype,uuid=file_uuid,uploaded_at=datetime.utcnow())
 
+
+    def get_file_contents(self):
+        filepath = os.path.join(current_app.root_path,current_app.config.get("FILE_UPLOAD_DIR"),self.uuid)
+        if not os.path.exists(filepath):
+            raise ValueError("could not find file")
+        try:
+            with open(filepath,"r") as file_in:
+                file_contents = file_in.read()
+        except:
+            raise ValueError("count not open file")
+
+        return file_contents
+
