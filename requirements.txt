@@ -97,6 +97,7 @@ WebTest==2.0.24
 Werkzeug==0.11.15
 WTForms==2.1
 xvfbwrapper==0.2.9
+-e .
 
 ###
 ## Comments too large for inline above
