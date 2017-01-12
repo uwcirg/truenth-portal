@@ -811,7 +811,7 @@
                 <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Questions") }}</h4>
                 <h4 class="text-muted">{{ _("Questions inquired of the patient at registration") }}</h4>
                 <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
-                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 2em 2em">
                     {{patientQGroup(current_user)}}
                 </div>
             </div>
@@ -838,7 +838,7 @@
             $("#patientQ").show();
             $("#patientQ hr").hide();
             {% if person and current_user and person.id != current_user.id %}
-                $("#patientQ input[type='radio']").each(function() {
+                $("#patientQ input[type='radio'], #treatmentDate, #treatmentMonth, #treatmentYear").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
             {% endif %}
@@ -849,34 +849,69 @@
                       var toCall = thisItem.attr("name")
                       // Get value from div - either true or false
                       var toSend = thisItem.val();
-                      tnthAjax.putClinical({{person.id}},toCall,toSend);
+                      if (toCall != "tx") tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
+
                       if (toSend == "true" || toCall ==  "pca_localized") {
                         thisItem.parents(".pat-q").nextAll().fadeIn();
                       } else {
                         if (toCall == "biopsy") {
-                          ["pca_diag", "pca_localized"].forEach(function(fieldName) {
-                              $("input[name='" + fieldName + "']").each(function() {
-                                  $(this).prop("checked", false);
-                              });
-                          });
-                          tnthAjax.putClinical({{person.id}},"pca_diag","false");
-                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                            ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+                                $("input[name='" + fieldName + "']").each(function() {
+                                    $(this).prop("checked", false);
+                                });
+                            });
+                            if ($("input[name='pca_diag']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
+                            };
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                            };
+                            if ($("input[name='tx']").length > 0) {
+                                tnthAjax.deleteTreatment({{person.id}}, $(this));
+                            };
                         } else if (toCall == "pca_diag") {
-                          ["pca_localized"].forEach(function(fieldName) {
+                            ["pca_localized", "tx"].forEach(function(fieldName) {
                               $("input[name='" + fieldName + "']").each(function() {
                                   $(this).prop("checked", false);
                               });
-                          });
-                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
+                            });
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                            };
+                            if ($("input[name='tx]").length > 0) {
+                                tnthAjax.deleteTreatment({{person.id}}, $(this));
+                            };
                         }
                         thisItem.parents(".pat-q").nextAll().fadeOut();
                       };
                   });
              {% endif %}
 
-             //wait for ajax calls to finish?
-             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-             setTimeout("checkDiagnosis();", 1000);
+            [{
+                "fields": $("#patientQ input[name='biopsy']"),
+                "containerId": "patBiopsy"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_diag']"),
+                "containerId": "patDiag"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_localized']"),
+                "containerId": "patMeta"
+            },
+            {
+                "fields": $("#patientQ input[name='tx']"),
+                "containerId": "patientQContainer"
+            }].forEach( function(item) {
+                item.fields.each(function() {
+                     getSaveLoaderDiv("profileForm", item.containerId);
+                    $(this).attr("save-container-id", item.containerId);
+                });
+            });
+
+            //wait for ajax calls to finish?
+            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+            setTimeout("checkDiagnosis();", 1000);
 
 
         });

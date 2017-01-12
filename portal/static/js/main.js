@@ -104,6 +104,9 @@ var loader = function(show) {
     };
 };
 
+var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
+var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
+
 var fillContent = {
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
@@ -375,6 +378,16 @@ var fillContent = {
             }
         };
         $("#profileConsentList").animate({opacity: 1});
+    },
+    "treatment": function(data) {
+        var treatmentCode = tnthAjax.hasTreatment(data);
+        if (treatmentCode) {
+            if (treatmentCode == CANCER_TREATMENT_CODE) {
+                $("#tx_yes").prop("checked", true);
+            } else {
+                $("#tx_no").prop("checked", true);
+            };
+        };
     },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
@@ -975,10 +988,7 @@ var tnthAjax = {
         });
     },
     "putDemo": function(userId,toSend,targetField, sync) {
-        //$(".save-info").css("opacity", 0);
-        if(targetField) {
-           $("#" + targetField.attr("save-container-id") + "_load").css("opacity", 1);
-        };
+        flo.showLoader(targetField);
         $.ajax ({
             type: "PUT",
             url: '/api/demographics/'+userId,
@@ -989,18 +999,10 @@ var tnthAjax = {
         }).done(function(data) {
             //console.log("done");
             //console.log(data);
-            if(targetField) {
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-               setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
-            };
+            flo.showUpdate(targetField);
         }).fail(function() {
             console.log("Problem updating demographics on server." + JSON.stringify(toSend));
-            if(targetField) {
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-               setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
-            };
+            flo.showError(targetField);
         });
     },
     "getDob": function(userId) {
@@ -1028,6 +1030,90 @@ var tnthAjax = {
             loader();
         });
     },
+    "hasTreatment": function(data) {
+        var found = false;
+        if (data && data.entry && data.entry.length > 0) {
+            // sort from newest to oldest based on lsat updated date
+            data.entry = data.entry.sort(function(a,b){
+                return new Date(b.resource.meta.lastUpdated) - new Date(a.resource.meta.lastUpdated);
+            });
+            var found = false;
+            (data.entry).forEach(function(item) {
+                //console.log(item.resource.code.coding[0].code +  " " + item.resource.performedDateTime)
+                if (!found) {
+                    var resourceItemCode = item.resource.code.coding[0].code;
+                    var system = item.resource.code.coding[0].system;
+
+                   // console.log(resourceItemCode)
+                   if ((resourceItemCode == CANCER_TREATMENT_CODE && (system == SNOMED_SYS_URL)) || (resourceItemCode == NONE_TREATMENT_CODE && (system == CLINICAL_SYS_URL))) {
+                        found = resourceItemCode;
+                    }
+
+                };
+            });
+        };
+
+        return found;
+    },
+    "getTreatment": function (userId) {
+        if (!userId) return false;
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/'+userId+'/procedure'
+        }).done(function(data) {
+            fillContent.treatment(data);
+        }).fail(function() {
+           // console.log("Problem retrieving data from server.");
+        });
+    },
+    "postTreatment": function(userId, started, treatmentDate, targetField) {
+        if (!userId) return false;
+
+        var code = NONE_TREATMENT_CODE;
+        var display = "None";
+        var system = CLINICAL_SYS_URL;
+
+        if (started) {
+            code = CANCER_TREATMENT_CODE;
+            display = "Procedure on prostate";
+            system = SNOMED_SYS_URL;
+
+        };
+
+        if (!hasValue(treatmentDate)) {
+            var date = new Date();
+            //in yyyy-mm-dd format
+            treatmentDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        };
+
+        var procID = [{ "code": code, "display": display, "system": system }];
+        var procArray = {};
+
+        procArray["resourceType"] = "Procedure";
+        procArray["subject"] = {"reference": "Patient/" + userId};
+        procArray["code"] = {"coding": procID};
+        procArray["performedDateTime"] = treatmentDate ? treatmentDate: "";
+
+        tnthAjax.postProc(userId, procArray, targetField);
+    },
+    deleteTreatment: function(userId, targetField) {
+        var self = this;
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/'+userId+'/procedure'
+        }).done(function(data) {
+            var treatmentCode = self.hasTreatment(data);
+            if (treatmentCode) {
+                if (treatmentCode == CANCER_TREATMENT_CODE) {
+                    tnthAjax.deleteProc(CANCER_TREATMENT_CODE, targetField, true);
+                } else {
+                    tnthAjax.deleteProc(NONE_TREATMENT_CODE, targetField, true);
+                };
+            };
+        }).fail(function() {
+           // console.log("Problem retrieving data from server.");
+        });
+    },
     "getProc": function(userId,newEntry) {
         $.ajax ({
             type: "GET",
@@ -1038,7 +1124,8 @@ var tnthAjax = {
            // console.log("Problem retrieving data from server.");
         });
     },
-    "postProc": function(userId,toSend) {
+    "postProc": function(userId,toSend, targetField) {
+        flo.showLoader(targetField);
         $.ajax ({
             type: "POST",
             url: '/api/procedure',
@@ -1046,18 +1133,24 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
+            flo.showUpdate(targetField);
         }).fail(function() {
            // console.log("Problem updating procedure on server.");
+            flo.showError(targetField);
         });
     },
-    "deleteProc": function(procedureId) {
+    "deleteProc": function(procedureId, targetField, sync) {
+        flo.showLoader(targetField);
         $.ajax ({
             type: "DELETE",
             url: '/api/procedure/'+procedureId,
             contentType: "application/json; charset=utf-8",
+            async: (sync ? false: true)
         }).done(function(data) {
+            flo.showUpdate(targetField);
         }).fail(function() {
-           // console.log("Problem deleting procedure on server.");
+            // console.log("Problem deleting procedure on server.");
+            flo.showError(targetField);
         });
     },
     "getRoleList": function() {
@@ -1122,9 +1215,7 @@ var tnthAjax = {
         });
     },
     "putClinical": function(userId, toCall, toSend, targetField) {
-        if(targetField) {
-           $("#" + targetField.attr("save-container-id") + "_load").css("opacity", 1);
-        };
+        flo.showLoader(targetField);
         $.ajax ({
             type: "POST",
             url: '/api/patient/'+userId+'/clinical/'+toCall,
@@ -1132,18 +1223,10 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify({value: toSend})
         }).done(function() {
-            if(targetField) {
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-               setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
-            };
+            flo.showUpdate(targetField);
         }).fail(function() {
             alert("There was a problem saving your answers. Please try again.");
-            if(targetField) {
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-               setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-               setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
-            };
+            flo.showError(targetField);
         });
     },
     "postTerms": function(toSend) {
@@ -1678,8 +1761,37 @@ function convertGMTToLocalTime(dateString, format) {
     }
 })();
 
+
+var FieldLoaderHelper = function () {
+    this.showLoader = function(targetField) {
+        if(targetField && targetField.length > 0) {
+           $("#" + targetField.attr("save-container-id") + "_load").css("opacity", 1);
+        };
+    };
+
+    this.showUpdate = function(targetField) {
+        if(targetField && targetField.length > 0) {
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
+        };
+    };
+
+    this.showError = function(targetField) {
+        if(targetField && targetField.length > 0) {
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
+        };
+    };
+
+};
+
+var flo = new FieldLoaderHelper();
+
+
 function getSaveLoaderDiv(parentID, containerID) {
-    var el = $("#" + parentID + " #" + containerID).parent().find('.load-container');
+    var el = $("#" + containerID + "_load");
     if (el.length == 0) $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
 };
 
