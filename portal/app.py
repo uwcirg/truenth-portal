@@ -236,5 +236,9 @@ def configure_metadata(app):
 def configure_cache(app):
     """Configure requests-cache"""
     requests_cache.install_cache(
-        cache_name=app.name, backend='redis', expire_after=180,
-        include_get_headers=True, old_data_on_error=True)
+        cache_name=app.name,
+        backend='redis',
+        expire_after=180,
+        include_get_headers=True,
+        old_data_on_error=True,
+    )
