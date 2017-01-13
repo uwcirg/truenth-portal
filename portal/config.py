@@ -46,10 +46,24 @@ class BaseConfig(object):
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
-    if 'SESSION_REDIS' in os.environ:
-        from redis import Redis
-        redis_uri = os.environ.get('SESSION_REDIS').split(':')
-        SESSION_REDIS = Redis(host=redis_uri[0], port=redis_uri[1])
+
+
+    SESSION_REDIS_URL = os.environ.get(
+        'SESSION_REDIS_URL',
+        'redis://localhost:6379/0'
+    )
+
+    from redis import Redis
+    from urlparse import urlparse
+    redis_url = urlparse(SESSION_REDIS_URL)
+
+    # Todo: create issue @ fengsp/flask-session
+    # config values aren't typically objects...
+    SESSION_REDIS = Redis(
+        host=redis_url.hostname if redis_url.hostname else None,
+        port=redis_url.port if redis_url.port else None,
+        db=redis_url.path.split('/')[1] if redis_url.hostname else None,
+    )
 
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
