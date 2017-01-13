@@ -5,10 +5,6 @@ cache: pip
 addons:
   postgresql: "9.4"
 
-# setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
-git:
-  depth: 2000
-
 services:
   - postgresql
   - redis-server
@@ -38,6 +34,11 @@ before_install:
 
   # Set TOXENV default (if not overridden by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
+
+  # Fetch all remote branches instead of just the currently checked out one
+  - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
+  - git fetch --unshallow
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
