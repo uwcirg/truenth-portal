@@ -24,6 +24,7 @@ ENV \
     PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json" \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
     CELERY_BROKER_URL="redis://redis:6379/0" \
+    REQUEST_CACHE_URL="redis://redis:6379/0" \
     SESSION_REDIS="redis:6379"
 RUN mkdir -p ${LOG_FOLDER}
 RUN chown www-data:www-data ${LOG_FOLDER}
