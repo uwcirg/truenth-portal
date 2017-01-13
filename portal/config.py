@@ -10,6 +10,10 @@ class BaseConfig(object):
         'CELERY_BROKER_URL',
         'redis://localhost:6379/0'
     )
+    REQUEST_CACHE_URL = os.environ.get(
+        'REQUEST_CACHE_URL',
+        'redis://localhost:6379/0'
+    )
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
