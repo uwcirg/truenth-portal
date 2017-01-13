@@ -72,7 +72,7 @@ class UserDocument(db.Model):
             with open(filepath,"r") as file_in:
                 file_contents = file_in.read()
         except:
-            raise ValueError("count not open file")
+            raise ValueError("could not open file")
 
         return file_contents
 
