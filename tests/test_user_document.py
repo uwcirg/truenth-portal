@@ -74,7 +74,7 @@ class TestUserDocument(TestCase):
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
-        rv = self.client.get('/api/user/{}/user_documents/{}/download'.format(
+        rv = self.client.get('/api/user/{}/user_documents/{}'.format(
                             service_user.id,udoc.id))
         self.assert200(rv)
         self.assertEqual(rv.data,test_contents)

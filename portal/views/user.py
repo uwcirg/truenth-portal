@@ -1360,7 +1360,7 @@ def user_documents(user_id):
                                        user.documents])
 
 
-@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>/download')
+@user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>')
 @oauth.require_oauth()
 def download_user_document(user_id,doc_id):
     """Download a user document beloinging to a user
