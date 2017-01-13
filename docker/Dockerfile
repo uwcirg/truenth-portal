@@ -25,7 +25,6 @@ ENV \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
     CELERY_BROKER_URL="redis://redis:6379/0" \
     SESSION_REDIS="redis:6379"
-COPY manage.py ${PROJECT_DIR}/bin
 RUN mkdir -p ${LOG_FOLDER}
 RUN chown www-data:www-data ${LOG_FOLDER}
 

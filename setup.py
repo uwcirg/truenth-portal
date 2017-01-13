@@ -44,6 +44,7 @@ setup(
     use_scm_version=True,
     zip_safe=False,
     packages=["portal"],
+    scripts=["manage.py"],
     setup_requires=("setuptools_scm"),
     install_requires=(
         "Authomatic",
