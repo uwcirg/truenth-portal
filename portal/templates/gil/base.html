@@ -196,9 +196,11 @@
               </svg>Log in with Google</a>
             <div class="box-modal__divider"></div>
             <form action="{{PORTAL}}/user/sign-in" method="POST" class="form" role="form">
-              <input name="email" type="text" placeholder="Email Address">
-              <input name="password" type="password" placeholder="Password">
+              <input name="email" type="text" placeholder="Email Address" required>
+              <input name="password" type="password" placeholder="Password" required>
               <input class="button button-large button--teal" type="submit" value="Log In">
+              <br/><br/>
+              <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Forgot your password?</span></a>
             </form>
           </div>
         </div>
