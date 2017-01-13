@@ -209,7 +209,8 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        with self.assertRaises(ValueError):
-            self.client.put('/api/demographics/%s' % TEST_USER_ID,
-                         content_type='application/json',
-                         data=json.dumps(data))
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert400(rv)
