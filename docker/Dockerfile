@@ -26,8 +26,8 @@ ENV \
     CELERY_BROKER_URL="redis://redis:6379/0" \
     REQUEST_CACHE_URL="redis://redis:6379/0" \
     SESSION_REDIS_URL="redis://redis:6379/0"
-RUN mkdir -p ${LOG_FOLDER}
-RUN chown www-data:www-data ${LOG_FOLDER}
+RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
+RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 COPY portal.wsgi /var/www/
 COPY portal.conf /etc/apache2/sites-available
