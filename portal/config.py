@@ -1,5 +1,6 @@
 """Configuration"""
 import os
+import redis
 from flask_script import Server
 
 
@@ -53,13 +54,12 @@ class BaseConfig(object):
         'redis://localhost:6379/0'
     )
 
-    from redis import Redis
     from urlparse import urlparse
     redis_url = urlparse(SESSION_REDIS_URL)
 
     # Todo: create issue @ fengsp/flask-session
     # config values aren't typically objects...
-    SESSION_REDIS = Redis(
+    SESSION_REDIS = redis.Redis(
         host=redis_url.hostname if redis_url.hostname else None,
         port=redis_url.port if redis_url.port else None,
         db=redis_url.path.split('/')[1] if redis_url.hostname else None,
