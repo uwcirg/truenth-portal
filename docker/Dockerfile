@@ -39,5 +39,5 @@ EXPOSE 80
 CMD \
     . /etc/apache2/envvars && \
     . ${PROJECT_DIR}/bin/activate && \
-    ${PROJECT_DIR}/bin/python ${FLASK_APP} initdb && \
+    ${FLASK_APP} initdb && \
     /usr/sbin/apache2 -D FOREGROUND
