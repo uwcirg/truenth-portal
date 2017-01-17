@@ -324,10 +324,11 @@ class User(db.Model, UserMixin):
         return None
 
     @locale.setter
-    def locale(self, code, name):
-        # IETF BCP 47 standard uses hyphens, but we instead store w/ underscores,
+    def locale(self, lang_info):
+        # lang_info is a tuple of format (language_code,language_name)
+        # IETF BCP 47 standard uses hyphens, bust we instead store w/ underscores,
         # to better integrate with babel/LR URLs/etc
-        data = {"coding": [{'code': code, 'display': name,
+        data = {"coding": [{'code': lang_info[0], 'display': lang_info[1],
                   'system': "urn:ietf:bcp:47"}]}
         self._locale = CodeableConcept.from_fhir(data)
 
