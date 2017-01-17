@@ -12,34 +12,28 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-# app_text:UCSF Medical Center organization consent URL
-# app_text:IRONMAN organization consent URL
+# apptext: IRONMAN organization consent URL
 # apptext: UCSF Medical Center organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
 msgstr ""
 
-# app_text:UW Medicine (University of Washington) organization consent URL
-# app_text:Australian Urology Associates organization consent URL
+# apptext: Australian Urology Associates organization consent URL
 # apptext: UW Medicine (University of Washington) organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
 msgstr ""
 
-# app_text:Terms of Use URL
 # apptext: Terms of Use URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603"
 msgstr ""
 
-# app_text:About TrueNTH URL
 # apptext: About TrueNTH URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
 msgstr ""
 
-# app_text:About Movember URL
 # apptext: About Movember URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565"
 msgstr ""
 
-# app_text:Legal URL
 # apptext: Legal URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577"
 msgstr ""
