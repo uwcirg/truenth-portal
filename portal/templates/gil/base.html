@@ -326,7 +326,6 @@
             $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
               e.stopPropagation();
               loader(true);
-
             });
             setTimeout("loader(false);", 0);
           });
