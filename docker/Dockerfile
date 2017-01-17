@@ -39,5 +39,9 @@ EXPOSE 80
 CMD \
     . /etc/apache2/envvars && \
     . ${PROJECT_DIR}/bin/activate && \
-    ${FLASK_APP} initdb && \
+    if [ -n "$(flask db current)" ]; then \
+        flask db migrate; \
+    else \
+        python ${FLASK_APP} initdb; \
+    fi && \
     /usr/sbin/apache2 -D FOREGROUND
