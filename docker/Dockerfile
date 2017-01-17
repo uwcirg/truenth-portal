@@ -20,6 +20,7 @@ RUN dpkg-reconfigure locales && \
 
 ENV \
     PROJECT_DIR="/opt/venvs/portal" \
+    FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json" \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
@@ -37,5 +38,5 @@ EXPOSE 80
 
 CMD \
     . /etc/apache2/envvars && \
-    ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb && \
+    ${PROJECT_DIR}/bin/python ${FLASK_APP} initdb && \
     /usr/sbin/apache2 -D FOREGROUND
