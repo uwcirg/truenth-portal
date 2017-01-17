@@ -311,18 +311,18 @@ var fillContent = {
                     [
                         {
                             content: (editable ? buttonText: "n/a"),
-                            class: "text-center"
+                            _class: "text-center"
                         },
                         {
                             content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
                         },
                         {
                             content: sDisplay,
-                            class: "indent"
+                            _class: "indent"
                         },
                         {
                             content: "<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a>",
-                            class: "text-center"
+                            _class: "text-center"
                         },
                         {
                             content: (item.signed).replace("T", " ")
@@ -331,7 +331,7 @@ var fillContent = {
                             content: (item.expires).replace("T", " ")
                         }
                     ].forEach(function(cell) {
-                        if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell.class? (" " + cell.class): "") + "' >" + cell.content + "</td>";
+                        if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
                     });
                     content += "</tr>";
                     //content += "<tr><td class='consentlist-cell text-center'>" + buttonText + "</td><td class='consentlist-cell'>" + (orgName != "" && orgName != undefined? orgName : item.organization_id) + "</td><td class='consentlist-cell' style='padding-left:1.2em'>" + sDisplay + "</td><td class='consentlist-cell'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></td><td class='consentlist-cell'>" + (item.signed).replace("T", " ") + "</td><td class='consentlist-cell'>" + (item.expires).replace("T", " ") + "</td></tr>";
@@ -1244,34 +1244,64 @@ var tnthAjax = {
     }
 };
 
+function getIEVersion() {
+    var match = navigator.userAgent.match(/(?:MSIE |Trident\/.*; rv:)(\d+)/);
+    return match ? parseInt(match[1]) : undefined;
+};
+
+function newHttpRequest(url,callBack)
+{
+    var xmlhttp;
+    if (window.XDomainRequest)
+    {
+        xmlhttp=new XDomainRequest();
+        xmlhttp.onload = function(){callBack(xmlhttp.responseText)};
+    }
+    else if (window.XMLHttpRequest)
+        xmlhttp=new XMLHttpRequest();
+    else
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    xmlhttp.onreadystatechange=function()
+    {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200)
+            callBack(xmlhttp.responseText);
+    }
+    xmlhttp.open("GET",url,true);
+    xmlhttp.send();
+};
+
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
 
         loader(true);
 
-        var initial_xhr = $.ajax({
-            url: PORTAL_NAV_PAGE,
-            type:'GET',
-            contentType:'text/plain',
-            cache: true,
-            //dataFilter:data_filter,
-            //xhr: xhr_function,
-            crossDomain: true
-            //xhrFields: {withCredentials: true},
-        }, 'html')
-        .done(function(data) {
-            embed_page(data);
-            //showSearch();
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-          //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-            loader();
-        })
-        .always(function() {
-            // alert( "complete" );
-
-        });
+        var isIE = getIEVersion();
+        if (isIE && isIE <= 9) {
+            newHttpRequest(PORTAL_NAV_PAGE, embed_page);
+        } else {
+            var initial_xhr = $.ajax({
+                url: PORTAL_NAV_PAGE,
+                type:'GET',
+                contentType:'text/plain',
+                cache: true,
+                //dataFilter:data_filter,
+                //xhr: xhr_function,
+                crossDomain: true
+                //xhrFields: {withCredentials: true},
+            }, 'html')
+            .done(function(data) {
+                embed_page(data);
+                //showSearch();
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+              //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+                loader();
+            })
+            .always(function() {
+                // alert( "complete" );
+            });
+        };
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
