@@ -35,4 +35,7 @@ RUN a2ensite portal
 
 EXPOSE 80
 
-CMD . /etc/apache2/envvars && ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb && /usr/sbin/apache2 -D FOREGROUND
+CMD \
+    . /etc/apache2/envvars && \
+    ${PROJECT_DIR}/bin/python ${PROJECT_DIR}/bin/manage.py initdb && \
+    /usr/sbin/apache2 -D FOREGROUND
