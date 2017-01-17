@@ -111,7 +111,7 @@
           </div>
           <a class="logo" href="{{PORTAL}}"></a>
           {% if not user %}
-            <div class="header__meta"><a class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">Log In</a><a class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
+            <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">Log In</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
           {% endif %}
         </header>
       {% endblock %}
@@ -124,7 +124,7 @@
           <h3 class="module__head">Everyone has a part to play in improving the prostate cancer journey.</h3>
           <p class="module__body">The more people that join us, the better the tools will become for you and future generations.</p>
           {% if not user %}
-          <div class="button-callout"><a class="button button--large button--teal" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
+          <div class="button-callout"><a href="#" class="button button--large button--teal" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
           {% endif %}
         </div>
       </div>
@@ -284,7 +284,8 @@
                   $("#loadingIndicator").show();
               } else {
                   showMain();
-                  setTimeout('$("#loadingIndicator").fadeOut();', 200);
+                  //setTimeout('$("#loadingIndicator").fadeOut();', 200);
+                  $("#loadingIndicator").hide()
               };
           };
 
@@ -322,11 +323,9 @@
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
              {% endif %}
 
-
-
-            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").on("click", function(e) {
-                e.stopPropagation();
-                loader(true);
+            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
+              e.stopPropagation();
+              loader(true);
             });
             setTimeout("loader(false);", 0);
           });
