@@ -126,17 +126,7 @@ function _setHostName(url) {
     };
 };
 
-
-if (typeof URL === "undefined") {
-    //for browsers such IE that does not support URL object specifically
-    _setHostName(PORTAL_NAV_PAGE);
-} else {
-    try {
-        PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
-    } catch(e) {
-        _setHostName(PORTAL_NAV_PAGE);
-    };
-};
+_setHostName(PORTAL_NAV_PAGE);
 
 
 {% block document_ready %}
