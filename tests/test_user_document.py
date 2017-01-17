@@ -33,8 +33,7 @@ class TestUserDocument(TestCase):
 
     def test_post_patient_report(self):
         #tests whether we can successfully post a patient report -type user doc file
-        service_user = self.add_service_user()
-        self.login(user_id=service_user.id)
+        self.login()
         test_contents = "This is a test."
         with NamedTemporaryFile(
             prefix='udoc_test_',
@@ -44,7 +43,7 @@ class TestUserDocument(TestCase):
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
             tempfileIO = StringIO(temp_pdf.read())
-            rv = self.client.post('/api/user/{}/patient_report'.format(service_user.id),
+            rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)
@@ -58,8 +57,7 @@ class TestUserDocument(TestCase):
 
 
     def test_download_user_document(self):
-        service_user = self.add_service_user()
-        self.login(user_id=service_user.id)
+        self.login()
         test_contents = "This is a test."
         with NamedTemporaryFile(
             prefix='udoc_test_',
@@ -69,13 +67,13 @@ class TestUserDocument(TestCase):
             temp_pdf.write(test_contents)
             temp_pdf.seek(0)
             tempfileIO = StringIO(temp_pdf.read())
-            rv = self.client.post('/api/user/{}/patient_report'.format(service_user.id),
+            rv = self.client.post('/api/user/{}/patient_report'.format(TEST_USER_ID),
                                 content_type='multipart/form-data', 
                                 data=dict({'file': (tempfileIO, temp_pdf.name)}))
             self.assert200(rv)
         udoc = db.session.query(UserDocument).order_by(UserDocument.id.desc()).first()
         rv = self.client.get('/api/user/{}/user_documents/{}'.format(
-                            service_user.id,udoc.id))
+                            TEST_USER_ID,udoc.id))
         self.assert200(rv)
         self.assertEqual(rv.data,test_contents)
 
