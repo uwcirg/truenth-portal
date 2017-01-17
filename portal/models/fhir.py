@@ -44,12 +44,18 @@ class FHIR_datetime(object):
     def parse(data, error_subject=None):
         """Parse input string to generate a UTC datetime instance
 
+        NB - date must be more recent than year 1900 or a ValueError
+        will be raised.
+
         :param data: the datetime string to parse
         :param error_subject: Subject string to use in error message
 
         :return: UTC datetime instance from given data
 
         """
+        # As we use datetime.strftime for display, and it can't handle dates
+        # older than 1900, treat all such dates as an error
+        epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')
         try:
             dt = parser.parse(data)
         except ValueError:
@@ -57,9 +63,14 @@ class FHIR_datetime(object):
             current_app.logger.warn(msg)
             abort(400, msg)
         if dt.tzinfo:
+            epoch = pytz.utc.localize(epoch)
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:
                 dt = dt.astimezone(pytz.utc)
+        # As we use datetime.strftime for display, and it can't handle dates
+        # older than 1900, treat all such dates as an error
+        if dt < epoch:
+            raise ValueError("Dates prior to year 1900 not supported")
         return dt
 
     @staticmethod
