@@ -26,7 +26,7 @@ manager = Manager(app)
 migrate = Migrate(
     app,
     db,
-    directory=os.path.join(app.root_path, '..', 'migrations')
+    directory=os.path.join(app.root_path, 'migrations')
 )
 manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
