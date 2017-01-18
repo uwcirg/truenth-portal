@@ -18,8 +18,8 @@ RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
     /usr/sbin/update-locale LANG=C.UTF-8
 
+ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
-    PROJECT_DIR="/opt/venvs/portal" \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json" \
