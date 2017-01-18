@@ -1,6 +1,7 @@
 """Module for i18n methods and functionality"""
 import sys
 import os
+from collections import defaultdict
 from flask import current_app
 from ..extensions import babel
 from .user import current_user
@@ -8,23 +9,16 @@ from .app_text import AppText
 from .intervention import Intervention
 
 
-def add_to_dict(d,k,o):
-    if k:
-        key = "\"" + k + "\""
-        if key not in d:
-            d[key] = set()
-        d[key].add(o)
-
-
 def get_db_strings():
-    elements = {}
-    query = AppText.query.with_entities(AppText.custom_text, AppText.name)
-    for entry in query:
-        add_to_dict(elements,entry[0],"apptext: " + entry[1])
-    query = Intervention.query.with_entities(Intervention.description, Intervention.card_html, Intervention.name)
-    for entry in query:
-        add_to_dict(elements,entry[0],"interventions: " + entry[2])
-        add_to_dict(elements,entry[1],"interventions: " + entry[2])
+    elements = defaultdict(set)
+    for entry in AppText.query:
+        if entry.custom_text:
+            elements["\"" + entry.custom_text + "\""].add("apptext: " + entry.name)
+    for entry in Intervention.query:
+        if entry.description:
+            elements["\"" + entry.description + "\""].add("interventions: " + entry.name)
+        if entry.card_html:
+            elements["\"" + entry.card_html + "\""].add("interventions: " + entry.name)
     return elements
 
 
