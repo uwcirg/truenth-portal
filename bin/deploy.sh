@@ -114,7 +114,6 @@ if [[
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
-    cd "${GIT_WORK_TREE}"
     python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
 
