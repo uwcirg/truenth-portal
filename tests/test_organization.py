@@ -6,7 +6,7 @@ import os
 from portal.extensions import db
 from portal.system_uri import SHORTCUT_ALIAS
 from portal.models.identifier import Identifier
-from portal.models.organization import Organization
+from portal.models.organization import Organization, OrgTree
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -197,3 +197,57 @@ class TestOrganization(TestCase):
         # obtain the org from the db, check the identifiers
         org = Organization.query.filter_by(name='Gastroenterology').one()
         self.assertEquals(2, org.identifiers.count())
+
+    def test_org_tree_nodes(self):
+        with self.assertRaises(ValueError) as context:
+            OrgTree().all_leaves_below_id(0)  # none of the above
+        self.assertTrue('not found' in context.exception.message)
+
+        nodes = OrgTree().all_leaves_below_id(101)  # UWMC - 3 children
+        self.assertEquals(3, len(nodes))
+
+    def deepen_org_tree(self):
+        """Create deeper tree for testing"""
+        org_l2 = Organization(id=1002, name='l2', partOf_id=102)
+        org_l3_1 = Organization(id=10031, name='l3_1', partOf_id=1002)
+        org_l3_2 = Organization(id=10032, name='l3_2', partOf_id=1002)
+        with SessionScope(db):
+            map(db.session.add, (org_l2, org_l3_1, org_l3_2))
+            db.session.commit()
+
+    def test_deeper_org_tree(self):
+        self.deepen_org_tree()
+        leaves = OrgTree().all_leaves_below_id(102)
+        self.assertTrue(len(leaves) == 2)
+        self.assertTrue(10032 in leaves)
+        self.assertTrue(10031 in leaves)
+
+    def test_provider_leaves(self):
+        # test provider with several org associations produces correct list
+        self.deepen_org_tree()
+        # Make provider with org associations at two levels
+        self.promote_user(role_name=ROLE.PROVIDER)
+
+        orgs = Organization.query.filter(Organization.id.in_((101, 102)))
+        for o in orgs:
+            self.test_user.organizations.append(o)
+        with SessionScope(db):
+            db.session.commit()
+        self.test_user = db.session.merge(self.test_user)
+
+        # Should now find children of 101 (102, 103, 104) and children
+        # of 102 (10031, 10032) for total of 4 leaf nodes
+        leaves = self.test_user.leaf_organizations()
+        self.assertEquals(len(leaves), 4)
+        self.assertTrue(103 in leaves)
+        self.assertTrue(104 in leaves)
+        self.assertTrue(10031 in leaves)
+        self.assertTrue(10032 in leaves)
+
+    def test_all_leaves(self):
+        # can we get a list of just the leaf orgs
+        self.deepen_org_tree()
+        leaves = OrgTree().all_leaf_ids()
+        self.assertEquals(len(leaves), 6)
+        for i in (103, 104, 10031, 10032, 202, 203):
+            self.assertTrue(i in leaves)

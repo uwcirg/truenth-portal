@@ -22,7 +22,7 @@ from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .intervention import UserIntervention
 from .performer import Performer
-from .organization import Organization
+from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
@@ -363,6 +363,20 @@ class User(db.Model, UserMixin):
         org = Organization.query.filter_by(name=organization_name).one()
         if org not in self.organizations:
             self.organizations.append(org)
+
+    def leaf_organizations(self):
+        """Return list of 'leaf' organization ids for user's orgs
+
+        Users, especially staff, have arbitrary number of organization
+        associations, at any level of the organization hierarchy.  This
+        method looks up all child leaf nodes from the users existing orgs.
+
+        """
+        leaves = set()
+        OT = OrgTree()
+        for org in self.organizations:
+            leaves.update(OT.all_leaves_below_id(org.id))
+        return list(leaves)
 
     def add_observation(self, fhir, audit):
         if not 'coding' in fhir['code']:

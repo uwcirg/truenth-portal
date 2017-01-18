@@ -290,6 +290,27 @@ class OrgTree(object):
         """Return list of all top level organization identifiers"""
         return self.root.children.keys()
 
+    def all_leaf_ids(self):
+        nodes = set()
+        for id in self.all_top_level_ids():
+            nodes.update(self.all_leaves_below_id(id))
+        return list(nodes)
+
+    def all_leaves_below_id(self, organization_id):
+        """Given org at arbitrary level, return list of leaf nodes below it"""
+        arb = self.find(organization_id)
+
+        def fetch_leaves(node):
+            stack = [node]
+            while stack:
+                node = stack.pop()
+                if not node.children:
+                    yield node.id
+                for child_node in node.children.values():
+                    stack.append(child_node)
+
+        return [leaf for leaf in fetch_leaves(arb)]
+
 
 def add_static_organization():
     """Insert special `none of the above` org at index 0"""
