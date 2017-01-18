@@ -407,6 +407,8 @@ def invite():
     body = request.form.get('body')
     recipients = request.form.get('recipients')
     user = current_user()
+    if not user.email:
+        abort(400, "Users without an email address can't send email")
     email = EmailMessage(subject=subject, body=body,
             recipients=recipients, sender=user.email,
             user_id=user.id)
