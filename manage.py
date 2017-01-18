@@ -3,6 +3,8 @@
 python manage.py --help
 
 """
+import os
+
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
@@ -21,7 +23,11 @@ from portal.site_persistence import SitePersistence
 app = create_app()
 manager = Manager(app)
 
-migrate = Migrate(app, db)
+migrate = Migrate(
+    app,
+    db,
+    directory=os.path.join(app.root_path, '..', 'migrations')
+)
 manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
