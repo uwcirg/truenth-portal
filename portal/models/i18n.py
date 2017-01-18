@@ -13,12 +13,12 @@ def get_db_strings():
     elements = defaultdict(set)
     for entry in AppText.query:
         if entry.custom_text:
-            elements["\"" + entry.custom_text + "\""].add("apptext: " + entry.name)
+            elements['"{}"'.format(entry.custom_text)].add("apptext: " + entry.name)
     for entry in Intervention.query:
         if entry.description:
-            elements["\"" + entry.description + "\""].add("interventions: " + entry.name)
+            elements['"{}"'.format(entry.description)].add("interventions: " + entry.name)
         if entry.card_html:
-            elements["\"" + entry.card_html + "\""].add("interventions: " + entry.name)
+            elements['"{}"'.format(entry.card_html)].add("interventions: " + entry.name)
     return elements
 
 
