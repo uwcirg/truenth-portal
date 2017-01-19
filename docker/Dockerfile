@@ -31,7 +31,25 @@ RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 COPY portal.wsgi /var/www/
-COPY portal.conf /etc/apache2/sites-available
+
+RUN printf '\n\
+<VirtualHost *:80>\n\
+  ServerName docker-dev-1.cirg.washington.edu\n\
+  LogLevel info\n\
+  ErrorLog /var/log/apache2/stg-error.log\n\
+  CustomLog /var/log/apache2/stg-access.log combined\n\
+  WSGIPassAuthorization On\n\
+  WSGIDaemonProcess stg_cs user=www-data group=www-data threads=5\n\
+  WSGIScriptAlias / /var/www/portal.wsgi\n\
+  <Directory /var/www/>\n\
+    WSGIProcessGroup stg_cs\n\
+    WSGIApplicationGroup %%{GLOBAL}\n\
+    Require all granted\n\
+  </Directory>\n\
+</VirtualHost>\n\
+\n'\
+> /etc/apache2/sites-available/portal.conf
+
 RUN a2ensite portal
 
 EXPOSE 80
