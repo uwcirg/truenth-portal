@@ -24,7 +24,8 @@ class AuthProvider(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column('provider', providers_list)
     provider_id = db.Column(db.String(40))
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                        nullable=False)
     user = db.relationship('User')
 
     def as_fhir(self):
