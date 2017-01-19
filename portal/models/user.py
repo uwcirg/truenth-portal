@@ -7,7 +7,7 @@ from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym
-from sqlalchemy import and_, UniqueConstraint
+from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
@@ -141,6 +141,7 @@ def permanently_delete_user(username):
     Includes wiping out audit rows, observations, etc.
 
     """
+    from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
 
@@ -159,6 +160,10 @@ def permanently_delete_user(username):
     comment = "purged all trace of {}".format(user)  # while format works
 
     # purge all the types with user foreign keys, then the user itself
+    UserRelationship.query.filter(
+        or_(UserRelationship.user_id==user.id,
+            UserRelationship.other_user_id==user.id)).delete()
+    UserObservation.query.filter_by(user_id=user.id).delete()
     UserIntervention.query.filter_by(user_id=user.id).delete()
     consent_audits = Audit.query.join(
         UserConsent, UserConsent.audit_id==Audit.id).filter(
@@ -171,7 +176,16 @@ def permanently_delete_user(username):
         db.session.delete(t)
     for o in user.observations:
         db.session.delete(o)
+    # Can't delete audit rows owned by this user, in cases like observations
+    # Update those to point to user doing the purge.
+    ob_audits = Audit.query.join(
+        Observation).filter(Audit.id==Observation.audit_id).filter(
+            Audit.user_id==user.id)
+    for au in ob_audits:
+        au.user_id = acting_user.id
     Audit.query.filter_by(user_id=user.id).delete()
+    for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
+        db.session.delete(ap)
 
     # the rest should die on cascade rules
     db.session.delete(user)
