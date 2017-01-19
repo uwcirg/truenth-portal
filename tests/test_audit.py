@@ -79,7 +79,6 @@ class TestAudit(TestCase):
         provider = db.session.merge(provider)
         self.login(provider.id)
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
-        print(rv.data)
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
         self.assertEquals(rv.json['audits'][0]['by'],
