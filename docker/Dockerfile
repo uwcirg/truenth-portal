@@ -36,8 +36,8 @@ RUN printf '\n\
 <VirtualHost *:80>\n\
   ServerName ${APACHE_SERVER_NAME}\n\
   LogLevel info\n\
-  ErrorLog /var/log/apache2/stg-error.log\n\
-  CustomLog /var/log/apache2/stg-access.log combined\n\
+  ErrorLog /dev/stderr\n\
+  CustomLog /dev/stdout combined\n\
   WSGIPassAuthorization On\n\
   WSGIDaemonProcess stg_cs user=${APACHE_RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
   WSGIScriptAlias / /var/www/portal.wsgi\n\
