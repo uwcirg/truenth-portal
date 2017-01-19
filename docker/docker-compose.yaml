@@ -9,6 +9,7 @@ services:
       - "${EXTERNAL_PORT:-8080}:80"
     environment:
       - APACHE_SERVER_NAME
+      - PERSISTENCE_FILE
     depends_on:
       - db
       - redis

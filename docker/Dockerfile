@@ -22,7 +22,7 @@ ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
-    PERSISTENCE_FILE="https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json" \
+    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}" \
     SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
     CELERY_BROKER_URL="redis://redis:6379/0" \
     REQUEST_CACHE_URL="redis://redis:6379/0" \
