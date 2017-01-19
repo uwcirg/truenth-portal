@@ -12,29 +12,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-# app_text:UCSF Medical Center organization consent URL
-# app_text:IRONMAN organization consent URL
+# apptext: IRONMAN organization consent URL
+# apptext: UCSF Medical Center organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
 msgstr ""
 
-# app_text:UW Medicine (University of Washington) organization consent URL
-# app_text:Australian Urology Associates organization consent URL
+# apptext: Australian Urology Associates organization consent URL
+# apptext: UW Medicine (University of Washington) organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
 msgstr ""
 
-# app_text:Terms of Use URL
+# apptext: Terms of Use URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603"
 msgstr ""
 
-# app_text:About TrueNTH URL
+# apptext: About TrueNTH URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
 msgstr ""
 
-# app_text:About Movember URL
+# apptext: About Movember URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565"
 msgstr ""
 
-# app_text:Legal URL
+# apptext: Legal URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577"
 msgstr ""
 
@@ -57,10 +57,12 @@ msgid "What Is Movember Foundation"
 msgstr ""
 
 #: portal/templates/access.html:26 portal/templates/portal.html:16
+# apptext: landing title
 msgid "Welcome to TrueNTH"
 msgstr ""
 
 #: portal/templates/access.html:27 portal/templates/portal.html:17
+# apptext: landing sub-title
 msgid "Tools for navigating the prostate cancer journey"
 msgstr ""
 
@@ -793,6 +795,8 @@ msgid "Body"
 msgstr ""
 
 #: portal/templates/invite.html:17
+# apptext: profileSendEmail invite email_subject
+# apptext: profileSendEmail option invite
 msgid "TrueNTH Invitation"
 msgstr ""
 
@@ -1553,5 +1557,82 @@ msgstr ""
 
 #: portal/templates/flask_user/user_profile.html:5
 msgid "User profile"
+msgstr ""
+
+# interventions: default
+msgid "OTHER: not yet officially supported"
+msgstr ""
+
+# interventions: decision_support_p3p
+msgid "Decision Support tool"
+msgstr ""
+
+# apptext: profileSendEmail reminder email_subject
+# apptext: profileSendEmail option reminder
+msgid "TrueNTH Reminder"
+msgstr ""
+
+# interventions: decision_support_p3p
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
+msgstr ""
+
+# apptext: portal registration
+msgid "TrueNTH Registration"
+msgstr ""
+
+# interventions: community_of_wellness
+msgid "Community of Wellness"
+msgstr ""
+
+# interventions: self_management
+msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
+msgstr ""
+
+# apptext: layout title
+msgid "TrueNTH USA"
+msgstr ""
+
+# apptext: Cellphone
+msgid "Cellphone"
+msgstr ""
+
+# interventions: assessment_engine
+msgid "Assessment Engine"
+msgstr ""
+
+# interventions: social_support
+msgid "Social Support Network"
+msgstr ""
+
+# apptext: profileSendEmail invite email_body
+msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><head><style>.btn{{color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px; border-radius:8px; padding:0.5em;}} .btn:hover {{ background-color: #2a4531; text-decoration: underline; }}</style></head><body><p>Hello,</p><p>This email was sent to you by (clinic name). It is an invitation to use the TrueNTH website, where you will report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in prostate cancer care can be made.</p><p>To complete your first questionnaire, you must verify your details and set up your account.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#79815D\" class=\"btn\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\" >Verify your account and answer questionnaire now</a></td></tr></table><p>Click the button above or use the link below to visit TrueNTH:<br /><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (instructions for support go here)</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p></body></html>"
+msgstr ""
+
+# interventions: care_plan
+msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
+msgstr ""
+
+# interventions: self_management
+msgid "Symptom Tracker tool"
+msgstr ""
+
+# interventions: decision_support_wisercare
+msgid "Decision Support WiserCare"
+msgstr ""
+
+# interventions: care_plan
+msgid "Care Plan"
+msgstr ""
+
+# apptext: profileSendEmail reminder email_body
+msgid "<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align="center" width="300" bgcolor="#0088cc" style="background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;"><a href="{0}" style="color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href="{0}">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
+msgstr ""
+
+# interventions: sexual_recovery
+msgid "Sexual Recovery"
+msgstr ""
+
+# interventions: sexual_recovery
+msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
 msgstr ""
 

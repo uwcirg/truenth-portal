@@ -11,6 +11,7 @@ from flask_migrate import Migrate, MigrateCommand
 from portal.app import create_app
 from portal.config import ConfigServer
 from portal.extensions import db
+from portal.models.i18n import upsert_to_template_file
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
@@ -84,6 +85,12 @@ def mark_test():
 def fake_user_consents():
     """Fabricate fake consent agreements where user -> orgs exist"""
     fake_consents()
+
+
+@manager.command
+def translations():
+    """Add extracted DB strings to existing PO template file"""
+    upsert_to_template_file()
 
 
 if __name__ == '__main__':
