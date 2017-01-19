@@ -154,6 +154,7 @@ def demographics_set(patient_id):
         abort(400, str(e))
     db.session.commit()
     auditable_event("updated demographics on user {0} from input {1}".format(
-        patient_id, json.dumps(request.json)), user_id=current_user().id)
+        patient_id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient_id)
     return jsonify(patient.as_fhir())
 

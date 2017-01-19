@@ -1178,7 +1178,7 @@ def assessment_set(patient_id):
     db.session.add(questionnaire_response)
     db.session.commit()
     auditable_event("added {}".format(questionnaire_response),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=patient_id)
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 

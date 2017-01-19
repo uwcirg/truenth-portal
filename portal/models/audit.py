@@ -22,12 +22,13 @@ class Audit(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     version = db.Column(db.Text, default=lookup_version, nullable=False)
     comment = db.Column(db.Text)
 
     def __str__(self):
-        return "Audit user {0.user_id} at {0.timestamp} {0.comment}".\
+        return "Audit by user {0.user_id} on user {0.subject_id} at {0.timestamp} {0.comment}".\
                 format(self)
 
     def as_fhir(self):
@@ -36,6 +37,7 @@ class Audit(db.Model):
         d['version'] = self.version
         d['lastUpdated'] = FHIR_datetime.as_fhir(self.timestamp)
         d['by'] = Reference.patient(self.user_id).as_fhir()
+        d['on'] = Reference.patient(self.subject_id).as_fhir()
         if self.comment:
             d['comment'] = self.comment
         return d
@@ -50,9 +52,11 @@ class Audit(db.Model):
 
         """
 
-        #2016-02-23 10:07:05,953: 10033 performed: logout
+        #2016-02-23 10:07:05,953: performed by 10033 on 10033: logout
         fields = entry.split(':')
         dt = parser.parse(':'.join(fields[0:2]))
-        user_id = int(fields[3].split()[0])
+        user_id = int(fields[3].split()[2])
+        subject_id = int(fields[3].split()[4])
         message = ':'.join(fields[4:])
-        return cls(user_id=user_id, timestamp=dt, comment=message)
+        return cls(user_id=user_id, subject_id=subject_id,
+                timestamp=dt, comment=message)

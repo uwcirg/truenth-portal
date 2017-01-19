@@ -23,19 +23,20 @@ import portal.models.audit
 AUDIT = (logging.WARN + logging.ERROR) / 2
 
 
-def auditable_event(message, user_id):
+def auditable_event(message, user_id, subject_id):
     """Record auditable event
 
     message: The message to record, i.e. "log in via facebook"
     user_id: The authenticated user id performing the action
+    subject_id: The user id upon which the action was performed
 
     """
-    text = "{0} performed: {1}".format(user_id, message)
+    text = "performed by {0} on {1}: {2}".format(user_id, subject_id, message)
     current_app.logger.log(AUDIT, text)
 
     with db.session.no_autoflush:
         db.session.add(portal.models.audit.Audit(
-            user_id=user_id, comment=message))
+            user_id=user_id, subject_id=subject_id, comment=message))
         db.session.commit()
 
 

@@ -242,7 +242,7 @@ def user_intervention_set(intervention_name):
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(
         intervention.description, json.dumps(request.json)),
-        user_id=current_user().id)
+        user_id=current_user().id, subject_id=user_id)
     return jsonify(message='ok')
 
 
@@ -299,7 +299,8 @@ def intervention_rule_set(intervention_name):
         abort(400, "`rank` values must be unique per intervention")
 
     auditable_event("added {} to intervention {}".format(
-        access_strategy, intervention.description), user_id=current_user().id)
+        access_strategy, intervention.description), user_id=current_user().id,
+        subject_id=current_user().id)
     return jsonify(message='ok')
 
 
@@ -403,5 +404,6 @@ def intervention_communicate(intervention_name):
     db.session.add(email)
     db.session.commit()
     auditable_event("intervention {} sent {}".format(
-        intervention.description, email), user_id=current_user().id)
+        intervention.description, email), user_id=current_user().id,
+        subject_id=current_user().id)
     return jsonify(message='sent')

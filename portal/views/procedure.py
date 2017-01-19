@@ -139,7 +139,8 @@ def post_procedure():
     patient = get_user(patient_id)
     patient.procedures.append(procedure)
     db.session.commit()
-    auditable_event("added {}".format(procedure), user_id=current_user().id)
+    auditable_event("added {}".format(procedure), user_id=current_user().id,
+        subject_id=patient_id)
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
@@ -188,7 +189,8 @@ def procedure_delete(procedure_id):
     current_user().check_role(permission='edit', other_id=patient_id)
     db.session.delete(procedure)
     db.session.commit()
-    auditable_event("deleted {}".format(procedure), user_id=current_user().id)
+    auditable_event("deleted {}".format(procedure), user_id=current_user().id,
+        subject_id=patient_id)
     return jsonify(message='deleted procedure')
 
 

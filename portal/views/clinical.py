@@ -395,7 +395,7 @@ def clinical_set(patient_id):
     if code != 200:
         abort(code, result)
     db.session.commit()
-    auditable_event(result, user_id=current_user().id)
+    auditable_event(result, user_id=current_user().id, subject_id=patient_id)
     return jsonify(message=result)
 
 
@@ -418,7 +418,8 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
                                          audit=Audit(user_id=current_user().id))
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
-        codeable_concept, truthiness, patient_id), user_id=current_user().id)
+        codeable_concept, truthiness, patient_id), user_id=current_user().id,
+        subject_id=patient_id)
     return jsonify(message='ok')
 
 
