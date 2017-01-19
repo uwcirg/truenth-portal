@@ -1,5 +1,5 @@
 """User API view functions"""
-from flask import abort, Blueprint, jsonify, url_for
+from flask import abort, current_app, Blueprint, jsonify, url_for
 from flask import request, make_response
 from flask_user import roles_required
 
