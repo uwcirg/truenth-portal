@@ -18,7 +18,6 @@ from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import permanently_delete_user, flag_test
-from portal.models.user_consent import fake_consents
 from portal.site_persistence import SitePersistence
 
 app = create_app()
@@ -79,12 +78,6 @@ def purge_user(username):
 def mark_test():
     """Designate all current users as test users"""
     flag_test()
-
-
-@manager.command
-def fake_user_consents():
-    """Fabricate fake consent agreements where user -> orgs exist"""
-    fake_consents()
 
 
 @manager.command
