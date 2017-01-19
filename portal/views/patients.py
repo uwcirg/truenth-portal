@@ -43,9 +43,8 @@ def patients_root():
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
-    return render_template(
-        'patients_by_org.html', org_list_by_parent=patients.all(),
-        wide_container="true")
+
+    return render_template('patients_by_org.html', patients_list=patients.all(), wide_container="true")
 
 
 @patients.route('/profile_create')

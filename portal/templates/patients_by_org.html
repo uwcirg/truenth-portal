@@ -48,35 +48,11 @@
     </div>
     <hr class="download-break"/>
 {% endif %}
-
-{% if org_list_by_parent|length > 1 %}
-<div class="small orgLinks">
-    <p>Skip to:</p>
-    <ul style="list-style-type: circle">
-        {% for parent_id in org_list_by_parent %}
-          {% for org in org_list_by_parent[parent_id] | sort(attribute='id') %}
-              {% if org.id != parent_id %}
-                <ul style="list-style-type: disc"><li><a href="#location{{org.id}}">{{ org.name }}</a></li></ul>
-              {% else %}
-                <li><a href="#location{{org.id}}">{{ org.name }}</a></li>
-              {% endif %}
-          {% endfor %}
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
-<hr />
-{% for parent_id in org_list_by_parent %}
-  {% set orgCount = 1 %}
-  {% for org in org_list_by_parent[parent_id] | sort(attribute='id')%}
       <div class="admin-table table-responsive smaller-text">
-          <h4 id="location{{org.id}}">{{ org.name }} {{ _("Patients") }}</h4>
-
-          <div id="adminTableToolbar{{org.id}}" class="admin-toolbar">
-          <span id="tableCount{{org.id}}"></span></div>
-          <table id="adminTable{{org.id}}"
-                 data-table-id="adminTable{{org.id}}"
+          <div id="adminTableToolbar" class="admin-toolbar">
+          <span id="tableCount"></span></div>
+          <table id="adminTable"
+                 data-table-id="adminTable"
                  class="tnth-admin-table"
                  data-classes="table table-hover table-condensed table-striped table-responsive"
                  data-toggle="table"
@@ -86,7 +62,7 @@
                  data-pagination="true"
                  data-page-size="50"
                  data-page-list="[25,50,100,ALL]"
-                 data-toolbar="#adminTableToolbar{{org.id}}"
+                 data-toolbar="#adminTableToolbar"
                  data-show-toggle="true"
                  data-show-columns="true"
                  data-smart-display="true"
@@ -98,45 +74,42 @@
                       <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
                       <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
                       <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
-              {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>
-              {% endif %}
-                      <th data-field="consent_date" data-sortable="true" class="text-center">{{ _("Consent Date (GMT)")}}</th>
-              {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <th data-field="status" data-sortable="true" class="text-center">{{ _("Assessment Status") }}</th>
-              {% endif %}
+                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>
+                      {% endif %}
+                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <th data-field="status" data-sortable="true" class="text-center">{{ _("Assessment Status") }}</th>
+                      {% endif %}
+                      <th data-field="organization" data-sortable="true">{{ _("Organization(s)") }}</th>
                   </tr>
               </thead>
               <tbody data-link="row" class="rowlink">
-              {% for user in org.users %}
+                   {% for patient in patients_list | sort(attribute='id')%}
                   <tr>
-                      <td><a href="{{ url_for('patients.patient_profile', patient_id=user.id) }}">{{ user.id }}</a></td>
-                      <td>{{ user.username }}</td>
-                      <td>{{ user.first_name if user.first_name }}</td>
-                      <td>{{ user.last_name if user.last_name }}</td>
-                      <td>{{ user.email if user.email }}</td>
-                    {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td class="rowlink-skip">{{ user.provider_html() | safe }}</td>
-                    {% endif %}
-                       <td class="text-center">{{ user.consent_date if user.consent_date}}</td>
-                    {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                      <td class="text-center">
-                        {{ user.assessment_status }}
+                      <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
+                      <td>{{ patient.username }}</td>
+                      <td>{{ patient.first_name if patient.first_name }}</td>
+                      <td>{{ patient.last_name if patient.last_name }}</td>
+                      <td>{{ patient.email if patient.email }}</td>
+                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
+                      {% endif %}
+                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <td class="text-center">
+                          {{ patient.assessment_status }}
+                        </td>
+                      {% endif %}
+                      <td>
+                        {% for org in patient.organizations | sort(attribute='id') %}
+                            {{org.name}} <br/>
+                        {% endfor %}
                       </td>
-                    {% endif %}
+                    {% endfor %}
                   </tr>
-              {% endfor %}
               </tbody>
           </table>
       </div>
-    {% if orgCount < org_list_by_parent[parent_id]|length %}
-        <hr />
-    {% endif %}
-    {% set orgCount = orgCount + 1 %}
-  {% endfor %}
-{% endfor %}
 
-</div>
 
 {% endblock %}
 {% block document_ready %}
