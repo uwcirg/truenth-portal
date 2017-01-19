@@ -43,7 +43,6 @@ def patients_root():
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
-    import pdb; pdb.set_trace()
     return render_template(
         'patients_by_org.html', org_list_by_parent=patients.all(),
         wide_container="true")
