@@ -34,7 +34,7 @@ COPY portal.wsgi /var/www/
 
 RUN printf '\n\
 <VirtualHost *:80>\n\
-  ServerName docker-dev-1.cirg.washington.edu\n\
+  ServerName ${APACHE_SERVER_NAME}\n\
   LogLevel info\n\
   ErrorLog /var/log/apache2/stg-error.log\n\
   CustomLog /var/log/apache2/stg-access.log combined\n\
@@ -49,6 +49,8 @@ RUN printf '\n\
 </VirtualHost>\n\
 \n'\
 > /etc/apache2/sites-available/portal.conf
+
+ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
 RUN a2ensite portal
 
