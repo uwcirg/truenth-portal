@@ -123,7 +123,10 @@ def account():
             user.organizations.append(org)
             auditable_event("adding {} to {}".format(org, user),
                            user_id=current_user().id)
-            needing_consents.add(OrgTree().find(org_id).top_level())
+            if current_app.config.get('CONSENT_WITH_TOP_LEVEL_ORG'):
+                needing_consents.add(OrgTree().find(org_id).top_level())
+            else:
+                needing_consents.add(org_id)
 
     for org_id in needing_consents:
         # providers need an implicit consent agreement for edit permission
