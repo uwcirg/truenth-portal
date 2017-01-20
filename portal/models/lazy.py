@@ -1,3 +1,4 @@
+import thread
 from sqlalchemy.orm.util import class_mapper
 
 from ..extensions import db
@@ -18,14 +19,14 @@ def lazyprop(fn):
     decorate the 'getter' with @lazyprop, where the function definition
     loads the object to be assigned to the given attribute.
 
+    NB - the SQLAlchemy session is NOT thread safe.  As this tends to be
+    the primary use of the lazyprop decorator, we include the thread
+    identifier in the key
+
     """
-    attr_name = '_lazy_{}'.format(fn.__name__)
-    disable_cache = True
+    attr_name = '_lazy_{}.{}'.format(fn.__name__, thread.get_ident())
     @property
     def _lazyprop(self):
-        if disable_cache:
-            return fn(self)
-
         if not hasattr(self, attr_name):
             setattr(self, attr_name, fn(self))
 

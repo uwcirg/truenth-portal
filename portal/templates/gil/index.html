@@ -130,6 +130,7 @@
     <script>
         $(document).ready(function() {
             $("body").attr("class", "page-home");
+            {% if redirect_uri %} $("#modal-login-register").modal("show");{%endif%}
         });
     </script>
   {% endblock %}
