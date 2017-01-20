@@ -598,7 +598,9 @@ def assessment_status(user, consent=None):
         consent_date = consent.audit.timestamp
     elif not user.valid_consents.count():
         return 'Expired'
-    consent_date = user.valid_consents[0].audit.timestamp
+    else:
+        consent_date = user.valid_consents[0].audit.timestamp
+    assert(consent_date)
 
     today = datetime.utcnow()
     def status_per_instrument(instrument_id, thresholds):
