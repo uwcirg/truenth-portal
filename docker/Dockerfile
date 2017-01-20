@@ -2,7 +2,9 @@ FROM debian:jessie
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN echo deb http://dl.bintray.com/v1/content/ivan-c/true_nth stable main > /etc/apt/sources.list.d/truenth.list
+ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/true_nth"
+
+RUN echo deb ${debian_repo} stable main > /etc/apt/sources.list.d/truenth.list
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
