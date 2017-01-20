@@ -230,6 +230,7 @@ class ClinicalConstants(object):
     def BIOPSY(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111').one()
+        assert coding
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -238,6 +239,7 @@ class ClinicalConstants(object):
     def PCaDIAG(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121').one()
+        assert coding
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -246,6 +248,7 @@ class ClinicalConstants(object):
     def PCaLocalized(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        assert coding
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -254,6 +257,7 @@ class ClinicalConstants(object):
     def TRUE_VALUE(self):
         value_quantity = ValueQuantity(
             value='true', units='boolean').add_if_not_found(True)
+        assert value_quantity
         return value_quantity
 
     @lazyprop
@@ -543,6 +547,7 @@ def add_static_concepts(only_quick=False):
 def localized_PCa(user):
     """Look up user's value for localized PCa"""
     codeable_concept = CC.PCaLocalized
+    assert codeable_concept
     value_quantities = user.fetch_values_for_concept(codeable_concept)
     if value_quantities:
         assert len(value_quantities) == 1
