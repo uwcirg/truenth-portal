@@ -7,9 +7,10 @@ from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
+from ..models.fhir import assessment_status
 from ..models.fhir import FHIR_datetime, QuestionnaireResponse
 from ..models.intervention import INTERVENTION
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, User
 from ..extensions import oauth
 from ..extensions import db
 
@@ -1315,3 +1316,81 @@ def complete_assessment():
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
+
+
+@assessment_engine_api.route('/consent-assessment-status')
+@oauth.require_oauth()
+def batch_assessment_status():
+    """Return a batch of consent and assessment states for list of users
+
+    ---
+    operationId: batch_assessment_status
+    tags:
+      - Internal
+    parameters:
+      - name: user_id
+        in: query
+        description:
+          TrueNTH user ID for assessment status lookup.  Any number of IDs
+          may be provided
+        required: true
+        type: array
+        items:
+          type: integer
+          format: int64
+        collectionFormat: multi
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: batch_assessment_response
+          required:
+            - consent_assessment_status
+          properties:
+            status:
+              type: array
+              items:
+                type: object
+                required:
+                  - user_id
+                  - consents
+                user_id:
+                  type: integer
+                  format: int64
+                  description: TrueNTH ID for user
+                consents:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - consent
+                      - assessment_status
+                    consent:
+                      type: string
+                      description: Details of the consent
+                    assessment_status:
+                      type: string
+                      description: User's assessment status
+      401:
+        description: if missing valid OAuth token
+
+    """
+    acting_user = current_user()
+    user_ids = request.args.getlist('user_id')
+    if not user_ids:
+        abort(400, "Requires at least one user_id")
+    results = []
+    users = User.query.filter(User.id.in_(user_ids))
+    for user in users:
+        if not acting_user.check_role('view', user.id):
+            continue
+        details = []
+        for consent in user.all_consents:
+            status = assessment_status(user, consent)
+            details.append(
+                {'consent': consent.as_json(), 'assessment_status': status})
+        results.append({'user_id': user.id, 'consents': details})
+
+    return jsonify(status=results)
