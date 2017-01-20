@@ -1346,8 +1346,6 @@ def batch_assessment_status():
         description: successful operation
         schema:
           id: batch_assessment_response
-          required:
-            - consent_assessment_status
           properties:
             status:
               type: array
