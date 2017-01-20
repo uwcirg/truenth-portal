@@ -20,8 +20,12 @@ def lazyprop(fn):
 
     """
     attr_name = '_lazy_{}'.format(fn.__name__)
+    disable_cache = True
     @property
     def _lazyprop(self):
+        if disable_cache:
+            return fn(self)
+
         if not hasattr(self, attr_name):
             setattr(self, attr_name, fn(self))
 
