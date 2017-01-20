@@ -400,7 +400,7 @@ def set_user_consents(user_id):
       - in: body
         name: body
         schema:
-          id: consent_agreement
+          id: post_consent_agreement
           required:
             - organization_id
             - agreement_url
