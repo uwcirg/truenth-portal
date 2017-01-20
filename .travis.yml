@@ -8,7 +8,6 @@ addons:
 services:
   - postgresql
   - redis-server
-  - docker
 env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
@@ -19,10 +18,18 @@ matrix:
   include:
     - env: TOXENV=docs
     - env:
+        - TOXENV=build
+      services:
+        - docker
+    - env:
         - TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
+  # Build artifacts only (no testing)
+  allow_failures:
+    - env:
+      - TOXENV=build
 
 before_install:
   # Set Github env vars
@@ -94,7 +101,7 @@ deploy:
   on:
     all_branches: true
     condition:
-      - $TOXENV = py27
+      - $TOXENV = build
       - $DEPLOY = true
       - -v BINTRAY_API_KEY
   provider: bintray
