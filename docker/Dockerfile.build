@@ -71,4 +71,5 @@ CMD \
 	yes | make-deb && \
 	git checkout debian/rules && \
 	dpkg-buildpackage -us -uc && \
-	mv /root/portal_* /tmp/artifacts
+	mv /root/portal_* /tmp/artifacts && \
+	dpkg-scanpackages /tmp/artifacts | gzip > /tmp/artifacts/Packages.gz
