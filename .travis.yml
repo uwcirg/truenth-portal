@@ -66,6 +66,7 @@ before_deploy:
   - docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "portal_builddeb:test"
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
   - cp --verbose /tmp/artifacts/* ../
+  - cp --recursive --verbose /tmp/artifacts artifacts
 
   # Build bintray descriptor file dynamically
   - >
