@@ -1356,23 +1356,25 @@ def batch_assessment_status():
                 required:
                   - user_id
                   - consents
-                user_id:
-                  type: integer
-                  format: int64
-                  description: TrueNTH ID for user
-                consents:
-                  type: array
-                  items:
-                    type: object
-                    required:
-                      - consent
-                      - assessment_status
-                    consent:
-                      type: string
-                      description: Details of the consent
-                    assessment_status:
-                      type: string
-                      description: User's assessment status
+                properties:
+                  user_id:
+                    type: integer
+                    format: int64
+                    description: TrueNTH ID for user
+                  consents:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - consent
+                        - assessment_status
+                      properties:
+                        consent:
+                          type: string
+                          description: Details of the consent
+                        assessment_status:
+                          type: string
+                          description: User's assessment status
       401:
         description: if missing valid OAuth token
 
