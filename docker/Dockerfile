@@ -1,3 +1,7 @@
+# TrueNTH Shared Services Dockerfile
+# This Dockerfile will build an image to run Shared Services from a previously built debian package (portal)
+
+
 FROM debian:jessie
 
 ENV DEBIAN_FRONTEND noninteractive
