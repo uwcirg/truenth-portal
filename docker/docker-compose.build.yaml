@@ -1,0 +1,15 @@
+---
+version: '2.1'
+services:
+  builder:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.build
+    environment:
+      - BRANCH
+      - REPO_SLUG
+    volumes:
+      - debian-repo:/tmp/artifacts
+volumes:
+  debian-repo:
+    driver: local
