@@ -39,7 +39,9 @@ def patients_root():
         Role.name==ROLE.PATIENT).with_entities(Role.id).first()
     patients = User.query.join(UserRoles).filter(
         and_(User.id==UserRoles.user_id,
-             UserRoles.role_id==patient_role_id)
+             UserRoles.role_id==patient_role_id,
+             User.deleted_id==None
+             )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
