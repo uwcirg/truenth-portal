@@ -1,127 +1,114 @@
 {% extends "layout.html" %}
 {% block main %}
-<div id="patientList" class="reduce-font-sizes">
-
-<h4 class="tnth-headline">Patient List</h4>
-<br/>
-<div><a  href="{{ url_for('patients.profile_create') }}"><button class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button></a> &nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
-<a href="" id="_downloadLink" target="_blank" style="visibility: hidden"></a>
-<hr/>
-
-{% if config.PROVIDER_BULK_DATA_ACCESS %}
-    <div class="download-wrapper">
-      <div class="orglist-download-container">
-          <div>
-            <a href="javascript:void(0);" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Export assessment data") }}</a>
-          </div>
-      </div>
-    </div>
-    <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export assessment data") }}</h4>
-              </div>
-              <div class="modal-body" style="padding: 1em">
-                  <div class="form-group">
-                    <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
-                    <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
-                      {% for instrument_code in config["INSTRUMENTS"] %}
-                      <div class="checkbox">
-                          <label>
-                              <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
-                          </label>
+  <div id="patientList" class="reduce-font-sizes">
+    <h4 class="tnth-headline">Patient List</h4>
+    <br/>
+    <div><a href="{{ url_for('patients.profile_create') }}"><button class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button></a> &nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
+    <a href="" id="_downloadLink" target="_blank" style="visibility: hidden"></a>
+    <hr/>
+  {% if config.PROVIDER_BULK_DATA_ACCESS %}
+      <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export assessment data") }}</h4>
+                </div>
+                <div class="modal-body" style="padding: 1em">
+                    <div class="form-group">
+                      <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
+                      <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
+                        {% for instrument_code in config["INSTRUMENTS"] %}
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                        <div id="_downloadMessage" style="color:#a94442"></div>
                       </div>
-                      {% endfor %}
-                      <div id="_downloadMessage" style="color:#a94442"></div>
                     </div>
-                  </div>
-                  <br/>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Export") }}</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
+                    <br/>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Export") }}</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
+                </div>
               </div>
             </div>
-          </div>
-    </div>
-    <hr class="download-break"/>
-{% endif %}
-      <div class="admin-table table-responsive smaller-text">
-          <div id="adminTableToolbar" class="admin-toolbar">
-          <span id="tableCount"></span></div>
-          <table id="adminTable"
-                 data-table-id="adminTable"
-                 class="tnth-admin-table"
-                 data-classes="table table-hover table-condensed table-striped table-responsive"
-                 data-toggle="table"
-                 data-sort-name="userid"
-                 data-sort-order="desc"
-                 data-search="true"
-                 data-pagination="true"
-                 data-page-size="20"
-                 data-page-list="[20, 40]"
-                 data-toolbar="#adminTableToolbar"
-                 data-show-toggle="true"
-                 data-show-columns="true"
-                 data-smart-display="true"
-                 data-unique-id="id"
-                 data-id-field="id"
-                 >
-              <thead>
-                  <tr>
-                      <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
-                      <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field">{{ _("ID") }}</th>
-                      <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
-                      <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
-                      <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
-                      <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
-                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                        <th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>
-                      {% endif %}
-                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                        <th data-field="status" data-sortable="true" data-class="status-field">{{ _("Assessment Status") }}</th>
-                      {% endif %}
-                       <th data-field="consentdate" data-sortable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
-                       <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Organization(s)") }}</th>
-                  </tr>
-              </thead>
-              <tbody data-link="row" class="rowlink">
-                   {% for patient in patients_list | sort(attribute='id')%}
-                  <tr>
-                      <td>{{patient.id}}</td>
-                      <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
-                      <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                      <td>{{ patient.first_name if patient.first_name }}</td>
-                      <td>{{ patient.last_name if patient.last_name }}</td>
-                      <td>{{ patient.email if patient.email }}</td>
-                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                        <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
-                      {% endif %}
-                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                        <td>
-                          {%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}
-                        </td>
-                      {% endif %}
-                      <td>
-                      </td>
-                      <td>
-                        {% for org in patient.organizations | sort(attribute='id') %}
-                           <span class="smaller-text">{{org.name}}</span><br/>
-                        {% endfor %}
-                      </td>
-                    {% endfor %}
-                  </tr>
-              </tbody>
-          </table>
       </div>
+  {% endif %}
 
+  <div class="admin-table table-responsive smaller-text">
+      <div id="adminTableToolbar" class="admin-toolbar">
+        {% if config.PROVIDER_BULK_DATA_ACCESS %}
+          <div class="orglist-download-container">
+              <div>
+                <a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Export assessment data") }}</a>
+              </div>
+         </div>
+        {% endif %}
+        <span id="tableCount"></span>
+      </div>
+      <table id="adminTable"
+             data-table-id="adminTable"
+             class="tnth-admin-table"
+             data-classes="table table-hover table-condensed table-striped table-responsive"
+             data-toggle="table"
+             data-sort-name="userid"
+             data-sort-order="desc"
+             data-search="true"
+             data-pagination="true"
+             data-page-size="20"
+             data-page-list="[20, 40]"
+             data-toolbar="#adminTableToolbar"
+             data-show-toggle="true"
+             data-show-columns="true"
+             data-smart-display="true"
+             data-unique-id="id"
+             data-id-field="id"
+             >
+          <thead>
+              <tr>
+                  <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
+                  <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field">{{ _("ID") }}</th>
+                  <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
+                  <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
+                  <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                  <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
+                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-class="status-field">{{ _("Assessment Status") }}</th>{% endif %}
+                  <th data-field="consentdate" data-sortable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
+                  <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Organization(s)") }}</th>
+              </tr>
+          </thead>
+          <tbody data-link="row" class="rowlink">
+               {% for patient in patients_list | sort(attribute='id')%}
+              <tr>
+                  <td>{{patient.id}}</td>
+                  <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
+                  <td id="{{patient.id}}_username">{{ patient.username }}</td>
+                  <td>{{ patient.first_name if patient.first_name }}</td>
+                  <td>{{ patient.last_name if patient.last_name }}</td>
+                  <td>{{ patient.email if patient.email }}</td>
+                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                    <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
+                  {% endif %}
+                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                    <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
+                  {% endif %}
+                  <td><!--consent datefield--></td>
+                  <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
+                {% endfor %}
+              </tr>
+          </tbody>
+      </table>
+ </div>
 
+</div>
 {% endblock %}
 {% block document_ready %}
 
-var arrLoaded = {};
 $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");

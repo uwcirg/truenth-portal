@@ -228,7 +228,8 @@ transform(-1000px, 0);*/
   display: none;
 }
 #patientAssessmentDownload {
-  padding: 0.6em;
+  padding: 0.65em;
+  font-size: 1.1em;
 }
 #patientsInstrumentList div.checkbox label {
   font-size: 0.8em;
