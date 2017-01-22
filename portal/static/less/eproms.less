@@ -105,6 +105,9 @@ body {
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
 }
+#adminTable {
+  transition: all 0.5s ease-in;
+}
 
 .save-info {
   opacity: 0;
@@ -1454,11 +1457,18 @@ div.input-group.date {
     padding: 2px;
   }
 
+  #adminTable .email-field {
+    display: none;
+  }
+
 }
 
-@media (max-width: 730) {
+@media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
+  }
+  #adminTable .status-field, #adminTable .reports-field {
+    display: none;
   }
 }
 
@@ -1519,6 +1529,9 @@ div.input-group.date {
   }
   .load-container {
     min-height: 1.5em;
+  }
+  #adminTable .consentdate-field {
+    display: none;
   }
 }
 @media (min-width: 992px) {
@@ -1593,6 +1606,9 @@ div.input-group.date {
 
 @media (max-width: 1199px) {
   .profile-img {
+    display: none;
+  }
+  #adminTable .organization-field {
     display: none;
   }
 }

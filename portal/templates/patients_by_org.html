@@ -60,7 +60,7 @@
              data-search="true"
              data-pagination="true"
              data-page-size="20"
-             data-page-list="[20, 40]"
+             data-page-list="[10, 25, 50]"
              data-toolbar="#adminTableToolbar"
              data-show-toggle="true"
              data-show-columns="true"
@@ -75,10 +75,10 @@
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
-                  <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
-                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-class="status-field">{{ _("Assessment Status") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
+                  <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
+                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Assessment Status") }}</th>{% endif %}
+                  <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Organization(s)") }}</th>
               </tr>
           </thead>
@@ -150,8 +150,8 @@ function getData(userString, isLast) {
                           cl = "text-danger";
                           break;
                     };
-                    a += (a != "" ? "<br/>" : "") + "<span class='" + cl + "'>" + item.assessment_status + "</span>";
-                    s += (s != "" ? "<br/>" : "") + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "");
+                    a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " smaller-text'>" + item.assessment_status + "</span>";
+                    s += (s != "" ? "<br/>" : "") + "<span class='smaller-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
                   };
                 };
                   prevItem.assessment_status = item.assessment_status;
@@ -186,11 +186,11 @@ function getData(userString, isLast) {
         };
       };
       //console.log("consent updated successfully.");
-      if(isLast) setTimeout("loader();", 300);
+      if(isLast) setTimeout("loader();", 1000);
   }).fail(function(xhr) {
       console.log("request failed.");
       ///console.log(xhr.responseText)
-      if(isLast) setTimeout("loader();", 300);
+      if(isLast) setTimeout("loader();", 1000);
   });
 };
 
@@ -236,14 +236,12 @@ function updateData() {
 
 $(document).ready(function() {
 
-  loader();
+    loader();
 
-  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-   $("#adminTable").on("page-change.bs.table", function() {
+   $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
       updateData();
     });
     setTimeout("updateData();", 0);
-  {% endif %}
 
   $("input[data-field='id']:checkbox").hide();
 

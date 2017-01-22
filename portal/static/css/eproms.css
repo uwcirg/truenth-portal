@@ -74,6 +74,10 @@ body {
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
 }
+
+#adminTable {
+  transition: all 0.5s ease-in;
+}
 .save-info {
   opacity: 0;
   -webkit-transition: opacity 0.8s ease-in;
@@ -651,15 +655,17 @@ a.btn {
 #userOrgs label :first-of-type {
   margin-bottom: 0.5em;
 }
+
 #fillOrgs legend {
-  font-size: 0.9em;
+  font-size: 0.92em;
   color: #595F57;
   margin: 4px 0 4px 0;
 }
 #fillOrgs,
 .noOrg-container {
-  font-size: 0.99em;
+  font-size: 0.95em;
 }
+
 input.clinic {
   margin-top: 6px;
 }
@@ -1172,7 +1178,10 @@ div.input-group.date {
 }
 
 .indent {
-  padding: 0 1em;
+  padding: 0 1.4em;
+}
+.text-muter {
+  color: #8e8d8d;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1319,10 +1328,16 @@ div.input-group.date {
   button.btn-delete-consent {
     padding: 2px;
   }
+  #adminTable .email-field {
+    display: none;
+  }
 }
-@media (max-width: 730) {
+@media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
+  }
+  #adminTable .status-field, #adminTable .reports-field {
+    display: none;
   }
 }
 @media (min-width: 768px) {
@@ -1379,6 +1394,9 @@ div.input-group.date {
   }
   .load-container {
     min-height: 1.5em;
+  }
+  #adminTable .consentdate-field {
+    display: none;
   }
 }
 @media (min-width: 992px) {
@@ -1447,6 +1465,9 @@ div.input-group.date {
 }
 @media (max-width: 1199px) {
   .profile-img {
+    display: none;
+  }
+  #adminTable .organization-field {
     display: none;
   }
 }
