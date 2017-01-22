@@ -148,6 +148,17 @@ def configure_blueprints(app, blueprints):
 
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
+    if app.config.get('LOG_SQL'):
+        sql_log_file = '/tmp/sql_log'
+        sql_file_handler = handlers.RotatingFileHandler(sql_log_file,
+                maxBytes=1000000, backupCount=20)
+        sql_file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(thread)d: %(message)s'
+        ))
+        sql_log = logging.getLogger('sqlalchemy.engine')
+        sql_log.setLevel(logging.INFO)
+        sql_log.addHandler(sql_file_handler)
+
     if app.testing:
         # Skip test mode. Just check standard output.
         return
