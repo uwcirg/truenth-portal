@@ -5,6 +5,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      args:
+        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/true_nth}"
     ports:
       - "${EXTERNAL_PORT:-8080}:80"
     environment:
