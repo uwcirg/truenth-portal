@@ -8,10 +8,16 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/true_nth"
 
-RUN echo deb ${debian_repo} stable main > /etc/apt/sources.list.d/truenth.list
-RUN echo deb file:///tmp/artifacts / > /etc/apt/sources.list.d/truenth.local.list
-
 COPY artifacts /tmp/artifacts
+
+# Only add local repository if packages available in artifacts/
+RUN \
+    if [ -n "$(ls -A /tmp/artifacts)" ]; then \
+        echo deb file:/tmp/artifacts ./ > /etc/apt/sources.list.d/truenth.local.list; \
+    else \
+        echo deb ${debian_repo} stable main > /etc/apt/sources.list.d/truenth.list; \
+    fi
+
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
