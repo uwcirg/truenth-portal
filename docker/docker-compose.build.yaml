@@ -1,3 +1,4 @@
+# sudo cp -R $(docker volume inspect --format '{{ .Mountpoint }}' docker_debian-repo) artifacts
 ---
 version: '2.1'
 services:
