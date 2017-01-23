@@ -33,7 +33,7 @@ class TestAssessment(TestCase):
     def mark_localized(self):
         self.test_user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
 
     def test_localized_on_time(self):
         # User finished both on time

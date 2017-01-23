@@ -169,7 +169,7 @@ class TestIntervention(TestCase):
         # Bless the test user with PCa diagnosis
         user.save_constrained_observation(
             codeable_concept=CC.PCaDIAG, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
@@ -545,7 +545,7 @@ class TestIntervention(TestCase):
             code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -650,7 +650,7 @@ class TestIntervention(TestCase):
             code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))

@@ -415,7 +415,8 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
                                          value_quantity=truthiness,
-                                         audit=Audit(user_id=current_user().id))
+                                         audit=Audit(user_id=current_user().id,
+                                          subject_id=patient_id))
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
         codeable_concept, truthiness, patient_id), user_id=current_user().id,
