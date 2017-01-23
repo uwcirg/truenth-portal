@@ -53,8 +53,8 @@ class BaseConfig(object):
 
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'
-    LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
-    LR_GROUP = 20147
+    LR_ORIGIN = 'https://stg-cms.us.truenth.org'
+    LR_GROUP = 20142
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
