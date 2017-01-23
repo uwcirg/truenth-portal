@@ -13,9 +13,9 @@
 @lgsubheadSize:   1.20em;
 @smallerText:     0.85em;
 @btnSize:         1em;
-@legendSize:      0.95em;
+@legendSize:      0.92em;
 @sessionListSize: 0.95em;
-@orgSize:         0.99em;
+@orgSize:         0.95em;
 
 /**
  * = Colors =
@@ -73,6 +73,9 @@ a.btn {
   visibility: hidden;
   -webkit-transition: visibility 0.5s ease-in;
   transition: visibility 0.5s ease-in;
+}
+#adminTable {
+  transition: all 0.5s ease-in;
 }
 
 #loginEmailReminderText
@@ -271,7 +274,8 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
 }
 
 #patientAssessmentDownload {
-  padding: 0.6em;
+  padding: 0.65em;
+  font-size: 1.1em;
 }
 
 #patientsInstrumentList div.checkbox label {
@@ -860,8 +864,6 @@ t
 }
 
 .profile-header {
-  /*width: 100%;
-  max-width: 100%;*/
   display:inline-block;
 }
 .profile-section {
@@ -899,8 +901,6 @@ t
 #loadingIndicator{
   /*display: none;*/
   position: fixed;
-  /*top: 200px;
-  left: 48%;*/
   top: 0;
   left: 0;
   right: 0;
@@ -908,19 +908,11 @@ t
   height: 2em;
   width: 2em;
   overflow: show;
-  /*margin-left: -50px;*/
-  /*width: 100px;
-  height: 100px;*/
   font-size: 1em;
   text-align: center;
   z-index: 99999;
   color: #444;
   margin: auto;
-  /*-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-  filter: alpha(opacity=80);
-  -moz-opacity: 0.8;
-  -khtml-opacity: 0.8;
-  opacity: 0.8;*/
 }
 #loadingIndicator:before {
   content: ' ';
@@ -1037,14 +1029,6 @@ t
     transform: rotate(360deg);
   }
 }
-/*********
-.loading {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
-  filter: alpha(opacity=40);
-  -moz-opacity: 0.4;
-  -khtml-opacity: 0.4;
-  opacity: 0.4;
-}*********/
 
 .side {
   height:26em
@@ -1262,9 +1246,29 @@ a.btn-delete {
   padding: 0.2em 0.4em 0.2em 0.3em
 }
 div.input-group.date {
-  margin-top:-2px;
+  margin-top: -2px;
 }
-
+div.org-container legend {
+  color: #474848;
+}
+div.org-container label.org-label{
+  margin: 0;
+}
+div.org-container .text-muter {
+  margin-bottom: 4px;
+  margin-top:4px;
+  font-size: 0.97em;
+  color: #989696;
+}
+div.org-container input[type="checkbox"] {
+  position:relative;
+  top:-1px;
+  right:4px;
+}
+#fillOrgs .divider {
+  display:block;
+  height:0.25em;
+}
 #profileProcedureContainer #tnthproc {
   max-width: 95%
 }
@@ -1277,7 +1281,6 @@ div.input-group.date {
 .indent {
   padding: 0 1em;
 }
-
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1440,11 +1443,19 @@ div.input-group.date {
     padding: 2px;
   }
 
+  #adminTable .email-field {
+    display: none;
+  }
+
 }
 
-@media (max-width: 730) {
+@media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
+  }
+
+  #adminTable .status-field, #adminTable .reports-field {
+    display: none;
   }
 }
 
@@ -1506,6 +1517,9 @@ div.input-group.date {
   }
   .load-container {
     min-height: 1.5em;
+  }
+  #adminTable .consentdate-field {
+    display: none;
   }
 
 }
@@ -1575,6 +1589,9 @@ div.input-group.date {
 
 @media (max-width: 1199px) {
   .profile-img {
+    display: none;
+  }
+  #adminTable .organization-field {
     display: none;
   }
 }

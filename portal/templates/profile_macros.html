@@ -276,7 +276,7 @@
             <div id="profileEmailMessage" class="text-info"></div>
         </form>
     </div>
-    <script>$(function () {
+    <script async>$(function () {
 
         function getAccessUrl() {
             var url = '';
@@ -318,14 +318,18 @@
                 var body = '';
                 var return_url = '';
                 var clinicName = (function() {
-                var orgs = $("input[name='organization']:checked");
-                var parentName = "";
+                    var orgs = $("#userOrgs input[name='organization']:checkbox:checked").not('[parent_org]');
+                    var parentName = "";
                     if (orgs.length > 0 ) {
                         orgs.each(function() {
-                            if ($(this).attr("data-parent-name") && !parentName) parentName = $(this).attr("data-parent-name");
+                            if (!parentName) {
+                                parentName = $(this).attr("data-parent-name");
+                                if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                                //console.log("pn: " + parentName)
+                            };
                         });
                     };
-                   var cn = parentName ? parentName: "your clinic";
+                    var cn = parentName ? parentName: "your clinic";
                     return cn;
                 })();
                 if (selectedOption.val() == 'invite'){
@@ -384,11 +388,32 @@
         {% if consent_agreements %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
-    <script>$(function () {
-                 {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
-                tnthAjax.getOrgs({{ person.id if person }});
+    <script>
+        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+        var orgsEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
 
-            });</script>
+        function disableOrgs() {
+            $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
+                    $(this).attr("disabled", true);
+            });
+        };
+
+        //console.log("orgs editable: " + orgsEditable)
+
+        var leafOrgs = false;
+        {% if (current_user.id != person.id) and current_user.has_role('provider') and not(current_user.has_role('admin')) %}
+            leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() |safe}} {% else %} false {% endif %};
+        {% endif %}
+        $(function () {
+            {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
+            tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);
+        });
+        function _handleOrgs() {
+            if (leafOrgs) OT.filterOrgs(leafOrgs);
+            if (!orgsEditable) disableOrgs();
+        };
+    </script>
 {%- endmacro %}
 
 {% macro consent(person, consent_agreements, current_user) -%}
@@ -426,8 +451,11 @@
     {% if person %}
     <div id="profileConsentList"></div>
     <!--<a id="consentBackLink" style="visibility:hidden" href="/patients"></a>-->
-    <script>
-        var consentEditable = {% if current_user.has_role('provider') or current_user.has_role('admin') %}true{% else %}false{% endif %};
+    <script async>
+        var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+        var consentEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        var _isAdmin = {%if current_user.has_role('admin') %}true{%else%}false{%endif%};
+
         /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
             var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
@@ -442,7 +470,7 @@
             });
         };
         $(function () {
-            setTimeout("tnthAjax.getConsent({{person.id}});", 500);
+            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 500);
         });
     </script>
     {% endif %}
@@ -454,7 +482,7 @@
         <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
         </table>
-        <script>
+        <script async>
         function _showText(obj) {
             if (obj) {
                 var f = $(obj).parent().find('.second');
@@ -608,7 +636,7 @@
         </div>
     {% endif %}
     {% if person %}
-    <script>
+    <script async>
     $(function () {
         tnthAjax.getRoles({{ person.id }}, true);
         $("#rolesGroup input[name='user_type']").each(function() {
@@ -638,7 +666,7 @@
         </table>
         <div id="profileSessionListError" style="color: #a94442"></div>
     </div>
-    <script>
+    <script async>
         $(function () {
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
@@ -1160,7 +1188,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title">{{ _("Consent History") }}</h4>
+                    <h4 id="consentHistoryLoc" class="profile-item-title">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
                     {{profileConsent(person, current_user)}}
                 </div>
             </div>
@@ -1311,7 +1339,7 @@
     </form>
     <br/>
 <div>
-<script>
+<script defer>
     var subjectId = {{ person.id if person}};
     var currentUserId = {{ current_user.id if current_user}};
 

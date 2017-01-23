@@ -309,8 +309,21 @@ class OrgTree(object):
                 for child_node in node.children.values():
                     stack.append(child_node)
 
-        return [leaf for leaf in fetch_leaves(arb)]
+        return list(fetch_leaves(arb))
 
+    def here_and_below_id(self, organization_id):
+        """Given org at arbitrary level, return list at and below"""
+        arb = self.find(organization_id)
+
+        def fetch_nodes(node):
+            stack = [node]
+            while stack:
+                node = stack.pop()
+                yield node.id
+                for id, child_node in node.children.items():
+                    stack.append(child_node)
+
+        return list(fetch_nodes(arb))
 
 def add_static_organization():
     """Insert special `none of the above` org at index 0"""

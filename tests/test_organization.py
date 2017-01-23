@@ -251,3 +251,10 @@ class TestOrganization(TestCase):
         self.assertEquals(len(leaves), 6)
         for i in (103, 104, 10031, 10032, 202, 203):
             self.assertTrue(i in leaves)
+
+    def test_here_and_below_id(self):
+        self.deepen_org_tree()
+        nodes = OrgTree().here_and_below_id(101)
+        self.assertEquals(len(nodes), 7)
+        for i in (101, 102, 103, 104, 1002, 10031, 10032):
+            self.assertTrue(i in nodes)

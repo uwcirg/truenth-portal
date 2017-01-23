@@ -61,7 +61,7 @@
             <br/>
           </div>
           <div class="modal-footer">
-            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+            <a href="#" onclick="location.replace('/login-as/{{user.id}}');" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
           </div>
         </div>
@@ -152,9 +152,9 @@ function adjustAssessmentInstrument(status) {
               instrumentId = IRONMAN_INSTRUMENT;
               break;
            };
-          
+
         };
-        
+
       };
     }).fail(function() {
         console.log("Problem retrieving data from server.")
@@ -162,8 +162,8 @@ function adjustAssessmentInstrument(status) {
   };
 
   //console.log("label: " + assessLabel + " instrumentId: " + instrumentId)
-   
-  if (hasValue(assessLabel) && hasValue(instrumentId)) {       
+
+  if (hasValue(assessLabel) && hasValue(instrumentId)) {
       $("#indexNavBar .assessmentLabel").each(function() { $(this).text(assessLabel); });
       $("#assessmentModal").on('show.bs.modal', function (e) {
           $(this).find(".modal-title").text("Assess patient for " + assessLabel);
@@ -184,7 +184,7 @@ function adjustAssessmentInstrument(status) {
 
 var pcaLocalizedStatus;
 
-{% if pca_localized_status is not none %} 
+{% if pca_localized_status is not none %}
 
 pcaLocalizedStatus = {% if pca_localized_status %}true{%else%}false{%endif%};
 
@@ -196,7 +196,7 @@ $(document).ready(function(){
 
     //initialize pca localized modal, NOTE, will not need to make extra ajax call if pca_localized_status is set initially
     adjustAssessmentInstrument(pcaLocalizedStatus);
-    
+
     [{
         attachID: "month",
         targetField: $("#month"),

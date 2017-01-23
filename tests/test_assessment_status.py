@@ -1,6 +1,7 @@
 """Module to test assessment_status"""
 from datetime import datetime
 from flask_webtest import SessionScope
+import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -67,3 +68,14 @@ class TestAssessment(TestCase):
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "Due")
+
+    def test_batch_lookup(self):
+        self.login()
+        self.bless_with_basics()
+        rv = self.client.get(
+            '/api/consent-assessment-status?user_id=1&user_id=2')
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['status']), 1)
+        self.assertEquals(
+            rv.json['status'][0]['consents'][0]['assessment_status'], 'Due')
+        print json.dumps(rv.json, indent=2)

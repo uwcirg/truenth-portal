@@ -7,9 +7,9 @@ from sqlalchemy import and_
 from ..extensions import oauth
 from ..models.app_text import app_text, ConsentATMA, VersionedResource
 from ..models.fhir import assessment_status, localized_PCa
-from ..models.organization import Organization, OrgTree
-from ..models.role import ROLE
-from ..models.user import User, current_user, get_user
+from ..models.organization import Organization, OrgTree, UserOrganization
+from ..models.role import Role, ROLE
+from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -21,51 +21,34 @@ def patients_root():
     """patients view function, intended for providers
 
     Present the logged in provider the list of patients matching
-    the providers organizations
+    the providers organizations (and any decendent organizations)
 
     """
     user = current_user()
-    org_list_by_parent = {}
-    now = datetime.utcnow()
 
-    for org_id in OrgTree().all_top_level_ids():
-        org_list_by_parent[org_id] = []
-
+    # Build list of all organization ids, and their decendents, the
+    # user belongs to
+    org_list = set()
+    OT = OrgTree()
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count
             continue
-        # we require a consent agreement between the user and the
-        # respective 'top-level' organization
-        top_level_id = OrgTree().find(org.id).top_level()
-        consent_query = UserConsent.query.filter(and_(
-            UserConsent.organization_id == top_level_id,
-            UserConsent.deleted_id == None,
-            UserConsent.expires > now)).with_entities(UserConsent.user_id)
-        consented_users = [u[0] for u in consent_query]
-        #top org should have all users from its child orgs
-        if org.id == top_level_id:
-            user_query = User.query.filter(User.id.in_(consented_users)).all()
-            org.users = [user for user in user_query if
-                     user.has_role(ROLE.PATIENT) and user.deleted_id is None]
-        else:
-            org.users = [user for user in org.users if
-                     user.has_role(ROLE.PATIENT) and
-                     user.id in consented_users and
-                     user.deleted_id is None]
+        org_list.update(OT.here_and_below_id(org.id))
 
-        additional_field = current_app.config.get('PATIENTS_BY_PROVIDER_ADDL_FIELDS')
-        for user in org.users:
-            if (additional_field and 'status' in additional_field):
-                #only load this conditionally, no need to load if not specified in config, as it is also conditionally rendered in the html
-                user.assessment_status = assessment_status(user) 
-            user.consent_date = (user.valid_consents[0].audit.timestamp).strftime('%m-%d-%Y') if user.valid_consents else None
+    # Gather up all patients belonging to any of the orgs (and their children)
+    # this (staff) user belongs to.
+    patient_role_id = Role.query.filter(
+        Role.name==ROLE.PATIENT).with_entities(Role.id).first()
+    patients = User.query.join(UserRoles).filter(
+        and_(User.id==UserRoles.user_id,
+             UserRoles.role_id==patient_role_id,
+             User.deleted_id==None
+             )
+        ).join(UserOrganization).filter(
+            and_(UserOrganization.user_id==User.id,
+                 UserOrganization.organization_id.in_(org_list)))
 
-        #store patients by org into top level org list so we can list them by top-level org
-        #before we were sorting by org only
-        org_list_by_parent[top_level_id].append(org)
-    return render_template(
-        'patients_by_org.html', org_list_by_parent = org_list_by_parent, wide_container="true")
-
+    return render_template('patients_by_org.html', patients_list=patients.all(), wide_container="true")
 
 @patients.route('/profile_create')
 @roles_required(ROLE.PROVIDER)
