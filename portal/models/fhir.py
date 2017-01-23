@@ -543,7 +543,6 @@ def add_static_concepts(only_quick=False):
 def localized_PCa(user):
     """Look up user's value for localized PCa"""
     codeable_concept = CC.PCaLocalized
-    assert codeable_concept
     value_quantities = user.fetch_values_for_concept(codeable_concept)
     if value_quantities:
         assert len(value_quantities) == 1
