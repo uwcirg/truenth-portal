@@ -35,7 +35,7 @@ def lazyprop(fn):
         # ORM objects (especially in testing) are occasionally detached
         if _is_sql_wrapper(attr):
             if attr not in db.session:
-                attr = db.session.merge(attr)
+                attr = fn(self)  # reload - merge fails on collected objs
                 setattr(self, attr_name, attr)
         return attr
     return _lazyprop
