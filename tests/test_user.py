@@ -492,7 +492,8 @@ class TestUser(TestCase):
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
-        audit = Audit(comment='test data', user_id=TEST_USER_ID)
+        audit = Audit(comment='test data', user_id=TEST_USER_ID,
+            subject_id=TEST_USER_ID)
         self.promote_user(user, ROLE.PROVIDER)
         self.promote_user(u2, ROLE.PATIENT)
         self.promote_user(member_of, ROLE.PATIENT)
@@ -793,7 +794,8 @@ class TestUser(TestCase):
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
-            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a')
+            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a',
+                subject_id=TEST_USER_ID)
             other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))

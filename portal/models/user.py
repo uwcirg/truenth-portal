@@ -774,6 +774,7 @@ class User(db.Model, UserMixin):
                 # Given a time, store and mark as "time of death"
                 audit = Audit(
                     user_id=current_user().id, timestamp=dt,
+                    subject_id=self.id,
                     comment="time of death for user {}".format(self.id))
                 self.deceased = audit
             elif 'deceasedBoolean' in fhir:
@@ -784,6 +785,7 @@ class User(db.Model, UserMixin):
                         self.deceased_id = None
                         audit = Audit(
                             user_id=current_user().id,
+                            subject_id=self.id,
                             comment=("Remove existing deceased from "
                                      "user {}".format(self.id)))
                         db.session.add(audit)
@@ -791,7 +793,7 @@ class User(db.Model, UserMixin):
                     # still marked with an audit, but without the special
                     # comment syntax and using default (current) time.
                     audit = Audit(
-                        user_id=current_user().id,
+                        user_id=current_user().id, subject_id=self.id,
                         comment=("Marking user {} as "
                                  "deceased".format(self.id)))
                     self.deceased = audit
@@ -1012,7 +1014,7 @@ class User(db.Model, UserMixin):
                                  [client.id for client in clients]))
 
         self.active = False
-        self.deleted = Audit(user_id=acting_user.id,
+        self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self))
 
         # purge any outstanding access tokens

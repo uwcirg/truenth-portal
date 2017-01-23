@@ -390,7 +390,7 @@ def clinical_set(patient_id):
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
-    audit = Audit(user_id=current_user().id)
+    audit = Audit(user_id=current_user().id, subject_id=patient_id)
     code, result = patient.add_observation(request.json, audit)
     if code != 200:
         abort(code, result)

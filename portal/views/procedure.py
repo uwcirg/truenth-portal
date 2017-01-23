@@ -125,7 +125,7 @@ def post_procedure():
             request.json['resourceType'] != 'Procedure':
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
-    audit = Audit(user_id=current_user().id)
+    audit = Audit(user_id=current_user().id, subject_id=current_user().id)
     try:
         procedure = Procedure.from_fhir(request.json, audit)
     except ValueError as e:

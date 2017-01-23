@@ -21,7 +21,7 @@ class TestClinical(TestCase):
     def prep_db_for_clinical(self):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
-            audit = Audit(user_id=TEST_USER_ID)
+            audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             observation = Observation(audit=audit)
             coding = Coding(system='SNOMED-CT', code='372278000',
                     display='Gleason score')

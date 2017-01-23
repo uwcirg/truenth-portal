@@ -14,7 +14,7 @@ class TestUserConsent(TestCase):
     url = 'http://fake.com?arg=critical'
 
     def test_content_options(self):
-        audit = Audit(user_id=TEST_USER_ID)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         org1, _ = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         uc = UserConsent(
@@ -34,7 +34,7 @@ class TestUserConsent(TestCase):
         org1, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
 
-        audit = Audit(user_id=TEST_USER_ID)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc1 = UserConsent(organization=org1, agreement_url=self.url,
                           audit=audit)
         uc2 = UserConsent(organization=org2, agreement_url=self.url,
@@ -128,7 +128,7 @@ class TestUserConsent(TestCase):
         org1_id, org2_id = org1.id, org2.id
         data = {'organization_id': org1_id}
 
-        audit = Audit(user_id=TEST_USER_ID)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         uc1 = UserConsent(organization=org1, agreement_url=self.url,
                           audit=audit)
         uc2 = UserConsent(organization=org2, agreement_url=self.url,

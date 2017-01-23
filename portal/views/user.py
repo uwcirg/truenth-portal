@@ -658,7 +658,8 @@ def delete_user_consents(user_id):
                 setattr(remove_uc, attr, False)
 
     remove_uc.deleted = Audit(
-        user_id=current_user().id, comment="Deleted consent agreement")
+        user_id=current_user().id, subject_id=user.id,
+        comment="Deleted consent agreement")
     db.session.commit()
 
     return jsonify(message="ok")
