@@ -8,34 +8,34 @@
     <hr/>
   {% if config.PROVIDER_BULK_DATA_ACCESS %}
       <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                  <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export assessment data") }}</h4>
-                </div>
-                <div class="modal-body" style="padding: 1em">
-                    <div class="form-group">
-                      <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
-                      <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
-                        {% for instrument_code in config["INSTRUMENTS"] %}
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
-                            </label>
-                        </div>
-                        {% endfor %}
-                        <div id="_downloadMessage" style="color:#a94442"></div>
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export assessment data") }}</h4>
+              </div>
+              <div class="modal-body" style="padding: 1em">
+                  <div class="form-group">
+                    <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
+                    <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
+                      {% for instrument_code in config["INSTRUMENTS"] %}
+                      <div class="checkbox">
+                          <label>
+                              <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
+                          </label>
                       </div>
+                      {% endfor %}
+                      <div id="_downloadMessage" style="color:#a94442"></div>
                     </div>
-                    <br/>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Export") }}</button>
-                  <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
-                </div>
+                  </div>
+                  <br/>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Export") }}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
               </div>
             </div>
+          </div>
       </div>
   {% endif %}
 
@@ -84,7 +84,7 @@
           </thead>
           <tbody data-link="row" class="rowlink">
                {% for patient in patients_list | sort(attribute='id')%}
-              <tr>
+              <tr id="id_row_{{patient.id}}">
                   <td>{{patient.id}}</td>
                   <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
                   <td id="{{patient.id}}_username">{{ patient.username }}</td>
@@ -103,11 +103,12 @@
               </tr>
           </tbody>
       </table>
- </div>
-
+  </div>
 </div>
 {% endblock %}
 {% block document_ready %}
+
+var requestsCounter = 0;
 
 $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
@@ -118,7 +119,7 @@ $(".tnth-admin-table").bootstrapTable({
     }
 });
 
-function getData(userString, isLast) {
+function getData(userString) {
   $.ajax ({
       type: "GET",
       url: '/api/consent-assessment-status',
@@ -150,13 +151,13 @@ function getData(userString, isLast) {
                           cl = "text-danger";
                           break;
                     };
-                    a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " smaller-text'>" + item.assessment_status + "</span>";
-                    s += (s != "" ? "<br/>" : "") + "<span class='smaller-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
+                    a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " small-text'>" + item.assessment_status + "</span>";
+                    s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
+
+                    prevItem.assessment_status = item.assessment_status;
+                    prevItem.consent_signed = item.consent.signed;
                   };
                 };
-                  prevItem.assessment_status = item.assessment_status;
-                  prevItem.consent_signed = item.consent.signed;
-
               });
           };
             //console.log("user id: " + status.user_id)
@@ -172,11 +173,12 @@ function getData(userString, isLast) {
         if (arrData.length > 0) {
           //console.log(arrData)
           arrData.forEach(function(d) {
-             var row = $("#adminTable tr[data-uniqueid='" + d.id + "']");
+             //var row = $("#adminTable tr[data-uniqueid='" + d.id + "']");
+             var row = $("#id_row_" + d.id);
              if (row.length > 0) {
                 var rindex = row.attr("data-index");
-                var statusField = row.find(".status-field");
-                var cdField = row.find(".consentdate-field");
+                var statusField = row.children(".status-field");
+                var cdField = row.children(".consentdate-field");
                //console.log("status: " + statusField.length + " cdField: " + cdField.length);
                if (d.data.status) statusField.html(d.data.status);
                if (d.data.consentdate) cdField.html(d.data.consentdate);
@@ -186,11 +188,12 @@ function getData(userString, isLast) {
         };
       };
       //console.log("consent updated successfully.");
-      if(isLast) setTimeout("loader();", 1000);
+      requestsCounter -= 1;
+      if(requestsCounter == 0) setTimeout("loader();", 1000);
   }).fail(function(xhr) {
       console.log("request failed.");
       ///console.log(xhr.responseText)
-      if(isLast) setTimeout("loader();", 1000);
+      setTimeout("loader();", 1000);
   });
 };
 
@@ -210,27 +213,26 @@ function updateData() {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
      if (index == (_userIds.length - 1)) {
        arrUsers.push(us);
-      }
-      else if (ct >= 10) {
+     }
+     else if (ct >= 5) {
         arrUsers.push(us);
         us = "";
         ct = 0;
-      };
+     };
   };
 
-  var o = 0, last=false;
-  arrUsers.forEach(function(us, index) {
-     loader(true);
-     if (index == (arrUsers.length-1)) last=true;
-     try {
-        setTimeout("getData('" + us + "', " + last + "); ", o);
-      } catch(ex) {
-        console.log("Error retrieving data: " + ex.message);
-      } finally {
-        loader();
-      };
-     o += 100;
-  });
+  if (arrUsers.length > 0) {
+    $("#loadingIndicator").hide();
+    loader(true);
+    requestsCounter = arrUsers.length;
+    arrUsers.forEach(function(us) {
+        try {
+          getData(us);
+        } catch(ex) {
+          console.log("Error request: " + ex.message)
+        };
+    });
+  };
 };
 
 
