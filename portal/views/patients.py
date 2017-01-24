@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, render_template
+from flask import abort, Blueprint, render_template, current_app
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -74,7 +74,7 @@ def patient_profile(patient_id):
     user.check_role("edit", other_id=patient_id)
     patient = get_user(patient_id)
     if not patient:
-        abort(404, "Patient {} Not Found".format(patient_id))
+        abort(404, "Patient {} Not Found".format(patient_id))   
     consent_agreements = get_orgs_consent_agreements()
     pca_localized_status = localized_PCa(patient)
 
@@ -84,11 +84,16 @@ def patient_profile(patient_id):
 def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
+        current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
         org = Organization.query.get(org_id)
         asset, url = VersionedResource.fetch_elements(
             app_text(ConsentATMA.name_key(organization=org)))
+        if url:
+            current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
+
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
                 'agreement_url': url}
+
     return consent_agreements

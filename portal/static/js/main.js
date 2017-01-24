@@ -1151,9 +1151,10 @@ var tnthAjax = {
             };
 
         }).fail(function() {
+            console.log("Request failed")
             return false;
          });
-        //console.log(consentedOrgIds)
+        console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     },
     handleConsent: function(obj) {
