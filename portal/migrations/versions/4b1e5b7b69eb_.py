@@ -31,11 +31,12 @@ def upgrade():
         audit.subject_id = audit.user_id
 
         # if comment references changed user, use that as subject_id
-        if audit.comment and ("user" in audit.comment):
+        if audit.comment:
             audit_comment_list = audit.comment.split()
-            subj_id = audit_comment_list[audit_comment_list.index("user") + 1]
-            if subj_id.isdigit():
-                audit.subject_id = int(subj_id)
+            if "user" in audit_comment_list:
+                subj_id = audit_comment_list[audit_comment_list.index("user") + 1]
+                if subj_id.isdigit():
+                    audit.subject_id = int(subj_id)
 
     session.commit()
 
