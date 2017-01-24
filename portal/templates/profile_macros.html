@@ -358,7 +358,7 @@
         <div id="fillOrgs"></div>
         <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
         </div>
-        {% if consent_agreements %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
+        {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
     <script>
