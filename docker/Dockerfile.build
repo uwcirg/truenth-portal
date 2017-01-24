@@ -39,16 +39,16 @@ Pin-Priority: 75\n\
 RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
 
 RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
-	debhelper \
-	dh-virtualenv\
-	fakeroot \
-	git \
-	libc6-i386 \
-	libffi-dev \
-	libpq-dev \
-	locales \
-	python-dev \
-	python-pip
+    debhelper \
+    dh-virtualenv\
+    fakeroot \
+    git \
+    libc6-i386 \
+    libffi-dev \
+    libpq-dev \
+    locales \
+    python-dev \
+    python-pip
 
 RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
@@ -66,11 +66,11 @@ ENV BRANCH=${BRANCH:-develop}
 ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
 
 CMD \
-	git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
-	cd /root/portal && \
-	yes | make-deb && \
-	git checkout debian/rules && \
-	dpkg-buildpackage -us -uc && \
-	mv /root/portal_* /tmp/artifacts && \
-	cd /tmp/artifacts && \
-	dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz
+    git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
+    cd /root/portal && \
+    yes | make-deb && \
+    git checkout debian/rules && \
+    dpkg-buildpackage -us -uc && \
+    mv /root/portal_* /tmp/artifacts && \
+    cd /tmp/artifacts && \
+    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz
