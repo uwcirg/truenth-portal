@@ -211,7 +211,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Login</h3>
-            <a href="{{PORTAL}}/user/sign-in" class="button button-large button--teal">Login</a>
+            <a href="#" onclick="goToLogin();" class="button button-large button--teal">Login</a>
             <br/><br/>
             <p class="box-modal__copy"><em>or</em></p>
             <div class="box-modal__divider"></div>
@@ -299,9 +299,13 @@
                   $("#loadingIndicator").show();
               } else {
                   showMain();
-                  //setTimeout('$("#loadingIndicator").fadeOut();', 200);
                   $("#loadingIndicator").hide()
               };
+          };
+
+          function goToLogin() {
+              $('#modal-login-register').modal('hide'); 
+              setTimeout("$('#modal-login').modal('show'); ", 500);
           };
 
           function showMain() {
@@ -317,6 +321,13 @@
           };
 
          $(document).ready(function(){
+
+            $("#modal-login-register").on("hidden.bs.modal", function (e) {
+                loader(true);
+            });
+            $("#modal-login").on("show.bs.modal", function(e) {
+                loader();
+            });
 
             // Configure and start the session timeout monitor
             {% if user %}
