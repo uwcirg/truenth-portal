@@ -1317,6 +1317,7 @@ def complete_assessment():
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
 
+
 @assessment_engine_api.route('/consent-assessment-status')
 @oauth.require_oauth()
 def batch_assessment_status():
