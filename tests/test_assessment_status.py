@@ -78,4 +78,3 @@ class TestAssessment(TestCase):
         self.assertEquals(len(rv.json['status']), 1)
         self.assertEquals(
             rv.json['status'][0]['consents'][0]['assessment_status'], 'Due')
-        print json.dumps(rv.json, indent=2)
