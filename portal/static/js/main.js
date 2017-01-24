@@ -431,7 +431,7 @@ var fillContent = {
     },
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
-            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
+            $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
             return false;
         }
 
