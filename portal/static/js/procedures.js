@@ -74,19 +74,6 @@ $(document).ready(function() {
     // Trigger eventInput on submit button
     $("button[id^='tnthproc-submit']").eventInput();
 
-    // Add/remove disabled from submit button
-
-    function checkSubmit(btnId) {
-
-        if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
-            // We trigger the click here. The button is actually hidden so user doesn't interact with it
-            // TODO - Remove the button completely and store the updated values elsewhere
-            $(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
-        } else {
-            $(btnId).addClass('disabled').attr('disabled',true);
-        };
-    };
-
     function isLeapYear(year)
     {
       return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
@@ -107,7 +94,7 @@ $(document).ready(function() {
         var errorColor = "#a94442";
         var validColor = "#777";
 
-        if (dTest && mTest && yTest) {  
+        if (dTest && mTest && yTest) {
 
             var date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
             var today = new Date();
@@ -143,32 +130,44 @@ $(document).ready(function() {
             };
 
         } else {
-            errorText = "";
-            if ((d != "") && (y != "") && (m != "")) {
-                if (!dTest) errorText += "Procedure day is not valid.";
-                if (!mTest) errorText += (errorText != "" ? "<br/>": "")  +  "Procedure month is not valid.";
-                if (!yTest) errorText += (errorText != "" ? "<br/>": "") + "Procedure year is not valid.";
-                deField.html(errorText).css("color", errorColor);
-            };
             return false;
         };
     };
 
     function setDate() {
-        var passedDate = dateFields.map(function(fn) {
+        var isValid = checkDate();
+        if (isValid) {
+            var passedDate = dateFields.map(function(fn) {
             fd = $("#" + fn);
             if (fd.attr("type") == "text") return fd.val();
             else return fd.find("option:selected").val();
-        }).join("/");
-        //console.log("passedDate: " + passedDate);
-        $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
-        dateFormatted = tnthDates.swap_mm_dd(passedDate);
-        //console.log("formatted date: " + dateFormatted);
-        $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+            }).join("/");
+            //console.log("passedDate: " + passedDate);
+            $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
+            dateFormatted = tnthDates.swap_mm_dd(passedDate);
+            //console.log("formatted date: " + dateFormatted);
+            $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+        } else {
+            $("button[id^='tnthproc-submit']").attr('data-date-read',"");
+            $("button[id^='tnthproc-submit']").attr('data-date',"");
+        };
+
         checkSubmit("button[id^='tnthproc-submit']");
 
     };
 
+     // Add/remove disabled from submit button
+
+    function checkSubmit(btnId) {
+        if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
+            // We trigger the click here. The button is actually hidden so user doesn't interact with it
+            // TODO - Remove the button completely and store the updated values elsewhere
+            //$(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
+            $(btnId).removeClass('disabled').removeAttr('disabled');
+        } else {
+            $(btnId).addClass('disabled').attr('disabled',true);
+        };
+    };
 
     // Update submit button when select changes
     $("select[id^='tnthproc']").on('change', function() {
@@ -186,13 +185,9 @@ $(document).ready(function() {
     var dateFields = ["procDay", "procMonth", "procYear"];
 
     dateFields.forEach(function(fn) {
-        var triggerEvent = $("#" + fn).attr("type") == "text" ? "blur": "change";
+        var triggerEvent = $("#" + fn).attr("type") == "text" ? "keyup": "change";
         $("#" + fn).on(triggerEvent, function() {
-            var isValid = checkDate();
-            //console.log("isValid: " +  isValid)
-            if (isValid) {
                 setDate();
-            };
         });
     });
 
