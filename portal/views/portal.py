@@ -67,8 +67,10 @@ def landing():
 
     timed_out = request.args.get('timed_out', False)
     gil = current_app.config.get('GIL')
-    redirect_uri = request.args.get('redirect_uri', False)
-    return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, redirect_uri=redirect_uri)
+    init_login_modal = False
+    if 'pending_authorize_args' in session:
+        init_login_modal = True
+    return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
 
 #from GIL
 @portal.route('/symptom-tracker')
