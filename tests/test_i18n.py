@@ -1,8 +1,7 @@
 """Unit test module for internationalization logic"""
-from flask_webtest import SessionScope
 from tests import TestCase, TEST_USER_ID
 from flask import current_app
-from flask.ext.login import login_user
+from flask_login import login_user
 
 from portal.models.i18n import get_locale
 from portal.models.user import User

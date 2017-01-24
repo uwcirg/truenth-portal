@@ -576,7 +576,7 @@ def most_recent_survey(user, instrument_id=None):
     return qr[0] if qr else None
 
 
-def assessment_status(user, consented_organization=None):
+def assessment_status(user, consent=None):
     """Return status string based on localized and recently completed surveys
 
     As per issue
@@ -586,17 +586,21 @@ def assessment_status(user, consented_organization=None):
     of site persistence.
 
     :param user: The user in question - patient on whom to check status
-    :param consented_organization: which organization (id) the user must
-        have consented with - from which the consent date is considered
+    :param consent: Consent agreement defining dates and which organization
+        to consider in the status check.  If not provided, use the first
+        valid consent found for the user.
     :return: a string defining the assessment status, such as "Expired"
 
     """
-    # First lookup the consent on file between the user and the consented_org
-    # used to determine the age and status of a user's assessments
-    # Skipping this requriement for demo - using user's first consent
-    if not user.valid_consents.count():
+    # If we aren't given a consent, use the first valid consent found for the
+    # user.
+    if consent:
+        consent_date = consent.audit.timestamp
+    elif not user.valid_consents.count():
         return 'Expired'
-    consent_date = user.valid_consents[0].audit.timestamp
+    else:
+        consent_date = user.valid_consents[0].audit.timestamp
+    assert(consent_date)
 
     today = datetime.utcnow()
     def status_per_instrument(instrument_id, thresholds):
