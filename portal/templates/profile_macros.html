@@ -85,13 +85,11 @@
         </select>
      </div>
      <script>$(function () {
-
         $('#locale').on('change', function() {
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
         });
-
      });</script>
 {%- endmacro %}
 
@@ -143,10 +141,7 @@
                 type:"GET",
                 url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
             }).done(function(data) {
-                //console.log(data);
-                //fillContent.indigenous(data);
                 var as = data["codeSystem"]["concept"];
-                //console.log(as);
                 var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
                 '<label>{{ _("Indigenous Status") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>' +'<div class="profile-radio-list">';
                 as.forEach(function(o) {
@@ -165,10 +160,8 @@
                     });
                 });
 
-
             }).fail(function(){
                 console.log("Problem retrieiving indigenous statuses");
-
             });
         })();
     });
@@ -212,17 +205,6 @@
             </div>
         </div>
     </div>
-   <script>
-        $(function () {
-            //$("#userRace input:checkbox").each(function() {
-             //   $(this).on("click", function() {
-                    //console.log("value: " + $(this).val());
-               //     assembleContent.demo({{ person.id if person }},true);
-               // });
-            //});
-        });
-    </script>
-
 {%- endmacro %}
 
 {% macro profileEthnicity(person) -%}
@@ -241,15 +223,6 @@
             </div>
         </div>
     </div>
-    <script>
-        $(function () {
-            //$("#userEthnicity input:radio").each(function() {
-                //$(this).on("click", function() {
-                    //assembleContent.demo({{ person.id if person }},true);
-                //});
-            //});
-        });
-    </script>
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
@@ -398,9 +371,6 @@
                     $(this).attr("disabled", true);
             });
         };
-
-        //console.log("orgs editable: " + orgsEditable)
-
         var leafOrgs = false;
         {% if (current_user.id != person.id) and current_user.has_role('provider') and not(current_user.has_role('admin')) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() |safe}} {% else %} false {% endif %};
@@ -450,7 +420,6 @@
 {% macro profileConsent(person, current_user) -%}
     {% if person %}
     <div id="profileConsentList"></div>
-    <!--<a id="consentBackLink" style="visibility:hidden" href="/patients"></a>-->
     <script async>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
@@ -492,7 +461,6 @@
         }
 
         $(function () {
-             ///api/user/<user_id>/audit
              var ww = $(window).width();
 
             $.ajax ({
@@ -677,12 +645,10 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json'
             }).done(function(data) {
-                //console.log(data["audits"]);
-                //console.log(data);
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
                     entries.forEach(function(entry, index) {
-                        //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
+
                         var reference = entry['questionnaire']['reference'];
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
@@ -719,15 +685,11 @@
 {% macro profileAssessment(person, instrument_id, authored_date) -%}
 
         <div id="userSessionReportDetail" cellpadding="2">
-            <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
-                <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
-                <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
-                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" >
-                </table>
-            <br />
+            <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
+            <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
+            <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" ></table><br />
         </div>
         <script>
-
         $(function () {
 
             if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
@@ -759,8 +721,6 @@
                                         ' GMT</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
-                            //console.log(entry['answer'])
-                            //String(q).substr(q.indexOf('.') + 1)
                             var q = entry['text'] ? entry['text'] : '';
                             var sq = "";
                             sq = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
@@ -1246,33 +1206,27 @@
 {%- endmacro %}
 
 {% macro profileProcedures(person, current_user) -%}
-<script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
-<style>
-    .treatment-container {margin-left:0.5em;}
-    #eventListtnthproc {margin-left: 0.5em}
-    #eventListtnthproc td { padding: 0.15em;}
-    #profileProcedureContainer { margin-left: 1em;}
-    #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
-    #procedureForm { margin-left: 0.5em;}
-    .procedureDateLabel { margin-bottom: 0;}
-</style>
-<p>{%if current_user and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
-    date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p>
-<div id="profileProcedureContainer">
-    <div class="inner">
-        <p class="text-muted">{%if current_user and (current_user.id == person.id) %}{{ _("Your treatments") }}{%else%}{{ _("Treatments") }}{%endif%}:</p>
-        <div id="userProcedures"></div>
-
-    </div>
-    <br/>
-    <form id="procedureForm" class="form-inline event-element">
-
-            <p class="text-muted">{{ _("Add a treatment") }}:</p>
+    <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
+    <style>
+        .treatment-container {margin-left:0.5em;}
+        #eventListtnthproc {margin-left: 0.5em}
+        #eventListtnthproc td { padding: 0.15em;}
+        #profileProcedureContainer { margin-left: 1em;}
+        #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
+        #procedureForm { margin-left: 0.5em;}
+        #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
+        button.btn {color:#777}
+    </style>
+    <p style="color: #696767">{%if (current_user and person) and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+        date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
+    <div id="profileProcedureContainer">
+        <form id="procedureForm" class="form-inline event-element">
+            <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
             <div class="row">
                 <div class="col-md-6 col-xs-11">
                     <div class='form-group'>
                         <select class='form-control' id='tnthproc'>
-                            <option value=''>{{ _("Select treatment") }}...</option>
+                            <option value=''>{{ _("Select") }}...</option>
                             <option value='373818007'>{{ _("Started watchful waiting") }}</option>
                             <option value='424313000'>{{ _("Started active surveillance") }}</option>
                             <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
@@ -1286,19 +1240,6 @@
                     </div>
                 </div>
             </div>
-
-            <!--
-            <div class='form-group'>
-                <label>Date:</label>
-                <div class="input-group date">
-                    <input class='event-value form-control' type='text' placeholder='DD/MM/YYYY' maxlength='10' data-error="Date should be in valid DD/MM/YYYY format" id='tnthproc-date' name='tnthproc-date' pattern="^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$"/>
-                    <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
-                        <i class="fa fa-calendar"></i>
-                    </span>
-                </div>
-                <div class="help-block with-errors"></div>
-            </div>
-            -->
             <br/>
             <div id="procDateGroup" class="form-group">
                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
@@ -1326,6 +1267,9 @@
                     <div>
                         <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
                     </div>
+                    <div>
+                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
+                    </div>
                 </div>
                 <div class="row">
                      <div class="col-md-9 col-xs-10">
@@ -1333,31 +1277,22 @@
                      </div>
                 </div>
             </div>
-        <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
-            <i class='fa fa-plus'></i> {{ _("Add Procedure") }}
-        </button>
-    </form>
-    <br/>
-<div>
-<script defer>
-    var subjectId = {{ person.id if person}};
-    var currentUserId = {{ current_user.id if current_user}};
-
-$(document).ready(function(){
-
-    tnthAjax.getProc({{ person.id if person}}, false);
-
-/**
-    // Class for both "done" and "skip" buttons
-    $(".continue-btn").on("click", function(event){
-        event.preventDefault();
-        window.location.replace("{{ return_address | safe }}");
-    });
-*/
-});
-
-</script>
-
+            <br />
+            <hr style="border-bottom: 1px solid #e5e5e5">
+            <div class="inner">
+                <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                <div id="userProcedures"></div>
+            </div>
+        </form>
+        <br/>
+    <div>
+    <script>
+        var subjectId = {{ person.id if person}};
+        var currentUserId = {{ current_user.id if current_user}};
+        $(document).ready(function(){
+            tnthAjax.getProc({{ person.id if person}}, false);
+        });
+    </script>
 {%- endmacro %}
 
 
