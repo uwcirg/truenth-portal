@@ -96,8 +96,7 @@ class UserConsent(db.Model):
             for attr in ('staff_editable', 'include_in_reports',
                          'send_reminders'):
                 if getattr(self, attr):
-                    d['attr'] = True
-
+                    d[attr] = True
         return d
 
     @classmethod

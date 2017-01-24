@@ -117,7 +117,6 @@
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = "";
-
 function _setHostName(url) {
     if (url) {
         var parser = document.createElement("a");
@@ -125,9 +124,7 @@ function _setHostName(url) {
         PORTAL_HOSTNAME = parser.hostname;
     };
 };
-
 _setHostName(PORTAL_NAV_PAGE);
-
 
 {% block document_ready %}
 $(document).ready(function(){

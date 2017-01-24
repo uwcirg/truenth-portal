@@ -211,6 +211,7 @@
     <script>
     $(function () {
         //tnthAjax.getConsent($("#iq_userId").val(), true);
+        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         tnthAjax.getOrgs($("#iq_userId").val(), false,true);
       });
     </script>

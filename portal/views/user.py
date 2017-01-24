@@ -562,6 +562,11 @@ def delete_user_consents(user_id):
     if not remove_uc:
         abort(404, "matching user consent not found")
 
+    if remove_uc.options:
+        for attr in ('staff_editable', 'include_in_reports', 'send_reminders'):
+            if getattr(remove_uc, attr):
+                setattr(remove_uc, attr, False)
+
     remove_uc.deleted = Audit(
         user_id=current_user().id, comment="Deleted consent agreement")
     db.session.commit()

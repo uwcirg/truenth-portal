@@ -80,7 +80,7 @@
 
 {% endblock %}
 {% block document_ready %}
-
+var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{ session.get('associate_clinic_id') }}";
 var fc, incompleteFields = [], mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
@@ -292,13 +292,13 @@ function initIncompleteFields() {
        incompleteFields[0].element.show();
   };
 
-  /***********
+  /************
   incompleteFields.forEach(function(field, index) {
       console.log(field.section.attr("id") + " " + field.element.length);
       console.log(field.element)
 
   });
-  ********/
+  ************/
 
 
   //console.log("length: " + incompleteFields.length);
@@ -553,7 +553,7 @@ $(document).ready(function(){
                       event: patientQClickEvent
                     },
       'clinics':    {
-                      fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
+                      fields: [$("#userOrgs input[name='organization']:checkbox").not('[parent_org]')],
                       event: userOrgChangeEvent
                     }
     };

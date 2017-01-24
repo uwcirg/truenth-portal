@@ -54,7 +54,7 @@ class TestUserConsent(TestCase):
         self.assertEquals(len(rv.json['consent_agreements']), 2)
         self.assertTrue('send_reminders' not in
                         rv.json['consent_agreements'][0])
-        self.assertTrue('staff_editable' not in
+        self.assertTrue('staff_editable' in
                         rv.json['consent_agreements'][0])
 
     def test_post_user_consent(self):

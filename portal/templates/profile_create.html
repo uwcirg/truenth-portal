@@ -57,52 +57,26 @@
                         <label>{{ _("Clinics") }}</label>
                         <div class="indent">
                         <div id="fillOrgs"></div>
-                        <!--
-                        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
-                        </div>
-                        -->
                         <div class="help-block with-errors"></div>
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+                        //userId, noOverride, sync, noPopulate
+                        var leafOrgs = {% if user.leaf_organizations() %} {{user.leaf_organizations() | safe}} {% else %} false {% endif %};
+
                         $.ajax ({
                             type: "GET",
                             url: '/api/organization'
                         }).done(function(data) {
-                            var clinicArray = [];
-                            $.each(data.entry,function(i,val){
-                                if (val.partOf) {
-                                    // Child clinic
-                                    var getParent = val.partOf.reference.split("/").pop();
-                                    jQuery.map(clinicArray, function(obj) {
-                                        if(obj.id === parseInt(getParent))
-                                            obj.children.push({"id": val.id, "name": val.name});
-                                    });
-                                } else {
-                                    // Parent clinic
-                                    clinicArray.push({ id: val.id, name: val.name, children: []});
-                                }
-                            });
-                            $.each(clinicArray, function(i,val) {
-                                // Fill in parent clinic
-                                if (val.name != "none of the above" && (val.children.length > 0)) {
-                                    $("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
-                                    //$("#fillOrgs").append("<legend>"+val.name+"</legend>");
-                                }
-                                // Fill in each child clinic
-                                if (val.children.length > 0) {
-                                    $.each(val.children, function(n,subval) {
-                                        var childClinic = '<div class="checkbox"><label>' +
-                                            '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
-                                            subval.id +'" data-parent-id="'+val.id+'"  data-parent-name="' + val.name + '"/>'+
-                                            subval.name +
-                                            '</label></div>';
-                                       $("#fillOrgs").append(childClinic);
-                                    });
-                                };
 
-                            });
+                            OT.populateOrgsList(data.entry);
+                            OT.populateUI();
 
+                            if (leafOrgs) {
+                                OT.filterOrgs(leafOrgs);
+                            }
+
+                            //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
                                     $("#userOrgs").find(".help-block").html("");
@@ -111,10 +85,6 @@
                         }).fail(function() {
                             console.log("Problem retrieving data from server.");
                         });
-
-
-                        //tnthAjax.getOrgs({{ user.id }}, true, true);
-                        //setTimeout('$("#noOrgs").click();', 0);
 
                     });</script>
                     <br/>
@@ -144,6 +114,7 @@
 
 {% block document_ready %}
 
+
 function _redirect(userId) {
     if (userId) {
         $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
@@ -167,14 +138,21 @@ $(document).ready(function(){
     //for each org send off ajax to set consent
     function setConsents(userId) {
         var orgs = {};
-        $("#createProfileForm input[name='organization'][data-parent-id]").each(function() {
+        $("#createProfileForm input[name='organization']:checkbox").each(function() {
             if ($(this).prop("checked")) {
-                var parentOrg = $(this).attr("data-parent-id");
-                if (!orgs[parentOrg]) {
-                    orgs[parentOrg] = true;
-                    //console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
+                var orgId, parentOrg;
+                parentOrg = $(this).attr("data-parent-id");
+                if (!hasValue(parentOrg)) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+
+                {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
+                    orgId = parentOrg;
+                {% else %}
+                    orgId = $(this).val();
+                {% endif %}
+                if (!orgs[orgId]) {
+                    orgs[orgId] = true;
                     //send off ajax for this
-                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}), true);
+                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": orgId, "agreement_url": $("#" + parentOrg + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true}), true);
                 };
             };
         });
