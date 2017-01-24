@@ -286,11 +286,11 @@ def login(provider_name):
                     db.session.commit()
                     auditable_event("register new user via {0}".\
                                     format(provider_name), user_id=user.id,
-                                    subject_id=result.user.id)
+                                    subject_id=user.id)
                 else:
                     auditable_event("login user via NEW IdP {0}".\
                                     format(provider_name), user_id=user.id,
-                                    subject_id=result.user.id)
+                                    subject_id=user.id)
                     user.image_url=image_url
 
                 ap = AuthProvider(provider=provider_name,
@@ -533,7 +533,7 @@ def client():
     db.session.add(client)
     db.session.commit()
     auditable_event("added intervention/client {}".format(
-        client), user_id=user.id, subject_id=client.user_id)
+        client), user_id=user.id, subject_id=user.id)
 
     # if user selected a role besides the default, set it.
     if form.application_role.data != INTERVENTION.DEFAULT.name:
@@ -541,7 +541,7 @@ def client():
         intervention = getattr(INTERVENTION, selected)
         auditable_event("client {0} assuming role {1}".format(
             client.client_id, selected), user_id=user.id,
-            subject_id=client.user_id)
+            subject_id=user.id)
         intervention.client_id = client.client_id
         db.session.commit()
     return redirect(url_for('.client_edit', client_id=client.client_id))
