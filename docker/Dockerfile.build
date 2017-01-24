@@ -72,4 +72,5 @@ CMD \
 	git checkout debian/rules && \
 	dpkg-buildpackage -us -uc && \
 	mv /root/portal_* /tmp/artifacts && \
-	dpkg-scanpackages /tmp/artifacts | gzip > /tmp/artifacts/Packages.gz
+	cd /tmp/artifacts && \
+	dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz
