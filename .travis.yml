@@ -123,7 +123,7 @@ deploy:
 
 after_deploy:
   - docker tag portal_web:latest "$GH_USERNAME-docker-portal.bintray.io/portal_web:latest"
-  - docker push "$GH_USERNAME-docker-portal.bintray.io" #(registry)
+  - docker push "$GH_USERNAME-docker-portal.bintray.io/portal_web:latest"
 
   - docker tag portal_web:latest "$DOCKER_CLOUD_USERNAME/portal_web:latest"
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker push "docker.io/$DOCKER_CLOUD_USERNAME/portal_web";fi
