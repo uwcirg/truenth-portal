@@ -6,6 +6,7 @@ import hmac
 import json
 import requests
 from authomatic.adapters import WerkzeugAdapter
+from authomatic.exceptions import CancellationError
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask_login import login_user, logout_user
@@ -235,6 +236,10 @@ def login(provider_name):
         return next_after_login()
     if result:
         if result.error:
+            if isinstance(result.error, CancellationError):
+                current_app.logger.info("User canceled IdP auth - send home")
+                return redirect(url_for('portal.landing'))
+
             reload_count = session.get('force_reload_count', 0)
             if reload_count > 2:
                 current_app.logger.warn("Failed 3 attempts: {}".format(
@@ -242,7 +247,7 @@ def login(provider_name):
                 abort(500, "unable to authorize with provider {}".format(
                     provider_name))
             session['force_reload_count'] = reload_count + 1
-            current_app.logger.info(result.error.message)
+            current_app.logger.info(str(result.error))
             # Work around for w/ Safari and cookies set to current site only
             # forcing a reload brings the local cookies back into view
             # (they're missing with such a setting on returning from
@@ -256,6 +261,10 @@ def login(provider_name):
             if not (result.user.name and result.user.id):
                 result.user.update()
                 image_url = picture_url(result)
+            # Experiencing problems pulling email from IdPs.
+            if not result.user.email:
+                abort(500, "No email for user {} from {}".format(
+                    result.user.id, provider_name))
 
             # Success - add or pull this user to/from database
             ap = AuthProvider.query.filter_by(provider=provider_name,
