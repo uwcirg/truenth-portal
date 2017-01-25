@@ -382,6 +382,10 @@ def set_user_consents(user_id):
     Assumed to have just been agreed to.  Include 'expires' if
     necessary, defaults to now and five years from now (both in UTC).
 
+    NB only one valid consent should be in place between a user and an
+    organization.  Therefore, if this POST would create a second consent on the
+    given user / organization, the existing consent will be marked deleted.
+
     ---
     tags:
       - User
@@ -469,6 +473,12 @@ def set_user_consents(user_id):
     request.json['user_id'] = user_id
     audit = Audit(user_id=current_user().id,
                   comment="Adding consent agreement")
+    # Look for existing consent for this user/org
+    delete_consents = []
+    for consent in user.valid_consents:
+        if consent.organization_id == request.json.get('organization_id'):
+            delete_consents.append(consent)
+
     try:
         consent = UserConsent.from_json(request.json)
         if request.json.get('expires'):
@@ -483,6 +493,9 @@ def set_user_consents(user_id):
 
     consent.audit = audit
     db.session.add(consent)
+    for old in delete_consents:
+        old.deleted = Audit(
+            comment="new consent replacing existing", user_id=user.id)
     db.session.commit()
 
     return jsonify(message="ok")

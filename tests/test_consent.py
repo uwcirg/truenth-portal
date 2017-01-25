@@ -91,6 +91,37 @@ class TestUserConsent(TestCase):
         self.assertEqual(self.test_user.valid_consents[0].audit.timestamp,
                          parser.parse(acceptance_date))
 
+    def test_post_replace_user_consent(self):
+        """second consent for same user,org should replace existing"""
+        org1 = Organization.query.filter(Organization.id > 0).first()
+        data = {'organization_id': org1.id, 'agreement_url': self.url,
+                'staff_editable': True, 'send_reminders': True}
+
+        self.login()
+        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert200(rv)
+        self.assertEqual(self.test_user.valid_consents.count(), 1)
+        consent = self.test_user.valid_consents[0]
+        self.assertEqual(consent.organization_id, org1.id)
+        self.assertTrue(consent.staff_editable)
+        self.assertTrue(consent.send_reminders)
+
+        # modify flags & repost - should have new values and only one
+        data['staff_editable'] = False
+        data['send_reminders'] = False
+        rv = self.client.post('/api/user/{}/consent'.format(TEST_USER_ID),
+                          content_type='application/json',
+                          data=json.dumps(data))
+        self.assert200(rv)
+        self.assertEqual(self.test_user.valid_consents.count(), 1)
+        consent = self.test_user.valid_consents[0]
+        self.assertEqual(consent.organization_id, org1.id)
+        self.assertFalse(consent.staff_editable)
+        self.assertFalse(consent.send_reminders)
+
+
     def test_delete_user_consent(self):
         org1, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
