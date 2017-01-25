@@ -1,6 +1,7 @@
 /*** Portal specific javascript. Topnav.js is separate and will be used across domains. **/
 
 var userSetLang = 'en_US';// FIXME scope? defined in both tnth.js/banner and main.js
+var DELAY_LOADING = false;
 
 function equalHeightBoxes(passClass) {
     var windowsize = $(window).width();
@@ -74,7 +75,9 @@ function showWrapper(hasLoader) {
     if (hasLoader) {
         $("#tnthNavWrapper").css(cssProp).promise().done(function() {
             //delay removal of loading div to prevent FOUC
-            setTimeout('$("#loadingIndicator").fadeOut();', 300);
+            if (!DELAY_LOADING) {
+                setTimeout('$("#loadingIndicator").fadeOut();', 300);
+            };
         });
     } else $("#tnthNavWrapper").css(cssProp);
 }

@@ -107,7 +107,8 @@
 </div>
 {% endblock %}
 {% block document_ready %}
-
+ //a workaround for wrapper not finished loading before the content displays, the finish loading of wrapper hides the loader
+DELAY_LOADING = true;
 var requestsCounter = 0;
 
 $(".tnth-admin-table").bootstrapTable({
@@ -189,11 +190,11 @@ function getData(userString) {
       };
       //console.log("consent updated successfully.");
       requestsCounter -= 1;
-      if(requestsCounter == 0) setTimeout("loader();", 1000);
+      if(requestsCounter == 0) setTimeout('$("#loadingIndicator").fadeOut();', 300);
   }).fail(function(xhr) {
       console.log("request failed.");
       ///console.log(xhr.responseText)
-      setTimeout("loader();", 1000);
+      setTimeout('$("#loadingIndicator").fadeOut();', 300);
   });
 };
 
@@ -222,9 +223,8 @@ function updateData() {
   };
 
   if (arrUsers.length > 0) {
-    $("#loadingIndicator").hide();
-    loader(true);
     requestsCounter = arrUsers.length;
+    loader(true);
     arrUsers.forEach(function(us) {
         try {
           getData(us);
@@ -238,12 +238,11 @@ function updateData() {
 
 $(document).ready(function() {
 
-    loader();
 
-   $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
+  $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
       updateData();
     });
-    setTimeout("updateData();", 0);
+    setTimeout(updateData, 0);
 
   $("input[data-field='id']:checkbox").hide();
 
