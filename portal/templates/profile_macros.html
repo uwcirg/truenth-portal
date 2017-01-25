@@ -365,6 +365,8 @@
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var orgsEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        //STAFF CANNOT EDIT THEIR OWN ORGS
+        {% if not(current_user.has_role('admin')) and current_user.has_role('provider') and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
 
         function disableOrgs() {
             $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
@@ -372,7 +374,7 @@
             });
         };
         var leafOrgs = false;
-        {% if (current_user.id != person.id) and current_user.has_role('provider') and not(current_user.has_role('admin')) %}
+        {% if current_user.has_role('provider') and not(current_user.has_role('admin')) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() |safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
