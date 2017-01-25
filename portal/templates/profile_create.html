@@ -256,13 +256,13 @@ $(document).ready(function(){
 
                     _demoArray['resourceType'] = 'Patient';
                     _demoArray['name'] = {
-                        'given': $('input[name=firstname]').val(),
-                        'family': $('input[name=lastname]').val()
+                        'given': $.trim($('input[name=firstname]').val()),
+                        'family':$.trim($('input[name=lastname]').val())
                     };
                     _demoArray['birthDate'] = $('input[name=birthDate]').val();
                     _demoArray['telecom'] = [
-                        { 'system': 'email', 'value': $('input[name=email]').val() },
-                        { 'system': 'phone', 'value': $('input[name=phone]').val() }
+                        { 'system': 'email', 'value': $.trim($('input[name=email]').val()) },
+                        { 'system': 'phone', 'value': $.trim($('input[name=phone]').val()) }
                     ];
 
                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){

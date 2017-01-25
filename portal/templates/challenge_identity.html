@@ -109,6 +109,10 @@ $(document).ready(function() {
         $("#year").val(arrDate[2]);
     };
 
+    $("input[type='text']").on("blur", function() {
+        $(this).val($.trim($(this).val()));
+    });
+
     $('#challengeForm').validator().on('submit', function (e) {
           if (!e.isDefaultPrevented()) {
                 if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
