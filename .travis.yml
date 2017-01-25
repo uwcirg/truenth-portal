@@ -120,3 +120,10 @@ deploy:
   file: "bintray.json"
   user: $GH_USERNAME
   key: $BINTRAY_API_KEY
+
+after_deploy:
+  - docker tag docker_web:latest "$GH_USERNAME-docker-portal.bintray.io/docker_web:latest" # tag
+  - docker push "$GH_USERNAME-docker-portal.bintray.io" #(registry)
+
+  - docker tag docker_web:latest "$DOCKER_CLOUD_USERNAME/docker_web:latest"
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker push "docker.io/$DOCKER_CLOUD_USERNAME/docker_web";fi
