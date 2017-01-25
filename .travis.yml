@@ -42,6 +42,9 @@ before_install:
   # Set TOXENV default (if not already set by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
+  # Set Docker username from github username (if not already set by repo env vars)
+  - if [[ ! -v DOCKER_CLOUD_USERNAME ]]; then export DOCKER_CLOUD_USERNAME="${GH_USERNAME//-}";fi
+
   # Fetch all remote branches instead of just the currently checked out one
   - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
