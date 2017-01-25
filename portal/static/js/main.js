@@ -803,7 +803,6 @@ var OrgTool = function() {
         $("input[name='organization']:checkbox").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                $(this).closest("label").addClass("text-muted");
                 if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
             };
         });
@@ -920,9 +919,12 @@ var OrgTool = function() {
                     childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container" ' + (_isTopLevel && (index > 0) ? " style='margin-top:0.5em' " : "") + '>'
 
                     if (orgsList[item.id].children.length > 0) {
-                         childClinic += "<label class='" + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + "' "  + ">" + item.name + "</label>";
-                         childClinic += "<input type='hidden' name='organization' id='" + item.id + "_org' value='" + item.id + "' " + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>';
-
+                        childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
+                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                        item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
+                        item.name +
+                        '</label>';
+                     
                      } else {
                         childClinic += '<label class="org-label">' +
                         '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
@@ -939,7 +941,7 @@ var OrgTool = function() {
                 });
             };
 
-            if (parentOrgsCt > 0) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
+            if (parentOrgsCt > 0 && orgsList[org].isTopLevel) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
         };
     };
 };

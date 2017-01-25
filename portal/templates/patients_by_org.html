@@ -232,6 +232,9 @@ function updateData() {
           console.log("Error request: " + ex.message)
         };
     });
+  } else {
+    DELAY_LOADING = false; 
+    setTimeout('$("#loadingIndicator").fadeOut();', 300);
   };
 };
 
