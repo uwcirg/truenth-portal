@@ -76,7 +76,7 @@ before_deploy:
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
 
-  - docker build --file docker/Dockerfile  --tag "portal_deb:test" .
+  - docker build --file docker/Dockerfile  --tag "portal_deb:test" --tag "portal_web:latest" .
 
   # Build bintray descriptor file dynamically
   - >
