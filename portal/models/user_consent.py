@@ -152,5 +152,4 @@ def db_maintenance():
 
             for org_id, consent_list in consents_by_org.items():
                 if len(consent_list) > 1:
-                    import pdb; pdb.set_trace()
                     delete_all_but_current(consent_list)
