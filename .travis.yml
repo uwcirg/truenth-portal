@@ -9,6 +9,9 @@ services:
   - postgresql
   - redis-server
 env:
+  matrix:
+    - TOXENV=py27
+    - TOXENV=docs
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
@@ -16,20 +19,18 @@ env:
 
 matrix:
   include:
-    - env: TOXENV=docs
-    - env:
-        - TOXENV=build
-      services:
-        - docker
-    - env:
-        - TOXENV=ui
+    - env: TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
+    - env: TOXENV=build
+      services:
+        - docker
   # Build artifacts only (no testing)
   allow_failures:
-    - env:
-      - TOXENV=build
+    - env: TOXENV=build
+      services:
+        - docker
 
 before_install:
   # Set Github env vars
