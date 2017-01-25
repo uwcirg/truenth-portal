@@ -172,7 +172,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Join Us!</h3>
-            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal">Create Account</a>
+            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
           </div>
           <div class="box-modal__footer"><span class="box-modal__sub">Want to Receive News?</span>
             <form class="js-mock-submit"><span class="submitted-text">Thank you!</span>
@@ -198,7 +198,7 @@
             <form action="{{PORTAL}}/user/sign-in" method="POST" class="form" role="form">
               <input name="email" type="text" placeholder="Email Address" required>
               <input name="password" type="password" placeholder="Password" required>
-              <input class="button button-large button--teal" type="submit" value="Log In">
+              <input class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
               <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Forgot your password?</span></a>
             </form>
@@ -211,12 +211,12 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Login</h3>
-            <a href="#" onclick="goToLogin();" class="button button-large button--teal">Login</a>
+            <a href="#" onclick="goToLogin();" class="button button-large button--teal button--login--register">Login</a>
             <br/><br/>
             <p class="box-modal__copy"><em>or</em></p>
             <div class="box-modal__divider"></div>
             <h3 class="box-modal__title">Join Us!</h3>
-            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal">Create Account</a>
+            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
           </div>
         </div>
       </div>
@@ -304,8 +304,8 @@
           };
 
           function goToLogin() {
-              $('#modal-login-register').modal('hide'); 
-              setTimeout("$('#modal-login').modal('show'); ", 500);
+              $('#modal-login-register').modal('hide');
+              setTimeout("$('#modal-login').modal('show'); ", 400);
           };
 
           function showMain() {
@@ -322,9 +322,6 @@
 
          $(document).ready(function(){
 
-            $("#modal-login-register").on("hidden.bs.modal", function (e) {
-                loader(true);
-            });
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
             });
