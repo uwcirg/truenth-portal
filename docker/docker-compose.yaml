@@ -2,6 +2,7 @@
 version: '2.1'
 services:
   web:
+    image: "${GH_USERNAME:-uwcirg}-docker-portal.bintray.io/docker_web:latest"
     build:
       context: ..
       dockerfile: docker/Dockerfile
