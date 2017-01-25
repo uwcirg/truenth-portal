@@ -18,6 +18,7 @@ from portal.models.organization import add_static_organization
 from portal.models.relationship import add_static_relationships
 from portal.models.role import add_static_roles
 from portal.models.user import permanently_delete_user, flag_test
+from portal.models.user_consent import db_maintenance
 from portal.site_persistence import SitePersistence
 
 app = create_app()
@@ -48,6 +49,7 @@ def seed(include_interventions=False, keep_unmentioned=False):
     add_static_organization()
     add_static_relationships()
     add_static_roles()
+    db_maintenance()
     db.session.commit()
 
     # import site export file if found

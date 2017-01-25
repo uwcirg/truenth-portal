@@ -123,3 +123,34 @@ class UserConsent(db.Model):
                 setattr(obj, attr, data.get(attr))
 
         return obj
+
+
+def db_maintenance():
+    """Patch up any user_consents from days when POST didn't delete old"""
+    # This is expected to be run once to clean up messy data, part of
+    # the seed process.  SLOW - don't use in production code.
+    from collections import defaultdict
+
+    admin = User.query.filter_by(email='bob25mary@gmail.com').first()
+
+    def delete_all_but_current(consent_list):
+        keeper = consent_list[0]
+        for item in consent_list:
+            if item.audit.timestamp > keeper.audit.timestamp:
+                keeper = item
+
+        audit = Audit(
+            comment="new consent replacing existing", user_id=admin.id)
+        for item in consent_list:
+            item.deleted = audit
+
+    for user in User.query.all():
+        if user.valid_consents.count() > 1:
+            consents_by_org = defaultdict(list)
+            for consent in user.valid_consents:
+                consents_by_org[consent.organization_id].append(consent)
+
+            for org_id, consent_list in consents_by_org.items():
+                if len(consent_list) > 1:
+                    import pdb; pdb.set_trace()
+                    delete_all_but_current(consent_list)
