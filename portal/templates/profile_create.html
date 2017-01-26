@@ -152,7 +152,7 @@ $(document).ready(function(){
                 if (!orgs[orgId]) {
                     orgs[orgId] = true;
                     //send off ajax for this
-                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": orgId, "agreement_url": $("#" + parentOrg + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true}), true);
+                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": orgId, "agreement_url": $("#" + parentOrg + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true, "user_id": userId}), true);
                 };
             };
         });
