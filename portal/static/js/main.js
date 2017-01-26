@@ -538,37 +538,11 @@ var assembleContent = {
             };
         });
 
-        if ((typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG) {
-            $.each($("#userOrgs input[name='organization']:checked"),function(i,v){
-                var dp = $(this).attr("data-parent-id");
-                if (!hasValue(dp)) {
-                    dp = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-                };
-                if (hasValue(dp)) {
-                    $("#userOrgs input:checkbox[value="+dp+"]").prop('checked', true);
-                };
-            });
-        };
-
         if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
             orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
             }).get();
-
-            if (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined" && CONSENT_WITH_TOP_LEVEL_ORG) {
-                var parentId;
-                $.each($("#userOrgs input[name='organization']:checked"),function(i,v){
-                    var dp = $(this).attr("data-parent-id");
-                    if (!hasValue(dp)) {
-                        dp = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-                    };
-                    if (dp && dp != parentId) {
-                        orgIDs.push({reference: "api/organization/"+dp});
-                        parentId = dp;
-                    };
-                });
-            };
 
             if (orgIDs) demoArray["careProvider"] = orgIDs;
         };
@@ -703,18 +677,6 @@ var assembleContent = {
         }
     },
     "orgs": function(userId) {
-        $.each($("#userOrgs input[name='organization']:checked"),function(i,v){
-            if ((typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG) {
-                var dp = $(this).attr("data-parent-id");
-                if (!hasValue(dp)) {
-                    dp = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-                };
-                if (hasValue(dp)) {
-                    $("#userOrgs input:checkbox[value="+dp+"]").prop('checked', true);
-                };
-            };
-
-        });
 
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
