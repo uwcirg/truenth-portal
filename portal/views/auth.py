@@ -261,10 +261,6 @@ def login(provider_name):
             if not (result.user.name and result.user.id):
                 result.user.update()
                 image_url = picture_url(result)
-            # Experiencing problems pulling email from IdPs.
-            if not result.user.email:
-                abort(500, "No email for user {} from {}".format(
-                    result.user.id, provider_name))
 
             # Success - add or pull this user to/from database
             ap = AuthProvider.query.filter_by(provider=provider_name,
@@ -276,6 +272,11 @@ def login(provider_name):
                 user.image_url=image_url
                 db.session.commit()
             else:
+                # Experiencing problems pulling email from IdPs.
+                if not result.user.email:
+                    abort(500, "No email for user {} from {}".format(
+                        result.user.id, provider_name))
+
                 # Confirm we haven't seen user from a different IdP
                 user = User.query.filter_by(email=result.user.email).\
                         first() if result.user.email else None
