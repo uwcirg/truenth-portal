@@ -99,7 +99,7 @@ before_deploy:
         "files": [
             {
                 "includePattern": "artifacts/(.+\\.deb)$",
-                "uploadPattern": "/$1",
+                "uploadPattern": "artifacts/$1",
                 "matrixParams": {
                     "deb_distribution": "stable",
                     "deb_component": "main",
