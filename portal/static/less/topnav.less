@@ -16,6 +16,7 @@
     text-decoration: none;
   }
   img {
+    margin: 0 0.5em
     vertical-align: middle;
   }
   * {
@@ -83,7 +84,7 @@
     margin: 0;
     padding: 2px 2px 2px 20px;
     position: relative;
-    float: right;
+    float: left;
     background-repeat: no-repeat;
     background-position: 4px 16px;
     background-image: url('../img/fa_bars_ffffff.png');
@@ -110,7 +111,8 @@
 
 /** Logo **/
 #tnthLogo {
-  float: left;
+  float: right;
+  margin-right: 2.5em;
   img {
     height: 75px;
   }
@@ -119,10 +121,12 @@
   padding: 0;
   img {
     height: 50px;
+    float: right;
   }
 }
 #tnthTopLinks {
-  float: right;
+  float: left;
+  margin-left: 0.5em;
 }
 
 /** Buttons **/
@@ -130,6 +134,7 @@
   position: relative;
   display: inline-block;
   vertical-align: middle; // match .btn alignment given font-size hack above
+  margin-left: 0.2em;
 }
 .tnth-nav-btn {
   display: inline-block;
@@ -151,7 +156,7 @@
   }
 }
 #tnthUserBtn {
-  padding: 6px 12px;
+  padding: 6px 24px;
   height: inherit;
 }
 #tnthHomeBtn {
@@ -318,10 +323,25 @@
     margin-right: -28px;
   }
 }
+@media (max-width: 991px) {
+  #tnthUserBtn {
+    padding: 6px 0px;
+    height: inherit;
+  }
+  #tnthLogo {
+    margin-right: 1em;
+  }
+}
 @media (min-width: 992px) {
   #tnthNavMainContainer {
     max-width: 940px;
   }
+}
+@media (min-width: 1199px) {
+   #tnthTopLinks {
+    margin-right: -28px;
+    margin-left: 0em;
+   }
 }
 @media (min-width: 1200px) {
   #tnthNavMainContainer {
