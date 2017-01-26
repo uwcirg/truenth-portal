@@ -76,7 +76,6 @@ before_deploy:
 
   # Copy artifacts off volume mounted on previous container
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
-  - cp --verbose /tmp/artifacts/* ../
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
 
@@ -99,7 +98,7 @@ before_deploy:
         },
         "files": [
             {
-                "includePattern": "../(.+\\.deb)$",
+                "includePattern": "artifacts/(.+\\.deb)$",
                 "uploadPattern": "/$1",
                 "matrixParams": {
                     "deb_distribution": "stable",
