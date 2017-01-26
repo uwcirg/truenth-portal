@@ -2,12 +2,12 @@
 version: '2.1'
 services:
   web:
-    image: "${GH_USERNAME:-uwcirg}-docker-portal.bintray.io/portal_web:latest"
+    image: "uwcirg-docker-${BINTRAY_DOCKER_REPO:-portal}.bintray.io/${IMAGE_NAME:-portal_web}:latest"
     build:
       context: ..
       dockerfile: docker/Dockerfile
       args:
-        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/true_nth}"
+        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     ports:
       - "${EXTERNAL_PORT:-8080}:80"
     environment:
