@@ -1,11 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import psycopg2
 import sys
 import os
 
 def parse_connection_uri():
     here, _ = os.path.split(__file__)
-    with open(os.path.join(here, '../portal/application.cfg'), 'r') as fh:
+    with open(os.path.join(here, '../instance/application.cfg'), 'r') as fh:
         conn_strings = [l for l in fh.readlines() if
                         l.startswith('SQLALCHEMY_DATABASE_URI')]
 
