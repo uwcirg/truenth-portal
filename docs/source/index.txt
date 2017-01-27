@@ -21,4 +21,5 @@ Contents:
     sessions
     development
     code
+    docker
     contributing

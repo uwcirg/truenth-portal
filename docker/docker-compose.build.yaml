@@ -1,5 +1,3 @@
-# To copy artifacts out of this image follow below example
-# sudo cp -R $(docker volume inspect --format '{{ .Mountpoint }}' docker_debian-repo) artifacts
 ---
 version: '2.1'
 services:
