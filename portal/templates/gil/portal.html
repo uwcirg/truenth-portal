@@ -20,12 +20,12 @@
             {% set display = intervention.display_for_user(user) %}
             {% if display.access %}
                 <div class="home--item-container">
-                    {% if intervention.description and intervention.description != "" %}<h4 class="icon-box__lowhead">{{ intervention.description }}</h4>{% endif %}
+                    {% if intervention.description and intervention.description != "" %}<h4 class="icon-box__lowhead icon_box__description">{{ intervention.description }}</h4>{% endif %}
                     <div class="home--item-text">{{ display.card_html | safe }}</div>
                     <br/>
                     <div>
                     {% if display.link_url is none %}
-                        <a class="icon-box__button icon-box__button--main" href="javascript: loader(false);"><span class="home--disabled-button">{{_("Start")}}<figure></figure></span></a>
+                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="javascript: loader(false);"><span class="home--disabled-button">{{_("Start")}}<figure></figure></span></a>
                     {% else %}
                         <a class="icon-box__button icon-box__button--main" href="{{ display.link_url }}"><span>{{ display.link_label }}<figure></figure></span></a>
                     {% endif %}
@@ -76,9 +76,33 @@
         $(document).ready(function() {
             $("body").attr("class", "page-home");
             $("aside").hide();
-            if ($(".home--item-container").length == 1) {
-                $(".home--item-container").removeClass("home--item-container").addClass("home--item-container-full");
+            $(".side-nav-items__item--home").hide();
+            var hc = $(".home--item-container");
+            if (hc.length == 1) {
+                hc.removeClass("home--item-container").addClass("home--item-container-full");
             };
+
+            var ct=0;
+            hc.each(function() {
+                var d = $(this).find(".icon_box__description");
+                var b = $(this).find(".icon-box__button");
+                var disabled = b.hasClass("icon-box__button--disabled");
+                var dm = /decision\s?support/gi;
+                var sm = /symptom\s?tracker/gi;
+                if (dm.test(d.text())) {
+                    $(".side-nav-items__item--decisionsupport a").attr("href", (!disabled ? b.attr("href") : "javascript: loader(false);"));
+                }
+                else if (sm.test(d.text())) {
+                    //do nothing
+                }
+                else if ($.trim(d.text()) != "") {
+                    //only draw two at most - otherwise the menu won't fit the screen
+                    if (ct < 2) {
+                        $(".side-nav-items__item--symptomtracker").after('<li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated' + (disabled ? ' side-nav-items__item-disabled' : "") + '"><a href="' + b.attr("href") + '">' + d.text() + '</a></li>');
+                    };
+                    ct++;
+                };
+            });
         });
     </script>
 {% endblock %}

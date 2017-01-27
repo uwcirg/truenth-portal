@@ -5989,15 +5989,19 @@ figure.nav-overlay {
 }
 .side-nav-items__item {
     display: block;
-    font-size: 32px;
-    line-height: 36px;
+    font-size: 26px;
+    line-height: 30px;
     font-weight: bold;
     margin: 0 0 20px;
 }
+.side-nav-items__item-disabled {
+    opacity: 0.6;
+}
 @media (max-width: 767px) {
     .side-nav-items__item {
-        font-size: 28px;
-        line-height: 28px;
+        font-size: 22px;
+        line-height: 22px;
+        margin-top: 1em
     }
 }
 .side-nav-items__item--has-icon a {
@@ -6010,8 +6014,8 @@ figure.nav-overlay {
     top: -3px;
 }
 .side-nav-items__item--accentuated a {
-    font-size: 25px;
-    line-height: 28px;
+    font-size: 22px;
+    line-height: 22px;
 }
 .side-nav-items__item figure {
     font-size: 30px;
