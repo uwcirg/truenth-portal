@@ -6795,7 +6795,7 @@ figure.nav-overlay {
     font-style: normal;
     font-size: 1em;
     color: #FFFFFF;
-    height: 270px;
+    height: 320px;
     display: block;
     padding: 40px;
     float: left;
@@ -6808,7 +6808,12 @@ figure.nav-overlay {
     margin: 0 auto;
     position: relative;
     padding: 3em;
+    text-align: center;
     transition: all 0.5s ease-in;
+}
+
+.home--item-container-full {
+    text-align: center;
 }
 
 .home--disabled-button {
@@ -6835,7 +6840,7 @@ figure.nav-overlay {
     margin: 0 1em;
     width: 100%;
     max-width: 100%;
-    padding: 2.3em 4em 1.5em 3em
+    padding: 3em 4em 1.5em 3em
 }
 .home--registration-container p {
     font-size: 1.2em;
@@ -6853,6 +6858,8 @@ figure.nav-overlay {
 .home--item-text {
     font-weight: normal;
     font-size: 0.97em;
+    margin: 1.5em 0 0.5em 0;
+    padding: 0.5em;
 }
 
 a.home--modal-link {
