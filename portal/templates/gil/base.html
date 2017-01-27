@@ -97,7 +97,7 @@
   {% block upperbanner %}
       {% if not user %}
       <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Have a code from your doctor? Click here to Sign Up
-          <figure></figure></a><a class="upper-banner__close js-close-upper-banner">
+          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
@@ -303,6 +303,22 @@
               };
           };
 
+          function setNoBanner() {
+              if (typeof sessionStorage != "undefined") {
+                sessionStorage.setItem('bannerAccessed', 'yes');
+              };
+          };
+
+          function checkBannerStatus() {
+            if (typeof sessionStorage != "undefined") {
+              var data = sessionStorage.getItem('bannerAccessed');
+              if (data == "yes") {
+                $(".page-border__top").hide();
+                $(".upper-banner").hide();
+              };
+            }
+          };
+
           function goToLogin() {
               $('#modal-login-register').modal('hide');
               setTimeout("$('#modal-login').modal('show'); ", 400);
@@ -321,6 +337,8 @@
           };
 
          $(document).ready(function(){
+
+            checkBannerStatus();
 
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
