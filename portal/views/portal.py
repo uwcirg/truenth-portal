@@ -328,6 +328,8 @@ def initial_queries():
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
         return redirect('portal.landing')
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
@@ -383,7 +385,10 @@ def home():
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
-    return render_template('portal.html', user=user,
+
+    gil = current_app.config.get('GIL')
+    
+    return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
                            interventions=interventions)
 
 

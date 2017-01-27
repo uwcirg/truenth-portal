@@ -27,15 +27,23 @@
             <div style="padding:0.2em 0">
                 {{ display.card_html | safe }}
             </div>
-            {% if display.link_url is none %}
-            <a class="btn-lg btn-tnth-primary disabled" href="{{ display.link_url }}">
-                {{ display.link_label }}
-            </a>
-            {% else %}
-            <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
-                {{ display.link_label }}
-            </a>
-            {% endif %}
+            <div>
+                {% if display.link_url is none %}
+                <div>
+                    <br/>
+                    <a class="btn-lg btn-tnth-primary disabled" href="#">
+                        {{ display.link_label }}
+                    </a>
+                </div>
+                {% else %}
+                <div>
+                    <br/>
+                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                        {{ display.link_label }}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
         </div>
     {% endif %}
 {% endfor %}
@@ -59,5 +67,3 @@
 </div>
 
 {% endblock %}
-
-
