@@ -140,7 +140,7 @@ def db_maintenance():
                 keeper = item
 
         audit = Audit(
-            comment="new consent replacing existing", user_id=admin.id if admin else None)
+            comment="new consent replacing existing", user_id=admin.id)
         for item in consent_list:
             item.deleted = audit
 
