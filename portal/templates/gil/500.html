@@ -1,0 +1,14 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{super()}}
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">Internal Server Error</h1>
+          <p class="page-intro__sub">Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below.</p>
+          <br/>
+          <p><a href="{{PORTAL}}/contact" class="icon-box__button icon-box__button--main">Send Message</a></p>
+        </div>
+      </div>
+    </main>
+{% endblock %}
