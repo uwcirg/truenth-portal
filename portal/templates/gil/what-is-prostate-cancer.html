@@ -238,4 +238,11 @@
       </div>
     </main>
 {% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $(".side-nav-items__item--whatisprostatecancer").hide();
+        });
+    </script>
+{% endblock %}
 

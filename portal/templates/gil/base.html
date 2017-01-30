@@ -73,17 +73,17 @@
           {% if user %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
           {% endif %}
-          <li class="side-nav-items__item"><a href="{{PORTAL}}/about">About TrueNTH</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{PORTAL}}/decision-support">
+          <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}/decision-support">
               <svg width="32" height="32">
                 <use xlink:href="#DS-Icon-Nav"></use>
               </svg>Decision Support</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{PORTAL}}/symptom-tracker">
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{PORTAL}}/symptom-tracker">
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>Symptom Tracker</a></li>
-          <li class="side-nav-items__item"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
-          <li class="side-nav-items__item"><a href="{{PORTAL}}/contact">Contact</a></li>
+          <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
+          <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">Contact</a></li>
           {% if not user %}
             <li class="side-nav-items__button"><a data-toggle="modal" data-target="#modal-register">Join Us</a></li>
             <li class="side-nav-items__button"><a data-toggle="modal" data-target="#modal-login">Log In</a></li>
@@ -97,7 +97,7 @@
   {% block upperbanner %}
       {% if not user %}
       <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Have a code from your doctor? Click here to Sign Up
-          <figure></figure></a><a class="upper-banner__close js-close-upper-banner">
+          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
@@ -303,6 +303,21 @@
               };
           };
 
+          function setNoBanner() {
+              if (typeof sessionStorage != "undefined") {
+                sessionStorage.setItem('bannerAccessed', 'yes');
+              };
+          };
+
+          function checkBannerStatus() {
+            if (typeof sessionStorage != "undefined") {
+              var data = sessionStorage.getItem('bannerAccessed');
+              if (data == "yes") {
+                $('.js-close-upper-banner').trigger("click");
+              };
+            }
+          };
+
           function goToLogin() {
               $('#modal-login-register').modal('hide');
               setTimeout("$('#modal-login').modal('show'); ", 400);
@@ -321,6 +336,8 @@
           };
 
          $(document).ready(function(){
+
+            checkBannerStatus();
 
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
