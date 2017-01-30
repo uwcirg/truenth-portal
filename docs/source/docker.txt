@@ -95,6 +95,8 @@ Our continuous integration setup leverages TravisCI's docker support and deploym
 
 Packages and images are built in a separate :term:`job` (named "build") that corresponds with a tox environment that does nothing and that's allowed to fail without delaying the build or affecting its status.
 
+If credentials are configured, packages and images will be uploaded to their corresponding repository after the build process. Otherwise, artifacts will only be built, but not uploaded or deployed.
+
 Currently, our TravisCI setup uses packages locally-built on TravisCI instead of pushing, then pulling from our Debian repository. This may lead to non-deterministic builds and should probably be reconciled at some point.
 
 Configuration
