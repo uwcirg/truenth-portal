@@ -7013,7 +7013,7 @@ figure.nav-overlay {
     padding: 1.2em;
 }
 #portalMain .icon-box__button span {
-    font-size: 0.8em;
+    font-size: 0.75em;
 }
 #portalMain .icon-box__lowhead {
     font-size: 1.2em;
@@ -7022,14 +7022,19 @@ figure.nav-overlay {
     margin-top: 25em;
     overflow: hidden;
 }
+
 .home--registraion-wrapper {
     margin-top: 1.3em;
 }
 .home--item-container-full, .home--registration-container {
-    margin: 0 1em;
+    margin: 0 1em 0 1.1em;
     width: 100%;
     max-width: 100%;
     padding: 3em 4em 1.5em 3em
+}
+.home--items-wrapper .icon-box__button {
+    line-height: 26px;
+    padding: 20px;
 }
 .home--registration-container p {
     font-size: 1.2em;
@@ -7046,9 +7051,11 @@ figure.nav-overlay {
 }
 .home--item-text {
     font-weight: normal;
-    font-size: 0.97em;
+    font-size: 1em;
     margin: 1.5em 0 0.5em 0;
-    padding: 0.5em;
+    padding: 0.5 0.3em;
+    height: 80px;
+    overflow: hidden;
 }
 
 a.home--modal-link {
@@ -7056,11 +7063,15 @@ a.home--modal-link {
     display: none;
 }
 
-.home--item-text p {
-    overflow:hidden;
+.home--item-text * {
+    /*overflow:hidden;
     text-overflow-multiline:ellipsis;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis;*/
+    font-size: 0.97em;
+}
+.capitalize {
+    text-transform: capitalize;   
 }
 
 @media (min-width: 1200px) {
@@ -7074,7 +7085,7 @@ a.home--modal-link {
     .home--item-container, .home--registration-container, .home--item-container-full {
         width: 95%;
         max-width: 100%;
-        margin: 1em 1.5em;
+        margin: 1em 1.5em 1em 1.6em;
     }
     .home--registration-container {
         padding: 1.5em 3em;
@@ -7084,7 +7095,7 @@ a.home--modal-link {
     .home--item-container, .home--registration-container, .home--item-container-full  {
         width: 90%;
         max-width: 100%;
-        margin: 1em 2.5em;
+        margin: 1em 2.5em 1em 2.6em;
     }
     .home--item-text p {
         overflow:hidden;
@@ -7119,6 +7130,19 @@ a.home--modal-link {
         padding: 0.5em 3em;
         font-size: 0.9em;
         height: 300px;
+    }
+    #portalMain .icon-box__button span {
+        font-size: 0.9em;
+    }
+    #portalMain .icon-box__button--main {
+        height: 66px;
+    }
+    .side-nav-items__item, .side-nav-items__item a {
+        font-size: 1em !important;
+        line-height: 1.2em;
+    }
+    .home--item-container, .home--item-container h4, .home--item-text * {
+        font-size: 1em !important;
     }
 }
 

@@ -104,7 +104,7 @@
   {% block upperbanner %}
       {% if not user %}
       <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Have a code from your doctor? Click here to Sign Up
-          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
+          <figure></figure></a><a class="upper-banner__close js-close-upper-banner"> <!-- onclick="setNoBanner()" awaiting ok on this functionality-->
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
@@ -180,12 +180,6 @@
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Join Us!</h3>
             <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
-          </div>
-          <div class="box-modal__footer"><span class="box-modal__sub">Want to Receive News?</span>
-            <form class="js-mock-submit"><span class="submitted-text">Thank you!</span>
-              <input type="text" placeholder="Email Address">
-              <button class="button" type="submit">Sign Up</button>
-            </form>
           </div>
         </div>
       </div>
@@ -306,7 +300,7 @@
                   $("#loadingIndicator").show();
               } else {
                   showMain();
-                  $("#loadingIndicator").hide()
+                  //$("#loadingIndicator").hide()
               };
           };
 
@@ -330,6 +324,58 @@
               setTimeout("$('#modal-login').modal('show'); ", 400);
           };
 
+          function filterMenu() {
+              $.ajax({
+                url: "{{PORTAL}}/gil-interventions-items",
+                context: document.body
+              }).done(function(data) {
+                //console.log(data)
+                var ct = 0;
+                $(".side-nav-items__item--decisionsupport").hide();
+                if (data.interventions) {
+                  (data.interventions).forEach(function(item) {
+                      var d = item.description;
+                      var b = item.link_url;
+                      var n = item.name.replace(/\_/g, " ")
+                      var disabled = item.link_url == "disabled";
+                      var dm = /decision\s?support/gi;
+                      var sm = /symptom\s?tracker/gi;
+                      var sm2 = /self[_\s]?management/gi;
+                      if (dm.test(d) || dm.test(n)) {
+                          if (!disabled) {
+                              $(".side-nav-items__item--decisionsupport a").attr("href",b);
+                              $(".side-nav-items__item--decisionsupport").show();
+                          };
+                      }
+                      else if (sm.test(d) || sm2.test(n)) {
+                          //do nothing - always display symptom tracker
+                          if (!disabled) {
+                            $(".side-nav-items__item--symptomtracker a").attr("href", b);
+                          };
+                      }
+                      else if ($.trim(d) != "") {
+                          //only draw 3 at most - otherwise the menu won't fit the screen
+                          if (ct < 3) {
+                              if (!disabled) {
+                                  var eitem = $("#intervention_item_" + ct);
+                                  if (eitem.length == 0) { //only draw this when there isn't already one
+                                    $(".side-nav-items__item--symptomtracker").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize">' + n + '</a></li>');
+                                    ct++;
+                                  };
+                              };
+                          };
+
+                      };
+                  });
+                };
+                $("#loadingIndicator").hide();
+              }).fail(function() {
+                $("#loadingIndicator").hide();
+              }).always(function() {
+                $("#loadingIndicator").hide();
+              });
+          };
+
           function showMain() {
             $("#mainHolder").css({
                           "visibility" : "visible",
@@ -339,12 +385,12 @@
                           "-khtml-opacity": 1,
                           "opacity": 1
                         });
-
+            {% if user and user.has_role("patient") %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
           };
 
          $(document).ready(function(){
 
-            checkBannerStatus();
+            //checkBannerStatus(); awaiting ok on this functionality
 
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
@@ -373,7 +419,7 @@
             $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
               e.stopPropagation();
 
-              if (!$(this).parent().hasClass("side-nav-items__item-disabled")) loader(true);
+              if (!$(this).parent().hasClass("side-nav-items__item-disabled") && !$(this).hasClass("icon-box__button--disabled")) loader(true);
               else loader(false);
             });
             setTimeout("loader(false);", 0);

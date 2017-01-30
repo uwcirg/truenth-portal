@@ -120,7 +120,7 @@
 #tnthLogoXs {
   padding: 0;
   img {
-    height: 50px;
+    height: 40px;
     float: right;
   }
 }
@@ -307,15 +307,21 @@
     }
   }
 }
-
-
 /** Responsive sizes **/
+@media (max-width: 498px) {
+  #tnthLogoXs img {
+    margin-right: 2em !important;
+  }
+}
 @media (max-width: 767px) {
   #tnthNavMain {
     display: none !important;
   }
   #tnthNavXs {
     display: block;
+  }
+  #tnthLogoXs img {
+    margin-right: 40%;
   }
 }
 @media (min-width: 768px) {
@@ -337,17 +343,27 @@
     max-width: 940px;
   }
 }
-@media (min-width: 1199px) {
+@media (min-width: 1219px) {
    #tnthTopLinks {
-    margin-right: -28px;
     margin-left: 0em;
    }
+   #tnthLogo {
+    margin-right: 2em;
+  }
 }
-@media (min-width: 1200px) {
+@media (min-width: 1220px) {
   #tnthNavMainContainer {
     max-width: none;
   }
   #tnthTopLinks {
     margin-right: 0;
+  }
+  #tnthLogo {
+    margin-right: 40%;
+  }
+}
+@media (min-width: 1380px) {
+  #tnthLogo {
+    margin-right: 45%;
   }
 }

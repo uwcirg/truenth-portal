@@ -9,7 +9,7 @@
         <p class="page-intro__sub">Below are the TrueNTH tools available to you.</p>
         <p class="page-intro__sub">More will become available as TrueNTH evolves.</p>
         <div class="button-callout">
-            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+            <figure id="portalScrollArrow"></figure>
         </div>
     </section>
 
@@ -50,12 +50,8 @@
         <div class="footer__logo-area">
           <figure class="footer__logo--truenth"></figure>
         </div>
-        <ul class="nav-list">
-          <li class="nav-list__item"><a href="{{PORTAL}}/about">About</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/decision-support">Decision Support</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/symptom-tracker">Symptom Tracker</a></li>
-        </ul>
         <ul class="nav-list nav-list--lower">
+          <li class="nav-list__item"><a href="{{PORTAL}}/about">About</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
         </ul>
         <ul class="nav-list nav-list--lower">
@@ -78,31 +74,19 @@
             $("aside").hide();
             $(".side-nav-items__item--home").hide();
             var hc = $(".home--item-container");
+            if (hc.length > 0) {
+                $("#portalScrollArrow").on("click", function() {
+                    var t = $("section.home--items-wrapper").offset().top;
+                    if (parseInt(t) >= 90) {
+                        $('html, body').animate({
+                            scrollTop: t - 90
+                        }, 1000);
+                    };
+                });
+            } else $("#portalScrollArrow").hide();
             if (hc.length == 1) {
                 hc.removeClass("home--item-container").addClass("home--item-container-full");
             };
-
-            var ct=0;
-            hc.each(function() {
-                var d = $(this).find(".icon_box__description");
-                var b = $(this).find(".icon-box__button");
-                var disabled = b.hasClass("icon-box__button--disabled");
-                var dm = /decision\s?support/gi;
-                var sm = /symptom\s?tracker/gi;
-                if (dm.test(d.text())) {
-                    $(".side-nav-items__item--decisionsupport a").attr("href", (!disabled ? b.attr("href") : "javascript: loader(false);"));
-                }
-                else if (sm.test(d.text())) {
-                    //do nothing
-                }
-                else if ($.trim(d.text()) != "") {
-                    //only draw two at most - otherwise the menu won't fit the screen
-                    if (ct < 2) {
-                        $(".side-nav-items__item--symptomtracker").after('<li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated' + (disabled ? ' side-nav-items__item-disabled' : "") + '"><a href="' + b.attr("href") + '">' + d.text() + '</a></li>');
-                    };
-                    ct++;
-                };
-            });
         });
     </script>
 {% endblock %}
