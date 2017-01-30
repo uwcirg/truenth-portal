@@ -31,12 +31,14 @@ portal = Blueprint('portal', __name__)
 
 
 def page_not_found(e):
-    return render_template('404.html', no_nav="true"), 404
+    gil = current_app.config.get('GIL')
+    return render_template('404.html' if not gil else '/gil/404.html', no_nav="true"), 404
 
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
-    return render_template('500.html', no_nav="true"), 500
+    gil = current_app.config.get('GIL')
+    return render_template('500.html' if not gil else '/gil/500.html', no_nav="true"), 500
 
 @portal.before_app_request
 def debug_request_dump():
