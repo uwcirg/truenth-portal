@@ -23,7 +23,7 @@ Flask-Babel==0.11.1
 Flask-Celery-Helper==1.1.0
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
-Flask-Migrate==2.0.2
+Flask-Migrate==2.0.3
 Flask-OAuthlib==0.9.3
 Flask-Script==2.0.5
 Flask-Session==0.3.0
@@ -38,11 +38,11 @@ future==0.16.0
 fuzzywuzzy==0.14.0
 imagesize==0.7.1
 ipdb==0.10.2
-ipython==5.1.0
+ipython==5.2.0
 ipython-genutils==0.1.0
 itsdangerous==0.24
 jedi==0.9.0
-Jinja2==2.9.4
+Jinja2==2.9.5
 jsonschema==2.5.1
 kombu==4.0.2
 Mako==1.0.6

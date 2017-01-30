@@ -40,3 +40,10 @@
       </div>
     </main>
 {% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $(".side-nav-items__item--symptomtracker").hide();
+        });
+    </script>
+{% endblock %}
