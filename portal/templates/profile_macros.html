@@ -233,21 +233,27 @@
     </div>
 {%- endmacro %}
 
+{% macro profileEmailForm(person) -%}
+    {% if person %}
+    <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
+        <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+        <label class="text-muted">{{ _("Send Email to Patient") }}</label>
+        <select  id="profileEmailSelect" class="form-control bd-element">
+            <option value="">{{ _("Select Email...") }}</option>
+            {% if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{% endif %}
+            <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+        </select>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send Email") }}</button>
+        <div id="profileEmailMessage" class="text-info"></div>
+    </form>
+    {% endif %}
+{%- endmacro %}
+
 
 {% macro profileSendEmail(person) -%}
     {% if person %}
     <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
-        <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
-            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-            <label>{{ _("Send Email to Patient") }}</label>
-            <select  id="profileEmailSelect" class="form-control bd-element">
-                <option value="">{{ _("Select Email...") }}</option>
-                {% if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{% endif %}
-                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
-            </select>
-            <button id="btnProfileSendEmail" class="btn btn-lg btn-tnth-primary disabled">{{ _("Send Email") }}</button>
-            <div id="profileEmailMessage" class="text-info"></div>
-        </form>
+        {{profileEmailForm(person)}}
     </div>
     <script async>$(function () {
 
@@ -1027,12 +1033,55 @@
         );
     </script>
 {%- endmacro %}
+{% macro profileCustomDetail(person) -%}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <br/>
+            <h4 class="profile-item-title"><em>{{_("Three ")}}</em>{{_("ways to complete questionnaire")}}</h4>
+            <div class="custom-container">
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 class="profile-item-title">{{_("Send ")}}<em>{{_("Email")}}</em></h4>
+                    <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div><br/>
+                    <div>{{profileEmailForm(person)}}</div>
+                </div>
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 class="profile-item-title"><em>{{_("Log in ")}}</em> {{_("as patient")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("This logs you out, and logs in as the patient. This is so the patient can complete their questionnaire on this device. Ideal for tablet computers.")}}</div><br/>
+                    <button class="btn btn-tnth-primary" onclick="location.replace('/login-as/{{person.id}}');">{{_("Login as Patient")}}</button>
+                </div>
+                <div class="profile-item-container custom-container-item">
+                    <h4 class="profile-item-title">{{_("Enter manually")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
+                    <button class="btn btn-tnth-primary" onclick="location.replace('/api/present-assessment?instrument_id=epic26&subject_id={{person.id}}');">{{_("Enter manually")}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>$(document).ready(function() {
+        $("#profileSendEmailContainer").hide();
+        $("#assessPatient").hide();
+        $("#loginAsPatient").hide();
+        $("#navMenuXs").hide();
+    });</script>
+{%- endmacro %}
 {% macro profile(person, current_user, consent_agreements) -%}
-
+    <!-- remember to add xs class to side when custom content is present -->
+    {% if config.CUSTOM_PATIENT_DETAIL %}
+        {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+            {{ profileCustomDetail(person) }}
+        {% endif %}
+    {% endif %}
+    {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <h4 class="profile-item-title">Patient Details</h4>
+        </div>
+    </div>
+    {% endif %}
     {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
          <div class="row">
             <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%endif%}">
                     <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
@@ -1040,14 +1089,14 @@
                 </div>
             </div>
             <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md side-xs{%endif%}">
                     <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    {{profilePhone(person)}}
                     {{profileEmail(person)}}
                     {{profileSendEmail(person)}}
                 </div>
             </div>
         </div>
-
     {% else %}
          {% if person.has_role('patient') %}
             <div class="row">
@@ -1064,6 +1113,7 @@
                         <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
                         <br/>
                         {{profileEmail(person)}}
+                        {{profilePhone(person)}}
                         {{profileLocale(person)}}
                     </div>
                 </div>
@@ -1096,9 +1146,7 @@
                     </div>
                 </div>
             </div>
-
          {% endif %}
-
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
@@ -1165,8 +1213,6 @@
                     <div class="flex">
                         <div>
                             {{profileGender(person)}}
-                            <br/>
-                            {{profilePhone(person)}}
                         </div>
                         <div>
                             {{profileEthnicity(person)|show_macro('ethnicity')}}
@@ -1217,7 +1263,7 @@
         #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
         #procedureForm { margin-left: 0.5em;}
         #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
-        button.btn {color:#777}
+        #profileProcedureContainer button.btn {color:#777}
     </style>
     <p style="color: #696767">{%if (current_user and person) and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
         date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>

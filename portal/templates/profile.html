@@ -34,16 +34,13 @@
 {% endif %}
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
 {% if current_user.has_role('provider') and user.has_role('patient') %}
-
-<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient for ") }} <em class="assessmentLabel">{{ _("Epic 26") }}</em></span>
-<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
+&nbsp;&nbsp;<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
 <!-- shown only in reduced browser size-->
-<div class="btn-group link-xs">
+<div id="navMenuXs" class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     {{ _("Select") }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient for ") }} <em class="assessmentLabel">{{ _("Epic 26") }}</em></a></li>
     <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
   </ul>
 </div>
@@ -67,32 +64,9 @@
         </div>
       </div>
 </div>
-
-
-<div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">{{ _("Assessing Patient for EPIC-26") }}</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.9em">
-            <br/>
-            <p class="text-left">{{ _("This will launch the EPIC-26 instrument for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-             <a href="/api/present-assessment?instrument_id=epic26&subject_id={{user.id}}" class="btn btn-default" style="font-size:0.7em">{{ _("Continue") }}</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
-          </div>
-        </div>
-      </div>
-</div>
 {% endif %}
 </nav>
 <div id="indexContainer">{{ _("Index List") }}</div>
-
-
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
   <div class="row" style="position: relative;">
@@ -107,7 +81,6 @@
       </div>
   </div>
 </form>
-
 {% endblock %}
 
 {% block document_ready %}
