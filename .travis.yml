@@ -77,7 +77,7 @@ after_success:
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
-  - docker build --file docker/Dockerfile  --tag "portal_deb:test" --tag "$IMAGE_NAME:latest" .
+  - docker build --file docker/Dockerfile  --tag "$IMAGE_NAME:latest" .
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
