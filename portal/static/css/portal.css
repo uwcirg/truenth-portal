@@ -926,7 +926,10 @@ table.profile-audit-log TH,
   }
 }
 .side {
-  height: 26em;
+  height: 29em;
+}
+.side-md {
+  height: 25em;
 }
 .flex {
   display: flex;
@@ -1227,7 +1230,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.85em;
   }
   .side {
-    height: 38em;
+    height: 40em;
   }
   #phone,
   #email {
@@ -1361,7 +1364,10 @@ div.org-container input[type="checkbox"] {
     height: 10em;
   }
   .side {
-    height: 35em;
+    height: 37em;
+  }
+  .side-xs {
+    height: 22em;
   }
   .load-container {
     min-height: 1.5em;
