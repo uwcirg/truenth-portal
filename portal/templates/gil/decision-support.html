@@ -62,7 +62,7 @@
                   <use xlink:href="#DS-Compass"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main" href="{{PORTAL}}/{%if user%}home{%else%}go{%endif%}"><span>Start<figure></figure></span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main decision-support-link" href="{{PORTAL}}/{%if user%}home{%else%}go{%endif%}"><span>Start<figure></figure></span></a></div>
             </div>
           </div>
         </div>
@@ -74,6 +74,7 @@
         $(document).ready(function() {
             $("body").attr("class", "page-about theme--intro-light");
             $(".side-nav-items__item--decisionsupport").hide();
+            $("footer a[href='/decision-support']").hide();
         });
     </script>
 {% endblock %}

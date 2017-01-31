@@ -4814,6 +4814,9 @@ only screen and (min-resolution: 2dppx) {
 .icon-box .icon-box__button {
     width: 100%;
 }
+.icon-box__button--disabled {
+    opacity: 0.4;
+}
 @media (max-width: 767px) {
     .icon-box__button {
         font-size: 20px;
@@ -6448,6 +6451,9 @@ figure.nav-overlay {
 .nav-list__item a {
     color: #fff;
 }
+.nav-list__item a.icon-box__button--disabled {
+    opacity: 0.4;
+}
 .nav-list__item a:hover {
     color: #8F9385;
 }
@@ -6886,7 +6892,7 @@ a.home--modal-link {
     cursor: pointer;
 }
 .capitalize {
-    text-transform: capitalize;   
+    text-transform: capitalize;
 }
 
 @media (min-width: 1200px) {
@@ -6911,6 +6917,10 @@ a.home--modal-link {
         width: 90%;
         max-width: 100%;
         margin: 1em 2.5em 1em 2.6em;
+        height: 340px;
+    }
+    .home--item-text {
+        height: 100px;
     }
     .home--item-text * {
         overflow:hidden;
