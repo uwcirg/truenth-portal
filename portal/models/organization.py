@@ -325,6 +325,26 @@ class OrgTree(object):
 
         return list(fetch_nodes(arb))
 
+    def at_or_below_ids(self, organization_id, other_organizations):
+        """Check if the other_organizations are at or below given organization
+
+        :param organization_id: effective parent to check against
+        :param other_organizations: iterable of organization_ids as potential
+            children.
+
+        :return: True if any org in other_organizations is equal to the
+            given organization_id, or a child of it.
+
+        """
+        ## work through list - shortcircuit out if a qualified node is found
+        for other_organization_id in other_organizations:
+            if organization_id == other_organization_id:
+                return True
+            children = self.here_and_below_id(organization_id)
+            if other_organization_id in children:
+                return True
+
+
 def add_static_organization():
     """Insert special `none of the above` org at index 0"""
     existing = Organization.query.get(0)
