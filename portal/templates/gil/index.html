@@ -130,7 +130,7 @@
     <script>
         $(document).ready(function() {
             $("body").attr("class", "page-home");
-            $(".side-nav-items__item--home").hide();
+            setSelectedNavItem($(".side-nav-items__item--home"));
             {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
         });
     </script>

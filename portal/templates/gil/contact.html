@@ -80,8 +80,8 @@
             if ($("#sendername").val() != "" && $("#body").val() != "" && $("#email").val() != "") {
                 $("#contactForm").submit();
             };
-        });
-        $(".side-nav-items__item--contact").hide();
+        })
+        setSelectedNavItem($(".side-nav-items__item--contact"));
       });
   </script>
 {% endblock %}
