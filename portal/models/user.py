@@ -215,7 +215,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         db.session.commit()
 
         # record this event
-        db.session.add(Audit(user_id=acting_user.id, comment=comment))
+        db.session.add(Audit(user_id=acting_user.id, comment=comment,
+            subject_id=acting_user.id, context='account'))
         db.session.commit()
 
     purge_user(user, acting_user)
@@ -774,7 +775,7 @@ class User(db.Model, UserMixin):
                 # Given a time, store and mark as "time of death"
                 audit = Audit(
                     user_id=current_user().id, timestamp=dt,
-                    subject_id=self.id,
+                    subject_id=self.id, context='user',
                     comment="time of death for user {}".format(self.id))
                 self.deceased = audit
             elif 'deceasedBoolean' in fhir:
@@ -785,7 +786,7 @@ class User(db.Model, UserMixin):
                         self.deceased_id = None
                         audit = Audit(
                             user_id=current_user().id,
-                            subject_id=self.id,
+                            subject_id=self.id, context='user',
                             comment=("Remove existing deceased from "
                                      "user {}".format(self.id)))
                         db.session.add(audit)
@@ -795,7 +796,7 @@ class User(db.Model, UserMixin):
                     audit = Audit(
                         user_id=current_user().id, subject_id=self.id,
                         comment=("Marking user {} as "
-                                 "deceased".format(self.id)))
+                                 "deceased".format(self.id)), context='user')
                     self.deceased = audit
 
         if 'name' in fhir:
@@ -1015,7 +1016,8 @@ class User(db.Model, UserMixin):
 
         self.active = False
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
-                             comment="marking deleted {}".format(self))
+                             comment="marking deleted {}".format(self),
+                             context='account')
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

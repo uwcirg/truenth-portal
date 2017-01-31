@@ -119,7 +119,7 @@ def post_user_accepted_tou(user_id):
     authd_user.check_role(permission='edit', other_id=user_id)
     audit = Audit(user_id = authd_user.id, subject_id=user_id,
                   comment = "user {} posting accepted ToU for user {}".format(
-                      authd_user.id, user_id))
+                      authd_user.id, user_id), context='tou')
     db.session.add(audit)
     return accept_tou(user_id)
 
@@ -167,7 +167,7 @@ def accept_tou(user_id=None):
     if not request.json or 'agreement_url' not in request.json:
         abort(400, "Requires JSON with the ToU 'agreement_url'")
     audit = Audit(user_id = user.id, subject_id=user.id,
-        comment = "ToU accepted")
+        comment = "ToU accepted", context='tou')
     tou = ToU(audit=audit, agreement_url=request.json['agreement_url'])
     db.session.add(tou)
     db.session.commit()

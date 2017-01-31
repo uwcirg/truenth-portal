@@ -116,7 +116,7 @@ def organization_delete(organization_id):
         current_app.logger.warn(message + str(e), exc_info=True)
         abort(message, 400)
     auditable_event("deleted {}".format(org), user_id=current_user().id,
-        subject_id=current_user().id)
+        subject_id=current_user().id, context='organization')
     OrgTree.invalidate_cache()
     return jsonify(message='deleted organization {}'.format(org))
 
@@ -187,7 +187,8 @@ def organization_post():
     db.session.add(org)
     db.session.commit()
     auditable_event("added new organization {}".format(org),
-                    user_id=current_user().id, subject_id=current_user().id)
+                    user_id=current_user().id, subject_id=current_user().id,
+                    context='organization')
     OrgTree.invalidate_cache()
     return jsonify(org.as_fhir())
 
@@ -257,6 +258,6 @@ def organization_put(organization_id):
     db.session.commit()
     auditable_event("updated organization from input {}".format(
         json.dumps(request.json)), user_id=current_user().id,
-        subject_id=current_user().id)
+        subject_id=current_user().id, context='organization')
     OrgTree.invalidate_cache()
     return jsonify(org.as_fhir())

@@ -125,7 +125,8 @@ def post_procedure():
             request.json['resourceType'] != 'Procedure':
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
-    audit = Audit(user_id=current_user().id, subject_id=current_user().id)
+    audit = Audit(user_id=current_user().id, subject_id=current_user().id,
+        context='procedure')
     try:
         procedure = Procedure.from_fhir(request.json, audit)
     except ValueError as e:
@@ -140,7 +141,7 @@ def post_procedure():
     patient.procedures.append(procedure)
     db.session.commit()
     auditable_event("added {}".format(procedure), user_id=current_user().id,
-        subject_id=patient_id)
+        subject_id=patient_id, context='procedure')
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
@@ -190,7 +191,7 @@ def procedure_delete(procedure_id):
     db.session.delete(procedure)
     db.session.commit()
     auditable_event("deleted {}".format(procedure), user_id=current_user().id,
-        subject_id=patient_id)
+        subject_id=patient_id, context='procedure')
     return jsonify(message='deleted procedure')
 
 

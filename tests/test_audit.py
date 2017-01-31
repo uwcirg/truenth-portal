@@ -10,9 +10,9 @@ from portal.models.reference import Reference
 from portal.models.role import ROLE
 from portal.models.user_consent import UserConsent
 
-log_login_idp = "2016-02-23 09:49:25,733: performed by {} on {}: login user via NEW IdP facebook".format(TEST_USER_ID,TEST_USER_ID)
-log_login_google = "2016-02-23 09:52:57,806: performed by {} on {}: login via google".format(TEST_USER_ID,TEST_USER_ID)
-log_callbacks = """2016-02-23 10:52:24,856: performed by {} on {}: after: Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, redirects: https://stg-sr.us.truenth.org/, callback: https://stg-sr.us.truenth.org/_/callback""".format(TEST_USER_ID,TEST_USER_ID)
+log_login_idp = "2016-02-23 09:49:25,733: performed by {} on {}: login: login user via NEW IdP facebook".format(TEST_USER_ID,TEST_USER_ID)
+log_login_google = "2016-02-23 09:52:57,806: performed by {} on {}: login: login via google".format(TEST_USER_ID,TEST_USER_ID)
+log_callbacks = """2016-02-23 10:52:24,856: performed by {} on {}: other: after: Client: yoOjy6poL2dVPVcXgi7zc8gCS0qvnOzpwyQemCTw, redirects: https://stg-sr.us.truenth.org/, callback: https://stg-sr.us.truenth.org/_/callback""".format(TEST_USER_ID,TEST_USER_ID)
 
 class TestAudit(TestCase):
     """Audit model tests"""
@@ -24,6 +24,10 @@ class TestAudit(TestCase):
     def test_parse_subject(self):
         a1 = Audit.from_logentry(log_login_idp)
         self.assertEquals(a1.subject_id, TEST_USER_ID)
+
+    def test_parse_context(self):
+        a1 = Audit.from_logentry(log_login_idp)
+        self.assertEquals(a1.context, "login")
 
     def test_message(self):
         a1 = Audit.from_logentry(log_callbacks)
@@ -44,7 +48,8 @@ class TestAudit(TestCase):
         self.assertEquals(0, len(rv.json['audits']))
 
     def test_get(self):
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID, comment='just test data')
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+                        comment='just test data')
         with SessionScope(db):
             db.session.add(audit)
             db.session.commit()
@@ -58,6 +63,7 @@ class TestAudit(TestCase):
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(rv.json['audits'][0]['context'], 'other')
         self.assertEquals(
             rv.json['audits'][0]['comment'], 'just test data')
 
@@ -85,5 +91,6 @@ class TestAudit(TestCase):
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(rv.json['audits'][0]['context'], 'other')
         self.assertEquals(
             rv.json['audits'][0]['comment'], 'just test data')
