@@ -16,7 +16,7 @@ class TestTou(TestCase):
 
     def test_tou_str(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-                    comment="Agreed to ToU")
+                    comment="Agreed to ToU", context='other')
         tou = ToU(audit=audit, agreement_url=tou_url)
         results = "{}".format(tou)
         self.assertTrue(tou_url in results)
