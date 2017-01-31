@@ -292,28 +292,23 @@ def observation_check(display, boolean_value):
     :param boolean_value: ValueQuantity boolean true or false expected
 
     """
-    coding = None
     try:
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, display=display).one()
     except NoResultFound:
-        #raise ValueError("coding.display '{}' not found".format(display))
-        pass
+        raise ValueError("coding.display '{}' not found".format(display))
     try:
-        if coding:
-            cc_id = CodeableConcept.query.filter(
+        cc_id = CodeableConcept.query.filter(
             CodeableConcept.codings.contains(coding)).one().id
     except NoResultFound:
-        #raise ValueError("codeable_concept'{}' not found".format(coding))
-        pass
+        raise ValueError("codeable_concept'{}' not found".format(coding))
 
     if boolean_value == 'true':
         vq = CC.TRUE_VALUE
     elif boolean_value == 'false':
         vq = CC.FALSE_VALUE
     else:
-        #raise ValueError("boolean_value must be 'true' or 'false'")
-        pass
+        raise ValueError("boolean_value must be 'true' or 'false'")
 
     def user_has_matching_observation(intervention, user):
         obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
@@ -440,9 +435,8 @@ class AccessStrategy(db.Model):
             # validate the given details by attempting to instantiate
             obj.instantiate()
         except Exception, e:
-            #raise ValueError("AccessStrategy instantiation error: {}".format(
-                #e))
-            pass
+            raise ValueError("AccessStrategy instantiation error: {}".format(
+                e))
         return obj
 
     def as_json(self):
