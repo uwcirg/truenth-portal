@@ -928,6 +928,9 @@ table.profile-audit-log TH,
 .side {
   height: 29em;
 }
+.side-lg {
+  height: 33em;
+}
 .side-md {
   height: 25em;
 }
@@ -1150,6 +1153,14 @@ div.org-container input[type="checkbox"] {
 }
 .indent {
   padding: 0 1em;
+}
+.registration-status-container {
+  margin:0 0 0.8em 0; 
+  font-size: 0.95em;
+}
+.registration-label {
+  display:inline-block; 
+  opacity: 0.7;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
