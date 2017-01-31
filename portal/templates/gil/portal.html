@@ -69,13 +69,6 @@
 {% endblock %}
 {% block document_ready %}
     <script>
-
-        function setNavItemSelected() {
-            console.log($(".side-nav-items__item--dashboard").length);
-            $(".side-nav-items__item--dashboard").addClass("side-nave-items__item--selected");
-            $("li.side-nave-items__item--selected").find("a").removeAttr("href");
-        };
-
         $(document).ready(function() {
             $("body").attr("class", "page-home");
             $("aside").hide();
@@ -94,7 +87,6 @@
             if (hc.length == 1) {
                 hc.removeClass("home--item-container").addClass("home--item-container-full");
             };
-            setTimeout("setNavItemSelected();", 0);
         });
     </script>
 {% endblock %}
