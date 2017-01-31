@@ -365,6 +365,10 @@
                           if (!disabled) {
                               //$(".side-nav-items__item--decisionsupport a").attr("href",b);
                               //$(".side-nav-items__item--decisionsupport").show();
+                              var ditem = $("#intervention_item_decisionsupport");
+                              if (ditem.length == 0) { //only draw this when there isn't already one
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
+                              };
                               $(".decision-support-link").each(function() {
                                 $(this).attr("href", b);
                                 $(this).removeClass("icon-box__button--disabled");
@@ -382,6 +386,10 @@
                           //do nothing - always display symptom tracker
                           if (!disabled) {
                             //$(".side-nav-items__item--symptomtracker a").attr("href", b);
+                            var sitem = $("#intervention_item_symptomtracker");
+                            if (sitem.length == 0) { //only draw this when there isn't already one
+                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
+                            };
                             $(this).removeClass("icon-box__button--disabled");
                             $(".symptom-tracker-link").each(function() {
                                 $(this).attr("href", b)
