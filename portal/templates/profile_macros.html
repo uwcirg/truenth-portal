@@ -237,13 +237,13 @@
     {% if person %}
     <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-        <label class="text-muted">{{ _("Send Email to Patient") }}</label>
+        <label id="sendEmailLabel" class="text-muted">{{ _("Send Email to Patient") }}</label>
         <select  id="profileEmailSelect" class="form-control bd-element">
             <option value="">{{ _("Select Email...") }}</option>
             {% if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{% endif %}
             <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
         </select>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send Email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
     </form>
     {% endif %}
@@ -1037,17 +1037,17 @@
      <div class="row">
         <div class="col-md-12 col-xs-12">
             <br/>
-            <h4 class="profile-item-title"><em>{{_("Three ")}}</em>{{_("ways to complete questionnaire")}}</h4>
+            <h4 class="profile-item-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
                 <div class="profile-item-container custom-container-item-right">
-                    <h4 class="profile-item-title">{{_("Send ")}}<em>{{_("Email")}}</em></h4>
+                    <h4 class="profile-item-title">{{_("Send email")}}</h4>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div><br/>
                     <div>{{profileEmailForm(person)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
-                    <h4 class="profile-item-title"><em>{{_("Log in ")}}</em> {{_("as patient")}}</h4>
-                    <div class="custom-container-content text-muted">{{_("This logs you out, and logs in as the patient. This is so the patient can complete their questionnaire on this device. Ideal for tablet computers.")}}</div><br/>
-                    <button class="btn btn-tnth-primary" onclick="location.replace('/login-as/{{person.id}}');">{{_("Login as Patient")}}</button>
+                    <h4 class="profile-item-title">{{_("Log in as patient")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
+                    <button class="btn btn-tnth-primary" onclick="location.replace('/login-as/{{person.id}}');">{{_("Login as patient")}}</button>
                 </div>
                 <div class="profile-item-container custom-container-item">
                     <h4 class="profile-item-title">{{_("Enter manually")}}</h4>
@@ -1059,6 +1059,7 @@
     </div>
     <script>$(document).ready(function() {
         $("#profileSendEmailContainer").hide();
+        $("#sendEmailLabel").hide();
         $("#assessPatient").hide();
         $("#loginAsPatient").hide();
         $("#navMenuXs").hide();
