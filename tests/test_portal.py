@@ -32,7 +32,7 @@ class TestPortal(TestCase):
 
         self.assertIn('Custom Label', rv.data)
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.card_html, rv.data)
+        self.assertIn(intervention.card_html, rv.data.decode('utf-8'))
 
     def test_user_card_html(self):
         """Interventions can further customize per user"""
@@ -57,11 +57,11 @@ class TestPortal(TestCase):
         rv = self.client.get('/home')
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.card_html, rv.data)
-        self.assertIn(ui.link_label, rv.data)
-        self.assertIn(ui.link_url, rv.data)
+        self.assertIn(ui.card_html, rv.data.decode('utf-8'))
+        self.assertIn(ui.link_label, rv.data.decode('utf-8'))
+        self.assertIn(ui.link_url, rv.data.decode('utf-8'))
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.display_for_user(user).link_label, rv.data)
+        self.assertIn(intervention.display_for_user(user).link_label, rv.data.decode('utf-8'))
 
     def test_provider_html(self):
         """Interventions can customize the provider text """

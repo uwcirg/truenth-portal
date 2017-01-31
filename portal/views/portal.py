@@ -75,6 +75,27 @@ def landing():
     return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
 
 #from GIL
+@portal.route('/gil-interventions-items')
+@oauth.require_oauth()
+def gil_interventions_items():
+    """ this is needed to filter the GIL menu based on user's intervention(s) 
+        trying to do this so code is more easily managed from front end side """
+    user = current_user()
+    user_interventions = []
+    interventions =\
+            Intervention.query.order_by(Intervention.display_rank).all()
+    for intervention in interventions:
+        display = intervention.display_for_user(user)
+        if display.access:
+            user_interventions.append({
+                "name": intervention.name,
+                "description": intervention.description if intervention.description else "",
+                "link_url": display.link_url if display.link_url is not None else "disabled",
+                "link_label": display.link_label if display.link_label is not None else ""
+            })
+
+    return jsonify(interventions=user_interventions)
+
 @portal.route('/symptom-tracker')
 def symptom_tracker():
     return render_template('gil/symptom-tracker.html', user=current_user())
@@ -330,6 +351,8 @@ def initial_queries():
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
         return redirect('portal.landing')
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
@@ -385,7 +408,11 @@ def home():
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
-    return render_template('portal.html', user=user,
+
+    gil = current_app.config.get('GIL')
+    print("GIL {0}".format(str(gil)))
+    
+    return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
                            interventions=interventions)
 
 
