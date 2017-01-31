@@ -15,6 +15,7 @@ man
 pip-selfcheck.json
 log
 
+.idea
 .settings/
 .pydevproject
 .project
