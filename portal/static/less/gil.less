@@ -4826,6 +4826,9 @@ only screen and (min-resolution: 2dppx) {
         color: #7C959E;
     }
 }
+.icon-box__button--disabled {
+    opacity: 0.4;
+}
 .icon-box:active,
 .icon-box:focus,
 .icon-box:visited,
@@ -6635,6 +6638,9 @@ figure.nav-overlay {
 .nav-list__item a {
     color: #fff;
 }
+.nav-list__item a.icon-box__button--disabled {
+    opacity: 0.4;
+}
 .nav-list__item a:hover {
     color: #8F9385;
 }
@@ -7071,7 +7077,7 @@ a.home--modal-link {
     font-size: 0.97em;
 }
 .capitalize {
-    text-transform: capitalize;   
+    text-transform: capitalize;
 }
 
 @media (min-width: 1200px) {
@@ -7097,7 +7103,10 @@ a.home--modal-link {
         max-width: 100%;
         margin: 1em 2.5em 1em 2.6em;
     }
-    .home--item-text p {
+    .home--item-text {
+        height: 100px;
+    }
+    .home--item-text * {
         overflow:hidden;
         text-overflow-multiline:ellipsis;
         width: 100%;

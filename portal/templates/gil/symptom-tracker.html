@@ -33,7 +33,7 @@
                   <use xlink:href="#ST-Graph"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main" href="{{PORTAL}}/{%if user%}home{%else%}go{%endif%}"><span>Start<figure></figure></span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main symptom-tracker-link" href="{{PORTAL}}/{%if user%}home{%else%}go{%endif%}"><span>Start<figure></figure></span></a></div>
             </div>
           </div>
         </div>
@@ -44,6 +44,7 @@
     <script>
         $(document).ready(function() {
             $(".side-nav-items__item--symptomtracker").hide();
+            $("footer a[href='/symptom-tracker']").hide();
         });
     </script>
 {% endblock %}

@@ -145,7 +145,7 @@
         <ul class="nav-list">
           <li class="nav-list__item"><a href="{{PORTAL}}/">Home</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/about">About</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/decision-support">Decision Support</a></li>
+          <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}/decision-support">Decision Support</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/symptom-tracker">Symptom Tracker</a></li>
         </ul>
         <ul class="nav-list nav-list--lower">
@@ -345,12 +345,35 @@
                           if (!disabled) {
                               $(".side-nav-items__item--decisionsupport a").attr("href",b);
                               $(".side-nav-items__item--decisionsupport").show();
+                              $(".decision-support-link").each(function() {
+                                $(this).attr("href", b);
+                                $(this).removeClass("icon-box__button--disabled");
+                              });
+                              $(".icon-box-decision-support").removeClass("icon-box--theme-inactive");
+                          } else {
+                            $(".decision-support-link").each(function() {
+                                $(this).removeAttr("href");
+                                $(this).addClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
                           };
                       }
                       else if (sm.test(d) || sm2.test(n)) {
                           //do nothing - always display symptom tracker
                           if (!disabled) {
                             $(".side-nav-items__item--symptomtracker a").attr("href", b);
+                            $(this).removeClass("icon-box__button--disabled");
+                            $(".symptom-tracker-link").each(function() {
+                                $(this).attr("href", b)
+                                $(this).removeClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-symptom-tracker").removeClass("icon-box--theme-inactive");
+                          } else {
+                            $(".symptom-tracker-link").each(function() {
+                                $(this).removeAttr("href");
+                                $(this).addClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
                           };
                       }
                       else if ($.trim(d) != "") {
