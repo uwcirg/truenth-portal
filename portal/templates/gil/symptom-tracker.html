@@ -43,7 +43,7 @@
 {% block document_ready %}
     <script>
         $(document).ready(function() {
-            $(".side-nav-items__item--symptomtracker").hide();
+            setSelectedNavItem($(".side-nav-items__item--symptomtracker"));
             $("footer a[href='/symptom-tracker']").hide();
         });
     </script>
