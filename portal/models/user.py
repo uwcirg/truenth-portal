@@ -207,6 +207,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         for au in ob_audits:
             au.user_id = acting_user.id
         Audit.query.filter_by(user_id=user.id).delete()
+        Audit.query.filter_by(subject_id=user.id).delete()
         for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
             db.session.delete(ap)
 

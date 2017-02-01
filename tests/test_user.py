@@ -531,7 +531,8 @@ class TestUser(TestCase):
         org_1002 = Organization.query.get(1002)
         org_10031 = Organization.query.get(10031)
         org_10032 = Organization.query.get(10032)
-        audit = Audit(comment="testing", user_id=TEST_USER_ID)
+        audit = Audit(comment="testing", user_id=TEST_USER_ID,
+                      subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
         self.promote_user(staff_top, ROLE.PROVIDER)
