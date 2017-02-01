@@ -237,15 +237,13 @@
     {% if person %}
     <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-         {% if person %}
-            <div class="registration-status-container">
-                <span class="text-muted">Registration Status: </span>
-                {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
-                {% else %}
-                <h4 class="text-success registration-label">registered</h4>
-                {% endif %}
-            </div>
-        {% endif %}
+        <div class="registration-status-container">
+            <span class="text-muted">Registration Status: </span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
+            {% else %}
+            <h4 class="text-success registration-label">registered</h4>
+            {% endif %}
+        </div>
         <label id="sendEmailLabel" class="text-muted">{{ _("Send Email to Patient") }}</label>
         <select  id="profileEmailSelect" class="form-control bd-element">
             <option value="">{{ _("Select Email...") }}</option>
