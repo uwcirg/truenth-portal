@@ -500,7 +500,8 @@ class TestUser(TestCase):
             db.session.merge, (user, org, u2, member_of))
         consent = UserConsent(
             user_id=member_of.id, organization_id=org.id,
-            audit=audit, agreement_url='http://example.org')
+            audit=audit, agreement_url='http://example.org',
+            options=STAFF_EDITABLE_MASK)
         with SessionScope(db):
             db.session.add(consent)
             db.session.commit()
