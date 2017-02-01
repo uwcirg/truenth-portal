@@ -124,7 +124,7 @@ function _redirect(userId) {
 
 $(document).ready(function(){
 
-    var _userId = '', _demoArray = {}, _orgArray = {};
+    var _userId = '', _demoArray = {}, _accountArray = {};
     var hasError = false;
     var errorMessage = '';
 
@@ -135,22 +135,25 @@ $(document).ready(function(){
         });
     });
 
+    function getParentOrgId(obj) {
+        var parentOrgId =  $(obj).attr("data-parent-id");
+        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        return parentOrgId;
+    };
+
     function getConsents() {
         var orgs = {}, consents = [];
         $("#createProfileForm input[name='organization']:checkbox").each(function() {
             if ($(this).prop("checked")) {
-                var orgId, parentOrg;
-                parentOrg = $(this).attr("data-parent-id");
-                if (!hasValue(parentOrg)) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-
+                var consent_org_id;
                 {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
-                    orgId = parentOrg;
+                    consent_org_id = getParentOrgId(this);
                 {% else %}
-                    orgId = $(this).val();
+                    consent_org_id = $(this).val();
                 {% endif %}
-                if (!orgs[orgId]) {
-                    orgs[orgId] = true;
-                    consents.push({"organization_id": orgId, "agreement_url": $("#" + parentOrg + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
+                if (!orgs[consent_org_id]) {
+                    orgs[consent_org_id] = true;
+                    consents.push({"organization_id": consent_org_id, "agreement_url": $("#" + getParentOrgId(this) + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
                 };
             };
         });
@@ -165,16 +168,9 @@ $(document).ready(function(){
     };
 
     function setHelpText(elementId, message, hasError) {
-
         var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
-
-        if (hasError) {
-            $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
-
-        } else {
-            $("#" + elementId).find(".help-block").text("").css("color", NORMAL_COLOR);
-        };
-
+        if (hasError) $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
+        else $("#" + elementId).find(".help-block").text("").css("color", NORMAL_COLOR);
     };
 
     $('#createProfileForm').validator().on('submit', function (e) {
@@ -227,39 +223,37 @@ $(document).ready(function(){
 
                 $("#updateProfile").attr("disabled", true);
 
-
-                _demoArray['resourceType'] = 'Patient';
-                _demoArray['name'] = {
-                    'given': $.trim($('input[name=firstname]').val()),
-                    'family':$.trim($('input[name=lastname]').val())
-                };
-                _demoArray['birthDate'] = $('input[name=birthDate]').val();
-                _demoArray['telecom'] = [
-                    { 'system': 'email', 'value': $.trim($('input[name=email]').val()) },
-                    { 'system': 'phone', 'value': $.trim($('input[name=phone]').val()) }
-                ];
-
                 var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                     return { organization_id: $(this).val() };
                 }).get();
                
-                _demoArray['organizations'] = orgIDs;
-            
-                _demoArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
-                _demoArray['consents'] = getConsents();
+                _accountArray['organizations'] = orgIDs;
+                _accountArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
+                _accountArray['consents'] = getConsents();
                 //console.log(_demoArray)
 
-                _get('/api/account', 'POST', JSON.stringify(_demoArray))
+                _get('/api/account', 'POST', JSON.stringify(_accountArray))
                 .then(function(responseData) {
 
                     _userId = responseData['user_id'];
-                    //console.log('user: ' + _userId);
+                
+                    _demoArray['resourceType'] = 'Patient';
+                    _demoArray['name'] = {
+                        'given': $.trim($('input[name=firstname]').val()),
+                        'family':$.trim($('input[name=lastname]').val())
+                    };
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['telecom'] = [
+                        { 'system': 'email', 'value': $.trim($('input[name=email]').val()) },
+                        { 'system': 'phone', 'value': $.trim($('input[name=phone]').val()) }
+                    ];
 
                      var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
         
                     _demoArray['careProvider'] = orgIDs;
+
 
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
