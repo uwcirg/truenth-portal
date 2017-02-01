@@ -58,7 +58,7 @@
             <br/>
           </div>
           <div class="modal-footer">
-            <a href="#" onclick="location.replace('/login-as/{{user.id}}');" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+            <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
           </div>
         </div>
@@ -163,6 +163,11 @@ pcaLocalizedStatus = {% if pca_localized_status %}true{%else%}false{%endif%};
 
 {% endif %}
 
+
+function handleLoginAs() {
+    sessionStorage.setItem("loginAsPatient", "true");
+    location.replace('/login-as/{{user.id}}');
+};
 
 $(document).ready(function(){
     $('#loginAsPatient a').tooltip();
