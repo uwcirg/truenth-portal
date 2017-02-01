@@ -29,9 +29,9 @@ def extract_context(comment):
             r'client .* releasing role',r'updated .* using']),
         ('account',['register','merging','account','marking deleted',
             'purging','registration']),
+        ('user',['time of death','deceased','demographics']),
         ('organization',['organization',r'adding .* to']),
         ('consent',['consent']),
-        ('user',['time of death','deceased','demographics']),
         ('observation',['observation']),
         ('group',['group']),
         ('procedure',['procedure']),
@@ -50,7 +50,7 @@ def upgrade():
     op.add_column('audit', sa.Column('subject_id', sa.Integer()))
     op.create_foreign_key('audit_subject_id_fkey', 'audit', 'users', ['subject_id'], ['id'])
 
-    op.add_column('audit', sa.Column('context', sa.Integer(), nullable=True))
+    op.add_column('audit', sa.Column('context', sa.Text(), nullable=True))
 
     # copying user_id to subject_id for existing audit rows
     bind = op.get_bind()
