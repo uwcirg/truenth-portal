@@ -5,39 +5,54 @@ cache: pip
 addons:
   postgresql: "9.4"
 
-# setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
-git:
-  depth: 2000
-
 services:
   - postgresql
   - redis-server
-  - docker
 env:
+  matrix:
+    - TOXENV=py27
+    - TOXENV=docs
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
     - PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json'
 
+    - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
+    - IMAGE_NAME=${IMAGE_NAME:-portal_web}
+    - BINTRAY_DEB_REPO=${BINTRAY_DEB_REPO:-true_nth}
+    - BINTRAY_DOCKER_REPO=${BINTRAY_DOCKER_REPO:-portal}
+
 matrix:
   include:
-    - env: TOXENV=docs
-    - env:
-        - TOXENV=ui
+    - env: TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
+    - env: TOXENV=build
+      services:
+        - docker
+  # Build artifacts only (no testing)
+  allow_failures:
+    - env: TOXENV=build
+      services:
+        - docker
 
 before_install:
   # Set Github env vars
   - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
   - export GH_USERNAME GH_REPO
+  - export SHORT_HASH=${TRAVIS_COMMIT::8}
 
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then export DEPLOY=true;fi
 
-  # Set TOXENV default (if not overridden by matrix environmental variables)
+  # Set TOXENV default (if not already set by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
+
+  # Fetch all remote branches instead of just the currently checked out one
+  - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
+  - git fetch --unshallow
 
   - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
 
@@ -50,21 +65,36 @@ install:
 script:
   - tox
 
-before_deploy:
-  - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
+after_success:
+  # Only run build steps in corresponding tox env
+  - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
+  # Set docker tag based on branch
+  - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH}}
+
+  - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
+  - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
-  - docker run -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "portal_builddeb:test"
+  - docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "portal_builddeb:test"
+
+  # Copy artifacts off volume mounted on previous container
   - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
-  - cp /tmp/artifacts/* ../
+  # Copy artifacts to current directory to allow local installation
+  - cp --recursive --verbose /tmp/artifacts artifacts
+  - docker build --file docker/Dockerfile  --tag "$IMAGE_NAME:$SHORT_HASH" --tag "$IMAGE_NAME:$TAG" --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER" .
+
+before_deploy:
+  - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
+  - docker login --username "$GH_USERNAME" --password "$BINTRAY_API_KEY" "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io"
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker login --username "$DOCKER_CLOUD_USERNAME" --password "$DOCKER_CLOUD_API_KEY" https://index.docker.io/v1/;fi
 
   # Build bintray descriptor file dynamically
   - >
     printf '
     {
         "package": {
-            "name": "true_nth_usa_portal",
-            "repo": "true_nth",
+            "name": "$PACKAGE_NAME",
+            "repo": "$BINTRAY_DEB_REPO",
             "subject": "$GH_USERNAME",
             "public_download_numbers": false,
             "public_stats": false
@@ -75,8 +105,8 @@ before_deploy:
         },
         "files": [
             {
-                "includePattern": "../(.+\\.deb)$",
-                "uploadPattern": "/$1",
+                "includePattern": "artifacts/(.+\\.deb)$",
+                "uploadPattern": "artifacts/$1",
                 "matrixParams": {
                     "deb_distribution": "stable",
                     "deb_component": "main",
@@ -93,10 +123,17 @@ deploy:
   on:
     all_branches: true
     condition:
-      - $TOXENV = py27
+      - $TOXENV = build
       - $DEPLOY = true
       - -v BINTRAY_API_KEY
   provider: bintray
   file: "bintray.json"
   user: $GH_USERNAME
   key: $BINTRAY_API_KEY
+
+after_deploy:
+  - docker tag $IMAGE_NAME:latest "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
+  - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
+
+  - docker tag $IMAGE_NAME:latest "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:latest"
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker push "docker.io/$DOCKER_CLOUD_USERNAME/$IMAGE_NAME";fi

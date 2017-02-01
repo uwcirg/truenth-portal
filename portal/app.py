@@ -7,6 +7,8 @@ import sys
 import requests_cache
 from flask import Flask
 from flask_webtest import get_scopefunc
+import redis
+from urlparse import urlparse
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
@@ -236,6 +238,18 @@ def configure_metadata(app):
 
 def configure_cache(app):
     """Configure requests-cache"""
+    REQUEST_CACHE_URL = app.config.get("REQUEST_CACHE_URL")
+    redis_url = urlparse(REQUEST_CACHE_URL)
+
     requests_cache.install_cache(
-        cache_name=app.name, backend='redis', expire_after=180,
-        include_get_headers=True, old_data_on_error=True)
+        cache_name=app.name,
+        backend='redis',
+        expire_after=180,
+        include_get_headers=True,
+        old_data_on_error=True,
+        connection=redis.StrictRedis(
+            host=redis_url.hostname if redis_url.hostname else None,
+            port=redis_url.port if redis_url.port else None,
+            db=redis_url.path.split('/')[1] if redis_url.hostname else None,
+        ),
+    )

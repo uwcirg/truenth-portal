@@ -1,0 +1,15 @@
+---
+version: '2.1'
+services:
+  builder:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.build
+    environment:
+      - BRANCH=${BRANCH:-develop}
+      - REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+    volumes:
+      - debian-repo:/tmp/artifacts
+volumes:
+  debian-repo:
+    driver: local

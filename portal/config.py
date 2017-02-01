@@ -1,14 +1,22 @@
 """Configuration"""
 import os
+import redis
 from flask_script import Server
 
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
     ANONYMOUS_USER_ACCOUNT = True
-    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_BROKER_URL = os.environ.get(
+        'CELERY_BROKER_URL',
+        'redis://localhost:6379/0'
+    )
+    REQUEST_CACHE_URL = os.environ.get(
+        'REQUEST_CACHE_URL',
+        'redis://localhost:6379/0'
+    )
     CELERY_IMPORTS = ('portal.tasks', )
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
     LOG_FOLDER = os.environ.get(
@@ -32,9 +40,31 @@ class BaseConfig(object):
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
+        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+    )
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
+
+
+    SESSION_REDIS_URL = os.environ.get(
+        'SESSION_REDIS_URL',
+        'redis://localhost:6379/0'
+    )
+
+    from urlparse import urlparse
+    redis_url = urlparse(SESSION_REDIS_URL)
+
+    # Todo: create issue @ fengsp/flask-session
+    # config values aren't typically objects...
+    SESSION_REDIS = redis.Redis(
+        host=redis_url.hostname if redis_url.hostname else None,
+        port=redis_url.port if redis_url.port else None,
+        db=redis_url.path.split('/')[1] if redis_url.hostname else None,
+    )
+
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
     USER_AFTER_LOGIN_ENDPOINT = 'auth.next_after_login'
@@ -67,10 +97,7 @@ class TestConfig(BaseConfig):
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'SQLALCHEMY_DATABASE_URI',
-        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
-    )
+
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'

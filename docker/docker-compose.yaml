@@ -1,0 +1,31 @@
+---
+version: '2.1'
+services:
+  web:
+    image: "uwcirg-docker-${BINTRAY_DOCKER_REPO:-portal}.bintray.io/${IMAGE_NAME:-portal_web}:latest"
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
+    ports:
+      - "${EXTERNAL_PORT:-8080}:80"
+    environment:
+      - APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
+      - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
+    depends_on:
+      - db
+      - redis
+  redis:
+    image: redis
+    ports:
+      - "6379"
+  db:
+    image: postgres
+    ports:
+      - "5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+volumes:
+  postgres-data:
+    driver: local
