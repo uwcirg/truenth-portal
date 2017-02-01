@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta http-equiv="Expires" content="Thu, 01 Jan 1970 00:00:00 GMT" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     {% set stylesheet = url_for('static', filename=config.PORTAL_STYLESHEET) %}
@@ -126,9 +129,35 @@ function _setHostName(url) {
 };
 _setHostName(PORTAL_NAV_PAGE);
 
+var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+if (LOGIN_AS_PATIENT) {
+  $(window).bind("load", function(){ window.history.forward();});
+  $(window).bind("unload", function(){ if (navigator.userAgent.indexOf("Firefox") > 0) location.reload();});
+  $(window).bind('popstate', function(event) {
+    // if the event has our history data on it, load the page fragment with AJAX
+    if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
+        location.reload();
+    }
+  });
+  $(window).bind("pageshow", function(event) {
+      if (((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) && (event.persisted || event.originalEvent.persisted)) {
+        location.reload();
+      };
+  });
+  $(window).bind('popstate', function(event) {
+      if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
+          location.reload();
+      };
+   });
+};
+
 {% block document_ready %}
+
 $(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
+   $('[data-toggle="popover"]').popover();
+   $(window).unload(function(){});
+});
+
 });
 {% endblock %}
 </script>

@@ -276,6 +276,27 @@
         <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
       {% endif %}
       <script>
+
+          var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+          if (LOGIN_AS_PATIENT) {
+              $(window).bind("load", function(){ window.history.forward(); });
+              $(window).bind("unload", function(){});
+              $(window).bind('popstate', function(event) {
+                // if the event has our history data on it, load the page fragment with AJAX
+                if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
+                    location.reload();
+                }
+              });
+              $(window).bind("pageshow", function(event) {
+                  if (((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) && (event.persisted || event.originalEvent.persisted)) location.reload();
+              });
+              $(window).bind('popstate', function(event) {
+                  if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
+                      location.reload();
+                  };
+               });
+          };
+
           function _readCookie(name) {
             var nameEQ = name + "=";
             var ca = document.cookie.split(';');
