@@ -915,10 +915,19 @@ class User(db.Model, UserMixin):
             # agreement at a higher level in the orgtree than the provider,
             # in which case the patient's organization must be a child
             # of the provider's organization for access.
+
+            # As long as the consent is valid (not expired or deleted) it's
+            # adequate for 'view'.  'edit' requires the staff_editable option
+            # on the consent.
             orgtree = OrgTree()
             if other.has_role(ROLE.PATIENT):
-                others_con_org_ids = [
-                    oc.organization_id for oc in other.valid_consents]
+                if permission == 'edit':
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents
+                        if oc.staff_editable]
+                else:
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents]
                 org_ids = [org.id for org in self.organizations]
                 for org_id in org_ids:
                     if orgtree.at_or_below_ids(org_id, others_con_org_ids):

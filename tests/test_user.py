@@ -619,6 +619,47 @@ class TestUser(TestCase):
                 self.assertTrue(
                     staff_leaf.check_role(perm, other_id=patient))
 
+        # Now remove the staff editable flag from the consents, which should
+        # preserve view but remove edit permission
+        for uc in (uc_w, uc_x, uc_y, uc_z):
+            uc = db.session.merge(uc)
+            uc.staff_editable = False
+
+        with SessionScope(db):
+            db.session.commit()
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+            patient_w, patient_x, patient_y, patient_z))
+
+        # top level staff can view all, edit none
+        staff_top = db.session.merge(staff_top)
+        for patient in (
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_top.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_top.check_role, 'edit', other_id=patient)
+
+        # mid level staff can view all, edit none
+        staff_mid = db.session.merge(staff_mid)
+        for patient in (
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_mid.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_mid.check_role, 'edit', other_id=patient)
+
+        # low level staff can view only those w/ same org; edit none
+        staff_leaf = db.session.merge(staff_leaf)
+        for perm in ('view', 'edit'):
+            for patient in (patient_w_id, patient_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_leaf.check_role, perm, patient)
+        for patient in (patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_leaf.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_leaf.check_role, 'edit', patient)
+
     def test_all_relationships(self):
         # obtain list of all relationships
         rv = self.client.get('/api/relationships')
