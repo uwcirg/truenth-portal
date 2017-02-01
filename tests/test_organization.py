@@ -206,15 +206,6 @@ class TestOrganization(TestCase):
         nodes = OrgTree().all_leaves_below_id(101)  # UWMC - 3 children
         self.assertEquals(3, len(nodes))
 
-    def deepen_org_tree(self):
-        """Create deeper tree for testing"""
-        org_l2 = Organization(id=1002, name='l2', partOf_id=102)
-        org_l3_1 = Organization(id=10031, name='l3_1', partOf_id=1002)
-        org_l3_2 = Organization(id=10032, name='l3_2', partOf_id=1002)
-        with SessionScope(db):
-            map(db.session.add, (org_l2, org_l3_1, org_l3_2))
-            db.session.commit()
-
     def test_deeper_org_tree(self):
         self.deepen_org_tree()
         leaves = OrgTree().all_leaves_below_id(102)

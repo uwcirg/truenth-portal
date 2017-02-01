@@ -135,66 +135,90 @@ class UserTimezone(Extension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username):
+def permanently_delete_user(username, user_id=None, acting_user=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
+    May pass either username or user_id.  Will prompt for acting_user if not
+    provided.
+
+    :param username: username (email) for user to purge
+    :param user_id: id of user in liew of username
+    :param acting_user: user taking the action, for record keeping
 
     """
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
 
-    actor = raw_input("\n\nWARNING!!!\n\n"
-                      " This will permanently destroy user: {}\n"
-                      " and all their related data.\n\n"
-                      " If you want to contiue, enter a valid user\n"
-                      " email as the acting party for our records: ".\
-                      format(username))
-    acting_user = User.query.filter_by(username=actor).first()
-    if not acting_user or actor == username:
-        raise ValueError("Actor must be a current user other than the target")
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        raise ValueError("No such user: {}".format(username))
-    comment = "purged all trace of {}".format(user)  # while format works
+    if not acting_user:
+        actor = raw_input(
+            "\n\nWARNING!!!\n\n"
+            " This will permanently destroy user: {}\n"
+            " and all their related data.\n\n"
+            " If you want to contiue, enter a valid user\n"
+            " email as the acting party for our records: ".\
+            format(username))
+        acting_user = User.query.filter_by(username=actor).first()
+    if not acting_user:
+        raise ValueError("Acting user not found -- can't continue")
+    if not username:
+        if not user_id:
+            raise ValueError("Must provide username or user_id")
+        else:
+            user = User.query.get(user_id)
+    else:
+        user = User.query.filter_by(username=username).first()
+        if user_id and user.id != user_id:
+                raise ValueError(
+                    "Contridicting username and user_id values given")
 
-    # purge all the types with user foreign keys, then the user itself
-    UserRelationship.query.filter(
-        or_(UserRelationship.user_id==user.id,
-            UserRelationship.other_user_id==user.id)).delete()
-    UserObservation.query.filter_by(user_id=user.id).delete()
-    UserIntervention.query.filter_by(user_id=user.id).delete()
-    consent_audits = Audit.query.join(
-        UserConsent, UserConsent.audit_id==Audit.id).filter(
-        UserConsent.user_id==user.id)
-    UserConsent.query.filter_by(user_id=user.id).delete()
-    for ca in consent_audits:
-        db.session.delete(ca)
-    tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
-    for t in tous:
-        db.session.delete(t)
-    for o in user.observations:
-        db.session.delete(o)
-    # Can't delete audit rows owned by this user, in cases like observations
-    # Update those to point to user doing the purge.
-    ob_audits = Audit.query.join(
-        Observation).filter(Audit.id==Observation.audit_id).filter(
-            Audit.user_id==user.id)
-    for au in ob_audits:
-        au.user_id = acting_user.id
-    Audit.query.filter_by(user_id=user.id).delete()
-    for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
-        db.session.delete(ap)
+    def purge_user(user, acting_user):
+        if not user:
+            raise ValueError("No such user: {}".format(username))
+        if acting_user.id == user.id:
+            raise ValueError(
+                "Actor must be a current user other than the target")
 
-    # the rest should die on cascade rules
-    db.session.delete(user)
-    db.session.commit()
+        comment = "purged all trace of {}".format(user)  # while format works
 
-    # record this event
-    db.session.add(Audit(user_id=acting_user.id, comment=comment))
-    db.session.commit()
+        # purge all the types with user foreign keys, then the user itself
+        UserRelationship.query.filter(
+            or_(UserRelationship.user_id==user.id,
+                UserRelationship.other_user_id==user.id)).delete()
+        UserObservation.query.filter_by(user_id=user.id).delete()
+        UserIntervention.query.filter_by(user_id=user.id).delete()
+        consent_audits = Audit.query.join(
+            UserConsent, UserConsent.audit_id==Audit.id).filter(
+            UserConsent.user_id==user.id)
+        UserConsent.query.filter_by(user_id=user.id).delete()
+        for ca in consent_audits:
+            db.session.delete(ca)
+        tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+        for t in tous:
+            db.session.delete(t)
+        for o in user.observations:
+            db.session.delete(o)
+        # Can't delete audit rows owned by this user, in cases like observations
+        # Update those to point to user doing the purge.
+        ob_audits = Audit.query.join(
+            Observation).filter(Audit.id==Observation.audit_id).filter(
+                Audit.user_id==user.id)
+        for au in ob_audits:
+            au.user_id = acting_user.id
+        Audit.query.filter_by(user_id=user.id).delete()
+        for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
+            db.session.delete(ap)
 
+        # the rest should die on cascade rules
+        db.session.delete(user)
+        db.session.commit()
+
+        # record this event
+        db.session.add(Audit(user_id=acting_user.id, comment=comment))
+        db.session.commit()
+
+    purge_user(user, acting_user)
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
@@ -616,6 +640,113 @@ class User(db.Model, UserMixin):
             d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
         return d
 
+    def update_consents(self, consent_list, acting_user):
+        """Update user's consents
+
+        Adds the provided list of consent agreements to the user.
+        If the user had pre-existing consent agreements between the
+        same organization_id, the new will replace the old
+
+        """
+        delete_consents = []  # capture consents being replaced
+        for consent in consent_list:
+            audit = Audit(user_id=acting_user.id,
+                          comment="Adding consent agreement")
+            # Look for existing consent for this user/org
+            for existing_consent in self.valid_consents:
+                if existing_consent.organization_id == consent.organization_id:
+                    delete_consents.append(existing_consent)
+
+            if hasattr(consent, 'acceptance_date'):
+                # Move data to where it belongs, in the audit row
+                audit.timestamp = consent.acceptance_date
+                del consent.acceptance_date
+
+            consent.audit = audit
+            db.session.add(consent)
+        for replaced in delete_consents:
+            replaced.deleted = Audit(
+                comment="new consent replacing existing", user_id=self.id)
+        db.session.commit()
+
+    def update_orgs(self, org_list, acting_user, excuse_top_check=False):
+        """Update user's organizations
+
+        Uses given list of organizations as the definitive list for
+        the user - meaning any current affiliations not mentioned will
+        be deleted.
+
+        :param org_list: list of organization objects for user's orgs
+        :param acting_user: user behind the request for permission checks
+        :param excuse_top_check: Set True to excuse check for changes
+          to top level orgs, say during initial account creation
+
+        """
+
+        def allow_org_change(org, user, acting_user):
+            """staff can not modify their own org affiliation at all
+
+            as per
+            https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
+            raise exception if staff or staff-admin  is attempting to
+            change their own org affiliations.
+
+            """
+            if (not acting_user.has_role(ROLE.ADMIN)
+                and acting_user.has_role(ROLE.PROVIDER)
+                and user.id == acting_user.id):
+                raise ValueError(
+                    "staff can't change their own organization affiliations")
+            return True
+
+        remove_if_not_requested = {org.id: org for org in
+                                   self.organizations}
+        for org in org_list:
+            if org.id in remove_if_not_requested:
+                remove_if_not_requested.pop(org.id)
+            if org not in self.organizations:
+                if not excuse_top_check:
+                    allow_org_change(org, user=self, acting_user=acting_user)
+                self.organizations.append(org)
+        for org in remove_if_not_requested.values():
+            if not excuse_top_check:
+                allow_org_change(org, user=self, acting_user=acting_user)
+            self.organizations.remove(org)
+
+    def update_roles(self, role_list, acting_user):
+        """Update user's roles
+
+        :param role_list: list of role objects defining exactly what
+          roles the user should have.  Any existing roles not mentioned
+          will be deleted from user's list
+        :param acting_user: user performing action, for permissions, etc.
+
+        """
+        # Don't allow promotion of service accounts
+        if self.has_role(ROLE.SERVICE):
+            abort(400, "Promotion of service users not allowed")
+
+        remove_if_not_requested = {role.id: role for role in self.roles}
+        for role in role_list:
+            # Don't allow others to add service to their accounts
+            if role.name == ROLE.SERVICE:
+                abort(400, "Service role is restricted to service accounts")
+            if role.id in remove_if_not_requested:
+                remove_if_not_requested.pop(role.id)
+            else:
+                self.roles.append(role)
+                audit = Audit(
+                    comment="added {} to user {}".format(
+                    role, self.id), user_id=acting_user.id)
+                db.session.add(audit)
+
+        for stale_role in remove_if_not_requested.values():
+            self.roles.remove(stale_role)
+            audit = Audit(
+                comment="deleted {} from user {}".format(
+                stale_role, self.id), user_id=acting_user.id)
+            db.session.add(audit)
+
     def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
@@ -631,36 +762,6 @@ class User(db.Model, UserMixin):
             """Return None unless the value contains data"""
             if value:
                 return value.rstrip() or None
-
-        def update_orgs():
-            def allow_org_change(org, user, acting_user):
-                """don't allow non-admin providers to change top level orgs
-
-                as per
-                https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
-                raise exception if non-admin provider is attempting to
-                change their top level orgs
-
-                """
-                if org.partOf_id is None:  # top-level orgs
-                    if not acting_user.has_role(ROLE.ADMIN) and\
-                       user.has_role(ROLE.PROVIDER):
-                        raise ValueError("non-admin providers can't change "
-                                         "their high-level orgs")
-                return True
-
-            remove_if_not_requested = {org.id: org for org in
-                                       self.organizations}
-            for item in fhir['careProvider']:
-                org = reference.Reference.parse(item)
-                if org.id in remove_if_not_requested:
-                    remove_if_not_requested.pop(org.id)
-                if org not in self.organizations:
-                    allow_org_change(org, user=self, acting_user=acting_user)
-                    self.organizations.append(org)
-            for org in remove_if_not_requested.values():
-                allow_org_change(org, user=self, acting_user=acting_user)
-                self.organizations.remove(org)
 
         def update_deceased(fhir):
             if 'deceasedDateTime' in fhir:
@@ -725,7 +826,9 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
-            update_orgs()
+            org_list = [reference.Reference.parse(item) for item in
+                        fhir['careProvider']]
+            self.update_orgs(org_list, acting_user)
         db.session.add(self)
 
     def merge_with(self, other_id):
@@ -795,18 +898,52 @@ class User(db.Model, UserMixin):
         other = User.query.get(other_id)
         if not other:
             abort(404, "User not found {}".format(other_id))
-        for role in self.roles:
-            if role.name in (ROLE.ADMIN, ROLE.SERVICE):
-                # Admin and service accounts have carte blanche
-                return True
-            if role.name == ROLE.PROVIDER:
-                # Providers get carte blanche on members with a signed
-                # consent for the same parent organization
-                user_orgs = set((c.id for c in self.organizations))
-                others_orgs = set(
-                    (c.organization_id for c in other.valid_consents))
-                if user_orgs.intersection(others_orgs):
-                    return True
+
+        if self.has_role(ROLE.ADMIN):
+            return True
+        if self.has_role(ROLE.SERVICE):
+            # Ideally, only users attached to the same intervention
+            # as the service token would qualify.  Edge cases around
+            # account creation and loose coupling between patients
+            # and interventions result in carte blanche for service
+            return True
+
+        if self.has_role(ROLE.PROVIDER):
+            # Providers have full access to all patients with a valid consent
+            # at or below the same level of the org tree as provider has
+            # associations with.  Furthermore, a patient may have a consent
+            # agreement at a higher level in the orgtree than the provider,
+            # in which case the patient's organization must be a child
+            # of the provider's organization for access.
+
+            # As long as the consent is valid (not expired or deleted) it's
+            # adequate for 'view'.  'edit' requires the staff_editable option
+            # on the consent.
+            orgtree = OrgTree()
+            if other.has_role(ROLE.PATIENT):
+                if permission == 'edit':
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents
+                        if oc.staff_editable]
+                else:
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents]
+                org_ids = [org.id for org in self.organizations]
+                for org_id in org_ids:
+                    if orgtree.at_or_below_ids(org_id, others_con_org_ids):
+                        return True
+                #Still here implies time to check 'furthermore' clause
+                others_orgs = [org.id for org in other.organizations]
+                for consented_org in others_con_org_ids:
+                    if orgtree.at_or_below_ids(consented_org, org_ids):
+                        # Okay, consent is partent of staff org
+                        # but it's only good if the patient's *org*
+                        # is at or below the staff's org (could be sibling
+                        # or down different branch of tree)
+                        for org_id in org_ids:
+                            if orgtree.at_or_below_ids(org_id, others_orgs):
+                                return True
+
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):

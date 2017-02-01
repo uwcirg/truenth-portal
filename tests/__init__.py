@@ -173,6 +173,15 @@ class TestCase(Base):
             db.session.add(consent)
             db.session.commit()
 
+    def deepen_org_tree(self):
+        """Create deeper tree when test needs it"""
+        org_l2 = Organization(id=1002, name='l2', partOf_id=102)
+        org_l3_1 = Organization(id=10031, name='l3_1', partOf_id=1002)
+        org_l3_2 = Organization(id=10032, name='l3_2', partOf_id=1002)
+        with SessionScope(db):
+            map(db.session.add, (org_l2, org_l3_1, org_l3_2))
+            db.session.commit()
+
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW
 

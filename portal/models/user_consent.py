@@ -101,7 +101,7 @@ class UserConsent(db.Model):
 
     @classmethod
     def from_json(cls, data):
-        user = User.query.get(data.get('user_id'))
+        user = 'user_id' in data and User.query.get(data['user_id'])
         if not user:
             raise ValueError("required user_id not found")
         org = Organization.query.get(data.get('organization_id'))
@@ -117,6 +117,16 @@ class UserConsent(db.Model):
             user_id=data['user_id'], organization_id=data['organization_id'],
             agreement_url=data['agreement_url'])
 
+        if data.get('expires'):
+            obj.expires = FHIR_datetime.parse(
+                data.get('expires'), error_subject='expires')
+        if data.get('acceptance_date'):
+            # The data model keeps acceptance_date in the audit, which
+            # isn't yet available - add directly to consent for client
+            # to migrate to audit row.
+            obj.acceptance_date = FHIR_datetime.parse(
+                data.get('acceptance_date'),
+                error_subject='acceptance_date')
         for attr in (
             'staff_editable', 'include_in_reports', 'send_reminders'):
             if attr in data:
