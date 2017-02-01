@@ -104,7 +104,7 @@
   {% block upperbanner %}
       {% if not user %}
       <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Have a code from your doctor? Click here to join us
-          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()"> 
+          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
@@ -179,7 +179,19 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Join Us!</h3>
-            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
+            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p>
+            <br/>
+            <p class="box-modal__copy">Do you have access code?</p>
+            <form action="/go" method="post">
+              <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required/>
+              <div class="access-code-container">
+                <a id="accessCodeLink" class="button button-large button--teal">Next</a>
+              </div>
+            </form>
+            <br/>
+            <p class="box-modal__copy"><em>otherwise</em></p>
+            <div class="box-modal__divider"></div>
+            <a href="{{PORTAL}}/user/register" class="button button-large button--teal">Create Account</a>
           </div>
         </div>
       </div>
@@ -340,7 +352,7 @@
                 cache: false
               }).done(function(data) {
                 //console.log(data)
-                var ct = 0;
+                var ct = 0, found_decision_support = false, found_symptom_tracker = false;
                 //$(".side-nav-items__item--decisionsupport").hide();
                 if (data.interventions) {
                   if (data.interventions.length > 0) {
@@ -369,6 +381,9 @@
                               if (ditem.length == 0) { //only draw this when there isn't already one
                                 $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
                               };
+
+                              found_decision_support = true;
+
                               $(".decision-support-link").each(function() {
                                 $(this).attr("href", b);
                                 $(this).removeClass("icon-box__button--disabled");
@@ -390,6 +405,9 @@
                             if (sitem.length == 0) { //only draw this when there isn't already one
                               $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
                             };
+
+                            found_symptom_tracker = true;
+
                             $(this).removeClass("icon-box__button--disabled");
                             $(".symptom-tracker-link").each(function() {
                                 $(this).attr("href", b)
@@ -418,6 +436,23 @@
 
                       };
                   });
+
+                  if (!found_decision_support) {
+                    $(".decision-support-link").each(function() {
+                          $(this).removeAttr("href");
+                          $(this).addClass("icon-box__button--disabled");
+                      });
+                    $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
+                  };
+
+                  if (!found_symptom_tracker) {
+                    $(".symptom-tracker-link").each(function() {
+                        $(this).removeAttr("href");
+                        $(this).addClass("icon-box__button--disabled");
+                    });
+                    $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
+                  };
+
                 };
                 $("#loadingIndicator").hide();
               }).fail(function() {
@@ -441,8 +476,8 @@
 
          $(document).ready(function(){
 
-            checkBannerStatus(); 
-            
+            checkBannerStatus();
+
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
             });
@@ -450,6 +485,12 @@
             $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
                 e.preventDefault();
                 return false;
+            });
+
+            $("#accessCodeLink").on("click", function() {
+                if ($("#shortcut_alias").val() != "") {
+                  location.replace("/go/" + $("#shortcut_alias").val())
+                };
             });
 
             // Configure and start the session timeout monitor
@@ -475,8 +516,8 @@
             $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
               e.stopPropagation();
 
-              if (!$(this).parent().hasClass("side-nav-items__item-disabled") 
-                && !$(this).hasClass("icon-box__button--disabled") 
+              if (!$(this).parent().hasClass("side-nav-items__item-disabled")
+                && !$(this).hasClass("icon-box__button--disabled")
                 && !$(this).parent().hasClass("side-nave-items__item--selected")
                 && !$(this).hasClass("symptom-tracker-link")
                 && !$(this).hasClass("decision-support-link")
