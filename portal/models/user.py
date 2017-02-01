@@ -684,19 +684,19 @@ class User(db.Model, UserMixin):
         """
 
         def allow_org_change(org, user, acting_user):
-            """don't allow non-admin providers to change top level orgs
+            """staff can not modify their own org affiliation at all
 
             as per
             https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
-            raise exception if non-admin provider is attempting to
-            change their top level orgs
+            raise exception if staff or staff-admin  is attempting to
+            change their own org affiliations.
 
             """
-            if org.partOf_id is None:  # top-level orgs
-                if not acting_user.has_role(ROLE.ADMIN) and\
-                   acting_user.has_role(ROLE.PROVIDER):
-                    raise ValueError("non-admin providers can't change "
-                                     "their high-level orgs")
+            if (not acting_user.has_role(ROLE.ADMIN)
+                and acting_user.has_role(ROLE.PROVIDER)
+                and user.id == acting_user.id):
+                raise ValueError(
+                    "staff can't change their own organization affiliations")
             return True
 
         remove_if_not_requested = {org.id: org for org in
