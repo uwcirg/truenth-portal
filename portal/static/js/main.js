@@ -298,7 +298,7 @@ var fillContent = {
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var content = "<table class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', 'Agreement', 'Signed Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
+            ['Organization', 'Consent Status', 'Agreement', 'Consented Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
             });
 
