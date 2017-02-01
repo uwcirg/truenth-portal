@@ -16,7 +16,7 @@ from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship, UserTimezone
-from portal.models.user_consent import UserConsent
+from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
 from portal.models.user import UserIndigenousStatusExtension
 from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
@@ -521,6 +521,103 @@ class TestUser(TestCase):
 
         kwargs = {'permission': 'view', 'other_id': member_of.id}
         self.assertTrue(user.check_role(**kwargs))
+
+    def test_deep_tree_check_role(self):
+        self.deepen_org_tree()
+
+        org_102 = Organization.query.get(102)
+        org_1002 = Organization.query.get(1002)
+        org_10031 = Organization.query.get(10031)
+        org_10032 = Organization.query.get(10032)
+        audit = Audit(comment="testing", user_id=TEST_USER_ID)
+
+        staff_top = self.add_user('Staff 102')
+        self.promote_user(staff_top, ROLE.PROVIDER)
+        staff_top.organizations.append(org_102)
+
+        staff_leaf = self.add_user('Staff 10031')
+        self.promote_user(staff_leaf, ROLE.PROVIDER)
+        staff_leaf.organizations.append(org_10031)
+
+        staff_mid = self.add_user('Staff 1002')
+        self.promote_user(staff_mid, ROLE.PROVIDER)
+        staff_mid.organizations.append(org_1002)
+
+        patient_w = self.add_user('patient w')
+        patient_w_id = patient_w.id
+        self.promote_user(patient_w, ROLE.PATIENT)
+        patient_w.organizations.append(org_10032)
+        uc_w = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_w_id, organization=org_10032,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_x = self.add_user('patient x')
+        patient_x_id = patient_x.id
+        self.promote_user(patient_x, ROLE.PATIENT)
+        patient_x.organizations.append(org_10032)
+        uc_x = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_x_id, organization=org_102,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_y = self.add_user('patient y')
+        patient_y_id = patient_y.id
+        self.promote_user(patient_y, ROLE.PATIENT)
+        patient_y.organizations.append(org_102)
+        uc_y = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_y_id, organization=org_10031,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_z = self.add_user('patient z')
+        patient_z_id = patient_z.id
+        self.promote_user(patient_z, ROLE.PATIENT)
+        patient_z.organizations.append(org_10031)
+        uc_z = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_z_id, organization=org_10031,
+            options=STAFF_EDITABLE_MASK)
+
+        with SessionScope(db):
+            db.session.add(uc_w)
+            db.session.add(uc_x)
+            db.session.add(uc_y)
+            db.session.add(uc_z)
+            db.session.commit()
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+            patient_w, patient_x, patient_y, patient_z))
+
+        ###
+        # Setup complete - test access
+        ###
+
+        # top level staff can view/edit all
+        staff_top = db.session.merge(staff_top)
+        for perm in ('view', 'edit'):
+            for patient in (
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_top.check_role(perm, other_id=patient))
+
+        # mid level staff can view/edit all
+        staff_mid = db.session.merge(staff_mid)
+        for perm in ('view', 'edit'):
+            for patient in (
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_mid.check_role(perm, other_id=patient))
+
+        # low level staff can view/edit only those w/ same org
+        staff_leaf = db.session.merge(staff_leaf)
+        for perm in ('view', 'edit'):
+            for patient in (patient_w_id, patient_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_leaf.check_role, perm, patient)
+        for perm in ('view', 'edit'):
+            for patient in (patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_leaf.check_role(perm, other_id=patient))
 
     def test_all_relationships(self):
         # obtain list of all relationships

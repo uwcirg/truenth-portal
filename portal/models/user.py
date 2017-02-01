@@ -919,18 +919,22 @@ class User(db.Model, UserMixin):
             if other.has_role(ROLE.PATIENT):
                 others_con_org_ids = [
                     oc.organization_id for oc in other.valid_consents]
-                for org in self.organizations:
-                    if orgtree.at_or_below_ids(org.id, others_con_org_ids):
+                org_ids = [org.id for org in self.organizations]
+                for org_id in org_ids:
+                    if orgtree.at_or_below_ids(org_id, others_con_org_ids):
                         return True
                 #Still here implies time to check 'furthermore' clause
+                others_orgs = [org.id for org in other.organizations]
                 for consented_org in others_con_org_ids:
-                    if orgtree.at_or_below_ids(consented_org, org):
+                    if orgtree.at_or_below_ids(consented_org, org_ids):
                         # Okay, consent is partent of staff org
                         # but it's only good if the patient's *org*
                         # is at or below the staff's org (could be sibling
                         # or down different branch of tree)
-                        if orgtree.at_or_below_ids(org, others_orgs):
-                            return True
+                        for org_id in org_ids:
+                            if orgtree.at_or_below_ids(org_id, others_orgs):
+                                return True
+
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):
