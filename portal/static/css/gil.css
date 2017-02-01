@@ -6907,6 +6907,18 @@ a.home--modal-link {
     cursor: pointer;
     margin: 1em 0 !important;
 }
+.access-code-container {
+    margin-top: 1em;
+}
+#modal-register input {
+    width: 100%;
+    margin-top: 0.5em;
+}
+#modal-register .button {
+    height: 68px;
+    font-size: 1em;
+    padding: 2em 0 2.3em 0 !important;
+}
 .capitalize {
     text-transform: capitalize;
 }
@@ -6985,6 +6997,9 @@ a.home--modal-link {
     .home--item-container, .home--item-container h4, .home--item-text * {
         font-size: 1em !important;
         padding: 0.2em;
+    }
+    #modal-register p, #modal-register .button {
+        font-size: 14px;
     }
 }
 
