@@ -1,18 +1,18 @@
 """User API view functions"""
-from flask import abort, current_app, Blueprint, jsonify, url_for
+from flask import abort, Blueprint, jsonify, url_for
 from flask import request, make_response
 from flask_user import roles_required
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..extensions import db, oauth, user_manager
 from ..models.audit import Audit
-from ..models.fhir import FHIR_datetime
 from ..models.group import Group
-from ..models.organization import Organization, OrgTree
+from ..models.organization import Organization
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, permanently_delete_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
@@ -226,7 +226,16 @@ def account():
     db.session.commit()
     auditable_event("new account generated for {}".format(user),
                     user_id=current_user().id)
-    db.session.commit()
+    if not adequate_perms:
+        # Make sure acting user has permission to edit the newly
+        # created user, or generate a 400 and purge the user.
+        try:
+            acting_user.check_role('edit', other_id=user.id)
+        except Unauthorized:
+            permanently_delete_user(
+                username=user.username, user_id=user.id,
+                acting_user=acting_user)
+            abort(400, "Inaccessible user created - review consent and roles")
     return jsonify(user_id=user.id)
 
 

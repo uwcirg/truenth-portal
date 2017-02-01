@@ -318,6 +318,31 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
 
+    def test_failed_account_creation_by_provider(self):
+        # without the right set of consents & roles, should fail 
+        org, org2 = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
+        org_id, org2_id = org.id, org2.id
+        provider = self.add_user('provider@example.com')
+        provider.organizations.append(org)
+        provider.organizations.append(org2)
+        provider_id = provider.id
+        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        data = {
+            'organizations': [{'organization_id': org_id},
+                              {'organization_id': org2_id}],
+            'consents': [{'organization_id': org_id,
+                        'agreement_url': 'http://fake.org',
+                        'staff_editable': True,
+                        'send_reminders': False}],
+            'roles': [{'name': ROLE.PARTNER}],
+            }
+        self.login(user_id=provider_id)
+        rv = self.client.post('/api/account',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
+
     def test_user_by_organization(self):
         # generate a handful of users in different orgs
         org_evens = Organization(name='odds')

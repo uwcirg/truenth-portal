@@ -135,66 +135,90 @@ class UserTimezone(Extension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username):
+def permanently_delete_user(username, user_id=None, acting_user=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
+    May pass either username or user_id.  Will prompt for acting_user if not
+    provided.
+
+    :param username: username (email) for user to purge
+    :param user_id: id of user in liew of username
+    :param acting_user: user taking the action, for record keeping
 
     """
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
 
-    actor = raw_input("\n\nWARNING!!!\n\n"
-                      " This will permanently destroy user: {}\n"
-                      " and all their related data.\n\n"
-                      " If you want to contiue, enter a valid user\n"
-                      " email as the acting party for our records: ".\
-                      format(username))
-    acting_user = User.query.filter_by(username=actor).first()
-    if not acting_user or actor == username:
-        raise ValueError("Actor must be a current user other than the target")
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        raise ValueError("No such user: {}".format(username))
-    comment = "purged all trace of {}".format(user)  # while format works
+    if not acting_user:
+        actor = raw_input(
+            "\n\nWARNING!!!\n\n"
+            " This will permanently destroy user: {}\n"
+            " and all their related data.\n\n"
+            " If you want to contiue, enter a valid user\n"
+            " email as the acting party for our records: ".\
+            format(username))
+        acting_user = User.query.filter_by(username=actor).first()
+    if not acting_user:
+        raise ValueError("Acting user not found -- can't continue")
+    if not username:
+        if not user_id:
+            raise ValueError("Must provide username or user_id")
+        else:
+            user = User.query.get(user_id)
+    else:
+        user = User.query.filter_by(username=username).first()
+        if user_id and user.id != user_id:
+                raise ValueError(
+                    "Contridicting username and user_id values given")
 
-    # purge all the types with user foreign keys, then the user itself
-    UserRelationship.query.filter(
-        or_(UserRelationship.user_id==user.id,
-            UserRelationship.other_user_id==user.id)).delete()
-    UserObservation.query.filter_by(user_id=user.id).delete()
-    UserIntervention.query.filter_by(user_id=user.id).delete()
-    consent_audits = Audit.query.join(
-        UserConsent, UserConsent.audit_id==Audit.id).filter(
-        UserConsent.user_id==user.id)
-    UserConsent.query.filter_by(user_id=user.id).delete()
-    for ca in consent_audits:
-        db.session.delete(ca)
-    tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
-    for t in tous:
-        db.session.delete(t)
-    for o in user.observations:
-        db.session.delete(o)
-    # Can't delete audit rows owned by this user, in cases like observations
-    # Update those to point to user doing the purge.
-    ob_audits = Audit.query.join(
-        Observation).filter(Audit.id==Observation.audit_id).filter(
-            Audit.user_id==user.id)
-    for au in ob_audits:
-        au.user_id = acting_user.id
-    Audit.query.filter_by(user_id=user.id).delete()
-    for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
-        db.session.delete(ap)
+    def purge_user(user, acting_user):
+        if not user:
+            raise ValueError("No such user: {}".format(username))
+        if acting_user.id == user.id:
+            raise ValueError(
+                "Actor must be a current user other than the target")
 
-    # the rest should die on cascade rules
-    db.session.delete(user)
-    db.session.commit()
+        comment = "purged all trace of {}".format(user)  # while format works
 
-    # record this event
-    db.session.add(Audit(user_id=acting_user.id, comment=comment))
-    db.session.commit()
+        # purge all the types with user foreign keys, then the user itself
+        UserRelationship.query.filter(
+            or_(UserRelationship.user_id==user.id,
+                UserRelationship.other_user_id==user.id)).delete()
+        UserObservation.query.filter_by(user_id=user.id).delete()
+        UserIntervention.query.filter_by(user_id=user.id).delete()
+        consent_audits = Audit.query.join(
+            UserConsent, UserConsent.audit_id==Audit.id).filter(
+            UserConsent.user_id==user.id)
+        UserConsent.query.filter_by(user_id=user.id).delete()
+        for ca in consent_audits:
+            db.session.delete(ca)
+        tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+        for t in tous:
+            db.session.delete(t)
+        for o in user.observations:
+            db.session.delete(o)
+        # Can't delete audit rows owned by this user, in cases like observations
+        # Update those to point to user doing the purge.
+        ob_audits = Audit.query.join(
+            Observation).filter(Audit.id==Observation.audit_id).filter(
+                Audit.user_id==user.id)
+        for au in ob_audits:
+            au.user_id = acting_user.id
+        Audit.query.filter_by(user_id=user.id).delete()
+        for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
+            db.session.delete(ap)
 
+        # the rest should die on cascade rules
+        db.session.delete(user)
+        db.session.commit()
+
+        # record this event
+        db.session.add(Audit(user_id=acting_user.id, comment=comment))
+        db.session.commit()
+
+    purge_user(user, acting_user)
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
