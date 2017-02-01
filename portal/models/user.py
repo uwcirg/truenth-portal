@@ -651,8 +651,8 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
-            audit = Audit(user_id=acting_user.id,
-                          comment="Adding consent agreement")
+            audit = Audit(user_id=acting_user.id, subject_id=self.id,
+                          comment="Adding consent agreement",context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
                 if existing_consent.organization_id == consent.organization_id:
@@ -667,7 +667,8 @@ class User(db.Model, UserMixin):
             db.session.add(consent)
         for replaced in delete_consents:
             replaced.deleted = Audit(
-                comment="new consent replacing existing", user_id=self.id)
+                comment="new consent replacing existing", user_id=self.id,
+                subject_id=self.id, context='consent')
         db.session.commit()
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
@@ -738,14 +739,16 @@ class User(db.Model, UserMixin):
                 self.roles.append(role)
                 audit = Audit(
                     comment="added {} to user {}".format(
-                    role, self.id), user_id=acting_user.id)
+                    role, self.id), user_id=acting_user.id,
+                    subject_id=self.id, context='role')
                 db.session.add(audit)
 
         for stale_role in remove_if_not_requested.values():
             self.roles.remove(stale_role)
             audit = Audit(
                 comment="deleted {} from user {}".format(
-                stale_role, self.id), user_id=acting_user.id)
+                stale_role, self.id), user_id=acting_user.id,
+                subject_id=self.id, context='role')
             db.session.add(audit)
 
     def update_from_fhir(self, fhir, acting_user):
