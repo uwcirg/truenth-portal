@@ -272,8 +272,15 @@ class TestUser(TestCase):
         provider.organizations.append(org2)
         provider_id = provider.id
         self.promote_user(user=provider, role_name=ROLE.PROVIDER)
-        data = {'organizations': [{'organization_id': org_id},
-                                  {'organization_id': org2_id}]}
+        data = {
+            'organizations': [{'organization_id': org_id},
+                              {'organization_id': org2_id}],
+            'consents': [{'organization_id': org_id,
+                        'agreement_url': 'http://fake.org',
+                        'staff_editable': True,
+                        'send_reminders': False}],
+            'roles': [{'name': ROLE.PATIENT}],
+            }
         self.login(user_id=provider_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
@@ -301,7 +308,7 @@ class TestUser(TestCase):
         self.assertEquals(new_user.first_name, given)
         self.assertEquals(new_user.last_name, family)
         self.assertEquals(new_user.username, None)
-        self.assertEquals(len(new_user.roles), 0)
+        self.assertEquals(len(new_user.roles), 1)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
         rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
@@ -457,11 +464,15 @@ class TestUser(TestCase):
         org = Organization(name='members only')
         user = self.test_user
         user.organizations.append(org)
-        self.promote_user(user, ROLE.PROVIDER)
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
         audit = Audit(comment='test data', user_id=TEST_USER_ID)
+        self.promote_user(user, ROLE.PROVIDER)
+        self.promote_user(u2, ROLE.PATIENT)
+        self.promote_user(member_of, ROLE.PATIENT)
+        user, org, u2, member_of = map(
+            db.session.merge, (user, org, u2, member_of))
         consent = UserConsent(
             user_id=member_of.id, organization_id=org.id,
             audit=audit, agreement_url='http://example.org')

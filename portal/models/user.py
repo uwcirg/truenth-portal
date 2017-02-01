@@ -616,6 +616,113 @@ class User(db.Model, UserMixin):
             d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
         return d
 
+    def update_consents(self, consent_list, acting_user):
+        """Update user's consents
+
+        Adds the provided list of consent agreements to the user.
+        If the user had pre-existing consent agreements between the
+        same organization_id, the new will replace the old
+
+        """
+        delete_consents = []  # capture consents being replaced
+        for consent in consent_list:
+            audit = Audit(user_id=acting_user.id,
+                          comment="Adding consent agreement")
+            # Look for existing consent for this user/org
+            for existing_consent in self.valid_consents:
+                if existing_consent.organization_id == consent.organization_id:
+                    delete_consents.append(existing_consent)
+
+            if hasattr(consent, 'acceptance_date'):
+                # Move data to where it belongs, in the audit row
+                audit.timestamp = consent.acceptance_date
+                del consent.acceptance_date
+
+            consent.audit = audit
+            db.session.add(consent)
+        for replaced in delete_consents:
+            replaced.deleted = Audit(
+                comment="new consent replacing existing", user_id=self.id)
+        db.session.commit()
+
+    def update_orgs(self, org_list, acting_user, excuse_top_check=False):
+        """Update user's organizations
+
+        Uses given list of organizations as the definitive list for
+        the user - meaning any current affiliations not mentioned will
+        be deleted.
+
+        :param org_list: list of organization objects for user's orgs
+        :param acting_user: user behind the request for permission checks
+        :param excuse_top_check: Set True to excuse check for changes
+          to top level orgs, say during initial account creation
+
+        """
+
+        def allow_org_change(org, user, acting_user):
+            """don't allow non-admin providers to change top level orgs
+
+            as per
+            https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
+            raise exception if non-admin provider is attempting to
+            change their top level orgs
+
+            """
+            if org.partOf_id is None:  # top-level orgs
+                if not acting_user.has_role(ROLE.ADMIN) and\
+                   acting_user.has_role(ROLE.PROVIDER):
+                    raise ValueError("non-admin providers can't change "
+                                     "their high-level orgs")
+            return True
+
+        remove_if_not_requested = {org.id: org for org in
+                                   self.organizations}
+        for org in org_list:
+            if org.id in remove_if_not_requested:
+                remove_if_not_requested.pop(org.id)
+            if org not in self.organizations:
+                if not excuse_top_check:
+                    allow_org_change(org, user=self, acting_user=acting_user)
+                self.organizations.append(org)
+        for org in remove_if_not_requested.values():
+            if not excuse_top_check:
+                allow_org_change(org, user=self, acting_user=acting_user)
+            self.organizations.remove(org)
+
+    def update_roles(self, role_list, acting_user):
+        """Update user's roles
+
+        :param role_list: list of role objects defining exactly what
+          roles the user should have.  Any existing roles not mentioned
+          will be deleted from user's list
+        :param acting_user: user performing action, for permissions, etc.
+
+        """
+        # Don't allow promotion of service accounts
+        if self.has_role(ROLE.SERVICE):
+            abort(400, "Promotion of service users not allowed")
+
+        remove_if_not_requested = {role.id: role for role in self.roles}
+        for role in role_list:
+            # Don't allow others to add service to their accounts
+            if role.name == ROLE.SERVICE:
+                abort(400, "Service role is restricted to service accounts")
+            if role.id in remove_if_not_requested:
+                remove_if_not_requested.pop(role.id)
+            else:
+                self.roles.append(role)
+                audit = Audit(
+                    comment="added {} to user {}".format(
+                    role, self.id), user_id=acting_user.id)
+                db.session.add(audit)
+
+        for stale_role in remove_if_not_requested.values():
+            self.roles.remove(stale_role)
+            audit = Audit(
+                comment="deleted {} from user {}".format(
+                stale_role, self.id), user_id=acting_user.id)
+            db.session.add(audit)
+
     def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
@@ -631,36 +738,6 @@ class User(db.Model, UserMixin):
             """Return None unless the value contains data"""
             if value:
                 return value.rstrip() or None
-
-        def update_orgs():
-            def allow_org_change(org, user, acting_user):
-                """don't allow non-admin providers to change top level orgs
-
-                as per
-                https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
-                raise exception if non-admin provider is attempting to
-                change their top level orgs
-
-                """
-                if org.partOf_id is None:  # top-level orgs
-                    if not acting_user.has_role(ROLE.ADMIN) and\
-                       user.has_role(ROLE.PROVIDER):
-                        raise ValueError("non-admin providers can't change "
-                                         "their high-level orgs")
-                return True
-
-            remove_if_not_requested = {org.id: org for org in
-                                       self.organizations}
-            for item in fhir['careProvider']:
-                org = reference.Reference.parse(item)
-                if org.id in remove_if_not_requested:
-                    remove_if_not_requested.pop(org.id)
-                if org not in self.organizations:
-                    allow_org_change(org, user=self, acting_user=acting_user)
-                    self.organizations.append(org)
-            for org in remove_if_not_requested.values():
-                allow_org_change(org, user=self, acting_user=acting_user)
-                self.organizations.remove(org)
 
         def update_deceased(fhir):
             if 'deceasedDateTime' in fhir:
@@ -725,7 +802,9 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
-            update_orgs()
+            org_list = [reference.Reference.parse(item) for item in
+                        fhir['careProvider']]
+            self.update_orgs(org_list, acting_user)
         db.session.add(self)
 
     def merge_with(self, other_id):
@@ -795,18 +874,39 @@ class User(db.Model, UserMixin):
         other = User.query.get(other_id)
         if not other:
             abort(404, "User not found {}".format(other_id))
-        for role in self.roles:
-            if role.name in (ROLE.ADMIN, ROLE.SERVICE):
-                # Admin and service accounts have carte blanche
-                return True
-            if role.name == ROLE.PROVIDER:
-                # Providers get carte blanche on members with a signed
-                # consent for the same parent organization
-                user_orgs = set((c.id for c in self.organizations))
-                others_orgs = set(
-                    (c.organization_id for c in other.valid_consents))
-                if user_orgs.intersection(others_orgs):
-                    return True
+
+        if self.has_role(ROLE.ADMIN):
+            return True
+        if self.has_role(ROLE.SERVICE):
+            # Ideally, only users attached to the same intervention
+            # as the service token would qualify.  Edge cases around
+            # account creation and loose coupling between patients
+            # and interventions result in carte blanche for service
+            return True
+
+        if self.has_role(ROLE.PROVIDER):
+            # Providers have full access to all patients with a valid consent
+            # at or below the same level of the org tree as provider has
+            # associations with.  Furthermore, a patient may have a consent
+            # agreement at a higher level in the orgtree than the provider,
+            # in which case the patient's organization must be a child
+            # of the provider's organization for access.
+            orgtree = OrgTree()
+            if other.has_role(ROLE.PATIENT):
+                others_con_org_ids = [
+                    oc.organization_id for oc in other.valid_consents]
+                for org in self.organizations:
+                    if orgtree.at_or_below_ids(org.id, others_con_org_ids):
+                        return True
+                #Still here implies time to check 'furthermore' clause
+                for consented_org in others_con_org_ids:
+                    if orgtree.at_or_below_ids(consented_org, org):
+                        # Okay, consent is partent of staff org
+                        # but it's only good if the patient's *org*
+                        # is at or below the staff's org (could be sibling
+                        # or down different branch of tree)
+                        if orgtree.at_or_below_ids(org, others_orgs):
+                            return True
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):
