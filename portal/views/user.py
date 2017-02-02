@@ -1377,6 +1377,12 @@ def user_documents(user_id):
         required: true
         type: integer
         format: int64
+      - name: document_type
+        in: query
+        description:
+          optional document_type to filter results
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -1435,14 +1441,20 @@ def user_documents(user_id):
         current_user().check_role(permission='view', other_id=user_id)
         user = get_user(user_id)
 
+    doctype = request.args.get('document_type')
+    if (doctype):
+        results = user.documents.filter_by(document_type=doctype)
+    else:
+        results = user.documents
+
     return jsonify(user_documents=[d.as_json() for d in
-                                       user.documents])
+                                       results])
 
 
 @user_api.route('/user/<int:user_id>/user_documents/<int:doc_id>')
 @oauth.require_oauth()
 def download_user_document(user_id,doc_id):
-    """Download a user document beloinging to a user
+    """Download a user document belonging to a user
 
     Used to download the file contents of a user document.
 

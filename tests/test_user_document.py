@@ -18,7 +18,7 @@ class TestUserDocument(TestCase):
         #tests whether we can successfully get the list of user documents for a user
         ud1 = UserDocument(document_type="TestFile", uploaded_at=datetime.utcnow(),
                           filename="test_file_1.txt", filetype="txt", uuid="012345")
-        ud2 = UserDocument(document_type="TestFile", uploaded_at=datetime.utcnow(),
+        ud2 = UserDocument(document_type="AlternateTestFile", uploaded_at=datetime.utcnow(),
                           filename="test_file_2.txt", filetype="txt", uuid="098765")
         self.test_user.documents.append(ud1)
         self.test_user.documents.append(ud2)
@@ -29,6 +29,10 @@ class TestUserDocument(TestCase):
         rv = self.client.get('/api/user/{}/user_documents'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json['user_documents']), 2)
+        # tests document_type filter
+        rv = self.client.get('/api/user/{}/user_documents?document_type=TestFile'.format(TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(len(rv.json['user_documents']), 1)
 
 
     def test_post_patient_report(self):
