@@ -21,10 +21,10 @@ Session = sessionmaker()
 def extract_context(comment):
     contexts = [
         ('login',['login','logout']),
-        ('assessment',['patient report']),
+        ('assessment',['patient report','questionnaireresponse']),
         ('authentication',['assuming identity', 'service',
             'inadequate permission','identity challenge',
-            'access token', 'Service']),
+            'access token']),
         ('intervention',['intervention', r'client .* assuming role',
             r'client .* releasing role',r'updated .* using']),
         ('account',['register','merging','account','marking deleted',
@@ -32,7 +32,7 @@ def extract_context(comment):
         ('user',['time of death','deceased','demographics']),
         ('organization',['organization',r'adding .* to']),
         ('consent',['consent']),
-        ('observation',['observation']),
+        ('observation',['observation',r'set codeableconcept .* on user']),
         ('group',['group']),
         ('procedure',['procedure']),
         ('relationship',['relationship']),
