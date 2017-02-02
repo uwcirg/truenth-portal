@@ -134,10 +134,9 @@ if (LOGIN_AS_PATIENT) {
   $(window).bind("load", function(){ window.history.forward();});
   $(window).bind("unload", function(){ if (navigator.userAgent.indexOf("Firefox") > 0) location.reload();});
   $(window).bind('popstate', function(event) {
-    // if the event has our history data on it, load the page fragment with AJAX
     if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
         location.reload();
-    }
+    };
   });
   $(window).bind("pageshow", function(event) {
       if (((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) && (event.persisted || event.originalEvent.persisted)) {
