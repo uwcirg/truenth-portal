@@ -685,7 +685,7 @@
                             $("#gmtText").show();
                         }
                         if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + originalAuthoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
@@ -700,8 +700,8 @@
                         $("#userSessionListTable").show();
 
                 } else {
-                    $("#userSessionsListContainer").hide();
-                    $("#profileSessionListMainContainer").hide();
+                    $("#userSessionListTable").hide();
+                    $("#userSessionsListContainer").append("<span class='text-muted'>No Assessment Data Found.</span>");
                 };
 
             }).fail(function() {
@@ -944,7 +944,7 @@
                         {% if person and person.provider_html() %}
                             {{person.provider_html() | safe}}
                         {% else %}
-                            <div class="text-mute">{{ _("No Reports Available") }}</div>
+                            <div class="text-muted">{{ _("No Reports Available") }}</div>
                         {% endif %}
                     </div>
                 </div>
