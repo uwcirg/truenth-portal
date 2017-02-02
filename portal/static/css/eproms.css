@@ -78,6 +78,14 @@ body {
 #adminTable {
   transition: all 0.5s ease-in;
 }
+
+#profileStudyIDContainer {
+  margin-top: -1em;
+}
+#profileStudyIDContainer input {
+  width: 50%;
+  max-width: 100%;
+}
 .save-info {
   opacity: 0;
   -webkit-transition: opacity 0.8s ease-in;
@@ -962,10 +970,10 @@ table.profile-audit-log TH,
   }
 }
 .side {
-  height: 26em;
+  height: 28em;
 }
 .side-md {
-  height: 22em;
+  height: 27em;
 }
 .side-lg {
   height: 32em;
@@ -1288,10 +1296,14 @@ div.org-container input[type="checkbox"] {
     font-size: 0.85em;
   }
   .side {
-    height: 38em;
+    height: 45em !important;
   }
   #phone,
   #email {
+    width: 100%;
+    max-width: 100%;
+  }
+  #profileStudyIDContainer input {
     width: 100%;
     max-width: 100%;
   }
@@ -1424,7 +1436,7 @@ div.org-container input[type="checkbox"] {
     height: 10em;
   }
   .side {
-    height: 35em;
+    height: 40em;
   }
   .side-lg {
     height: 38em;

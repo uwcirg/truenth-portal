@@ -60,6 +60,9 @@ a.btn {
   padding: 0.1em auto;
   color: #5a5a5a;
 }
+#profileStudyIDContainer {
+  display: none;
+}
 .save-info {
   opacity: 0;
   -webkit-transition: opacity 0.8s ease-in;

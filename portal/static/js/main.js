@@ -359,6 +359,15 @@ var fillContent = {
             $("#terms").fadeIn();
         };
     },
+    "subjectId": function(data) {
+        if (data.identifier) {
+            (data.identifier).forEach(function(item) {
+                if (item.system == "http://us.truenth.org/identity-codes/external-study-id") {
+                    if (hasValue(item.value)) $("#profileStudyId").val(item.value);
+                };
+            });
+        };
+    },
     "consentList" : function(data, userId, errorMessage, errorCode) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
             var dataArray = data["consent_agreements"].sort(function(a,b){
@@ -743,6 +752,49 @@ var assembleContent = {
                     );
                 };
             };
+
+
+            var studyId = $("#profileStudyId").val();
+            if (hasValue(studyId)) {
+                studyId = $.trim(studyId);
+                var identifiers = null;
+                //get current identifier(s)
+                $.ajax ({
+                    type: "GET",
+                    url: '/api/demographics/'+userId,
+                    async: false
+                }).done(function(data) {
+                    if (data && data.identifier) identifiers = data.identifier;
+                }).fail(function() {
+                   // console.log("Problem retrieving data from server.");
+                });
+
+                var studySource = "";
+                //use the parent org name for the study source
+                $("#userOrgs input[name='organization']").each(function() {
+                    if (!studySource && $(this).prop("checked")) {
+                        var parentOrg = $(this).closest(".org-container[data-parent-name]").attr("data-parent-name");
+                        if (hasValue(parentOrg)) studySource = parentOrg;
+                    };
+                });
+
+                var studyIdObj = {
+                    assigner: {
+                        "display": hasValue(studySource)? studySource : "current study"
+                    },
+                    system: "http://us.truenth.org/identity-codes/external-study-id",
+                    use: "secondary",
+                    value: studyId
+                };
+
+                if (identifiers) {
+                    identifiers.push(studyIdObj);
+                } else {
+                    identifiers = [studyIdObj];
+                };
+                demoArray["identifier"] = identifiers;
+            };
+            
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
 
@@ -1299,10 +1351,11 @@ var tnthAjax = {
             };
         });
     },
-    "getDemo": function(userId, noOverride) {
+    "getDemo": function(userId, noOverride, sync) {
         $.ajax ({
             type: "GET",
-            url: '/api/demographics/'+userId
+            url: '/api/demographics/'+userId,
+            async: (sync ? false: true)
         }).done(function(data) {
             if (!noOverride) {
                 fillContent.race(data);
@@ -1311,6 +1364,7 @@ var tnthAjax = {
                 fillContent.orgs(data);
                 fillContent.demo(data);
                 fillContent.timezone(data);
+                fillContent.subjectId(data);
             }
             loader();
         }).fail(function() {
