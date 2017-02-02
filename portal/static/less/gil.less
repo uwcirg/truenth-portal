@@ -5959,6 +5959,9 @@ figure.nav-overlay {
     .side-nav * {
         font-size: 14px
     }
+    .side-nav *, h3.side-nav__heading {
+        font-size: 12px !important;
+    }
 }
 .is-nav-expanded .side-nav {
     left: 0;
@@ -6007,6 +6010,12 @@ figure.nav-overlay {
 .side-nav-items__item-disabled {
     opacity: 0.6;
 }
+@media (max-width: 680px) {
+    .side-nav-items__item {
+        line-height: 26px;
+    }
+}
+
 @media (max-width: 767px) {
     .side-nav-items__item {
         font-size: 22px;
