@@ -56,7 +56,7 @@ pexpect==4.2.1
 pickleshare==0.7.4
 pkginfo==1.4.1
 pluggy==0.4.0
-prompt-toolkit==1.0.10
+prompt-toolkit==1.0.11
 psycopg2==2.6.2
 ptpython==0.36
 ptyprocess==0.5.1
