@@ -46,14 +46,19 @@ class TestDemographics(TestCase):
         dob = '1999-01-31'
         dod = '2027-12-31T09:10:00'
         gender = 'Male'
+        phone = "867-5309"
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "birthDate": dob,
                 "deceasedDateTime": dod,
                 "gender": gender,
-                "telecom": [{
-                    "system": "phone",
-                    "value": "867-5309"
+                "telecom": [
+                    {
+                        "system": "phone",
+                        "value": phone,
+                    }, {
+                        "system": 'email',
+                        'value': '__no_email__'
                     }],
                 "extension": [{
                     "url":
@@ -82,6 +87,12 @@ class TestDemographics(TestCase):
 
         self.assert200(rv)
         fhir = json.loads(rv.data)
+        for item in fhir['telecom']:
+            if item['system'] == 'phone':
+                self.assertEquals(phone, item['value'])
+            else:
+                self.fail(
+                    'unexpected telecom system: {}'.format(item['system']))
         self.assertEquals(fhir['birthDate'], dob)
         self.assertEquals(fhir['deceasedDateTime'], dod)
         self.assertEquals(fhir['gender'], gender.lower())
@@ -91,6 +102,8 @@ class TestDemographics(TestCase):
         self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
+        self.assertTrue(user._email.startswith('__no_email__'))
+        self.assertTrue(user.email is None)
         self.assertEquals(user.first_name, given)
         self.assertEquals(user.last_name, family)
         self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
