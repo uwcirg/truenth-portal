@@ -190,10 +190,9 @@ def update_card_html_on_completion():
             else:
                 potential_instruments = ('prems', 'eortc')
 
-            # Need to remove completed instruments (or the user has
-            # to repeat that instruments).
-            # TODO: refactor needed - for now, repeat call
-            # to get status per instrument
+            # Need to remove completed instruments
+            # TODO: refactor needed
+            # for now, repeat call to get status per instrument
             instrument_id = []
             for instrument in potential_instruments:
                 results = most_recent_survey(user, instrument)
