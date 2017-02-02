@@ -185,7 +185,20 @@ def update_card_html_on_completion():
             link_label = 'Begin questionnaire'
             if status == 'In Progress':
                 link_label = 'Continue quesionnaire in progress'
-            instrument_id = ['epic26', 'eproms_add'] if localized else 'eortc'
+            if localized:
+                potential_instruments = ('epic26', 'eproms_add')
+            else:
+                potential_instruments = ('prems', 'eortc')
+
+            # Need to remove completed instruments (or the user has
+            # to repeat that instruments).
+            # TODO: refactor needed - for now, repeat call
+            # to get status per instrument
+            instrument_id = []
+            for instrument in potential_instruments:
+                results = most_recent_survey(user, instrument)
+                if 'completed' not in results:
+                    instrument_id.append(instrument)
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
                instrument_id=instrument_id,

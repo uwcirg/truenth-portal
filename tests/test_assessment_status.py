@@ -70,6 +70,7 @@ class TestAssessment(TestCase):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "Completed")

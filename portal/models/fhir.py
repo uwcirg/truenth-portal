@@ -651,4 +651,14 @@ def assessment_status(user, consent=None):
             (1, "Due"),
             (30, "Overdue")
         )
-        return status_per_instrument('eortc', thresholds)
+        eortc_status = status_per_instrument('eortc', thresholds)
+        prems_status = status_per_instrument('prems', thresholds)
+        if eortc_status == prems_status:
+            # Same state - return like value
+            return eortc_status
+        else:
+            if "Expired" in (eortc_status, prems_status):
+                # One expired, but not both
+                return "Partially Completed"
+            return "In Progress"
+
