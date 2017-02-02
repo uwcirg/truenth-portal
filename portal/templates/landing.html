@@ -52,6 +52,7 @@
 {% block document_ready %}
     $("document").ready(function() {
         $("#fullSizeBox").closest("div.col-lg-12").css("padding", "0");
+        if (typeof sessionStorage != "undefined") sessionStorage.clear();
     });
 {% endblock %}
 

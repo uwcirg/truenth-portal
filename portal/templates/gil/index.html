@@ -132,6 +132,7 @@
             $("body").attr("class", "page-home");
             setSelectedNavItem($(".side-nav-items__item--home"));
             {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
+            if (typeof sessionStorage != "undefined") sessionStorage.clear();
         });
     </script>
   {% endblock %}
