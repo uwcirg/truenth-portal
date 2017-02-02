@@ -6,7 +6,7 @@ from tests.test_assessment_status import mock_qr
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC, QuestionnaireResponse
+from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
@@ -330,6 +330,7 @@ class TestIntervention(TestCase):
 
         # Add a fake assessments and see a change
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
