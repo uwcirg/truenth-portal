@@ -4,7 +4,7 @@ from dateutil import parser
 from flask import abort, current_app
 import json
 import pytz
-from sqlalchemy import and_, UniqueConstraint
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
@@ -551,18 +551,18 @@ def localized_PCa(user):
 
 
 def most_recent_survey(user, instrument_id=None):
-    """Look up timestamp for most recently completed QuestionnaireResponse
+    """Look up timestamp for recent QuestionnaireResponse for user
 
     :param user: Patient to whom completed QuestionnaireResponses belong
     :param instrument_id: Optional parameter to limit type of
         QuestionnaireResponse in lookup.
-    :return: authored (timestamp) of the most recent QuestionnaireResponse,
-        else None
+    :return: dictionary with authored (timestamp) of the most recent
+        QuestionnaireResponse keyed by status found
 
     """
-    query = QuestionnaireResponse.query.filter(and_(
-        QuestionnaireResponse.subject_id == user.id,
-        QuestionnaireResponse.status == 'completed'))
+    query = QuestionnaireResponse.query.distinct(
+        QuestionnaireResponse.status).filter(
+        QuestionnaireResponse.subject_id == user.id)
     if instrument_id:
         query = query.filter(
             QuestionnaireResponse.document[
@@ -570,10 +570,15 @@ def most_recent_survey(user, instrument_id=None):
             ].astext.endswith(instrument_id))
 
     query = query.order_by(
+        QuestionnaireResponse.status,
         QuestionnaireResponse.authored).limit(
-            1).with_entities(QuestionnaireResponse.authored)
-    qr = query.first()
-    return qr[0] if qr else None
+            5).with_entities(QuestionnaireResponse.status,
+                            QuestionnaireResponse.authored)
+    results = {}
+    for qr in query:
+        if qr[1] not in results:
+            results[qr[0]] = qr[1]
+    return results
 
 
 def assessment_status(user, consent=None):
@@ -612,9 +617,11 @@ def assessment_status(user, consent=None):
 
         :return: matching status string from constraints
         """
-        completion = most_recent_survey(user, instrument_id)
-        if completion:
+        recents = most_recent_survey(user, instrument_id)
+        if 'completed' in recents:
             return "Completed"
+        if 'in-progress' in recents:
+            return "In Progress"
         delta = today - consent_date
         for days_allowed, message in thresholds:
             if delta < timedelta(days=days_allowed+1):

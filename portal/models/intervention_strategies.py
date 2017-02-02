@@ -149,7 +149,8 @@ def update_card_html_on_completion():
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
-        authored = most_recent_survey(user)
+        recents = most_recent_survey(user)
+        authored = recents.get('completed')
         localized = localized_PCa(user)
         status = assessment_status(user)
         if status in ('Due', 'Overdue', 'In Progress'):
