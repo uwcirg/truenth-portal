@@ -680,6 +680,13 @@ input.clinic {
 #profileCreateForm h4 {
   margin-left: 3em;
 }
+#noEmailContainer {
+  margin-top: 0.3em;
+}
+#noEmail {
+  position:relative; 
+  top:-1px
+}
 #profileSendEmailContainer {
   padding-bottom: 5%;
   background-color: #f9f9f9;
