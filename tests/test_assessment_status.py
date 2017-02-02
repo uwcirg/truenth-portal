@@ -1,7 +1,6 @@
 """Module to test assessment_status"""
 from datetime import datetime
 from flask_webtest import SessionScope
-import json
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -9,7 +8,7 @@ from portal.models.fhir import CC, QuestionnaireResponse, assessment_status
 from tests import TestCase, TEST_USER_ID
 
 
-def mock_qr(user_id, instrument_id):
+def mock_qr(user_id, instrument_id, status='completed'):
     today = datetime.utcnow()
     qr_document = {
         "questionnaire": {
@@ -20,7 +19,8 @@ def mock_qr(user_id, instrument_id):
         }
     }
     qr = QuestionnaireResponse(
-        subject_id=TEST_USER_ID, status='completed',
+        subject_id=TEST_USER_ID,
+        status=status,
         authored=today,
         document=qr_document)
     with SessionScope(db):
@@ -43,8 +43,19 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
 
         self.test_user = db.session.merge(self.test_user)
-        assessment_status(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "Completed")
+
+    def test_localized_inprogress_on_time(self):
+        # User finished both on time
+        self.bless_with_basics()  # pick up a consent, etc.
+        self.mark_localized()
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add',
+                status='in-progress')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
+                status='in-progress')
+
+        self.test_user = db.session.merge(self.test_user)
+        self.assertEquals(assessment_status(self.test_user), "In Progress")
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
@@ -59,6 +70,7 @@ class TestAssessment(TestCase):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         self.test_user = db.session.merge(self.test_user)
         self.assertEquals(assessment_status(self.test_user), "Completed")
