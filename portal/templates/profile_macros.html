@@ -1172,7 +1172,7 @@
     {% else %}
         <div class="row">
             <div class="col-md-7 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-custom side-md{%endif%}">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role('patient') %}
                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
                      {% else %}
