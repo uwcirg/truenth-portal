@@ -856,7 +856,6 @@
                 };
             {% endif %}
 
-
         };
         $(function () {
             $("#patientQ").show();
@@ -1105,6 +1104,13 @@
         );
     </script>
 {%- endmacro %}
+{% macro profileStudyID(person) -%}
+    <div id="profileStudyIDContainer" class="form-group">
+        <label class="text-muted">Study ID</label>
+        <input type="text" id="profileStudyId" class="form-control" required/>
+        <div class="help-block with-errors"></div>
+    </div>
+{%- endmacro %}
 {% macro profileCustomDetail(person) -%}
      <div class="row">
         <div class="col-md-12 col-xs-12">
@@ -1158,6 +1164,7 @@
                     <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                 </div>
             </div>
             <div class="col-md-6 col-xs-12">
@@ -1172,7 +1179,7 @@
     {% else %}
         <div class="row">
             <div class="col-md-7 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-md side-custom{%endif%}">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}{% if person.has_role('patient') %}side{%else%}side-md{%endif%}{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role('patient') %}
                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
                      {% else %}
@@ -1181,10 +1188,11 @@
                      <br/>
                      {{profileName(person)}}
                      {{profileBirthDate(person)}}
+                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                 </div>
             </div>
             <div class="col-md-5 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-md{%endif%}"">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}{% if person.has_role('patient') %}side{%else%}side-md{%endif%}{%else%}side-md side-custom{%endif%}">
                     <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
                     <br/>
                     {{profileEmail(person)}}
