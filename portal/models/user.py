@@ -13,6 +13,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
+import time
 
 from .audit import Audit
 
@@ -31,6 +32,7 @@ from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import Telecom
 
 INVITE_PREFIX = "__invite__"
+NO_EMAIL_PREFIX = "__no_email__"
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
@@ -377,13 +379,25 @@ class User(db.Model, UserMixin):
         # its being used in a query statement (email.ilike('foo'))
         if isinstance(self._email, basestring):
             if self._email.startswith(INVITE_PREFIX):
+                # strip the invite prefix for UI
                 return self._email[len(INVITE_PREFIX):]
+
+            if self._email.startswith(NO_EMAIL_PREFIX):
+                # return None as we don't have an email
+                return None
 
         return self._email
 
     @email.setter
     def email(self, email):
-        self._email = email
+        if email == NO_EMAIL_PREFIX:
+            # Need a unique value to avoid unique constraint
+            if self.id:
+                self._email = NO_EMAIL_PREFIX + str(self.id)
+            else:
+                self._email = NO_EMAIL_PREFIX + str(time.time())
+        else:
+            self._email = email
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
