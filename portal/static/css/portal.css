@@ -1128,7 +1128,7 @@ div.org-container legend {
   color: #474848;
 }
 div.org-container label.org-label{
-  margin: 0.1em 0;
+  margin: 0.12em 0 0.14em 0
 }
 div.org-container .text-muter {
   margin-bottom: 4px;
@@ -1142,8 +1142,9 @@ div.org-container input[type="checkbox"] {
   right:4px;
 }
 #fillOrgs .divider {
-  display:block;
-  height:0.25em;
+  display: block;
+  height: 0.27em;
+  margin-bottom: 0.15em;
 }
 #profileProcedureContainer #tnthproc {
   max-width: 95%;
@@ -1156,11 +1157,11 @@ div.org-container input[type="checkbox"] {
   padding: 0 1em;
 }
 .registration-status-container {
-  margin:0 0 0.8em 0; 
+  margin:0 0 0.8em 0;
   font-size: 0.95em;
 }
 .registration-label {
-  display:inline-block; 
+  display:inline-block;
   opacity: 0.7;
   font-size: 1em;
 }
@@ -1441,6 +1442,7 @@ div.org-container input[type="checkbox"] {
   .form-group input[type=checkbox] {
     position: relative;
     margin-right: 3px;
+    top: -1px;
   }
   /** Unless explicitly wrapped in reduce-font-sizes class **/
   body .reduce-font-sizes {
