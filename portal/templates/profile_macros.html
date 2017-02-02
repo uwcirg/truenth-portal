@@ -477,6 +477,9 @@
 
         $(function () {
              var ww = $(window).width();
+             var auditUserId = $("#audit_user_id").val();
+             var userTimeZone = getUserTimeZone(auditUserId);
+             var userLocale = getUserLocale(auditUserId);
 
             $.ajax ({
                 type: "GET",
@@ -496,7 +499,8 @@
                         else item["by"] = "-";
                         //console.log(r.exec(String(item["by"])));
 
-                        item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
+                        if (String(userTimeZone).toUpperCase() != "UTC") item["lastUpdated"] = convertUserDateTimeByLocaleTimeZone(String(item["lastUpdated"]), userTimeZone, userLocale);
+                        else item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -536,12 +540,14 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Date/Time (GMT)',
+                                title: 'Date/Time' + (userTimeZone == "UTC" ? " (GMT)" : ""),
                                 sortable: true,
                                 searchable: true,
+                                /******
                                 sorter: function(a, b) {
                                     return new Date(b).getTime() - new Date(a).getTime();
                                 },
+                                ****/
                                 width: '20%'
                             },
                             {
@@ -645,7 +651,7 @@
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small>( {{ _("GMT Time Zone") }} )</small></th></tr>
+            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText">( {{ _("GMT Time Zone") }} )</small></th></tr>
         </table>
         <div id="profileSessionListError" style="color: #a94442"></div>
     </div>
@@ -653,6 +659,8 @@
         $(function () {
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
+        var userTimeZone = getUserTimeZone(sessionUserId);
+        var userLocale = getUserLocale(sessionUserId);
 
         $.ajax ({
                 type: "GET",
@@ -668,7 +676,14 @@
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         var authoredDate = String(entry['authored']);
-                        //console.log(arrRefs)
+                        var originalAuthoredDate = authoredDate;
+                        if (userTimeZone != "UTC") {
+                            authoredDate = convertUserDateTimeByLocaleTimeZone(authoredDate, userTimeZone, userLocale);
+                            $("#gmtText").hide();
+                        }
+                        else {
+                            $("#gmtText").show();
+                        }
                         if (instrumentId) {
                             var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
@@ -684,7 +699,10 @@
                         $("#userSessionListTable").append(sessionListHTML);
                         $("#userSessionListTable").show();
 
-                } else $("#profileSessionListMainContainer").hide();
+                } else {
+                    $("#userSessionsListContainer").hide();
+                    $("#profileSessionListMainContainer").hide();
+                };
 
             }).fail(function() {
                 console.log("Problem retrieving session data from server.");
@@ -710,6 +728,10 @@
             var sessionListHTML = "";
             var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
+            var userTimeZone = getUserTimeZone(sessionUserId);
+            var userLocale = getUserLocale(sessionUserId);
+            var convertedAuthoredDate = convertUserDateTimeByLocaleTimeZone(sessionAuthoredDate, userTimeZone, userLocale);
+
             $.ajax ({
                     type: "GET",
                     url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
@@ -731,7 +753,8 @@
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         String(entry['authored']).replace(/[tz]/gi, " ") +
-                                        ' GMT</span><hr/></caption>';
+                                        convertedAuthoredDate.replace(/[tz]/gi, " ") +
+                                        (String(userTimeZone).toLowerCase() == "utc" ? ' GMT': "") + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '';
@@ -929,6 +952,50 @@
     </div>
 {%- endmacro %}
 
+{% macro profileTimeZone(person) %}
+    <div id="profileTimeZoneGroup" class="form-group">
+        <label>Time Zone</label>
+        <select class="form-control" id="profileTimeZone">
+            <option value="UTC">-- Select --</option>
+            <option value="America/Denver">America/Denver</option>
+            <option value="America/Los_Angeles">America/Los Angeles</option>
+            <option value="America/Indianapolis">America/Indianapolis</option>
+            <option value="America/New_York">America/New York</option>
+            <option value="Australia/Adelaide">Australia/Adelaide</option>
+            <option value="Australia/Brisbane">Australia/Brisbane</option>
+            <option value="Australia/Broken_Hill">Australia/Broken_Hill</option>
+            <option value="Australia/Canberra">Australia/Canberra</option>
+            <option value="Australia/Currie">Australia/Currie</option>
+            <option value="Australia/Darwin">Australia/Darwin</option>
+            <option value="Australia/Eucla">Australia/Eucla</option>
+            <option value="Australia/Hobart">Australia/Hobart</option>
+            <option value="Australia/LHI">Australia/LHI</option>
+            <option value="Australia/Lindeman">Australia/Lindeman</option>
+            <option value="Australia/Lord_Howe">Australia/Lord_Howe</option>
+            <option value="Australia/Melbourne">Australia/Melbourne</option>
+            <option value="Australia/NSW">Australia/NSW</option>
+            <option value="Australia/North">Australia/North</option>
+            <option value="Australia/Perth">Australia/Perth</option>
+            <option value="Australia/Queensland">Australia/Queensland</option>
+            <option value="Australia/South">Australia/South</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+            <option value="Australia/Tasmania">Australia/Tasmania</option>
+            <option value="Australia/Victoria">Australia/Victoria</option>
+            <option value="Australia/West">Australia/West</option>
+            <option value="Australia/Yancowinna">Australia/Yancowinna</option>
+        </select>
+    </div>
+    <script>
+    $(function() {
+         $('#profileTimeZone').on('change', function() {
+            setTimeout(function(){
+                window.location.reload(true);
+            },1000);
+        });
+    });
+    </script>
+{%-endmacro %}
+
 {% macro profileDeceased(person, current_user) -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
@@ -1103,55 +1170,28 @@
             </div>
         </div>
     {% else %}
-         {% if person.has_role('patient') %}
-            <div class="row">
-                <div class="col-md-7 col-xs-12">
-                    <div class="profile-item-container side">
-                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
-                         <br/>
-                         {{profileName(person)}}
-                         {{profileBirthDate(person)}}
-                    </div>
-                </div>
-                <div class="col-md-5 col-xs-12">
-                    <div class="profile-item-container side">
-                        <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
-                        <br/>
-                        {{profileEmail(person)}}
-                        {{profilePhone(person)}}
-                        {{profileLocale(person)}}
-                    </div>
+        <div class="row">
+            <div class="col-md-7 col-xs-12">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-custom side-md{%endif%}">
+                     {% if person.has_role('patient') %}
+                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
+                     {% else %}
+                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("User Information") }}</h4>
+                     {% endif %}
+                     <br/>
+                     {{profileName(person)}}
+                     {{profileBirthDate(person)}}
                 </div>
             </div>
-         {% else %}
-            <div class="row">
-                <div class="col-md-7 col-xs-12">
-                    <div class="profile-item-container side">
-                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("User Information") }}</h4>
-                         <br/>
-                         <div class="row">
-                            <div class="col-md-11 col-xs-11">
-                                {{profileName(person)}}
-                                {{profileBirthDate(person)}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 col-xs-12">
-                    <div class="profile-item-container side">
-                        <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-11 col-xs-11">
-                                {{profileEmail(person)}}
-                                {{profilePhone(person)}}
-                                {{profileLocale(person)}}
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-5 col-xs-12">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side{%else%}side-md{%endif%}"">
+                    <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    <br/>
+                    {{profileEmail(person)}}
+                    {{profilePhone(person)}}
                 </div>
             </div>
-         {% endif %}
+        </div>
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
@@ -1199,17 +1239,6 @@
         </div>
     </div>
 
-    {% if person and (person.has_role('patient') or person.has_role('partner'))%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-
     {%if person and person.has_role('patient')%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -1229,6 +1258,31 @@
                             {{profileIndigenous(person)|show_macro('indigenous')}}
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div  class="profile-item-container">
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title">Locale / Time Zone</h4>
+                <div class="flex">
+                    <div class="timezone-container">
+                        {{profileLocale(person)}}
+                    </div>
+                    <div class="timezone-container">
+                        {{profileTimeZone(person)}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if person and (person.has_role('patient') or person.has_role('partner'))%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>

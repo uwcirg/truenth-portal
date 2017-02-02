@@ -929,11 +929,12 @@ table.profile-audit-log TH,
   height: 29em;
 }
 .side-lg {
-  height: 33em;
+  height: 34em;
 }
 .side-md {
-  height: 25em;
+  height: 24em;
 }
+
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -1161,6 +1162,10 @@ div.org-container input[type="checkbox"] {
 .registration-label {
   display:inline-block; 
   opacity: 0.7;
+  font-size: 1em;
+}
+.timezone-container {
+  padding-bottom: 2em;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1242,6 +1247,9 @@ div.org-container input[type="checkbox"] {
   }
   .side {
     height: 40em;
+  }
+  .side-custom {
+    height: 37em;
   }
   #phone,
   #email {
@@ -1385,6 +1393,9 @@ div.org-container input[type="checkbox"] {
   }
   #adminTable .consentdate-field {
     display: none;
+  }
+  .side-custom {
+    height: 35em;
   }
 }
 @media (min-width: 992px) {

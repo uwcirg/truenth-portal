@@ -1075,6 +1075,9 @@ t
 .side-md {
   height: 22em
 }
+.side-lg {
+  height: 32em
+}
 .custom-container {
   display: flex;
   margin-bottom: 2em;
@@ -1097,7 +1100,7 @@ t
   justify-content: flex-start;
 }
 .flex div {
-  margin: 0.5em 1.2em 0.5em 0.1em;
+  margin: 0.5em 1.7em 0.5em 0.1em;
 }
 
 .pagination {
@@ -1350,6 +1353,10 @@ div.org-container input[type="checkbox"] {
 .registration-label {
   display:inline-block; 
   opacity: 0.7;
+  font-size: 0.99em;
+}
+.timezone-container {
+  padding-bottom: 2em;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1503,6 +1510,9 @@ div.org-container input[type="checkbox"] {
   #adminTable .email-field {
     display: none;
   }
+  .timezone-container {
+    padding-bottom: 0;
+  }
 
 }
 
@@ -1569,6 +1579,9 @@ div.org-container input[type="checkbox"] {
   }
   .side {
     height: 35em;
+  }
+  .side-lg {
+    height: 38em;
   }
   .side-xs {
     height: 22em;

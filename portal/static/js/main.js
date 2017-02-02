@@ -107,6 +107,91 @@ var loader = function(show) {
     };
 };
 
+function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
+    if (!dateString) return "";
+    else {
+        if (!timeZone) timeZone = "UTC";
+        if (!locale)  locale = "en-us";
+        //locale needs to be in this format - us-en
+        //month: 'numeric', day: 'numeric',
+        locale = locale.replace("_", "-").toLowerCase();
+        var options = {
+            year: 'numeric', day: 'numeric', month: 'numeric',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+        };
+        options.timeZone =  timeZone;
+        //older browsers don't support this
+        if (window.Intl && typeof Intl != "undefined") {
+            //console.log("dateString: " + dateString)
+            //var convertedDate = new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
+            var convertedDate = new Date(dateString).toLocaleString(locale, options);
+            //console.log("dateString: " + dateString + " convertedDate: " + convertedDate);
+            return convertedDate.replace(/\,/g, "");
+        } else return dateString; //return dateString without conversion
+    };
+};
+
+function getUserTimeZone(userId) {
+    var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
+    var userTimeZone = "";
+    if (selectVal.toLowerCase() ==  "utc" || selectVal == "") {
+        if (userId) {
+            $.ajax ({
+                type: "GET",
+                url: '/api/demographics/'+userId,
+                async: false
+            }).done(function(data) {
+                if (data) {
+                    data.extension.forEach(
+                        function(item, index) {
+                            if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+                                userTimeZone = item.timezone;
+                            };
+                        });
+                };
+
+            }).fail(function() {
+                userTimeZone = "UTC";
+            });
+        };
+    } else userTimeZone = selectVal;
+
+    //console.log("userTimeZone: " + userTimeZone);
+    return userTimeZone ? userTimeZone : "UTC";
+};
+
+function getUserLocale(userId) {
+  var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
+  var locale = "";
+
+  if (!localeSelect) {
+        if (userId) {
+            $.ajax ({
+                    type: "GET",
+                    url: '/api/demographics/'+userId,
+                    async: false
+            }).done(function(data) {
+                if (data && data.communication) {
+                    data.communication.forEach(
+                        function(item, index) {
+                            if (item.language) {
+                                locale = item["language"]["coding"][0].code;
+                                //console.log("locale: " + locale)
+                            };
+                    });
+                };
+
+            }).fail(function() {
+                locale = "en-us";
+            });
+        };
+   } else locale = localeSelect;
+
+   //console.log("locale? " + locale)
+   return locale ? locale : "en-us";
+};
+
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
 var CONSENT_ENUM = {
@@ -283,6 +368,8 @@ var fillContent = {
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
+            var userTimeZone = getUserTimeZone(userId);
+            var userLocale = getUserLocale(userId);
 
             $.ajax ({
                 type: "GET",
@@ -298,7 +385,7 @@ var fillContent = {
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var content = "<table class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', 'Agreement', 'Consented Date (GMT)', 'Expires (GMT)'].forEach(function (title, index) {
+            ['Organization', 'Consent Status', 'Agreement', 'Consented Date <span class="gmt">(GMT)</span>', 'Expires <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
             });
 
@@ -313,6 +400,9 @@ var fillContent = {
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
+                    var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
+                    var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
+                    
 
                     switch(consentStatus) {
                         case "deleted":
@@ -377,10 +467,10 @@ var fillContent = {
                             "_class": "text-center"
                         },
                         {
-                            content: (item.signed).replace("T", " ")
+                            content: (signedDate).replace("T", " ")
                         },
                         {
-                            content: (item.expires).replace("T", " ")
+                            content: (expiresDate).replace("T", " ")
                         }
                     ].forEach(function(cell) {
                         if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
@@ -394,6 +484,9 @@ var fillContent = {
 
             if (hasContent) {
                 $("#profileConsentList").html(content);
+                if (userTimeZone.toUpperCase() != "UTC") $("#profileConsentList .gmt").each(function() {
+                    $(this).hide();
+                });
             } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
 
             if (editable) {
@@ -483,6 +576,17 @@ var fillContent = {
             html: true
         });
     },
+    "timezone": function(data) {
+        data.extension.forEach(function(item, index) {
+            if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+                $("#profileTimeZone option").each(function() {
+                    if ($(this).val() == item.timezone) {
+                        $(this).attr("selected", true);
+                    };
+                });
+            };
+        });
+    },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
             $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' >" + role.name.replace("_", " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
@@ -562,8 +666,8 @@ var assembleContent = {
         if (onProfile) {
 
             // Grab profile field values - looks for regular and hidden, can be checkbox or radio
-            var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus");
-            var ethnicityIDs, raceIDs, indigenousIDs;
+            var e =  $("#userEthnicity"), r = $("#userRace"), i = $("#userIndigenousStatus"), tz = $("#profileTimeZone");
+            var ethnicityIDs, raceIDs, indigenousIDs, tzID;
 
             demoArray["extension"] = [];
 
@@ -614,6 +718,7 @@ var assembleContent = {
                     )
                 };
             };
+
             if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
@@ -625,6 +730,18 @@ var assembleContent = {
                         ]
                     }}
                 ];
+            };
+
+            if (tz.length > 0) {
+                tzID = $("#profileTimeZone option:selected").val();
+                if (tzID) {
+                    demoArray["extension"].push(
+                        {
+                            timezone: tzID,
+                            url: "http://hl7.org/fhir/StructureDefinition/user-timezone"
+                        }
+                    );
+                };
             };
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
@@ -1193,6 +1310,7 @@ var tnthAjax = {
                 fillContent.indigenous(data);
                 fillContent.orgs(data);
                 fillContent.demo(data);
+                fillContent.timezone(data);
             }
             loader();
         }).fail(function() {
