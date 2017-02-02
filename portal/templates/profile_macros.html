@@ -1141,6 +1141,13 @@
         $("#assessPatient").hide();
         $("#loginAsPatient").hide();
         $("#navMenuXs").hide();
+        if (! hasValue($("#email").val()) ){
+            $("#profileEmailSelect").attr("disabled", true);
+        } else $("#profileEmailSelect").attr("disabled", false);
+        $("#email").on("keyup", function() {
+            if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
+            else $("#profileEmailSelect").attr("disabled", true);
+        });
     });</script>
 {%- endmacro %}
 {% macro profile(person, current_user, consent_agreements) -%}
