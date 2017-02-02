@@ -184,7 +184,7 @@ def update_card_html_on_completion():
             """.format(user.display_name, intro=intro)
             link_label = 'Begin questionnaire'
             if status == 'In Progress':
-                link_label = 'Continue quesionnaire in progress'
+                link_label = 'Continue questionnaire in progress'
             if localized:
                 potential_instruments = ('epic26', 'eproms_add')
             else:
