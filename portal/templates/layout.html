@@ -151,12 +151,10 @@ if (LOGIN_AS_PATIENT) {
 };
 
 {% block document_ready %}
-
 $(document).ready(function(){
    $('[data-toggle="popover"]').popover();
    $(window).unload(function(){});
 });
-
 {% endblock %}
 </script>
 {% if config.metadata.version %}<!--Shared services version: {{config.metadata.version}}-->{% endif %}
