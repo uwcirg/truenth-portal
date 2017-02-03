@@ -272,9 +272,11 @@ $(document).ready(function(){
                     var emailVal = $.trim($('input[name=email]').val());
                     if (hasValue(emailVal)) {
                         _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
-                    } else {
-                        _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
-                    };
+                    } 
+                    //not sending in value for email for now
+                    //else {
+                    //    _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
+                    //};
                     _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
                     
                      var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
