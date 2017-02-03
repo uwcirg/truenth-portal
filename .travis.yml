@@ -71,7 +71,7 @@ after_success:
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
   # Set docker tag based on branch
-  - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH}}
+  - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
 
   - docker pull "uwcirg-docker-$BINTRAY_DOCKER_REPO.bintray.io/deb_builder:latest"
   - docker volume create --name debian-repo
