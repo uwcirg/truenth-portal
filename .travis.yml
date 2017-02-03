@@ -129,7 +129,7 @@ deploy:
       - -v BINTRAY_API_KEY
   provider: bintray
   file: "bintray.json"
-  user: $GH_USERNAME
+  user: $BINTRAY_USERNAME
   key: $BINTRAY_API_KEY
 
 after_deploy:
