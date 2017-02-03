@@ -73,13 +73,13 @@ after_success:
   # Set docker tag based on branch
   - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH}}
 
-  - docker build --file docker/Dockerfile.build --tag "portal_builddeb:test" .
+  - docker build --file docker/Dockerfile.build --tag "deb_builder:test" .
   - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
-  - docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "portal_builddeb:test"
+  - docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "deb_builder:test"
 
   # Copy artifacts off volume mounted on previous container
-  - docker cp $(docker ps --quiet --latest --filter ancestor="portal_builddeb:test"):/tmp/artifacts /tmp
+  - docker cp $(docker ps --quiet --latest --filter ancestor="deb_builder:test"):/tmp/artifacts /tmp
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
   - docker build --file docker/Dockerfile  --tag "$IMAGE_NAME:$SHORT_HASH" --tag "$IMAGE_NAME:$TAG" --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER" .
