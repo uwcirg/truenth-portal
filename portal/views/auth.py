@@ -270,7 +270,7 @@ def login(provider_name):
                     provider_id=result.user.id).first()
             if ap:
                 auditable_event("login via {0}".format(provider_name),
-                                user_id=ap.user_id, subject_id=result.user.id,
+                                user_id=ap.user_id, subject_id=ap.user.id,
                                 context='login')
                 user = User.query.filter_by(id=ap.user_id).first()
                 user.image_url=image_url
