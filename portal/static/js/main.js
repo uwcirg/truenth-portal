@@ -44,7 +44,7 @@ function embed_page(data){
         .html(data).promise().done(function() {
             //for firefox? need to figure out why it doesn't show the content if not deling this call??
             if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("loader();", 100);
+                setTimeout("loader();", 300);
                 //console.log("in firefox")
             } else setTimeout("loader();", 0);
 
@@ -57,7 +57,6 @@ function embed_page(data){
 }
 
 function showMain() {
-
     $("#mainHolder").css({
                           "visibility" : "visible",
                           "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
@@ -70,16 +69,18 @@ function showMain() {
 }
 
 function showWrapper(hasLoader) {
-    var cssProp = {"visibility":"visible", "display": "block"};
-    //adding this for firefox fix
-    if (hasLoader) {
-        $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-            //delay removal of loading div to prevent FOUC
-            if (!DELAY_LOADING) {
-                setTimeout('$("#loadingIndicator").fadeOut();', 300);
-            };
-        });
-    } else $("#tnthNavWrapper").css(cssProp);
+    if (!$("#tnthNavWrapper").is(":visible")) {
+        var cssProp = {"visibility":"visible", "display": "block"};
+        //adding this for firefox fix
+        if (hasLoader) {
+            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
+                //delay removal of loading div to prevent FOUC
+                if (!DELAY_LOADING) {
+                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
+                };
+            });
+        } else $("#tnthNavWrapper").css(cssProp);
+    };
 }
 
 // Loading indicator that appears in UI on page loads and when saving
@@ -98,7 +99,7 @@ var loader = function(show) {
         // Otherwise we'll hide it
         //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
-        if (!$("#tnthNavWrapper").is(":visible")) showWrapper(true);
+        showWrapper(true);
         if (!DELAY_LOADING) {
             setTimeout('$("#loadingIndicator").fadeOut();', 300);
         };
