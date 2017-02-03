@@ -209,6 +209,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         for au in ob_audits:
             au.user_id = acting_user.id
         Audit.query.filter_by(user_id=user.id).delete()
+        Audit.query.filter_by(subject_id=user.id).delete()
         for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
             db.session.delete(ap)
 
@@ -217,7 +218,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         db.session.commit()
 
         # record this event
-        db.session.add(Audit(user_id=acting_user.id, comment=comment))
+        db.session.add(Audit(user_id=acting_user.id, comment=comment,
+            subject_id=acting_user.id, context='account'))
         db.session.commit()
 
     purge_user(user, acting_user)
@@ -664,8 +666,8 @@ class User(db.Model, UserMixin):
         """
         delete_consents = []  # capture consents being replaced
         for consent in consent_list:
-            audit = Audit(user_id=acting_user.id,
-                          comment="Adding consent agreement")
+            audit = Audit(user_id=acting_user.id, subject_id=self.id,
+                          comment="Adding consent agreement",context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
                 if existing_consent.organization_id == consent.organization_id:
@@ -680,7 +682,8 @@ class User(db.Model, UserMixin):
             db.session.add(consent)
         for replaced in delete_consents:
             replaced.deleted = Audit(
-                comment="new consent replacing existing", user_id=self.id)
+                comment="new consent replacing existing", user_id=self.id,
+                subject_id=self.id, context='consent')
         db.session.commit()
 
     def update_orgs(self, org_list, acting_user, excuse_top_check=False):
@@ -751,14 +754,16 @@ class User(db.Model, UserMixin):
                 self.roles.append(role)
                 audit = Audit(
                     comment="added {} to user {}".format(
-                    role, self.id), user_id=acting_user.id)
+                    role, self.id), user_id=acting_user.id,
+                    subject_id=self.id, context='role')
                 db.session.add(audit)
 
         for stale_role in remove_if_not_requested.values():
             self.roles.remove(stale_role)
             audit = Audit(
                 comment="deleted {} from user {}".format(
-                stale_role, self.id), user_id=acting_user.id)
+                stale_role, self.id), user_id=acting_user.id,
+                subject_id=self.id, context='role')
             db.session.add(audit)
 
     def update_from_fhir(self, fhir, acting_user):
@@ -788,6 +793,7 @@ class User(db.Model, UserMixin):
                 # Given a time, store and mark as "time of death"
                 audit = Audit(
                     user_id=current_user().id, timestamp=dt,
+                    subject_id=self.id, context='user',
                     comment="time of death for user {}".format(self.id))
                 self.deceased = audit
             elif 'deceasedBoolean' in fhir:
@@ -798,6 +804,7 @@ class User(db.Model, UserMixin):
                         self.deceased_id = None
                         audit = Audit(
                             user_id=current_user().id,
+                            subject_id=self.id, context='user',
                             comment=("Remove existing deceased from "
                                      "user {}".format(self.id)))
                         db.session.add(audit)
@@ -805,9 +812,9 @@ class User(db.Model, UserMixin):
                     # still marked with an audit, but without the special
                     # comment syntax and using default (current) time.
                     audit = Audit(
-                        user_id=current_user().id,
+                        user_id=current_user().id, subject_id=self.id,
                         comment=("Marking user {} as "
-                                 "deceased".format(self.id)))
+                                 "deceased".format(self.id)), context='user')
                     self.deceased = audit
 
         if 'name' in fhir:
@@ -1026,8 +1033,9 @@ class User(db.Model, UserMixin):
                                  [client.id for client in clients]))
 
         self.active = False
-        self.deleted = Audit(user_id=acting_user.id,
-                             comment="marking deleted {}".format(self))
+        self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
+                             comment="marking deleted {}".format(self),
+                             context='account')
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

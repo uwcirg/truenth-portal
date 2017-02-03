@@ -133,13 +133,13 @@ class TestCase(Base):
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
             self.test_user.save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
-                audit=Audit(user_id=TEST_USER_ID))
+                audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
 
     def add_procedure(self, code='367336001', display='Chemotherapy',
                      system=SNOMED):
         "Add procedure data into the db for the test user"
         with SessionScope(db):
-            audit = Audit(user_id=TEST_USER_ID)
+            audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             procedure = Procedure(audit=audit)
             coding = Coding(system=system,
                             code=code,
@@ -163,7 +163,7 @@ class TestCase(Base):
         self.test_user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent
-        audit = Audit(user_id=TEST_USER_ID)
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         tou = ToU(audit=audit, agreement_url='http://not.really.org')
         parent_org = OrgTree().find(org.id).top_level()
         consent = UserConsent(user_id=TEST_USER_ID, organization_id=parent_org,

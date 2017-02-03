@@ -43,7 +43,7 @@ class TestSitePersistence(TestCase):
             code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user = db.session.merge(user)

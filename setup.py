@@ -49,6 +49,7 @@ setup(
     install_requires=(
         "Authomatic",
         "celery",
+        "enum34",
         "Flask",
         "Flask-Babel",
         "Flask-Celery-Helper",

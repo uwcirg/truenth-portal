@@ -73,10 +73,12 @@ def deauthorized():
 
 
 def flask_user_login_event(app, user, **extra):
-    auditable_event("local user login", user_id=user.id)
+    auditable_event("local user login", user_id=user.id, subject_id=user.id,
+                    context='login')
 
 def flask_user_registered_event(app, user, **extra):
-    auditable_event("local user registered", user_id=user.id)
+    auditable_event("local user registered", user_id=user.id, subject_id=user.id,
+                    context='account')
 
 
 # Register functions to receive signals from flask_user
@@ -144,7 +146,8 @@ def next_after_login():
         invited_user_id = session['invited_verified_user_id']
         assert user.id != invited_user_id
         auditable_event("merging invited user {} into account {}".format(
-            invited_user_id, user.id), user_id=user.id)
+            invited_user_id, user.id), user_id=user.id, subject_id=user.id,
+            context='account')
         user.merge_with(invited_user_id)
         invited_user = User.query.get(invited_user_id)
         invited_user.delete_user(acting_user=user)
@@ -267,7 +270,8 @@ def login(provider_name):
                     provider_id=result.user.id).first()
             if ap:
                 auditable_event("login via {0}".format(provider_name),
-                                user_id=ap.user_id)
+                                user_id=ap.user_id, subject_id=result.user.id,
+                                context='login')
                 user = User.query.filter_by(id=ap.user_id).first()
                 user.image_url=image_url
                 db.session.commit()
@@ -285,10 +289,12 @@ def login(provider_name):
                     user = add_authomatic_user(result.user, image_url)
                     db.session.commit()
                     auditable_event("register new user via {0}".\
-                                    format(provider_name), user_id=user.id)
+                                    format(provider_name), user_id=user.id,
+                                    subject_id=user.id, context='account')
                 else:
                     auditable_event("login user via NEW IdP {0}".\
-                                    format(provider_name), user_id=user.id)
+                                    format(provider_name), user_id=user.id,
+                                    subject_id=user.id, context='login')
                     user.image_url=image_url
 
                 ap = AuthProvider(provider=provider_name,
@@ -322,7 +328,8 @@ def login_as(user_id):
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
     auditable_event("assuming identity of user {}".format(user_id),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=user_id,
+                    context='authentication')
     logout(prevent_redirect=True)
     login_user(get_user(user_id))
     return next_after_login()
@@ -387,7 +394,8 @@ def logout(prevent_redirect=False):
 
     if user_id:
         event = 'logout' if not timed_out else 'logout due to timeout'
-        auditable_event(event, user_id=user_id)
+        auditable_event(event, user_id=user_id, subject_id=user_id,
+            context='login')
         # delete_facebook_authorization()  #Not using at this time
 
     logout_user()
@@ -531,14 +539,15 @@ def client():
     db.session.add(client)
     db.session.commit()
     auditable_event("added intervention/client {}".format(
-        client), user_id=user.id)
+        client), user_id=user.id, subject_id=user.id, context='intervention')
 
     # if user selected a role besides the default, set it.
     if form.application_role.data != INTERVENTION.DEFAULT.name:
         selected = form.application_role.data
         intervention = getattr(INTERVENTION, selected)
         auditable_event("client {0} assuming role {1}".format(
-            client.client_id, selected), user_id=user.id)
+            client.client_id, selected), user_id=user.id,
+            subject_id=user.id, context='intervention')
         intervention.client_id = client.client_id
         db.session.commit()
     return redirect(url_for('.client_edit', client_id=client.client_id))
@@ -634,14 +643,17 @@ def client_edit(client_id):
         if current_role and current_role.name != selected:
             current_role.client_id = None
             auditable_event("client {0} releasing role {1}".format(
-                client.client_id, current_role.description), user_id=user.id)
+                client.client_id, current_role.description),
+                user_id=user.id, subject_id=client.user_id,
+                context='intervention')
         if selected != INTERVENTION.DEFAULT.name:
             intervention = getattr(INTERVENTION, selected)
             if intervention.client_id != client.client_id:
                 intervention.client_id = client.client_id
                 auditable_event("client {0} assuming role {1}".format(
                     client.client_id, intervention.description),
-                    user_id=user.id)
+                    user_id=user.id, subject_id=client.user_id,
+                    context='intervention')
 
     if not form.validate_on_submit():
         return render_template('client_edit.html', client=client, form=form,
@@ -651,7 +663,8 @@ def client_edit(client_id):
     redirect_target = url_for('.clients_list')
     if request.form.get('delete'):
         auditable_event("deleted intervention/client {}".format(
-            client.client_id), user_id=user.id)
+            client.client_id), user_id=user.id, subject_id=client.user_id,
+            context='intervention')
         if client.intervention:
             client.intervention.client_id = None
         db.session.delete(client)
@@ -663,10 +676,12 @@ def client_edit(client_id):
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
-        auditable_event("Service account created by", user_id=user.id)
+        auditable_event("service account created by", user_id=user.id,
+            subject_id=client.user_id, context='authentication')
         create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
-            client.client_id), user_id=user.id)
+            client.client_id), user_id=user.id, subject_id=client.user_id,
+            context='authentication')
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
         form.populate_obj(client)
@@ -677,7 +692,8 @@ def client_edit(client_id):
     if b4 != after:
         auditable_event("edited intervention/client {}"
                         " before: <{}> after: <{}>".format(
-                        client.client_id, b4, after), user_id=user.id)
+                        client.client_id, b4, after), user_id=user.id,
+                        subject_id=client.user_id, context='intervention')
     return redirect(redirect_target)
 
 

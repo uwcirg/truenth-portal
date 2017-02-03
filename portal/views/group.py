@@ -159,7 +159,8 @@ def add_group():
     g = Group(name=name, description=request.json['description'])
     db.session.add(g)
     db.session.commit()
-    auditable_event("{g} added".format(g=g), user_id=current_user().id)
+    auditable_event("{g} added".format(g=g), user_id=current_user().id,
+        subject_id=current_user().id, context='group')
     return jsonify(message="ok")
 
 
@@ -232,5 +233,6 @@ def edit_group(group_name):
     g.name = Group.validate_name(request.json['name'])
     g.description = request.json['description']
     db.session.commit()
-    auditable_event("{g} updated".format(g=g), user_id=current_user().id)
+    auditable_event("{g} updated".format(g=g), user_id=current_user().id,
+        subject_id=current_user().id, context='group')
     return jsonify(message="ok")

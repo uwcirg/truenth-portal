@@ -82,6 +82,7 @@ def patient_search():
             # Mask unauthorized as a not-found.  Don't want unauthed users
             # farming information
             auditable_event("looking up users with inadequate permission",
-                            user_id=current_user().id)
+                            user_id=current_user().id, subject_id=user.id,
+                            context='authentication')
             abort(404)
     abort(404)

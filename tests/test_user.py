@@ -492,7 +492,8 @@ class TestUser(TestCase):
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
-        audit = Audit(comment='test data', user_id=TEST_USER_ID)
+        audit = Audit(comment='test data', user_id=TEST_USER_ID,
+            subject_id=TEST_USER_ID)
         self.promote_user(user, ROLE.PROVIDER)
         self.promote_user(u2, ROLE.PATIENT)
         self.promote_user(member_of, ROLE.PATIENT)
@@ -530,7 +531,8 @@ class TestUser(TestCase):
         org_1002 = Organization.query.get(1002)
         org_10031 = Organization.query.get(10031)
         org_10032 = Organization.query.get(10032)
-        audit = Audit(comment="testing", user_id=TEST_USER_ID)
+        audit = Audit(comment="testing", user_id=TEST_USER_ID,
+                      subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
         self.promote_user(staff_top, ROLE.PROVIDER)
@@ -793,7 +795,8 @@ class TestUser(TestCase):
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
-            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a')
+            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a',
+                subject_id=TEST_USER_ID)
             other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))

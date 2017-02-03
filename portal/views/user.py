@@ -225,7 +225,8 @@ def account():
 
     db.session.commit()
     auditable_event("new account generated for {}".format(user),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=user.id,
+                    context='account')
     if not adequate_perms:
         # Make sure acting user has permission to edit the newly
         # created user, or generate a 400 and purge the user.
@@ -364,7 +365,8 @@ def access_url(user_id):
     access_url = url_for(
         'portal.access_via_token', token=token, _external=True)
     auditable_event("generated access token for user {}".format(user_id),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=user.id,
+                    context='authentication')
     return jsonify(access_url=access_url)
 
 
@@ -658,7 +660,8 @@ def delete_user_consents(user_id):
                 setattr(remove_uc, attr, False)
 
     remove_uc.deleted = Audit(
-        user_id=current_user().id, comment="Deleted consent agreement")
+        user_id=current_user().id, subject_id=user_id,
+        comment="Deleted consent agreement", context='consent')
     db.session.commit()
 
     return jsonify(message="ok")
@@ -805,14 +808,16 @@ def set_user_groups(user_id):
         if requested_group not in user.groups:
             user.groups.append(requested_group)
             auditable_event("added {} to user {}".format(
-                requested_group, user.id), user_id=current_user().id)
+                requested_group, user.id), user_id=current_user().id,
+                subject_id=user.id, context='group')
         else:
             remove_if_not_requested.pop(requested_group.id)
 
     for stale_group in remove_if_not_requested.values():
         user.groups.remove(stale_group)
         auditable_event("deleted {} from user {}".format(
-            stale_group, user.id), user_id=current_user().id)
+            stale_group, user.id), user_id=current_user().id,
+            subject_id=user.id, context='group')
 
     if user not in db.session:
         db.session.add(user)
@@ -1068,10 +1073,12 @@ def set_relationships(user_id):
     db.session.commit()
     for ad in audit_adds:
         auditable_event("added {}".format(ad),
-                        user_id=current_user().id)
+                        user_id=current_user().id, subject_id=user.id,
+                        context='relationship')
     for ad in audit_dels:
         auditable_event("deleted {}".format(ad),
-                        user_id=current_user().id)
+                        user_id=current_user().id, subject_id=user.id,
+                        context='relationship')
     # Return user's updated relationship list
     return relationships(user.id)
 
@@ -1583,5 +1590,6 @@ def upload_user_document(user_id):
     db.session.add(doc)
     db.session.commit()
     auditable_event("patient report {} posted for user {}".format(
-        doc.uuid, user_id), user_id=current_user().id)
+        doc.uuid, user_id), user_id=current_user().id, subject_id=user_id,
+        context='assessment')
     return jsonify(message="ok")

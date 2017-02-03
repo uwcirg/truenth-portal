@@ -229,8 +229,9 @@ def access_via_token(token):
         if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
             # only give such tokens 5 minutes - recheck validity
             verify_token(valid_seconds=5*60)
-            auditable_event("promoting user without challeng via token, "
-                            "pending registration", user_id=user.id)
+            auditable_event("promoting user without challenge via token, "
+                            "pending registration", user_id=user.id,
+                            subject_id=user.id, context='account')
             user.mask_email()
             db.session.commit()
             session['invited_verified_user_id'] = user.id
@@ -244,7 +245,8 @@ def access_via_token(token):
     # invited user id, should we need to merge associated details
     # after user proves themselves and logs in
     auditable_event("invited user entered using token, pending "
-                    "registration", user_id=user.id)
+                    "registration", user_id=user.id, subject_id=user.id,
+                    context='account')
     session['challenge.user_id'] = user.id
     session['challenge.next_url'] = url_for('user.register', email=user.email)
     session['challenge.merging_accounts'] = True
@@ -325,7 +327,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
         auditable_event("Failed identity challenge tests with values:"
                         "(first_name={}, last_name={}, birthdate={})".\
                         format(first_name, last_name, birthdate),
-                        user_id=user.id)
+                        user_id=user.id, subject_id=user.id,
+                        context='authentication')
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
@@ -562,7 +565,8 @@ def questions():
     if not user:
         user = add_anon_user()
         db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id)
+        auditable_event("register new anonymous user", user_id=user.id,
+            subject_id=user.id, context='account')
         session['id'] = user.id
         login_user(user)
 
@@ -576,7 +580,8 @@ def questions_anon():
     if not user:
         user = add_anon_user()
         db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id)
+        auditable_event("register new anonymous user", user_id=user.id,
+            subject_id=user.id, context='account')
         session['id'] = user.id
         login_user(user)
     return render_template('questions_anon.html', user=user,

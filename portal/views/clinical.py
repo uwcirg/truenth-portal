@@ -390,12 +390,14 @@ def clinical_set(patient_id):
     if not request.json or 'resourceType' not in request.json or\
             request.json['resourceType'] != 'Observation':
         abort(400, "Requires FHIR resourceType of 'Observation'")
-    audit = Audit(user_id=current_user().id)
+    audit = Audit(user_id=current_user().id, subject_id=patient_id,
+        context='observation')
     code, result = patient.add_observation(request.json, audit)
     if code != 200:
         abort(code, result)
     db.session.commit()
-    auditable_event(result, user_id=current_user().id)
+    auditable_event(result, user_id=current_user().id, subject_id=patient_id,
+        context='observation')
     return jsonify(message=result)
 
 
@@ -415,10 +417,12 @@ def clinical_api_shortcut_set(patient_id, codeable_concept):
     truthiness = ValueQuantity(value=value, units='boolean')
     patient.save_constrained_observation(codeable_concept=codeable_concept,
                                          value_quantity=truthiness,
-                                         audit=Audit(user_id=current_user().id))
+                                         audit=Audit(user_id=current_user().id,
+                                          subject_id=patient_id, context='observation'))
     db.session.commit()
     auditable_event("set {0} {1} on user {2}".format(
-        codeable_concept, truthiness, patient_id), user_id=current_user().id)
+        codeable_concept, truthiness, patient_id), user_id=current_user().id,
+        subject_id=patient_id, context='observation')
     return jsonify(message='ok')
 
 

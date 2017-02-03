@@ -66,8 +66,8 @@ def auditlog_addevent():
     message = request.form.get('message')
     if not message:
         return jsonify(message="missing required 'message' in post")
-    auditable_event('remote message: {0}'.format(message),
-                    user_id=current_user().id)
+    auditable_event('remote message: {0}'.format(message), context='other',
+                    user_id=current_user().id, subject_id=current_user().id)
     return jsonify(message='ok')
 
 
