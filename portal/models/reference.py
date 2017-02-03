@@ -23,7 +23,7 @@ class Reference(object):
     def patient(cls, patient_id):
         """Create a reference object from a known patient id"""
         instance = cls()
-        instance.patient_id = int(patient_id) if patient_id else None
+        instance.patient_id = int(patient_id)
         return instance
 
     @classmethod
