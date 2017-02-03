@@ -106,7 +106,7 @@ fi
 
 # DB Changes
 if [[
-    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 )) &&
+    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/migrations) && $? -eq 0 )) &&
     -z $INIT
 ]]; then
     activate_once
