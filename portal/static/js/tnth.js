@@ -159,7 +159,7 @@ $('.tnth-navbar-toggle').click(function(){
 
 $(document).ready(function(){
   // Once nav is loaded, make the wrapper visible
-  setTimeout('$("#tnthNavWrapper").css("visibility","visible")', 0);
+  setTimeout('$("#tnthNavWrapper").css("visibility","visible")', 100);
 
 });
 

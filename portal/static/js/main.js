@@ -44,7 +44,7 @@ function embed_page(data){
         .html(data).promise().done(function() {
             //for firefox? need to figure out why it doesn't show the content if not deling this call??
             if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("loader();", 100);
+                setTimeout("loader();", 300);
                 //console.log("in firefox")
             } else setTimeout("loader();", 0);
 
@@ -57,7 +57,6 @@ function embed_page(data){
 }
 
 function showMain() {
-
     $("#mainHolder").css({
                           "visibility" : "visible",
                           "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
@@ -70,16 +69,18 @@ function showMain() {
 }
 
 function showWrapper(hasLoader) {
-    var cssProp = {"visibility":"visible", "display": "block"};
-    //adding this for firefox fix
-    if (hasLoader) {
-        $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-            //delay removal of loading div to prevent FOUC
-            if (!DELAY_LOADING) {
-                setTimeout('$("#loadingIndicator").fadeOut();', 300);
-            };
-        });
-    } else $("#tnthNavWrapper").css(cssProp);
+    if (!$("#tnthNavWrapper").is(":visible")) {
+        var cssProp = {"visibility":"visible", "display": "block"};
+        //adding this for firefox fix
+        if (hasLoader) {
+            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
+                //delay removal of loading div to prevent FOUC
+                if (!DELAY_LOADING) {
+                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
+                };
+            });
+        } else $("#tnthNavWrapper").css(cssProp);
+    };
 }
 
 // Loading indicator that appears in UI on page loads and when saving
@@ -99,11 +100,9 @@ var loader = function(show) {
         //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
         showWrapper(true);
-        if ($("#loadingIndicator").is("visible")) {
+        if (!DELAY_LOADING) {
             setTimeout('$("#loadingIndicator").fadeOut();', 300);
-            //console.log("shouldn't get here")
-        }
-        // $("#profileForm").removeClass("loading");
+        };
     };
 };
 
@@ -1655,6 +1654,39 @@ function newHttpRequest(url,callBack)
     xmlhttp.send();
 };
 
+$.ajaxSetup({
+    timeout: 2000, 
+    retryAfter:3000
+});
+var attempts = 0;
+
+funcWrapper = function(param) {
+    attempts++;
+    $.ajax({
+        url: PORTAL_NAV_PAGE,
+        type:'GET',
+        contentType:'text/plain',
+        cache: true,
+        //dataFilter:data_filter,
+        //xhr: xhr_function,
+        crossDomain: true
+        //xhrFields: {withCredentials: true},
+    }, 'html')
+    .done(function(data) {
+        embed_page(data);
+        //showSearch();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+        if (attempts < 3) {
+            setTimeout ( function(){ funcWrapper( param ) }, $.ajaxSetup().retryAfter );
+        } else loader();
+    })
+    .always(function() {
+        loader();
+    });
+};
+
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
@@ -1665,27 +1697,7 @@ $(document).ready(function() {
         if (isIE && isIE <= 9) {
             newHttpRequest(PORTAL_NAV_PAGE, embed_page);
         } else {
-            var initial_xhr = $.ajax({
-                url: PORTAL_NAV_PAGE,
-                type:'GET',
-                contentType:'text/plain',
-                cache: true,
-                //dataFilter:data_filter,
-                //xhr: xhr_function,
-                crossDomain: true
-                //xhrFields: {withCredentials: true},
-            }, 'html')
-            .done(function(data) {
-                embed_page(data);
-                //showSearch();
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-              //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-                loader();
-            })
-            .always(function() {
-                // alert( "complete" );
-            });
+            funcWrapper();
         };
     } else loader();
 
