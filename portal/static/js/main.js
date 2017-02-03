@@ -98,12 +98,10 @@ var loader = function(show) {
         // Otherwise we'll hide it
         //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
-        showWrapper(true);
-        if ($("#loadingIndicator").is("visible")) {
+        if (!$("#tnthNavWrapper").is(":visible")) showWrapper(true);
+        if (!DELAY_LOADING) {
             setTimeout('$("#loadingIndicator").fadeOut();', 300);
-            //console.log("shouldn't get here")
-        }
-        // $("#profileForm").removeClass("loading");
+        };
     };
 };
 
@@ -1655,6 +1653,39 @@ function newHttpRequest(url,callBack)
     xmlhttp.send();
 };
 
+$.ajaxSetup({
+    timeout: 2000, 
+    retryAfter:3000
+});
+var attempts = 0;
+
+funcWrapper = function(param) {
+    attempts++;
+    $.ajax({
+        url: PORTAL_NAV_PAGE,
+        type:'GET',
+        contentType:'text/plain',
+        cache: true,
+        //dataFilter:data_filter,
+        //xhr: xhr_function,
+        crossDomain: true
+        //xhrFields: {withCredentials: true},
+    }, 'html')
+    .done(function(data) {
+        embed_page(data);
+        //showSearch();
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
+        if (attempts < 3) {
+            setTimeout ( function(){ funcWrapper( param ) }, $.ajaxSetup().retryAfter );
+        } else loader();
+    })
+    .always(function() {
+        loader();
+    });
+};
+
 $(document).ready(function() {
 
     if (typeof PORTAL_NAV_PAGE != 'undefined') {
@@ -1665,27 +1696,7 @@ $(document).ready(function() {
         if (isIE && isIE <= 9) {
             newHttpRequest(PORTAL_NAV_PAGE, embed_page);
         } else {
-            var initial_xhr = $.ajax({
-                url: PORTAL_NAV_PAGE,
-                type:'GET',
-                contentType:'text/plain',
-                cache: true,
-                //dataFilter:data_filter,
-                //xhr: xhr_function,
-                crossDomain: true
-                //xhrFields: {withCredentials: true},
-            }, 'html')
-            .done(function(data) {
-                embed_page(data);
-                //showSearch();
-            })
-            .fail(function(jqXHR, textStatus, errorThrown) {
-              //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
-                loader();
-            })
-            .always(function() {
-                // alert( "complete" );
-            });
+            funcWrapper();
         };
     } else loader();
 
