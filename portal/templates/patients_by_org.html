@@ -126,6 +126,7 @@ function getData(userString) {
       url: '/api/consent-assessment-status',
       contentType: "application/json; charset=utf-8",
       data: userString,
+      timeout: 10000,
       dataType: 'json'
   }).done(function(data) {
      // console.log(data);
@@ -136,8 +137,8 @@ function getData(userString) {
             var a = "", s = "", prevItem = {};
             if (c) {
             c.forEach(function(item) {
-                if ((prevItem.assessment_status != item.assessment_status)
-                    && (prevItem.consent_signed != item.consent.signed)){
+                if (!prevItem.consent_signed || ((prevItem.assessment_status != item.assessment_status)
+                    && (prevItem.consent_signed != item.consent.signed))){
                   if (!(/null/.test(item.consent.agreement_url))) {
                     var cl = "";
                     var sd = item.consent.signed? (item.consent.signed).substring(0, 10) : "";
