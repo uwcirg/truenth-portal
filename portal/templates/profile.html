@@ -165,7 +165,12 @@ pcaLocalizedStatus = {% if pca_localized_status %}true{%else%}false{%endif%};
 
 
 function handleLoginAs() {
-    sessionStorage.setItem("loginAsPatient", "true");
+    //sessionStorage does not work allow addition of item in private mode
+    try {
+      sessionStorage.setItem("loginAsPatient", "true");
+    } catch(e) {
+
+    }
     location.replace('/login-as/{{user.id}}');
 };
 

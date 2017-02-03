@@ -69,19 +69,17 @@ function showMain() {
 }
 
 function showWrapper(hasLoader) {
-    if (!$("#tnthNavWrapper").is(":visible")) {
-        var cssProp = {"visibility":"visible", "display": "block"};
-        //adding this for firefox fix
-        if (hasLoader) {
-            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-                //delay removal of loading div to prevent FOUC
-                if (!DELAY_LOADING) {
-                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
-                };
-            });
-        } else $("#tnthNavWrapper").css(cssProp);
-    };
-}
+    var cssProp = {"visibility":"visible", "display": "block"};
+    //adding this for firefox fix
+    if (hasLoader) {
+        $("#tnthNavWrapper").css(cssProp).promise().done(function() {
+            //delay removal of loading div to prevent FOUC
+            if (!DELAY_LOADING) {
+                setTimeout('$("#loadingIndicator").fadeOut();', 300);
+            };
+        });
+    } else $("#tnthNavWrapper").css(cssProp);
+};
 
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
@@ -378,6 +376,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
+            var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
 
             $.ajax ({
                 type: "GET",
@@ -386,15 +385,22 @@ var fillContent = {
             }).done(function(data) {
                 if (data) {
                     data.entry.forEach(function(entry) {
-                        orgs[entry["id"]] = entry["name"];
+                        //console.log(entry["id"] +  " " + entry["name"] + " partOf: " + entry["partOf"])
+                        var oi = entry["id"];
+                        if (hasValue(oi)  && (parseInt(oi) != 0)) {
+                            orgs[oi] = {
+                                "_name" : entry["name"],
+                                "partOf": entry["partOf"] ? (entry["partOf"]["reference"]).split("/")[2] : null
+                            };
+                        };
                     });
                 };
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var content = "<table class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', 'Agreement', 'Consented Date <span class="gmt">(GMT)</span>', 'Expires <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
-                if (title != "n/a") content += "<TH class='consentlist-header" + (index==0?" text-center": "") + "'>" + title + "</TH>";
+            ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
+                if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
 
             var hasContent = false;
@@ -402,7 +408,13 @@ var fillContent = {
             dataArray.forEach(function(item, index) {
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
-                    var orgName = orgs[item.organization_id] ? orgs[item.organization_id]: item.organization_id;
+                    var orgName = "";
+                    var orgId = item.organization_id;
+                    if (orgs[orgId]) {
+                        if(orgs[orgId].partOf && orgs[orgs[orgId].partOf]) orgName = orgs[orgs[orgId].partOf]._name;
+                        else orgName = orgs[orgId]._name;
+                    } else orgName = orgId;
+                    //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
                     var expired = tnthDates.getDateDiff(item.expires);
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
@@ -410,7 +422,7 @@ var fillContent = {
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
-                    
+
 
                     switch(consentStatus) {
                         case "deleted":
@@ -471,14 +483,11 @@ var fillContent = {
                             "_class": "indent"
                         },
                         {
-                            content: "<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a>",
+                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>",
                             "_class": "text-center"
                         },
                         {
                             content: (signedDate).replace("T", " ")
-                        },
-                        {
-                            content: (expiresDate).replace("T", " ")
                         }
                     ].forEach(function(cell) {
                         if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
@@ -492,6 +501,9 @@ var fillContent = {
 
             if (hasContent) {
                 $("#profileConsentList").html(content);
+                if (!ctop) $("#profileConsentList .agreement").each(function() {
+                    $(this).parent().hide();
+                });
                 if (userTimeZone.toUpperCase() != "UTC") $("#profileConsentList .gmt").each(function() {
                     $(this).hide();
                 });
@@ -793,7 +805,7 @@ var assembleContent = {
                 };
                 demoArray["identifier"] = identifiers;
             };
-            
+
 
             demoArray["gender"] = $("input[name=sex]:checked").val();
 
@@ -1448,6 +1460,7 @@ var tnthAjax = {
             fillContent.treatment(data);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
+           $("#userProcedures").html("<span class='text-danger'>Error retrieving data from server</span>");
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
