@@ -519,7 +519,7 @@
                       });
                     $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
                   } else {
-                      handleNoOrgs({{user.id}});
+                      {% if user %} handleNoOrgs({{user.id}}); {% endif %}
                   };
 
                   if (!found_symptom_tracker) {
