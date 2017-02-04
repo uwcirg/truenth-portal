@@ -181,7 +181,7 @@
             <h3 class="box-modal__title">Join Us!</h3>
             <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p>
             <br/>
-            <p class="box-modal__copy">Do you have access code?</p>
+            <p class="box-modal__copy">Do you have an access code?</p>
             <form action="/go" method="post">
               <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required/>
               <div class="access-code-container">
@@ -234,6 +234,29 @@
         </div>
       </div>
     </div>
+    <div class="modal fade" id="modal-org">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content box-modal">
+          <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
+            <h3 class="box-modal__title">Organizations</h3>
+            <p class="box-modal__copy">You currently do not affiliate with any organization. Please select one.</p>
+            <div class="box-modal__divider"></div>
+            <br/>
+            <div class="form-group profile-section" id="userOrgs">
+                <div class="indent">
+                <div id="fillOrgs"></div>
+                <input type="hidden" name="__firstname" value="{{user.first_name if user and user.first_name}}"/>
+                <input type="hidden" name="__lastname"  value="{{user.last_name if user and user.last_name}}" />
+                <input type="hidden" name="__birthdate" value="{{user.birthdate if user and user.birthdate}}" />
+                <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
+                </div>
+                <!-- consent agreement -->
+                <button id="submit-orgs" class="button button--teal" type="button">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="session-warning-modal" class="modal fade">
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">
@@ -246,6 +269,36 @@
         </div>
       </div>
     </div>
+{% endblock %}
+{% block consent %}
+  {% if consent_agreements %}
+      <div id="consentContainer" style="visibility:invisible">
+          {% for org in consent_agreements %}
+            <div id="{{org}}_consentItem" class="consent">
+              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
+              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/><label id="{{org}}_consent_label" labelfor="#{{org}}_consent">Sharing data with {{consent_agreements[org].organization_name}}?</label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
+              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
+                  <div class="modal-dialog" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">{{ _("Sharing your data") }}</h4>
+                        </div>
+                        <div class="modal-body">
+                          <br/>
+                           {{consent_agreements[org].asset|safe}}
+                          <br/>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              </div>
+          {% endfor %}
+      </div>
+    {% endif %}
 {% endblock %}
 {% block init_scripts %}
     <script src="{{PORTAL}}{{url_for('static', filename='js/vendor.js') }}"></script>
@@ -394,6 +447,7 @@
                       var dm = /decision\s?support/gi;
                       var sm = /symptom\s?tracker/gi;
                       var sm2 = /self[_\s]?management/gi;
+                      //console.log(n + " " + d)
                       if (dm.test(d) || dm.test(n)) {
                           if (!disabled) {
                               //$(".side-nav-items__item--decisionsupport a").attr("href",b);
@@ -464,6 +518,8 @@
                           $(this).addClass("icon-box__button--disabled");
                       });
                     $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
+                  } else {
+                      handleNoOrgs({{user.id}});
                   };
 
                   if (!found_symptom_tracker) {
@@ -483,6 +539,36 @@
               });
           };
 
+          function handleNoOrgs(userId) {
+              
+              $(".intervention-link").each(function() {
+                var dm = /decision\s?support/gi;
+                if (dm.test($(this).text())) {
+                    var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+                    if (hasSet) return false;
+                    var self = this;
+                    $.ajax ({
+                        type: "GET",
+                        url: '/api/demographics/' + userId,
+                        async: false
+                    }).done(function(data) {
+                        //console.log(data)
+                        if (data && data.careProvider) {
+                            $.each(data.careProvider,function(i,val){
+                                var orgID = val.reference.split("/").pop();
+                                if (orgID == "0") {
+                                  $(self).removeAttr("href");
+                                  $(self).on("click", function() { $("figure.js-close-nav").trigger("click"); setTimeout('$("#modal-org").modal("show");', 0); });
+                                };
+                            });
+                        };
+                    }).fail(function() {
+                       // console.log("Problem retrieving data from server.");
+                    });
+                };
+             });
+          };
+
           function showMain() {
             $("#mainHolder").css({
                           "visibility" : "visible",
@@ -492,7 +578,7 @@
                           "-khtml-opacity": 1,
                           "opacity": 1
                         });
-            {% if user and user.has_role("patient") %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
+            {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
           };
 
          $(document).ready(function(){
@@ -502,6 +588,42 @@
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader();
             });
+
+            {% if user %}
+              OT.getOrgs({{user.id}}, true);
+              $("#submit-orgs").on("click", function() {
+                    var os = $("#userOrgs input[name='organization']:checked");
+                    os.each(function() {
+                      if ($(this).attr("id") !== "noOrgs") {
+                        var parentOrg = $(this).attr("data-parent-id");
+                        if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+                        var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                        //console.log('agreement: ' + agreementUrl)
+                        if (agreementUrl && agreementUrl != "") {
+                            var params = CONSENT_ENUM["consented"];
+                            params.org = parentOrg;
+                            params.agreementUrl = agreementUrl;
+                            setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
+                        };
+
+                      };
+
+                    });
+                     
+                    if (os.length > 0) {
+                      OT.updateOrg({{user.id}});
+                      $("a.box-modal__close").trigger("click");
+                      setTimeout("location.reload();", 1000);
+                      if (typeof sessionStorage != "undefined") {
+                        try {
+                          sessionStorage.setItem("noOrgModalViewed", "true");
+                        } catch(e) {
+
+                        };
+                      }
+                    };
+              });
+            {% endif %}
 
             $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
                 e.preventDefault();

@@ -93,7 +93,7 @@ def gil_interventions_items():
                 "link_url": display.link_url if display.link_url is not None else "disabled",
                 "link_label": display.link_label if display.link_label is not None else ""
             })
-
+    
     return jsonify(interventions=user_interventions)
 
 @portal.route('/symptom-tracker')
@@ -413,10 +413,23 @@ def home():
             Intervention.query.order_by(Intervention.display_rank).all()
 
     gil = current_app.config.get('GIL')
-    print("GIL {0}".format(str(gil)))
+    consent_agreements = {}
+    if gil:
+        for org_id in OrgTree().all_top_level_ids():
+            current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
+            org = Organization.query.get(org_id)
+            asset, url = VersionedResource.fetch_elements(
+                app_text(ConsentATMA.name_key(organization=org)))
+            if url:
+                current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
+
+            consent_agreements[org.id] = {
+                    'organization_name': org.name,
+                    'asset': asset,
+                    'agreement_url': url}
     
     return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
-                           interventions=interventions)
+                           interventions=interventions, consent_agreements=consent_agreements)
 
 
 @portal.route('/admin')

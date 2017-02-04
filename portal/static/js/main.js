@@ -405,15 +405,22 @@ var fillContent = {
 
             var hasContent = false;
 
+            //recursively get the top level org name
+            function getOrgName (orgId) {
+                if (!orgs[orgId].partOf) {
+                    console.log("orgId: " + orgId + " partOf: " + orgs[orgId].partOf)
+                    return orgs[orgId]._name;
+                }
+                else getOrgName(orgId)
+            };
+
             dataArray.forEach(function(item, index) {
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
-                    if (orgs[orgId]) {
-                        if(orgs[orgId].partOf && orgs[orgs[orgId].partOf]) orgName = orgs[orgs[orgId].partOf]._name;
-                        else orgName = orgs[orgId]._name;
-                    } else orgName = orgId;
+                    if (!ctop) orgName = getOrgName(item.organization_id);
+                    else  orgName = orgs[orgId]._name;
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
                     var expired = tnthDates.getDateDiff(item.expires);
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
@@ -483,8 +490,8 @@ var fillContent = {
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>",
-                            "_class": "text-center"
+                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>"
+        
                         },
                         {
                             content: (signedDate).replace("T", " ")
