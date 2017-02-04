@@ -6927,6 +6927,29 @@ a.home--modal-link {
 .capitalize {
     text-transform: capitalize;
 }
+#userOrgs, .noOrg-container {
+    font-size: 1em;
+    text-align: left;
+}
+.noOrg-container {
+    margin-top: -0.3em;
+    margin-bottom: 2em;
+}
+#fillOrgs legend {
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
+    opacity: 0.7;
+}
+#fillOrgs span {
+    margin-left: 0.2em;
+}
+#fillOrgs input[type='checkbox'] {
+    position: relative;
+    top: -1px;
+}
+.tnth-hide {
+    display: none;
+}
 
 @media (min-width: 1200px) {
     .home--item-container {

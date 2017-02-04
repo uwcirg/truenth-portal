@@ -265,3 +265,408 @@ module.exports = WindowScroll = (function() {
 
 
 },{}]},{},[2])
+
+var OrgObj = function(orgId, orgName, parentOrg) {
+    this.id = orgId;
+    this.name = orgName;
+    this.children = [];
+    this.parentOrgId = parentOrg;
+    this.isTopLevel = false;
+};
+
+var CONSENT_ENUM = {
+    "consented": {
+        "staff_editable": true,
+        "include_in_reports": true,
+        "send_reminders": true
+    },
+     "suspended": {
+        "staff_editable": true,
+        "include_in_reports": true,
+        "send_reminders": false
+    },
+    "purged": {
+        "staff_editable": false,
+        "include_in_reports": false,
+        "send_reminders": false
+    }
+};
+
+function hasValue(val) {
+    return val != null && val != "" && val != "undefined";
+};
+
+var OrgTool = function() {
+
+    var TOP_LEVEL_ORGS = [];
+    var orgsList = {};
+    
+
+    this.inArray = function (val, array) {
+        if (val && array) {
+            for (var i = 0; i < array.length; i++) {
+                if (array[i] == val) return true;
+            };
+        };
+        return false;
+    };
+
+    this.getTopLevelOrgs = function() {
+        return TOP_LEVEL_ORGS;
+    };
+
+    this.getOrgsList = function() {
+        return orgsList;
+    };
+
+    this.getConsent = function(userId, sync) {
+       if (!userId) return false;
+       $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+"/consent",
+            async: (sync ? false : true),
+            cache: false
+        }).done(function(data) {
+            if (data.consent_agreements) {
+                var d = data["consent_agreements"];
+                d.forEach(function(item) {
+                    var orgId = item.organization_id;
+                    //console.log("org Id: " + orgId);
+                    var orgName = $("#" + orgId + "_org").attr("org_name");
+                    if ($("#" + orgId + "_consent").length > 0) {
+                        $("#" + orgId + "_consent").attr("checked", true);
+                    };
+                });
+            };
+           fillContent.consentList(data, userId, null, null);
+           loader();
+           return true;
+        }).fail(function(xhr) {
+            console.log("Problem retrieving data from server.");
+            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
+            loader();
+            return false;
+        });
+    };
+    this.setConsent = function(userId, params, status, sync) {
+        if (userId && params) {
+            var consented = this.hasConsent(userId, params["org"], status);
+            if (!consented) {
+                $.ajax ({
+                    type: "POST",
+                    url: '/api/user/' + userId + '/consent',
+                    contentType: "application/json; charset=utf-8",
+                    cache: false,
+                    dataType: 'json',
+                    async: (sync? false: true),
+                    data: JSON.stringify({"user_id": userId, "organization_id": params["org"], "agreement_url": params["agreementUrl"], "staff_editable": (hasValue(params["staff_editable"])? params["staff_editable"] : false), "include_in_reports": (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false), "send_reminders": (hasValue(params["send_reminders"]) ? params["send_reminders"] : false) })
+                }).done(function(data) {
+                    //console.log("consent updated successfully.");
+                }).fail(function(xhr) {
+                    //console.log("request to updated consent failed.");
+                    //console.log(xhr.responseText)
+                });
+            };
+        };
+    };
+    /****** NOTE - this will return the latest updated consent entry *******/
+    this.hasConsent = function(userId, orgId, filterStatus) {
+        //console.log("in hasConsent: userId: " + userId + " orgId: " + orgId)
+        if (!userId) return false;
+        if (!orgId) return false;
+
+        var consentedOrgIds = [], expired = 0, found = false, suspended = false;
+        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+"/consent",
+            async: false,
+            cache: false
+        }).done(function(data) {
+            if (data.consent_agreements) {
+                var d = data["consent_agreements"];
+                if (d.length > 0) {
+                    d = d.sort(function(a,b){
+                        return new Date(b.signed) - new Date(a.signed); //latest comes first
+                    });
+                    item = d[0];
+                    expired = OT.getDateDiff(item.expires);
+                    if (item.deleted) found = true;
+                    if (expired > 0) found = true;
+                    if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
+                    if (!found) {
+                        if (orgId == item.organization_id) {
+                            //console.log("consented orgid: " + orgId)
+                            switch(filterStatus) {
+                                case "suspended":
+                                    if (suspended) found = true;
+                                    break;
+                                case "purged":
+                                    found = true;
+                                    break;
+                                case "consented":
+                                    if (!suspended) {
+                                        if (item.staff_editable && item.send_reminders && item.include_in_reports) found = true;
+                                    };
+                                    break;
+                                default:
+                                    found = true; //default is to return both suspended and consented entries
+                            };
+                            if (found) consentedOrgIds.push(orgId);
+
+                        };
+                    };
+                }
+            };
+
+        }).fail(function() {
+            return false;
+         });
+        //console.log(consentedOrgIds)
+        return consentedOrgIds.length > 0 ? consentedOrgIds : null;
+    };
+    this.getDateDiff = function(startDate,dateToCalc) {
+        var a = startDate.split(/[^0-9]/);
+        var dateTime = new Date(a[0], a[1]-1, a[2]).getTime();
+        var d;
+        if (dateToCalc) {
+            var c = dateToCalc.split(/[^0-9]/);
+            d = new Date(c[0], c[1]-1, c[2]).getTime()
+        } else {
+            // If no baseDate, then use today to find the number of days between dateToCalc and today
+            d = new Date().getTime()
+        }
+        // Round down to floor so we don't add an extra day if session is 12+ hours into the day
+        return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
+    };
+
+    this.getOrgs = function(userId, sync, callback) {
+        var self = this;
+        $.ajax ({
+            type: "GET",
+            url: '/api/organization',
+            async: sync? false : true
+        }).done(function(data) {
+
+            $("#fillOrgs").attr("userId", userId);
+
+            OT.populateOrgsList(data.entry);
+            OT.populateUI();
+            if (callback) callback();
+
+            $("#userOrgs input[name='organization']").each(function() {
+                $(this).on("click", function() {
+
+                    var userId = $("#fillOrgs").attr("userId");
+                    var parentOrg = $(this).attr("data-parent-id");
+
+                    if ($(this).prop("checked")){
+                        if ($(this).attr("id") !== "noOrgs") {
+                            //console.log("set no org here")
+                            $("#noOrgs").prop('checked',false);
+
+                        } else {
+                            $("#userOrgs input[name='organization']").each(function() {
+                                //console.log("in id: " + $(this).attr("id"))
+                               if ($(this).attr("id") !== "noOrgs") {
+                                    $(this).prop('checked',false);
+                                };
+                            });
+
+                        };
+                    };
+                });
+            });
+        }).fail(function() {
+           // console.log("Problem retrieving data from server.");
+        });
+    },
+    this.updateOrg = function(userId) {
+
+        var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
+            return { reference: "api/organization/"+$(this).val() };
+        }).get();
+
+        //console.log("org ids" + orgIDs)
+
+        if (typeof orgIDs === 'undefined'){
+            orgIDs = [0]  // special value for `none of the above`
+        };
+
+        var demoArray = {};
+        demoArray["resourceType"] = "Patient";
+        demoArray["careProvider"] = orgIDs;
+        demoArray["name"] = {
+            "given": $.trim($("#__firstname").val()),
+            "family": $.trim($("#__lastname").val())
+        };
+        if ($("#__birthdate").val() != "") demoArray["birthDate"] = $("#__birthdate").val();
+
+        $.ajax ({
+            type: "PUT",
+            url: '/api/demographics/'+userId,
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            async: true,
+            data: JSON.stringify(demoArray)
+        }).done(function(data) {
+        }).fail(function() {
+            console.log("Problem updating demographics on server.");
+        });
+
+    },
+    this.filterOrgs = function(leafOrgs) {
+        //console.log(leafOrgs)
+        if (!leafOrgs) return false;
+        var self = this;
+
+        $("input[name='organization']:checkbox").each(function() {
+            if (! self.inArray($(this).val(), leafOrgs)) {
+                $(this).hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+            };
+        });
+
+        var topList = self.getTopLevelOrgs();
+
+        topList.forEach(function(orgId) {
+            var allChildrenHidden = true;
+            $(".org-container[data-parent-id='" + orgId + "']").each(function() {
+                var subOrgs = $(this).find(".org-container");
+                if (subOrgs.length > 0) {
+                    var allSubOrgsHidden = true;
+                    subOrgs.each(function() {
+                         var isVisible = false;
+                         $(this).find("input[name='organization']").each(function() {
+                             if ($(this).is(":visible")) {
+                                isVisible = true;
+                                allChildrenHidden = false;
+                             };
+                         });
+
+                        if (!isVisible) {
+                            $(this).hide();
+                        } else allSubOrgsHidden = false;
+
+                    });
+
+                    if (allSubOrgsHidden) $(this).children("label").hide();
+
+                } else {
+                    var ip = $(this).find("input[name='organization']");
+                    if (ip.length > 0) {
+                        ip.each(function() {
+                            if ($(this).is(":visible")) allChildrenHidden = false;
+                        });
+                    };
+                };
+            });
+            if (allChildrenHidden) {
+                $("#fillOrgs").find("legend[orgid='" + orgId + "']").hide();
+            };
+
+        });
+    };
+
+    this.findOrg = function(entry, orgId) {
+        var org;
+        if (entry && orgId) {
+            entry.forEach(function(item) {
+                if (!org) {
+                    if (item.id == orgId) org = item;
+                };
+            });
+        };
+        return org;
+    };
+    this.getTopLevelOrgs = function() {
+        if (TOP_LEVEL_ORGS.length == 0) {
+            var topOrgs = $("#fillOrgs").find(input[name='organization'][parent_org='true']);
+            if (topOrgs.length > 0) {
+                topOrgs.each(function() {
+                    TOP_LEVEL_ORGS.push[$(this).val()];
+                });
+            };
+        };
+        return TOP_LEVEL_ORGS;
+    };
+
+    this.populateOrgsList = function(items) {
+        if (!items) return false;
+        var entry = items, self = this, parentId;
+        items.forEach(function(item) {
+            if (item.partOf) {
+                parentId = item.partOf.reference.split("/").pop();
+                if (!orgsList[parentId]) {
+                    var o = self.findOrg(entry, parentId);
+                    orgsList[parentId] = new OrgObj(o.id, o.name);
+                };
+                orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
+                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+                else orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+            } else {
+                if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
+                if (item.id != 0) {
+                    orgsList[item.id].isTopLevel = true;
+                    TOP_LEVEL_ORGS.push(item.id);
+                };
+            };
+        });
+        items.forEach(function(item) {
+            if (item.partOf) {
+                parentId = item.partOf.reference.split("/").pop();
+                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+            };
+        });
+        //console.log(orgsList)
+        return orgsList;
+    };
+
+    this.populateUI = function() {
+        var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs();
+        for (org in orgsList) {
+            if (orgsList[org].isTopLevel && (orgsList[org].children.length > 0)) {
+                $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                parentOrgsCt++;
+            }
+            // Fill in each child clinic
+            if (orgsList[org].children.length > 0) {
+                var childClinic = "";
+                orgsList[org].children.forEach(function(item, index) {
+                    var _parentOrgId = item.parentOrgId;
+                    var _parentOrg = orgsList[_parentOrgId];
+                    var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
+                    childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
+
+                    if (orgsList[item.id].children.length > 0) {
+                        childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
+                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                        item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
+                        item.name +
+                        '</span></label>';
+
+                     } else {
+                        childClinic += '<label class="org-label">' +
+                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                        item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
+                        item.name +
+                        '</span></label>';
+                    };
+
+                    childClinic += '</div>';
+
+                    if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
+                    else $("#fillOrgs").append(childClinic);
+
+                });
+            };
+
+            if (parentOrgsCt > 0 && orgsList[org].isTopLevel) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
+        };
+    };
+};
+
+var OT = new OrgTool();
+
+
+
