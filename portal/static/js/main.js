@@ -71,14 +71,16 @@ function showMain() {
 function showWrapper(hasLoader) {
     var cssProp = {"visibility":"visible", "display": "block"};
     //adding this for firefox fix
-    if (hasLoader) {
-        $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-            //delay removal of loading div to prevent FOUC
-            if (!DELAY_LOADING) {
-                setTimeout('$("#loadingIndicator").fadeOut();', 300);
-            };
-        });
-    } else $("#tnthNavWrapper").css(cssProp);
+    if (!$("#tnthNavWrapper").is(":visible") || navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        if (hasLoader) {
+            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
+                //delay removal of loading div to prevent FOUC
+                if (!DELAY_LOADING) {
+                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
+                };
+            });
+        } else $("#tnthNavWrapper").css(cssProp);
+    };
 };
 
 // Loading indicator that appears in UI on page loads and when saving
@@ -105,10 +107,13 @@ var loader = function(show) {
 };
 
 function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
+    //firefox does not support Intl API
+    if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
+
     if (!dateString) return "";
     else {
-        if (!timeZone) timeZone = "UTC";
-        if (!locale)  locale = "en-us";
+        if (!hasValue(timeZone)) timeZone = "UTC";
+        if (!hasValue(locale))  locale = "en-us";
         //locale needs to be in this format - us-en
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
@@ -406,21 +411,30 @@ var fillContent = {
             var hasContent = false;
 
             //recursively get the top level org name
-            function getOrgName (orgId) {
-                if (!orgs[orgId].partOf) {
-                    console.log("orgId: " + orgId + " partOf: " + orgs[orgId].partOf)
-                    return orgs[orgId]._name;
+            function getOrgName (_orgId) {
+                if (!(orgs[_orgId].partOf)) {
+                    return orgs[_orgId]._name;
                 }
-                else getOrgName(orgId)
+                else {
+                    return getOrgName(orgs[_orgId].partOf);
+                };
             };
+
+            //console.log(orgs)
 
             dataArray.forEach(function(item, index) {
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
-                    if (!ctop) orgName = getOrgName(item.organization_id);
-                    else  orgName = orgs[orgId]._name;
+                    if (!ctop) {
+                        try {
+                            orgName = getOrgName(orgId);
+                        } catch(e) {
+                            orgName = orgs[orgId]._name;
+                        };
+                    } else orgName = orgs[orgId]._name;
+
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
                     var expired = tnthDates.getDateDiff(item.expires);
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
@@ -491,7 +505,7 @@ var fillContent = {
                         },
                         {
                             content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>"
-        
+
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -1675,7 +1689,7 @@ function newHttpRequest(url,callBack)
 };
 
 $.ajaxSetup({
-    timeout: 2000, 
+    timeout: 2000,
     retryAfter:3000
 });
 var attempts = 0;
