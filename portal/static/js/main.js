@@ -1360,7 +1360,7 @@ var tnthAjax = {
 
                     } else {
                         //delete all orgs
-                        $("#userOrgs").find("input[name='organization]").each(function() {
+                        $("#userOrgs").find("input[name='organization']").each(function() {
                             console.log("in delete: " + $(this).val())
                             setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": $(this).val()}) + ");", 0);
                         });
