@@ -39,7 +39,7 @@
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
                     {{profilePhone(False)}}
-                    <div class="form-group">
+                    <div id="studyIdContainer" class="form-group">
                         <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
                         <input type="text" class="form-control" id="studyId" name="studyId"/>
                     </div>
@@ -253,7 +253,7 @@ $(document).ready(function(){
                 var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                     return { organization_id: $(this).val() };
                 }).get();
-               
+
                 _accountArray['organizations'] = orgIDs;
                 _accountArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
                 _accountArray['consents'] = getConsents();
@@ -263,7 +263,7 @@ $(document).ready(function(){
                 .then(function(responseData) {
 
                     _userId = responseData['user_id'];
-                
+
                     _demoArray['resourceType'] = 'Patient';
                     _demoArray['name'] = {
                         'given': $.trim($('input[name=firstname]').val()),
@@ -280,11 +280,11 @@ $(document).ready(function(){
                         _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
                     };
                     _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
-                    
+
                      var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
-        
+
                     _demoArray['careProvider'] = orgIDs;
 
                     var studySource = "";

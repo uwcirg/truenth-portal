@@ -60,7 +60,7 @@ a.btn {
   padding: 0.1em auto;
   color: #5a5a5a;
 }
-#profileStudyIDContainer {
+#profileStudyIDContainer, #studyIdContainer{
   display: none;
 }
 .save-info {
@@ -646,14 +646,14 @@ input.clinic {
   margin-top: 0.5em;
 }
 #createProfileForm #studyId {
-  width:350px; 
+  width:350px;
   max-width: 100%;
 }
 #noEmailContainer {
   margin-top: 0.3em;
 }
 #noEmail {
-  position:relative; 
+  position:relative;
   top:-1px
 }
 #profileSendEmailContainer {

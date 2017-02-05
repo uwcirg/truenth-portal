@@ -108,7 +108,7 @@ var loader = function(show) {
 
 function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
     //firefox does not support Intl API
-    if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
+    //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
 
     if (!dateString) return "";
     else {
@@ -124,13 +124,18 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         };
         options.timeZone =  timeZone;
         //older browsers don't support this
-        if (window.Intl && typeof Intl != "undefined") {
-            //console.log("dateString: " + dateString)
-            //var convertedDate = new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
-            var convertedDate = new Date(dateString).toLocaleString(locale, options);
-            //console.log("dateString: " + dateString + " convertedDate: " + convertedDate);
-            return convertedDate.replace(/\,/g, "");
-        } else return dateString; //return dateString without conversion
+        //console.log("dateString: " + dateString)
+        var convertedDate = dateString;
+        try {
+            convertedDate = new Date(dateString).toLocaleString(locale, options);
+            if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+        } catch(e) {
+            $(".timezone-error").each(function() {
+                $(this).addClass("text-danger").html("Error converting time zone: " + e.message);
+            });
+        }
+        //console.log("dateString: " + dateString + " convertedDate: " + convertedDate);
+        return convertedDate.replace(/\,/g, "");
     };
 };
 
@@ -525,7 +530,7 @@ var fillContent = {
                 if (!ctop) $("#profileConsentList .agreement").each(function() {
                     $(this).parent().hide();
                 });
-                if (userTimeZone.toUpperCase() != "UTC") $("#profileConsentList .gmt").each(function() {
+                if ($(".timezone-error").text() == "" && (userTimeZone.toUpperCase() != "UTC")) $("#profileConsentList .gmt").each(function() {
                     $(this).hide();
                 });
             } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
@@ -620,9 +625,12 @@ var fillContent = {
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
             if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+                //console.log(item.timezone)
+                console.log(item.timezone + " ")
                 $("#profileTimeZone option").each(function() {
-                    if ($(this).val() == item.timezone) {
-                        $(this).attr("selected", true);
+                    console.log(item.timezone + " " + $(this).val())
+                    if ($.trim($(this).val()) == $.trim(item.timezone)) {
+                        $(this).prop("selected", true);
                     };
                 });
             };
@@ -1360,7 +1368,7 @@ var tnthAjax = {
 
                     } else {
                         //delete all orgs
-                        $("#userOrgs").find("input[name='organization]").each(function() {
+                        $("#userOrgs").find("input[name='organization']").each(function() {
                             console.log("in delete: " + $(this).val())
                             setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": $(this).val()}) + ");", 0);
                         });
@@ -2233,6 +2241,8 @@ var FieldLoaderHelper = function () {
 
     this.showUpdate = function(targetField) {
         if(targetField && targetField.length > 0) {
+             $("#" + targetField.attr("save-container-id") + "_error").text("");
+             $("#"+ targetField.attr("save-container-id") + "_success").text("success");
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
             setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
@@ -2241,6 +2251,8 @@ var FieldLoaderHelper = function () {
 
     this.showError = function(targetField) {
         if(targetField && targetField.length > 0) {
+            $("#" + targetField.attr("save-container-id") + "_error").text("Unable to update. System Error.");
+            $("#" + targetField.attr("save-container-id") + "_success").text("");
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
             setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
