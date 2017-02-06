@@ -116,7 +116,7 @@
                 <figure></figure><span>Menu</span>
             </a>
           </div>
-          <a class="logo" href="{{PORTAL}}"></a>
+          <a class="logo" href="{{PORTAL}}/"></a>
           {% if not user %}
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">Log In</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
           {% endif %}
@@ -238,8 +238,8 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
-            <h3 class="box-modal__title">Organizations</h3>
-            <p class="box-modal__copy">You currently do not affiliate with any organization. Please select one.</p>
+            <br/>
+            <h4 class="box-modal__copy">What is your main clinic for prostate cancer care?</h4>
             <div class="box-modal__divider"></div>
             <br/>
             <div class="form-group profile-section" id="userOrgs">
@@ -252,6 +252,8 @@
                 </div>
                 <!-- consent agreement -->
                 <button id="submit-orgs" class="button button--teal" type="button">Submit</button>
+                <br/>
+                <div id="modal-org-error" class="box-modal__copy text-danger"></div>
             </div>
           </div>
         </div>
@@ -272,30 +274,12 @@
 {% endblock %}
 {% block consent %}
   {% if consent_agreements %}
-      <div id="consentContainer" style="visibility:invisible">
+      <div id="consentContainer">
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="consent">
               <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
-              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/><label id="{{org}}_consent_label" labelfor="#{{org}}_consent">Sharing data with {{consent_agreements[org].organization_name}}?</label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
-              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
-                  <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">{{ _("Sharing your data") }}</h4>
-                        </div>
-                        <div class="modal-body">
-                          <br/>
-                           {{consent_agreements[org].asset|safe}}
-                          <br/>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
+              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/>
+            </div>
           {% endfor %}
       </div>
     {% endif %}
@@ -332,22 +316,16 @@
 
           var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
           if (LOGIN_AS_PATIENT) {
-              $(window).bind("load", function(){ window.history.forward(); });
-              $(window).bind("unload", function(){});
-              $(window).bind('popstate', function(event) {
-                // if the event has our history data on it, load the page fragment with AJAX
-                if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
-                    location.reload();
-                }
+              if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+              window.addEventListener('popstate', function(event) {
+                if (typeof history != 'undefined' && history.pushState) {
+                  history.pushState(null, null, location.href);
+                  setTimeout('location.reload();', 0);
+                } else {
+                  window.history.forward(1);
+                  setTimeout('location.reload();', 0);
+                };
               });
-              $(window).bind("pageshow", function(event) {
-                  if (((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) && (event.persisted || event.originalEvent.persisted)) location.reload();
-              });
-              $(window).bind('popstate', function(event) {
-                  if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
-                      location.reload();
-                  };
-               });
           };
 
           function _readCookie(name) {
@@ -498,17 +476,13 @@
                           };
                       }
                       else if ($.trim(d) != "") {
-                          //only draw 3 at most - otherwise the menu won't fit the screen
-                          //if (ct < 3) {
-                              if (!disabled) {
-                                  var eitem = $("#intervention_item_" + ct);
-                                  if (eitem.length == 0) { //only draw this when there isn't already one
-                                    $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
-                                    ct++;
-                                  };
+                          if (!disabled) {
+                              var eitem = $("#intervention_item_" + ct);
+                              if (eitem.length == 0) { //only draw this when there isn't already one
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
+                                ct++;
                               };
-                          //};
-
+                          };
                       };
                   });
 
@@ -540,11 +514,11 @@
           };
 
           function handleNoOrgs(userId) {
-              
-              $(".intervention-link").each(function() {
+              $(".intervention-link, a.decision-support-link").each(function() {
                 var dm = /decision\s?support/gi;
-                if (dm.test($(this).text())) {
+                if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
                     var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+                    //allow modal to show once once action has been taken
                     if (hasSet) return false;
                     var self = this;
                     $.ajax ({
@@ -556,9 +530,12 @@
                         if (data && data.careProvider) {
                             $.each(data.careProvider,function(i,val){
                                 var orgID = val.reference.split("/").pop();
-                                if (orgID == "0") {
+                                if (parseInt(orgID) === 0) {
                                   $(self).removeAttr("href");
-                                  $(self).on("click", function() { $("figure.js-close-nav").trigger("click"); setTimeout('$("#modal-org").modal("show");', 0); });
+                                  $(self).on("click", function() {
+                                    $("figure.js-close-nav").trigger("click");
+                                    setTimeout('$("#modal-org").modal("show");', 0);
+                                  });
                                 };
                             });
                         };
@@ -567,6 +544,23 @@
                     });
                 };
              });
+          };
+
+          function updateOrgCallback(errorMessage) {
+              if (!errorMessage) {
+                $("a.box-modal__close").trigger("click");
+                loader(true);
+                setTimeout("location.reload();", 1000);
+                if (typeof sessionStorage != "undefined") {
+                  try {
+                    sessionStorage.setItem("noOrgModalViewed", "true");
+                  } catch(e) {
+
+                  };
+                };
+              } else {
+                $("#modal-org-error").html(errorMessage);
+              };
           };
 
           function showMain() {
@@ -586,41 +580,31 @@
             checkBannerStatus();
 
             $("#modal-login").on("show.bs.modal", function(e) {
-                loader();
+                loader(false);
             });
 
             {% if user %}
-              OT.getOrgs({{user.id}}, true);
+               OT.getOrgs({{user.id}});
               $("#submit-orgs").on("click", function() {
                     var os = $("#userOrgs input[name='organization']:checked");
-                    os.each(function() {
-                      if ($(this).attr("id") !== "noOrgs") {
-                        var parentOrg = $(this).attr("data-parent-id");
-                        if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-                        var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
-                        //console.log('agreement: ' + agreementUrl)
-                        if (agreementUrl && agreementUrl != "") {
-                            var params = CONSENT_ENUM["consented"];
-                            params.org = parentOrg;
-                            params.agreementUrl = agreementUrl;
-                            setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
-                        };
-
-                      };
-
-                    });
-                     
                     if (os.length > 0) {
-                      OT.updateOrg({{user.id}});
-                      $("a.box-modal__close").trigger("click");
-                      setTimeout("location.reload();", 1000);
-                      if (typeof sessionStorage != "undefined") {
-                        try {
-                          sessionStorage.setItem("noOrgModalViewed", "true");
-                        } catch(e) {
+                      os.each(function() {
+                        if ($(this).attr("id") !== "noOrgs") {
+                          var parentOrg = $(this).attr("data-parent-id");
+                          if (!parentOrg) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
+                          var agreementUrl = $("#" + parentOrg + "_agreement_url").val();
+                          //console.log('agreement: ' + agreementUrl)
+                          if (agreementUrl && agreementUrl != "") {
+                              var params = CONSENT_ENUM["consented"];
+                              params.org = parentOrg;
+                              params.agreementUrl = agreementUrl;
+                              setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
+                          };
 
                         };
-                      }
+
+                      });
+                      OT.updateOrg({{user.id}}, updateOrgCallback);
                     };
               });
             {% endif %}
@@ -656,18 +640,7 @@
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
              {% endif %}
 
-            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
-              e.stopPropagation();
-
-              if (!$(this).parent().hasClass("side-nav-items__item-disabled")
-                && !$(this).hasClass("icon-box__button--disabled")
-                && !$(this).parent().hasClass("side-nave-items__item--selected")
-                && !$(this).hasClass("symptom-tracker-link")
-                && !$(this).hasClass("decision-support-link")
-                && !$(this).hasClass("intervention-link")
-                ) loader(true);
-              else loader(false);
-            });
+            //see gil.js to call loader onclick event of each nav.link
             setTimeout("loader(false);", 0);
           });
 

@@ -139,9 +139,10 @@ module.exports = NavToggle = (function() {
       e.preventDefault();
       href = $(this).attr('href');
       $('html').removeClass(navExpandedClass);
+      loader(true);
       return setTimeout(function() {
         return window.location = href;
-      }, 1000);
+      }, 500);
     });
     return $('.side-nav a[data-toggle=modal]').on('click touchend', function(e) {
       var target;
@@ -300,7 +301,7 @@ var OrgTool = function() {
 
     var TOP_LEVEL_ORGS = [];
     var orgsList = {};
-    
+
 
     this.inArray = function (val, array) {
         if (val && array) {
@@ -317,36 +318,6 @@ var OrgTool = function() {
 
     this.getOrgsList = function() {
         return orgsList;
-    };
-
-    this.getConsent = function(userId, sync) {
-       if (!userId) return false;
-       $.ajax ({
-            type: "GET",
-            url: '/api/user/'+userId+"/consent",
-            async: (sync ? false : true),
-            cache: false
-        }).done(function(data) {
-            if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                d.forEach(function(item) {
-                    var orgId = item.organization_id;
-                    //console.log("org Id: " + orgId);
-                    var orgName = $("#" + orgId + "_org").attr("org_name");
-                    if ($("#" + orgId + "_consent").length > 0) {
-                        $("#" + orgId + "_consent").attr("checked", true);
-                    };
-                });
-            };
-           fillContent.consentList(data, userId, null, null);
-           loader();
-           return true;
-        }).fail(function(xhr) {
-            console.log("Problem retrieving data from server.");
-            fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
-            loader();
-            return false;
-        });
     };
     this.setConsent = function(userId, params, status, sync) {
         if (userId && params) {
@@ -371,12 +342,11 @@ var OrgTool = function() {
     };
     /****** NOTE - this will return the latest updated consent entry *******/
     this.hasConsent = function(userId, orgId, filterStatus) {
-        //console.log("in hasConsent: userId: " + userId + " orgId: " + orgId)
         if (!userId) return false;
         if (!orgId) return false;
 
         var consentedOrgIds = [], expired = 0, found = false, suspended = false;
-        //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
+
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
@@ -425,6 +395,7 @@ var OrgTool = function() {
         //console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     };
+
     this.getDateDiff = function(startDate,dateToCalc) {
         var a = startDate.split(/[^0-9]/);
         var dateTime = new Date(a[0], a[1]-1, a[2]).getTime();
@@ -481,38 +452,59 @@ var OrgTool = function() {
            // console.log("Problem retrieving data from server.");
         });
     },
-    this.updateOrg = function(userId) {
+    this.updateOrg = function(userId, callback) {
 
+        var demoArray = {}, errorMessage = "";
+        $.ajax ({
+            type: "GET",
+            url: '/api/demographics/'+userId,
+            async: false
+        }).done(function(data) {
+            demoArray = data;
+        }).fail(function() {
+            errorMessage = "Error retrieving demographics information for user.";
+        });
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
         }).get();
 
-        //console.log("org ids" + orgIDs)
+        if (!hasValue(errorMessage)) {
+          if (typeof orgIDs === 'undefined'){
+              orgIDs = [0]  // special value for `none of the above`
+          } else {
+            var __roles =  [{'name': 'patient'}];
+            //update user role if user has chosen an org
+            $.ajax ({
+              type: "PUT",
+              url: '/api/user/'+userId+'/roles',
+              contentType: "application/json; charset=utf-8",
+              dataType: 'json',
+              data: JSON.stringify({"roles": __roles})
+            }).done(function(data) {
 
-        if (typeof orgIDs === 'undefined'){
-            orgIDs = [0]  // special value for `none of the above`
+            }).fail(function(jhr) {
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user role.";
+            });
+          };
+
+          demoArray["careProvider"] = orgIDs;
+
+          $.ajax ({
+              type: "PUT",
+              url: '/api/demographics/'+userId,
+              contentType: "application/json; charset=utf-8",
+              dataType: 'json',
+              async: true,
+              data: JSON.stringify(demoArray)
+          }).done(function(data) {
+              if (callback) callback(errorMessage);
+          }).fail(function() {
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user organization.";
+              if (callback) callback(errorMessage);
+          });
+        } else {
+          if(typeof callback != "undefined") callback(errorMessage);
         };
-
-        var demoArray = {};
-        demoArray["resourceType"] = "Patient";
-        demoArray["careProvider"] = orgIDs;
-        demoArray["name"] = {
-            "given": $.trim($("#__firstname").val()),
-            "family": $.trim($("#__lastname").val())
-        };
-        if ($("#__birthdate").val() != "") demoArray["birthDate"] = $("#__birthdate").val();
-
-        $.ajax ({
-            type: "PUT",
-            url: '/api/demographics/'+userId,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            async: true,
-            data: JSON.stringify(demoArray)
-        }).done(function(data) {
-        }).fail(function() {
-            console.log("Problem updating demographics on server.");
-        });
 
     },
     this.filterOrgs = function(leafOrgs) {

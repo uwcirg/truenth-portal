@@ -6927,6 +6927,12 @@ a.home--modal-link {
 .capitalize {
     text-transform: capitalize;
 }
+#modal-org {
+    z-index: 9999;
+}
+#moda-org-error {
+    font-size: 1em;
+}
 #userOrgs, .noOrg-container {
     font-size: 1em;
     text-align: left;
@@ -6949,6 +6955,9 @@ a.home--modal-link {
 }
 .tnth-hide {
     display: none;
+}
+#consentContainer {
+    visibility: invisible;
 }
 
 @media (min-width: 1200px) {
@@ -6994,6 +7003,15 @@ a.home--modal-link {
     .home--item-container, .home--registration-container, .home--item-container-full  {
         max-width: 100%;
         margin: 5%;
+    }
+    #modal-org, #modal-org * {
+        font-size: 14px !important;
+    }
+    #fillOrgs * {
+        font-size: 12px !important;
+    }
+    #submit-orgs {
+        font-size: 12px !important;
     }
 }
 @media (max-width: 680px) {
