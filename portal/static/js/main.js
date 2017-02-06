@@ -693,8 +693,14 @@ var assembleContent = {
             orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
             }).get();
-
-            if (orgIDs) demoArray["careProvider"] = orgIDs;
+            if (orgIDs) {
+                if (orgIDs.length > 0) {
+                    demoArray["careProvider"] = orgIDs;
+                } else {
+                    demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
+                };
+            };
+            
         };
 
         if (hasValue($("#deathDate").val())) {
@@ -844,7 +850,7 @@ var assembleContent = {
             demoArray["telecom"].push({ "system": "phone", "value": $.trim($("input[name=phone]").val()) });
            //console.log("demoArray", demoArray);
         };
-        //console.log(demoArray)
+        console.log(demoArray)
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
 
     },
@@ -1167,9 +1173,21 @@ var tnthAjax = {
                                 //console.log("in id: " + $(this).attr("id"))
                                if ($(this).attr("id") !== "noOrgs") {
                                     $(this).prop('checked',false);
-                                };
+                               } else {
+                                    if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
+                               };
                             });
 
+                        };
+                    } else {
+                        var isChecked = false;
+                        $("#userOrgs input[name='organization']").each(function() {
+                            if ($(this).prop("checked")) {
+                                isChecked = true;
+                            };
+                        });
+                        if (!isChecked) {
+                            if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                         };
                     };
                     getSaveLoaderDiv("profileForm", "userOrgs");
@@ -1382,7 +1400,6 @@ var tnthAjax = {
                     } else {
                         //delete all orgs
                         $("#userOrgs").find("input[name='organization']").each(function() {
-                            console.log("in delete: " + $(this).val())
                             setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": $(this).val()}) + ");", 0);
                         });
                     };

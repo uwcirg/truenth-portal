@@ -7132,6 +7132,11 @@ a.home--modal-link {
     margin-top: -0.3em;
     margin-bottom: 2em;
 }
+.noOrg-container label span {
+    position: relative;
+    left: -5px;
+    top: 1px;
+}
 #fillOrgs legend {
     font-size: 1.1em;
     margin-bottom: 0.5em;
@@ -7194,14 +7199,15 @@ a.home--modal-link {
         max-width: 100%;
         margin: 5%;
     }
-    #modal-org, #modal-org * {
+    #modal-org, #modal-org h4 {
         font-size: 14px !important;
     }
-    #fillOrgs * {
+    #fillOrgs *, .noOrg-container *, #submit-orgs {
         font-size: 12px !important;
     }
-    #submit-orgs {
-        font-size: 12px !important;
+    .noOrg-container input {
+        position: relative;
+        top: -1px;
     }
 }
 @media (max-width: 680px) {
