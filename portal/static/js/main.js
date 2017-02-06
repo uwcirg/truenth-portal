@@ -625,10 +625,7 @@ var fillContent = {
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
             if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
-                //console.log(item.timezone)
-                console.log(item.timezone + " ")
                 $("#profileTimeZone option").each(function() {
-                    console.log(item.timezone + " " + $(this).val())
                     if ($.trim($(this).val()) == $.trim(item.timezone)) {
                         $(this).prop("selected", true);
                     };
