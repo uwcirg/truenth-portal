@@ -540,7 +540,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Date/Time' + (userTimeZone == "UTC" ? " (GMT)" : ""),
+                                title: 'Date/Time' + (userTimeZone == "UTC" ? "<span class='gmt'> (GMT)</span>" : ($(".timezone-error").text() == "" ? "" : ("<span class='gmt'> (GMT)</span>"))),
                                 sortable: true,
                                 searchable: true,
                                 /******
@@ -651,7 +651,7 @@
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText">( {{ _("GMT Time Zone") }} )</small></th></tr>
+            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT Time Zone") }} )</small></th></tr>
         </table>
         <div id="profileSessionListError" style="color: #a94442"></div>
     </div>
@@ -679,7 +679,7 @@
                         var originalAuthoredDate = authoredDate;
                         if (userTimeZone != "UTC") {
                             authoredDate = convertUserDateTimeByLocaleTimeZone(authoredDate, userTimeZone, userLocale);
-                            $("#gmtText").hide();
+                            if($(".timezone-error").text() == "") $("#gmtText").hide();
                         }
                         else {
                             $("#gmtText").show();
@@ -754,7 +754,7 @@
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         String(entry['authored']).replace(/[tz]/gi, " ") +
                                         convertedAuthoredDate.replace(/[tz]/gi, " ") +
-                                        (String(userTimeZone).toLowerCase() == "utc" ? ' GMT': "") + '</span><hr/></caption>';
+                                        (String(userTimeZone).toLowerCase() == "utc" ? " <span class='gmt'>GMT</span>": "") + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '';
@@ -954,7 +954,7 @@
 {% macro profileTimeZone(person) %}
     <div id="profileTimeZoneGroup" class="form-group">
         <label>Time Zone</label>
-        <select class="form-control" id="profileTimeZone">
+        <select class="form-control" id="profileTimeZone" save-container-id="profileTimeZone">
             <option value="UTC">-- Select --</option>
             <option value="America/Denver">America/Denver</option>
             <option value="America/Los_Angeles">America/Los Angeles</option>
@@ -972,7 +972,6 @@
             <option value="Australia/Lindeman">Australia/Lindeman</option>
             <option value="Australia/Lord_Howe">Australia/Lord_Howe</option>
             <option value="Australia/Melbourne">Australia/Melbourne</option>
-            <option value="Australia/NSW">Australia/NSW</option>
             <option value="Australia/North">Australia/North</option>
             <option value="Australia/Perth">Australia/Perth</option>
             <option value="Australia/Queensland">Australia/Queensland</option>
@@ -984,14 +983,22 @@
             <option value="Australia/Yancowinna">Australia/Yancowinna</option>
         </select>
     </div>
+    <div class="timezone-error"></div>
     <script>
+    {% if person %}
     $(function() {
-         $('#profileTimeZone').on('change', function() {
-            setTimeout(function(){
-                window.location.reload(true);
-            },1000);
+        getSaveLoaderDiv("profileForm", "profileTimeZone");
+        $('#profileTimeZone').on('change', function() {
+            $(".timezone-error").text("");
+            assembleContent.demo({{ person.id }},true, $(this), true);
+            if ($.trim($("#profileTimeZone_error").text()) == "") {
+                setTimeout(function(){
+                    window.location.reload(true);
+                },1000);
+            };
         });
     });
+    {% endif %}
     </script>
 {%-endmacro %}
 
@@ -1186,7 +1193,7 @@
     {% else %}
         <div class="row">
             <div class="col-md-7 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}{% if person.has_role('patient') %}side{%else%}side-md{%endif%}{%else%}side-md side-custom{%endif%}">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role('patient') %}
                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
                      {% else %}
@@ -1195,11 +1202,10 @@
                      <br/>
                      {{profileName(person)}}
                      {{profileBirthDate(person)}}
-                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                 </div>
             </div>
             <div class="col-md-5 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}{% if person.has_role('patient') %}side{%else%}side-md{%endif%}{%else%}side-md side-custom{%endif%}">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
                     <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
                     <br/>
                     {{profileEmail(person)}}
