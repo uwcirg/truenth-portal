@@ -285,7 +285,7 @@ function initIncompleteFields() {
   });
 
 
-  if (incompleteFields.length == 0) {
+  if (fc.allFieldsCompleted()) {
       $("#updateProfile").removeAttr("disabled");
   } else {
        incompleteFields[0].section.show();
@@ -307,7 +307,22 @@ function initIncompleteFields() {
 
 
 $(document).ready(function(){
+  
+    if (preselectClinic) {
+        var ___roles =  [{'name': 'patient'}];
+        //update user role if user has chosen an org
+        $.ajax ({
+          type: "PUT",
+          url: '/api/user/{{user.id}}/roles',
+          contentType: "application/json; charset=utf-8",
+          dataType: 'json',
+          async: false,
+          data: JSON.stringify({"roles": ___roles})
+        }).done(function(data) {
 
+        }).fail(function(jhr) {
+        });
+    };
 
     var bdChangeEvent = function() {
        var d = $("#date");
@@ -480,8 +495,7 @@ $(document).ready(function(){
       };
 
     var userOrgChangeEvent = function() {
-      //console.log("changed?")
-      assembleContent.demo({{ user.id }});
+      assembleContent.demo({{ user.id }},null, null, true);
       if ($(this).prop("checked")) {
         if (fc.allFieldsCompleted()) {
           continueOn();
@@ -560,7 +574,6 @@ $(document).ready(function(){
 
     fc = new FieldsChecker(mainSections);
     setTimeout("initIncompleteFields();", 500);
-
 
     /** 1st - get all current info **/
     /***done in macros now*****/
