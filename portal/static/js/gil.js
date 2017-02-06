@@ -139,9 +139,10 @@ module.exports = NavToggle = (function() {
       e.preventDefault();
       href = $(this).attr('href');
       $('html').removeClass(navExpandedClass);
+      loader(true);
       return setTimeout(function() {
         return window.location = href;
-      }, 1000);
+      }, 500);
     });
     return $('.side-nav a[data-toggle=modal]').on('click touchend', function(e) {
       var target;
@@ -453,52 +454,57 @@ var OrgTool = function() {
     },
     this.updateOrg = function(userId, callback) {
 
-        var demoArray = {};
+        var demoArray = {}, errorMessage = "";
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId,
             async: false
         }).done(function(data) {
             demoArray = data;
+        }).fail(function() {
+            errorMessage = "Error retrieving demographics information for user.";
         });
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
         }).get();
 
-        var errorMessage = "";
+        if (!hasValue(errorMessage)) {
+          if (typeof orgIDs === 'undefined'){
+              orgIDs = [0]  // special value for `none of the above`
+          } else {
+            var __roles =  [{'name': 'patient'}];
+            //update user role if user has chosen an org
+            $.ajax ({
+              type: "PUT",
+              url: '/api/user/'+userId+'/roles',
+              contentType: "application/json; charset=utf-8",
+              dataType: 'json',
+              data: JSON.stringify({"roles": __roles})
+            }).done(function(data) {
 
-        if (typeof orgIDs === 'undefined'){
-            orgIDs = [0]  // special value for `none of the above`
-        } else {
-          var __roles =  [{'name': 'patient'}];
-          //update user role if user has chosen an org
+            }).fail(function(jhr) {
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user role.";
+            });
+          };
+
+          demoArray["careProvider"] = orgIDs;
+
           $.ajax ({
-            type: "PUT",
-            url: '/api/user/'+userId+'/roles',
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            data: JSON.stringify({"roles": __roles})
+              type: "PUT",
+              url: '/api/demographics/'+userId,
+              contentType: "application/json; charset=utf-8",
+              dataType: 'json',
+              async: true,
+              data: JSON.stringify(demoArray)
           }).done(function(data) {
-
-          }).fail(function(jhr) {
-            errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user role.";
+              if (callback) callback(errorMessage);
+          }).fail(function() {
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user organization.";
+              if (callback) callback(errorMessage);
           });
+        } else {
+          if(typeof callback != "undefined") callback(errorMessage);
         };
-        demoArray["careProvider"] = orgIDs;
-
-        $.ajax ({
-            type: "PUT",
-            url: '/api/demographics/'+userId,
-            contentType: "application/json; charset=utf-8",
-            dataType: 'json',
-            async: true,
-            data: JSON.stringify(demoArray)
-        }).done(function(data) {
-            if (callback) callback(errorMessage);
-        }).fail(function() {
-            errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user organization.";
-            if (callback) callback(errorMessage);
-        });
 
     },
     this.filterOrgs = function(leafOrgs) {

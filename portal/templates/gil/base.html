@@ -274,7 +274,7 @@
 {% endblock %}
 {% block consent %}
   {% if consent_agreements %}
-      <div id="consentContainer" style="visibility:invisible">
+      <div id="consentContainer">
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="consent">
               <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
@@ -530,7 +530,7 @@
                         if (data && data.careProvider) {
                             $.each(data.careProvider,function(i,val){
                                 var orgID = val.reference.split("/").pop();
-                                if (orgID == "0") {
+                                if (parseInt(orgID) === 0) {
                                   $(self).removeAttr("href");
                                   $(self).on("click", function() {
                                     $("figure.js-close-nav").trigger("click");
@@ -549,7 +549,8 @@
           function updateOrgCallback(errorMessage) {
               if (!errorMessage) {
                 $("a.box-modal__close").trigger("click");
-                setTimeout("location.reload();", 300);
+                loader(true);
+                setTimeout("location.reload();", 1000);
                 if (typeof sessionStorage != "undefined") {
                   try {
                     sessionStorage.setItem("noOrgModalViewed", "true");
@@ -559,7 +560,7 @@
                 };
               } else {
                 $("#modal-org-error").html(errorMessage);
-              }
+              };
           };
 
           function showMain() {
@@ -579,7 +580,7 @@
             checkBannerStatus();
 
             $("#modal-login").on("show.bs.modal", function(e) {
-                loader();
+                loader(false);
             });
 
             {% if user %}
@@ -639,18 +640,7 @@
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
              {% endif %}
 
-            $("li.side-nav-items__item a, a.icon-box__button--main, li.nav-list__item a").not("[data-toggle='modal']").not("[id='submitButton']").on("click", function(e) {
-              e.stopPropagation();
-
-              if (!$(this).parent().hasClass("side-nav-items__item-disabled")
-                && !$(this).hasClass("icon-box__button--disabled")
-                && !$(this).parent().hasClass("side-nave-items__item--selected")
-                && !$(this).hasClass("symptom-tracker-link")
-                && !$(this).hasClass("decision-support-link")
-                && !$(this).hasClass("intervention-link")
-                ) loader(true);
-              else loader(false);
-            });
+            //see gil.js to call loader onclick event of each nav.link
             setTimeout("loader(false);", 0);
           });
 
