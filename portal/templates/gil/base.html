@@ -316,22 +316,16 @@
 
           var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
           if (LOGIN_AS_PATIENT) {
-              $(window).bind("load", function(){ window.history.forward(); });
-              $(window).bind("unload", function(){});
-              $(window).bind('popstate', function(event) {
-                // if the event has our history data on it, load the page fragment with AJAX
-                if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
-                    location.reload();
-                }
+              if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+              window.addEventListener('popstate', function(event) {
+                if (typeof history != 'undefined' && history.pushState) {
+                  history.pushState(null, null, location.href);
+                  setTimeout('location.reload();', 0);
+                } else {
+                  window.history.forward(1);
+                  setTimeout('location.reload();', 0);
+                };
               });
-              $(window).bind("pageshow", function(event) {
-                  if (((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) && (event.persisted || event.originalEvent.persisted)) location.reload();
-              });
-              $(window).bind('popstate', function(event) {
-                  if ((typeof LOGIN_AS_PATIENT != "undefined") && LOGIN_AS_PATIENT) {
-                      location.reload();
-                  };
-               });
           };
 
           function _readCookie(name) {
