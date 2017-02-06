@@ -540,7 +540,7 @@ $(document).ready(function(){
         if (e.isDefaultPrevented()) {
           alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid.");
         } else {
-          assembleContent.demo({{ user.id }});
+          assembleContent.demo({{ user.id }},null, null, true);
         }
     });
 

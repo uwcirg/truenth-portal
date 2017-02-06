@@ -359,12 +359,12 @@ var fillContent = {
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
-            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
+            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true); 
         };
 
         if ($('#userOrgs input.clinic:checked').size()) {
             $("#terms").fadeIn();
-        };
+        }
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -1132,6 +1132,24 @@ var tnthAjax = {
             OT.populateUI();
             if (callback) callback();
             tnthAjax.getDemo(userId, noOverride);
+            if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
+                var ob = $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]");
+                ob.prop('checked', true);
+                var ___roles =  [{'name': 'patient'}];
+                tnthAjax.handleConsent(ob);
+                //update user role if user has chosen an org
+                $.ajax ({
+                  type: "PUT",
+                  url: '/api/user/' + userId +'/roles',
+                  contentType: "application/json; charset=utf-8",
+                  dataType: 'json',
+                  async: false,
+                  data: JSON.stringify({"roles": ___roles})
+                }).done(function(data) {
+
+                }).fail(function(jhr) {
+                });
+            };
 
             $("#userOrgs input[name='organization']").each(function() {
                 $(this).on("click", function() {
@@ -1341,8 +1359,6 @@ var tnthAjax = {
             if (!hasValue(parentOrg)) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
             if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
             var cto = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-
-            //console.log("parent org: " + parentOrg + ' parent name: ' + parentName)
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
                     if (parentOrg) {
