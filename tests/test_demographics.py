@@ -37,6 +37,7 @@ class TestDemographics(TestCase):
         self.add_concepts()
 
         # clinic reference requires pre-existing organization
+        self.shallow_org_tree()
         (org_id, org_name), (org2_id, org2_name) = [
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
@@ -141,6 +142,7 @@ class TestDemographics(TestCase):
     def test_demographics_duplicate_ref(self):
         # adding duplicate careProvider
 
+        self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         org_id, org_name = org.id, org.name
 

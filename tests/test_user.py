@@ -264,6 +264,7 @@ class TestUser(TestCase):
 
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider
+        self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
@@ -319,7 +320,8 @@ class TestUser(TestCase):
         self.assertEquals(new_user.organizations.count(), 2)
 
     def test_failed_account_creation_by_provider(self):
-        # without the right set of consents & roles, should fail 
+        # without the right set of consents & roles, should fail
+        self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
@@ -792,6 +794,7 @@ class TestUser(TestCase):
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
+            self.shallow_org_tree()
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])

@@ -31,16 +31,18 @@ class TestAppText(TestCase):
 
     def test_expansion(self):
         with SessionScope(db):
-            title = AppText.query.filter_by(name='landing title').one()
+            title = AppText(name='landing title')
             title.custom_text = '_expanded_'
+            db.session.add(title)
             db.session.commit()
         result = render_template('landing.html')
         self.assertTrue('_expanded_' in result)
 
     def test_missing_arg(self):
         with SessionScope(db):
-            title = AppText.query.filter_by(name='landing title').one()
+            title = AppText(name='landing title')
             title.custom_text = '_expanded_ {0}'
+            db.session.add(title)
             db.session.commit()
         self.assertRaises(ValueError, render_template, 'landing.html')
 

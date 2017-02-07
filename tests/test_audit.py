@@ -71,6 +71,7 @@ class TestAudit(TestCase):
         provider = self.add_user('provider@example.com')
         self.promote_user(role_name=ROLE.PATIENT)
         self.promote_user(provider, role_name=ROLE.PROVIDER)
+        self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         provider.organizations.append(org)
         self.test_user.organizations.append(org)

@@ -7,17 +7,29 @@ to life and properly control the visiblity of a intervention card?
 
 """
 from flask_webtest import SessionScope
+import os
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.site_persistence import SitePersistence
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.app_text import app_text
 
+known_good_persistence_file =\
+"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/80c79388e39a8efde2d2929ab94c15efefc0d7da/site_persistence_file.json"
 
 class TestSitePersistence(TestCase):
+
+    def setUp(self):
+        super(TestSitePersistence, self).setUp()
+        if os.environ.get('PERSISTENCE_FILE'):
+            self.fail("unset environment var PERSISTENCE_FILE for test")
+        self.app.config['PERSISTENCE_FILE'] = known_good_persistence_file
+        SitePersistence().import_(
+            include_interventions=True, keep_unmentioned=False)
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
