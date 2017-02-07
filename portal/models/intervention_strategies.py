@@ -159,7 +159,7 @@ def update_card_html_on_completion():
                 The questionnaire you are about to complete asks about your health.
                 Many of the questions relate to symptoms people with prostate
                 cancer may experience in their journey, as well as some general
-                health questions. It should take approximately 15 minutes.
+                health questions.
                 </p>"""
             else:
                 intro = """<p>
@@ -175,7 +175,7 @@ def update_card_html_on_completion():
             <p>
             By having many people come back and complete this same
             questionnaire over time, we can collectively improve the care of
-            all men with prostate cancer.
+            other men through their prostate cancer journey.
             </p><p>
             It is important that you answer all questions honestly and
             completely. Information contained within this survey will remain
@@ -223,9 +223,9 @@ def update_card_html_on_completion():
 
             {intro}
             <p>
-            You will be reminded by email on your email address {email} when
+            You will be reminded by email {email} when
             the next questionnaire is to be completed.
-            <a href={change_email_url}>Change email address</a>
+            <a href={change_email_url}>Change email address here</a>.
             </p><p>
             Your most recently completed questionnaire was on
             {most_recent_survey_date}.
