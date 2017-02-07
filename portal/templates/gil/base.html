@@ -593,6 +593,17 @@
                 setTimeout("location.reload();", 0);
             });
 
+            $("#modal-org").on("hide.bs.modal", function(e) {
+                 if (typeof sessionStorage != "undefined") {
+                   try {
+                     sessionStorage.setItem("noOrgModalViewed", "true");
+                   } catch(e) {
+
+                   };
+                 };
+                 setTimeout("location.reload();", 0);
+             });
+
             {% if user %}
                OT.getOrgs({{user.id}});
               $("#submit-orgs").on("click", function() {
