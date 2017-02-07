@@ -1147,7 +1147,7 @@
     <script>
     function adjustAssessmentInstrument(status) {
           var instrumentId = "";
-          var CRV_INSTRUMENT = "epic-26", IRONMAN_INSTRUMENT="eortc";
+          var CRV_INSTRUMENT = "epic26", IRONMAN_INSTRUMENT="eortc&instrument_id=prems";
           if (hasValue(status)) {
               if (status) instrumentId = CRV_INSTRUMENT;
               else instrumentId = IRONMAN_INSTRUMENT;
@@ -1177,7 +1177,7 @@
         };
         console.log(" instrumentId: " + instrumentId)
         if (hasValue(instrumentId)) {
-        $("#assessmentLink").attr("href", "/api/present-assessment?instrument_id="+instrumentId.replace('-','')+"&subject_id={{person.id}}");
+        $("#assessmentLink").attr("href", "/api/present-assessment?instrument_id="+instrumentId+"&subject_id={{person.id}}");
         };
     };
 
