@@ -15,6 +15,7 @@ import sqlalchemy as sa
 import re
 from sqlalchemy.orm import sessionmaker
 from portal.models.audit import Audit
+from portal.models.user import User
 
 Session = sessionmaker()
 
@@ -65,12 +66,12 @@ def upgrade():
 
         if audit.comment:
             # if comment references changed user, use that as subject_id
-            audit_comment_list = audit.comment.split()
+            audit_comment_list = audit.comment.lower().split()
             if ("user" in audit_comment_list
                 and len(audit_comment_list) > audit_comment_list.index("user")
                + 1):
                 subj_id = audit_comment_list[audit_comment_list.index("user") + 1]
-                if subj_id.isdigit():
+                if subj_id.isdigit() and session.query(User).filter_by(id = subj_id).first():
                     audit.subject_id = int(subj_id)
 
             # if possible, use context extracted from comment
