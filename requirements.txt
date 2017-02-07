@@ -43,7 +43,7 @@ ipython-genutils==0.1.0
 itsdangerous==0.24
 jedi==0.10.0
 Jinja2==2.9.5
-jsonschema==2.5.1
+jsonschema==2.6.0
 kombu==4.0.2
 Mako==1.0.6
 MarkupSafe==0.23
