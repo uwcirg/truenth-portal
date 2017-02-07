@@ -4,8 +4,10 @@ from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 import json
 
 from portal.extensions import db
+from portal.models.auth import AuthProvider
 from portal.models.organization import Organization, OrgTree
 from portal.models.role import ROLE
+from portal.models.user import User
 
 
 class TestDemographics(TestCase):
@@ -112,6 +114,33 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations.count(), 2)
         self.assertEquals(user.organizations[0].name, org_name)
         self.assertEquals(user.organizations[1].name, org2_name)
+
+    def test_auth_identifiers(self):
+        # add a fake FB and Google auth provider for user
+        ap_fb = AuthProvider(provider='facebook', provider_id='fb-123',
+                             user_id=TEST_USER_ID)
+        ap_g = AuthProvider(provider='google', provider_id='google-123',
+                             user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(ap_fb)
+            db.session.add(ap_g)
+            db.session.commit()
+        self.login()
+        rv = self.client.get('/api/demographics')
+
+        fhir = json.loads(rv.data)
+        self.assertEquals(len(fhir['identifier']), 4)
+
+        # put a study identifier
+        study_id = {
+            "system":"http://us.truenth.org/identity-codes/external-study-id",
+            "use":"secondary","value":"Test Study Id"}
+        fhir['identifier'].append(study_id)
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(fhir))
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.identifiers.count(), 5)
 
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
