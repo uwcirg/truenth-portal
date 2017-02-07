@@ -456,6 +456,7 @@
                 data["user_documents"].forEach(function(item) {
                     if (String(userTimeZone).toUpperCase() != "UTC") item["uploaded_at"] = convertUserDateTimeByLocaleTimeZone(String(item["uploaded_at"]), userTimeZone, userLocale);
                     else item["uploaded_at"] = String(item["uploaded_at"]).replace(/[tz]/gi, " ");
+                    item["actions"] = "Download"
                     fData.push(item);
                 });
 
@@ -465,7 +466,7 @@
                     pageSize: 5,
                     pageList: [5, 10, 25, 50, 100],
                     classes: 'table table-responsive profile-patient-reports',
-                    sortName: 'id',
+                    sortName: 'uploaded_at',
                     search: true,
                     smartDisplay: true,
                     showToggle: true,
@@ -479,12 +480,6 @@
                     undefinedText: '--',
                     columns: [
                         {
-                            field: 'id',
-                            title: 'ID',
-                            width: '5%',
-                            sortable: true,
-                            searchable: true
-                        }, {
                             field: 'user_id',
                             title: 'User',
                             width: '5%',
@@ -506,12 +501,17 @@
                             },
                             ****/
                             width: '20%'
-                        },
-                        {
+                        }, {
                             field: 'document_type',
                             title: 'Document Type',
                             sortable: true,
                             visible: false
+                        }, {
+                            field: 'actions',
+                            title: 'Actions',
+                            sortable: false,
+                            searchable: false,
+                            visible: true
                         }
                     ]
                 } );
