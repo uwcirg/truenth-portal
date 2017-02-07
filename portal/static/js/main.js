@@ -112,6 +112,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
 
     if (!dateString) return "";
     else {
+        var errorMessage = "";
         if (!hasValue(timeZone)) timeZone = "UTC";
         if (!hasValue(locale))  locale = "en-us";
         //locale needs to be in this format - us-en
@@ -130,10 +131,25 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
             convertedDate = new Date(dateString).toLocaleString(locale, options);
             if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
         } catch(e) {
+            var oMessage = e.message;
+            try {
+                var d = new Date(dateString);
+                var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
+                var offset = d.getTimezoneOffset() / 60;
+                var hours = d.getHours();
+                newDate.setHours(hours - offset);
+                convertedDate = newDate.toLocaleString();
+                $(".timezone-warning").addClass("text-warning").html("Error occurred when converting timezone: " + oMessage + "<br/>Date/time converted to local date/time instead.");
+            } catch(e2) {
+                errorMessage += "Error occurred when converting timezone: " + oMessage;
+                errorMessage += "<br/>Attempted but unable to convert date/time to local time: " + e2.message;
+            };
+        };
+        if (hasValue(errorMessage)) {
             $(".timezone-error").each(function() {
-                $(this).addClass("text-danger").html("Error converting time zone: " + e.message);
+                $(this).addClass("text-danger").html(errorMessage);
             });
-        }
+        };
         //console.log("dateString: " + dateString + " convertedDate: " + convertedDate);
         return convertedDate.replace(/\,/g, "");
     };
@@ -359,7 +375,7 @@ var fillContent = {
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
-            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true); 
+            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
         };
 
         if ($('#userOrgs input.clinic:checked').size()) {
@@ -693,8 +709,14 @@ var assembleContent = {
             orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
             }).get();
+            if (orgIDs) {
+                if (orgIDs.length > 0) {
+                    demoArray["careProvider"] = orgIDs;
+                } else {
+                    demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
+                };
+            };
 
-            if (orgIDs) demoArray["careProvider"] = orgIDs;
         };
 
         if (hasValue($("#deathDate").val())) {
@@ -844,7 +866,6 @@ var assembleContent = {
             demoArray["telecom"].push({ "system": "phone", "value": $.trim($("input[name=phone]").val()) });
            //console.log("demoArray", demoArray);
         };
-        //console.log(demoArray)
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
 
     },
@@ -1167,9 +1188,21 @@ var tnthAjax = {
                                 //console.log("in id: " + $(this).attr("id"))
                                if ($(this).attr("id") !== "noOrgs") {
                                     $(this).prop('checked',false);
-                                };
+                               } else {
+                                    if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
+                               };
                             });
 
+                        };
+                    } else {
+                        var isChecked = false;
+                        $("#userOrgs input[name='organization']").each(function() {
+                            if ($(this).prop("checked")) {
+                                isChecked = true;
+                            };
+                        });
+                        if (!isChecked) {
+                            if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                         };
                     };
                     getSaveLoaderDiv("profileForm", "userOrgs");
@@ -1382,7 +1415,6 @@ var tnthAjax = {
                     } else {
                         //delete all orgs
                         $("#userOrgs").find("input[name='organization']").each(function() {
-                            console.log("in delete: " + $(this).val())
                             setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": $(this).val()}) + ");", 0);
                         });
                     };

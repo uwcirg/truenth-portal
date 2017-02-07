@@ -248,7 +248,7 @@
                 <input type="hidden" name="__firstname" value="{{user.first_name if user and user.first_name}}"/>
                 <input type="hidden" name="__lastname"  value="{{user.last_name if user and user.last_name}}" />
                 <input type="hidden" name="__birthdate" value="{{user.birthdate if user and user.birthdate}}" />
-                <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
+                <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
                 </div>
                 <!-- consent agreement -->
                 <button id="submit-orgs" class="button button--teal" type="button">Submit</button>
@@ -548,7 +548,7 @@
 
           function updateOrgCallback(errorMessage) {
               if (!errorMessage) {
-                $("a.box-modal__close").trigger("click");
+                $("#modal-org a.box-modal__close").trigger("click");
                 loader(true);
                 setTimeout("location.reload();", 1000);
                 if (typeof sessionStorage != "undefined") {
@@ -582,6 +582,27 @@
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
             });
+            $("#modal-org").on("hide.bs.modal", function(e) {
+                if (typeof sessionStorage != "undefined") {
+                  try {
+                    sessionStorage.setItem("noOrgModalViewed", "true");
+                  } catch(e) {
+
+                  };
+                };
+                setTimeout("location.reload();", 0);
+            });
+
+            $("#modal-org").on("hide.bs.modal", function(e) {
+                 if (typeof sessionStorage != "undefined") {
+                   try {
+                     sessionStorage.setItem("noOrgModalViewed", "true");
+                   } catch(e) {
+
+                   };
+                 };
+                 setTimeout("location.reload();", 0);
+             });
 
             {% if user %}
                OT.getOrgs({{user.id}});
