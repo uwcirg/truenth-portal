@@ -15,8 +15,6 @@ env:
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
-    - PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json'
-
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}
     - BINTRAY_DEB_REPO=${BINTRAY_DEB_REPO:-true_nth}

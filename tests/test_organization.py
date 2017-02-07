@@ -30,7 +30,7 @@ class TestOrganization(TestCase):
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
-        parent = Organization(id=1, name='fake parent reference')
+        parent = Organization(id=101, name='fake parent reference')
         with SessionScope(db):
             db.session.add(parent)
             db.session.commit()
@@ -50,7 +50,7 @@ class TestOrganization(TestCase):
                           data['address'][0]['line'][0])
         self.assertEquals(org.name, data['name'])
         self.assertEquals(org.phone, "022-655 2320")
-        self.assertEquals(org.partOf_id, 1)
+        self.assertEquals(org.partOf_id, parent_id)
 
         # confirm we can store
         with SessionScope(db):
@@ -137,6 +137,7 @@ class TestOrganization(TestCase):
         self.assert400(rv)
 
     def test_organization_delete(self):
+        self.shallow_org_tree()
         (org1_id, org1_name), (org2_id, org2_name) = [
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
@@ -159,6 +160,7 @@ class TestOrganization(TestCase):
         shortcut = Identifier(
             use='secondary', system=SHORTCUT_ALIAS, value='shortcut')
 
+        self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         before = org.identifiers.count()
         org.identifiers.append(alias)
@@ -199,12 +201,13 @@ class TestOrganization(TestCase):
         self.assertEquals(2, org.identifiers.count())
 
     def test_org_tree_nodes(self):
+        self.shallow_org_tree()
         with self.assertRaises(ValueError) as context:
             OrgTree().all_leaves_below_id(0)  # none of the above
         self.assertTrue('not found' in context.exception.message)
 
-        nodes = OrgTree().all_leaves_below_id(101)  # UWMC - 3 children
-        self.assertEquals(3, len(nodes))
+        nodes = OrgTree().all_leaves_below_id(101)
+        self.assertEquals(1, len(nodes))
 
     def test_deeper_org_tree(self):
         self.deepen_org_tree()
@@ -226,12 +229,11 @@ class TestOrganization(TestCase):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
 
-        # Should now find children of 101 (102, 103, 104) and children
-        # of 102 (10031, 10032) for total of 4 leaf nodes
+        # Should now find children of 101 (1001) and leaf children
+        # of 102 (10031, 10032) for total of 3 leaf nodes
         leaves = self.test_user.leaf_organizations()
-        self.assertEquals(len(leaves), 4)
-        self.assertTrue(103 in leaves)
-        self.assertTrue(104 in leaves)
+        self.assertEquals(len(leaves), 3)
+        self.assertTrue(1001 in leaves)
         self.assertTrue(10031 in leaves)
         self.assertTrue(10032 in leaves)
 
@@ -239,13 +241,13 @@ class TestOrganization(TestCase):
         # can we get a list of just the leaf orgs
         self.deepen_org_tree()
         leaves = OrgTree().all_leaf_ids()
-        self.assertEquals(len(leaves), 6)
-        for i in (103, 104, 10031, 10032, 202, 203):
+        self.assertEquals(len(leaves), 3)
+        for i in (1001, 10031, 10032):
             self.assertTrue(i in leaves)
 
     def test_here_and_below_id(self):
         self.deepen_org_tree()
-        nodes = OrgTree().here_and_below_id(101)
-        self.assertEquals(len(nodes), 7)
-        for i in (101, 102, 103, 104, 1002, 10031, 10032):
+        nodes = OrgTree().here_and_below_id(102)
+        self.assertEquals(len(nodes), 4)
+        for i in (102, 1002, 10031, 10032):
             self.assertTrue(i in nodes)

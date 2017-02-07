@@ -28,7 +28,6 @@ from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
 from portal.models.user_consent import UserConsent
-from portal.site_persistence import SitePersistence
 from portal.system_uri import SNOMED
 
 TEST_USER_ID = 1
@@ -158,8 +157,10 @@ class TestCase(Base):
         self.test_user.birthdate = datetime.utcnow()
 
         # Register with a clinic
+        self.shallow_org_tree()
         org = Organization.query.filter(
             Organization.partOf_id != None).first()
+        assert org
         self.test_user.organizations.append(org)
 
         # Agree to Terms of Use and sign consent
@@ -173,14 +174,26 @@ class TestCase(Base):
             db.session.add(consent)
             db.session.commit()
 
+    def shallow_org_tree(self):
+        """Create shallow org tree for common test needs"""
+        org_101 = Organization(id=101, name='101')
+        org_102 = Organization(id=102, name='102')
+        org_1001 = Organization(id=1001, name='1001', partOf_id=101)
+        with SessionScope(db):
+            map(db.session.add, (org_101, org_102, org_1001))
+            db.session.commit()
+        OrgTree.invalidate_cache()
+
     def deepen_org_tree(self):
         """Create deeper tree when test needs it"""
+        self.shallow_org_tree()
         org_l2 = Organization(id=1002, name='l2', partOf_id=102)
         org_l3_1 = Organization(id=10031, name='l3_1', partOf_id=1002)
         org_l3_2 = Organization(id=10032, name='l3_2', partOf_id=1002)
         with SessionScope(db):
             map(db.session.add, (org_l2, org_l3_1, org_l3_2))
             db.session.commit()
+        OrgTree.invalidate_cache()
 
     def add_concepts(self):
         """Only tests needing concepts should load - VERY SLOW
@@ -207,8 +220,6 @@ class TestCase(Base):
             add_static_relationships()
             add_static_roles()
             db.session.commit()
-            SitePersistence().import_(include_interventions=True,
-                                      keep_unmentioned=False)
         self.init_data()
 
         self.client = self.__app.test_client()

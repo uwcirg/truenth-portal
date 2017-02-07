@@ -11,6 +11,7 @@ from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
 import requests
+from requests.exceptions import MissingSchema
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -187,7 +188,14 @@ class VersionedResource(object):
         :returns: (asset, url)
 
         """
-        response = requests.get(url)
+        try:
+            response = requests.get(url)
+        except MissingSchema:
+            # In testing, mocking of test data includes not loading
+            # app_text resources defining legit URLs.  punt if testing
+            if current_app.config.get('TESTING'):
+                return ("[TESTING - fake response]", 'http://fake.org')
+            raise  # reraise same exception if we're not testing
         try:
             return (
                 response.json()['asset'],
@@ -227,6 +235,8 @@ def app_text(name, *args):
     """
     item = AppText.query.filter_by(name=name).first()
     if not item:
+        if current_app.config.get('TESTING'):
+            return "[TESTING - ignore missing app_text '{}']".format(name)
         raise ValueError("unknown customized app string '{}'".format(name))
 
     text = str(item)
