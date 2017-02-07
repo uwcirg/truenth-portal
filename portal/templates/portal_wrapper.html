@@ -37,13 +37,9 @@
         };
     };
 
-    function showWrapper() {
-        if (!$("#tnthNavWrapper").is(":visible")) setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 100);
-    };
-
     $(document).ready(function(){
       // Once nav is loaded, make the wrapper visible - delay displaying to avoid
-      setTimeout("showWrapper();", 200);
+      setTimeout('$("#tnthNavWrapper").css("visibility","visible");', 300);
       // Configure and start the session timeout monitor
       {% if user %}
           var sessMon = sessionMonitor({
