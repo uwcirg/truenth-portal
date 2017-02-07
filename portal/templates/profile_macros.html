@@ -456,7 +456,7 @@
                 data["user_documents"].forEach(function(item) {
                     if (String(userTimeZone).toUpperCase() != "UTC") item["uploaded_at"] = convertUserDateTimeByLocaleTimeZone(String(item["uploaded_at"]), userTimeZone, userLocale);
                     else item["uploaded_at"] = String(item["uploaded_at"]).replace(/[tz]/gi, " ");
-                    item["actions"] = "Download"
+                    item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
                 });
 
@@ -495,11 +495,6 @@
                             title: 'Uploaded At' + (userTimeZone == "UTC" ? " (GMT)" : ""),
                             sortable: true,
                             searchable: true,
-                            /******
-                            sorter: function(a, b) {
-                                return new Date(b).getTime() - new Date(a).getTime();
-                            },
-                            ****/
                             width: '20%'
                         }, {
                             field: 'document_type',
