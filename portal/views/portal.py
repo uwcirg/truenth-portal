@@ -116,7 +116,7 @@ class ShortcutAliasForm(FlaskForm):
         if len(field.data.strip()):
             try:
                 Identifier.query.filter_by(
-                    system=SHORTCUT_ALIAS, value=field.data).one()
+                    system=SHORTCUT_ALIAS, _value=field.data).one()
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
