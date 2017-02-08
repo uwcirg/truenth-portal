@@ -828,19 +828,7 @@ var assembleContent = {
                    // console.log("Problem retrieving data from server.");
                 });
 
-                var studySource = "";
-                //use the parent org name for the study source
-                $("#userOrgs input[name='organization']").each(function() {
-                    if (!studySource && $(this).prop("checked")) {
-                        var parentOrg = $(this).closest(".org-container[data-parent-name]").attr("data-parent-name");
-                        if (hasValue(parentOrg)) studySource = parentOrg;
-                    };
-                });
-
                 var studyIdObj = {
-                    assigner: {
-                        "display": hasValue(studySource)? studySource : "current study"
-                    },
                     system: "http://us.truenth.org/identity-codes/external-study-id",
                     use: "secondary",
                     value: studyId
