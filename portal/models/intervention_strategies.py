@@ -188,7 +188,7 @@ def update_card_html_on_completion():
             if localized:
                 potential_instruments = ('epic26', 'eproms_add')
             else:
-                potential_instruments = ('prems', 'eortc')
+                potential_instruments = ('eortc', 'prems')
 
             # Need to remove completed instruments
             # TODO: refactor needed
