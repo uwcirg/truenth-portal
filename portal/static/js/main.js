@@ -995,7 +995,7 @@ var OrgTool = function() {
                     subOrgs.each(function() {
                          var isVisible = false;
                          $(this).find("input[name='organization']").each(function() {
-                             if ($(this).is(":visible")) {
+                             if ($(this).is(":visible") || $(this).css("display") != "none") {
                                 isVisible = true;
                                 allChildrenHidden = false;
                              };
@@ -1013,7 +1013,7 @@ var OrgTool = function() {
                     var ip = $(this).find("input[name='organization']");
                     if (ip.length > 0) {
                         ip.each(function() {
-                            if ($(this).is(":visible")) allChildrenHidden = false;
+                            if ($(this).is(":visible") || $(this).css("display") != "none") allChildrenHidden = false;
                         });
                     };
                 };
@@ -1096,14 +1096,14 @@ var OrgTool = function() {
                     childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
 
                     if (orgsList[item.id].children.length > 0) {
-                        childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
+                        childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                         '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                         item.name +
                         '</label>';
 
                      } else {
-                        childClinic += '<label class="org-label">' +
+                        childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
                         '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                         item.name +

@@ -66,14 +66,13 @@
                      <hr class="pc-hr"/>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
-                        <div class="indent">
                         <div id="fillOrgs"></div>
                         <div class="help-block with-errors"></div>
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
                         //userId, noOverride, sync, noPopulate
-                        var leafOrgs = {% if user.leaf_organizations() %} {{user.leaf_organizations() | safe}} {% else %} false {% endif %};
+                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
 
                         $.ajax ({
                             type: "GET",

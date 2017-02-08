@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, render_template, current_app
+from flask import abort, Blueprint, render_template, current_app, request
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -25,14 +25,19 @@ def patients_root():
     """
     user = current_user()
 
-    # Build list of all organization ids, and their decendents, the
-    # user belongs to
-    org_list = set()
-    OT = OrgTree()
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-            continue
-        org_list.update(OT.here_and_below_id(org.id))
+    request_org_list = request.args.get('org_list')
+
+    if request_org_list:
+        org_list = request_org_list.split(",")
+    else:
+        # Build list of all organization ids, and their decendents, the
+        # user belongs to
+        org_list = set()
+        OT = OrgTree()
+        for org in user.organizations:
+            if org.id == 0:  # None of the above doesn't count
+                continue
+            org_list.update(OT.here_and_below_id(org.id))
 
     # Gather up all patients belonging to any of the orgs (and their children)
     # this (staff) user belongs to.
@@ -46,8 +51,13 @@ def patients_root():
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
+    leaf_organizations = None
+    try:         
+        leaf_organizations = user.leaf_organizations()
+    except ValueError:
+         current_app.logger.debug("In patients list: error retrieving leaf organizations for user %s", str(user.id))
 
-    return render_template('patients_by_org.html', patients_list=patients.all(), wide_container="true")
+    return render_template('patients_by_org.html', patients_list=patients.all(), user=user, request_org_list=org_list if request_org_list else None, leaf_organizations=leaf_organizations, wide_container="true")
 
 @patients.route('/profile_create')
 @roles_required(ROLE.PROVIDER)
@@ -55,14 +65,19 @@ def patients_root():
 def profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
-    return render_template("profile_create.html", user = user, consent_agreements=consent_agreements)
+    leaf_organizations = None
+    try:         
+        leaf_organizations = user.leaf_organizations()
+    except ValueError:
+         current_app.logger.debug("In profile create: error retrieving leaf organizations for user %s", str(user.id))
+    return render_template("profile_create.html", user = user, consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
 def sessionReport(user_id, instrument_id, authored_date):
     user = get_user(user_id)
-    return render_template("sessionReport.html",user=user, current_user = current_user(), instrument_id=instrument_id, authored_date=authored_date)
+    return render_template("sessionReport.html",user=user, current_user=current_user(), instrument_id=instrument_id, authored_date=authored_date)
 
 
 @patients.route('/patient_profile/<int:patient_id>')
@@ -74,11 +89,11 @@ def patient_profile(patient_id):
     user.check_role("edit", other_id=patient_id)
     patient = get_user(patient_id)
     if not patient:
-        abort(404, "Patient {} Not Found".format(patient_id))   
+        abort(404, "Patient {} Not Found".format(patient_id))
     consent_agreements = get_orgs_consent_agreements()
     pca_localized_status = localized_PCa(patient)
 
-    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements = consent_agreements, pca_localized_status = pca_localized_status if pca_localized_status else None)
+    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements=consent_agreements, pca_localized_status=pca_localized_status if pca_localized_status else None)
 
 
 def get_orgs_consent_agreements():
