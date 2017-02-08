@@ -90,10 +90,9 @@ class UserIdentifier(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     identifier_id = db.Column(
         db.ForeignKey('identifiers.id'), nullable=False)
-    #identifier = db.relationship(Identifier, cascade="save-update")
-    #user = db.relationship('User', cascade="save-update")
+    identifier = db.relationship(Identifier, cascade="save-update")
+    user = db.relationship('User', cascade="save-update")
 
     def __str__(self):
-        pass
-        #return ("user_identifier {} for {}".format(
-        #    self.identifier, self.user))
+        return ("user_identifier {} for {}".format(
+            self.identifier, self.user))
