@@ -1265,7 +1265,6 @@
                 //console.log("Problem retrieving data from server.")
             });
         };
-        console.log(" instrumentId: " + instrumentId)
         if (hasValue(instrumentId)) {
         $("#assessmentLink").attr("href", "/api/present-assessment?instrument_id="+instrumentId+"&subject_id={{person.id}}");
         };
