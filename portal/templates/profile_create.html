@@ -287,20 +287,10 @@ $(document).ready(function(){
 
                     _demoArray['careProvider'] = orgIDs;
 
-                    var studySource = "";
+
                     var studyId = $("#studyId").val();
                     if (hasValue(studyId)) {
-                        //use the parent org name for the study source
-                        $("#userOrgs input[name='organization']").each(function() {
-                            if (!studySource && $(this).prop("checked")) {
-                                var parentOrg = $(this).closest(".org-container[data-parent-name]").attr("data-parent-name");
-                                if (hasValue(parentOrg)) studySource = parentOrg;
-                            };
-                        });
                         var studyIdObj = {
-                            assigner: {
-                                "display": hasValue(studySource)? studySource : "current study"
-                            },
                             system: "http://us.truenth.org/identity-codes/external-study-id",
                             use: "secondary",
                             value: studyId
