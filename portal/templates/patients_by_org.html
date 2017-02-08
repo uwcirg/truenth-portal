@@ -173,7 +173,7 @@ $(document).ready(function() {
   });
 
   {% if config.PROVIDER_BULK_DATA_ACCESS %}
-    AT.initOrgsList({{user.id}}, leafOrgs, org_list);
+    AT.initOrgsList({{user.id}}, leafOrgs, (/org_list/.test(location.href) ? org_list : null));
     $("#orglist-dropdown").on("click", function() {
       handleOrgsListDropDown(this);
     });
