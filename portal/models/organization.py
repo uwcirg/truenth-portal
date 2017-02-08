@@ -72,7 +72,7 @@ class Organization(db.Model):
         if 'identifier' in data:
             for id in data['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
-                if identifier not in self.identifiers:
+                if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
         return self
 

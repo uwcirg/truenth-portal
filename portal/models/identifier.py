@@ -67,7 +67,7 @@ class Identifier(db.Model):
 
         """
         existing = Identifier.query.filter_by(system=self.system,
-                                              value=self.value).first()
+                                              _value=self.value).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:
