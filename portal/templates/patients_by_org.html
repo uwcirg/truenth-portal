@@ -3,8 +3,8 @@
   <div id="patientList" class="reduce-font-sizes">
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
-    <div><a href="{{ url_for('patients.profile_create') }}"><button class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button></a> &nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
-    <a href="" id="_downloadLink" target="_blank" style="visibility: hidden"></a>
+    <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button>&nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
+    <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
   {% if config.PROVIDER_BULK_DATA_ACCESS %}
       <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
@@ -14,39 +14,42 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export assessment data") }}</h4>
               </div>
-              <div class="modal-body" style="padding: 1em">
+              <div class="modal-body">
                   <div class="form-group">
                     <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
-                    <div id="patientsInstrumentList" class="profile-radio-list" style="margin-left:1em">
+                    <div id="patientsInstrumentList" class="profile-radio-list">
                       {% for instrument_code in config["INSTRUMENTS"] %}
-                      <div class="checkbox">
-                          <label>
-                              <input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}
-                          </label>
+                      <div class="checkbox"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
                       </div>
                       {% endfor %}
-                      <div id="_downloadMessage" style="color:#a94442"></div>
+                      <div id="_downloadMessage"></div>
                     </div>
                   </div>
                   <br/>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="patientsDownloadButton" style="font-size:0.8em">{{ _("Export") }}</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Close") }}</button>
+                <button type="button" class="btn btn-default" id="patientsDownloadButton">{{ _("Export") }}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
               </div>
             </div>
           </div>
       </div>
   {% endif %}
-
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
         {% if config.PROVIDER_BULK_DATA_ACCESS %}
-          <div class="orglist-download-container">
-              <div>
-                <a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal"><span class="glyphicon glyphicon-save"></span>&nbsp;{{ _("Export assessment data") }}</a>
-              </div>
+          <div class="orglist-download-container"><div><a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export assessment data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
          </div>
+         <div id="orglistSelector" class="dropdown btn-group orglist-selector">
+            <button id="orglist-dropdown" class="create-user-link btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Filter List By Clinic &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
+            </button>
+            <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
+              <div class="form-group smaller-text" id="userOrgs">
+                <div id="fillOrgs" class="smaller-text"></div>
+              </div>
+            </div>
+          </div>
         {% endif %}
         <span id="tableCount"></span>
       </div>
@@ -59,8 +62,8 @@
              data-sort-order="desc"
              data-search="true"
              data-pagination="true"
-             data-page-size="20"
-             data-page-list="[10, 25, 50]"
+             data-page-size="15"
+             data-page-list="[15, 25, 50]"
              data-toolbar="#adminTableToolbar"
              data-show-toggle="true"
              data-show-columns="true"
@@ -76,178 +79,75 @@
                   <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
+                   <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
                   {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Assessment Status") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Organization(s)") }}</th>
               </tr>
           </thead>
-          <tbody data-link="row" class="rowlink">
+          <tbody id="admin-table-body" data-link="row" class="rowlink">
                {% for patient in patients_list | sort(attribute='id')%}
-              <tr id="id_row_{{patient.id}}">
-                  <td>{{patient.id}}</td>
-                  <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
-                  <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                  <td>{{ patient.first_name if patient.first_name }}</td>
-                  <td>{{ patient.last_name if patient.last_name }}</td>
-                  <td>{{ patient.email if patient.email }}</td>
-                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                    <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
-                  {% endif %}
-                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
-                    <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
-                  {% endif %}
-                  <td><!--consent datefield--></td>
-                  <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-                {% endfor %}
-              </tr>
+                  <tr id="id_row_{{patient.id}}">
+                      <td>{{patient.id}}</td>
+                      <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
+                      <td id="{{patient.id}}_username">{{ patient.username }}</td>
+                      <td>{{ patient.first_name if patient.first_name }}</td>
+                      <td>{{ patient.last_name if patient.last_name }}</td>
+                      <td>{{ patient.email if patient.email }}</td>
+                      <td>{{ patient.phone if patient.phone}}</td>
+                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
+                      {% endif %}
+                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                        <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
+                      {% endif %}
+                      <td><!--consent datefield--></td>
+                      <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
+                  </tr>
+               {% endfor %}
           </tbody>
       </table>
   </div>
 </div>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block document_ready %}
- //a workaround for wrapper not finished loading before the content displays, the finish loading of wrapper hides the loader
-DELAY_LOADING = true;
-var requestsCounter = 0;
 
-$(".tnth-admin-table").bootstrapTable({
+var leafOrgs = {% if leaf_organizations %} {{ leaf_organizations | safe}} {% else %} false {% endif %};
+var org_list = {};
+{% if org_list %}
+  {% for org in org_list %}
+      org_list[{{org}}] = true;
+  {% endfor %}
+{% endif %}
+
+function handleOrgsListDropDown(obj) {
+  if (!obj) obj = $("#orglist-dropdown");
+  if ($("#org-menu").is(":visible")) {
+    $(obj).find("span.glyphicon-menu-down").show();
+    $(obj).find("span.glyphicon-menu-up").hide();
+  } else {
+    $(obj).find("span.glyphicon-menu-down").hide();
+    $(obj).find("span.glyphicon-menu-up").show();
+  };
+};
+
+$(document).ready(function() {
+  
+  $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
+      AT.updateData();
+   });
+  setTimeout(AT.updateData, 0);
+
+  $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");
         var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
         $("#tableCount"+thisId).html(rowInfo);
         return rowInfo;
     }
-});
-
-function getData(userString) {
-  $.ajax ({
-      type: "GET",
-      url: '/api/consent-assessment-status',
-      contentType: "application/json; charset=utf-8",
-      data: userString,
-      timeout: 10000,
-      dataType: 'json'
-  }).done(function(data) {
-     // console.log(data);
-      if (data.status) {
-        var arrData = [];
-        data.status.forEach(function(status) {
-            var c = status.consents;
-            var a = "", s = "", prevItem = {};
-            if (c) {
-            c.forEach(function(item) {
-                if (!prevItem.consent_signed || ((prevItem.assessment_status != item.assessment_status)
-                    && (prevItem.consent_signed != item.consent.signed))){
-                  if (!(/null/.test(item.consent.agreement_url))) {
-                    var cl = "";
-                    var sd = item.consent.signed? (item.consent.signed).substring(0, 10) : "";
-                    switch(String(item.assessment_status).toLowerCase()) {
-                        case "completed":
-                          cl = "text-success";
-                          break;
-                        case "due":
-                          cl = "text-warning";
-                          break;
-                        case "overdue":
-                          cl = "text-danger";
-                          break;
-                    };
-                    a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " small-text'>" + item.assessment_status + "</span>";
-                    s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
-
-                    prevItem.assessment_status = item.assessment_status;
-                    prevItem.consent_signed = item.consent.signed;
-                  };
-                };
-              });
-          };
-            //console.log("user id: " + status.user_id)
-            arrData.push({
-              "id": status.user_id,
-              "data": {
-              "status": a,
-              "consentdate": s
-              }
-            });
-        });
-
-        if (arrData.length > 0) {
-          //console.log(arrData)
-          arrData.forEach(function(d) {
-             //var row = $("#adminTable tr[data-uniqueid='" + d.id + "']");
-             var row = $("#id_row_" + d.id);
-             if (row.length > 0) {
-                var rindex = row.attr("data-index");
-                var statusField = row.children(".status-field");
-                var cdField = row.children(".consentdate-field");
-               //console.log("status: " + statusField.length + " cdField: " + cdField.length);
-               if (d.data.status) statusField.html(d.data.status);
-               if (d.data.consentdate) cdField.html(d.data.consentdate);
-              };
-          });
-
-        };
-      };
-      //console.log("consent updated successfully.");
-      requestsCounter -= 1;
-      if(requestsCounter == 0) setTimeout('$("#loadingIndicator").fadeOut();', 300);
-  }).fail(function(xhr) {
-      console.log("request failed.");
-      ///console.log(xhr.responseText)
-      setTimeout('$("#loadingIndicator").fadeOut();', 300);
   });
-};
-
-function updateData() {
-
-  var us = "", _userIds = [], ct = 0, arrUsers = [];
-
-  $("td.id-field").each(function() {
-      var id = parseInt($(this).text());
-      if (!isNaN(id)) {
-          _userIds.push(id);
-      };
-   });
-
-  for (var index = 0; index < _userIds.length; index++, ct++) {
-
-     us += (us != ""?"&":"") + "user_id=" + _userIds[index];
-     if (index == (_userIds.length - 1)) {
-       arrUsers.push(us);
-     }
-     else if (ct >= 5) {
-        arrUsers.push(us);
-        us = "";
-        ct = 0;
-     };
-  };
-
-  if (arrUsers.length > 0) {
-    requestsCounter = arrUsers.length;
-    loader(true);
-    arrUsers.forEach(function(us) {
-        try {
-          getData(us);
-        } catch(ex) {
-          console.log("Error request: " + ex.message)
-        };
-    });
-  } else {
-    DELAY_LOADING = false; 
-    setTimeout('$("#loadingIndicator").fadeOut();', 300);
-  };
-};
-
-
-$(document).ready(function() {
-
-
-  $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
-      updateData();
-    });
-    setTimeout(updateData, 0);
-
   $("input[data-field='id']:checkbox").hide();
 
   $(document).delegate("#patientsDownloadButton", "click", function(event){
@@ -271,6 +171,17 @@ $(document).ready(function() {
   $("input[name='instrument']").on("click", function() {
       if ($(this).is(":checked")) $("#_downloadMessage").text("");
   });
+
+  {% if config.PROVIDER_BULK_DATA_ACCESS %}
+    AT.initOrgsList({{user.id}}, leafOrgs, (/org_list/.test(location.href) ? org_list : null));
+    $("#orglist-dropdown").on("click", function() {
+      handleOrgsListDropDown(this);
+    });
+    $("html").on("click", function() {
+      handleOrgsListDropDown();
+    });
+  {% endif %}
+
 });
 
 {% endblock %}

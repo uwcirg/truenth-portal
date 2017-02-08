@@ -76,7 +76,43 @@ body {
 }
 
 #adminTable {
+  min-height: 280px;
   transition: all 0.5s ease-in;
+}
+
+div.orglist-selector {
+  display: inline-block;
+}
+
+#adminTableToolbar div.orglist-selector button {
+  background-color: #FFF;
+  border: 1px solid #ccc;
+  height: 2.95em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+#adminTableToolbar div.dropdown-menu {
+  z-index: 50;
+  max-height: 500px;
+  transition: height 300ms ease-in;
+}
+#adminTableToolbar div.org-container {
+  display: block;
+  margin: -0.4em 0;
+}
+div.orglist-selector div.dropdown-menu #userOrgs {
+  width: 280px;
+  max-width: 100%;
+  padding: 0 0.5em 0 1em;
+  margin: 0 auto;
+}
+div.orglist-selector div.dropdown-menu #fillOrgs .divider {
+  display: none;
+}
+div.orglist-selector div.org-container label.org-label {
+  margin: -5em 0;
+  font-size: 0.95em;
+  display: inline;
 }
 
 #profileStudyIDContainer {
@@ -256,15 +292,30 @@ transform(-1000px, 0);*/
   margin-left: 8px;
   display: none;
 }
+#patientList #_downloadLink {
+  visibility: hidden;
+}
 #patientAssessmentDownload {
   padding: 0.65em;
   font-size: 1.1em;
+}
+#dataDownloadModal .modal-body {
+  padding: 1em
+}
+#dataDownloadModal button {
+  font-size:0.8em;
+}
+#dataDownloadModal .profile-radio-list {
+  margin-left:1em
+}
+#_downloadMessage {
+  color:#a94442
 }
 #patientsInstrumentList div.checkbox label {
   font-size: 0.8em;
 }
 .orglist-download-container {
-  display: flex;
+  display: inline-block;
   font-size: 0.9em;
   color: #57675B;
   flex-wrap: wrap;
@@ -276,6 +327,7 @@ transform(-1000px, 0);*/
 .orglist-download-container a {
   color: #57675B;
 }
+
 a {
   color: #57675B;
 }
@@ -680,14 +732,17 @@ input.clinic {
   margin-top: 0.5em;
 }
 #createProfileForm #studyId {
-  width:350px; 
+  width:350px;
   max-width: 100%;
+}
+#createProfileForm .btn-tnth-back {
+  margin-left: 3.5em;
 }
 #noEmailContainer {
   margin-top: 0.3em;
 }
 #noEmail {
-  position:relative; 
+  position:relative;
   top:-1px
 }
 #profileSendEmailContainer {
@@ -983,10 +1038,10 @@ table.profile-audit-log TH,
   height: 28em;
 }
 .side-md {
-  height: 27em;
+  height: 24em;
 }
 .side-lg {
-  height: 32em;
+  height: 29em;
 }
 .flex {
   display: flex;
@@ -1251,6 +1306,18 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0;
   }
 }
+@media (max-width: 506px) {
+  div.admin-table div.pull-right {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.2em;
+  }
+  div.admin-table div.pull-right.search {
+    width: 50%;
+    float: left !important;
+    max-width: 100%;
+  }
+}
 @media (max-width: 640px) {
   body,
   .form-control,
@@ -1307,6 +1374,9 @@ div.org-container input[type="checkbox"] {
   }
   .side {
     height: 45em !important;
+  }
+  .one-side {
+    height: 24em !important;
   }
   #phone,
   #email {
@@ -1384,6 +1454,23 @@ div.org-container input[type="checkbox"] {
   #adminTable .email-field {
     display: none;
   }
+
+  #adminTableToolbar div.indent {
+    padding: 0 0.2em;
+  }
+
+  #adminTableToolbar div.dropdown-menu {
+    width: 200px !important;
+    overflow: hidden;
+  }
+
+  div.orglist-selector div.dropdown-menu #userOrgs{
+    width: 180px !important;
+  }
+  div.orglist-selector div.org-container label.org-label {
+    font-size: 0.8em;
+  }
+
   .timezone-container {
     padding-bottom: 0;
   }
@@ -1448,11 +1535,17 @@ div.org-container input[type="checkbox"] {
   .side {
     height: 40em;
   }
+  .side-md {
+    height: 36em;
+  }
   .side-lg {
-    height: 38em;
+    height: 41em;
   }
   .side-xs {
     height: 22em;
+  }
+  .one-side {
+    height: 24em;
   }
   .load-container {
     min-height: 1.5em;

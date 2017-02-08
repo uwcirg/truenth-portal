@@ -170,7 +170,7 @@
 
 {% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
-        <label>{{ _("Race") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{ _("Race") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <div class="profile-radio-list">
 
             <div class="checkbox">
@@ -209,7 +209,7 @@
 
 {% macro profileEthnicity(person) -%}
     <div class="form-group profile-section" id="userEthnicity">
-        <label>{{ _("Ethnicity") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{ _("Ethnicity") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <div class="profile-radio-list">
             <div class="radio">
                 <label>
@@ -1265,7 +1265,6 @@
                 //console.log("Problem retrieving data from server.")
             });
         };
-        console.log(" instrumentId: " + instrumentId)
         if (hasValue(instrumentId)) {
         $("#assessmentLink").attr("href", "/api/present-assessment?instrument_id="+instrumentId+"&subject_id={{person.id}}");
         };
@@ -1304,7 +1303,7 @@
     {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
          <div class="row">
             <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-lg{%endif%}">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
                     <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
@@ -1312,7 +1311,7 @@
                 </div>
             </div>
             <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md side-xs{%else%}side-lg{%endif%}">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg one-side{%endif%}{%else%}side-lg{%endif%}">
                     <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
                     {{profilePhone(person)}}
                     {{profileEmail(person)}}
@@ -1335,7 +1334,7 @@
                 </div>
             </div>
             <div class="col-md-5 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom one-side{%endif%}">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
                     <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
                     <br/>
                     {{profileEmail(person)}}

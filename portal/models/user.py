@@ -463,9 +463,14 @@ class User(db.Model, UserMixin):
         """
         leaves = set()
         OT = OrgTree()
-        for org in self.organizations:
-            leaves.update(OT.all_leaves_below_id(org.id))
-        return list(leaves)
+        if self.organizations:
+            for org in self.organizations:
+                if org.id == 0:
+                    continue
+                leaves.update(OT.all_leaves_below_id(org.id))
+            return list(leaves)
+        else:
+            return None
 
     def add_observation(self, fhir, audit):
         if not 'coding' in fhir['code']:
