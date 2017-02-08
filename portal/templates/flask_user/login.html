@@ -58,6 +58,7 @@
 
 {% endblock %}
 {% block document_ready %}
+{{super()}}
 $("document").ready(function() {
     $("#fullSizeBox").closest("div.col-lg-12").css("padding", "0");
     var qs = (function(a) {
