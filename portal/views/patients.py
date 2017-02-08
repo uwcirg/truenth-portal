@@ -67,14 +67,19 @@ def profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
     leaf_organizations = user.leaf_organizations()
-    return render_template("profile_create.html", user = user, consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
+    return render_template(
+        "profile_create.html", user = user, 
+        consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>/<authored_date>')
 @oauth.require_oauth()
 def sessionReport(user_id, instrument_id, authored_date):
     user = get_user(user_id)
-    return render_template("sessionReport.html",user=user, current_user=current_user(), instrument_id=instrument_id, authored_date=authored_date)
+    return render_template(
+        "sessionReport.html",user=user, 
+        current_user=current_user(), instrument_id=instrument_id, 
+        authored_date=authored_date)
 
 
 @patients.route('/patient_profile/<int:patient_id>')
