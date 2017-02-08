@@ -16,18 +16,17 @@ from fuzzywuzzy import fuzz
 import time
 
 from .audit import Audit
-
-
 from ..extensions import db
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
+from .identifier import Identifier
 from .intervention import UserIntervention
 from .performer import Performer
 from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import Telecom
 
@@ -37,6 +36,10 @@ NO_EMAIL_PREFIX = "__no_email__"
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
+
+internal_identifier_systems = (
+    TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS
+
 
 class Extension:
     """Abstract base class for common user extension FHIR objects"""
@@ -309,6 +312,8 @@ class User(db.Model, UserMixin):
     deceased = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deceased_id])
     documents = db.relationship('UserDocument', lazy='dynamic')
+    _identifiers = db.relationship(
+        'Identifier', lazy='dynamic', secondary='user_identifiers')
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
@@ -412,6 +417,35 @@ class User(db.Model, UserMixin):
         """
         if not self._email.startswith(prefix):
             self._email = prefix + self._email
+
+    @property
+    def identifiers(self):
+        """Return list of identifiers
+
+        Several identifiers are "implicit", such as the primary key
+        from the user table, and any auth_providers associated with
+        this user.  Add those if not already found for this user
+        on request, and return with existing identifiers linked
+        with this account.
+
+        """
+        primary = Identifier(use='official', system=TRUENTH_ID, value=self.id)
+        if primary not in self._identifiers.all():
+            self._identifiers.append(primary)
+
+        if self.username:
+            secondary = Identifier(
+                use='secondary', system=TRUENTH_USERNAME, value=self.username)
+            if secondary not in self._identifiers.all():
+                self._identifiers.append(secondary)
+
+        for provider in self.auth_providers:
+            p_id = Identifier.from_fhir(provider.as_fhir())
+            if p_id not in self._identifiers.all():
+                self._identifiers.append(p_id)
+
+        return self._identifiers
+
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
@@ -580,27 +614,6 @@ class User(db.Model, UserMixin):
         return fhir
 
     def as_fhir(self):
-        def identifiers():
-            """build and return list of idetifiers"""
-            ids = []
-            ids.append(
-                {'use': 'official',
-                 'system': '{system}/{provider}'.format(
-                     system=TRUENTH_IDENTITY_SYSTEM,
-                     provider='TrueNTH-identity'),
-                 'assigner': {'display': 'TrueNTH'},
-                 'value': self.id})
-            ids.append(
-                {'use': 'secondary',
-                 'system': '{system}/{provider}'.format(
-                     system=TRUENTH_IDENTITY_SYSTEM,
-                     provider='TrueNTH-username'),
-                 'assigner': {'display': 'TrueNTH'},
-                 'value': self.username})
-            for provider in self.auth_providers:
-                ids.append(provider.as_fhir())
-            return ids
-
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
@@ -624,7 +637,7 @@ class User(db.Model, UserMixin):
 
         d = {}
         d['resourceType'] = "Patient"
-        d['identifier'] = identifiers()
+        d['identifier'] = [id.as_fhir() for id in self.identifiers]
         d['name'] = {}
         if self.first_name:
             d['name']['given'] = self.first_name
@@ -817,6 +830,34 @@ class User(db.Model, UserMixin):
                                  "deceased".format(self.id)), context='user')
                     self.deceased = audit
 
+        def update_identifiers(fhir):
+            """Given FHIR defines identifiers, but we never remove implicit
+
+            Implicit identifiers include user.id, user.email (username)
+            and any auth_providers.  Others may be manipulated via
+            this function like any PUT interface, where the given values
+            are conclusive - deleting unmentioned and adding new.
+
+            """
+            if not 'identifier' in fhir:
+                return
+
+            # ignore internal system identifiers
+            pre_existing = [ident for ident in self._identifiers
+                            if ident.system not in internal_identifier_systems]
+            for identifier in fhir['identifier']:
+                new_id = Identifier.from_fhir(identifier)
+                if new_id.system in internal_identifier_systems:
+                    continue
+                if new_id in pre_existing:
+                    pre_existing.pop(new_id)
+                else:
+                    self._identifiers.append(new_id)
+
+            # remove any pre existing that were not mentioned
+            for unmentioned in pre_existing:
+                self._identifiers.remove(unmentioned)
+
         if 'name' in fhir:
             self.first_name = v_or_n(
                 fhir['name'].get('given')) or self.first_name
@@ -831,6 +872,7 @@ class User(db.Model, UserMixin):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
         update_deceased(fhir)
+        update_identifiers(fhir)
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
@@ -883,7 +925,7 @@ class User(db.Model, UserMixin):
         for relationship in ('organizations', '_consents', 'procedures',
                              'observations', 'relationships', 'roles',
                              'races', 'ethnicities', 'groups',
-                             'questionnaire_responses'):
+                             'questionnaire_responses', '_identifiers'):
             self_entity = getattr(self, relationship)
             other_entity = getattr(other, relationship)
             if relationship == 'roles':
@@ -892,6 +934,11 @@ class User(db.Model, UserMixin):
                                self_entity and item.name not in
                                ('write_only',
                                 'promote_without_identity_challenge')]
+            elif relationship == '_identifiers':
+                # Don't copy internal identifiers
+                append_list = [item for item in other_entity if item not in
+                               self_entity and item.system not in
+                               internal_identifier_systems]
             else:
                 append_list = [item for item in other_entity if item not in
                                self_entity]

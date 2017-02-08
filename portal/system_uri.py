@@ -12,6 +12,17 @@ TRUENTH_CLINICAL_CODE_SYSTEM = '{}/clinical-codes'.format(TRUENTH_NAMESPACE)
 # Auth identities - typically used with suffix for provider (i.e. google)
 # or to name identity type (i.e. TrueNTH-username)
 TRUENTH_IDENTITY_SYSTEM = '{}/identity-codes'.format(TRUENTH_NAMESPACE)
+TRUENTH_ID ='{system}/{provider}'.format(
+    system=TRUENTH_IDENTITY_SYSTEM,
+    provider='TrueNTH-identity')
+TRUENTH_USERNAME = '{system}/{provider}'.format(
+    system=TRUENTH_IDENTITY_SYSTEM,
+    provider='TrueNTH-username')
+SUPPORTED_OAUTH_PROVIDERS = ('facebook', 'google')
+TRUENTH_PROVIDER_SYSTEMS = tuple('{system}/{provider}'.format(
+    system=TRUENTH_IDENTITY_SYSTEM, provider=provider) for
+    provider in SUPPORTED_OAUTH_PROVIDERS)
+
 SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)
 
 TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(

@@ -11,13 +11,12 @@ from urlparse import urlparse
 
 from ..extensions import db, oauth
 from .relationship import RELATIONSHIP
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user
 
-providers_list = ENUM('facebook', 'google', 'twitter', 'truenth',
+providers_list = ENUM(*SUPPORTED_OAUTH_PROVIDERS,
         name='providers', create_type=False)
-
 
 class AuthProvider(db.Model):
     __tablename__ = 'auth_providers'
@@ -35,7 +34,6 @@ class AuthProvider(db.Model):
         d['use'] = 'secondary'
         d['system'] = '{system}/{provider}'.format(
             system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider)
-        d['assigner'] = {'display': self.provider}
         d['value'] = self.provider_id
         return d
 
