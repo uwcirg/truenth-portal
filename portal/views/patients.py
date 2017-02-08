@@ -25,7 +25,7 @@ def patients_root():
     """
     user = current_user()
 
-    request_org_list = request.args.get('org_list')
+    request_org_list = request.args.get('org_list', None)
 
     if request_org_list:
         org_list = request_org_list.split(",")
@@ -54,8 +54,11 @@ def patients_root():
 
     leaf_organizations = user.leaf_organizations()
 
-    return render_template('patients_by_org.html', patients_list=patients.all(), user=user, \
-           request_org_list=org_list if request_org_list else None, leaf_organizations=leaf_organizations, wide_container="true")
+    return render_template(
+        'patients_by_org.html', patients_list=patients.all(),
+        user=user, org_list=org_list, 
+        leaf_organizations=leaf_organizations, wide_container="true")
+
 
 @patients.route('/profile_create')
 @roles_required(ROLE.PROVIDER)
@@ -87,8 +90,10 @@ def patient_profile(patient_id):
     consent_agreements = get_orgs_consent_agreements()
     pca_localized_status = localized_PCa(patient)
 
-    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements=consent_agreements, \
-           pca_localized_status=pca_localized_status if pca_localized_status else None)
+    return render_template(
+        'profile.html', user=patient,  
+        providerPerspective="true", consent_agreements=consent_agreements, 
+        pca_localized_status=pca_localized_status if pca_localized_status else None)
 
 
 def get_orgs_consent_agreements():

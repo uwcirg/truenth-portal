@@ -115,10 +115,10 @@
 {% block document_ready %}
 
 var leafOrgs = {% if leaf_organizations %} {{ leaf_organizations | safe}} {% else %} false {% endif %};
-var request_org_list = {};
-{% if request_org_list %}
-  {% for org in request_org_list %}
-      request_org_list[{{org}}] = true;
+var org_list = {};
+{% if org_list %}
+  {% for org in org_list %}
+      org_list[{{org}}] = true;
   {% endfor %}
 {% endif %}
 
@@ -173,7 +173,7 @@ $(document).ready(function() {
   });
 
   {% if config.PROVIDER_BULK_DATA_ACCESS %}
-    AT.initOrgsList({{user.id}}, leafOrgs, request_org_list);
+    AT.initOrgsList({{user.id}}, leafOrgs, org_list);
     $("#orglist-dropdown").on("click", function() {
       handleOrgsListDropDown(this);
     });
