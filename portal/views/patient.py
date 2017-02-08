@@ -5,11 +5,14 @@ for providers
 
 """
 from flask import abort, Blueprint, request
+import json
+from sqlalchemy import and_
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from .demographics import demographics
 from ..extensions import oauth
+from ..models.identifier import Identifier, UserIdentifier
 from ..models.role import ROLE
 from ..models.user import current_user, User
 
@@ -43,7 +46,12 @@ def patient_search():
     parameters:
       - name: search_parameters
         in: query
-        description: Search parameters, such as `email`
+        description:
+            Search parameters, such as `email` or `identifier`.  For
+            identifier, URL-encode a serialized JSON object with the `system`
+            and `value` attributes defined.  An example looking up a patient
+            by a fake identifier
+            `api/patient/?identifier={"system":%20"http://fake.org/id",%20"value":%20"12a7"}`
         required: true
         type: string
     responses:
@@ -61,14 +69,31 @@ def patient_search():
           up details on the match.
 
     """
-    ## search criteria - only email used at this time
     search_params = {}
     for k,v in request.args.items():
         if k == 'email':
             search_params[k] = v
+        elif k == 'identifier':
+            try:
+                ident_dict = json.loads(v)
+                if not (ident_dict.get('system') and ident_dict.get('value')):
+                    abort(400,
+                          "need 'system' and 'value' to look up identifier")
+                ui = UserIdentifier.query.join(
+                    Identifier).filter(and_(
+                        UserIdentifier.identifier_id==Identifier.id,
+                        Identifier.system==ident_dict['system'],
+                        Identifier._value==ident_dict['value'])).first()
+                if ui:
+                    search_params['id'] = ui.user_id
+            except ValueError:
+                abort(400, "Ill formed identifier parameter")
         else:
             abort(400, "can't search on '{}' at this time".format(k))
 
+    if not search_params:
+        # Nothing found worth looking up above
+        abort(404)
     match = User.query.filter_by(**search_params)
     if match.count() > 1:
         abort(400, "can't yet bundle results, multiple found")
