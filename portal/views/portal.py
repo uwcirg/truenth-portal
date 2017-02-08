@@ -156,7 +156,7 @@ def specific_clinic_landing(clinic_alias):
     # Shortcut aliases are registered with the organization as identifiers.
     # Confirm the requested alias exists or 404
     identifier = Identifier.query.filter_by(system=SHORTCUT_ALIAS,
-                                            value=clinic_alias).first()
+                                            _value=clinic_alias).first()
     if not identifier:
         current_app.logger.debug("Clinic alias not found: %s", clinic_alias)
         abort(404)
