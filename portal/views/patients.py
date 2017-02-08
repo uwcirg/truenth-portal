@@ -51,13 +51,11 @@ def patients_root():
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
-    leaf_organizations = None
-    try:         
-        leaf_organizations = user.leaf_organizations()
-    except ValueError:
-         current_app.logger.debug("In patients list: error retrieving leaf organizations for user %s", str(user.id))
 
-    return render_template('patients_by_org.html', patients_list=patients.all(), user=user, request_org_list=org_list if request_org_list else None, leaf_organizations=leaf_organizations, wide_container="true")
+    leaf_organizations = user.leaf_organizations()
+
+    return render_template('patients_by_org.html', patients_list=patients.all(), user=user, \
+           request_org_list=org_list if request_org_list else None, leaf_organizations=leaf_organizations, wide_container="true")
 
 @patients.route('/profile_create')
 @roles_required(ROLE.PROVIDER)
@@ -65,11 +63,7 @@ def patients_root():
 def profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
-    leaf_organizations = None
-    try:         
-        leaf_organizations = user.leaf_organizations()
-    except ValueError:
-         current_app.logger.debug("In profile create: error retrieving leaf organizations for user %s", str(user.id))
+    leaf_organizations = user.leaf_organizations()
     return render_template("profile_create.html", user = user, consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
@@ -93,7 +87,8 @@ def patient_profile(patient_id):
     consent_agreements = get_orgs_consent_agreements()
     pca_localized_status = localized_PCa(patient)
 
-    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements=consent_agreements, pca_localized_status=pca_localized_status if pca_localized_status else None)
+    return render_template('profile.html', user=patient,  providerPerspective="true", consent_agreements=consent_agreements, \
+           pca_localized_status=pca_localized_status if pca_localized_status else None)
 
 
 def get_orgs_consent_agreements():

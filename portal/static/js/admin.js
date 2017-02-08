@@ -82,17 +82,16 @@ var AdminTool = function() {
         };
         //console.log("consent updated successfully.");
         requestsCounter -= 1;
-        if(requestsCounter == 0) self.fadeLoader();
+        if(requestsCounter == 0) AT.fadeLoader();
     }).fail(function(xhr) {
         //console.log("request failed.");
-        self.fadeLoader();
+        AT.fadeLoader();
     });
   };
 
   this.updateData = function() {
 
     var us = "", _userIds = [], ct = 0, arrUsers = [];
-    var self = this;
 
     $("td.id-field").each(function() {
         var id = parseInt($(this).text());
@@ -122,11 +121,11 @@ var AdminTool = function() {
             AT.getData(us);
           } catch(ex) {
             //console.log("Error request: " + ex.message);
-            self.fadeLoader();
+            AT.fadeLoader();
           };
       });
     } else {
-      self.fadeLoader();
+      AT.fadeLoader();
     };
   };
   this.setUserOrg = function(userId) {
@@ -138,10 +137,10 @@ var AdminTool = function() {
       if (data && data.careProvider) {
         $.each(data.careProvider,function(i,val){
             var orgID = val.reference.split("/").pop();
-            self.userOrgs.push(orgID);
+            AT.userOrgs.push(orgID);
             if (orgID == "0") $("#createUserLink").attr("disabled", true);
         });
-      if (self.userOrgs.length == 0) $("#createUserLink").attr("disabled", true);
+      if (AT.userOrgs.length == 0) $("#createUserLink").attr("disabled", true);
       };
     }).fail(function() {
 
