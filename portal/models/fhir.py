@@ -1,4 +1,5 @@
 """Model classes for retaining FHIR data"""
+from collections import defaultdict
 from datetime import date, datetime, timedelta
 from dateutil import parser
 from flask import abort, current_app
@@ -581,34 +582,132 @@ def most_recent_survey(user, instrument_id=None):
     return results
 
 
-def assessment_status(user, consent=None):
-    """Return status string based on localized and recently completed surveys
 
-    As per issue
-    https://www.pivotaltracker.com/n/projects/1225464/stories/135853115
+class AssessmentStatus(object):
+    """Lookup and hold assessment status detail for a user
 
-    This includes hardcoded business rules that may need to become part
-    of site persistence.
-
-    :param user: The user in question - patient on whom to check status
-    :param consent: Consent agreement defining dates and which organization
-        to consider in the status check.  If not provided, use the first
-        valid consent found for the user.
-    :return: a string defining the assessment status, such as "Expired"
+    Complicated task due to nature of multiple instruments which differ
+    depending on user state such as localized or metastatic.
 
     """
-    # If we aren't given a consent, use the first valid consent found for the
-    # user.
-    if consent:
-        consent_date = consent.audit.timestamp
-    elif not user.valid_consents.count():
-        return 'Expired'
-    else:
-        consent_date = user.valid_consents[0].audit.timestamp
-    assert(consent_date)
 
-    today = datetime.utcnow()
-    def status_per_instrument(instrument_id, thresholds):
+    def __init__(self, user, consent=None):
+        """Initialize assessment status object for given user/consent
+
+        :param user: The user in question - patient on whom to check status
+        :param consent: Consent agreement defining dates and which organization
+            to consider in the status check.  If not provided, use the first
+            valid consent found for the user.  Users w/o consents have
+            overall_status of `Expired`
+
+        """
+        self.user = user
+        self._consent = consent
+        self._overall_status, self._consent_date = None, None
+        self._localized = localized_PCa(user)
+        self.instrument_status = defaultdict(dict)
+
+    @property
+    def consent_date(self):
+        """Return timestamp of signed consent, if available, else None"""
+
+        if self._consent_date:
+            return self._consent_date
+
+        # If we aren't given a consent, use the first valid consent found
+        # for the user.
+        if not self._consent:
+            self._consent = self.user.valid_consents[0]
+
+        if self._consent:
+            self._consent_date = self._consent.audit.timestamp
+        else:
+            # Tempting to call this invalid state, but it's possible
+            # the consent has been revoked, treat as expired.
+            self._consent_date = None
+        return self._consent_date
+
+    @property
+    def completed_date(self):
+        """Returns timestamp from completed assessment, if available"""
+        self.__obtain_status_details()
+        best_date = None
+        for instrument, details in self.instrument_status.items():
+            if 'completed' in details:
+                # TODO: in event of multiple completed instruments,
+                # not sure *which* date is best??
+                best_date = details['completed']
+        return best_date
+
+    @property
+    def localized(self):
+        return self._localized
+
+    @property
+    def overall_status(self):
+        """Returns display quality string for user's overall status"""
+        self.__obtain_status_details()
+        return self._overall_status
+
+    def instruments_needing_full_assessment(self):
+        self.__obtain_status_details()
+        results = []
+        for instrument_id, details in self.instrument_status.items():
+            if 'completed' or 'in-progress' in details:
+                continue
+            results.append(instrument_id)
+        return results
+
+    def instruments_in_process(self):
+        self.__obtain_status_details()
+        results = []
+        for instrument_id, details in self.instrument_status.items():
+            if 'in-progress' in details:
+                results.append(instrument_id)
+        return results
+
+    def __obtain_status_details(self):
+        # expensive process - do once
+        if hasattr(self, '_details_obtained'):
+            return
+        if not self.consent_date:
+            self._overall_status = 'Expired'
+            self._details_obtained = True
+            return
+        if self.localized:
+            thresholds = (
+                (7, "Due"),
+                (90, "Overdue"),
+            )
+            for instrument in ('epic26', 'eproms_add'):
+                self.__status_per_instrument(instrument, thresholds)
+        else:
+            # assuming metastaic - although it's possible the user just didn't
+            # answer the localized question
+            thresholds = (
+                (1, "Due"),
+                (30, "Overdue")
+            )
+            for instrument in ('eortc', 'prems'):
+                self.__status_per_instrument(instrument, thresholds)
+
+        try:
+            status_strings = [details['status'] for details in
+                              self.instrument_status.values()]
+        except KeyError:
+            import pdb; pdb.set_trace()
+
+        if all(status_strings[0] == status for status in status_strings):
+            # All intruments in the same state - use the common value
+            self._overall_status = status_strings[0]
+        else:
+            if any("Expired" == status for status in status_strings):
+                # At least one expired, but not all
+                self._overall_status = "Partially Completed"
+            self._overall_status = "In Progress"
+        self._details_obtained = True
+
+    def __status_per_instrument(self, instrument_id, thresholds):
         """Returns status for one instrument
 
         :param instrument_id: the instument in question
@@ -616,49 +715,23 @@ def assessment_status(user, consent=None):
             NB - these must be ordered with increasing values.
 
         :return: matching status string from constraints
+
         """
-        recents = most_recent_survey(user, instrument_id)
-        if 'completed' in recents:
-            return "Completed"
-        if 'in-progress' in recents:
-            return "In Progress"
-        delta = today - consent_date
-        for days_allowed, message in thresholds:
-            if delta < timedelta(days=days_allowed+1):
-                return message
-        return "Expired"
+        def status_from_recents(recents):
+            if 'completed' in recents:
+                return "Completed"
+            if 'in-progress' in recents:
+                return "In Progress"
+            today = datetime.utcnow()
+            delta = today - self.consent_date
+            for days_allowed, message in thresholds:
+                if delta < timedelta(days=days_allowed+1):
+                    return message
+            return "Expired"
 
-    if localized_PCa(user):
-        thresholds = (
-            (7, "Due"),
-            (90, "Overdue"),
-        )
-        epic_status = status_per_instrument('epic26', thresholds)
-        eproms_status = status_per_instrument('eproms_add', thresholds)
-        if epic_status == eproms_status:
-            # Same state - return like value
-            return epic_status
-        else:
-            if "Expired" in (epic_status, eproms_status):
-                # One expired, but not both
-                return "Partially Completed"
-            return "In Progress"
-
-    else:
-        # assuming metastaic - although it's possible the user just didn't
-        # answer the localized question
-        thresholds = (
-            (1, "Due"),
-            (30, "Overdue")
-        )
-        eortc_status = status_per_instrument('eortc', thresholds)
-        prems_status = status_per_instrument('prems', thresholds)
-        if eortc_status == prems_status:
-            # Same state - return like value
-            return eortc_status
-        else:
-            if "Expired" in (eortc_status, prems_status):
-                # One expired, but not both
-                return "Partially Completed"
-            return "In Progress"
-
+        if not instrument_id in self.instrument_status:
+            self.instrument_status[instrument_id] = most_recent_survey(
+                self.user, instrument_id)
+        if not 'status' in self.instrument_status[instrument_id]:
+            self.instrument_status[instrument_id]['status'] =\
+                    status_from_recents(self.instrument_status[instrument_id])

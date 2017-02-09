@@ -4,7 +4,7 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC, QuestionnaireResponse, assessment_status
+from portal.models.fhir import CC, QuestionnaireResponse, AssessmentStatus
 from tests import TestCase, TEST_USER_ID
 
 
@@ -43,7 +43,8 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
 
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(assessment_status(self.test_user), "Completed")
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Completed")
 
     def test_localized_inprogress_on_time(self):
         # User finished both on time
@@ -55,7 +56,8 @@ class TestAssessment(TestCase):
                 status='in-progress')
 
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(assessment_status(self.test_user), "In Progress")
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "In Progress")
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
@@ -64,7 +66,8 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
 
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(assessment_status(self.test_user), "In Progress")
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "In Progress")
 
     def test_metastatic_on_time(self):
         # User finished both on time
@@ -73,13 +76,15 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(assessment_status(self.test_user), "Completed")
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Completed")
 
     def test_metastatic_due(self):
         # hasn't taken, but still in "Due" period
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user = db.session.merge(self.test_user)
-        self.assertEquals(assessment_status(self.test_user), "Due")
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Due")
 
     def test_batch_lookup(self):
         self.login()
