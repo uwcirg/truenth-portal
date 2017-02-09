@@ -170,6 +170,8 @@ class TestPortal(TestCase):
 
     def test_celery_add(self):
         """Try simply add task handed off to celery"""
+        if not self.app.config.get('CELERY_INSTALLED', True):
+            return  # config for dev hosts w/o celery
         x = 151
         y = 99
         rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'.\
