@@ -43,7 +43,7 @@
         {% endif %}
         {% if config.ALLOW_FILTER_BY_ORGS %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-            <button id="orglist-dropdown" class="create-user-link btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button id="orglist-dropdown" class="create-user-link btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer">
               Filter List By Clinic &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
             </button>
             <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
@@ -116,7 +116,6 @@
 {% endblock %}
 {% block document_ready %}
 
-var leafOrgs = {% if leaf_organizations %} {{ leaf_organizations | safe}} {% else %} false {% endif %};
 var org_list = {};
 {% if org_list %}
   {% for org in org_list %}
@@ -135,8 +134,10 @@ function handleOrgsListDropDown(obj) {
   };
 };
 
+var AT = new AdminTool({{user.id}});
+
 $(document).ready(function() {
-  
+
   $("#adminTable").on("page-change.bs.table sort.bs.table toggle.bs.table", function() {
       AT.updateData();
    });
@@ -175,13 +176,8 @@ $(document).ready(function() {
   });
 
   {% if config.ALLOW_FILTER_BY_ORGS %}
-    AT.initOrgsList({{user.id}}, leafOrgs, (/org_list/.test(location.href) ? org_list : null));
-    $("#orglist-dropdown").on("click", function() {
-      handleOrgsListDropDown(this);
-    });
-    $("html").on("click", function() {
-      handleOrgsListDropDown();
-    });
+    //console.log(org_list)
+    AT.initOrgsList(org_list);
   {% endif %}
 
 });

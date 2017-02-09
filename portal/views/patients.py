@@ -26,14 +26,19 @@ def patients_root():
     user = current_user()
 
     request_org_list = request.args.get('org_list', None)
+    # Build list of all organization ids, and their decendents, the
+    # user belongs to
+    org_list = set()
+    OT = OrgTree()
 
     if request_org_list:
-        org_list = request_org_list.split(",")
+        #for selected filtered orgs, we also need to get the children of each, if any
+        request_org_list = set(request_org_list.split(","))
+        for orgId in request_org_list:
+            if orgId == 0:  # None of the above doesn't count
+                continue
+            org_list.update(OT.here_and_below_id(orgId))
     else:
-        # Build list of all organization ids, and their decendents, the
-        # user belongs to
-        org_list = set()
-        OT = OrgTree()
         for org in user.organizations:
             if org.id == 0:  # None of the above doesn't count
                 continue
@@ -52,12 +57,10 @@ def patients_root():
             and_(UserOrganization.user_id==User.id,
                  UserOrganization.organization_id.in_(org_list)))
 
-    leaf_organizations = user.leaf_organizations()
-
     return render_template(
         'patients_by_org.html', patients_list=patients.all(),
-        user=user, org_list=org_list, 
-        leaf_organizations=leaf_organizations, wide_container="true")
+        user=user, org_list=org_list,
+        wide_container="true")
 
 
 @patients.route('/profile_create')
@@ -68,7 +71,7 @@ def profile_create():
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "profile_create.html", user = user, 
+        "profile_create.html", user = user,
         consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
@@ -77,8 +80,8 @@ def profile_create():
 def sessionReport(user_id, instrument_id, authored_date):
     user = get_user(user_id)
     return render_template(
-        "sessionReport.html",user=user, 
-        current_user=current_user(), instrument_id=instrument_id, 
+        "sessionReport.html",user=user,
+        current_user=current_user(), instrument_id=instrument_id,
         authored_date=authored_date)
 
 
@@ -96,8 +99,8 @@ def patient_profile(patient_id):
     pca_localized_status = localized_PCa(patient)
 
     return render_template(
-        'profile.html', user=patient,  
-        providerPerspective="true", consent_agreements=consent_agreements, 
+        'profile.html', user=patient,
+        providerPerspective="true", consent_agreements=consent_agreements,
         pca_localized_status=pca_localized_status if pca_localized_status else None)
 
 

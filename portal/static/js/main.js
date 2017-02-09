@@ -115,6 +115,8 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         var errorMessage = "";
         if (!hasValue(timeZone)) timeZone = "UTC";
         if (!hasValue(locale))  locale = "en-us";
+        $(".timezone-error").html("");
+        $(".timezone-warning").html("");
         //locale needs to be in this format - us-en
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
@@ -128,7 +130,8 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         //console.log("dateString: " + dateString)
         var convertedDate = dateString;
         try {
-            convertedDate = new Date(dateString).toLocaleString(locale, options);
+            dateString = dateString.replace(/-/g, '/').replace("T", " ").replace(",", "");
+            convertedDate = new Date(dateString).toLocaleTimeString(locale, options);
             if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
         } catch(e) {
             var oMessage = e.message;
@@ -973,7 +976,6 @@ var OrgTool = function() {
     };
 
     this.filterOrgs = function(leafOrgs) {
-        //console.log(leafOrgs)
         if (!leafOrgs) return false;
         var self = this;
 
