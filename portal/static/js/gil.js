@@ -267,6 +267,10 @@ module.exports = WindowScroll = (function() {
 
 },{}]},{},[2])
 
+$("input[type='text']").on("blur paste", function() {
+      $(this).val($.trim($(this).val()));
+});
+
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
     this.name = orgName;
