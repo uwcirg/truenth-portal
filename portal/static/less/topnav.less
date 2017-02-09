@@ -66,7 +66,8 @@
   display: none;
   margin: 0;
   width: 100%;
-  background-color: #83885F;
+  max-width: 100%;
+  background-color: #171c20;
   background-image: url('../img/header_background.jpg');
   background-size: auto 81px;
   background-repeat: no-repeat;
@@ -75,6 +76,7 @@
   border: none;
   position: relative;
   min-height: 50px;
+  overflow: hidden;
   &:after {
     clear: both;
     display: table;
@@ -111,9 +113,9 @@
 
 /** Logo **/
 #tnthLogo {
-  float: right;
-  clear: left;
-  margin-right: 32%;
+  width: 200px;
+  margin: 0 auto;
+  transition: margin 10ms ease-in;
   img {
     height: 75px;
   }
@@ -126,8 +128,9 @@
   }
 }
 #tnthTopLinks {
-  float: left;
-  /*margin-left: 0.5em;*/
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /** Buttons **/
@@ -314,7 +317,11 @@
     margin-right: 2em !important;
   }
 }
-@media (max-width: 767px) {
+@media (max-width: 991px) {
+  #tnthUserBtn {
+    padding: 6px 0px;
+    height: inherit;
+  }
   #tnthNavMain {
     display: none !important;
   }
@@ -325,46 +332,13 @@
     margin-right: 40%;
   }
 }
-@media (min-width: 768px) {
-  #tnthTopLinks {
-    margin-right: -28px;
-  }
-}
-@media (max-width: 991px) {
-  #tnthUserBtn {
-    padding: 6px 0px;
-    height: inherit;
-  }
-  #tnthLogo {
-    margin-right: 1em;
-  }
-}
 @media (min-width: 992px) {
   #tnthNavMainContainer {
     max-width: 940px;
   }
 }
-@media (min-width: 1219px) {
-   #tnthTopLinks {
-    margin-left: 0;
-   }
-   #tnthLogo {
-    margin-right: 32%;
-  }
-}
 @media (min-width: 1220px) {
   #tnthNavMainContainer {
     max-width: none;
-  }
-  #tnthTopLinks {
-    margin-right: 0;
-  }
-  #tnthLogo {
-    margin-right: 42%;
-  }
-}
-@media (min-width: 1380px) {
-  #tnthLogo {
-    margin-right: 45%;
   }
 }
