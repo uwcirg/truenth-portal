@@ -2,7 +2,7 @@ FROM debian:jessie
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/true_nth"
+ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
 
 COPY artifacts /tmp/artifacts
 
