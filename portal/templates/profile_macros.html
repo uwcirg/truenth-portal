@@ -1080,7 +1080,8 @@
     $(function() {
         getSaveLoaderDiv("profileForm", "profileTimeZone");
         $('#profileTimeZone').on('change', function() {
-            $(".timezone-error").text("");
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
             if ($.trim($("#profileTimeZone_error").text()) == "") {
                 setTimeout(function(){

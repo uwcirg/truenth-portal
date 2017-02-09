@@ -1,10 +1,12 @@
 //a workaround for wrapper not finished loading before the content displays, the finish loading of wrapper hides the loader
 DELAY_LOADING = true;
 
-var AdminTool = function() {
+var AdminTool = function(userId) {
   var requestsCounter = 0;
 
+  this.userId = userId;
   this.userOrgs = [];
+  this.here_below_orgs = [];
 
   this.fadeLoader = function() {
       DELAY_LOADING = false;
@@ -128,11 +130,14 @@ var AdminTool = function() {
       AT.fadeLoader();
     };
   };
-  this.setUserOrg = function(userId) {
+  this.getMainOrgList = function() {
+      return OT.getOrgsList();
+  };
+  this.setUserOrgs = function() {
     var self = this;
     $.ajax ({
             type: "GET",
-            url: '/api/demographics/'+userId
+            url: '/api/demographics/'+this.userId
     }).done(function(data) {
       if (data && data.careProvider) {
         $.each(data.careProvider,function(i,val){
@@ -147,10 +152,45 @@ var AdminTool = function() {
     });
   };
   this.getUserOrgs = function() {
+    if (this.userOrgs.length == 0) this.setUserOrgs(this.userId);
     return this.userOrgs;
   };
-  this.initOrgsList = function(userId, leafOrgs, request_org_list) {
-      AT.setUserOrg(userId);
+  ;
+  getChildOrgs = function(orgs) {
+      var mainOrgsList = AT.getMainOrgList();
+      if (!orgs || (orgs.length == 0)) {
+        return AT.here_below_orgs;
+      } else {
+        var childOrgs = [];
+        orgs.forEach(function(org) {
+            var o = mainOrgsList[org.id];
+            if (o) {
+              AT.here_below_orgs.push(org.id);
+              var c  = o.children ? o.children : null;
+              if (c && c.length > 0) {
+                  c.forEach(function(i) {
+                    childOrgs.push(i);
+                  });
+              };
+            };
+        });
+        return getChildOrgs(childOrgs);
+      };
+  };
+
+  this.getHereBelowOrgs = function() {
+    var userOrgs = AT.userOrgs, mainOrgsList = OT.getOrgsList();
+    userOrgs.forEach(function(orgId) {
+        AT.here_below_orgs.push(orgId);
+        var co = mainOrgsList[orgId];
+        getChildOrgs((co && co.children ? co.children : null));
+    });
+  }
+  this.initOrgsList = function(request_org_list) {
+      //set user orgs
+      AT.setUserOrgs();
+      var iterated = /org_list/.test(location.href);
+
       var noPatientData = $("#admin-table-body").find("tr.no-records-found").length > 0;
       if (!noPatientData) {
         $.ajax ({
@@ -160,15 +200,14 @@ var AdminTool = function() {
 
             OT.populateOrgsList(data.entry);
             OT.populateUI();
-            var orgsList = OT.getOrgsList();
-            if (leafOrgs) {
-               //console.log(leafOrgs)
-               OT.filterOrgs(leafOrgs);
-            };
-            //console.log(orgsList)
-            $("#userOrgs input[name='organization']").each(function() {
-                if (request_org_list && request_org_list[$(this).val()]) $(this).prop("checked", true);
-                $(this).on("click", function() {
+            AT.getHereBelowOrgs();
+            OT.filterOrgs(AT.here_below_orgs);
+          
+            var ofields = $("#userOrgs input[name='organization']");
+            ofields.each(function() {
+                if (iterated && request_org_list && request_org_list[$(this).val()]) $(this).prop("checked", true);
+                $(this).on("click touchstart", function(e) {
+                    e.stopPropagation();
                     var orgsList = [];
                     $("#userOrgs input[name='organization']").each(function() {
                         if ($(this).is(":checked")) orgsList.push($(this).val());
@@ -178,13 +217,32 @@ var AdminTool = function() {
                     } else location.replace("/patients");
                 });
             });
+            if (iterated && ofields.length > 0) {
+              $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label></div>");
+              $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
+                  e.stopPropagation();
+                  var orgsList = [];
+                  $("#userOrgs input[name='organization']").each(function() {
+                      $(this).prop("checked", true);
+                      orgsList.push($(this).val());
+                  });
+                  location.replace("/patients/?org_list=" + orgsList.join(","));
+              });
+              $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
+                  e.stopPropagation();
+                  $("#userOrgs input[name='organization']").each(function() {
+                      $(this).prop("checked", false);
+                  });
+              });
+            };
+
         }).fail(function() {
             //console.log("Problem retrieving data from server.");
         });
 
       //orglist-dropdown
-      $('#orglist-dropdown').on('click', function () {
-          setTimeout('AT.setOrgsMenuHeight();', 0);
+      $('#orglist-dropdown').on('click touchstart', function () {
+          setTimeout('AT.setOrgsMenuHeight(' + (iterated?80:50) + ');', 0);
       });
     } else {
       //no patient data
@@ -193,11 +251,15 @@ var AdminTool = function() {
    };
   };
 
-  this.setOrgsMenuHeight = function() {
+  this.setOrgsMenuHeight = function(padding) {
+    if (!padding) padding = 50;
     var h = parseInt($("#fillOrgs").height());
-    if (!isNaN(h) && h > 0) $("#org-menu").height(h + 50);
+    if (!isNaN(h) && h > 0) {
+      $("#org-menu").height(h + padding);
+      if ($("#adminTable").height() < $("#org-menu").height()) {
+          setTimeout('$("#adminTable").height($("#org-menu").height() + ' + padding + ');', 0);
+      };
+    };
   };
 
 };
-
-var AT = new AdminTool();

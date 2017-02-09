@@ -87,14 +87,23 @@ div.orglist-selector {
 #adminTableToolbar div.orglist-selector button {
   background-color: #FFF;
   border: 1px solid #ccc;
-  height: 2.95em;
+  padding: 0.65em;
+  height: 3.01em;
   border-radius: 4px;
   font-size: 0.9em;
 }
 #adminTableToolbar div.dropdown-menu {
-  z-index: 50;
   max-height: 500px;
   transition: height 300ms ease-in;
+}
+#adminTableToolbar #orglist-footer-container {
+  padding: 0 0.5em;
+  width: 200px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+#adminTableToolbar #orglist-footer-container label {
+  font-weight: normal;
 }
 #adminTableToolbar div.org-container {
   display: block;
@@ -105,6 +114,9 @@ div.orglist-selector div.dropdown-menu #userOrgs {
   max-width: 100%;
   padding: 0 0.5em 0 1em;
   margin: 0 auto;
+}
+div.orglist-selector div.dropdown-menu #userOrgs input {
+  cursor: pointer;
 }
 div.orglist-selector div.dropdown-menu #fillOrgs .divider {
   display: none;
@@ -298,6 +310,7 @@ transform(-1000px, 0);*/
 #patientAssessmentDownload {
   padding: 0.65em;
   font-size: 1.1em;
+  height: 2.8em;
 }
 #dataDownloadModal .modal-body {
   padding: 1em
