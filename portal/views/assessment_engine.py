@@ -1210,6 +1210,18 @@ def present_assessment(instruments=None):
             - epic26
             - eq5d
         collectionFormat: multi
+      - name: resume_instrument_id
+        in: query
+        description:
+          ID of the instrument, eg "epic26", "eq5d"
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
@@ -1258,6 +1270,22 @@ def present_assessment(instruments=None):
         AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
         instruments=",".join(queued_instruments),
     )
+
+    if "resume_instrument_id" in request.args:
+        resume_instruments = request.args.getlist('resume_instrument_id')
+
+        if set(resume_instruments) - set(configured_instruments):
+            abort(
+                404,
+                "No matching assessment found: %s" % (
+                    ", ".join(set(resume_instruments) - set(configured_instruments))
+                )
+            )
+
+        assessment_url = "{assessment_url}&resume_instrument_id={resume}".format(
+            assessment_url=assessment_url,
+            resume=",".join(resume_instruments),
+        )
 
     if "subject_id" in request.args:
         assessment_url = "{assessment_url}&subject_id={subject_id}".format(
