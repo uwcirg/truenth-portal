@@ -65,13 +65,13 @@
             <br />
             <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
             <br />
-            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide" disabled>{{ _("Continue to TrueNTH") }}</button>
         {% else %}
            <div class="reg-complete-container">
               <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
               <p>{{ _("Click continue to start using TrueNTH") }}</p>
               <br/>
-              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide">{{ _("Continue to TrueNTH") }}</button>
            </div>
         {% endif %}
 
@@ -243,12 +243,12 @@ FieldsChecker.prototype.showAll = function() {
 
 function continueOn() {
   $("#continueText").fadeIn();
-  $("#updateProfile").removeAttr("disabled");
+  $("#updateProfile").removeAttr("disabled").show();
 };
 
 function stopContinue() {
   $("#continueText").fadeOut();
-  $("#updateProfile").attr("disabled", true);
+  $("#updateProfile").attr("disabled", true).hide();
 };
 
 function initIncompleteFields() {
@@ -286,7 +286,7 @@ function initIncompleteFields() {
 
 
   if (fc.allFieldsCompleted()) {
-      $("#updateProfile").removeAttr("disabled");
+      $("#updateProfile").removeAttr("disabled").show();
   } else {
        incompleteFields[0].section.show();
        incompleteFields[0].element.show();
@@ -370,29 +370,35 @@ $(document).ready(function(){
         tnthAjax.putRoles({{user.id}},toSend);
         if (theVal == "patient") {
             // If patient, then we always show bdGroup
-            if ($("#bdGroup").length > 0) {
-              $("#bdGroup").fadeIn();
-            };
-            // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-
-            if ($("#bdGroup").length > 0) {
-              $('html, body').animate({
-                scrollTop: $('#bdGroup').offset().top
-              }, 500);
-              if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
-            } else fc.getNextField($(this).attr("sectionIndex"), $(this));
-
-            //$("#clinics").hide();
-
-            $("#patientQ").attr("skipped", "false");
-            $("#bdGroup").attr("skipped", "false");
-            $("#clinics").attr("skipped", "false");
-
-
-            if (fc.allFieldsCompleted()) {
-              continueOn();
+            var fname = $("#firstname"), lname = $("#lastname");
+            if (fname.length > 0 && lname.length > 0 && (fname.val() == "" || lname.val() == "")) {
+                if (!hasValue(fname.val())) fname.trigger("blur");
+                if (!hasValue(lname.val())) lname.trigger("blur");
             } else {
-              stopContinue();
+              if ($("#bdGroup").length > 0) {
+                $("#bdGroup").fadeIn();
+              };
+              // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
+
+              if ($("#bdGroup").length > 0) {
+                $('html, body').animate({
+                  scrollTop: $('#bdGroup').offset().top
+                }, 500);
+                if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
+              } else fc.getNextField($(this).attr("sectionIndex"), $(this));
+
+              //$("#clinics").hide();
+
+              $("#patientQ").attr("skipped", "false");
+              $("#bdGroup").attr("skipped", "false");
+              $("#clinics").attr("skipped", "false");
+
+
+              if (fc.allFieldsCompleted()) {
+                continueOn();
+              } else {
+                stopContinue();
+              };
             };
 
         } else {
