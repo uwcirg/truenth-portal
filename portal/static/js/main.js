@@ -976,6 +976,7 @@ var OrgTool = function() {
     };
 
     this.filterOrgs = function(leafOrgs) {
+        //console.log(leafOrgs)
         if (!leafOrgs) return false;
         var self = this;
 

@@ -88,7 +88,7 @@ div.orglist-selector {
   background-color: #FFF;
   border: 1px solid #ccc;
   padding: 0.65em;
-  height: 3.01em;
+  height: 2.86em;
   border-radius: 4px;
   font-size: 0.9em;
 }
@@ -310,7 +310,7 @@ transform(-1000px, 0);*/
 #patientAssessmentDownload {
   padding: 0.65em;
   font-size: 1.1em;
-  height: 2.8em;
+  height: 2.6em;
 }
 #dataDownloadModal .modal-body {
   padding: 1em
@@ -1474,7 +1474,7 @@ div.org-container input[type="checkbox"] {
 
   #adminTableToolbar div.dropdown-menu {
     width: 200px !important;
-    overflow: hidden;
+    overflow: auto;
   }
 
   div.orglist-selector div.dropdown-menu #userOrgs{
