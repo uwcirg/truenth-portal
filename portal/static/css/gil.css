@@ -6965,6 +6965,45 @@ a.home--modal-link {
     visibility: invisible;
 }
 
+.box-modal div.or {
+    background: #ccc8c1;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    height: 25px;
+    line-height: 27px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 25px;
+    margin: 1em auto;
+    position: relative;
+    z-index: 1;
+}
+
+#modal-login-register div.or {
+    background-color: #7c959e;
+    opacity: 0.7;
+}
+#modal-register div.or {
+    width: 70px;
+    /*background-color: #7c959e;*/
+    opacity: 0.7;
+    border-radius: 30px;
+    color: #516167;
+}
+.box-modal-or__divider {
+    height: 1px;
+    background: #ebebeb;
+    position: relative;
+    margin: -1.6em auto 20px auto;
+    width: 100%;
+}
+#access_code_info {
+    padding: 0.2em;
+    font-size: 0.95em;
+}
+
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;

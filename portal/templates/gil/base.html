@@ -86,8 +86,8 @@
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>Symptom Tracker</a></li>
          {% if not user or (user and user.has_role('patient')) %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item-disabled"><a href="javascript: loader(false);">Exercise and Diet</a></li>
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item-disabled"><a href="javascript: loader(false);">Lived Experience</a></li>
+            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
+            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
          {% endif %}
           <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
           <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">Contact</a></li>
@@ -183,14 +183,17 @@
             <br/>
             <p class="box-modal__copy">Do you have an access code?</p>
             <form action="/go" method="post">
-              <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required/>
+              <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required autocomplete="off"/>
+              <div id="access_code_info" class="box-modal__copy text-left"></div>
+              <input type="hidden" id="access_code_error" value="false" />
               <div class="access-code-container">
                 <a id="accessCodeLink" class="button button-large button--teal">Next</a>
               </div>
             </form>
             <br/>
-            <p class="box-modal__copy"><em>otherwise</em></p>
-            <div class="box-modal__divider"></div>
+            <div class="or">otherwise</div>
+            <div class="box-modal-or__divider"></div>
+            <br/>
             <a href="{{PORTAL}}/user/register" class="button button-large button--teal">Create Account</a>
           </div>
         </div>
@@ -200,21 +203,26 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal box-modal--login">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
-            <h3 class="box-modal__title">Login</h3><a href="{{PORTAL}}/login/facebook/" class="button button--facebook button-large button--teal button--has-svg">
-              <svg width="15" height="31">
-                <use xlink:href="#Facebook-Icon"></use>
-              </svg>Log in with Facebook</a><a href="{{PORTAL}}/login/google/" class="button button--google button-large button--teal button--has-svg">
-              <svg width="20" height="31">
-                <use xlink:href="#Google-Icon"></use>
-              </svg>Log in with Google</a>
-            <div class="box-modal__divider"></div>
-            <form action="{{PORTAL}}/user/sign-in" method="POST" class="form" role="form">
+            <h3 class="box-modal__title">Login</h3>
+             <form action="{{PORTAL}}/user/sign-in" method="POST" class="form" role="form">
               <input name="email" type="text" placeholder="Email Address" required>
               <input name="password" type="password" placeholder="Password" required>
               <input class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
               <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Forgot your password?</span></a>
             </form>
+            <div class="or">or</div>
+            <div class="box-modal-or__divider"></div>
+            <br/>
+            <div>
+            <a href="{{PORTAL}}/login/facebook/" class="button button--facebook button-large button--teal button--has-svg">
+              <svg width="15" height="31">
+                <use xlink:href="#Facebook-Icon"></use>
+              </svg>Log in with Facebook</a><a href="{{PORTAL}}/login/google/" class="button button--google button-large button--teal button--has-svg">
+              <svg width="20" height="31">
+                <use xlink:href="#Google-Icon"></use>
+              </svg>Log in with Google</a>
+            </div>
           </div>
         </div>
       </div>
@@ -226,8 +234,9 @@
             <h3 class="box-modal__title">Login</h3>
             <a href="#" onclick="goToLogin();" class="button button-large button--teal button--login--register">Login</a>
             <br/><br/>
-            <p class="box-modal__copy"><em>or</em></p>
-            <div class="box-modal__divider"></div>
+            <div class="or">or</div>
+            <div class="box-modal-or__divider"></div>
+            <br/>
             <h3 class="box-modal__title">Join Us!</h3>
             <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
           </div>
@@ -312,22 +321,7 @@
         </script>
         <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
       {% endif %}
-      <script>
-
-          var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-          if (LOGIN_AS_PATIENT) {
-              if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
-              window.addEventListener('popstate', function(event) {
-                if (typeof history != 'undefined' && history.pushState) {
-                  history.pushState(null, null, location.href);
-                  setTimeout('location.reload();', 0);
-                } else {
-                  window.history.forward(1);
-                  setTimeout('location.reload();', 0);
-                };
-              });
-          };
-
+      <script>         
           function _readCookie(name) {
             var nameEQ = name + "=";
             var ca = document.cookie.split(';');
@@ -368,35 +362,18 @@
               };
           };
 
-          function setNoBanner() {
-              if (typeof sessionStorage != "undefined") {
-                sessionStorage.setItem('bannerAccessed', 'yes');
-              };
+          function showMain() {
+            $("#mainHolder").css({
+                          "visibility" : "visible",
+                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
+                          "filter": "alpha(opacity=100)",
+                          "-moz-opacity": 1,
+                          "-khtml-opacity": 1,
+                          "opacity": 1
+                        });
+            {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
           };
 
-          function checkBannerStatus() {
-            if (typeof sessionStorage != "undefined") {
-              var data = sessionStorage.getItem('bannerAccessed');
-              if (data == "yes") {
-                $('.js-close-upper-banner').trigger("click");
-              };
-            }
-          };
-
-          function goToLogin() {
-              $('#modal-login-register').modal('hide');
-              setTimeout("$('#modal-login').modal('show'); ", 400);
-          };
-          function setSelectedNavItem(obj) {
-              $(obj).addClass("side-nave-items__item--selected");
-              $("li.side-nave-items__item--selected").find("a").attr("href", "#");
-
-              $(obj).on("click", function(event) {
-                    event.preventDefault();
-                    $(".side-nav__close").trigger("click");
-                    return;
-               });
-          };
           function filterMenu() {
               $.ajax({
                 url: "{{PORTAL}}/gil-interventions-items",
@@ -513,68 +490,6 @@
               });
           };
 
-          function handleNoOrgs(userId) {
-              $(".intervention-link, a.decision-support-link").each(function() {
-                var dm = /decision\s?support/gi;
-                if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
-                    var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
-                    //allow modal to show once once action has been taken
-                    if (hasSet) return false;
-                    var self = this;
-                    $.ajax ({
-                        type: "GET",
-                        url: '/api/demographics/' + userId,
-                        async: false
-                    }).done(function(data) {
-                        //console.log(data)
-                        if (data && data.careProvider) {
-                            $.each(data.careProvider,function(i,val){
-                                var orgID = val.reference.split("/").pop();
-                                if (parseInt(orgID) === 0) {
-                                  $(self).removeAttr("href");
-                                  $(self).on("click", function() {
-                                    $("figure.js-close-nav").trigger("click");
-                                    setTimeout('$("#modal-org").modal("show");', 0);
-                                  });
-                                };
-                            });
-                        };
-                    }).fail(function() {
-                       // console.log("Problem retrieving data from server.");
-                    });
-                };
-             });
-          };
-
-          function updateOrgCallback(errorMessage) {
-              if (!errorMessage) {
-                $("#modal-org a.box-modal__close").trigger("click");
-                loader(true);
-                setTimeout("location.reload();", 1000);
-                if (typeof sessionStorage != "undefined") {
-                  try {
-                    sessionStorage.setItem("noOrgModalViewed", "true");
-                  } catch(e) {
-
-                  };
-                };
-              } else {
-                $("#modal-org-error").html(errorMessage);
-              };
-          };
-
-          function showMain() {
-            $("#mainHolder").css({
-                          "visibility" : "visible",
-                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
-                          "filter": "alpha(opacity=100)",
-                          "-moz-opacity": 1,
-                          "-khtml-opacity": 1,
-                          "opacity": 1
-                        });
-            {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
-          };
-
          $(document).ready(function(){
 
             checkBannerStatus();
@@ -635,9 +550,36 @@
                 return false;
             });
 
+            $("#shortcut_alias").on("blur focusout", function() {
+                OT.validateIdentifier(false, 
+                  function(data) { 
+                    if (data) {
+                      if (data.name) {
+                        $("#access_code_info").text("Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name);
+                        $("#access_code_error").val("false");
+                      } else {
+                        if (data.error) {
+                          $("#access_code_info").text("You have entered an invalid access code.  Please try again");
+                          $("#access_code_error").val("true");
+                        };
+                      };
+                    } else {
+                        if (hasValue($("#shortcut_alias").val())) {
+                          $("#access_code_info").text("System is unable to process your request.");
+                          $("#access_code_error").val("true");
+                        };
+                    };
+
+                  });
+            });
+
+            $("#shortcut_alias").on("keyup", function() {
+                $("#access_code_info").text("");
+            })
+
             $("#accessCodeLink").on("click", function() {
-                if ($("#shortcut_alias").val() != "") {
-                  location.replace("/go/" + $("#shortcut_alias").val())
+                if ($("#shortcut_alias").val() != "" && $("#access_code_error").val() == "false") {
+                  setTimeout('location.replace("{{PORTAL}}/go/" + $("#shortcut_alias").val());', 1000);
                 };
             });
 
