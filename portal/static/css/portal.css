@@ -51,7 +51,54 @@ a.btn {
   transition: visibility 0.5s ease-in;
 }
 #adminTable {
+  min-height: 280px;
   transition: all 0.5s ease-in;
+}
+div.orglist-selector {
+  display: inline-block;
+}
+
+#adminTableToolbar div.orglist-selector button {
+  background-color: #FFF;
+  border: 1px solid #ccc;
+  padding: 0.65em;
+  height: 2.86em;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+#adminTableToolbar div.dropdown-menu {
+  max-height: 500px;
+  transition: height 300ms ease-in;
+}
+#adminTableToolbar #orglist-footer-container {
+  padding: 0 0.5em;
+  width: 200px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+#adminTableToolbar #orglist-footer-container label {
+  font-weight: normal;
+}
+#adminTableToolbar div.org-container {
+  display: block;
+  margin: -0.1em 0 -0.2em 0;
+}
+div.orglist-selector div.dropdown-menu #userOrgs {
+  width: 300px;
+  max-width: 100%;
+  padding: 1em 0.5em 0 1em;
+  margin: 0 auto;
+}
+div.orglist-selector div.dropdown-menu #userOrgs input {
+  cursor: pointer;
+}
+div.orglist-selector div.dropdown-menu #fillOrgs .divider {
+  display: none;
+}
+div.orglist-selector div.org-container label.org-label {
+  margin: -5em 0;
+  font-size: 0.95em;
+  display: inline;
 }
 #loginEmailReminderText {
   margin-left: 8px;
@@ -233,15 +280,31 @@ transform(-1000px, 0);*/
   margin-left: 8px;
   display: none;
 }
+#patientList #_downloadLink {
+   visibility: hidden;
+ }
 #patientAssessmentDownload {
   padding: 0.65em;
   font-size: 1.1em;
+  height: 2.6em;
 }
 #patientsInstrumentList div.checkbox label {
   font-size: 0.8em;
 }
+#dataDownloadModal .modal-body {
+   padding: 1em
+ }
+ #dataDownloadModal button {
+   font-size:0.8em;
+ }
+ #dataDownloadModal .profile-radio-list {
+   margin-left:1em
+ }
+ #_downloadMessage {
+   color:#a94442
+ }
 .orglist-download-container {
-  display: flex;
+  display: inline-block;
   font-size: 0.9em;
   color: #57675B;
   flex-wrap: wrap;
@@ -649,6 +712,9 @@ input.clinic {
   width:350px;
   max-width: 100%;
 }
+#createProfileForm .btn-tnth-back {
+   margin-left: 3.5em;
+ }
 #noEmailContainer {
   margin-top: 0.3em;
 }
@@ -1200,6 +1266,18 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0;
   }
 }
+@media (max-width: 506px) {
+   div.admin-table div.pull-right {
+     width: 100%;
+     max-width: 100%;
+     padding: 0 0.2em;
+   }
+   div.admin-table div.pull-right.search {
+     width: 50%;
+     float: left !important;
+     max-width: 100%;
+   }
+ }
 @media (max-width: 640px) {
   body,
   .form-control,
@@ -1335,9 +1413,22 @@ div.org-container input[type="checkbox"] {
   button.btn-delete-consent {
     padding: 2px;
   }
-  #adminTable .email-field {
+   #adminTable .email-field {
     display: none;
   }
+   #adminTableToolbar div.indent {
+     padding: 0 0.2em;
+   }
+   #adminTableToolbar div.dropdown-menu {
+     width: 230px !important;
+     overflow: auto;
+   }
+   div.orglist-selector div.dropdown-menu #userOrgs{
+     width: 180px !important;
+   }
+   div.orglist-selector div.org-container label.org-label {
+     font-size: 0.8em;
+   }
   .side-custom {
     height: 37em;
   }

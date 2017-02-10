@@ -137,7 +137,8 @@ var AdminTool = function(userId) {
     var self = this;
     $.ajax ({
             type: "GET",
-            url: '/api/demographics/'+this.userId
+            url: '/api/demographics/'+this.userId,
+            async: false
     }).done(function(data) {
       if (data && data.careProvider) {
         $.each(data.careProvider,function(i,val){
@@ -242,7 +243,7 @@ var AdminTool = function(userId) {
 
       //orglist-dropdown
       $('#orglist-dropdown').on('click touchstart', function () {
-          setTimeout('AT.setOrgsMenuHeight(' + (iterated?80:50) + ');', 0);
+          setTimeout('AT.setOrgsMenuHeight(' + (iterated?'100':'50') + ');', 0);
       });
     } else {
       //no patient data
