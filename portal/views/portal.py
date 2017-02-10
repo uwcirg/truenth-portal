@@ -32,13 +32,13 @@ portal = Blueprint('portal', __name__)
 
 def page_not_found(e):
     gil = current_app.config.get('GIL')
-    return render_template('404.html' if not gil else '/gil/404.html', no_nav="true"), 404
+    return render_template('404.html' if not gil else '/gil/404.html', no_nav="true", user=current_user()), 404
 
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
     gil = current_app.config.get('GIL')
-    return render_template('500.html' if not gil else '/gil/500.html', no_nav="true"), 500
+    return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
 
 @portal.before_app_request
 def debug_request_dump():
@@ -93,8 +93,30 @@ def gil_interventions_items():
                 "link_url": display.link_url if display.link_url is not None else "disabled",
                 "link_label": display.link_label if display.link_label is not None else ""
             })
-
+   
     return jsonify(interventions=user_interventions)
+@portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
+def gil_shortcut_alias_validation(clinic_alias):
+    # Shortcut aliases are registered with the organization as identifiers.
+    # Confirm the requested alias exists or 404
+    identifier = Identifier.query.filter_by(system=SHORTCUT_ALIAS,
+                                            _value=clinic_alias).first()
+    if not identifier:
+        current_app.logger.debug("Clinic alias not found: %s", clinic_alias)
+        return jsonify({"error": "clinic alias not found"})
+
+    # Expecting exactly one organization for this alias, save ID in session
+    results = OrganizationIdentifier.query.filter_by(
+        identifier_id=identifier.id).one()
+    # Top-level orgs won't work, as the UI only lists the clinic level
+    org = Organization.query.get(results.organization_id)
+    if org.partOf_id is None:
+        return jsonify({"error": "alias points to top-level organization"})
+
+    identifier = {"name": org.name}
+
+
+    return jsonify(identifier)
 
 @portal.route('/symptom-tracker')
 def symptom_tracker():
@@ -107,6 +129,14 @@ def decision_support():
 @portal.route('/what-is-prostate-cancer')
 def prostate_cancer_facts():
     return render_template('gil/what-is-prostate-cancer.html', user=current_user())
+
+@portal.route('/exercise-and-diet')
+def exercise_and_diet():
+    return render_template('gil/exercise-and-diet.html', user=current_user())
+
+@portal.route('/lived-experience')
+def lived_experience():
+    return render_template('gil/lived-experience.html', user=current_user())
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])

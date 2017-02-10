@@ -1,0 +1,19 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{super()}}
+      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">Exercise and Diet</h1>
+          <p class="page-intro__sub">Coming in 2017.</p>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+  <script>
+      $(document).ready(function(){
+        setSelectedNavItem($(".side-nav-items__item--exercisediet"));
+      });
+  </script>
+{% endblock %}

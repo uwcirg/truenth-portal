@@ -270,6 +270,49 @@ module.exports = WindowScroll = (function() {
 $("input[type='text']").on("blur paste", function() {
       $(this).val($.trim($(this).val()));
 });
+var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+if (LOGIN_AS_PATIENT) {
+    if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function(event) {
+      if (typeof history != 'undefined' && history.pushState) {
+        history.pushState(null, null, location.href);
+        setTimeout('location.reload();', 0);
+      } else {
+        window.history.forward(1);
+        setTimeout('location.reload();', 0);
+      };
+    });
+};
+
+function setNoBanner() {
+    if (typeof sessionStorage != "undefined") {
+      sessionStorage.setItem('bannerAccessed', 'yes');
+    };
+};
+
+function checkBannerStatus() {
+  if (typeof sessionStorage != "undefined") {
+    var data = sessionStorage.getItem('bannerAccessed');
+    if (data == "yes") {
+      $('.js-close-upper-banner').trigger("click");
+    };
+  }
+};
+
+function goToLogin() {
+    $('#modal-login-register').modal('hide');
+    setTimeout("$('#modal-login').modal('show'); ", 400);
+};
+function setSelectedNavItem(obj) {
+    $(obj).addClass("side-nave-items__item--selected");
+    $("li.side-nave-items__item--selected").find("a").attr("href", "#");
+
+    $(obj).on("click", function(event) {
+          event.preventDefault();
+          $(".side-nav__close").trigger("click");
+          return;
+     });
+};
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
@@ -305,7 +348,6 @@ var OrgTool = function() {
 
     var TOP_LEVEL_ORGS = [];
     var orgsList = {};
-
 
     this.inArray = function (val, array) {
         if (val && array) {
@@ -415,6 +457,20 @@ var OrgTool = function() {
         return Math.floor((d - dateTime) / (1000 * 60 * 60 * 24))
     };
 
+    this.validateIdentifier = function(sync, callback) {
+      if (this.identifiers) return this.identifiers;
+      var self = this;
+       $.ajax ({
+            type: "GET",
+            url: "/gil-shortcut-alias-validation/" + $("#shortcut_alias").val(),
+            async: sync? false : true
+        }).done(function(data) {
+          if (callback) callback(data);
+        }).fail(function() {
+          if (callback) callback();
+        });
+
+    };
     this.getOrgs = function(userId, sync, callback) {
         var self = this;
         $.ajax ({
@@ -454,6 +510,7 @@ var OrgTool = function() {
             });
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
+           if (callback) callback();
         });
     },
     this.updateOrg = function(userId, callback) {
@@ -663,6 +720,56 @@ var OrgTool = function() {
 };
 
 var OT = new OrgTool();
+
+function handleNoOrgs(userId) {
+      $(".intervention-link, a.decision-support-link").each(function() {
+        var dm = /decision\s?support/gi;
+        if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
+            var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+            //allow modal to show once once action has been taken
+            if (hasSet) return false;
+            var self = this;
+            $.ajax ({
+                type: "GET",
+                url: '/api/demographics/' + userId,
+                async: false
+            }).done(function(data) {
+                //console.log(data)
+                if (data && data.careProvider) {
+                    $.each(data.careProvider,function(i,val){
+                        var orgID = val.reference.split("/").pop();
+                        if (parseInt(orgID) === 0) {
+                          $(self).removeAttr("href");
+                          $(self).on("click", function() {
+                            $("figure.js-close-nav").trigger("click");
+                            setTimeout('$("#modal-org").modal("show");', 0);
+                          });
+                        };
+                    });
+                };
+            }).fail(function() {
+               // console.log("Problem retrieving data from server.");
+            });
+        };
+     });
+  };
+
+function updateOrgCallback(errorMessage) {
+    if (!errorMessage) {
+      $("#modal-org a.box-modal__close").trigger("click");
+      loader(true);
+      setTimeout("location.reload();", 1000);
+      if (typeof sessionStorage != "undefined") {
+        try {
+          sessionStorage.setItem("noOrgModalViewed", "true");
+        } catch(e) {
+
+        };
+      };
+    } else {
+      $("#modal-org-error").html(errorMessage);
+    };
+};
 
 
 
