@@ -17,13 +17,17 @@ RUN \
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
-RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
-    apache2 \
-    libapache2-mod-wsgi \
-    libpq5 \
-    locales \
-    portal \
-    python2.7
+RUN \
+    apt-get clean && \
+    apt-get update && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --force-yes \
+        apache2 \
+        libapache2-mod-wsgi \
+        libpq5 \
+        locales \
+        portal \
+        python2.7
 
 RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
