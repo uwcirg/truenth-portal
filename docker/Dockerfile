@@ -28,6 +28,9 @@ RUN \
         python2.7 && \
     apt-get clean
 
+# Todo: move to same step as package installation
+RUN rm -rf /tmp/artifacts
+
 ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
@@ -65,6 +68,8 @@ ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 RUN a2ensite portal
 
 EXPOSE 80
+
+
 
 CMD \
     . /etc/apache2/envvars && \
