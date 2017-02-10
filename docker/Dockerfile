@@ -20,7 +20,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D4
 RUN \
     apt-get update && \
     apt-get dist-upgrade -y && \
-    apt-get install -y --force-yes \
+    apt-get install -y --force-yes --no-install-recommends \
         apache2 \
         libapache2-mod-wsgi \
         libpq5 \
