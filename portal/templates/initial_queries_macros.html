@@ -38,14 +38,6 @@
           </div>
         </div>
     </div>
-    <script>$(function () {
-        tnthAjax.getName($("#iq_userId").val());
-        ["firstname", "lastname"].forEach(function(field) {
-            $("#" + field).on("blur", function() {
-                assembleContent.demo($("#iq_userId").val());
-            });
-        });
-      });</script>
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
