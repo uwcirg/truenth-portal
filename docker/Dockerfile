@@ -20,9 +20,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D4
 RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
     apache2 \
     libapache2-mod-wsgi \
+    libpq5 \
     locales \
     portal \
-    postgresql \
     python2.7
 
 RUN dpkg-reconfigure locales && \
