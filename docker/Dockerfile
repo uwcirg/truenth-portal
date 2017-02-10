@@ -24,14 +24,9 @@ RUN \
         apache2 \
         libapache2-mod-wsgi \
         libpq5 \
-        locales \
         portal \
         python2.7 && \
     apt-get clean
-
-RUN dpkg-reconfigure locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8
 
 ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
