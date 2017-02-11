@@ -2,63 +2,64 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
-<div class="row">
-    <div class="col-md-push-1 col-md-7 col-xs-11">
-        <h4 class="tnth-headline">Register for TrueNTH</h4>
-    </div>
-</div>
- <hr style="position: relative; top:-16px"/>
-<div class="row" id="socialMediaRegistrationContainer">
-    <div class="col-md-push-2 col-md-7 col-xs-11">
-        <p class="profile-item-title">Register using:</p>
-
-        <div style="margin-left: 1em">
-            <a style="margin: 0.2em auto" href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
-               class="btn btn-social btn-facebook">
-                <i class="fa fa-facebook"></i>
-                Facebook
-            </a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <a style="margin: 0.2em auto" href="{{ url_for('auth.login', provider_name='google', next=request.args.get('next')) }}"
-               class="btn btn-social btn-google">
-                <i class="fa fa-google"></i>
-                Google
-            </a>
-        </div>
-
-        <div style="margin-top: 0.5em">
-            <a class="small-text" href="#" data-toggle="modal" data-target="#accountModal">Learn more about using Facebook or Google to sign up for TrueNTH.</a>
-        </div>
-        <hr/>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-push-2 col-md-7 col-xs-11">
-        <p  id="createAcctTxt" class="profile-item-title" style="margin-top: 1.5em">Or create an account:</p>
-    </div>
-</div>
 <form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
 
-    <div class="row" style="margin: 0 auto">
-        <div class="col-md-push-2 col-md-7 col-xs-11 profile-item-container" style="padding: 3em 2.5em">
-            {{ form.hidden_tag() }}
-            {# Username or Email #}
-            {% set field = form.username if user_manager.enable_username else form.email %}
-            {{ render_field(field, label="Email address", label_visible=false, tabindex=220, required="required", data_error="Email address is required." ) }}
+    <div class="row">
+        <div class="col-md-push-3 col-md-5 col-xs-11">
+             <div class="btn-social-container">
+                <h4 class="tnth-headline reg-title">Register for TrueNTH</h4>
+                <p id="createAcctTxt" class="profile-item-title">Create an account:</p>
+                {{ form.hidden_tag() }}
+                {# Username or Email #}
+                {% set field = form.username if user_manager.enable_username else form.email %}
+                {{ render_field(field, label="Email address", label_visible=false, tabindex=220, required="required", data_error="Email address is required." ) }}
 
-            {% if user_manager.enable_email and user_manager.enable_username %}
-            {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true" ) }}
-            {% endif %}
+                {% if user_manager.enable_email and user_manager.enable_username %}
+                {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true" ) }}
+                {% endif %}
 
-            {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$",
-  infoText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
+                {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$",
+      infoText="Password must have at least 6 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
 
-            {% if user_manager.enable_retype_password %}
-            {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240) }}
-            {% endif %}
+                {% if user_manager.enable_retype_password %}
+                {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240) }}
+                {% endif %}
+                <br/>
 
-            <br/>
+                {{ render_submit_field(form.submit, "Register", tabindex=280) }}
 
-            {{ render_submit_field(form.submit, "Register", tabindex=280) }}
+                <br/><br/><br/>
+                <div class="divider"></div>
+                <div class="or">or</div>
+                <div class="or-divider"></div>
+                <br/>
+            </div>
+            <div id="socialMediaRegistrationContainer">
+                <div class="btn-social-container">
+                     <p class="profile-item-title">Register using:</p>
+                    <div>
+                        <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
+                           class="btn btn-social btn-facebook">
+                            <i class="fa fa-facebook"></i>
+                           Log In With Facebook
+                        </a>
+                    </div>
+                    <div class="divider"></div>
+                    <div>
+                        <a href="{{ url_for('auth.login', provider_name='google', next=request.args.get('next')) }}"
+                           class="btn btn-social btn-google">
+                            <i class="fa fa-google"></i>
+                            Log In With Google
+                        </a>
+                    </div>
+                    <div class="divider"></div>
+                    <div>
+                        <a class="smaller-text text-muted" href="#" data-toggle="modal" data-target="#accountModal">Learn more about using Facebook or Google to sign up for TrueNTH.</a>
+                    </div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <br/><br/>
         </div>
     </div>
 </form>
@@ -97,9 +98,6 @@ $(document).ready(function(){
         var theMsg = $(this).attr("data-match_error");
         $(this).attr("data-match-error", theMsg);
     });
-    if (!$("#socialMediaRegistrationContainer").is(":visible")) {
-        $("#createAcctTxt").text("Create an account").css({"margin-top": "0", "margin-left": "0.9em"});
-    }
 
     var qs = (function(a) {
     if (a == "") return {};
