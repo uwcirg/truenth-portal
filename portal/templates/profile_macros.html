@@ -387,7 +387,7 @@
             });
         };
         var leafOrgs = false;
-        {% if (current_user.has_role('provider') or ((person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)) and not(current_user.has_role('admin')) %}
+        {% if current_user.has_role('provider') and not(current_user.has_role('admin')) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
@@ -405,8 +405,21 @@
                         checkedOrgs[$(this).val()] = true;
                     };
                     $(this).attr("type", "radio");
-                    if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+                    if (checkedOrgs[$(this).val()]) {
+                        $(this).prop("checked", true);
+                    };
                 });
+            {% endif %}
+            {% if current_user.has_role('patient') and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var checkedOrgs = [];
+                userOrgs.each(function() {
+                    if ($(this).prop("checked")) {
+                        checkedOrgs.push($(this).val());
+                    };
+                });
+                if (checkedOrgs.length > 0) OT.filterOrgs(checkedOrgs);
+
             {% endif %}
         };
     </script>

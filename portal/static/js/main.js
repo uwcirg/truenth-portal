@@ -701,9 +701,9 @@ var assembleContent = {
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        $.each($("#userOrgs input:checkbox"),function(i,v){
+        $.each($("#userOrgs input"),function(i,v){
             if ($(this).attr("data-parent-id")) {
-                $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
+                if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
             };
         });
 
@@ -982,7 +982,7 @@ var OrgTool = function() {
         if (!leafOrgs) return false;
         var self = this;
 
-        $("input[name='organization']:checkbox").each(function() {
+        $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
                 if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
