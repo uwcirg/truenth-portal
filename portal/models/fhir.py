@@ -617,7 +617,8 @@ class AssessmentStatus(object):
         # If we aren't given a consent, use the first valid consent found
         # for the user.
         if not self._consent:
-            self._consent = self.user.valid_consents[0]
+            if self.user.valid_consents and len(list(self.user.valid_consents)) > 0:
+                self._consent = self.user.valid_consents[0]
 
         if self._consent:
             self._consent_date = self._consent.audit.timestamp
