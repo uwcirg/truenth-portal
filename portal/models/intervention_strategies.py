@@ -23,7 +23,7 @@ import sys
 
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
-from .fhir import assessment_status, localized_PCa, most_recent_survey
+from .fhir import AssessmentStatus
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .procedure_codes import known_treatment_started
@@ -149,12 +149,10 @@ def update_card_html_on_completion():
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
-        recents = most_recent_survey(user)
-        authored = recents.get('completed')
-        localized = localized_PCa(user)
-        status = assessment_status(user)
-        if status in ('Due', 'Overdue', 'In Progress'):
-            if localized:
+        assessment_status = AssessmentStatus(user=user)
+        if assessment_status.overall_status in (
+            'Due', 'Overdue', 'In Progress'):
+            if assessment_status.localized:
                 intro = """<p>
                 The questionnaire you are about to complete asks about your health.
                 Many of the questions relate to symptoms people with prostate
@@ -183,27 +181,14 @@ def update_card_html_on_completion():
             </p>
             """.format(user.display_name, intro=intro)
             link_label = 'Begin questionnaire'
-            if status == 'In Progress':
+            if assessment_status.overall_status == 'In Progress':
                 link_label = 'Continue questionnaire in progress'
-            if localized:
-                potential_instruments = ('epic26', 'eproms_add')
-            else:
-                potential_instruments = ('eortc', 'prems')
-
-            # Need to remove completed instruments
-            # TODO: refactor needed
-            # for now, repeat call to get status per instrument
-            instrument_id = []
-            for instrument in potential_instruments:
-                results = most_recent_survey(user, instrument)
-                if 'completed' not in results:
-                    instrument_id.append(instrument)
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
-               instrument_id=instrument_id,
-            )
-        elif status == "Completed":
-            if localized:
+                instrument_id=assessment_status.instruments_needing_full_assessment(),
+                resume_instrument_id=assessment_status.instruments_in_process())
+        elif assessment_status.overall_status == "Completed":
+            if assessment_status.localized:
                 intro = """<p>
                 By contributing your information to this
                 project, we can collectively improve the care of all men with
@@ -231,19 +216,22 @@ def update_card_html_on_completion():
             {most_recent_survey_date}.
             You can view previous responses below.
             </p>
-            """.format(email=user.email,
-                       intro=intro,
-                       change_email_url=url_for("portal.profile"),
-                       next_survey_date=authored+timedelta(days=365),
-                       most_recent_survey_date=authored)
+            """.format(
+                email=user.email,
+                intro=intro,
+                change_email_url=url_for("portal.profile"),
+                next_survey_date=assessment_status.completed_date+timedelta(
+                    days=365),
+                most_recent_survey_date=assessment_status.completed_date)
             link_label = 'View previous questionnaire'
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
         else:
             # Should only land here in expired or partially completed state
-            if status not in ("Expired", "Partially Completed"):
-                current_app.logger.error("Unexpected state {} for user {} "
-                             "authored: {} localized: {}".format(
-                                 status, user.id, authored, localized))
+            if assessment_status.overall_status not in (
+                "Expired", "Partially Completed"):
+                current_app.logger.error(
+                    "Unexpected state {} for {}".format(
+                        assesment_status.overall_status, user))
             card_html = (
                 "<p>The assessment is no longer available. "
                 "A research staff member will contact you for assistance.</p>")

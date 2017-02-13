@@ -7,7 +7,7 @@ from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
-from ..models.fhir import assessment_status
+from ..models.fhir import AssessmentStatus
 from ..models.fhir import FHIR_datetime, QuestionnaireResponse
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User
@@ -1389,9 +1389,10 @@ def batch_assessment_status():
             continue
         details = []
         for consent in user.all_consents:
-            status = assessment_status(user, consent)
+            a_s = AssessmentStatus(user=user, consent=consent)
             details.append(
-                {'consent': consent.as_json(), 'assessment_status': status})
+                {'consent': consent.as_json(),
+                 'assessment_status': a_s.overall_status})
         results.append({'user_id': user.id, 'consents': details})
 
     return jsonify(status=results)
