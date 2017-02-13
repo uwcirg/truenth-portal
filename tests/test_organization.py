@@ -65,8 +65,12 @@ class TestOrganization(TestCase):
 
     def test_as_fhir(self):
         org = Organization(name='Homer\'s Hospital')
+        org.use_specific_codings = True
+        org.race_codings = False
         data = org.as_fhir()
         self.assertEquals(org.name, data['name'])
+        self.assertTrue(data['use_specific_codings'])
+        self.assertFalse(data['race_codings'])
 
     def test_organization_get(self):
         self.login()

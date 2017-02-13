@@ -173,6 +173,8 @@ class Organization(db.Model):
                          'ethnicity_codings','indigenous_codings'):
                 if getattr(self, attr):
                     d[attr] = True
+                else:
+                    d[attr] = False
         if self.identifiers:
             d['identifier'] = []
         for id in self.identifiers:
