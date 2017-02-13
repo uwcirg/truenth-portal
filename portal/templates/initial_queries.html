@@ -306,7 +306,7 @@ function initIncompleteFields() {
 
 
 $(document).ready(function(){
-  
+
     if (preselectClinic) {
         var ___roles =  [{'name': 'patient'}];
         //update user role if user has chosen an org
@@ -572,7 +572,7 @@ $(document).ready(function(){
                       event: patientQClickEvent
                     },
       'clinics':    {
-                      fields: [$("#userOrgs input[name='organization']:checkbox").not('[parent_org]')],
+                      fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
                       event: userOrgChangeEvent
                     }
     };

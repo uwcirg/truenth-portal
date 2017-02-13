@@ -314,6 +314,16 @@ function setSelectedNavItem(obj) {
      });
 };
 
+function handleAccessCode() {
+  if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
+    $("#access_code_info").show();
+    $(this).addClass("icon-box__button--disabled");
+    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 1800);
+  } else {
+    if ($("#access_code_error").text() != "") $("#access_code_error").show();
+  };
+};
+
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
     this.name = orgName;
@@ -744,6 +754,9 @@ function handleNoOrgs(userId) {
                             $("figure.js-close-nav").trigger("click");
                             setTimeout('$("#modal-org").modal("show");', 0);
                           });
+                          if (typeof sessionStorage != "undefined") {
+                              sessionStorage.removeItem("decisionSupportInSession");
+                          };
                         };
                     });
                 };
