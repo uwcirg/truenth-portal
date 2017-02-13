@@ -3,6 +3,7 @@ from flask import abort, Blueprint, current_app, jsonify, request, redirect
 from flask import session
 from flask_swagger import swagger
 import jsonschema
+import requests
 from sqlalchemy import or_
 
 from ..audit import auditable_event
@@ -1210,6 +1211,18 @@ def present_assessment(instruments=None):
             - epic26
             - eq5d
         collectionFormat: multi
+      - name: resume_instrument_id
+        in: query
+        description:
+          ID of the instrument, eg "epic26", "eq5d"
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
@@ -1239,28 +1252,41 @@ def present_assessment(instruments=None):
     configured_instruments = current_app.config['INSTRUMENTS']
 
     queued_instruments = request.args.getlist('instrument_id')
+    resume_instruments = request.args.getlist('resume_instrument_id')
+
+    # Combine requested instruments into single list, maintaining order
+    common_instruments = queued_instruments + resume_instruments
+    common_instruments = sorted(
+        set(common_instruments),
+        key=lambda x: common_instruments.index(x)
+    )
 
     # Hack to allow deprecated API to piggyback
     # Remove when deprecated_present_assessment() is fully removed
     if instruments is not None:
         queued_instruments = instruments
 
-
-    if set(queued_instruments) - set(configured_instruments):
+    if set(common_instruments) - set(configured_instruments):
         abort(
             404,
             "No matching assessment found: %s" % (
-                ", ".join(set(queued_instruments) - set(configured_instruments))
+                ", ".join(set(common_instruments) - set(configured_instruments))
             )
         )
 
-    assessment_url = "{AE_URL}/surveys/new_session?{subject}project={instruments}".format(
-        AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        subject="subject_id=%s&" % (
-            request.args.get("subject_id") if "subject_id" in request.args else "",
-        ),
-        instruments=",".join(queued_instruments),
-    )
+    assessment_params = {
+        "project": ",".join(common_instruments),
+        "resume_instrument_id": ",".join(resume_instruments),
+        "subject_id": request.args.get('subject_id'),
+    }
+    # Clear empty querystring params
+    assessment_params = {k:v for k,v in assessment_params.items() if v}
+
+    assessment_url = "".join((
+        INTERVENTION.ASSESSMENT_ENGINE.link_url,
+        "/surveys/new_session?",
+        requests.compat.urlencode(assessment_params),
+    ))
 
     if 'next' in request.args:
         next_url = request.args.get('next')
