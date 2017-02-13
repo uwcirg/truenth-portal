@@ -304,7 +304,7 @@
                 var body = '';
                 var return_url = '';
                 var clinicName = (function() {
-                    var orgs = $("#userOrgs input[name='organization']:checkbox:checked").not('[parent_org]');
+                    var orgs = $("#userOrgs input[name='organization']:checked").not('[parent_org]');
                     var parentName = "";
                     if (orgs.length > 0 ) {
                         orgs.each(function() {
@@ -369,7 +369,7 @@
         <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <div class="indent">
         <div id="fillOrgs"></div>
-        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
+        <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
         </div>
         {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
         <div class="help-block with-errors"></div>
@@ -388,7 +388,7 @@
         };
         var leafOrgs = false;
         {% if current_user.has_role('provider') and not(current_user.has_role('admin')) %}
-            leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() |safe}} {% else %} false {% endif %};
+            leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
             {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
@@ -397,6 +397,30 @@
         function _handleOrgs() {
             if (leafOrgs) OT.filterOrgs(leafOrgs);
             if (!orgsEditable) disableOrgs();
+            {% if (person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var checkedOrgs = {};
+                userOrgs.each(function() {
+                    if ($(this).prop("checked")) {
+                        checkedOrgs[$(this).val()] = true;
+                    };
+                    $(this).attr("type", "radio");
+                    if (checkedOrgs[$(this).val()]) {
+                        $(this).prop("checked", true);
+                    };
+                });
+            {% endif %}
+            {% if current_user.has_role('patient') and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var checkedOrgs = [];
+                userOrgs.each(function() {
+                    if ($(this).prop("checked")) {
+                        checkedOrgs.push($(this).val());
+                    };
+                });
+                if (checkedOrgs.length > 0) OT.filterOrgs(checkedOrgs);
+
+            {% endif %}
         };
     </script>
 {%- endmacro %}

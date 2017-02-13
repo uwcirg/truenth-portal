@@ -184,8 +184,8 @@
             <p class="box-modal__copy">Do you have an access code?</p>
             <form action="/go" method="post">
               <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required autocomplete="off"/>
-              <div id="access_code_info" class="box-modal__copy text-left"></div>
-              <input type="hidden" id="access_code_error" value="false" />
+              <div id="access_code_info" class="box-modal__copy text-left tnth-hide"></div>
+              <div id="access_code_error" class="tnth-hide"></div>
               <div class="access-code-container">
                 <a id="accessCodeLink" class="button button-large button--teal">Next</a>
               </div>
@@ -321,7 +321,7 @@
         </script>
         <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
       {% endif %}
-      <script>         
+      <script>
           function _readCookie(name) {
             var nameEQ = name + "=";
             var ca = document.cookie.split(';');
@@ -470,7 +470,15 @@
                       });
                     $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
                   } else {
-                      {% if user %} handleNoOrgs({{user.id}}); {% endif %}
+                      {% if user %} 
+                        handleNoOrgs({{user.id}}); 
+                        if (typeof sessionStorage != "undefined" && sessionStorage.getItem("decisionSupportInSession")) {
+                            var l =  $("#intervention_item_decisionsupport a");
+                            var la = l.attr("href");
+                            if (l.length > 0 && hasValue(la) && $.trim(la) != "#") location.replace(l.attr("href"));
+                        };
+
+                      {% endif %}
                   };
 
                   if (!found_symptom_tracker) {
@@ -497,15 +505,18 @@
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
             });
-            $("#modal-org").on("hide.bs.modal", function(e) {
-                if (typeof sessionStorage != "undefined") {
-                  try {
-                    sessionStorage.setItem("noOrgModalViewed", "true");
-                  } catch(e) {
+            $("#modal-register").on("show.bs.modal", function(e) {
+                var button = $(e.relatedTarget);
+                //console.log(button.hasClass("decision-support-link"));
+                if (button.hasClass("decision-support-link")) {
+                    if (typeof sessionStorage != "undefined") {
+                       try {
+                         sessionStorage.setItem("decisionSupportInSession", "true");
+                       } catch(e) {
 
-                  };
+                       };
+                    };
                 };
-                setTimeout("location.reload();", 0);
             });
 
             $("#modal-org").on("hide.bs.modal", function(e) {
@@ -536,7 +547,6 @@
                               params.agreementUrl = agreementUrl;
                               setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
                           };
-
                         };
 
                       });
@@ -550,37 +560,41 @@
                 return false;
             });
 
-            $("#shortcut_alias").on("blur focusout", function() {
-                OT.validateIdentifier(false, 
-                  function(data) { 
-                    if (data) {
-                      if (data.name) {
-                        $("#access_code_info").text("Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name);
-                        $("#access_code_error").val("false");
-                      } else {
-                        if (data.error) {
-                          $("#access_code_info").text("You have entered an invalid access code.  Please try again");
-                          $("#access_code_error").val("true");
-                        };
-                      };
-                    } else {
-                        if (hasValue($("#shortcut_alias").val())) {
-                          $("#access_code_info").text("System is unable to process your request.");
-                          $("#access_code_error").val("true");
-                        };
-                    };
+            $("#shortcut_alias").on("keyup", function(e) {
+                if ($(this).val() != "") {
+                    OT.validateIdentifier(false,
+                      function(data) {
+                        if (data) {
+                          if (data.name) {
+                            $("#access_code_info").text("Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration...");
+                            $("#access_code_error").text("");
 
-                  });
+                          } else {
+                            if (data.error) {
+                              $("#access_code_info").text("");
+                              $("#access_code_error").text("You have entered an invalid access code.  Please try again");
+                            };
+                          };
+                        } else {
+                            if (hasValue($("#shortcut_alias").val())) {
+                              $("#access_code_info").text("");
+                              $("#access_code_error").text("System is unable to process your request.");
+                            };
+                        };
+
+                      });
+                } else $("#access_code_info").text("");
             });
 
-            $("#shortcut_alias").on("keyup", function() {
-                $("#access_code_info").text("");
+            $("#shortcut_alias").on("keydown", function(e) {
+                if (e.keyCode == 13) {
+                  e.preventDefault();
+                  handleAccessCode();
+                };
             })
 
             $("#accessCodeLink").on("click", function() {
-                if ($("#shortcut_alias").val() != "" && $("#access_code_error").val() == "false") {
-                  setTimeout('location.replace("{{PORTAL}}/go/" + $("#shortcut_alias").val());', 1000);
-                };
+                handleAccessCode();
             });
 
             // Configure and start the session timeout monitor

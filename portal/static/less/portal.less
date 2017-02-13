@@ -781,10 +781,27 @@ btn {
 
 #fillOrgs, .noOrg-container{
   font-size: @orgSize;
+  margin-top: 0.2em;
 }
 
 input.clinic {
-  margin-top:6px;
+  margin-top: 6px;
+}
+#fillOrgs label.org-label input[type="radio"] {
+  position: relative;
+  right: 5px !important;
+  top: -1px !important;
+}
+div.noOrg-container {
+  input[type="radio"] {
+  font-size:0.95em;
+  top: 2px;
+  }
+  span {
+  margin-left:5px;
+  position: relative;
+  top: 1px;
+  }
 }
 
 #createProfileForm  .title {

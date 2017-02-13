@@ -701,9 +701,9 @@ var assembleContent = {
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        $.each($("#userOrgs input:checkbox"),function(i,v){
+        $.each($("#userOrgs input"),function(i,v){
             if ($(this).attr("data-parent-id")) {
-                $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
+                if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input:checkbox[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
             };
         });
 
@@ -712,11 +712,13 @@ var assembleContent = {
             orgIDs = $("#userOrgs input[name='organization']").map(function(){
                     if ($(this).prop("checked")) return { reference: "api/organization/"+$(this).val() };
             }).get();
+
             if (orgIDs) {
                 if (orgIDs.length > 0) {
                     demoArray["careProvider"] = orgIDs;
                 } else {
-                    demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
+                    //don't update org to none if at the initial queries page
+                    if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
                 };
             };
 
@@ -980,7 +982,7 @@ var OrgTool = function() {
         if (!leafOrgs) return false;
         var self = this;
 
-        $("input[name='organization']:checkbox").each(function() {
+        $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
                 if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
@@ -1142,8 +1144,7 @@ var tnthAjax = {
 
             OT.populateOrgsList(data.entry);
             OT.populateUI();
-            if (callback) callback();
-            tnthAjax.getDemo(userId, noOverride);
+            tnthAjax.getDemo(userId, noOverride, sync, callback);
             if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
                 var ob = $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]");
                 ob.prop('checked', true);
@@ -1427,7 +1428,7 @@ var tnthAjax = {
             };
         });
     },
-    "getDemo": function(userId, noOverride, sync) {
+    "getDemo": function(userId, noOverride, sync, callback) {
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId,
@@ -1443,9 +1444,11 @@ var tnthAjax = {
                 fillContent.subjectId(data);
             }
             loader();
+            if (callback) callback();
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
             loader();
+            if (callback) callback();
         });
     },
     "putDemo": function(userId,toSend,targetField, sync) {

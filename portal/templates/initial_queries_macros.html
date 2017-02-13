@@ -195,16 +195,29 @@
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
           <div id="fillOrgs"></div>
-          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("I'm not receiving care at any of the above clinics") }}</label></div>
+          <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("I'm not receiving care at any of the above clinics") }}</span></label></div>
         </div>
       </div>
       {{consent(consent_agreements)}}
     </div>
     <script>
+    function _orgsCallback() {
+      {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+          var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+          var checkedOrgs = {};
+          userOrgs.each(function() {
+              if ($(this).prop("checked")) {
+                  checkedOrgs[$(this).val()] = true;
+              };
+              $(this).attr("type", "radio");
+              if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+          });
+      {% endif %}
+    };
     $(function () {
         //tnthAjax.getConsent($("#iq_userId").val(), true);
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
-        tnthAjax.getOrgs($("#iq_userId").val(), false,true);
+        tnthAjax.getOrgs($("#iq_userId").val(), false,true, _orgsCallback);
       });
     </script>
 
