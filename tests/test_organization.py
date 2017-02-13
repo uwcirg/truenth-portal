@@ -27,6 +27,9 @@ class TestOrganization(TestCase):
                           data['address'][1]['line'][0])
         self.assertEquals(org.name, data['name'])
         self.assertEquals(org.phone, "022-655 2300")
+        self.assertTrue(org.use_specific_codings)
+        self.assertTrue(org.race_codings)
+        self.assertFalse(org.ethnicity_codings)
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
@@ -251,3 +254,29 @@ class TestOrganization(TestCase):
         self.assertEquals(len(nodes), 4)
         for i in (102, 1002, 10031, 10032):
             self.assertTrue(i in nodes)
+
+    def test_coding_option_inheritance(self):
+        # create parent with specific coding options
+        parent = Organization(id=101, name='test parent')
+        parent.use_specific_codings = True
+        parent.race_codings = True
+        parent.ethnicity_codings = False
+        parent.indigenous_codings = False
+        with SessionScope(db):
+            db.session.add(parent)
+            db.session.commit()
+        parent = db.session.merge(parent)
+        parent_id = parent.id
+        # create child org, test inheritance of coding options
+        org = Organization(name='test', partOf_id=101)
+        org.use_specific_codings = False
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.commit()
+        org = db.session.merge(org)
+        self.assertTrue(org.id)
+        self.assertEquals(org.partOf_id, parent_id)
+        self.assertFalse(org.use_specific_codings)
+        self.assertTrue(org.race_codings)
+        self.assertFalse(org.ethnicity_codings)
+        self.assertFalse(org.indigenous_codings)
