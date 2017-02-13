@@ -1254,13 +1254,16 @@ def present_assessment(instruments=None):
             )
         )
 
-    assessment_url = "{AE_URL}/surveys/new_session?{subject}project={instruments}".format(
+    assessment_url = "{AE_URL}/surveys/new_session?project={instruments}".format(
         AE_URL=INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        subject="subject_id=%s&" % (
-            request.args.get("subject_id") if "subject_id" in request.args else "",
-        ),
         instruments=",".join(queued_instruments),
     )
+
+    if "subject_id" in request.args:
+        assessment_url = "{assessment_url}&subject_id={subject_id}".format(
+            assessment_url=assessment_url,
+            subject_id=request.args.get('subject_id')
+        )
 
     if 'next' in request.args:
         next_url = request.args.get('next')
