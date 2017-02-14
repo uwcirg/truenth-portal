@@ -132,97 +132,102 @@
         </div>
     </div>
 {%- endmacro %}
+
 {% macro profileIndigenous(person) -%}
-    <div id="userIndigenousStatusContainer"></div>
-    <script>
-    $(function () {
-        (function() {
-            $.ajax({
-                type:"GET",
-                url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
-            }).done(function(data) {
-                var as = data["codeSystem"]["concept"];
-                var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
-                '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
-                as.forEach(function(o) {
-                    html += '<div>' + '<label>' +
-                            '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
-
-                });
-                html += "</div></div>";
-                $("#userIndigenousStatusContainer").html(html);
-                getSaveLoaderDiv("profileForm", "userIndigenousStatus");
-                $("#userIndigenousStatusContainer input[type='radio']").each(function() {
-                    $(this).attr("save-container-id", "userIndigenousStatus");
-                    $(this).on("click", function() {
-                        //console.log("value: " + $(this).val());
-                        assembleContent.demo({{ person.id if person }},true, $(this));
+    {% if person and person.org_coding_display_options.indigenous %}
+        <div id="userIndigenousStatusContainer"></div>
+        <script>
+        $(function () {
+            (function() {
+                $.ajax({
+                    type:"GET",
+                    url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
+                }).done(function(data) {
+                    var as = data["codeSystem"]["concept"];
+                    var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                    '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
+                    as.forEach(function(o) {
+                        html += '<div>' + '<label>' +
+                                '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
                     });
-                });
+                    html += "</div></div>";
+                    $("#userIndigenousStatusContainer").html(html);
+                    getSaveLoaderDiv("profileForm", "userIndigenousStatus");
+                    $("#userIndigenousStatusContainer input[type='radio']").each(function() {
+                        $(this).attr("save-container-id", "userIndigenousStatus");
+                        $(this).on("click", function() {
+                            //console.log("value: " + $(this).val());
+                            assembleContent.demo({{ person.id if person }},true, $(this));
+                        });
+                    });
 
-            }).fail(function(){
-                console.log("Problem retrieiving indigenous statuses");
-            });
-        })();
-    });
-    </script>
+                }).fail(function(){
+                    console.log("Problem retrieiving indigenous statuses");
+                });
+            })();
+        });
+        </script>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileRace(person) -%}
-    <div class="form-group profile-section" id="userRace">
-        <label>{{ _("Race") }}</label>
-        <div class="profile-radio-list">
-
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="1002-5">{{ _("American Indian or Alaska Native") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2028-9">{{ _("Asian") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2054-5">{{ _("Black or African American") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2076-8">{{ _("Native Hawaiian or Other Pacific Islander") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2106-3">{{ _("White") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2131-1">{{ _("Other") }}
-                </label>
+    {% if person and person.org_coding_display_options.race %}
+        <div class="form-group profile-section" id="userRace">
+            <label>{{ _("Race") }}</label>
+            <div class="profile-radio-list">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="1002-5">{{ _("American Indian or Alaska Native") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2028-9">{{ _("Asian") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2054-5">{{ _("Black or African American") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2076-8">{{ _("Native Hawaiian or Other Pacific Islander") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2106-3">{{ _("White") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2131-1">{{ _("Other") }}
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileEthnicity(person) -%}
-    <div class="form-group profile-section" id="userEthnicity">
-        <label>{{ _("Ethnicity") }}</label>
-        <div class="profile-radio-list">
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2135-2">{{ _("Hispanic or Latino") }}
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2186-5">{{ _("Not Hispanic or Latino") }}
-                </label>
+    {% if person and person.org_coding_display_options.ethnicity %}
+        <div class="form-group profile-section" id="userEthnicity">
+            <label>{{ _("Ethnicity") }}</label>
+            <div class="profile-radio-list">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2135-2">{{ _("Hispanic or Latino") }}
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2186-5">{{ _("Not Hispanic or Latino") }}
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}

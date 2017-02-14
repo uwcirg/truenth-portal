@@ -446,6 +446,21 @@ class User(db.Model, UserMixin):
 
         return self._identifiers
 
+    @property
+    def org_coding_display_options(self):
+        """Collates all race/ethnicity/indigenous display options
+        from the user's orgs to establish which options to display"""
+        options = {}
+        orgs = self.organizations
+        if orgs:
+            options['race'] = any(o.race_codings for o in orgs)
+            options['ethnicity'] = any(o.ethnicity_codings for o in orgs)
+            options['indigenous'] = any(o.indigenous_codings for o in orgs)
+        else:
+            attrs = ('race','ethnicity','indigenous')
+            options = dict.fromkeys(attrs,True)
+        return options
+
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
