@@ -6986,11 +6986,11 @@ a.home--modal-link {
     opacity: 0.7;
 }
 #modal-register div.or {
-    width: 70px;
-    /*background-color: #7c959e;*/
+    width: 84px;
     opacity: 0.7;
     border-radius: 30px;
     color: #3d494e;
+    letter-spacing: 2px;
 }
 .box-modal-or__divider {
     height: 1px;

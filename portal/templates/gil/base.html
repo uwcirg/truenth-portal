@@ -470,8 +470,8 @@
                       });
                     $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
                   } else {
-                      {% if user %} 
-                        handleNoOrgs({{user.id}}); 
+                      {% if user %}
+                        handleNoOrgs({{user.id}});
                         if (typeof sessionStorage != "undefined" && sessionStorage.getItem("decisionSupportInSession")) {
                             var l =  $("#intervention_item_decisionsupport a");
                             var la = l.attr("href");
@@ -560,8 +560,9 @@
                 return false;
             });
 
-            $("#shortcut_alias").on("keyup", function(e) {
+            $("#shortcut_alias").on("keyup paste", function(e) {
                 if ($(this).val() != "") {
+                    console.log(e.type +  " " + e.target.value)
                     OT.validateIdentifier(false,
                       function(data) {
                         if (data) {
