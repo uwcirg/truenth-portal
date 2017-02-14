@@ -394,6 +394,7 @@
             {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
             tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);
         });
+        
         function _handleOrgs() {
             if (leafOrgs) OT.filterOrgs(leafOrgs);
             if (!orgsEditable) disableOrgs();
@@ -414,11 +415,26 @@
                 var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
                 var checkedOrgs = [];
                 userOrgs.each(function() {
-                    if ($(this).prop("checked")) {
-                        checkedOrgs.push($(this).val());
+                    if ($(this).prop("checked") && parseInt($(this).val()) != 0) {
+                        checkedOrgs.push({
+                            "id": $(this).val(),
+                            "name": $("#org-label-" + $(this).val()).text()
+                        });
                     };
                 });
-                if (checkedOrgs.length > 0) OT.filterOrgs(checkedOrgs);
+                if (checkedOrgs.length > 0) {
+                    var html = "";
+                    checkedOrgs.forEach(function(item) {
+                        html += '<div id="' + item.id + '_container" class="indent org-container"><label id="org-label-' + item.id + '" class="org-label"><input class="clinic" type="checkbox" name="organization" id="' + item.id + '_org" value="' + item.id + '" disabled="disabled" checked>' + item.name + "</label></div>";
+                    });
+                    $("#fillOrgs").html(html);
+                    $("div.noOrg-container").hide();
+                } else {
+                    if ($("#noOrgs").is(":checked")) {
+                        $("#fillOrgs").html("<span class='text-muted'>No organization/affiliation</span>");
+                        $("div.noOrg-container").hide();
+                    };
+                }
 
             {% endif %}
         };
