@@ -20,7 +20,7 @@ Two Dockerfiles (Dockerfile.build and Dockerfile) define how to build a Debian p
 Building a Debian Package
 -------------------------
 
-To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)
+To build a Debian package from the latest latest code on Github (develop branch of uwcirg/true_nth_usa_portal)::
 
     # Create the volume to hold artifacts
     docker volume create --name debian-repo
@@ -38,9 +38,10 @@ To build a Debian package from the latest latest code on Github (develop branch 
     sudo cp -R $(docker volume inspect --format '{{ .Mountpoint }}' debian-repo) artifacts
 
 .. note::
-    All of these commands are run from the git top level directory (``git rev-parse --show-toplevel``)
+    All of these commands are run from the git top level directory (obtained by:``git rev-parse --show-toplevel``)
 
-If you would like to create a package from a topic branch or fork you can override the Github repo and branch as below
+If you would like to create a package from a topic branch or fork you can override the Github repo and branch as below::
+
     # Run the container (override defaults)
     docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG='USERNAME/true_nth_usa_portal' -e BRANCH='feature/feature-branch-name' "portal_builddeb:latest"
 
@@ -55,18 +56,19 @@ The portal Docker image can be built using Debian packages from a remote Debian 
 Remote Debian Repo
 ~~~~~~~~~~~~~~~~~~
 
-To build an image of the portal (portal_web) with defaults
+To build an image of the portal (portal_web) with defaults::
 
     # Build the image
     docker build --file docker/Dockerfile --build-arg --tag "portal_web:latest" .
 
-If you would like to use your own repo, the default Debian repo can be overridden as follows
+If you would like to use your own repo, the default Debian repo can be overridden as follows::
+
     docker build --file docker/Dockerfile --build-arg debian_repo="http://dl.bintray.com/v1/content/myaccount/myrepo" --tag "portal_web:myrepo" .
 
 Local Debian Repo
 ~~~~~~~~~~~~~~~~~
 
-To build an image of the portal with a locally created Debian portal package first create the package as described in `Building a Debian Package`_. After checking that a package exists in the artifacts directory, run the below command to build an image of the portal with the aforementioned package.
+To build an image of the portal with a locally created Debian portal package first create the package as described in `Building a Debian Package`_. After checking that a package exists in the artifacts directory, run the below command to build an image of the portal with the aforementioned package. ::
 
     # Use the packages available in artifacts/
     docker build --file docker/Dockerfile --build-arg --tag "portal_web:local_deb" .
@@ -79,10 +81,12 @@ Docker-compose offers a higher-level interface to build and run containers toget
 
 As it stands Docker Compose lacks a way to build the prerequisite Debian package before building the portal_web container and will use the default Debian repository unless packages are placed in the artifact directory beforehand.
 
-To download and start the set of containers that comprise Shared Services issue the following command
+To download and start the set of containers that comprise Shared Services issue the following command::
+
     docker-compose -f docker/docker-compose.yaml up
 
-If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands
+If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
+
     # Build the "web" service locally instead of downloading from a docker registry
     docker-compose -f docker/docker-compose.yaml build web
     docker-compose -f docker/docker-compose.yaml up
