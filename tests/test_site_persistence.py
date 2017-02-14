@@ -62,7 +62,7 @@ class TestSitePersistence(TestCase):
             'support for the many details of life as a prostate cancer '
             'survivor</p>'))
         self.assertEquals(
-            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
+            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
 
