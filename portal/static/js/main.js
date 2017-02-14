@@ -245,9 +245,7 @@ var fillContent = {
             var clinicalItem = val.content.code.coding[0].display;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
-            } else if (clinicalItem == "PCa localized diagnosis") {
-                clinicalItem = "pca_localized";
-            }
+            };
             var ci = $('div[data-topic="'+clinicalItem+'"]');
             if (ci.length > 0) ci.fadeIn().next().fadeIn();
             var clinicalValue = val.content.valueQuantity.value;
