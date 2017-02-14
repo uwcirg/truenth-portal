@@ -374,7 +374,7 @@
           };
 
           function filterMenu() {
-             
+              var HAS_REDIRECT = false;
               $.ajax({
                 url: "{{PORTAL}}/gil-interventions-items",
                 context: document.body,
@@ -477,8 +477,10 @@
                             var l =  $("#intervention_item_decisionsupport a");
                             var la = l.attr("href");
                             if (l.length > 0 && validateUrl(la)) {
-                              IO.clearSession("decision-support")
-                              location.replace(l.attr("href"));
+                              IO.clearSession("decision-support");
+                              HAS_REDIRECT = true;
+                              loader(true);
+                              setTimeout('location.replace("' + l.attr("href") + '");', 0);
                               return true;
                             };
                         };
@@ -500,18 +502,20 @@
                         var la = l.attr("href");
                         if (l.length > 0 && validateUrl(la)) {
                           IO.clearSession("symptom-tracker");
-                          location.replace(l.attr("href"));
+                          loader(true);
+                          HAS_REDIRECT = true;
+                          setTimeout('location.replace("' + l.attr("href") + '");', 0);
                           return true;
                         };
                     };
                   };
 
                 };
-                $("#loadingIndicator").hide();
+                if(!HAS_REDIRECT) $("#loadingIndicator").hide();
               }).fail(function() {
                 $("#loadingIndicator").hide();
               }).always(function() {
-                $("#loadingIndicator").hide();
+                if(!HAS_REDIRECT) $("#loadingIndicator").hide();
               });
           };
 
