@@ -1,6 +1,6 @@
 {% extends "gil/base.html" %}
 {% block main %}
-    <main class="main">
+    <main class="main decision-support-main">
      {{ super() }}
       <div class="page-intro page-intro--dark page-intro--decision-support" style="background-image: url({{url_for('static', filename='img/DS-Top-Background.jpg') }})">
         <div class="page-intro__content">
@@ -75,6 +75,7 @@
             $("body").attr("class", "page-about theme--intro-light");
             setSelectedNavItem($(".side-nav-items__item--decisionsupport"));
             $("footer a[href='/decision-support']").hide();
+            IO.clearSession("decision-support");
         });
     </script>
 {% endblock %}

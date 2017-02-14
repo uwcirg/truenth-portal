@@ -194,7 +194,7 @@
             <div class="or">otherwise</div>
             <div class="box-modal-or__divider"></div>
             <br/>
-            <a href="{{PORTAL}}/user/register" class="button button-large button--teal">Create Account</a>
+            <a id="btnCreateAccount" href="{{PORTAL}}/user/register" class="button button-large button--teal">Create Account</a>
           </div>
         </div>
       </div>
@@ -352,7 +352,6 @@
                   DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
               };
           };
-
           var loader = function(show) {
               if (show) {
                   $("#loadingIndicator").show();
@@ -375,6 +374,7 @@
           };
 
           function filterMenu() {
+             
               $.ajax({
                 url: "{{PORTAL}}/gil-interventions-items",
                 context: document.body,
@@ -469,13 +469,18 @@
                           $(this).addClass("icon-box__button--disabled");
                       });
                     $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
+                    IO.clearSession("decision-support");
                   } else {
                       {% if user %}
                         handleNoOrgs({{user.id}});
-                        if (typeof sessionStorage != "undefined" && sessionStorage.getItem("decisionSupportInSession")) {
+                        if (IO.getSession("decision-support")) {
                             var l =  $("#intervention_item_decisionsupport a");
                             var la = l.attr("href");
-                            if (l.length > 0 && hasValue(la) && $.trim(la) != "#") location.replace(l.attr("href"));
+                            if (l.length > 0 && validateUrl(la)) {
+                              IO.clearSession("decision-support")
+                              location.replace(l.attr("href"));
+                              return true;
+                            };
                         };
 
                       {% endif %}
@@ -487,6 +492,18 @@
                         $(this).addClass("icon-box__button--disabled");
                     });
                     $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
+                    IO.clearSession("symptom-tracker");
+                  } else {
+                    //#intervention_item_symptomtracker
+                    if (IO.getSession("symptom-tracker")) {
+                        var l =  $("#intervention_item_symptomtracker a");
+                        var la = l.attr("href");
+                        if (l.length > 0 && validateUrl(la)) {
+                          IO.clearSession("symptom-tracker");
+                          location.replace(l.attr("href"));
+                          return true;
+                        };
+                    };
                   };
 
                 };
@@ -505,18 +522,9 @@
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
             });
-            $("#modal-register").on("show.bs.modal", function(e) {
-                var button = $(e.relatedTarget);
-                //console.log(button.hasClass("decision-support-link"));
-                if (button.hasClass("decision-support-link")) {
-                    if (typeof sessionStorage != "undefined") {
-                       try {
-                         sessionStorage.setItem("decisionSupportInSession", "true");
-                       } catch(e) {
-
-                       };
-                    };
-                };
+           
+            $("#btnCreateAccount").on("click", function() {
+                IO.setInterventionSession();
             });
 
             $("#modal-org").on("hide.bs.modal", function(e) {
@@ -562,7 +570,6 @@
 
             $("#shortcut_alias").on("keyup paste", function(e) {
                 if ($(this).val() != "") {
-                    console.log(e.type +  " " + e.target.value)
                     OT.validateIdentifier(false,
                       function(data) {
                         if (data) {
