@@ -1,6 +1,6 @@
 {% extends "gil/base.html" %}
 {% block main %}
-    <main class="main">
+    <main class="main symptom-tracker-main">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--symptom-tracker" style="background-image: url({{url_for('static', filename='img/ST-Top-Background.jpg') }})">
         <div class="page-intro__content">
@@ -45,6 +45,7 @@
         $(document).ready(function() {
             setSelectedNavItem($(".side-nav-items__item--symptomtracker"));
             $("footer a[href='/symptom-tracker']").hide();
+            IO.clearSession("symptom-tracker");
         });
     </script>
 {% endblock %}

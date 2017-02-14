@@ -298,7 +298,6 @@ function checkBannerStatus() {
     };
   }
 };
-
 function goToLogin() {
     $('#modal-login-register').modal('hide');
     setTimeout("$('#modal-login').modal('show'); ", 400);
@@ -318,11 +317,68 @@ function handleAccessCode() {
   if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
     $("#access_code_info").show();
     $(this).addClass("icon-box__button--disabled");
+    IO.setInterventionSession();
     setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 1800);
   } else {
     if ($("#access_code_error").text() != "") $("#access_code_error").show();
   };
 };
+
+var InterventionSessionObj = function() {
+    var SESSION_ID_ENUM = {
+      "decision-support": "decisionSupportInSession",
+      "symptom-tracker": "symptomTrackerInSession"
+    };
+
+    this.setInterventionSession = function() {
+        var inDecisionSupport = $("main.decision-support-main").length > 0;
+        var inSymptomTracker = $("main.symptom-tracker-main").length > 0;
+        if (inDecisionSupport) {
+            if (typeof sessionStorage != "undefined") {
+               try {
+                 sessionStorage.setItem(SESSION_ID_ENUM["decision-support"], "true");
+               } catch(e) {
+
+               };
+            };
+        };
+        if (inSymptomTracker) {
+            if (typeof sessionStorage != "undefined") {
+               try {
+                 sessionStorage.setItem(SESSION_ID_ENUM["symptom-tracker"], "true");
+               } catch(e) {
+
+               };
+            };
+        };
+    };
+    this.getSession = function(id) {
+      if (!id) return false;
+      else return (typeof sessionStorage != "undefined" && sessionStorage.getItem(SESSION_ID_ENUM[id]));
+    };
+    this.clearSession = function(type) {
+        switch(type) {
+          case "decision-support":
+            if (this.getSession("decision-support")){
+                sessionStorage.removeItem(SESSION_ID_ENUM["decision-support"])
+            };
+            break;
+          case "symptom-tracker":
+            if (this.getSession("symptom-tracker")){
+                sessionStorage.removeItem(SESSION_ID_ENUM["symptom-tracker"])
+            };
+            break;
+          default:
+            //remove all
+            for (var item in SESSION_ID_ENUM) {
+              this.clearSession(item);
+            };
+            break;
+        };
+    };
+};
+
+var IO = new InterventionSessionObj();
 
 var OrgObj = function(orgId, orgName, parentOrg) {
     this.id = orgId;
