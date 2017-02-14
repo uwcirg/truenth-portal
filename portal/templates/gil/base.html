@@ -476,7 +476,7 @@
                         if (IO.getSession("decision-support")) {
                             var l =  $("#intervention_item_decisionsupport a");
                             var la = l.attr("href");
-                            if (l.length > 0 && hasValue(la) && $.trim(la) != "#") {
+                            if (l.length > 0 && validateUrl(la)) {
                               IO.clearSession("decision-support")
                               location.replace(l.attr("href"));
                               return true;
@@ -498,7 +498,7 @@
                     if (IO.getSession("symptom-tracker")) {
                         var l =  $("#intervention_item_symptomtracker a");
                         var la = l.attr("href");
-                        if (l.length > 0 && hasValue(la) && $.trim(la) != "#") {
+                        if (l.length > 0 && validateUrl(la)) {
                           IO.clearSession("symptom-tracker");
                           location.replace(l.attr("href"));
                           return true;

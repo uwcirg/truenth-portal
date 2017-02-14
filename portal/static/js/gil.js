@@ -409,6 +409,9 @@ var CONSENT_ENUM = {
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };
+function validateUrl(val) {
+    return  hasValue(val) && $.trim(val) != "#" && /(\/([a-zA-Z0-9.,?'\\+&%$#=~_-]+))+$/.test(val);
+};
 
 var OrgTool = function() {
 
