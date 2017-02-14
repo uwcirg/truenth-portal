@@ -143,7 +143,7 @@
             }).done(function(data) {
                 var as = data["codeSystem"]["concept"];
                 var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
-                '<label>{{ _("Indigenous Status") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>' +'<div class="profile-radio-list">';
+                '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                 as.forEach(function(o) {
                     html += '<div>' + '<label>' +
                             '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
@@ -170,7 +170,7 @@
 
 {% macro profileRace(person) -%}
     <div class="form-group profile-section" id="userRace">
-        <label>{{ _("Race") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{ _("Race") }}</label>
         <div class="profile-radio-list">
 
             <div class="checkbox">
@@ -209,7 +209,7 @@
 
 {% macro profileEthnicity(person) -%}
     <div class="form-group profile-section" id="userEthnicity">
-        <label>{{ _("Ethnicity") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <label>{{ _("Ethnicity") }}</label>
         <div class="profile-radio-list">
             <div class="radio">
                 <label>
