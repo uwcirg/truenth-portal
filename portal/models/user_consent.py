@@ -143,14 +143,15 @@ def db_maintenance():
 
     admin = User.query.filter_by(email='bob25mary@gmail.com').first()
 
-    def delete_all_but_current(consent_list):
+    def delete_all_but_current(user, consent_list):
         keeper = consent_list[0]
         for item in consent_list:
             if item.audit.timestamp > keeper.audit.timestamp:
                 keeper = item
 
         audit = Audit(
-            comment="new consent replacing existing", user_id=admin.id)
+            comment="new consent replacing existing", user_id=admin.id,
+            subject_id=user.id, context='consent')
         for item in consent_list:
             item.deleted = audit
 
@@ -162,4 +163,4 @@ def db_maintenance():
 
             for org_id, consent_list in consents_by_org.items():
                 if len(consent_list) > 1:
-                    delete_all_but_current(consent_list)
+                    delete_all_but_current(user, consent_list)
