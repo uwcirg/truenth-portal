@@ -422,7 +422,7 @@ $(document).ready(function(){
           if (toCall != "tx") {
             tnthAjax.putClinical({{user.id}},toCall,toSend);
           };
-          if (toSend == "true") {
+          if (toSend == "true" || toCall ==  "pca_localized") {
 
             thisItem.parents(".pat-q").next().fadeIn();
             $("#clinics").hide(); //this is hard coded, ARGHHH!!
@@ -452,25 +452,28 @@ $(document).ready(function(){
             };
           } else {
             if (toCall == "biopsy") {
-              ["pca_diag", "tx"].forEach(function(fieldName) {
+              ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
                       $(this).attr("skipped", "true");
                   });
               });
               if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
+              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
 
               if ($("input[name='tx']").length > 0) {
                 tnthAjax.deleteTreatment({{user.id}});
               };
             } else if (toCall == "pca_diag") {
-              ["tx"].forEach(function(fieldName) {
+              ["pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);
                       $(this).attr("skipped", "true");
                   });
               });
+              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
 
+              //tnthAjax.putClinical({{user.id}},"tx","false");
               if ($("input[name='tx']").length > 0) {
                 tnthAjax.deleteTreatment({{user.id}});
               };
@@ -565,7 +568,7 @@ $(document).ready(function(){
                       event: bdChangeEvent
                     },
       'patientQ':   {
-                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='tx']")],
+                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                       event: patientQClickEvent
                     },
       'clinics':    {
@@ -611,5 +614,4 @@ $(document).ready(function(){
     });********************************/
   });
 {% endblock %}
-
 

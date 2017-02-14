@@ -1008,17 +1008,29 @@
                       var toSend = thisItem.val();
                       tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
 
-                      if (toSend == "true") {
+                      if (toSend == "true" || toCall ==  "pca_localized") {
                         thisItem.parents(".pat-q").nextAll().fadeIn();
                       } else {
                         if (toCall == "biopsy") {
-                            ["pca_diag"].forEach(function(fieldName) {
+                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                                 $("input[name='" + fieldName + "']").each(function() {
                                     $(this).prop("checked", false);
                                 });
                             });
                             if ($("input[name='pca_diag']").length > 0) {
                                 tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
+                            };
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                            };
+                        } else if (toCall == "pca_diag") {
+                            ["pca_localized"].forEach(function(fieldName) {
+                              $("input[name='" + fieldName + "']").each(function() {
+                                  $(this).prop("checked", false);
+                              });
+                            });
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
                             };
                         }
                         thisItem.parents(".pat-q").nextAll().fadeOut();
@@ -1033,6 +1045,10 @@
             {
                 "fields": $("#patientQ input[name='pca_diag']"),
                 "containerId": "patDiag"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_localized']"),
+                "containerId": "patMeta"
             }
             ].forEach( function(item) {
                 item.fields.each(function() {
