@@ -1277,48 +1277,13 @@
                 <div class="profile-item-container custom-container-item">
                     <h4 class="profile-item-title">{{_("Enter manually")}}</h4>
                     <div class="custom-container-content text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
-                    <a class="btn btn-tnth-primary" id="assessmentLink" href="location.replace('/api/present-assessment?instrument_id=eortc&instrument_id=prems&subject_id={{person.id}}');">{{_("Enter manually")}}</a>
+                    <a class="btn btn-tnth-primary" id="assessmentLink" href="/api/present-assessment?instrument_id=eortc&instrument_id=prems&subject_id={{person.id}}">{{_("Enter manually")}}</a>
 
                 </div>
             </div>
         </div>
     </div>
     <script>
-    function adjustAssessmentInstrument(status) {
-          var instrumentId = "";
-          var CRV_INSTRUMENT = "epic26", IRONMAN_INSTRUMENT="eortc&instrument_id=prems";
-          if (hasValue(status)) {
-              if (status) instrumentId = CRV_INSTRUMENT;
-              else instrumentId = IRONMAN_INSTRUMENT;
-          } else {
-            $.ajax ({
-                type: "GET",
-                async: false,
-                url: "/api/patient/{{ person.id }}/clinical/pca_localized"
-            }).done(function(data) {
-              if (data) {
-                var va = data.value ? String(data.value).toLowerCase(): "";
-                //console.log(data)
-                if (hasValue(va)) {
-                   switch(String(va).toLowerCase()) {
-                    case "true":
-                      instrumentId = CRV_INSTRUMENT;
-                      break;
-                    case "false":
-                      instrumentId = IRONMAN_INSTRUMENT;
-                      break;
-                   };
-                };
-              };
-            }).fail(function() {
-                //console.log("Problem retrieving data from server.")
-            });
-        };
-        if (hasValue(instrumentId)) {
-        $("#assessmentLink").attr("href", "/api/present-assessment?instrument_id="+instrumentId+"&subject_id={{person.id}}");
-        };
-    };
-
     $(document).ready(function() {
         $("#profileSendEmailContainer").hide();
         $("#sendEmailLabel").hide();
@@ -1331,8 +1296,6 @@
             if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
             else $("#profileEmailSelect").attr("disabled", true);
         });
-        //initialize pca localized modal, NOTE, will not need to make extra ajax call if pca_localized_status is set initially
-        adjustAssessmentInstrument(pcaLocalizedStatus);
     });</script>
 {%- endmacro %}
 {% macro profile(person, current_user, consent_agreements) -%}
@@ -1406,10 +1369,6 @@
 
     {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
-    {% endif %}
-
-    {% if (person.has_role("patient")) and (person.id != current_user.id and current_user.has_role('provider'))%}
-        {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}}
     {% endif %}
 
     {% if person and person.has_role('patient') %}

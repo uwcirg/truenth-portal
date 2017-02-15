@@ -44,26 +44,6 @@
                         <input type="text" class="form-control" id="studyId" name="studyId"/>
                     </div>
                     <br/>
-                    <hr class="pc-hr"/>
-                    <div class="form-group" id="clinicalGroup">
-                        <label id="clinicalGroupLabel">{{ _("Clinical Question") }}</label>
-                        <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
-                        <div class="indent">
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-                                </label>
-                            </div>
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
-                                </label>
-                            </div>
-                        </div>
-                         <div class="help-block with-errors"></div>
-                     </div>
-                     <br/>
-                     <hr class="pc-hr"/>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
@@ -184,13 +164,6 @@ $(document).ready(function(){
         return consents;
     };
 
-    function setClinical(userId) {
-        var val = "unknown";
-        if ($("#pca_localized_yes").is(":checked")) val = "true";
-        else if ($("#pca_localized_no").is(":checked")) val = "false";
-        _get('/api/patient/' + userId + '/clinical/pca_localized', 'POST', JSON.stringify({value: val}), true);
-    };
-
     function setHelpText(elementId, message, hasError) {
         var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
         if (hasError) $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
@@ -300,7 +273,6 @@ $(document).ready(function(){
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {
-                        setClinical(_userId);
                         $('#confirmMsg').fadeIn();
                         setTimeout("$('#confirmMsg').fadeOut();", 800);
                         setTimeout("_redirect(" + _userId + ");", 1000);
