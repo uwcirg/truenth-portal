@@ -667,7 +667,7 @@ class AssessmentStatus(object):
         self.__obtain_status_details()
         results = []
         for instrument_id, details in self.instrument_status.items():
-            if 'completed' or 'in-progress' in details:
+            if 'completed' in details or 'in-progress' in details:
                 continue
             results.append(instrument_id)
         return results
