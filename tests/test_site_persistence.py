@@ -19,7 +19,8 @@ from portal.models.organization import Organization
 from portal.models.app_text import app_text
 
 known_good_persistence_file =\
-"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/80c79388e39a8efde2d2929ab94c15efefc0d7da/site_persistence_file.json"
+"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/b42b4f9fda85fd9484b3d68145813de190a0c9c8/site_persistence_file.json"
+
 
 class TestSitePersistence(TestCase):
 
@@ -74,7 +75,7 @@ class TestSitePersistence(TestCase):
             'support for the many details of life as a prostate cancer '
             'survivor</p>'))
         self.assertEquals(
-            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
+            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
 
