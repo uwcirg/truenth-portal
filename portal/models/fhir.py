@@ -705,11 +705,8 @@ class AssessmentStatus(object):
             for instrument in ('eortc', 'prems'):
                 self.__status_per_instrument(instrument, thresholds)
 
-        try:
-            status_strings = [details['status'] for details in
-                              self.instrument_status.values()]
-        except KeyError:
-            import pdb; pdb.set_trace()
+        status_strings = [details['status'] for details in
+                          self.instrument_status.values()]
 
         if all(status_strings[0] == status for status in status_strings):
             # All intruments in the same state - use the common value
