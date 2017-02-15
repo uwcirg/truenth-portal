@@ -181,10 +181,12 @@ function getUserTimeZone(userId) {
                 userTimeZone = "UTC";
             });
         };
-    } else userTimeZone = selectVal;
+    } else {
+        userTimeZone = selectVal;
+    };
 
     //console.log("userTimeZone: " + userTimeZone);
-    return userTimeZone ? userTimeZone : "UTC";
+    return hasValue(userTimeZone) ? userTimeZone : "UTC";
 };
 
 function getUserLocale(userId) {
@@ -466,6 +468,7 @@ var fillContent = {
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
+                    var signedDate = item.signed;
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
 
 
