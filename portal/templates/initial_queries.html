@@ -27,12 +27,11 @@
 
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
-        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed%}
+        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed or 'localized' in still_needed %}
           <h3 class="tnth-headline">{{ _("About You") }}</h3>
 
           <p class="profile-item-title">{{ _("Thank You! Now, please finish your registration by telling us about yourself.") }}</p>
 
-            <!--<p>First, tell us who you are:</p>-->
             {% if user and user._email %}
                 <input type="hidden" name="email" id="email" value="{{user._email}}" />
             {% endif %}
@@ -56,7 +55,7 @@
                   <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
                 {% endif %}
             {% endif %}
-            {% if 'clinical' in still_needed %}
+            {% if 'clinical' in still_needed  or 'localized' in still_needed%}
               {{patientQGroup(user)}}
             {% endif %}
             {% if 'org' in still_needed %}
@@ -568,7 +567,7 @@ $(document).ready(function(){
                       event: bdChangeEvent
                     },
       'patientQ':   {
-                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
+                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
                       event: patientQClickEvent
                     },
       'clinics':    {
@@ -576,6 +575,8 @@ $(document).ready(function(){
                       event: userOrgChangeEvent
                     }
     };
+
+    {% if not ('localized' in still_needed) %} $("#patMeta").remove(); {% endif %}
 
     fc = new FieldsChecker(mainSections);
     setTimeout("initIncompleteFields();", 500);
