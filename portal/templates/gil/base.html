@@ -578,7 +578,7 @@
                       function(data) {
                         if (data) {
                           if (data.name) {
-                            $("#access_code_info").text("Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration...");
+                            $("#access_code_info").html("Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration . . .");
                             $("#access_code_error").text("");
 
                           } else {

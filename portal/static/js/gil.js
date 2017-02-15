@@ -318,7 +318,7 @@ function handleAccessCode() {
     $("#access_code_info").show();
     $(this).addClass("icon-box__button--disabled");
     IO.setInterventionSession();
-    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 1800);
+    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 4000);
   } else {
     if ($("#access_code_error").text() != "") $("#access_code_error").show();
   };
