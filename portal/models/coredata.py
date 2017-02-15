@@ -147,12 +147,31 @@ class ClinicalData(CoredataPoint):
             return len(user.roles) > 0
 
         required = {item: False for item in (
-            CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized)}
+            CC.BIOPSY, CC.PCaDIAG)}
 
         for obs in user.observations:
             if obs.codeable_concept in required:
                 required[obs.codeable_concept] = True
         return all(required.values())
+
+
+class LocalizedData(CoredataPoint):
+    def hasdata(self, user):
+        """only need localized data from patients"""
+        if ROLE.PATIENT not in (r.name for r in user.roles) :
+            # If they haven't set a role, we don't know if we care yet
+            return len(user.roles) > 0
+
+        # Some systems use organization affiliation to denote localized
+        if current_app.config.get('LOCALIZED_AFFILIATE_ORG'):
+            # on these systems, we don't ask about localized - let
+            # the org check worry about that
+            return True
+        else:
+            for obs in user.observations:
+                if obs.codeable_concept == CC.PCaLocalized:
+                    return True
+            return False
 
 
 class NameData(CoredataPoint):
@@ -172,7 +191,8 @@ def configure_coredata(app):
 
     # Add static list of "configured" datapoints
     config_datapoints = app.config.get(
-        'REQUIRED_CORE_DATA', ['name', 'dob', 'role', 'org', 'clinical', 'tou'])
+        'REQUIRED_CORE_DATA',
+        ['name', 'dob', 'role', 'org', 'clinical', 'localized', 'tou'])
 
     for name in config_datapoints:
         # Camel case with 'Data' suffix - expect to find class in local

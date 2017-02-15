@@ -543,12 +543,25 @@ def add_static_concepts(only_quick=False):
 
 def localized_PCa(user):
     """Look up user's value for localized PCa"""
-    codeable_concept = CC.PCaLocalized
-    value_quantities = user.fetch_values_for_concept(codeable_concept)
-    if value_quantities:
-        assert len(value_quantities) == 1
-        return value_quantities[0].value == 'true'
-    return False
+    from .organization import Organization, OrgTree
+
+    # Some systems use organization affiliation to note
+    # if a user has what we call a 'localized diagnosis'
+    if current_app.config.get('LOCALIZED_AFFILIATE_ORG', None):
+        localized_org = Organization.query.filter_by(
+            name=current_app.config.get('LOCALIZED_AFFILIATE_ORG')).one()
+        ot = OrgTree()
+        consented_orgs = [c.organization_id for c in user.valid_consents]
+        if ot.at_or_below_ids(localized_org.id, consented_orgs):
+            return True
+        return False
+    else:
+        codeable_concept = CC.PCaLocalized
+        value_quantities = user.fetch_values_for_concept(codeable_concept)
+        if value_quantities:
+            assert len(value_quantities) == 1
+            return value_quantities[0].value == 'true'
+        return False
 
 
 def most_recent_survey(user, instrument_id=None):
