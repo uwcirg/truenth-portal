@@ -7013,7 +7013,7 @@ figure.nav-overlay {
     font-style: normal;
     font-size: 1em;
     color: #FFFFFF;
-    height: 320px;
+    height: 330px;
     display: block;
     padding: 40px;
     float: left;
@@ -7075,13 +7075,12 @@ figure.nav-overlay {
     font-size: 1.2em;
     padding: 1em 0;
 }
-
-nav.side-nav::-webkit-scrollbar {
+nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar  {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb {
+nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
 .home--item-text {
