@@ -108,6 +108,11 @@ var AdminTool = function(userId) {
        if (index == (_userIds.length - 1)) {
          arrUsers.push(us);
        }
+       else if (ct == (_userIds.length - 1)) {
+          arrUsers.push(us);
+          us = "";
+          ct = 0;
+       }
        else if (ct >= 10) {
           arrUsers.push(us);
           us = "";
@@ -203,7 +208,7 @@ var AdminTool = function(userId) {
             OT.populateUI();
             AT.getHereBelowOrgs();
             OT.filterOrgs(AT.here_below_orgs);
-          
+
             var ofields = $("#userOrgs input[name='organization']");
             ofields.each(function() {
                 if (iterated && request_org_list && request_org_list[$(this).val()]) $(this).prop("checked", true);
