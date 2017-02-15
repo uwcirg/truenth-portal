@@ -409,8 +409,9 @@ var CONSENT_ENUM = {
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };
+//this test for full URL - "https://stg-sm.us.truenth.org" etc.
 function validateUrl(val) {
-    return  hasValue(val) && $.trim(val) != "#" && /(\/([a-zA-Z0-9.,?'\\+&%$#=~_-]+))+$/.test(val);
+    return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
 };
 
 var OrgTool = function() {
