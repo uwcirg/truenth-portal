@@ -29,6 +29,10 @@ def mock_qr(user_id, instrument_id, status='completed'):
         db.session.commit()
 
 
+localized_instruments = set(['eproms_add', 'epic26'])
+metastaic_instruments = set(['eortc', 'prems'])
+
+
 class TestAssessment(TestCase):
 
     def mark_localized(self):
@@ -45,6 +49,13 @@ class TestAssessment(TestCase):
         # with that consent in place, test user should be 'localized'
         self.assertTrue(localized_PCa(self.test_user))
 
+        # confirm appropriate instruments
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(
+            set(a_s.instruments_needing_full_assessment()),
+            localized_instruments)
+        self.assertFalse(a_s.instruments_in_process())
+
     def test_localized_on_time(self):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
@@ -55,6 +66,10 @@ class TestAssessment(TestCase):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Completed")
+
+        # confirm appropriate instruments
+        self.assertFalse(a_s.instruments_needing_full_assessment())
+        self.assertFalse(a_s.instruments_in_process())
 
     def test_localized_inprogress_on_time(self):
         # User finished both on time
@@ -69,6 +84,11 @@ class TestAssessment(TestCase):
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "In Progress")
 
+        # confirm appropriate instruments
+        self.assertFalse(a_s.instruments_needing_full_assessment())
+        self.assertEquals(
+            set(a_s.instruments_in_process()), localized_instruments)
+
     def test_localized_in_process(self):
         # User finished one, time remains for other
         self.bless_with_basics()  # pick up a consent, etc.
@@ -78,6 +98,13 @@ class TestAssessment(TestCase):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "In Progress")
+
+        # confirm appropriate instruments
+        self.assertEquals(
+            localized_instruments -
+            set(a_s.instruments_needing_full_assessment()),
+            set(['eproms_add']))
+        self.assertFalse(a_s.instruments_in_process())
 
     def test_metastatic_on_time(self):
         # User finished both on time
@@ -89,12 +116,22 @@ class TestAssessment(TestCase):
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Completed")
 
+        # shouldn't need full or any inprocess
+        self.assertFalse(a_s.instruments_needing_full_assessment())
+        self.assertFalse(a_s.instruments_in_process())
+
     def test_metastatic_due(self):
         # hasn't taken, but still in "Due" period
         self.bless_with_basics()  # pick up a consent, etc.
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Due")
+
+        # confirm list of expected intruments needing attention
+        self.assertEquals(
+            metastaic_instruments,
+            set(a_s.instruments_needing_full_assessment()))
+        self.assertFalse(a_s.instruments_in_process())
 
     def test_batch_lookup(self):
         self.login()
