@@ -5,6 +5,7 @@ from flask_webtest import SessionScope
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC, QuestionnaireResponse, AssessmentStatus
+from portal.models.fhir import localized_PCa
 from tests import TestCase, TEST_USER_ID
 
 
@@ -34,6 +35,15 @@ class TestAssessment(TestCase):
         self.test_user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+
+    def test_localized_using_org(self):
+        self.bless_with_basics()
+        self.test_user = db.session.merge(self.test_user)
+        org_name = self.test_user.valid_consents[0].organization.name
+        self.app.config['LOCALIZED_AFFILIATE_ORG'] = org_name
+
+        # with that consent in place, test user should be 'localized'
+        self.assertTrue(localized_PCa(self.test_user))
 
     def test_localized_on_time(self):
         # User finished both on time
