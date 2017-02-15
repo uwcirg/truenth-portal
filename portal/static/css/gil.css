@@ -5310,6 +5310,10 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     border: 2px solid #E3E0DB;
     min-width: 215px;
 }
+.box-modal form input.button--login {
+    background-color: #c7c6c0;
+    border: 2px solid #c7c6c0;
+}
 .box-modal form input:focus,
 .box-modal form input:active {
     border: 2px solid #7C959E;
@@ -6881,12 +6885,12 @@ figure.nav-overlay {
     padding: 1em 0;
 }
 
-::-webkit-scrollbar {
+nav.side-nav::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-::-webkit-scrollbar-thumb {
+nav.side-nav::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
 .home--item-text {
@@ -6966,7 +6970,7 @@ a.home--modal-link {
 }
 
 .box-modal div.or {
-    background: #ccc8c1;
+    background: #adb1ad;
     border-radius: 12px;
     color: #fff;
     font-size: 9px;
@@ -6976,9 +6980,10 @@ a.home--modal-link {
     text-align: center;
     text-transform: uppercase;
     width: 25px;
-    margin: 1em auto;
+    margin: 1.1em auto;
     position: relative;
     z-index: 1;
+    letter-spacing: 2px;
 }
 
 #modal-login-register div.or {
@@ -6989,7 +6994,8 @@ a.home--modal-link {
     width: 84px;
     opacity: 0.7;
     border-radius: 30px;
-    color: #3d494e;
+    background-color: #9a9e90;
+    font-weight: normal;
     letter-spacing: 2px;
 }
 .box-modal-or__divider {
@@ -7001,7 +7007,7 @@ a.home--modal-link {
 }
 #access_code_info {
     padding: 0.2em;
-    font-size: 0.95em;
+    font-size: 1em;
 }
 
 @media (min-width: 1200px) {
