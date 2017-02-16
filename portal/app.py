@@ -17,6 +17,7 @@ from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
 from .models.i18n import get_locale
+from .models.role import ROLE
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
 from .views.auth import auth, capture_next_view_function
@@ -93,6 +94,7 @@ def configure_app(app, config):
 
 def configure_jinja(app):
     app.jinja_env.globals.update(app_text=app_text)
+    app.jinja_env.globals.update(ROLE=ROLE)
 
 
 def configure_error_handlers(app):

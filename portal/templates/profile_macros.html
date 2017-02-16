@@ -383,9 +383,9 @@
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var orgsEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
         //STAFF CANNOT EDIT THEIR OWN ORGS
-        {% if not(current_user.has_role('admin')) and current_user.has_role('provider') and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
+        {% if not(current_user.has_role(ROLE.ADMIN)) and current_user.has_role(ROLE.STAFF) and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
 
         function disableOrgs() {
             $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
@@ -393,7 +393,7 @@
             });
         };
         var leafOrgs = false;
-        {% if current_user.has_role('provider') and not(current_user.has_role('admin')) %}
+        {% if current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
@@ -575,8 +575,8 @@
     <div id="profileConsentList"></div>
     <script async>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var consentEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
-        var _isAdmin = {%if current_user.has_role('admin') %}true{%else%}false{%endif%};
+        var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
+        var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
 
         /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
@@ -599,7 +599,7 @@
 {%- endmacro %}
 
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
+    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF)) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
@@ -1301,18 +1301,18 @@
 {% macro profile(person, current_user, consent_agreements) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {% if config.CUSTOM_PATIENT_DETAIL %}
-        {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+        {% if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) %}
             {{ profileCustomDetail(person) }}
         {% endif %}
     {% endif %}
-    {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+    {% if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title">Patient Details</h4>
         </div>
     </div>
     {% endif %}
-    {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+    {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and (current_user.id != person.id) %}
          <div class="row">
             <div class="col-md-6 col-xs-12">
                 <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
@@ -1356,7 +1356,7 @@
         </div>
     {% endif %}
 
-    {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
+    {% if (person and person.has_role(ROLE.PATIENT)) or (current_user.has_role(ROLE.STAFF) and current_user.id != person.id)%}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
@@ -1367,11 +1367,11 @@
         </div>
     {% endif %}
 
-    {% if (person.id == current_user.id and person.has_role("patient")) or (person.id != current_user.id and current_user.has_role('provider'))%}
+    {% if (person.id == current_user.id and person.has_role(ROLE.PATIENT)) or (person.id != current_user.id and current_user.has_role(ROLE.STAFF))%}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
-    {% if person and person.has_role('patient') %}
+    {% if person and person.has_role(ROLE.PATIENT) %}
         <!--  hide the procedure section for now as more rules will be applied to this section
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -1456,10 +1456,10 @@
             </div>
         </div>
     {% endif %}
-    {% if (person and current_user) and person.has_role('patient') and current_user.has_role('provider') %}
+    {% if (person and current_user) and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) %}
         {{profileDeceased(person, current_user)}}
     {% endif %}
-    {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
+    {% if (person and current_user) and current_user.has_role(ROLE.ADMIN) and not person.has_role(ROLE.SERVICE) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1469,7 +1469,7 @@
             </div>
         </div>
     {% endif %}
-    {% if (person and current_user) and (current_user.has_role('admin') or current_user.has_role('provider')) %}
+    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1493,7 +1493,7 @@
         #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
         #profileProcedureContainer button.btn {color:#777}
     </style>
-    <p style="color: #696767">{%if (current_user and person) and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+    <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
         date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
     <div id="profileProcedureContainer">
         <form id="procedureForm" class="form-inline event-element">
