@@ -662,7 +662,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' >" + role.name.replace("_", " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' >" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1634,7 +1634,6 @@ var tnthAjax = {
             type: "GET",
             url: '/api/user/'+userId+'/roles'
         }).done(function(data) {
-            //self.getRoleList();
             fillContent.roles(data,isProfile);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
