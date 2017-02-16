@@ -306,22 +306,6 @@ function initIncompleteFields() {
 
 $(document).ready(function(){
 
-    if (preselectClinic) {
-        var ___roles =  [{'name': 'patient'}];
-        //update user role if user has chosen an org
-        $.ajax ({
-          type: "PUT",
-          url: '/api/user/{{user.id}}/roles',
-          contentType: "application/json; charset=utf-8",
-          dataType: 'json',
-          async: false,
-          data: JSON.stringify({"roles": ___roles})
-        }).done(function(data) {
-
-        }).fail(function(jhr) {
-        });
-    };
-
     var bdChangeEvent = function() {
        var d = $("#date");
        var m = $("#month");
