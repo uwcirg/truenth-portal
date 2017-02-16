@@ -384,7 +384,7 @@ var fillContent = {
         });
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
-        if (hasValue(preselectClinic)) {
+        if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
             $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
         };
 
@@ -1152,7 +1152,7 @@ var tnthAjax = {
             OT.populateOrgsList(data.entry);
             OT.populateUI();
             tnthAjax.getDemo(userId, noOverride, sync, callback);
-            if (hasValue(preselectClinic)) {
+            if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
                 var ob = $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]");
                 ob.prop('checked', true);
                 var ___roles =  [{'name': 'patient'}];
