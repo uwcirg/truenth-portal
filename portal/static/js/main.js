@@ -106,6 +106,19 @@ var loader = function(show) {
     };
 };
 
+function convertToLocalTime(dateString) {
+    var convertedDate = "";
+    if (hasValue(dateString)) {
+        var d = new Date(dateString);
+        var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
+        var offset = d.getTimezoneOffset() / 60;
+        var hours = d.getHours();
+        newDate.setHours(hours - offset);
+        convertedDate = newDate.toLocaleString();
+    };
+    return convertedDate;
+};
+
 function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
     //firefox does not support Intl API
     //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
@@ -121,39 +134,32 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
         var options = {
-            year: 'numeric', day: 'numeric', month: 'numeric',
+            year: 'numeric', day: 'numeric', month: 'short',
             hour: 'numeric', minute: 'numeric', second: 'numeric',
             hour12: false
         };
         options.timeZone =  timeZone;
         //older browsers don't support this
-        //console.log("dateString: " + dateString)
         var convertedDate = dateString;
         try {
-            dateString = dateString.replace(/-/g, '/').replace("T", " ").replace(",", "");
-            convertedDate = new Date(dateString).toLocaleTimeString(locale, options);
-            if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+            if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
+                convertedDate = new Date(dateString).toLocaleString(locale, options);
+                if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+            } else {
+                if (timeZone != "UTC") {
+                    convertedDate = convertToLocalTime(dateString);
+                    $(".timezone-warning").addClass("text-warning").html("Date/Time conversion does not work in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                    $(".gmt").each(function() { $(this).hide()});
+                }; 
+            }
         } catch(e) {
-            var oMessage = e.message;
-            try {
-                var d = new Date(dateString);
-                var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
-                var offset = d.getTimezoneOffset() / 60;
-                var hours = d.getHours();
-                newDate.setHours(hours - offset);
-                convertedDate = newDate.toLocaleString();
-                $(".timezone-warning").addClass("text-warning").html("Error occurred when converting timezone: " + oMessage + "<br/>Date/time converted to local date/time instead.");
-            } catch(e2) {
-                errorMessage += "Error occurred when converting timezone: " + oMessage;
-                errorMessage += "<br/>Attempted but unable to convert date/time to local time: " + e2.message;
-            };
+            errorMessage = "Error occurred when converting timezone: " + e.Message;
         };
         if (hasValue(errorMessage)) {
             $(".timezone-error").each(function() {
                 $(this).addClass("text-danger").html(errorMessage);
             });
         };
-        //console.log("dateString: " + dateString + " convertedDate: " + convertedDate);
         return convertedDate.replace(/\,/g, "");
     };
 };
@@ -185,7 +191,6 @@ function getUserTimeZone(userId) {
         userTimeZone = selectVal;
     };
 
-    //console.log("userTimeZone: " + userTimeZone);
     return hasValue(userTimeZone) ? userTimeZone : "UTC";
 };
 
@@ -379,7 +384,7 @@ var fillContent = {
         });
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
-        if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
+        if (hasValue(preselectClinic)) {
             $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
         };
 
@@ -468,7 +473,6 @@ var fillContent = {
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
-                    var signedDate = item.signed;
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
 
 
@@ -1148,7 +1152,7 @@ var tnthAjax = {
             OT.populateOrgsList(data.entry);
             OT.populateUI();
             tnthAjax.getDemo(userId, noOverride, sync, callback);
-            if ( typeof preselectClinic !== 'undefined' && preselectClinic !== "None" ) {
+            if (hasValue(preselectClinic)) {
                 var ob = $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]");
                 ob.prop('checked', true);
                 var ___roles =  [{'name': 'patient'}];
