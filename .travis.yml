@@ -80,7 +80,7 @@ after_success:
   - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-docker-true_nth.bintray.io/deb_builder:latest"):/tmp/artifacts /tmp
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
-  - docker build --file docker/Dockerfile  --tag "$IMAGE_NAME:$SHORT_HASH" --tag "$IMAGE_NAME:$TAG" --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER" .
+  - docker build --file docker/Dockerfile --tag "$IMAGE_NAME:$SHORT_HASH" --tag "$IMAGE_NAME:$TAG" --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER" .
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
