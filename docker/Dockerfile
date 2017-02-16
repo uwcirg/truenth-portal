@@ -4,8 +4,8 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN \
     apt-get update && \
-    apt-get dist-upgrade -y && \
-    apt-get install -y --force-yes --no-install-recommends \
+    apt-get dist-upgrade --yes && \
+    apt-get install --yes --force-yes --no-install-recommends \
         apache2 \
         libapache2-mod-wsgi \
         libpq5 \
@@ -46,7 +46,7 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D4
 
 RUN \
     apt-get update && \
-    apt-get install -y --force-yes portal && \
+    apt-get install --yes --force-yes portal && \
     apt-get clean
 
 # Todo: move to same step as package installation
