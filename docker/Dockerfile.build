@@ -20,21 +20,25 @@ Pin-Priority: 75\n\
 
 RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
 
-RUN apt-get clean && apt-get update && apt-get -y dist-upgrade && apt-get -y --force-yes install \
-    debhelper \
-    dh-virtualenv\
-    fakeroot \
-    git \
-    libc6-i386 \
-    libffi-dev \
-    libpq-dev \
-    locales \
-    python-dev \
-    python-pip
 
 RUN dpkg-reconfigure locales && \
     locale-gen C.UTF-8 && \
     /usr/sbin/update-locale LANG=C.UTF-8
+RUN \
+    apt-get update && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --force-yes --no-install-recommends \
+        debhelper \
+        dh-virtualenv\
+        fakeroot \
+        git \
+        libc6-i386 \
+        libffi-dev \
+        libpq-dev \
+        locales \
+        python-dev \
+        python-pip && \
+    apt-get clean
 
 RUN pip install --upgrade pip setuptools
 RUN pip install make-deb
