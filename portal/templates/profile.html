@@ -28,7 +28,7 @@
 {{ back_link(PORTAL, _('Home')) }}
 {% endif %}
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-{% if current_user.has_role('provider') and user.has_role('patient') %}
+{% if current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) %}
 &nbsp;&nbsp;<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
 <!-- shown only in reduced browser size-->
 <div id="navMenuXs" class="btn-group link-xs">

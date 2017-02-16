@@ -747,7 +747,7 @@ class User(db.Model, UserMixin):
 
             """
             if (not acting_user.has_role(ROLE.ADMIN)
-                and acting_user.has_role(ROLE.PROVIDER)
+                and acting_user.has_role(ROLE.STAFF)
                 and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
@@ -1001,8 +1001,8 @@ class User(db.Model, UserMixin):
             # and interventions result in carte blanche for service
             return True
 
-        if self.has_role(ROLE.PROVIDER):
-            # Providers have full access to all patients with a valid consent
+        if self.has_role(ROLE.STAFF):
+            # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as provider has
             # associations with.  Furthermore, a patient may have a consent
             # agreement at a higher level in the orgtree than the provider,

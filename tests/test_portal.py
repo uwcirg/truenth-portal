@@ -77,7 +77,7 @@ class TestPortal(TestCase):
 
         self.bless_with_basics()
         self.login()
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.promote_user(role_name=ROLE.PATIENT)
 
         # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the

@@ -240,7 +240,7 @@ class TestDemographics(TestCase):
     def test_non_admin_org_change(self):
         """non-admin providers can't change their top-level orgs"""
         self.bless_with_basics()
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.test_user = db.session.merge(self.test_user)
 
         top = OrgTree().find(
