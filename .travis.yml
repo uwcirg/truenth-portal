@@ -53,7 +53,7 @@ before_install:
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
 
-  - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
+  - psql --command 'create database portal_unit_tests owner postgres;' --username postgres
 
   - pip install --upgrade pip setuptools
   - export PORTAL_VERSION="$(python setup.py --version)"
@@ -74,7 +74,7 @@ after_success:
   - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
   - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
-  - docker run --volume debian-repo:/tmp/artifacts -e REPO_SLUG=$TRAVIS_REPO_SLUG -e BRANCH=${TRAVIS_BRANCH:-develop} "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
+  - docker run --volume debian-repo:/tmp/artifacts --env REPO_SLUG=$TRAVIS_REPO_SLUG --env BRANCH=${TRAVIS_BRANCH:-develop} "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
 
   # Copy artifacts off volume mounted on previous container
   - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-docker-true_nth.bintray.io/deb_builder:latest"):/tmp/artifacts /tmp
