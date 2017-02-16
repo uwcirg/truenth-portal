@@ -869,8 +869,9 @@ class User(db.Model, UserMixin):
                 new_id = Identifier.from_fhir(identifier)
                 if new_id.system in internal_identifier_systems:
                     continue
+                new_id = new_id.add_if_not_found()
                 if new_id in pre_existing:
-                    pre_existing.pop(new_id)
+                    pre_existing.remove(new_id)
                 else:
                     self._identifiers.append(new_id)
 
