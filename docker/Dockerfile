@@ -48,7 +48,7 @@ RUN \
     apt-get update && \
     apt-get install --yes --force-yes portal && \
     apt-get clean && \
-    rm -rf /tmp/artifacts
+    rm --force --recursive --verbose /tmp/artifacts
 
 COPY portal.wsgi /var/www/
 
