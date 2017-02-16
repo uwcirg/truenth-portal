@@ -81,7 +81,7 @@
 {% block document_ready %}
 var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
-var preselectClinic = {% if session.get('associate_clinic_id') %}"{{ session.get('associate_clinic_id') }}"{% else %}""{% endif %};
+var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
 var fc, incompleteFields = [], mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
 /***** helper class to keep track of missing fields ***/
