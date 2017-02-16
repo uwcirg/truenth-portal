@@ -835,7 +835,12 @@ var assembleContent = {
                     url: '/api/demographics/'+userId,
                     async: false
                 }).done(function(data) {
-                    if (data && data.identifier) identifiers = data.identifier;
+                    if (data && data.identifier) {
+                        identifiers = [];
+                        (data.identifier).forEach(function(identifier) {
+                            if (identifier.system != "http://us.truenth.org/identity-codes/external-study-id") identifiers.push(identifier);
+                        });
+                    };
                 }).fail(function() {
                    // console.log("Problem retrieving data from server.");
                 });
