@@ -1638,8 +1638,11 @@ var tnthAjax = {
             type: "GET",
             url: '/api/user/'+userId+'/roles'
         }).done(function(data) {
+<<<<<<< 7b6e97894a918ffb13019f12a7df75fca4c70012
             //self.getRoleList();
             $(".get-roles-error").remove();
+=======
+>>>>>>> dynamically populate roles list, instead of hard coding it on the UI
             fillContent.roles(data,isProfile);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
