@@ -20,10 +20,6 @@ Pin-Priority: 75\n\
 
 RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
 
-
-RUN dpkg-reconfigure locales && \
-    locale-gen C.UTF-8 && \
-    /usr/sbin/update-locale LANG=C.UTF-8
 RUN \
     apt-get update && \
     apt-get dist-upgrade -y && \
@@ -35,7 +31,6 @@ RUN \
         libc6-i386 \
         libffi-dev \
         libpq-dev \
-        locales \
         python-dev \
         python-pip && \
     apt-get clean
