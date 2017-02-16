@@ -30,6 +30,8 @@ RUN printf '\n\
 \n'\
 > /etc/apache2/sites-available/portal.conf
 
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
+
 ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
 
 COPY artifacts /tmp/artifacts
@@ -41,8 +43,6 @@ RUN \
     else \
         echo deb ${debian_repo} stable main > /etc/apt/sources.list.d/truenth.list; \
     fi
-
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
 RUN \
     apt-get update && \
