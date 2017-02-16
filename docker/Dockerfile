@@ -47,10 +47,8 @@ RUN \
 RUN \
     apt-get update && \
     apt-get install --yes --force-yes portal && \
-    apt-get clean
-
-# Todo: move to same step as package installation
-RUN rm -rf /tmp/artifacts
+    apt-get clean && \
+    rm -rf /tmp/artifacts
 
 COPY portal.wsgi /var/www/
 
