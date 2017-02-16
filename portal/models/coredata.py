@@ -1,7 +1,7 @@
 """Coredata Module
 
 Core is a rather ambigious term - includes upfront questions such
-as DOB and patient / provider role.  Basic diagnosis and procedure
+as DOB and patient / staff role.  Basic diagnosis and procedure
 questions.
 
 Interventions will sometimes require their own set of data, for which the
@@ -97,7 +97,7 @@ class DobData(CoredataPoint):
     def hasdata(self, user):
         # DOB is only required for patient
         roles = [r.name for r in user.roles]
-        if ROLE.PROVIDER in roles or ROLE.PARTNER in roles:
+        if ROLE.STAFF in roles or ROLE.PARTNER in roles:
             return True
         elif ROLE.PATIENT in roles:
             # SR users get a pass
@@ -130,7 +130,7 @@ class OrgData(CoredataPoint):
 
         Special "none of the above" org still counts.
         """
-        if user.has_role(ROLE.PROVIDER) or user.has_role(ROLE.PARTNER):
+        if user.has_role(ROLE.STAFF) or user.has_role(ROLE.PARTNER):
             return True
         if user.organizations.count() > 0:
             return True

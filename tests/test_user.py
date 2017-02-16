@@ -272,7 +272,7 @@ class TestUser(TestCase):
         provider.organizations.append(org)
         provider.organizations.append(org2)
         provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        self.promote_user(user=provider, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -329,7 +329,7 @@ class TestUser(TestCase):
         provider.organizations.append(org)
         provider.organizations.append(org2)
         provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        self.promote_user(user=provider, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -373,7 +373,7 @@ class TestUser(TestCase):
 
     def test_default_role(self):
         self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.login()
         rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
@@ -381,7 +381,7 @@ class TestUser(TestCase):
         self.assertEquals(len(result_roles['roles']), 2)
         received = [r['name'] for r in result_roles['roles']]
         self.assertTrue(ROLE.PATIENT in received)
-        self.assertTrue(ROLE.PROVIDER in received)
+        self.assertTrue(ROLE.STAFF in received)
 
     def test_unauth_role(self):
         self.login()
@@ -496,7 +496,7 @@ class TestUser(TestCase):
         member_of.organizations.append(org)
         audit = Audit(comment='test data', user_id=TEST_USER_ID,
             subject_id=TEST_USER_ID)
-        self.promote_user(user, ROLE.PROVIDER)
+        self.promote_user(user, ROLE.STAFF)
         self.promote_user(u2, ROLE.PATIENT)
         self.promote_user(member_of, ROLE.PATIENT)
         user, org, u2, member_of = map(
@@ -537,15 +537,15 @@ class TestUser(TestCase):
                       subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
-        self.promote_user(staff_top, ROLE.PROVIDER)
+        self.promote_user(staff_top, ROLE.STAFF)
         staff_top.organizations.append(org_102)
 
         staff_leaf = self.add_user('Staff 10031')
-        self.promote_user(staff_leaf, ROLE.PROVIDER)
+        self.promote_user(staff_leaf, ROLE.STAFF)
         staff_leaf.organizations.append(org_10031)
 
         staff_mid = self.add_user('Staff 1002')
-        self.promote_user(staff_mid, ROLE.PROVIDER)
+        self.promote_user(staff_mid, ROLE.STAFF)
         staff_mid.organizations.append(org_1002)
 
         patient_w = self.add_user('patient w')
