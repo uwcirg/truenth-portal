@@ -24,7 +24,6 @@ RUN \
         apache2 \
         libapache2-mod-wsgi \
         libpq5 \
-        portal \
         python2.7 && \
     apt-get clean
 
@@ -62,6 +61,12 @@ RUN printf '\n\
 </VirtualHost>\n\
 \n'\
 > /etc/apache2/sites-available/portal.conf
+
+
+RUN \
+    apt-get update && \
+    apt-get install -y portal && \
+    apt-get clean
 
 ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
