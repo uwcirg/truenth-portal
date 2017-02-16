@@ -23,6 +23,8 @@ env:
 matrix:
   include:
     - env: TOXENV=docs
+      services: []
+      addons: {}
     - env: TOXENV=ui
       addons:
         postgresql: "9.4"
