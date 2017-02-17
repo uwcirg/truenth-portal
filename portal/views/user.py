@@ -1,5 +1,5 @@
 """User API view functions"""
-from flask import abort, Blueprint, jsonify, url_for
+from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
 from sqlalchemy.orm.exc import NoResultFound
@@ -562,6 +562,8 @@ def set_user_consents(user_id):
         description: if user_id doesn't exist
 
     """
+    current_app.logger.debug('post user consent called w/: {}'.format(
+        request.json))
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
@@ -636,6 +638,8 @@ def delete_user_consents(user_id):
         description: if user_id doesn't exist
 
     """
+    current_app.logger.debug('delete user consent called w/: {}'.format(
+        request.json))
     user = current_user()
     if user.id != user_id:
         current_user().check_role(permission='edit', other_id=user_id)
@@ -653,11 +657,6 @@ def delete_user_consents(user_id):
             break
     if not remove_uc:
         abort(404, "matching user consent not found")
-
-    if remove_uc.options:
-        for attr in ('staff_editable', 'include_in_reports', 'send_reminders'):
-            if getattr(remove_uc, attr):
-                setattr(remove_uc, attr, False)
 
     remove_uc.deleted = Audit(
         user_id=current_user().id, subject_id=user_id,
