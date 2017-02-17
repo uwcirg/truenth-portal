@@ -702,7 +702,7 @@ class AssessmentStatus(object):
                 (1, "Due"),
                 (30, "Overdue")
             )
-            for instrument in ('eortc', 'prems'):
+            for instrument in ('eortc', 'hpfs', 'prems'):
                 self.__status_per_instrument(instrument, thresholds)
 
         status_strings = [details['status'] for details in
