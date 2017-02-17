@@ -5452,10 +5452,10 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     form {
         input {
             display: inline-block;
-            background: #E3E0DB;
+            background: #f1efec;
             height: 44px;
             padding: 5px;
-            border: 2px solid #E3E0DB;
+            border: 2px solid #f1efec;
             min-width: 215px;
         }
         button {
@@ -7075,12 +7075,12 @@ figure.nav-overlay {
     font-size: 1.2em;
     padding: 1em 0;
 }
-nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar  {
+nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb {
+nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb, div.modal.fade::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
 .home--item-text {
@@ -7286,6 +7286,14 @@ a.home--modal-link {
     }
     #modal-register p, #modal-register .button {
         font-size: 14px;
+    }
+    #session-warning-modal * {
+        font-size: 1em;
+    }
+    #session-warning-modal button {
+        font-size: 1em !important;
+        width: 100%;
+        max-width: 100%;
     }
 }
 

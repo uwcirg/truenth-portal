@@ -1,3 +1,5 @@
+var VO, IO, OT;
+
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
   fx: {
@@ -12,7 +14,7 @@ module.exports = {
 
 
 },{}],2:[function(require,module,exports){
-var admin, global, navToggle, upperBanner, video, windowResize, windowScroll;
+var admin, global, navToggle, upperBanner, video, windowResize, windowScroll, visObj, interventionSessionObj, orgTool;
 
 upperBanner = require('./modules/upper-banner');
 
@@ -28,6 +30,12 @@ admin = require('./modules/admin');
 
 video = require('./modules/video');
 
+visObj = require('./modules/visobj');
+
+interventionSessionObj = require('./modules/interventionSessionObj');
+
+orgTool = require('./modules/orgTool');
+
 $(function() {
   if (window.app == null) {
     window.app = {};
@@ -38,11 +46,14 @@ $(function() {
   window.app.windowResize = new windowResize();
   window.app.navToggle = new navToggle();
   window.app.admin = new admin();
+  VO = new visObj();
+  IO = new interventionSessionObj();
+  OT = new orgTool();
   return window.app.video = new video();
 });
 
 
-},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9}],3:[function(require,module,exports){
+},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12}],3:[function(require,module,exports){
 var Admin, loggedInAdminClass, loggedInClass, upperBannerClosedClass;
 
 loggedInAdminClass = 'is-showing-logged-in';
@@ -179,7 +190,6 @@ module.exports = UpperBanner = (function() {
 
 })();
 
-
 },{}],7:[function(require,module,exports){
 var Video, navExpandedClass;
 
@@ -228,7 +238,6 @@ module.exports = Resize = (function() {
       }, 50)).trigger('resize.setElements');
     });
   }
-
   return Resize;
 
 })();
@@ -263,68 +272,59 @@ module.exports = WindowScroll = (function() {
   return WindowScroll;
 
 })();
+},{}],
+10:[function(require,module,exports){
+var VisObj;
 
-
-},{}]},{},[2])
-
-$("input[type='text']").on("blur paste", function() {
-      $(this).val($.trim($(this).val()));
-});
-var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-if (LOGIN_AS_PATIENT) {
-    if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
-    window.addEventListener('popstate', function(event) {
-      if (typeof history != 'undefined' && history.pushState) {
-        history.pushState(null, null, location.href);
-        setTimeout('location.reload();', 0);
-      } else {
-        window.history.forward(1);
-        setTimeout('location.reload();', 0);
+module.exports = VisObj = (function() {
+  function VisObj() {
+    this.HAS_REDIRECT = false;
+    this.hideMain = function () {
+      $("#mainHolder").hide();
+      $("#mainHolder").css({
+                  "visibility" : "hidden",
+                  "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)",
+                  "filter": "alpha(opacity=0)",
+                  "-moz-opacity": 0,
+                  "-khtml-opacity": 0,
+                  "opacity": 0
+                });
+    };
+    this.showMain = function() {
+      if (!this.HAS_REDIRECT) {
+        $("#mainHolder").css({
+                  "visibility" : "visible",
+                  "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
+                  "filter": "alpha(opacity=100)",
+                  "-moz-opacity": 1,
+                  "-khtml-opacity": 1,
+                  "opacity": 1
+                });
       };
-    });
-};
-
-function setNoBanner() {
-    if (typeof sessionStorage != "undefined") {
-      sessionStorage.setItem('bannerAccessed', 'yes');
     };
-};
-
-function checkBannerStatus() {
-  if (typeof sessionStorage != "undefined") {
-    var data = sessionStorage.getItem('bannerAccessed');
-    if (data == "yes") {
-      $('.js-close-upper-banner').trigger("click");
+    this.showLoader = function() {
+      if (!($("#loadingIndicator").is(":visible"))) $("#loadingIndicator").show();
     };
-  }
-};
-function goToLogin() {
-    $('#modal-login-register').modal('hide');
-    setTimeout("$('#modal-login').modal('show'); ", 400);
-};
-function setSelectedNavItem(obj) {
-    $(obj).addClass("side-nave-items__item--selected");
-    $("li.side-nave-items__item--selected").find("a").attr("href", "#");
+    this.hideLoader = function() {
+      $("#loadingIndicator").hide();
+    };
+    this.setRedirect = function() {
+      this.HAS_REDIRECT = true;
+      this.showLoader();
+      this.hideMain();
 
-    $(obj).on("click", function(event) {
-          event.preventDefault();
-          $(".side-nav__close").trigger("click");
-          return;
-     });
-};
-
-function handleAccessCode() {
-  if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
-    $("#access_code_info").show();
-    $(this).addClass("icon-box__button--disabled");
-    IO.setInterventionSession();
-    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 4000);
-  } else {
-    if ($("#access_code_error").text() != "") $("#access_code_error").show();
+    };
   };
-};
+  return VisObj;
+})();
 
-var InterventionSessionObj = function() {
+},{}],
+11:[function(require,module,exports){
+var InterventionSessionObj;
+
+module.exports = InterventionSessionObj = (function() {
+  function InterventionSessionObj() {
+
     var SESSION_ID_ENUM = {
       "decision-support": "decisionSupportInSession",
       "symptom-tracker": "symptomTrackerInSession"
@@ -376,46 +376,18 @@ var InterventionSessionObj = function() {
             break;
         };
     };
-};
+  }
+  return InterventionSessionObj;
 
-var IO = new InterventionSessionObj();
+})();
 
-var OrgObj = function(orgId, orgName, parentOrg) {
-    this.id = orgId;
-    this.name = orgName;
-    this.children = [];
-    this.parentOrgId = parentOrg;
-    this.isTopLevel = false;
-};
 
-var CONSENT_ENUM = {
-    "consented": {
-        "staff_editable": true,
-        "include_in_reports": true,
-        "send_reminders": true
-    },
-     "suspended": {
-        "staff_editable": true,
-        "include_in_reports": true,
-        "send_reminders": false
-    },
-    "purged": {
-        "staff_editable": false,
-        "include_in_reports": false,
-        "send_reminders": false
-    }
-};
+},{}],
+12:[function(require,module,exports){
+var OrgTool;
 
-function hasValue(val) {
-    return val != null && val != "" && val != "undefined";
-};
-//this test for full URL - "https://stg-sm.us.truenth.org" etc.
-function validateUrl(val) {
-    return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
-};
-
-var OrgTool = function() {
-
+module.exports = OrgTool = (function() {
+  function OrgTool() {
     var TOP_LEVEL_ORGS = [];
     var orgsList = {};
 
@@ -586,6 +558,7 @@ var OrgTool = function() {
     this.updateOrg = function(userId, callback) {
 
         var demoArray = {}, errorMessage = "";
+
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId,
@@ -595,6 +568,7 @@ var OrgTool = function() {
         }).fail(function() {
             errorMessage = "Error retrieving demographics information for user.";
         });
+
         var orgIDs = $("#userOrgs input[name='organization']:checked").map(function(){
             return { reference: "api/organization/"+$(this).val() };
         }).get();
@@ -602,22 +576,7 @@ var OrgTool = function() {
         if (!hasValue(errorMessage)) {
           if (typeof orgIDs === 'undefined'){
               orgIDs = [0]  // special value for `none of the above`
-          } else {
-            var __roles =  [{'name': 'patient'}];
-            //update user role if user has chosen an org
-            $.ajax ({
-              type: "PUT",
-              url: '/api/user/'+userId+'/roles',
-              contentType: "application/json; charset=utf-8",
-              dataType: 'json',
-              data: JSON.stringify({"roles": __roles})
-            }).done(function(data) {
-
-            }).fail(function(jhr) {
-              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user role.";
-            });
-          };
-
+          }
           demoArray["careProvider"] = orgIDs;
 
           $.ajax ({
@@ -638,6 +597,7 @@ var OrgTool = function() {
         };
 
     },
+
     this.filterOrgs = function(leafOrgs) {
         //console.log(leafOrgs)
         if (!leafOrgs) return false;
@@ -666,7 +626,6 @@ var OrgTool = function() {
                                 allChildrenHidden = false;
                              };
                          });
-
                         if (!isVisible) {
                             $(this).hide();
                         } else allSubOrgsHidden = false;
@@ -741,7 +700,6 @@ var OrgTool = function() {
                 if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
             };
         });
-        //console.log(orgsList)
         return orgsList;
     };
 
@@ -787,10 +745,69 @@ var OrgTool = function() {
             if (parentOrgsCt > 0 && orgsList[org].isTopLevel) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
         };
     };
+  };
+  return OrgTool;
+
+})();
+},{}]
+
+},{},[2])
+
+$("input[type='text']").on("blur paste", function() {
+      $(this).val($.trim($(this).val()));
+});
+var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+if (LOGIN_AS_PATIENT) {
+    if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+    window.addEventListener('popstate', function(event) {
+      if (typeof history != 'undefined' && history.pushState) {
+        history.pushState(null, null, location.href);
+        setTimeout('location.reload();', 0);
+      } else {
+        window.history.forward(1);
+        setTimeout('location.reload();', 0);
+      };
+    });
 };
 
-var OT = new OrgTool();
+function setNoBanner() {
+    if (typeof sessionStorage != "undefined") {
+      sessionStorage.setItem('bannerAccessed', 'yes');
+    };
+};
 
+function checkBannerStatus() {
+  if (typeof sessionStorage != "undefined") {
+    var data = sessionStorage.getItem('bannerAccessed');
+    if (data == "yes") {
+      $('.js-close-upper-banner').trigger("click");
+    };
+  }
+};
+function goToLogin() {
+    $('#modal-login-register').modal('hide');
+    setTimeout("$('#modal-login').modal('show'); ", 400);
+};
+function setSelectedNavItem(obj) {
+    $(obj).addClass("side-nave-items__item--selected");
+    $("li.side-nave-items__item--selected").find("a").attr("href", "#");
+
+    $(obj).on("click", function(event) {
+          event.preventDefault();
+          $(".side-nav__close").trigger("click");
+          return;
+     });
+};
+function handleAccessCode() {
+  if ($("#shortcut_alias").val() != "" && $("#access_code_error").text() == "") {
+    $("#access_code_info").show();
+    $("#accessCodeLink").addClass("icon-box__button--disabled");
+    IO.setInterventionSession();
+    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 4000);
+  } else {
+    if ($("#access_code_error").text() != "") $("#access_code_error").show();
+  };
+};
 function handleNoOrgs(userId) {
       $(".intervention-link, a.decision-support-link").each(function() {
         var dm = /decision\s?support/gi;
@@ -814,9 +831,7 @@ function handleNoOrgs(userId) {
                             $("figure.js-close-nav").trigger("click");
                             setTimeout('$("#modal-org").modal("show");', 0);
                           });
-                          if (typeof sessionStorage != "undefined") {
-                              sessionStorage.removeItem("decisionSupportInSession");
-                          };
+                          IO.clearSession("decision-support");
                         };
                     });
                 };
@@ -844,5 +859,38 @@ function updateOrgCallback(errorMessage) {
     };
 };
 
+function hasValue(val) {
+    return val != null && val != "" && val != "undefined";
+};
+//this test for full URL - "https://stg-sm.us.truenth.org" etc.
+function validateUrl(val) {
+    return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
+};
+
+var OrgObj = function(orgId, orgName, parentOrg) {
+    this.id = orgId;
+    this.name = orgName;
+    this.children = [];
+    this.parentOrgId = parentOrg;
+    this.isTopLevel = false;
+};
+
+var CONSENT_ENUM = {
+    "consented": {
+        "staff_editable": true,
+        "include_in_reports": true,
+        "send_reminders": true
+    },
+     "suspended": {
+        "staff_editable": true,
+        "include_in_reports": true,
+        "send_reminders": false
+    },
+    "purged": {
+        "staff_editable": false,
+        "include_in_reports": false,
+        "send_reminders": false
+    }
+};
 
 

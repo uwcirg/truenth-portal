@@ -816,18 +816,23 @@ div.noOrg-container {
   }
 }
 
-#createProfileForm  .title {
-  margin-top: 5%;
-}
-#createProfileForm .study-id-label {
-  margin-top: 0.5em;
-}
-#createProfileForm #studyId {
-  width:350px;
-  max-width: 100%;
-}
-#createProfileForm .btn-tnth-back {
-  margin-left: 3.5em;
+#createProfileForm  {
+  .title {
+    margin-top: 5%;
+  }
+  .study-id-label {
+    margin-top: 0.5em;
+  }
+  #studyId {
+    width:350px;
+    max-width: 100%;
+  }
+  input[type="text"] {
+    height: 40px !important;
+  }
+  select{
+    height: 40px !important;
+  }
 }
 
 #noEmailContainer {
@@ -850,7 +855,8 @@ div.noOrg-container {
 
 .create-account-container {
   padding: 3.5em 4em;
-  width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 .left-indent-bottom {
   margin-left: 3.2em;

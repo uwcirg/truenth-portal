@@ -352,32 +352,21 @@
                   DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
               };
           };
+
           var loader = function(show) {
               if (show) {
-                  $("#loadingIndicator").show();
+                  VO.showLoader();
               } else {
-                  showMain();
-                  //$("#loadingIndicator").hide()
+                  {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} VO.hideLoader(); {% endif %}
+                  VO.showMain();
               };
           };
 
-          function showMain() {
-            $("#mainHolder").css({
-                          "visibility" : "visible",
-                          "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
-                          "filter": "alpha(opacity=100)",
-                          "-moz-opacity": 1,
-                          "-khtml-opacity": 1,
-                          "opacity": 1
-                        });
-            {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} $("#loadingIndicator").hide(); {% endif %}
-          };
-
           function filterMenu() {
-              var HAS_REDIRECT = false;
               $.ajax({
                 url: "{{PORTAL}}/gil-interventions-items",
                 context: document.body,
+                async: false,
                 cache: false
               }).done(function(data) {
                 //console.log(data)
@@ -478,8 +467,7 @@
                             var la = l.attr("href");
                             if (l.length > 0 && validateUrl(la)) {
                               IO.clearSession("decision-support");
-                              HAS_REDIRECT = true;
-                              loader(true);
+                              VO.setRedirect();
                               setTimeout('location.replace("' + l.attr("href") + '");', 0);
                               return true;
                             };
@@ -502,8 +490,7 @@
                         var la = l.attr("href");
                         if (l.length > 0 && validateUrl(la)) {
                           IO.clearSession("symptom-tracker");
-                          loader(true);
-                          HAS_REDIRECT = true;
+                          VO.setRedirect();
                           setTimeout('location.replace("' + l.attr("href") + '");', 0);
                           return true;
                         };
@@ -511,11 +498,9 @@
                   };
 
                 };
-                if(!HAS_REDIRECT) $("#loadingIndicator").hide();
+                VO.hideLoader();
               }).fail(function() {
-                $("#loadingIndicator").hide();
-              }).always(function() {
-                if(!HAS_REDIRECT) $("#loadingIndicator").hide();
+                VO.hideLoader();
               });
           };
 
@@ -526,7 +511,7 @@
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
             });
-           
+
             $("#btnCreateAccount").on("click", function() {
                 IO.setInterventionSession();
             });
