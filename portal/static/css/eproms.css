@@ -763,8 +763,8 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm .btn-tnth-back {
-  margin-left: 3.5em;
+#createProfileForm input[type="text"], #createProfileForm select{
+  height: 40px !important;
 }
 #noEmailContainer {
   margin-top: 0.3em;
@@ -784,7 +784,8 @@ div.noOrg-container span {
 }
 .create-account-container {
   padding: 3.5em 4em;
-  width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1512,7 +1513,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 768px) {
-  
+
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/

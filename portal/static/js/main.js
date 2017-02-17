@@ -108,6 +108,7 @@ var loader = function(show) {
 
 function convertToLocalTime(dateString) {
     var convertedDate = "";
+    //assuming dateString is UTC date/time
     if (hasValue(dateString)) {
         var d = new Date(dateString);
         var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
@@ -134,7 +135,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
         var options = {
-            year: 'numeric', day: 'numeric', month: 'short',
+            year: 'numeric', day: 'numeric', month: 'numeric',
             hour: 'numeric', minute: 'numeric', second: 'numeric',
             hour12: false
         };
@@ -148,9 +149,9 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
             } else {
                 if (timeZone != "UTC") {
                     convertedDate = convertToLocalTime(dateString);
-                    $(".timezone-warning").addClass("text-warning").html("Date/Time conversion does not work in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                    $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion does not work in current browser.<br/>All date/time fields are converted to local time zone instead.");
                     $(".gmt").each(function() { $(this).hide()});
-                }; 
+                };
             }
         } catch(e) {
             errorMessage = "Error occurred when converting timezone: " + e.Message;
@@ -385,7 +386,7 @@ var fillContent = {
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]").prop('checked', true);
+            $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]").prop('checked', true);
         };
 
         if ($('#userOrgs input.clinic:checked').size()) {
@@ -1158,22 +1159,10 @@ var tnthAjax = {
             OT.populateUI();
             tnthAjax.getDemo(userId, noOverride, sync, callback);
             if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-                var ob = $("body").find("#userOrgs input.clinic:checkbox[value="+preselectClinic+"]");
+                var ob = $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]");
                 ob.prop('checked', true);
                 var ___roles =  [{'name': 'patient'}];
                 tnthAjax.handleConsent(ob);
-                //update user role if user has chosen an org
-                $.ajax ({
-                  type: "PUT",
-                  url: '/api/user/' + userId +'/roles',
-                  contentType: "application/json; charset=utf-8",
-                  dataType: 'json',
-                  async: false,
-                  data: JSON.stringify({"roles": ___roles})
-                }).done(function(data) {
-
-                }).fail(function(jhr) {
-                });
             };
 
             $("#userOrgs input[name='organization']").each(function() {
