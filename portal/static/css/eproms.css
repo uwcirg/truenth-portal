@@ -93,12 +93,12 @@ div.orglist-selector {
   font-size: 0.9em;
 }
 #adminTableToolbar div.dropdown-menu {
-  max-height: 500px;
+  max-height: 550px;
   transition: height 300ms ease-in;
 }
 #adminTableToolbar #orglist-footer-container {
   padding: 0 0.5em;
-  width: 200px;
+  width: 250px;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -110,7 +110,7 @@ div.orglist-selector {
   margin: -0.4em 0;
 }
 div.orglist-selector div.dropdown-menu #userOrgs {
-  width: 280px;
+  width: 300px;
   max-width: 100%;
   padding: 0 0.5em 0 1em;
   margin: 0 auto;

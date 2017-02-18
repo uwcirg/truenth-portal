@@ -198,63 +198,67 @@ var AdminTool = function(userId) {
       var iterated = /org_list/.test(location.href);
 
       var noPatientData = $("#admin-table-body").find("tr.no-records-found").length > 0;
-      if (!noPatientData) {
-        $.ajax ({
-            type: "GET",
-            url: '/api/organization'
-        }).done(function(data) {
 
-            OT.populateOrgsList(data.entry);
-            OT.populateUI();
+      $.ajax ({
+          type: "GET",
+          url: '/api/organization'
+      }).done(function(data) {
+
+          OT.populateOrgsList(data.entry);
+          OT.populateUI();
+          if (!noPatientData) {
             AT.getHereBelowOrgs();
             OT.filterOrgs(AT.here_below_orgs);
+          };
 
-            var ofields = $("#userOrgs input[name='organization']");
-            ofields.each(function() {
-                if (iterated && request_org_list && request_org_list[$(this).val()]) $(this).prop("checked", true);
-                $(this).on("click touchstart", function(e) {
-                    e.stopPropagation();
-                    var orgsList = [];
-                    $("#userOrgs input[name='organization']").each(function() {
-                        if ($(this).is(":checked")) orgsList.push($(this).val());
-                    });
-                    if (orgsList.length > 0) {
-                      location.replace("/patients/?org_list=" + orgsList.join(","));
-                    } else location.replace("/patients");
-                });
-            });
-            if (iterated && ofields.length > 0) {
-              $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label></div>");
-              $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
+          var ofields = $("#userOrgs input[name='organization']");
+          ofields.each(function() {
+              if ((AT.here_below_orgs).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
+              $(this).on("click touchstart", function(e) {
                   e.stopPropagation();
                   var orgsList = [];
                   $("#userOrgs input[name='organization']").each(function() {
-                      $(this).prop("checked", true);
-                      orgsList.push($(this).val());
+                      if ($(this).is(":checked")) orgsList.push($(this).val());
                   });
-                  location.replace("/patients/?org_list=" + orgsList.join(","));
+                  if (orgsList.length > 0) {
+                    location.replace("/patients/?org_list=" + orgsList.join(","));
+                  } else location.replace("/patients");
               });
-              $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
-                  e.stopPropagation();
-                  $("#userOrgs input[name='organization']").each(function() {
-                      $(this).prop("checked", false);
-                  });
-              });
-            };
+          });
+          if (iterated && ofields.length > 0) {
+            $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
+            $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
+                e.stopPropagation();
+                var orgsList = [];
+                $("#userOrgs input[name='organization']").each(function() {
+                    $(this).prop("checked", true);
+                    orgsList.push($(this).val());
+                });
+                location.replace("/patients/?org_list=" + orgsList.join(","));
+            });
+            $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
+                e.stopPropagation();
+                $("#userOrgs input[name='organization']").each(function() {
+                    $(this).prop("checked", false);
+                });
+            });
+            $("#orglist-close-ckbox").on("click touchstart", function(e) {
+                e.stopPropagation();
+                $("#orglistSelector").trigger("click")
+            });
+          };
 
-        }).fail(function() {
-            //console.log("Problem retrieving data from server.");
-        });
+      }).fail(function() {
+          //console.log("Problem retrieving data from server.");
+      });
 
       //orglist-dropdown
       $('#orglist-dropdown').on('click touchstart', function () {
           setTimeout('AT.setOrgsMenuHeight(' + (iterated?'100':'50') + ');', 0);
+          setTimeout('$("#orglist-close-ckbox").prop("checked", false);', 0);
       });
-    } else {
-      //no patient data
-      $("#patientAssessmentDownload").hide();
-      $("#orglistSelector").hide();
-   };
+
+      if (noPatientData) $("#patientAssessmentDownload").hide();
   };
 
   this.setOrgsMenuHeight = function(padding) {
