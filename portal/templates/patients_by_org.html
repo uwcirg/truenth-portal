@@ -109,6 +109,7 @@
           </tbody>
       </table>
   </div>
+  <div id="admin-table-error-message" class="text-danger smaller-text"></div>
 </div>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
@@ -136,7 +137,7 @@ var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
-  $("#adminTable").on("page-change.bs.table sort.bs.table reset-view.bs.table toggle.bs.table", function() {
+  $("#adminTable").on("page-change.bs.table sort.bs.table reset-view.bs.table toggle.bs.table post-body.bs.table", function() {
       AT.updateData();
    });
   setTimeout(AT.updateData, 0);
