@@ -105,6 +105,9 @@ def capture_next_view_function(real_function):
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
+        if request.args.get('suspend_initial_queries'):
+            session['suspend_initial_queries'] = request.args.get(
+                'suspend_initial_queries')
         return real_function()
     return capture_next
 
@@ -155,7 +158,10 @@ def next_after_login():
         del session['invited_verified_user_id']
 
     # Present intial questions (TOU et al) if not already obtained
-    if not Coredata().initial_obtained(user):
+    # NB - this act may be suspended by request from an external
+    # client during patient registration
+    if (not session.get('suspend_initial_queries', None)
+       ) and not Coredata().initial_obtained(user):
         current_app.logger.debug("next_after_login: [need data] -> "
                                  "initial_queries")
         return redirect(url_for('portal.initial_queries'))
@@ -180,6 +186,8 @@ def next_after_login():
         del session['next']
         current_app.logger.debug("next_after_login: [have session['next']] "
                                  "-> {}".format(next_url))
+        if 'suspend_initial_queries' in session:
+            del session['suspend_initial_queries']
         return redirect(next_url)
 
     # No better place to go, send user home
