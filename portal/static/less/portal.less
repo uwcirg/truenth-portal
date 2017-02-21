@@ -102,13 +102,20 @@ div.orglist-selector {
   width: 250px;
   max-width: 100%;
   margin: 0 auto;
- label {
-  font-weight: normal;
+  label {
+   font-weight: normal;
   }
-};
+  input[type="checkbox"] {
+    position: relative;
+    top: -1px;
+  }
+}
 #adminTableToolbar div.org-container {
   display: block;
   margin: -0.1em 0 -0.2em 0;
+}
+#adminTable div.card-view {
+  display: flex;
 }
 div.orglist-selector div.dropdown-menu #userOrgs {
   width: 300px;

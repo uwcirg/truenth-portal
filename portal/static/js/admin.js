@@ -68,7 +68,6 @@ var AdminTool = function(userId) {
           if (arrData.length > 0) {
             //console.log(arrData)
             arrData.forEach(function(d) {
-               //var row = $("#adminTable tr[data-uniqueid='" + d.id + "']");
                var row = $("#id_row_" + d.id);
                if (row.length > 0) {
                   var rindex = row.attr("data-index");
@@ -77,7 +76,17 @@ var AdminTool = function(userId) {
                  //console.log("status: " + statusField.length + " cdField: " + cdField.length);
                  if (d.data.status) statusField.html(d.data.status);
                  if (d.data.consentdate) cdField.html(d.data.consentdate);
-                };
+
+                 //card view
+                 var cvf = row.find(".card-view");
+                 cvf.each(function() {
+                    var ctf = $(this).find(".title");
+                    if ((/consent date/gi).test(ctf.text())) {
+                      ctf.next().html(d.data.consentdate);
+                    };
+                 });
+
+               };
             });
 
           };
@@ -87,6 +96,7 @@ var AdminTool = function(userId) {
         if(requestsCounter == 0) AT.fadeLoader();
     }).fail(function(xhr) {
         //console.log("request failed.");
+        $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
         AT.fadeLoader();
     });
   };
@@ -95,13 +105,12 @@ var AdminTool = function(userId) {
 
     var us = "", _userIds = [], ct = 0, arrUsers = [];
 
-    $("td.id-field").each(function() {
-        var id = parseInt($(this).text());
+    $("#adminTable tr[data-uniqueid]").each(function() {
+        var id = $(this).attr("data-uniqueid");
         if (!isNaN(id)) {
-            _userIds.push(id);
+          _userIds.push(id);
         };
-     });
-
+    });
     for (var index = 0; index < _userIds.length; index++, ct++) {
 
        us += (us != ""?"&":"") + "user_id=" + _userIds[index];
@@ -225,7 +234,7 @@ var AdminTool = function(userId) {
                   } else location.replace("/patients");
               });
           });
-          if (iterated && ofields.length > 0) {
+          if (ofields.length > 0) {
             $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
             $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
                 e.stopPropagation();
@@ -234,6 +243,7 @@ var AdminTool = function(userId) {
                     $(this).prop("checked", true);
                     orgsList.push($(this).val());
                 });
+                $("#orglist-clearall-ckbox").prop("checked", false);
                 location.replace("/patients/?org_list=" + orgsList.join(","));
             });
             $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
@@ -244,7 +254,7 @@ var AdminTool = function(userId) {
             });
             $("#orglist-close-ckbox").on("click touchstart", function(e) {
                 e.stopPropagation();
-                $("#orglistSelector").trigger("click")
+                $("#orglistSelector").trigger("click");
             });
           };
 
@@ -254,22 +264,27 @@ var AdminTool = function(userId) {
 
       //orglist-dropdown
       $('#orglist-dropdown').on('click touchstart', function () {
-          setTimeout('AT.setOrgsMenuHeight(' + (iterated?'100':'50') + ');', 0);
-          setTimeout('$("#orglist-close-ckbox").prop("checked", false);', 0);
+          setTimeout('AT.setOrgsMenuHeight(100); AT.clearFilterButtons();', 10);
       });
 
       if (noPatientData) $("#patientAssessmentDownload").hide();
   };
 
   this.setOrgsMenuHeight = function(padding) {
-    if (!padding) padding = 50;
+    if (!padding) padding = 100;
     var h = parseInt($("#fillOrgs").height());
     if (!isNaN(h) && h > 0) {
       $("#org-menu").height(h + padding);
-      if ($("#adminTable").height() < $("#org-menu").height()) {
-          setTimeout('$("#adminTable").height($("#org-menu").height() + ' + padding + ');', 0);
+      if ($("div.admin-table").height() < $("#org-menu").height()) {
+          setTimeout('$("div.admin-table").height($("#org-menu").height() + ' + padding + ');', 0);
       };
     };
+  };
+
+  this.clearFilterButtons = function() {
+    $("#orglist-close-ckbox").prop("checked", false);
+    $("#orglist-clearall-ckbox").prop("checked", false);
+    $("#orglist-selectall-ckbox").prop("checked", false);
   };
 
 };
