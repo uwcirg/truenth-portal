@@ -6,7 +6,7 @@
     <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button>&nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
     <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
-  {% if config.PROVIDER_BULK_DATA_ACCESS %}
+  {% if config.STAFF_BULK_DATA_ACCESS %}
       <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -37,7 +37,7 @@
   {% endif %}
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
-        {% if config.PROVIDER_BULK_DATA_ACCESS %}
+        {% if config.STAFF_BULK_DATA_ACCESS %}
           <div class="orglist-download-container"><div><a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
          </div>
         {% endif %}
@@ -80,8 +80,8 @@
                   <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
                    <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
-                  {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -96,10 +96,10 @@
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
-                      {% if 'reports' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
                       {% endif %}
-                      {% if 'status' in config.PATIENTS_BY_PROVIDER_ADDL_FIELDS %}
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
                       {% endif %}
                       <td><!--consent datefield--></td>
