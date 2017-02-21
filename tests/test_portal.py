@@ -80,9 +80,9 @@ class TestPortal(TestCase):
         self.promote_user(role_name=ROLE.STAFF)
         self.promote_user(role_name=ROLE.PATIENT)
 
-        # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the
+        # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
-        self.app.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
+        self.app.config['PATIENT_LIST_ADDL_FIELDS'] = [
             'reports',]
         rv = self.client.get('/patients/')
 
