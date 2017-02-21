@@ -251,7 +251,8 @@ class SitePersistence(object):
                     if include_interventions:
                         self._log("Intervention {id} collision on "
                                   "import.  {details}".format(
-                                      id=org.id, details=details.getvalue()))
+                                      id=intervention.id,
+                                      details=details.getvalue()))
                         db.session.delete(existing)
                         db.session.add(intervention)
                     else:
