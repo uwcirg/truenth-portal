@@ -1,5 +1,5 @@
 """Model classes for retaining FHIR data"""
-from collections import defaultdict
+from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from dateutil import parser
 from flask import abort, current_app
@@ -618,7 +618,7 @@ class AssessmentStatus(object):
         self._consent = consent
         self._overall_status, self._consent_date = None, None
         self._localized = localized_PCa(user)
-        self.instrument_status = defaultdict(dict)
+        self.instrument_status = OrderedDict()
 
     @property
     def consent_date(self):
