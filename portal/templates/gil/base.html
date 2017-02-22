@@ -358,7 +358,7 @@
               if (show) {
                   VO.showLoader();
               } else {
-                  {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} VO.hideLoader(); {% endif %}
+                  {% if user and (not user.has_role(ROLE.STAFF)) and (not user.has_role("admin")) %} filterMenu(); {% else %} VO.hideLoader(); {% endif %}
                   VO.showMain();
               };
           };

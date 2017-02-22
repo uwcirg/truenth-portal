@@ -262,17 +262,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
 
-    def test_account_creation_by_provider(self):
-        # permission challenges when done as provider
+    def test_account_creation_by_staff(self):
+        # permission challenges when done as staff
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.STAFF)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -282,7 +282,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -319,17 +319,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
 
-    def test_failed_account_creation_by_provider(self):
+    def test_failed_account_creation_by_staff(self):
         # without the right set of consents & roles, should fail
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.STAFF)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -339,7 +339,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PARTNER}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))

@@ -1037,11 +1037,11 @@ class User(db.Model, UserMixin):
 
         if self.has_role(ROLE.STAFF):
             # Staff has full access to all patients with a valid consent
-            # at or below the same level of the org tree as provider has
+            # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
-            # agreement at a higher level in the orgtree than the provider,
+            # agreement at a higher level in the orgtree than the staff member,
             # in which case the patient's organization must be a child
-            # of the provider's organization for access.
+            # of the staff's organization for access.
 
             # As long as the consent is valid (not expired or deleted) it's
             # adequate for 'view'.  'edit' requires the staff_editable option
@@ -1077,9 +1077,9 @@ class User(db.Model, UserMixin):
         return role_name in [r.name for r in self.roles]
 
     def provider_html(self):
-        """Helper used from templates to display any custom provider text
+        """Helper used from templates to display any custom staff/provider text
 
-        Interventions can add personalized HTML for care providers
+        Interventions can add personalized HTML for care staff
         to consume on the /patients list.  Look up any values for this user
         on all interventions.
 
