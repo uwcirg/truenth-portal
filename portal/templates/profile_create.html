@@ -17,14 +17,17 @@
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row">
-        <div class="col-md-12">
-            <hr>
-            <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
-            <hr/>
-            <br/>
-            <div class="profile-item-container create-account-container">
+        <div class="col-md-11">
+            <div class="row">
+                <div class="col-md-push-1 col-md-11 col-xs-12">
+                    <hr>
+                    <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
+                    <hr/>
+                    <br/>
+
+                    <div class="profile-item-container create-account-container">
                     <div class="row">
-                        <div class="col-md-9 col-xs-12">
+                        <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
                             {{profileBirthDate(False)}}
                             <br/>
@@ -43,7 +46,8 @@
                         <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
                         <input type="text" class="form-control" id="studyId" name="studyId"/>
                     </div>
-                    <br/>
+                    <div class="divider"></div>
+                    <hr/>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
@@ -85,6 +89,8 @@
             <div>
                 {{ back_btn('patients','Patients List')}}
                 <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            </div>
+            </div>
             </div>
         </div>
     </div>
@@ -280,7 +286,7 @@ $(document).ready(function(){
                         clear();
                     }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
                         $("#updateProfile").attr("disabled", false);
                     });
 
@@ -288,7 +294,7 @@ $(document).ready(function(){
                     //Display Error Here
                     //console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
                     $("#updateProfile").attr("disabled", false);
                 });
 

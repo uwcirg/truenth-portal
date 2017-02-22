@@ -39,7 +39,7 @@ Flask-WebTest==0.0.8
 Flask-WTF==0.14.2
 functools32==3.2.3.post2
 future==0.16.0
-fuzzywuzzy==0.14.0
+fuzzywuzzy==0.15.0
 imagesize==0.7.1
 ipdb==0.10.2
 ipython==5.2.2

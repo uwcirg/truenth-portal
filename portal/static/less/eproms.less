@@ -128,8 +128,18 @@ div.orglist-selector {
   border-radius: 4px;
   font-size: 0.9em;
 }
+#adminTableToolbar #orglist-footer-container {
+  padding: 0 0.5em;
+  width: 250px;
+  max-width: 100%;
+  margin: 0 auto;
+ label {
+  font-weight: normal;
+  }
+};
+
 #adminTableToolbar div.dropdown-menu {
-  max-height: 500px;
+  max-height: 550px;
   transition: height 300ms ease-in;
 }
 #adminTableToolbar div.org-container {
@@ -816,18 +826,23 @@ div.noOrg-container {
   }
 }
 
-#createProfileForm  .title {
-  margin-top: 5%;
-}
-#createProfileForm .study-id-label {
-  margin-top: 0.5em;
-}
-#createProfileForm #studyId {
-  width:350px;
-  max-width: 100%;
-}
-#createProfileForm .btn-tnth-back {
-  margin-left: 3.5em;
+#createProfileForm  {
+  .title {
+    margin-top: 5%;
+  }
+  .study-id-label {
+    margin-top: 0.5em;
+  }
+  #studyId {
+    width:350px;
+    max-width: 100%;
+  }
+  input[type="text"] {
+    height: 40px !important;
+  }
+  select{
+    height: 40px !important;
+  }
 }
 
 #noEmailContainer {
@@ -850,7 +865,8 @@ div.noOrg-container {
 
 .create-account-container {
   padding: 3.5em 4em;
-  width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1643,9 +1659,6 @@ div.org-container input[type="checkbox"] {
 }
 
 @media (min-width: 768px) {
-  #mainNav {
-    height: 135px;
-  }
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
@@ -1681,6 +1694,11 @@ div.org-container input[type="checkbox"] {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+}
+@media (min-width: 991px) {
+  #mainNav {
+    height: 135px;
   }
 }
 @media (max-width: 991px) {

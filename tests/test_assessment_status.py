@@ -30,7 +30,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
 
 
 localized_instruments = set(['eproms_add', 'epic26'])
-metastaic_instruments = set(['eortc', 'prems'])
+metastaic_instruments = set(['eortc', 'hpfs', 'prems'])
 
 
 class TestAssessment(TestCase):
@@ -110,6 +110,7 @@ class TestAssessment(TestCase):
         # User finished both on time
         self.bless_with_basics()  # pick up a consent, etc.
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='hpfs')
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         self.test_user = db.session.merge(self.test_user)

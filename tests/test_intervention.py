@@ -321,6 +321,7 @@ class TestIntervention(TestCase):
 
         # Add a fake assessments and see a change
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='hpfs')
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         user, ae = map(db.session.merge, (self.test_user, ae))

@@ -99,13 +99,13 @@ div.orglist-selector {
 }
 #adminTableToolbar #orglist-footer-container {
   padding: 0 0.5em;
-  width: 200px;
+  width: 250px;
   max-width: 100%;
   margin: 0 auto;
-}
-#adminTableToolbar #orglist-footer-container label {
+ label {
   font-weight: normal;
-}
+  }
+};
 #adminTableToolbar div.org-container {
   display: block;
   margin: -0.1em 0 -0.2em 0;
@@ -803,19 +803,23 @@ div.noOrg-container {
   top: 1px;
   }
 }
-
-#createProfileForm  .title {
-  margin-top: 5%;
-}
-#createProfileForm .study-id-label {
-  margin-top: 0.5em;
-}
-#createProfileForm #studyId {
-  width:350px;
-  max-width: 100%;
-}
-#createProfileForm .btn-tnth-back {
-   margin-left: 3.5em;
+#createProfileForm  {
+  .title {
+    margin-top: 5%;
+  }
+  .study-id-label {
+    margin-top: 0.5em;
+  }
+  #studyId {
+    width:350px;
+    max-width: 100%;
+  }
+  input[type="text"] {
+    height: 40px !important;
+  }
+  select{
+    height: 40px !important;
+  }
 }
 #noEmailContainer {
   margin-top: 0.3em;
@@ -1530,7 +1534,7 @@ div.org-container input[type="checkbox"] {
   }
   .create-account-container {
     padding: 3.5em 3em;
-    width: 90%;
+    width: 100%;
     max-width: 100%;
   }
 
@@ -1618,9 +1622,6 @@ div.org-container input[type="checkbox"] {
 
 
 @media (min-width: 768px) {
-  #mainNav {
-    height: 135px;
-  }
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
@@ -1656,6 +1657,11 @@ div.org-container input[type="checkbox"] {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+}
+@media (min-width: 991px) {
+  #mainNav {
+    height: 135px;
   }
 }
 @media (max-width: 991px) {

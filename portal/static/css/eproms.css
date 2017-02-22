@@ -93,12 +93,12 @@ div.orglist-selector {
   font-size: 0.9em;
 }
 #adminTableToolbar div.dropdown-menu {
-  max-height: 500px;
+  max-height: 550px;
   transition: height 300ms ease-in;
 }
 #adminTableToolbar #orglist-footer-container {
   padding: 0 0.5em;
-  width: 200px;
+  width: 250px;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -110,7 +110,7 @@ div.orglist-selector {
   margin: -0.4em 0;
 }
 div.orglist-selector div.dropdown-menu #userOrgs {
-  width: 280px;
+  width: 300px;
   max-width: 100%;
   padding: 0 0.5em 0 1em;
   margin: 0 auto;
@@ -763,8 +763,8 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm .btn-tnth-back {
-  margin-left: 3.5em;
+#createProfileForm input[type="text"], #createProfileForm select{
+  height: 40px !important;
 }
 #noEmailContainer {
   margin-top: 0.3em;
@@ -784,7 +784,8 @@ div.noOrg-container span {
 }
 .create-account-container {
   padding: 3.5em 4em;
-  width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1512,9 +1513,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 768px) {
-  #mainNav {
-    height: 135px;
-  }
+
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
@@ -1592,6 +1591,11 @@ div.org-container input[type="checkbox"] {
   .custom-container #profileEmailSelect {
     width: 90%;
     max-width: 100%;
+  }
+}
+@media (min-width: 991px) {
+  #mainNav {
+    height: 135px;
   }
 }
 @media (min-width: 992px) {

@@ -1,11 +1,10 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, render_template, current_app, request
+from flask import abort, Blueprint, render_template, request
 from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.app_text import app_text, ConsentATMA, VersionedResource
-from ..models.fhir import localized_PCa
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
@@ -105,12 +104,9 @@ def patient_profile(patient_id):
 def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
-        current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
         org = Organization.query.get(org_id)
         asset, url = VersionedResource.fetch_elements(
             app_text(ConsentATMA.name_key(organization=org)))
-        if url:
-            current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
 
         consent_agreements[org.id] = {
                 'organization_name': org.name,

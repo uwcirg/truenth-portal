@@ -2,7 +2,7 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort
+from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
@@ -703,7 +703,11 @@ class User(db.Model, UserMixin):
                           comment="Adding consent agreement",context='consent')
             # Look for existing consent for this user/org
             for existing_consent in self.valid_consents:
-                if existing_consent.organization_id == consent.organization_id:
+                if existing_consent.organization_id == int(
+                    consent.organization_id):
+                    current_app.logger.debug("deleting matching consent {} "
+                                             "replacing with {} ".format(
+                                                 existing_consent, consent))
                     delete_consents.append(existing_consent)
 
             if hasattr(consent, 'acceptance_date'):

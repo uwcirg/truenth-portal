@@ -72,7 +72,7 @@ div.orglist-selector {
 }
 #adminTableToolbar #orglist-footer-container {
   padding: 0 0.5em;
-  width: 200px;
+  width: 250px;
   max-width: 100%;
   margin: 0 auto;
 }
@@ -728,9 +728,9 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm .btn-tnth-back {
-   margin-left: 3.5em;
- }
+#createProfileForm input[type="text"], #createProfileForm select{
+  height: 40px !important;
+}
 #noEmailContainer {
   margin-top: 0.3em;
 }
@@ -749,7 +749,8 @@ div.noOrg-container span {
 }
 .create-account-container {
   padding: 3.5em 4em;
-  width: 90%;
+  width: 100%;
+  max-width: 100%;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1461,9 +1462,6 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 768px) {
-  #mainNav {
-    height: 135px;
-  }
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
@@ -1497,6 +1495,11 @@ div.org-container input[type="checkbox"] {
   }
   .tnth-splash-bottom-link {
     font-size: 24px;
+  }
+}
+@media (min-width: 991px) {
+  #mainNav {
+    height: 135px;
   }
 }
 @media (max-width: 991px) {

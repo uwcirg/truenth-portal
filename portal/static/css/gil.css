@@ -5304,10 +5304,10 @@ body.modal-open .modal.is-modal-active .modal-dialog {
 }
 .box-modal form input {
     display: inline-block;
-    background: #E3E0DB;
+    background: #f1efec;
     height: 44px;
     padding: 5px;
-    border: 2px solid #E3E0DB;
+    border: 2px solid #f1efec;
     min-width: 215px;
 }
 .box-modal form input.button--login {
@@ -6885,12 +6885,12 @@ figure.nav-overlay {
     padding: 1em 0;
 }
 
-nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar  {
+nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb {
+nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb, div.modal.fade::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
 .home--item-text {
