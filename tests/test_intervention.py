@@ -298,6 +298,37 @@ class TestIntervention(TestCase):
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
 
+    def test_in_role(self):
+        user = self.test_user
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.public_access = False
+        d = {
+             'function': 'in_role_list',
+             'kwargs': [
+                 {'name': 'role_list',
+                  'value': [ROLE.PATIENT,]}]
+            }
+
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name="SELF_MANAGEMENT if PATIENT",
+                intervention_id = sm.id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+
+        # Prior to granting user PATIENT role, the strategy
+        # should not give access to SM
+        self.assertFalse(sm.display_for_user(user).access)
+
+        # Add PATIENT to user's roles
+        add_role(user, ROLE.PATIENT)
+        with SessionScope(db):
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertTrue(sm.display_for_user(user).access)
+
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
         ae  = INTERVENTION.ASSESSMENT_ENGINE

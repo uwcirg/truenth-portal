@@ -236,7 +236,7 @@ class SitePersistence(object):
                 if not dict_match(strat_json, existing.as_json(), details):
                     self._log("AccessStrategy {id} collision on "
                               "import.  {details}".format(
-                                  id=org.id, details=details.getvalue()))
+                                  id=existing.id, details=details.getvalue()))
                     db.session.delete(existing)
                     db.session.add(strat)
             else:
