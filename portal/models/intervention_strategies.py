@@ -299,14 +299,14 @@ def tx_begun(boolean_value):
     """Returns strategy function testing if user is known to have started Tx
 
     :param boolean_value: true for known treatment started (i.e. procedure
-        indicating tx has begun), false for known treatment not started,
-        (i.e. watchful waiting, etc.)
+        indicating tx has begun), false to confirm a user doesn't have
+        a procedure indicating tx has begun
 
     """
     if boolean_value == 'true':
         check_func = known_treatment_started
     elif boolean_value == 'false':
-        check_func = known_treatment_not_started
+        check_func = lambda u: not known_treatment_started(u)
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 

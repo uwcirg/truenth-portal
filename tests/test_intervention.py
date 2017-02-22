@@ -14,6 +14,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import add_role
+from portal.system_uri import SNOMED
 
 class TestIntervention(TestCase):
 
@@ -186,8 +187,8 @@ class TestIntervention(TestCase):
         cp = INTERVENTION.CARE_PLAN
         user = db.session.merge(self.test_user)
 
-        # Prior to declaring TX, user shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
+        # Prior to declaring TX, user should have access
+        self.assertTrue(cp.display_for_user(user).access)
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -195,8 +196,19 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        # Declaring they started TX, should grant access
+        # Declaring they started a non TX proc, should still have access
         self.assertTrue(cp.display_for_user(user).access)
+
+        self.add_procedure(
+            code='26294005',
+            display='Radical prostatectomy (nerve-sparing)',
+            system=SNOMED)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        # Declaring they started a TX proc, should lose access
+        self.assertFalse(cp.display_for_user(user).access)
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
