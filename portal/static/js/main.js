@@ -2295,7 +2295,7 @@ var FieldLoaderHelper = function () {
              $("#"+ targetField.attr("save-container-id") + "_success").text("success");
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 2000);
         };
     };
 
@@ -2305,7 +2305,7 @@ var FieldLoaderHelper = function () {
             $("#" + targetField.attr("save-container-id") + "_success").text("");
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 5000);
         };
     };
 
