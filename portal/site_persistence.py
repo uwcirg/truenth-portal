@@ -33,10 +33,14 @@ def dict_compare(d1, d2):
 def dict_match(newd, oldd, diff_stream):
     """Returns true/false, if the two dicts contain same key/values
 
+    Compares deep structure, ignores key order
+
     :param newd: First dict to compare, i.e. new state
     :param oldd: Second dict, i.e. current or old state
     :param diff_stream: StringIO like object to report dif details
-    Compares deep structure, ignores key order
+    :return: True if the two dictionaries match, False with details in
+        diff_stream otherwise
+
     """
     added, removed, modified, same = dict_compare(newd, oldd)
     if len(same) == len(newd.keys()) and len(newd.keys()) == len(oldd.keys()):
