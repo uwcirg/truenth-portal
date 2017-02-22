@@ -80,7 +80,7 @@
                   <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
                    <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
-                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="provider_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
@@ -97,7 +97,7 @@
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip">{{ patient.provider_html() | safe }}</td>
+                        <td class="rowlink-skip">{{ patient.staff_html() | safe }}</td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>

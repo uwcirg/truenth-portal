@@ -344,8 +344,8 @@ def login_as(user_id):
     """Provide direct login w/o auth to user account, but only if qualified
 
     Special individuals may assume the identity of other users, but only
-    if the business rules validate.  For example, a provider may log in
-    as a patient who has a current consent on file for the provider's
+    if the business rules validate.  For example, staff may log in
+    as a patient who has a current consent on file for the staff's
     organization.
 
     If qualified, the current user's session is destroyed and the requested

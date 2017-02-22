@@ -41,7 +41,7 @@ class TestIntervention(TestCase):
                 'link_label': 'link magic',
                 'link_url': 'http://safe.com',
                 'status_text': 'status example',
-                'provider_html': "unique HTML for /patients view"
+                'staff_html': "unique HTML for /patients view"
                }
 
         rv = self.client.put('/api/intervention/sexual_recovery',
@@ -56,7 +56,7 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.link_label, data['link_label'])
         self.assertEquals(ui.link_url, data['link_url'])
         self.assertEquals(ui.status_text, data['status_text'])
-        self.assertEquals(ui.provider_html, data['provider_html'])
+        self.assertEquals(ui.staff_html, data['staff_html'])
 
     def test_intervention_bad_access(self):
         client = self.add_client()
@@ -735,7 +735,7 @@ class TestIntervention(TestCase):
                               link_label='link magic',
                               link_url='http://example.com',
                               status_text='status example',
-                              provider_html='custom ph')
+                              staff_html='custom ph')
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
@@ -751,7 +751,7 @@ class TestIntervention(TestCase):
         self.assertEquals(rv.json['link_label'], "link magic")
         self.assertEquals(rv.json['link_url'], "http://example.com")
         self.assertEquals(rv.json['status_text'], "status example")
-        self.assertEquals(rv.json['provider_html'], "custom ph")
+        self.assertEquals(rv.json['staff_html'], "custom ph")
 
 
     def test_communicate(self):

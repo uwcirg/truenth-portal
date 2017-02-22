@@ -1076,7 +1076,7 @@ class User(db.Model, UserMixin):
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
 
-    def provider_html(self):
+    def staff_html(self):
         """Helper used from templates to display any custom staff/provider text
 
         Interventions can add personalized HTML for care staff
@@ -1086,14 +1086,14 @@ class User(db.Model, UserMixin):
         """
         uis = UserIntervention.query.filter(and_(
             UserIntervention.user_id == self.id,
-            UserIntervention.provider_html != None))
+            UserIntervention.staff_html != None))
         if uis.count() == 0:
             return ""
         if uis.count() == 1:
-            return uis[0].provider_html
+            return uis[0].staff_html
         else:
             return '<div>' + '</div><div>'.join(
-                [ui.provider_html for ui in uis]) + '</div>'
+                [ui.staff_html for ui in uis]) + '</div>'
 
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""

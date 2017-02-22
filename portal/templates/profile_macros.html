@@ -1012,8 +1012,8 @@
                 <div class="profile-item-container">
                     <h4 id="interventionReportsLoc" class="profile-item-title">{{ _("Intervention Reports") }}</h4>
                     <div>
-                        {% if person and person.provider_html() %}
-                            {{person.provider_html() | safe}}
+                        {% if person and person.staff_html() %}
+                            {{person.staff_html() | safe}}
                         {% else %}
                             <div class="text-muted">{{ _("No Reports Available") }}</div>
                         {% endif %}
