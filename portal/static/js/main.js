@@ -1600,8 +1600,10 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
             flo.showUpdate(targetField);
+            $(".get-procs-error").remove();
         }).fail(function() {
            // console.log("Problem updating procedure on server.");
+            if ($(".get-procs-error").length == 0) $(".error-message").append("<div class='get-procs-error'>Server error occurred saving procedure/treatment information.</div>");
             flo.showError(targetField);
         });
     },
@@ -1614,8 +1616,10 @@ var tnthAjax = {
             async: (sync ? false: true)
         }).done(function(data) {
             flo.showUpdate(targetField);
+            $(".del-procs-error").remove();
         }).fail(function() {
             // console.log("Problem deleting procedure on server.");
+            if ($(".del-procs-error").length == 0) $(".error-message").append("<div class='del-procs-error'>Server error occurred removing procedure/treatment information.</div>");
             flo.showError(targetField);
         });
     },
