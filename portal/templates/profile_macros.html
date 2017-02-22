@@ -1350,18 +1350,16 @@
     {% endif %}
 
     {% if person and person.has_role('patient') %}
-        <!--  hide the procedure section for now as more rules will be applied to this section
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
                     <div>
-                        {{profileProcedures(person, current_user)}}
+                        {{profileProcedures(person, current_user) | show_macro('procedures')}}
                     </div>
                 </div>
             </div>
         </div>
-        -->
     {% endif %}
 
     {% if person and person.has_role('patient') %}
