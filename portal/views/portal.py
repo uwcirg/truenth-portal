@@ -14,7 +14,7 @@ from .auth import next_after_login
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
+from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
@@ -541,11 +541,9 @@ def legal():
 def terms_and_conditions():
     """ Legal/terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    asset, url = VersionedResource.fetch_elements(
-            app_text(ToU_ATMA.name_key()))
-    terms = {'asset': asset, 'agreement_url': url}
+    response = requests.get(app_text(Terms_ATMA.name_key()))
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        terms=terms)
+        content=response.text)
 
 @portal.route('/about')
 def about():
