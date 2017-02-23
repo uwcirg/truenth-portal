@@ -7029,8 +7029,8 @@ a.home--modal-link {
     text-align: center;
 }
 .page-home .copyright, .is-scrolled .header .copyright {
-    color: #7c959e;
-    opacity: 0.5;
+    color: #9da4a7;
+    opacity: 0.6;
 }
 @media (min-width: 1200px) {
     .home--item-container {
