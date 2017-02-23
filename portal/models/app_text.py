@@ -115,6 +115,21 @@ class ToU_ATMA(AppTextModelAdapter):
         """
         return "Terms of Use URL"
 
+class Terms_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for New Terms Of Use agreements - namely the URL"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a New Terms of Use agreement - new item just added
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+
+        :returns: string for AppText.name field
+
+        """
+        return "New Terms of Use URL"
+
 
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
