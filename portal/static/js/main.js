@@ -2291,21 +2291,21 @@ var FieldLoaderHelper = function () {
 
     this.showUpdate = function(targetField) {
         if(targetField && targetField.length > 0) {
-             $("#" + targetField.attr("save-container-id") + "_error").text("");
+             $("#" + targetField.attr("save-container-id") + "_error").text("").css("opacity", 0);
              $("#"+ targetField.attr("save-container-id") + "_success").text("success");
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 1800);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 2000);
         };
     };
 
     this.showError = function(targetField) {
         if(targetField && targetField.length > 0) {
             $("#" + targetField.attr("save-container-id") + "_error").html("Unable to update. System/Server Error.");
-            $("#" + targetField.attr("save-container-id") + "_success").text("");
+            $("#" + targetField.attr("save-container-id") + "_success").text("").css("opacity", 0);
             setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
             setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 1800);
+            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 5000);
         };
     };
 
