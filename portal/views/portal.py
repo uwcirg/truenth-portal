@@ -93,7 +93,7 @@ def gil_interventions_items():
                 "link_url": display.link_url if display.link_url is not None else "disabled",
                 "link_label": display.link_label if display.link_label is not None else ""
             })
-   
+
     return jsonify(interventions=user_interventions)
 @portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
 def gil_shortcut_alias_validation(clinic_alias):
@@ -534,14 +534,18 @@ def legal():
     """ Legal/terms of use page"""
     gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
-    return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user=current_user())
+    return render_template('legal.html' if not gil else 'gil/legal.html',
+        content=response.text, user=current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
     """ Legal/terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(ToU_ATMA.name_key()))
-    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html', content=response.json()['asset'])
+    asset, url = VersionedResource.fetch_elements(
+            app_text(ToU_ATMA.name_key()))
+    terms = {'asset': asset, 'agreement_url': url}
+    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
+        terms=terms)
 
 @portal.route('/about')
 def about():
