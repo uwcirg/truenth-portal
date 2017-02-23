@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+    <meta http-equiv="Expires" content="Thu, 01 Jan 1970 00:00:00 GMT" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     {% set stylesheet = url_for('static', filename=config.PORTAL_STYLESHEET) %}
@@ -117,7 +120,6 @@
 <script>
 PORTAL_NAV_PAGE = window.location.protocol+"//"+window.location.host+"/api/portal-wrapper-html/";
 PORTAL_HOSTNAME = "";
-
 function _setHostName(url) {
     if (url) {
         var parser = document.createElement("a");
@@ -125,23 +127,26 @@ function _setHostName(url) {
         PORTAL_HOSTNAME = parser.hostname;
     };
 };
+_setHostName(PORTAL_NAV_PAGE);
 
-
-if (typeof URL === "undefined") {
-    //for browsers such IE that does not support URL object specifically
-    _setHostName(PORTAL_NAV_PAGE);
-} else {
-    try {
-        PORTAL_HOSTNAME = new URL(PORTAL_NAV_PAGE).hostname;
-    } catch(e) {
-        _setHostName(PORTAL_NAV_PAGE);
+var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+if (LOGIN_AS_PATIENT) {
+  if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+  window.addEventListener('popstate', function(event) {
+    if (typeof history != 'undefined' && history.pushState) {
+      history.pushState(null, null, location.href);
+      setTimeout('location.reload();', 0);
+    } else {
+      window.history.forward(1);
+      setTimeout('location.reload();', 0);
     };
+  });
 };
-
 
 {% block document_ready %}
 $(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
+   $('[data-toggle="popover"]').popover();
+   $(window).unload(function(){});
 });
 {% endblock %}
 </script>

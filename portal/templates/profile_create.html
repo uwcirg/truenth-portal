@@ -10,100 +10,75 @@
 #clinicalGroupLabel {
     margin-bottom: 1em;
 }
+.required {
+    color: #a09f9f ;
+}
 </style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
-    <div class="row" style="position: relative;">
-        <div class="col-md-12">
-            <hr>
-            <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
-            <hr/>
-            <br/>
-            <div class="profile-item-container create-account-container">
+    <div class="row">
+        <div class="col-md-11">
+            <div class="row">
+                <div class="col-md-push-1 col-md-11 col-xs-12">
+                    <hr>
+                    <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
+                    <hr/>
+                    <br/>
+
+                    <div class="profile-item-container create-account-container">
                     <div class="row">
-                        <div class="col-md-9 col-xs-12">
+                        <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
                             {{profileBirthDate(False)}}
                             <br/>
                         </div>
                     </div>
-                    {{profileEmail(False)}}
+                    <div class="form-group float-input-label profile-section" id="emailGroup">
+                        <label for="email">{{ _("Email Address") }}</label>
+                        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" placeholder="{{ _('Your email') }}" value="" data-customemail="true" required />
+                        <div id="noEmailContainer">
+                            <input type="checkbox" id="noEmail" class="text-muted">&nbsp;<span class="text-muted">User does not have email address</span>
+                        </div>
+                        <div class="help-block with-errors" id="erroremail"></div>
+                    </div>
                     {{profilePhone(False)}}
-                    <br/>
-                    <hr class="pc-hr"/>
-                    <div class="form-group" id="clinicalGroup">
-                        <label id="clinicalGroupLabel">{{ _("Clinical Question") }}</label>
-                        <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
-                        <div class="indent">
-                            <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-                              </label>
-                            </div>
-                            <div class="radio">
-                              <label>
-                                <input type="radio" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (in other parts of body as well)") }}
-                              </label>
-                            </div>
-                        </div>
-                         <div class="help-block with-errors"></div>
-                     </div>
-                     <br/>
-                     <hr class="pc-hr"/>
+                    <div id="studyIdContainer" class="form-group">
+                        <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
+                        <input type="text" class="form-control" id="studyId" name="studyId"/>
+                    </div>
+                    <div class="divider"></div>
+                    <hr/>
                     <div class="form-group profile-section" id="userOrgs">
-                        <label>{{ _("Clinics") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-                        <div class="indent">
+                        <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
-                        <!--
-                        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
-                        </div>
-                        -->
                         <div class="help-block with-errors"></div>
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+                        //userId, noOverride, sync, noPopulate
+                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+
                         $.ajax ({
                             type: "GET",
                             url: '/api/organization'
                         }).done(function(data) {
-                            var clinicArray = [];
-                            $.each(data.entry,function(i,val){
-                                if (val.partOf) {
-                                    // Child clinic
-                                    var getParent = val.partOf.reference.split("/").pop();
-                                    jQuery.map(clinicArray, function(obj) {
-                                        if(obj.id === parseInt(getParent))
-                                            obj.children.push({"id": val.id, "name": val.name});
-                                    });
-                                } else {
-                                    // Parent clinic
-                                    clinicArray.push({ id: val.id, name: val.name, children: []});
-                                }
-                            });
-                            $.each(clinicArray, function(i,val) {
-                                // Fill in parent clinic
-                                if (val.name != "none of the above" && (val.children.length > 0)) {
-                                    $("#fillOrgs").append("<legend>"+val.name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + val.name + "\" id='" + val.id + "_org' value='"+val.id+"' />");
-                                    //$("#fillOrgs").append("<legend>"+val.name+"</legend>");
-                                }
-                                // Fill in each child clinic
-                                if (val.children.length > 0) {
-                                    $.each(val.children, function(n,subval) {
-                                        var childClinic = '<div class="checkbox"><label>' +
-                                            '<input class="clinic init-queries-field" type="checkbox" name="organization" id="' +  subval.id + '_org" value="'+
-                                            subval.id +'" data-parent-id="'+val.id+'"  data-parent-name="' + val.name + '"/>'+
-                                            subval.name +
-                                            '</label></div>';
-                                       $("#fillOrgs").append(childClinic);
-                                    });
-                                }
 
+                            OT.populateOrgsList(data.entry);
+                            OT.populateUI();
+
+                            if (leafOrgs) {
+                                OT.filterOrgs(leafOrgs);
+                            }
+
+                            //console.log(orgsList)
+                            $("#userOrgs input[name='organization']").each(function() {
+                                $(this).on("click", function() {
+                                    $("#userOrgs").find(".help-block").html("");
+                                });
                             });
                         }).fail(function() {
                             console.log("Problem retrieving data from server.");
                         });
-                        //tnthAjax.getOrgs({{ user.id }}, true, true);
-                        //setTimeout('$("#noOrgs").click();', 0);
 
                     });</script>
                     <br/>
@@ -114,6 +89,8 @@
             <div>
                 {{ back_btn('patients','Patients List')}}
                 <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            </div>
+            </div>
             </div>
         </div>
     </div>
@@ -133,6 +110,7 @@
 
 {% block document_ready %}
 
+
 function _redirect(userId) {
     if (userId) {
         $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
@@ -142,62 +120,60 @@ function _redirect(userId) {
 
 $(document).ready(function(){
 
-    var _userId = '', _demoArray = {}, _orgArray = {};
+    var _userId = '', _demoArray = {}, _accountArray = {};
     var hasError = false;
     var errorMessage = '';
 
-    //for each org send off ajax to set consent
-    function setConsents(userId) {
-        var orgs = {};
-        $("#createProfileForm input[name='organization'][data-parent-id]").each(function() {
+    $("#noEmail").on("click", function() {
+        if ($(this).is(":checked")) {
+            $("#email").val("");
+            $("#email").attr("disabled", true);
+            $("#email").removeAttr("required");
+            $("#email").removeAttr("data-customemail");
+            setTimeout('$("#erroremail").text("");', 500);
+        }
+        else {
+            $("#email").attr("disabled", false);
+            $("#email").attr("required", "required");
+            $("#email").attr("data-customemail", "true");
+        };
+    });
+
+    $("input[name='pca_localized']").each(function() {
+        $(this).on("click", function() {
+            $("#clinicalGroup").find(".help-block").html("");
+        });
+    });
+
+    function getParentOrgId(obj) {
+        var parentOrgId =  $(obj).attr("data-parent-id");
+        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        return parentOrgId;
+    };
+
+    function getConsents() {
+        var orgs = {}, consents = [];
+        $("#createProfileForm input[name='organization']:checkbox").each(function() {
             if ($(this).prop("checked")) {
-                var parentOrg = $(this).attr("data-parent-id");
-                if (!orgs[parentOrg]) {
-                    orgs[parentOrg] = true;
-                    //console.log("parent Org: " + parentOrg + " agreement: " + $("#" + parentOrg + "_consentItem").val());
-                    //send off ajax for this
-                     _get('/api/user/' + userId + '/consent', 'POST', JSON.stringify({"organization_id": parentOrg, "agreement_url": $("#" + parentOrg + "_consentItem").val()}), true);
+                var consent_org_id;
+                {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
+                    consent_org_id = getParentOrgId(this);
+                {% else %}
+                    consent_org_id = $(this).val();
+                {% endif %}
+                if (!orgs[consent_org_id]) {
+                    orgs[consent_org_id] = true;
+                    consents.push({"organization_id": consent_org_id, "agreement_url": $("#" + getParentOrgId(this) + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
                 };
             };
         });
-    };
-
-    function setClinical(userId) {
-        var val = "unknown";
-        if ($("#pca_localized_yes").is(":checked")) val = "true";
-        else if ($("#pca_localized_no").is(":checked")) val = "false";
-        _get('/api/patient/' + userId + '/clinical/pca_localized', 'POST', JSON.stringify({value: val}), true);
-    };
-
-
-    function getOrgs(type) {
-        var orgArray = {};
-        switch(type) {
-            case 'account':
-            	//console.log('checked: ' + $('#userOrgs input:checkbox:checked').val())
-            	//var orgId = $('#userOrgs input:checkbox:checked').val();
-                //orgArray['organization_id'] = (orgId == '' ? '0': orgId);
-                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
-                    return { organization_id: $(this).val() };
-                }).get();
-                orgArray['organizations'] = orgIDs;
-                break;
-
-        };
-        return orgArray;
+        return consents;
     };
 
     function setHelpText(elementId, message, hasError) {
-
         var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
-
-        if (hasError) {
-            $("#" + elementId + " .help-block").text(message).css("color", WARNING_COLOR);
-
-        } else {
-            $("#" + elementId + " .help-block").text("").css("color", NORMAL_COLOR);
-        };
-
+        if (hasError) $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
+        else $("#" + elementId).find(".help-block").text("").css("color", NORMAL_COLOR);
     };
 
     $('#createProfileForm').validator().on('submit', function (e) {
@@ -209,17 +185,18 @@ $(document).ready(function(){
 
                 hasError = false;
 
-                if ($("#emailGroup").hasClass("has-error")) {
-                    hasError = true;
-                } else {
-
-                    if ($("#current_user_email").val() === $("#email").val()) {
-                        setHelpText("emailGroup", "Email is already in use.", true);
+                if (!$("#noEmail").is(":checked")) {
+                    if ($("#emailGroup").hasClass("has-error")) {
+                        hasError = true;
                     } else {
-                        setHelpText("emailGroup", "", false);
+
+                        if ($("#current_user_email").val() === $("#email").val()) {
+                            setHelpText("emailGroup", "Email is already in use.", true);
+                        } else {
+                            setHelpText("emailGroup", "", false);
+                        };
                     };
                 };
-
 
                 if ($("#userOrgs input:checkbox:checked").length == 0) {
                    setHelpText("userOrgs", "An organization must be selected.", true);
@@ -251,72 +228,75 @@ $(document).ready(function(){
 
                 $("#updateProfile").attr("disabled", true);
 
-                _get('/api/account', 'POST', JSON.stringify(getOrgs('account')))
+                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    return { organization_id: $(this).val() };
+                }).get();
 
+                _accountArray['organizations'] = orgIDs;
+                _accountArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
+                _accountArray['consents'] = getConsents();
+                //console.log(_demoArray)
+
+                _get('/api/account', 'POST', JSON.stringify(_accountArray))
                 .then(function(responseData) {
 
                     _userId = responseData['user_id'];
-                    console.log('user: ' + _userId);
 
                     _demoArray['resourceType'] = 'Patient';
                     _demoArray['name'] = {
-                        'given': $('input[name=firstname]').val(),
-                        'family': $('input[name=lastname]').val()
+                        'given': $.trim($('input[name=firstname]').val()),
+                        'family':$.trim($('input[name=lastname]').val())
                     };
                     _demoArray['birthDate'] = $('input[name=birthDate]').val();
-                    _demoArray['telecom'] = [
-                        { 'system': 'email', 'value': $('input[name=email]').val() },
-                        { 'system': 'phone', 'value': $('input[name=phone]').val() }
-                    ];
 
-                    var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                    _demoArray['telecom'] = [];
+
+                    var emailVal = $.trim($('input[name=email]').val());
+                    if (hasValue(emailVal)) {
+                        _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
+                    } else {
+                        _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
+                    };
+                    _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
+
+                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
-                    if (typeof orgIDs === 'undefined'){
-                        orgIDs = [0]  // special value for `none of the above`
-                    }
-
 
                     _demoArray['careProvider'] = orgIDs;
 
 
-                    //console.log(_demoArray);
+                    var studyId = $("#studyId").val();
+                    if (hasValue(studyId)) {
+                        var studyIdObj = {
+                            system: "http://us.truenth.org/identity-codes/external-study-id",
+                            use: "secondary",
+                            value: studyId
+                        };
+                        _demoArray["identifier"] = [studyIdObj];
+                    };
 
-
-                    //Adding demographic information
-                    //Adding roles of patient and write_only for user
                     Promise.all([
-                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray)),
-                        _get('/api/user/'+_userId+'/roles', 'PUT', JSON.stringify({'roles': [{'name': 'patient'}]}))])
+                       _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {
-                        // Both promises resolved
-                        //console.log('promises resolved');
-                        setConsents(_userId);
-                        setClinical(_userId);
                         $('#confirmMsg').fadeIn();
                         setTimeout("$('#confirmMsg').fadeOut();", 800);
                         setTimeout("_redirect(" + _userId + ");", 1000);
-                        //$('#createProfileForm')[0].reset();
                         $("#updateProfile").attr("disabled", false);
                         clear();
-                    })
-                    .catch(function(error) {
-                        // One or more promises was rejected
-                        console.log('error: ' + error);
+                    }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
                         $("#updateProfile").attr("disabled", false);
-
                     });
+
                 }).catch(function(error) {
                     //Display Error Here
-                    console.log('error: ' + error);
+                    //console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>' + errorMessage + '</small>').fadeIn();
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
                     $("#updateProfile").attr("disabled", false);
                 });
-
-
 
           };
     });
@@ -346,7 +326,6 @@ $(document).ready(function(){
         });
 
     };
-
 
     function clear() {
         ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {

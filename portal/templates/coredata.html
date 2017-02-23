@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileProcedures %}
 
 <h3 class="tnth-headline">{{ _("More About You") }}</h3>
 
@@ -76,104 +77,10 @@
 {% endif %}
 
 {% if 'procedure' in require %}
-<script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
-<style>
-    .treatment-container {margin-left:0.5em;}
-    #eventListtnthproc {margin-left: 0.5em}
-    #eventListtnthproc td { padding: 0.15em;}
-    #profileProcedureContainer { margin-left: 1em;}
-    #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
-    #procedureForm { margin-left: 0.5em;}
-    .procedureDateLabel { margin-bottom: 0;}
-</style>
-<p>{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
-    date, please make your best guess.") }}<span class="text-muted smaller-text"></span></p>
-
-<p>{{ _("Add a treatment") }}:</p>
-<div id="profileProcedureContainer">
-    <div class="inner">
-        <p class="text-muted">{{ _("Your Treatments") }}:</p>
-        <div id="userProcedures"></div>
-
-    </div>
-    <br/>
-    <form id="procedureForm" class="form-inline event-element to-validate" data-toggle="validator">
-
-            <p class="text-muted">{{ _("Add a treatment") }}:</p>
-            <div class="row">
-                <div class="col-md-6 col-xs-11">
-                    <div class='form-group'>
-                        <select class='form-control' id='tnthproc'>
-                            <option value=''>{{ _("Select treatment") }}...</option>
-                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
-                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
-                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
-                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
-                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
-                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
-                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
-                            <option value='999999999'>{{ _("None of the above") }}</option>
-                        </select>
-                        <div class="help-block with-errors"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!--
-            <div class='form-group'>
-                <label>Date:</label>
-                <div class="input-group date">
-                    <input class='event-value form-control' type='text' placeholder='DD/MM/YYYY' maxlength='10' data-error="Date should be in valid DD/MM/YYYY format" id='tnthproc-date' name='tnthproc-date' pattern="^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$"/>
-                    <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
-                        <i class="fa fa-calendar"></i>
-                    </span>
-                </div>
-                <div class="help-block with-errors"></div>
-            </div>
-            -->
-            <br/>
-            <div id="procDateGroup" class="form-group">
-                <label class="procedureDateLabel">{{ _("Date") }}:</label>
-                <div class="flex">
-                    <div>
-                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="([1-9]|[12][0-9]|3[01])">
-                    </div>
-                    <div>
-                        <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
-                            <option value="">{{ _("Month") }}...</option>
-                            <option value="01">{{ _("January") }}</option>
-                            <option value="02">{{ _("February") }}</option>
-                            <option value="03">{{ _("March") }}</option>
-                            <option value="04">{{ _("April") }}</option>
-                            <option value="05">{{ _("May") }}</option>
-                            <option value="06">{{ _("June") }}</option>
-                            <option value="07">{{ _("July") }}</option>
-                            <option value="08">{{ _("August") }}</option>
-                            <option value="09">{{ _("September") }}</option>
-                            <option value="10">{{ _("October") }}</option>
-                            <option value="11">{{ _("November") }}</option>
-                            <option value="12">{{ _("December") }}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
-                    </div>
-                </div>
-                <div class="row">
-                     <div class="col-md-5 col-xs-10">
-                        <div id="procDateErrorContainer" class="help-block with-errors"></div>
-                     </div>
-                </div>
-            </div>
-        <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
-            <i class='fa fa-plus'></i> {{ _("Add Procedure") }}
-        </button>
-    </form>
-    <br/>
-<div>
+{{profileProcedures(user, user)}}
 <br /><br />
 <!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
-<div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
+<div class="btn btn-default continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
 
 {% endif %}
 
@@ -181,7 +88,7 @@
 {% endblock %}
 
 {% block document_ready %}
-    var subjectId = {{ user.id }}; 
+    var subjectId = {{ user.id }};
     var currentUserId = subjectId;
 
 $(document).ready(function(){

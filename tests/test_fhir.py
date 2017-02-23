@@ -1,6 +1,5 @@
 """Unit test module for fhir model"""
 from datetime import datetime
-from dateutil import parser, tz
 from flask_webtest import SessionScope
 import pytz
 from tests import TestCase, TEST_USER_ID
@@ -101,13 +100,15 @@ class TestFHIR(TestCase):
         self.assertIn(c2.display, cc_str)
 
     def test_qr_format(self):
-        qr = QuestionnaireResponse(user_id=TEST_USER_ID,
-                                   status='in-progress',
-                                   authored=datetime.utcnow())
+        qr = QuestionnaireResponse(
+            subject_id=TEST_USER_ID,
+            status='in-progress',
+            authored=datetime.utcnow(),
+        )
         db.session.add(qr)
         db.session.commit()
         qr_str = "test format: {}".format(qr)
-        self.assertIn(str(qr.user_id), qr_str)
+        self.assertIn(str(qr.subject_id), qr_str)
         self.assertIn(str(qr.status), qr_str)
 
     def test_tz_aware_conversion(self):

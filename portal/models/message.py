@@ -1,5 +1,6 @@
 """Model classes for message data"""
 from datetime import datetime
+from textwrap import fill
 from flask import current_app
 from flask_mail import Message
 from flask_mail import email_dispatched
@@ -31,7 +32,7 @@ class EmailMessage(db.Model):
         message = Message(subject=self.subject,
                 sender=current_app.config['DEFAULT_MAIL_SENDER'],
                 recipients=self.recipients.split())
-        message.html = self.body
+        message.html = fill(self.body, width=180)
         mail.send(message)
 
     def __str__(self):

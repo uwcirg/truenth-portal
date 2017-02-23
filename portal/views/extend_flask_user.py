@@ -1,5 +1,5 @@
 """Module to extend or specialize flask user views for our needs"""
-from flask import current_app, url_for, session
+from flask import abort, current_app, url_for, session
 from flask_user.views import reset_password
 
 from .portal import challenge_identity
@@ -17,6 +17,8 @@ def reset_password_view_function(token):
         # As they will fail the challenge without data to compare, provide
         # a back door.
         user = get_user(user_id)
+        if not user:
+            abort (404, "User not found")
         if not all((user.birthdate, user.first_name, user.last_name)):
             return reset_password(token)
 

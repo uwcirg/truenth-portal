@@ -7,17 +7,30 @@ to life and properly control the visiblity of a intervention card?
 
 """
 from flask_webtest import SessionScope
+import os
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.site_persistence import SitePersistence
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.app_text import app_text
 
+known_good_persistence_file =\
+"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/b42b4f9fda85fd9484b3d68145813de190a0c9c8/site_persistence_file.json"
+
 
 class TestSitePersistence(TestCase):
+
+    def setUp(self):
+        super(TestSitePersistence, self).setUp()
+        if os.environ.get('PERSISTENCE_FILE'):
+            self.fail("unset environment var PERSISTENCE_FILE for test")
+        self.app.config['PERSISTENCE_FILE'] = known_good_persistence_file
+        SitePersistence().import_(
+            include_interventions=True, keep_unmentioned=False)
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
@@ -39,12 +52,11 @@ class TestSitePersistence(TestCase):
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
 
         # Fulfill conditions
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user = db.session.merge(user)
@@ -63,7 +75,7 @@ class TestSitePersistence(TestCase):
             'support for the many details of life as a prostate cancer '
             'survivor</p>'))
         self.assertEquals(
-            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker tool')
+            INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.link_label, 'Go to Symptom Tracker')
 

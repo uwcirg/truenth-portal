@@ -1,0 +1,35 @@
+#!/usr/bin/make -f
+
+DH_VIRTUALENV_ARGS = --preinstall='pip>=8' --preinstall='setuptools>=12'
+
+
+distclean:
+	rm -Rf build debian/portal/ env
+
+
+override_dh_virtualenv:
+	# Remove self-referential requirement
+	# Otherwise a .egg-link file is created instead of actually installing portal module in site-packages/
+	sed -i '/-e ./d' requirements.txt
+
+	dh_virtualenv $(DH_VIRTUALENV_ARGS)
+
+override_dh_builddeb:
+# Manually fix paths erroneously pointing to build environment
+# Todo: move to more appropriate step
+
+	find \
+		debian/portal/opt/venvs/portal/lib/ \
+		-name easy-install.pth \
+		-exec \
+			sed \
+				--in-place \
+				--expression 's|$(PWD)/debian/portal/opt/venvs/|/opt/venvs/|g' \
+				{} \; \
+		-print
+
+	dh_builddeb
+
+
+%:
+	dh $@ --with python-virtualenv

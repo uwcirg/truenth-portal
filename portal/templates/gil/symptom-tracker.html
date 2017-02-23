@@ -1,0 +1,51 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main symptom-tracker-main">
+      {{ super() }}
+      <div class="page-intro page-intro--dark page-intro--symptom-tracker" style="background-image: url({{url_for('static', filename='img/ST-Top-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">Symptom Tracker</h1>
+          <p class="page-intro__sub">Track your symptoms to see how they are changing over time, and how they compare to other men with prostate cancer.</p>
+          <div class="button-callout">{% if not user %}<a href="#" class="button--teal icon-box__button icon-box__button--main" data-toggle="modal" data-target="#modal-register"><span>Start<figure></figure></span></a>{% endif %}<strong class="js-scroll-down" data-target=".page-intro">Learn More</strong>
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}">
+        <div class="module-wrap--inner">
+          <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--symptom module-wrap--theme-brown">
+        <div class="module">
+          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools – Symptom Tracker</div>
+          <h3 class="module__head">Monitoring and Tracking</h3>
+          <p class="module__body">We’ve created a tool that asks you questions about your symptoms and side-effects throughout your prostate cancer journey from diagnosis through recovery.</p>
+          <p class="module__body">Every time you complete the tracking questionnaire it adds data to your graph, shows you how your experience compares with other men, and provides relevant tips.</p><img src="{{url_for('static', filename='img/sample-graph@2x.png') }}">
+          <div class="next-down">
+            <p class="next-down__copy">We’ve created a tool to track your prostate cancer treatment side effects over time and provide personal guidance.</p>
+          </div>
+          <div class="icon-box-wrap">
+            <div class="icon-box-wrap__main icon-box icon-box--theme-compass icon-box--theme-brown">
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">Tool N<em>o</em>2: Monitoring</strong>
+                <h4 class="icon-box__head">Symptom Tracker</h4><span class="icon-box__lowhead">Questionnaire / 10 Mins</span>
+                <svg class="icon-box__icon" width="90" height="90">
+                  <use xlink:href="#ST-Graph"></use>
+                </svg>
+              </div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main symptom-tracker-link {% if not user %}icon-box__button--disabled{% endif %}" href="{{PORTAL}}{%if user%}/home{%else%}/{%endif%}"><span>Start<figure></figure></span></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            setSelectedNavItem($(".side-nav-items__item--symptomtracker"));
+            $("footer a[href='/symptom-tracker']").hide();
+            IO.clearSession("symptom-tracker");
+        });
+    </script>
+{% endblock %}

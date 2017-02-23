@@ -21,7 +21,7 @@ class TestClinical(TestCase):
     def prep_db_for_clinical(self):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
-            audit = Audit(user_id=TEST_USER_ID)
+            audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
             observation = Observation(audit=audit)
             coding = Coding(system='SNOMED-CT', code='372278000',
                     display='Gleason score')
@@ -40,7 +40,7 @@ class TestClinical(TestCase):
     def test_clinicalGET(self):
         self.prep_db_for_clinical()
         self.login()
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
 
         clinical_data = json.loads(rv.data)
         self.assertEquals('Gleason score',
@@ -84,7 +84,7 @@ class TestClinical(TestCase):
                 }
 
         self.login()
-        rv = self.app.post('/api/patient/%s/clinical' % TEST_USER_ID,
+        rv = self.client.post('/api/patient/%s/clinical' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
@@ -94,13 +94,13 @@ class TestClinical(TestCase):
     def test_empty_clinical_get(self):
         """Access clinical on user w/o any clinical info"""
         self.login()
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         self.assert200(rv)
 
     def test_empty_biopsy_get(self):
         """Access biopsy on user w/o any clinical info"""
         self.login()
-        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'unknown')
@@ -108,7 +108,7 @@ class TestClinical(TestCase):
     def test_clinical_biopsy_put(self):
         """Shortcut API - just biopsy data w/o FHIR overhead"""
         self.login()
-        rv = self.app.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        rv = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -116,7 +116,7 @@ class TestClinical(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0] 
         vq = data['entry'][0]['content']['valueQuantity'] 
@@ -128,12 +128,12 @@ class TestClinical(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct biopsy value
-        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
         # Can we alter the value?
-        rv = self.app.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
+        rv = self.client.post('/api/patient/%s/clinical/biopsy' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': False}))
         self.assert200(rv)
@@ -141,7 +141,7 @@ class TestClinical(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Confirm it's altered
-        rv = self.app.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical/biopsy' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'false')
 
@@ -152,7 +152,7 @@ class TestClinical(TestCase):
     def test_clinical_pca_diag(self):
         """Shortcut API - just PCa diagnosis w/o FHIR overhead"""
         self.login()
-        rv = self.app.post('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
+        rv = self.client.post('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID,
                            content_type='application/json',
                            data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -160,7 +160,7 @@ class TestClinical(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
@@ -172,14 +172,14 @@ class TestClinical(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct pca_diag value
-        rv = self.app.get('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical/pca_diag' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
     def test_clinical_pca_localized(self):
         """Shortcut API - just PCa localized diagnosis w/o FHIR overhead"""
         self.login()
-        rv = self.app.post(
+        rv = self.client.post(
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID,
             content_type='application/json', data=json.dumps({'value': True}))
         self.assert200(rv)
@@ -187,7 +187,7 @@ class TestClinical(TestCase):
         self.assertEquals(result['message'], 'ok')
 
         # Can we get it back in FHIR?
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
+        rv = self.client.get('/api/patient/%s/clinical' % TEST_USER_ID)
         data = json.loads(rv.data)
         coding = data['entry'][0]['content']['code']['coding'][0]
         vq = data['entry'][0]['content']['valueQuantity']
@@ -199,35 +199,8 @@ class TestClinical(TestCase):
         self.assertEquals(vq['value'], 'true')
 
         # Access the direct pca_localized value
-        rv = self.app.get(
+        rv = self.client.get(
             '/api/patient/%s/clinical/pca_localized' % TEST_USER_ID)
-        data = json.loads(rv.data)
-        self.assertEquals(data['value'], 'true')
-
-    def test_clinical_tx(self):
-        """Shortcut API - just treatment w/o FHIR overhead"""
-        self.login()
-        rv = self.app.post('/api/patient/%s/clinical/tx' % TEST_USER_ID,
-                           content_type='application/json',
-                           data=json.dumps({'value': True}))
-        self.assert200(rv)
-        result = json.loads(rv.data)
-        self.assertEquals(result['message'], 'ok')
-
-        # Can we get it back in FHIR?
-        rv = self.app.get('/api/patient/%s/clinical' % TEST_USER_ID)
-        data = json.loads(rv.data)
-        coding = data['entry'][0]['content']['code']['coding'][0] 
-        vq = data['entry'][0]['content']['valueQuantity'] 
-
-        self.assertEquals(coding['code'], '131')
-        self.assertEquals(coding['display'], 'treatment begun')
-        self.assertEquals(coding['system'],
-                          'http://us.truenth.org/clinical-codes')
-        self.assertEquals(vq['value'], 'true')
-
-        # Access the direct tx api
-        rv = self.app.get('/api/patient/%s/clinical/tx' % TEST_USER_ID)
         data = json.loads(rv.data)
         self.assertEquals(data['value'], 'true')
 
@@ -237,7 +210,7 @@ class TestClinical(TestCase):
             data = json.load(fhir_data)
 
         self.login()
-        rv = self.app.put('/api/patient/{}/clinical'.format(TEST_USER_ID),
+        rv = self.client.put('/api/patient/{}/clinical'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)

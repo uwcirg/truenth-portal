@@ -1,7 +1,7 @@
 {% from "initial_queries_macros.html" import patientQGroup %}
 
 {% macro profileImage(person) -%}
-    {% if person.image_url %}
+    {% if person and person.image_url %}
         <div class="profile-img hidden-xs">
             <img src="{{ person and person.image_url }}" />
         </div>
@@ -14,11 +14,10 @@
         <label>{{ _("Birth Date") }}</label>
         <div class="row">
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
-
+                <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="((0)?[1-9]|1\d|2\d|3[01])" maxlength="2" data-error="Birthday must be valid and in required format." required />
             </div>
             <div class="col-md-4 col-xs-10">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
+                <select class="form-control bd-element" name="birthdayMonth" id="month" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -33,14 +32,13 @@
                     <option value="11">{{ _("November") }}</option>
                     <option value="12">{{ _("December") }}</option>
                 </select>
-
             </div>
             <div class="col-md-4 col-xs-6">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
-
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
-        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+        <div class="help-block with-errors"></div>
+        <span id="errorbirthday" class="help-block" style="display: none; color:#a94442"></span>
      </div>
      <script>
         $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
@@ -51,14 +49,28 @@
                 $("#month").val(bdArray[1]);
                 $("#date").val(bdArray[2]);
             };
-            {% if person %}
-                $("#year, #month, #date").on("change", function() {
-                    if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
-                        $("#birthday").val($("#year").val() + "-" + $("#month").val() + "-" + $("#date").val());
-                    }
+
+            ["year", "month", "date"].forEach(function(fn) {
+                var field = $("#" + fn);
+                var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
+                field.on(triggerEvent, function() {
+                    var y = $("#year"), m = $("#month"), d = $("#date");
+
+                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
+
+                        var isValid = tnthDates.validateBirthDate(m.val(), d.val(), y.val() );
+                        //console.log("valid? " + isValid)
+                        if (isValid) {
+                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                        } else {
+                            $("#birthday").val("");
+                            return false;
+                        };
+                    };
                     //assembleContent.demo({{person.id}}, true);
                 });
-            {% endif %}
+            });
+
         });
      </script>
 {%- endmacro %}
@@ -73,13 +85,11 @@
         </select>
      </div>
      <script>$(function () {
-
         $('#locale').on('change', function() {
             setTimeout(function(){
                 window.location.reload(true);
             },1000);
         });
-
      });</script>
 {%- endmacro %}
 
@@ -106,7 +116,7 @@
 {% macro profileGender(person) -%}
     <div class="form-group profile-section" id="genderGroup">
         <label id="genderLabel">{{ _("Gender") }}</label>
-        <div class="profile-radio-list">
+        <div id="profile-gender-list" class="profile-radio-list">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
@@ -122,148 +132,142 @@
         </div>
     </div>
 {%- endmacro %}
+
 {% macro profileIndigenous(person) -%}
-    <div id="userIndigenousStatusContainer"></div>
-    <script>
-    $(function () {
-        (function() {
-            $.ajax({
-                type:"GET",
-                url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
-            }).done(function(data) {
-                //console.log(data);
-                //fillContent.indigenous(data);
-                var as = data["codeSystem"]["concept"];
-                //console.log(as);
-                var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
-                '<label>{{ _("Indigenous Status") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>' +'<div class="profile-radio-list">';
-                as.forEach(function(o) {
-                    html += '<div>' + '<label>' +
-                            '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
-
-                });
-                html += "</div></div>";
-                $("#userIndigenousStatusContainer").html(html);
-                getSaveLoaderDiv("profileForm", "userIndigenousStatus");
-                $("#userIndigenousStatusContainer input[type='radio']").each(function() {
-                    $(this).attr("save-container-id", "userIndigenousStatus");
-                    $(this).on("click", function() {
-                        //console.log("value: " + $(this).val());
-                        assembleContent.demo({{ person.id if person }},true, $(this));
+    {% if person and person.org_coding_display_options.indigenous %}
+        <div id="userIndigenousStatusContainer"></div>
+        <script>
+        $(function () {
+            (function() {
+                $.ajax({
+                    type:"GET",
+                    url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
+                }).done(function(data) {
+                    var as = data["codeSystem"]["concept"];
+                    var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                    '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
+                    as.forEach(function(o) {
+                        html += '<div>' + '<label>' +
+                                '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
                     });
+                    html += "</div></div>";
+                    $("#userIndigenousStatusContainer").html(html);
+                    getSaveLoaderDiv("profileForm", "userIndigenousStatus");
+                    $("#userIndigenousStatusContainer input[type='radio']").each(function() {
+                        $(this).attr("save-container-id", "userIndigenousStatus");
+                        $(this).on("click", function() {
+                            //console.log("value: " + $(this).val());
+                            assembleContent.demo({{ person.id if person }},true, $(this));
+                        });
+                    });
+
+                }).fail(function(){
+                    console.log("Problem retrieiving indigenous statuses");
                 });
-
-
-            }).fail(function(){
-                console.log("Problem retrieiving indigenous statuses");
-
-            });
-        })();
-    });
-    </script>
+            })();
+        });
+        </script>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileRace(person) -%}
-    <div class="form-group profile-section" id="userRace">
-        <label>{{ _("Race") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <div class="profile-radio-list">
-
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="1002-5">{{ _("American Indian or Alaska Native") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2028-9">{{ _("Asian") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2054-5">{{ _("Black or African American") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2076-8">{{ _("Native Hawaiian or Other Pacific Islander") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2106-3">{{ _("White") }}
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" name="race" value="2131-1">{{ _("Other") }}
-                </label>
+    {% if person and person.org_coding_display_options.race %}
+        <div class="form-group profile-section" id="userRace">
+            <label>{{ _("Race") }}</label>
+            <div class="profile-radio-list">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="1002-5">{{ _("American Indian or Alaska Native") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2028-9">{{ _("Asian") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2054-5">{{ _("Black or African American") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2076-8">{{ _("Native Hawaiian or Other Pacific Islander") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2106-3">{{ _("White") }}
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="race" value="2131-1">{{ _("Other") }}
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
-   <script>
-        $(function () {
-            //$("#userRace input:checkbox").each(function() {
-             //   $(this).on("click", function() {
-                    //console.log("value: " + $(this).val());
-               //     assembleContent.demo({{ person.id if person }},true);
-               // });
-            //});
-        });
-    </script>
-
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileEthnicity(person) -%}
-    <div class="form-group profile-section" id="userEthnicity">
-        <label>{{ _("Ethnicity") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
-        <div class="profile-radio-list">
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2135-2">{{ _("Hispanic or Latino") }}
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ethnicity" value="2186-5">{{ _("Not Hispanic or Latino") }}
-                </label>
+    {% if person and person.org_coding_display_options.ethnicity %}
+        <div class="form-group profile-section" id="userEthnicity">
+            <label>{{ _("Ethnicity") }}</label>
+            <div class="profile-radio-list">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2135-2">{{ _("Hispanic or Latino") }}
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="ethnicity" value="2186-5">{{ _("Not Hispanic or Latino") }}
+                    </label>
+                </div>
             </div>
         </div>
-    </div>
-    <script>
-        $(function () {
-            //$("#userEthnicity input:radio").each(function() {
-                //$(this).on("click", function() {
-                    //assembleContent.demo({{ person.id if person }},true);
-                //});
-            //});
-        });
-    </script>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup">
         <label for="email">{{ _("Email Address") }}</label>
-        <input type="text" class="form-control" id="email" name="email" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email }}" data-customemail="true" required>
+        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" save-container-id="email" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
 
+{% macro profileEmailForm(person) -%}
+    {% if person %}
+    <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
+        <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+        <div class="registration-status-container">
+            <span class="text-muted">Registration Status: </span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
+            {% else %}
+            <h4 class="text-success registration-label">registered</h4>
+            {% endif %}
+        </div>
+        <label id="sendEmailLabel" class="text-muted">{{ _("Send Email to Patient") }}</label>
+        <select  id="profileEmailSelect" class="form-control bd-element">
+            <option value="">{{ _("Select Email...") }}</option>
+            {% if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{% endif %}
+            <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
+        </select>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send email") }}</button>
+        <div id="profileEmailMessage" class="text-info"></div>
+    </form>
+    {% endif %}
+{%- endmacro %}
+
 
 {% macro profileSendEmail(person) -%}
+    {% if person %}
     <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">
-        <form id="sendEmailForm" action="{{ url_for('portal.invite') }}" method="POST">
-            <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
-            <label>{{ _("Send Email to Patient") }}</label>
-            <select  id="profileEmailSelect" class="form-control bd-element">
-                <option value="">{{ _("Select Email...") }}</option>
-                <option value="invite">{{ app_text('profileSendEmail option invite') }}</option>
-                <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
-            </select>
-            <button id="btnProfileSendEmail" class="btn btn-lg btn-tnth-primary disabled">{{ _("Send Email") }}</button>
-            <div id="profileEmailMessage" class="text-info"></div>
-        </form>
+        {{profileEmailForm(person)}}
     </div>
-    <script>$(function () {
+    <script async>$(function () {
 
         function getAccessUrl() {
             var url = '';
@@ -305,14 +309,18 @@
                 var body = '';
                 var return_url = '';
                 var clinicName = (function() {
-                var orgs = $("input[name='organization']:checked");
-                var parentName = "";
+                    var orgs = $("#userOrgs input[name='organization']:checked").not('[parent_org]');
+                    var parentName = "";
                     if (orgs.length > 0 ) {
                         orgs.each(function() {
-                            if ($(this).attr("data-parent-name") && !parentName) parentName = $(this).attr("data-parent-name");
+                            if (!parentName) {
+                                parentName = $(this).attr("data-parent-name");
+                                if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                                //console.log("pn: " + parentName)
+                            };
                         });
                     };
-                   var cn = parentName ? parentName: "your clinic";
+                    var cn = parentName ? parentName: "your clinic";
                     return cn;
                 })();
                 if (selectedOption.val() == 'invite'){
@@ -350,6 +358,7 @@
 
 
      });</script>
+     {% endif %}
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
@@ -362,49 +371,209 @@
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div class="form-group profile-section" id="userOrgs">
-        <label>{{ _("Clinics") }}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
+        <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
         <div class="indent">
         <div id="fillOrgs"></div>
-        <div class="checkbox noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("None of the Above") }}</label></div>
+        <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
         </div>
-        {% if consent_agreements and person.has_role('patient') %}{{consent(person, consent_agreements, current_user) | show_macro('consent')}} {% endif %}
+        {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
-    <script>$(function () {
-                 {% if consent_agreements and person.has_role('patient') %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
-                tnthAjax.getOrgs({{ person.id if person }});
+    <script>
+        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+        var orgsEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        //STAFF CANNOT EDIT THEIR OWN ORGS
+        {% if not(current_user.has_role('admin')) and current_user.has_role('provider') and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
 
-            });</script>
+        function disableOrgs() {
+            $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
+                    $(this).attr("disabled", true);
+            });
+        };
+        var leafOrgs = false;
+        {% if current_user.has_role('provider') and not(current_user.has_role('admin')) %}
+            leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
+        {% endif %}
+        $(function () {
+            {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
+            tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);
+        });
+
+        function _handleOrgs() {
+
+            if (leafOrgs) OT.filterOrgs(leafOrgs);
+            if (!orgsEditable) disableOrgs();
+
+            {% if (person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var checkedOrgs = {};
+                userOrgs.each(function() {
+                    if ($(this).prop("checked")) {
+                        checkedOrgs[$(this).val()] = true;
+                    };
+                    $(this).attr("type", "radio");
+                    if (checkedOrgs[$(this).val()]) {
+                        $(this).prop("checked", true);
+                    };
+                });
+            {% endif %}
+            {% if (current_user.has_role('patient') or current_user.has_role('write_only')) and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var checkedOrgs = [];
+                userOrgs.each(function() {
+                    if ($(this).prop("checked") && parseInt($(this).val()) != 0) {
+                        checkedOrgs.push({
+                            "id": $(this).val(),
+                            "name": $("#org-label-" + $(this).val()).text()
+                        });
+                    };
+                });
+                if (checkedOrgs.length > 0) {
+                    var html = "";
+                    checkedOrgs.forEach(function(item) {
+                        html += '<div id="' + item.id + '_container" class="org-container"><label id="org-label-' + item.id + '" class="org-label"><input class="clinic" type="checkbox" name="organization" id="' + item.id + '_org" value="' + item.id + '" disabled="disabled" checked>' + item.name + "</label></div>";
+                    });
+                    $("#fillOrgs").html(html);
+                    $("div.noOrg-container").hide();
+                } else {
+                    if ($("#noOrgs").is(":checked")) {
+                        $("#fillOrgs").html("<span class='text-muted'>No organization/affiliation</span>");
+                        $("div.noOrg-container").hide();
+                    };
+                }
+
+            {% endif %}
+        };
+    </script>
 {%- endmacro %}
 
 {% macro consent(person, consent_agreements, current_user) -%}
-    {% if consent_agreements %}
+    {% if person and consent_agreements %}
         <div id="consentContainer">
             {% for org in consent_agreements %}
-              <div id="{{org}}_consentItem" class="consent">
-                <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
-                <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"  {% if current_user.id != person.id%} disabled {% endif %}/><label id="{{org}}_consent_label" labelfor="#{{org}}_consent">Sharing data with {{consent_agreements[org].organization_name}}?</label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
-                <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">{{ _("Sharing your data") }}</h4>
-                          </div>
-                          <div class="modal-body">
-                            <br/>
-                             {{consent_agreements[org].asset|safe}}
-                            <br/>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-                          </div>
-                        </div>
-                      </div>
-                  </div>
-                </div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
             {% endfor %}
         </div>
+    {% endif %}
+{%- endmacro %}
+
+{% macro patientReports(person) -%}
+    <input type="hidden" id="pr_user_id" value="{{person.id}}"/>
+    <div id="prTableToolBar"><span id="tableCount"></span></div>
+    <table id="profilePatientReportTable" class="smaller-text">
+    </table>
+    <script async>
+
+    $(function () {
+         var ww = $(window).width();
+         var prUserId = $("#pr_user_id").val();
+         var userTimeZone = getUserTimeZone(prUserId);
+         var userLocale = getUserLocale(prUserId);
+
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/' + $("#pr_user_id").val() + '/user_documents?document_type=PatientReport',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json'
+        }).done(function(data) {
+            if (data["user_documents"] && data["user_documents"].length > 0 ) {
+                var fData = [];
+                data["user_documents"].forEach(function(item) {
+                    if (String(userTimeZone).toUpperCase() != "UTC") item["uploaded_at"] = convertUserDateTimeByLocaleTimeZone(String(item["uploaded_at"]), userTimeZone, userLocale);
+                    else item["uploaded_at"] = String(item["uploaded_at"]).replace(/[tz]/gi, " ");
+                    item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
+                    fData.push(item);
+                });
+
+                $('#profilePatientReportTable').bootstrapTable( {
+                    data: fData,
+                    pagination: true,
+                    pageSize: 5,
+                    pageList: [5, 10, 25, 50, 100],
+                    classes: 'table table-responsive profile-patient-reports',
+                    sortName: 'uploaded_at',
+                    search: true,
+                    smartDisplay: true,
+                    showToggle: true,
+                    showColumns: true,
+                    toolbar: "#prTableToolBar",
+                    rowStyle: function rowStyle(row, index) {
+                          return {
+                            css: {"background-color": (index % 2 != 0 ? "#F2F2F2" : "#FFF")}
+                          };
+                    },
+                    undefinedText: '--',
+                    columns: [
+                        {
+                            field: 'user_id',
+                            title: 'User',
+                            width: '5%',
+                            sortable: true,
+                            searchable: true
+                        }, {
+                            field: 'filename',
+                            title: 'Filename',
+                            searchable: true,
+                            sortable: true
+                        }, {
+                            field: 'uploaded_at',
+                            title: 'Uploaded At' + (userTimeZone == "UTC" ? " (GMT)" : ""),
+                            sortable: true,
+                            searchable: true,
+                            width: '20%'
+                        }, {
+                            field: 'document_type',
+                            title: 'Document Type',
+                            sortable: true,
+                            visible: false
+                        }, {
+                            field: 'actions',
+                            title: 'Actions',
+                            sortable: false,
+                            searchable: false,
+                            visible: true
+                        }
+                    ]
+                } );
+            } else {
+                $("#profilePatientReportTable").closest("div.profile-item-container").hide();
+            }
+
+
+        }).fail(function() {
+            $("#profilePatientReportTable").closest("div.profile-item-container").hide();
+            console.log("Problem retrieving patient reports from server.");
+        });
+     });</script>
+{%- endmacro %}
+
+{% macro profileConsent(person, current_user) -%}
+    {% if person %}
+    <div id="profileConsentList"></div>
+    <script async>
+        var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
+        var consentEditable = {% if (current_user.has_role('provider') and 'provider' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role('patient') and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role('admin') %}true{% else %}false{% endif %};
+        var _isAdmin = {%if current_user.has_role('admin') %}true{%else%}false{%endif%};
+
+        /**** this function is used when this section becomes editable ****/
+        function reloadConsentList() {
+            var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+            $("#profileConsentList").animate({opacity: 0}, function() {
+                    $(this).html(eventLoading).css('opacity',1);
+                    // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+                    // more obvious when the updated list loads
+                    setTimeout(function(){
+                        tnthAjax.getConsent({{person.id}});
+                    },1000);
+
+            });
+        };
+        $(function () {
+            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 500);
+        });
+    </script>
     {% endif %}
 {%- endmacro %}
 
@@ -414,7 +583,7 @@
         <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
         </table>
-        <script>
+        <script async>
         function _showText(obj) {
             if (obj) {
                 var f = $(obj).parent().find('.second');
@@ -424,8 +593,10 @@
         }
 
         $(function () {
-             ///api/user/<user_id>/audit
              var ww = $(window).width();
+             var auditUserId = $("#audit_user_id").val();
+             var userTimeZone = getUserTimeZone(auditUserId);
+             var userLocale = getUserLocale(auditUserId);
 
             $.ajax ({
                 type: "GET",
@@ -445,7 +616,8 @@
                         else item["by"] = "-";
                         //console.log(r.exec(String(item["by"])));
 
-                        item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
+                        if (String(userTimeZone).toUpperCase() != "UTC") item["lastUpdated"] = convertUserDateTimeByLocaleTimeZone(String(item["lastUpdated"]), userTimeZone, userLocale);
+                        else item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -485,12 +657,14 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Date/Time (GMT)',
+                                title: 'Date/Time' + (userTimeZone == "UTC" ? "<span class='gmt'> (GMT)</span>" : ($(".timezone-error").text() == "" ? "" : ("<span class='gmt'> (GMT)</span>"))),
                                 sortable: true,
                                 searchable: true,
+                                /******
                                 sorter: function(a, b) {
                                     return new Date(b).getTime() - new Date(a).getTime();
                                 },
+                                ****/
                                 width: '20%'
                             },
                             {
@@ -516,7 +690,7 @@
 
 {% macro profileRole(person, current_user) -%}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
-        <h4 class="text-muted">{{ _("for") + " " + person.username }}</h4>
+        <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" style="margin-left: 10px">
@@ -567,12 +741,13 @@
             </div>
         </div>
     {% endif %}
-    <script>$(function () {
-
-    tnthAjax.getRoles({{ person.id }}, true);
-    $("#rolesGroup input[name='user_type']").each(function() {
-        $(this).on("click", function() {
-            var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+    {% if person %}
+    <script async>
+    $(function () {
+        tnthAjax.getRoles({{ person.id }}, true);
+        $("#rolesGroup input[name='user_type']").each(function() {
+            $(this).on("click", function() {
+                var roles = $("#rolesGroup input:checkbox:checked").map(function(){
                     return { name: $(this).val() };
                 }).get();
                 var toSend = {"roles": roles};
@@ -582,6 +757,7 @@
         });
     });
     </script>
+    {% endif %}
 
 {%- endmacro %}
 
@@ -592,13 +768,16 @@
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Assessment Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small>( {{ _("GMT Time Zone") }} )</small></th></tr>
+            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT Time Zone") }} )</small></th></tr>
         </table>
+        <div id="profileSessionListError" style="color: #a94442"></div>
     </div>
-    <script>
+    <script async>
         $(function () {
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
+        var userTimeZone = getUserTimeZone(sessionUserId);
+        var userLocale = getUserLocale(sessionUserId);
 
         $.ajax ({
                 type: "GET",
@@ -606,19 +785,24 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json'
             }).done(function(data) {
-                //console.log(data["audits"]);
-                //console.log(data);
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
                     entries.forEach(function(entry, index) {
-                        //console.log(convertGMTToLocalTime(entry['authored'], 'mm/dd/yyyy hh:mm:ss'));
+
                         var reference = entry['questionnaire']['reference'];
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         var authoredDate = String(entry['authored']);
-                        //console.log(arrRefs)
+                        var originalAuthoredDate = authoredDate;
+                        if (userTimeZone != "UTC") {
+                            authoredDate = convertUserDateTimeByLocaleTimeZone(authoredDate, userTimeZone, userLocale);
+                            if($(".timezone-error").text() == "") $("#gmtText").hide();
+                        }
+                        else {
+                            $("#gmtText").show();
+                        }
                         if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + originalAuthoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
@@ -630,31 +814,30 @@
                         };
                     });
                         $("#userSessionListTable").append(sessionListHTML);
+                        $("#userSessionListTable").show();
 
-                } else $("#profileSessionListMainContainer").hide();
+                } else {
+                    $("#userSessionListTable").hide();
+                    $("#userSessionsListContainer").append("<span class='text-muted'>No Questionnaire Data Found.</span>");
+                };
 
             }).fail(function() {
                 console.log("Problem retrieving session data from server.");
-                $("profileSessionListMainContainer").hide();
+                $("#userSessionListTable").hide();
+                $("#profileSessionListError").html("Problem retrieving session data from server.");
             });
 
     });
     </script>
 {%- endmacro %}
-
-
 {% macro profileAssessment(person, instrument_id, authored_date) -%}
 
         <div id="userSessionReportDetail" cellpadding="2">
-            <!--<span>Questionnaire answers for {{person.first_name + " " + person.last_name}}</span>-->
-                <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
-                <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
-                <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" >
-                </table>
-            <br />
+            <input type="hidden" id="_report_user_id" value="{{person.id if person}}" />
+            <input type="hidden" id="_report_authored_date" value="{{authored_date}}" />
+            <table class="tnth-admin-table table table-condensed table-striped table-bordered small-text" id="userSessionReportDetailTable" ></table><br />
         </div>
         <script>
-
         $(function () {
 
             if (!(_isTouchDevice())) $('#userSessionReportDetailHeader [data-toggle="tooltip"]').tooltip();
@@ -662,6 +845,10 @@
             var sessionListHTML = "";
             var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
+            var userTimeZone = getUserTimeZone(sessionUserId);
+            var userLocale = getUserLocale(sessionUserId);
+            var convertedAuthoredDate = convertUserDateTimeByLocaleTimeZone(sessionAuthoredDate, userTimeZone, userLocale);
+
             $.ajax ({
                     type: "GET",
                     url: '/api/patient/' + sessionUserId + '/assessment/{{instrument_id}}',
@@ -683,11 +870,10 @@
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         String(entry['authored']).replace(/[tz]/gi, " ") +
-                                        ' GMT</span><hr/></caption>';
+                                        convertedAuthoredDate.replace(/[tz]/gi, " ") +
+                                        (String(userTimeZone).toLowerCase() == "utc" ? " <span class='gmt'>GMT</span>": "") + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
-                            //console.log(entry['answer'])
-                            //String(q).substr(q.indexOf('.') + 1)
                             var q = entry['text'] ? entry['text'] : '';
                             var sq = "";
                             sq = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
@@ -718,7 +904,7 @@
             <div class="profile-item-container">
                 <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Question") }}</h4>
                 <p class="text-muted">{{ _("Question inquired of the patient at account creation") }}</p>
-                <input type="hidden" id="iq_userId" value="{{person.id}}" />
+                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
                 <div id="pcaLocalizedContainer" class="well" style="margin-top: 1em; padding: 0.7em 2em 1em 2em">
                      <div id="patMeta" data-topic="pca_localized" class="pat-q">
                       <br />
@@ -746,9 +932,11 @@
             tnthAjax.getClinical({{ person.id }});
             $("#pca_localized_yes").on("click", function() {
                 tnthAjax.putClinical({{person.id}},"pca_localized","true", $(this));
+                setTimeout('adjustAssessmentInstrument();', 1000);
             });
             $("#pca_localized_no").on("click", function() {
                 tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                setTimeout('adjustAssessmentInstrument();', 1000);
             });
             getSaveLoaderDiv("profileForm", "pcaLocalizedContainer");
         });
@@ -763,8 +951,8 @@
             <div class="profile-item-container">
                 <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Questions") }}</h4>
                 <h4 class="text-muted">{{ _("Questions inquired of the patient at registration") }}</h4>
-                <input type="hidden" id="iq_userId" value="{{person.id}}" />
-                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 1em 2em">
+                <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
+                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 2em 2em">
                     {{patientQGroup(current_user)}}
                 </div>
             </div>
@@ -785,17 +973,16 @@
                 };
             {% endif %}
 
-
         };
         $(function () {
-            //$("#patientQ").show();
+            $("#patientQ").show();
+            $("#patTx").remove();
+
             $("#patientQ hr").hide();
             {% if person and current_user and person.id != current_user.id %}
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
-
-
             {% endif %}
 
             {% if person %}
@@ -804,37 +991,60 @@
                       var toCall = thisItem.attr("name")
                       // Get value from div - either true or false
                       var toSend = thisItem.val();
-                      tnthAjax.putClinical({{person.id}},toCall,toSend);
+                      tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
+
                       if (toSend == "true" || toCall ==  "pca_localized") {
                         thisItem.parents(".pat-q").nextAll().fadeIn();
-
                       } else {
                         if (toCall == "biopsy") {
-                          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
-                              $("input[name='" + fieldName + "']").each(function() {
-                                  $(this).prop("checked", false);
-                              });
-                          });
-                          tnthAjax.putClinical({{person.id}},"pca_diag","false");
-                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                          tnthAjax.putClinical({{person.id}},"tx","false");
+                            ["pca_diag", "pca_localized"].forEach(function(fieldName) {
+                                $("input[name='" + fieldName + "']").each(function() {
+                                    $(this).prop("checked", false);
+                                });
+                            });
+                            if ($("input[name='pca_diag']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_diag","false", $(this));
+                            };
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                            };
                         } else if (toCall == "pca_diag") {
-                          ["pca_localized", "tx"].forEach(function(fieldName) {
+                            ["pca_localized"].forEach(function(fieldName) {
                               $("input[name='" + fieldName + "']").each(function() {
                                   $(this).prop("checked", false);
                               });
-                          });
-                          tnthAjax.putClinical({{person.id}},"pca_localized","false");
-                          tnthAjax.putClinical({{person.id}},"tx","false");
+                            });
+                            if ($("input[name='pca_localized']").length > 0) {
+                                tnthAjax.putClinical({{person.id}},"pca_localized","false", $(this));
+                            };
                         }
                         thisItem.parents(".pat-q").nextAll().fadeOut();
                       };
                   });
              {% endif %}
 
-             //wait for ajax calls to finish?
-             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-             setTimeout("checkDiagnosis();", 1000);
+            [{
+                "fields": $("#patientQ input[name='biopsy']"),
+                "containerId": "patBiopsy"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_diag']"),
+                "containerId": "patDiag"
+            },
+            {
+                "fields": $("#patientQ input[name='pca_localized']"),
+                "containerId": "patMeta"
+            }
+            ].forEach( function(item) {
+                item.fields.each(function() {
+                     getSaveLoaderDiv("profileForm", item.containerId);
+                    $(this).attr("save-container-id", item.containerId);
+                });
+            });
+
+            //wait for ajax calls to finish?
+            //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
+            setTimeout("checkDiagnosis();", 1000);
 
 
         });
@@ -847,10 +1057,10 @@
                 <div class="profile-item-container">
                     <h4 id="interventionReportsLoc" class="profile-item-title">{{ _("Intervention Reports") }}</h4>
                     <div>
-                        {% if person.provider_html() %}
+                        {% if person and person.provider_html() %}
                             {{person.provider_html() | safe}}
                         {% else %}
-                            <div class="text-mute">{{ _("No Reports Available") }}</div>
+                            <div class="text-muted">{{ _("No Reports Available") }}</div>
                         {% endif %}
                     </div>
                 </div>
@@ -858,85 +1068,277 @@
     </div>
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements) -%}
+{% macro profileTimeZone(person) %}
+    <div id="profileTimeZoneGroup" class="form-group">
+        <label>Time Zone</label>
+        <select class="form-control" id="profileTimeZone" save-container-id="profileTimeZone">
+            <option value="UTC">-- Select --</option>
+            <option value="America/Denver">America/Denver</option>
+            <option value="America/Los_Angeles">America/Los Angeles</option>
+            <option value="America/Indianapolis">America/Indianapolis</option>
+            <option value="America/New_York">America/New York</option>
+            <option value="Australia/Adelaide">Australia/Adelaide</option>
+            <option value="Australia/Brisbane">Australia/Brisbane</option>
+            <option value="Australia/Broken_Hill">Australia/Broken_Hill</option>
+            <option value="Australia/Canberra">Australia/Canberra</option>
+            <option value="Australia/Currie">Australia/Currie</option>
+            <option value="Australia/Darwin">Australia/Darwin</option>
+            <option value="Australia/Eucla">Australia/Eucla</option>
+            <option value="Australia/Hobart">Australia/Hobart</option>
+            <option value="Australia/Lindeman">Australia/Lindeman</option>
+            <option value="Australia/Lord_Howe">Australia/Lord_Howe</option>
+            <option value="Australia/Melbourne">Australia/Melbourne</option>
+            <option value="Australia/North">Australia/North</option>
+            <option value="Australia/Perth">Australia/Perth</option>
+            <option value="Australia/Queensland">Australia/Queensland</option>
+            <option value="Australia/South">Australia/South</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+            <option value="Australia/Tasmania">Australia/Tasmania</option>
+            <option value="Australia/Victoria">Australia/Victoria</option>
+            <option value="Australia/West">Australia/West</option>
+            <option value="Australia/Yancowinna">Australia/Yancowinna</option>
+        </select>
+    </div>
+    <div class="timezone-warning"></div>
+    <div class="timezone-error"></div>
+    <script>
+    {% if person %}
+    $(function() {
+        getSaveLoaderDiv("profileForm", "profileTimeZone");
+        $('#profileTimeZone').on('change', function() {
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
+            assembleContent.demo({{ person.id }},true, $(this), true);
+            if ($.trim($("#profileTimeZone_error").text()) == "") {
+                setTimeout(function(){
+                    window.location.reload(true);
+                },1000);
+            };
+        });
+    });
+    {% endif %}
+    </script>
+{%-endmacro %}
 
-    {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
-         <div class="row">
-            <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side">
-                    <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                    {{profileName(person)}}
-                    {{profileBirthDate(person)}}
+{% macro profileDeceased(person, current_user) -%}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container">
+                <h4 id="deathLoc" class="profile-item-title">{{ _("Deceased Status") }}</h4>
+                <br/>
+                <input type="hidden" id="deathDate" value="" />
+                <div class="checkbox" id="boolDeathGroup">
+                    <label>
+                        <input type="checkbox" name="boolDeath" id="boolDeath" value="1" save-container-id="boolDeathGroup">{{ _("Has the patient passed away?") }}
+                    </label>
+                </div>
+                <hr/>
+                <div class="form-group">
+                    <label class="text-muted">{{ _("Deceased Date") }}</label>
+                </div>
+                <div class="row" style="margin-top:-8px">
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group profile-section">
+                            <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDay" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                             <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-10">
+                        <div class="form-group profile-section">
+                            <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonth" required>
+                                <option value="">{{ _("Month") }}...</option>
+                                <option value="01">{{ _("January") }}</option>
+                                <option value="02">{{ _("February") }}</option>
+                                <option value="03">{{ _("March") }}</option>
+                                <option value="04">{{ _("April") }}</option>
+                                <option value="05">{{ _("May") }}</option>
+                                <option value="06">{{ _("June") }}</option>
+                                <option value="07">{{ _("July") }}</option>
+                                <option value="08">{{ _("August") }}</option>
+                                <option value="09">{{ _("September") }}</option>
+                                <option value="10">{{ _("October") }}</option>
+                                <option value="11">{{ _("November") }}</option>
+                                <option value="12">{{ _("December") }}</option>
+                            </select>
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-6">
+                        <div class="form-group profile-section">
+                            <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYear" required />
+                            <div class="help-block with-errors"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="errorDeathDate" style="color:#a94442"><div>
+                <br/>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(
+            function() {
+                getSaveLoaderDiv("profileForm", "boolDeathGroup");
+                $("#boolDeath").on("change", function() {
+                    if (!($(this).is(":checked"))) {
+                        $("#deathYear").val("");
+                        $("#deathDay").val("");
+                        $("#deathMonth").val("");
+                        $("#deathDate").val("");
+                    }
+                    assembleContent.demo({{person.id}}, true, $(this));
+                });
+
+                ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
+                    getSaveLoaderDiv("profileForm", fn);
+                    var fd = $("#" + fn);
+                    var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
+                    fd.on(triggerEvent, function() {
+                         var d = $("#deathDay");
+                         var m = $("#deathMonth");
+                         var y = $("#deathYear");
+                         if (d.val() != "" && m.val() != "" && y.val() != "") {
+                            if (d.get(0).validity.valid && m.get(0).validity.valid && y.get(0).validity.valid) {
+                                var today = new Date();
+                                // Check to see if this is a real date
+                                var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
+                                var date = new Date(iy,im-1,iid);
+                                var errorMsg = "";
+
+                                if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                                    if (iy < 1900) errorMsg = "Year must be after 1900";
+                                    // Only allow if birthdate is before today
+                                    if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                                        errorMsg = "The date must not be in the future.";
+                                    };
+                                } else errorMsg = "Invalid Date. Please enter a valid date.";
+
+                                if (errorMsg == "") {
+                                    $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                                    $("#boolDeath").prop("checked", true);
+                                    $("#errorDeathDate").text("");
+                                    assembleContent.demo({{person.id}}, true, $(this));
+                                } else {
+                                    $("#errorDeathDate").text(errorMsg);
+                                };
+                            };
+                        };
+                    });
+                });
+            }
+        );
+    </script>
+{%- endmacro %}
+{% macro profileStudyID(person) -%}
+    <div id="profileStudyIDContainer" class="form-group">
+        <label class="text-muted">Study ID</label>
+        <input type="text" id="profileStudyId" class="form-control" required/>
+        <div class="help-block with-errors"></div>
+    </div>
+{%- endmacro %}
+{% macro profileCustomDetail(person) -%}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <br/>
+            <h4 class="profile-item-title">{{_("Three ways to complete questionnaire")}}</h4>
+            <div class="custom-container">
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 class="profile-item-title">{{_("Send email")}}</h4>
+                    <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div><br/>
+                    <div>{{profileEmailForm(person)}}</div>
+                </div>
+                <div class="profile-item-container custom-container-item-right">
+                    <h4 class="profile-item-title">{{_("Log in as patient")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
+                    <button class="btn btn-tnth-primary" onclick="handleLoginAs();">{{_("Login as patient")}}</button>
+                </div>
+                <div class="profile-item-container custom-container-item">
+                    <h4 class="profile-item-title">{{_("Enter manually")}}</h4>
+                    <div class="custom-container-content text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
+                    <a class="btn btn-tnth-primary" id="assessmentLink" href="/api/present-assessment?instrument_id=eortc&instrument_id=hpfs&instrument_id=prems&subject_id={{person.id}}">{{_("Enter manually")}}</a>
 
                 </div>
             </div>
+        </div>
+    </div>
+    <script>
+    $(document).ready(function() {
+        $("#profileSendEmailContainer").hide();
+        $("#sendEmailLabel").hide();
+        $("#loginAsPatient").hide();
+        $("#navMenuXs").hide();
+        if (! hasValue($("#email").val()) ){
+            $("#profileEmailSelect").attr("disabled", true);
+        } else $("#profileEmailSelect").attr("disabled", false);
+        $("#email").on("keyup", function() {
+            if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
+            else $("#profileEmailSelect").attr("disabled", true);
+        });
+    });</script>
+{%- endmacro %}
+{% macro profile(person, current_user, consent_agreements) -%}
+    <!-- remember to add xs class to side when custom content is present -->
+    {% if config.CUSTOM_PATIENT_DETAIL %}
+        {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+            {{ profileCustomDetail(person) }}
+        {% endif %}
+    {% endif %}
+    {% if current_user and person and current_user.has_role('provider') and person.has_role('patient') %}
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <h4 class="profile-item-title">Patient Details</h4>
+        </div>
+    </div>
+    {% endif %}
+    {% if person and person.has_role('patient') and current_user.has_role('provider') and (current_user.id != person.id) %}
+         <div class="row">
             <div class="col-md-6 col-xs-12">
-                <div class="profile-item-container side">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
+                    <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6 col-xs-12">
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg one-side{%endif%}{%else%}side-lg{%endif%}">
                     <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    {{profilePhone(person)}}
                     {{profileEmail(person)}}
                     {{profileSendEmail(person)}}
                 </div>
             </div>
         </div>
-
     {% else %}
-         {% if person.has_role('patient') %}
-            <div class="row">
-                <div class="col-md-7 col-xs-12">
-                    <div class="profile-item-container side">
-                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
-                         <br/>
-                         {{profileName(person)}}
-                         {{profileBirthDate(person)}}
-                    </div>
-                </div>
-                <div class="col-md-5 col-xs-12">
-                    <div class="profile-item-container side">
-                        <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
-                        <br/>
-                        {{profileEmail(person)}}
-                        {{profileLocale(person)}}
-                    </div>
+        <div class="row">
+            <div class="col-md-7 col-xs-12">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
+                     {% if person.has_role('patient') %}
+                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
+                     {% else %}
+                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("User Information") }}</h4>
+                     {% endif %}
+                     <br/>
+                     {{profileName(person)}}
+                     {{profileBirthDate(person)}}
                 </div>
             </div>
-         {% else %}
-            <div class="row">
-                <div class="col-md-7 col-xs-12">
-                    <div class="profile-item-container side">
-                         <h4 id="patientInformationLoc" class="profile-item-title">{{ _("User Information") }}</h4>
-                         <br/>
-                         <div class="row">
-                            <div class="col-md-11 col-xs-11">
-                                {{profileName(person)}}
-                                {{profileBirthDate(person)}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-5 col-xs-12">
-                    <div class="profile-item-container side">
-                        <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
-                        <br/>
-                        <div class="row">
-                            <div class="col-md-11 col-xs-11">
-                                {{profileEmail(person)}}
-                                {{profilePhone(person)}}
-                                {{profileLocale(person)}}
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-md-5 col-xs-12">
+                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
+                    <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    <br/>
+                    {{profileEmail(person)}}
+                    {{profilePhone(person)}}
                 </div>
             </div>
-
-         {% endif %}
-
+        </div>
     {% endif %}
 
     {% if (person and person.has_role('patient')) or (current_user.has_role('provider') and current_user.id != person.id)%}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title">{{ _("PRO Assessments") }}</h4>
+                     <h4 id="proAssessmentsLoc" class="profile-item-title">{{ _("PRO Questionnaires") }}</h4>
                     {{profileSessionList(person, current_user)}}
                 </div>
             </div>
@@ -947,24 +1349,20 @@
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
-    {% if (person.has_role("patient")) and (person.id != current_user.id and current_user.has_role('provider'))%}
-        {{profileClinicalPCALocalized(person, current_user) | show_macro('pca_localized')}}
-    {% endif %}
-
-    {% if person.has_role('patient') %}
+    {% if person and person.has_role('patient') %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
                     <div>
-                        {{profileProcedures(person, current_user)}}
+                        {{profileProcedures(person, current_user) | show_macro('procedures')}}
                     </div>
                 </div>
             </div>
         </div>
     {% endif %}
 
-    {% if person.has_role('patient') %}
+    {% if person and person.has_role('patient') %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
     {% endif %}
 
@@ -976,8 +1374,7 @@
             </div>
         </div>
     </div>
-
-    {%if person.has_role('patient')%}
+    {%if person and person.has_role('patient')%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -985,8 +1382,6 @@
                     <div class="flex">
                         <div>
                             {{profileGender(person)}}
-                            <br/>
-                            {{profilePhone(person)}}
                         </div>
                         <div>
                             {{profileEthnicity(person)|show_macro('ethnicity')}}
@@ -1001,6 +1396,44 @@
                 </div>
             </div>
         </div>
+    {% endif %}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div  class="profile-item-container">
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title">Locale / Time Zone</h4>
+                <div class="flex">
+                    <div class="timezone-container">
+                        {{profileLocale(person)}}
+                    </div>
+                    <div class="timezone-container">
+                        {{profileTimeZone(person)}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if (person and current_user) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="patientReportsLoc" class="profile-item-title">{{ _("Patient Reports") }}</h4>
+                    {{patientReports(person)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if person and (person.has_role('patient') or person.has_role('partner'))%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                    {{profileConsent(person, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if (person and current_user) and person.has_role('patient') and current_user.has_role('provider') %}
+        {{profileDeceased(person, current_user)}}
     {% endif %}
     {% if (person and current_user) and current_user.has_role('admin') and not person.has_role('service') %}
         <div class="row">
@@ -1025,33 +1458,27 @@
 {%- endmacro %}
 
 {% macro profileProcedures(person, current_user) -%}
-<script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
-<style>
-    .treatment-container {margin-left:0.5em;}
-    #eventListtnthproc {margin-left: 0.5em}
-    #eventListtnthproc td { padding: 0.15em;}
-    #profileProcedureContainer { margin-left: 1em;}
-    #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
-    #procedureForm { margin-left: 0.5em;}
-    .procedureDateLabel { margin-bottom: 0;}
-</style>
-<p>{%if current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer treatments has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer treatments have you had, if any? If you don&#39;t remember the exact
-    date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p>
-<div id="profileProcedureContainer">
-    <div class="inner">
-        <p class="text-muted">{%if current_user.id == person.id%}{{ _("Your treatments") }}{%else%}{{ _("Treatments") }}{%endif%}:</p>
-        <div id="userProcedures"></div>
-
-    </div>
-    <br/>
-    <form id="procedureForm" class="form-inline event-element to-validate" data-toggle="validator">
-
-            <p class="text-muted">{{ _("Add a treatment") }}:</p>
+    <script src="{{ url_for('static', filename='js/procedures.js') }}"></script>
+    <style>
+        .treatment-container {margin-left:0.5em;}
+        #eventListtnthproc {margin-left: 0.5em}
+        #eventListtnthproc td { padding: 0.15em;}
+        #profileProcedureContainer { margin-left: 1em;}
+        #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
+        #procedureForm { margin-left: 0.5em;}
+        #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
+        #profileProcedureContainer button.btn {color:#777}
+    </style>
+    <p style="color: #696767">{%if (current_user and person) and current_user.has_role('provider') and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+        date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
+    <div id="profileProcedureContainer">
+        <form id="procedureForm" class="form-inline event-element">
+            <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
             <div class="row">
                 <div class="col-md-6 col-xs-11">
                     <div class='form-group'>
                         <select class='form-control' id='tnthproc'>
-                            <option value=''>{{ _("Select treatment") }}...</option>
+                            <option value=''>{{ _("Select") }}...</option>
                             <option value='373818007'>{{ _("Started watchful waiting") }}</option>
                             <option value='424313000'>{{ _("Started active surveillance") }}</option>
                             <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
@@ -1065,28 +1492,15 @@
                     </div>
                 </div>
             </div>
-
-            <!--
-            <div class='form-group'>
-                <label>Date:</label>
-                <div class="input-group date">
-                    <input class='event-value form-control' type='text' placeholder='DD/MM/YYYY' maxlength='10' data-error="Date should be in valid DD/MM/YYYY format" id='tnthproc-date' name='tnthproc-date' pattern="^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$"/>
-                    <span class="input-group-addon" onclick="$('#tnthproc-date').datepicker('show')">
-                        <i class="fa fa-calendar"></i>
-                    </span>
-                </div>
-                <div class="help-block with-errors"></div>
-            </div>
-            -->
             <br/>
             <div id="procDateGroup" class="form-group">
                 <label class="procedureDateLabel">{{ _("Date") }}:</label>
                 <div class="flex">
                     <div>
-                        <input class="form-control" id="procDay" name="procDay"  type="text" placeholder="DD" patterntype="text" maxlength="2" data-birthday="true" required="" pattern="([1-9]|[12][0-9]|3[01])">
+                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" >
                     </div>
                     <div>
-                        <select class="form-control" name="procMonth" id="procMonth" data-birthday="true" required="">
+                        <select class="form-control" name="procMonth" id="procMonth">
                             <option value="">{{ _("Month") }}...</option>
                             <option value="01">{{ _("January") }}</option>
                             <option value="02">{{ _("February") }}</option>
@@ -1103,46 +1517,40 @@
                         </select>
                     </div>
                     <div>
-                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required="" pattern="\d{4}">
+                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
+                    </div>
+                    <div>
+                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
                     </div>
                 </div>
                 <div class="row">
-                     <div class="col-md-5 col-xs-10">
+                     <div class="col-md-9 col-xs-10">
                         <div id="procDateErrorContainer" class="help-block with-errors"></div>
                      </div>
                 </div>
             </div>
-        <button class='btn btn-default hidden disabled' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled>
-            <i class='fa fa-plus'></i> {{ _("Add Procedure") }}
-        </button>
-    </form>
-    <br/>
-<div>
-<script>
-    var subjectId = {{ person.id }};
-    var currentUserId = {{ current_user.id }};
-
-$(document).ready(function(){
-
-    tnthAjax.getProc({{ person.id }}, false);
-
-/**
-    // Class for both "done" and "skip" buttons
-    $(".continue-btn").on("click", function(event){
-        event.preventDefault();
-        window.location.replace("{{ return_address | safe }}");
-    });
-*/
-});
-
-</script>
-
+            <br />
+            <hr style="border-bottom: 1px solid #e5e5e5">
+            <div class="inner">
+                <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                <div id="userProcedures"></div>
+            </div>
+        </form>
+        <br/>
+    <div>
+    <script>
+        var subjectId = {{ person.id if person}};
+        var currentUserId = {{ current_user.id if current_user}};
+        $(document).ready(function(){
+            tnthAjax.getProc({{ person.id if person}}, false);
+        });
+    </script>
 {%- endmacro %}
 
 
 {% macro profileSaveBtn() -%}
     <p id="saveMsg" class="error-message text-muted  bg-warning" style="display: none"><small>{{ _("You have updated your profile. Click the Save button to submit your changes.") }} {{ _("Or") }} <a href="">{{ _("cancel") }}</a>.</small></p>
-    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>{{ _("There is a problem with your profile. Please correct it before saving.") }}<br/>{{ _("Make sure all required fields are filled out.") }}</small></p>
+    <p id="errorMsg" class="error-message text-muted  bg-danger" style="display: none"><small>{{ _("There is a problem with your profile. Please correct it before saving.") }}<br/>{{ _("Make sure all required fields are filled out and all entries are valid.") }}</small></p>
     <p id="serviceErrorMsg" class="error-message text-muted bg-danger" style="display: none"></p>
     <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary">{{ _("Save") }}</button>
     <span id="confirmMsg" class="text-muted tnth-hide small-text">&nbsp;&nbsp;<em>{{ _("Profile changes have been saved") }}</em></span>

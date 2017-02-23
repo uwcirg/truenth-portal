@@ -6,6 +6,7 @@ import hmac
 import json
 import requests
 from authomatic.adapters import WerkzeugAdapter
+from authomatic.exceptions import CancellationError
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask_login import login_user, logout_user
@@ -72,10 +73,12 @@ def deauthorized():
 
 
 def flask_user_login_event(app, user, **extra):
-    auditable_event("local user login", user_id=user.id)
+    auditable_event("local user login", user_id=user.id, subject_id=user.id,
+                    context='login')
 
 def flask_user_registered_event(app, user, **extra):
-    auditable_event("local user registered", user_id=user.id)
+    auditable_event("local user registered", user_id=user.id, subject_id=user.id,
+                    context='account')
 
 
 # Register functions to receive signals from flask_user
@@ -87,12 +90,24 @@ def capture_next_view_function(real_function):
     real_function = real_function
 
     def capture_next():
-        """Alternate view function plugged in to capture 'next' in session"""
+        """Alternate view function plugged in to capture 'next' in session
+
+        NB if already logged in - this will bounce user to home, unless
+        the user has role write_only, as such users may be logging in
+        or registering new accounts, to be merged with the write_only one.
+
+        """
+        if current_user() and not current_user().has_role(ROLE.WRITE_ONLY):
+            return redirect(url_for('portal.home'))
+
         if request.args.get('next'):
             session['next'] = request.args.get('next')
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
+        if request.args.get('suspend_initial_queries'):
+            session['suspend_initial_queries'] = request.args.get(
+                'suspend_initial_queries')
         return real_function()
     return capture_next
 
@@ -134,7 +149,8 @@ def next_after_login():
         invited_user_id = session['invited_verified_user_id']
         assert user.id != invited_user_id
         auditable_event("merging invited user {} into account {}".format(
-            invited_user_id, user.id), user_id=user.id)
+            invited_user_id, user.id), user_id=user.id, subject_id=user.id,
+            context='account')
         user.merge_with(invited_user_id)
         invited_user = User.query.get(invited_user_id)
         invited_user.delete_user(acting_user=user)
@@ -142,7 +158,10 @@ def next_after_login():
         del session['invited_verified_user_id']
 
     # Present intial questions (TOU et al) if not already obtained
-    if not Coredata().initial_obtained(user):
+    # NB - this act may be suspended by request from an external
+    # client during patient registration
+    if (not session.get('suspend_initial_queries', None)
+       ) and not Coredata().initial_obtained(user):
         current_app.logger.debug("next_after_login: [need data] -> "
                                  "initial_queries")
         return redirect(url_for('portal.initial_queries'))
@@ -167,6 +186,8 @@ def next_after_login():
         del session['next']
         current_app.logger.debug("next_after_login: [have session['next']] "
                                  "-> {}".format(next_url))
+        if 'suspend_initial_queries' in session:
+            del session['suspend_initial_queries']
         return redirect(next_url)
 
     # No better place to go, send user home
@@ -226,6 +247,10 @@ def login(provider_name):
         return next_after_login()
     if result:
         if result.error:
+            if isinstance(result.error, CancellationError):
+                current_app.logger.info("User canceled IdP auth - send home")
+                return redirect(url_for('portal.landing'))
+
             reload_count = session.get('force_reload_count', 0)
             if reload_count > 2:
                 current_app.logger.warn("Failed 3 attempts: {}".format(
@@ -233,7 +258,7 @@ def login(provider_name):
                 abort(500, "unable to authorize with provider {}".format(
                     provider_name))
             session['force_reload_count'] = reload_count + 1
-            current_app.logger.info(result.error.message)
+            current_app.logger.info(str(result.error))
             # Work around for w/ Safari and cookies set to current site only
             # forcing a reload brings the local cookies back into view
             # (they're missing with such a setting on returning from
@@ -253,11 +278,17 @@ def login(provider_name):
                     provider_id=result.user.id).first()
             if ap:
                 auditable_event("login via {0}".format(provider_name),
-                                user_id=ap.user_id)
+                                user_id=ap.user_id, subject_id=ap.user.id,
+                                context='login')
                 user = User.query.filter_by(id=ap.user_id).first()
                 user.image_url=image_url
                 db.session.commit()
             else:
+                # Experiencing problems pulling email from IdPs.
+                if not result.user.email:
+                    abort(500, "No email for user {} from {}".format(
+                        result.user.id, provider_name))
+
                 # Confirm we haven't seen user from a different IdP
                 user = User.query.filter_by(email=result.user.email).\
                         first() if result.user.email else None
@@ -266,10 +297,12 @@ def login(provider_name):
                     user = add_authomatic_user(result.user, image_url)
                     db.session.commit()
                     auditable_event("register new user via {0}".\
-                                    format(provider_name), user_id=user.id)
+                                    format(provider_name), user_id=user.id,
+                                    subject_id=user.id, context='account')
                 else:
                     auditable_event("login user via NEW IdP {0}".\
-                                    format(provider_name), user_id=user.id)
+                                    format(provider_name), user_id=user.id,
+                                    subject_id=user.id, context='login')
                     user.image_url=image_url
 
                 ap = AuthProvider(provider=provider_name,
@@ -303,7 +336,8 @@ def login_as(user_id):
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
     auditable_event("assuming identity of user {}".format(user_id),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=user_id,
+                    context='authentication')
     logout(prevent_redirect=True)
     login_user(get_user(user_id))
     return next_after_login()
@@ -368,7 +402,8 @@ def logout(prevent_redirect=False):
 
     if user_id:
         event = 'logout' if not timed_out else 'logout due to timeout'
-        auditable_event(event, user_id=user_id)
+        auditable_event(event, user_id=user_id, subject_id=user_id,
+            context='login')
         # delete_facebook_authorization()  #Not using at this time
 
     logout_user()
@@ -376,7 +411,7 @@ def logout(prevent_redirect=False):
     notify_clients(user_id)
     if prevent_redirect:
         return
-    return redirect('/')
+    return redirect('/' if not timed_out else '/?timed_out=1')
 
 class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""
@@ -512,14 +547,15 @@ def client():
     db.session.add(client)
     db.session.commit()
     auditable_event("added intervention/client {}".format(
-        client), user_id=user.id)
+        client), user_id=user.id, subject_id=user.id, context='intervention')
 
     # if user selected a role besides the default, set it.
     if form.application_role.data != INTERVENTION.DEFAULT.name:
         selected = form.application_role.data
         intervention = getattr(INTERVENTION, selected)
         auditable_event("client {0} assuming role {1}".format(
-            client.client_id, selected), user_id=user.id)
+            client.client_id, selected), user_id=user.id,
+            subject_id=user.id, context='intervention')
         intervention.client_id = client.client_id
         db.session.commit()
     return redirect(url_for('.client_edit', client_id=client.client_id))
@@ -615,14 +651,17 @@ def client_edit(client_id):
         if current_role and current_role.name != selected:
             current_role.client_id = None
             auditable_event("client {0} releasing role {1}".format(
-                client.client_id, current_role.description), user_id=user.id)
+                client.client_id, current_role.description),
+                user_id=user.id, subject_id=client.user_id,
+                context='intervention')
         if selected != INTERVENTION.DEFAULT.name:
             intervention = getattr(INTERVENTION, selected)
             if intervention.client_id != client.client_id:
                 intervention.client_id = client.client_id
                 auditable_event("client {0} assuming role {1}".format(
                     client.client_id, intervention.description),
-                    user_id=user.id)
+                    user_id=user.id, subject_id=client.user_id,
+                    context='intervention')
 
     if not form.validate_on_submit():
         return render_template('client_edit.html', client=client, form=form,
@@ -632,7 +671,8 @@ def client_edit(client_id):
     redirect_target = url_for('.clients_list')
     if request.form.get('delete'):
         auditable_event("deleted intervention/client {}".format(
-            client.client_id), user_id=user.id)
+            client.client_id), user_id=user.id, subject_id=client.user_id,
+            context='intervention')
         if client.intervention:
             client.intervention.client_id = None
         db.session.delete(client)
@@ -644,10 +684,12 @@ def client_edit(client_id):
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
-        auditable_event("Service account created by", user_id=user.id)
+        auditable_event("service account created by", user_id=user.id,
+            subject_id=client.user_id, context='authentication')
         create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
-            client.client_id), user_id=user.id)
+            client.client_id), user_id=user.id, subject_id=client.user_id,
+            context='authentication')
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
         form.populate_obj(client)
@@ -658,7 +700,8 @@ def client_edit(client_id):
     if b4 != after:
         auditable_event("edited intervention/client {}"
                         " before: <{}> after: <{}>".format(
-                        client.client_id, b4, after), user_id=user.id)
+                        client.client_id, b4, after), user_id=user.id,
+                        subject_id=client.user_id, context='intervention')
     return redirect(redirect_target)
 
 
@@ -757,7 +800,10 @@ def token_status():
               description: The authorized scopes.
 
     """
-    token_type, access_token = request.headers.get('Authorization').split()
+    authorization = request.headers.get('Authorization')
+    if not authorization:
+        abort(401, "Authorization header required")
+    token_type, access_token = authorization.split()
     token = Token.query.filter_by(access_token=access_token).first()
     if not token:
         abort(404, "token not found")

@@ -9,6 +9,17 @@
     <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
   </div> -->
   <input type="hidden" id="iq_userId" value="{{user.id}}" />
+  <style>
+      .reg-complete-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0.2em auto;
+        background-color: #f8f8f9;
+        padding: 2em 2em 2.7em 2em;
+        text-align: center;
+        border-radius: 8px;
+      }
+  </style>
 
   {% if 'tou' in still_needed %}
     {{tou(terms)}}
@@ -16,12 +27,11 @@
 
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
-        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed%}
+        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed or 'localized' in still_needed %}
           <h3 class="tnth-headline">{{ _("About You") }}</h3>
 
           <p class="profile-item-title">{{ _("Thank You! Now, please finish your registration by telling us about yourself.") }}</p>
 
-            <!--<p>First, tell us who you are:</p>-->
             {% if user and user._email %}
                 <input type="hidden" name="email" id="email" value="{{user._email}}" />
             {% endif %}
@@ -31,8 +41,8 @@
                 {% if user and user.first_name and user.last_name %}
                   <p>{{ _("Your") }} <em>{{ _("Name") }}</em>: {{user.first_name}} {{user.last_name}}</p>
                   <br/>
-                  <input type="text" name="firstname" id="fistname" value="{{user.first_name}}" style="display:none"/>
-                  <input type="text" name="lastname" id="lastname" value="{{user.last_name}}" style="display:none"/>
+                  <input type="hidden" name="firstname" id="fistname" value="{{user.first_name}}"/>
+                  <input type="hidden" name="lastname" id="lastname" value="{{user.last_name}}"/>
                 {% endif %}
             {% endif %}
             {% if 'role' in still_needed %}
@@ -45,7 +55,7 @@
                   <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
                 {% endif %}
             {% endif %}
-            {% if 'clinical' in still_needed %}
+            {% if 'clinical' in still_needed  or 'localized' in still_needed%}
               {{patientQGroup(user)}}
             {% endif %}
             {% if 'org' in still_needed %}
@@ -54,216 +64,443 @@
             <br />
             <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
             <br />
-            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide" disabled>{{ _("Continue to TrueNTH") }}</button>
         {% else %}
-          <style>
-          .reg-complete-container {
-            width: 500px;
-            max-width: 100%;
-            margin: 10% auto;
-            background-color: #eee;
-            padding: 2em 2em 2.7em 2em;
-            text-align: center;
-            border-radius: 8px;
-          }
-          </style>
            <div class="reg-complete-container">
-              <h4 class="profile-item-title"> {{ _("Thank you for registering.") }}</h4>
+              <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
               <p>{{ _("Click continue to start using TrueNTH") }}</p>
-              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+              <br/>
+              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide">{{ _("Continue to TrueNTH") }}</button>
            </div>
         {% endif %}
 
   </form>
   </div>
+  <div>
+    <div class="error-message text-danger"></div>
+  <div>
 
 {% endblock %}
 {% block document_ready %}
-
+var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
-var preselectClinic = "{{ session.get('associate_clinic_id') }}";
+var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
+var fc, incompleteFields = [], mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
+/***** helper class to keep track of missing fields ***/
+var FieldsChecker = function(mainSections) {
+  this.mainSections = mainSections;
+  this.incompleteFields = [];
+};
 
-function checkIncompleteFields() {
+FieldsChecker.prototype.getIncompleteFields = function() {
+  return this.incompleteFields;
+};
 
-    var sections = [];
-    var incompleteFields = [];
-    var mainSections = {
-        'nameGroup': [$("#firstname"), $("#lastname")],
-        'rolesGroup': [$("input[name='user_type']")],
-        'bdGroup': [$("#month"), $("#date"), $("#year")],
-        'patientQ': [$("input[name='biopsy']"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
-        'clinics': [$("#userOrgs input[name='organization'][data-parent-id]")]
-      };
-    var _isChecked = false;
-      for (var section in mainSections) {
-          var fields = mainSections[section];
+FieldsChecker.prototype.setIncompleteFields = function() {
+  var self = this;
+  if (this.mainSections) {
+    var ms = this.mainSections;
+    self.reset();
+    for (var section in ms) {
+      if (!self.sectionCompleted(section)) {
+          var fields = ms[section].fields;
           fields.forEach(function(field) {
-              if (field.length > 0) {
-                var type = field.attr('type');
-                switch(String(type).toLowerCase()) {
-                case 'checkbox':
-                      _isChecked = false;
-                      field.each(function() {
-                          if ($(this).is(":checked")) {
-                            _isChecked = true;
-                          };
-                      });
-                      if (!(_isChecked)) incompleteFields.push({'section': $('#'+ section), 'element':field});
-                      break;
-                case 'radio':
-                    if (!field.prop("checked")) incompleteFields.push({'section': $('#'+ section), 'element':field});
-                    break;
-                case 'select':
-                case 'text':
-                    if (field.val() == '') incompleteFields.push({'section': $('#' + section), 'element': field});
-                    break;
-                };
-              };
+            if (field.length > 0) {
+            self.incompleteFields.push({'sectionId': section, 'section': $('#'+ section), 'element':field});
+            };
           });
       };
-
-      incompleteFields.forEach(function(field, index) {
-          var f = field.element;
-          f.attr('sectionIndex', index);
-          var triggerEvent = ($(f).attr("type") == "text" ? "change" : "click");
-
-          f.on(triggerEvent, function() {
-              if ($(this).attr('sectionIndex') == (incompleteFields.length - 1)) $("#updateProfile").removeAttr("disabled");
-              else {
-                incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].section.show();
-                incompleteFields[parseInt($(this).attr('sectionIndex')) + 1].element.show();
-              };
-              //console.log('field index: ' + f.attr('sectionIndex'));
-              //console.log('incomplete fields length: ' + incompleteFields.length);
-          });
-
-      });
-
-
-    if (incompleteFields.length == 0) {
-        $("#updateProfile").removeAttr("disabled");
-    } else {
-         incompleteFields[0].section.show();
-         incompleteFields[0].element.show();
-
     };
 
-    /*
-    incompleteFields.forEach(function(field, index) {
-        console.log(field.section.attr("id") + " " + field.section.length);
-
+    self.incompleteFields.forEach(function(field, index) {
+      var fe = field.element;
+      fe.each(function() {
+          var f = $(this);
+          f.attr('sectionIndex', index);
+      });
     });
-    */
 
-    //console.log("length: " + incompleteFields.length);
+  };
+};
+
+FieldsChecker.prototype.reset = function() {
+    var self = this;
+    self.incompleteFields.forEach(function(field) {
+      var fe = field.element;
+      fe.each(function() {
+          var f = $(this);
+          f.removeAttr('sectionIndex');
+      });
+    });
+    self.incompleteFields = [];
+};
+
+FieldsChecker.prototype.getNextField = function(currentIndex, field) {
+    currentIndex = parseInt(currentIndex);
+    var self = this;
+    if (!isNaN(currentIndex) && currentIndex >= 0) {
+      if ((currentIndex + 1) <= (this.incompleteFields.length - 1)) {
+          this.incompleteFields[currentIndex + 1].section.show();
+          //console.log("next Index? " + currentIndex + 1);
+          //console.log(this.incompleteFields[currentIndex + 1].section)
+          var el = this.incompleteFields[currentIndex + 1].element;
+           el.fadeIn();
+           $('html, body').animate({
+              scrollTop: el.offset().top
+           }, 500);
+      };
+    } else {
+      if (field) {
+          var parentContainer = field.closest("[parent-section='true']");
+          var found = false;
+          //console.log("parentContainer:")
+          //console.log(parentContainer)
+          if (parentContainer.length > 0) {
+              var nexts = parentContainer.nextAll("[parent-section='true']");
+              nexts.each(function() {
+                var parentId = $(this).attr("id");
+                //console.log('parentId: ' + parentId)
+                if (!found) {
+                  if (!self.sectionCompleted(parentId)) {
+                      var section = $(this);
+                      section.fadeIn();
+                      $('html, body').animate({
+                          scrollTop: section.offset().top
+                      }, 500);
+                      section.children().first().fadeIn();
+                      found = true;
+                  };
+
+                  if (!found) {
+                      if (self.sectionCompleted(parentId)) $(this).fadeIn();
+                  };
+                };
+              });
+          };
+      };
+    }
+};
+
+FieldsChecker.prototype.sectionCompleted = function(sectionId) {
+  var isComplete = true;
+  if (this.mainSections && this.mainSections[sectionId]) {
+  //console.log(sectionId)
+    var fields = this.mainSections[sectionId].fields;
+    //console.log(fields)
+    if (fields) {
+        fields.forEach(function(field) {
+          if (field.length > 0 && (field.attr("skipped") != "true")) {
+            var type = field.attr('type');
+            switch(String(type).toLowerCase()) {
+            case 'checkbox':
+                  _isChecked = false;
+                  field.each(function() {
+                      if ($(this).is(":checked")) {
+                        _isChecked = true;
+                      };
+                  });
+                  if (!(_isChecked)) isComplete = false;
+                  break;
+            case 'radio':
+                if (!field.is(":checked")) isComplete = false;
+                break;
+            case 'select':
+                if (field.val() == '') isComplete = false;
+                break;
+            case 'text':
+                if (field.val() == '') isComplete = false;
+                else if (!(field.get(0).validity.valid)) isComplete = false;
+                break;
+            };
+          };
+      });
+    };
+  };
+  return isComplete;
+};
+
+
+FieldsChecker.prototype.allFieldsCompleted = function() {
+  this.setIncompleteFields();
+  var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
+  if (completed) this.showAll();
+  return completed;
+};
+
+FieldsChecker.prototype.showAll = function() {
+  var mainSections = this.mainSections;
+  if (mainSections) {
+    for (sec in mainSections) {
+      var mf = $("#" + sec);
+      if (mf.attr("skipped") == "true") continue;
+      mf.fadeIn();
+      mainSections[sec].fields.forEach(function(field) {
+          if (field.attr("skipped") != "true") field.fadeIn();
+      });
+    };
+  };
+};
+
+function continueOn() {
+  $("#continueText").fadeIn();
+  $("#updateProfile").removeAttr("disabled").show();
+};
+
+function stopContinue() {
+  $("#continueText").fadeOut();
+  $("#updateProfile").attr("disabled", true).hide();
+};
+
+function initIncompleteFields() {
+
+  fc.setIncompleteFields();
+  incompleteFields = fc.getIncompleteFields();
+  incompleteFields.forEach(function(field, index) {
+
+    var fe = field.element;
+
+    fe.each(function() {
+        var f = $(this);
+        var triggerEvent = ($(f).attr("type") == "text" ? "blur" : "click");
+        if (f.get(0).nodeName.toLowerCase() == "select") triggerEvent = "change";
+        var customEvent = mainSections[field.sectionId].event;
+
+        if (customEvent) {
+          f.on(triggerEvent, customEvent);
+        }
+        else {
+            f.on(triggerEvent, function() {
+                if ($(this).value != "" && this.validity.valid) {
+                  fc.getNextField($(this).attr('sectionIndex'));
+                  var isComplete = fc.allFieldsCompleted();
+                  if (isComplete) {
+                     continueOn();
+                  }
+                };
+                //console.log('field index: ' + f.attr('sectionIndex'));
+                //console.log('incomplete fields length: ' + incompleteFields.length);
+            });
+        };
+    });
+  });
+
+
+  if (fc.allFieldsCompleted()) {
+      $("#updateProfile").removeAttr("disabled").show();
+  } else {
+       incompleteFields[0].section.show();
+       incompleteFields[0].element.show();
+  };
+
+  /************
+  incompleteFields.forEach(function(field, index) {
+      console.log(field.section.attr("id") + " " + field.element.length);
+      console.log(field.element)
+
+  });
+  ************/
+
+
+  //console.log("length: " + incompleteFields.length);
 
 };
 
 
 $(document).ready(function(){
 
-    //setTimeout("checkIncompleteFields()", 500);
-    $(document).ajaxStop(function () {
-      checkIncompleteFields();
-    });
+    var bdChangeEvent = function() {
+       var d = $("#date");
+       var m = $("#month");
+       var y = $("#year");
+       if (d.val() != "" && m.val() != "" && y.val() != "") {
+          if (this.validity.valid) {
+              var today = new Date();
+              // Check to see if this is a real date
+              var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
+              var date = new Date(iy,im-1,iid);
+              var errorMsg = "";
 
-    /** 1st - get all current info **/
-    /***done in macros now*****/
-    //tnthAjax.getRoles({{ user.id }});
-    //tnthAjax.getOrgs({{ user.id }});
-    //tnthAjax.getDemo({{ user.id}});
-    //tnthAjax.getClinical({{ user.id }});
+              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                  if (iy < 1900) errorMsg = "Year must be after 1900";
+                  // Only allow if birthdate is before today
+                  if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
+                      errorMsg = "The date must not be in the future.";
+                  };
+              } else errorMsg = "Invalid Date. Please enter a valid date.";
 
-    /** 2nd - submit changes and update UI **/
-    /*
-    $("#queriesForm input").on("blur",function(){
-      //this only works when demo info is present
-       assembleContent.dob({{user.id}});
-    });
-    */
+              if (errorMsg == "") {
+                  $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
+                  $("#errorbirthday").text("").hide();
+                  assembleContent.demo($("#iq_userId").val());
+                  //fc.getNextField($(this).attr('sectionIndex'));
+                  var isComplete = fc.allFieldsCompleted();
+                  if (isComplete) {
+                     continueOn();
+                  } else fc.getNextField(null, $("#year"));
+              } else {
+                  $("#errorbirthday").text(errorMsg).show();
+                  stopContinue();
+              };
+          };
+      };
+    };
 
 
-    $("#rolesGroup input:radio").on("click",function(){
+    var rolesGroupClickEvent = function(){
         var roles = [];
         var theVal = $(this).val();
         roles.push({name: theVal});
         var toSend = {"roles": roles};
         tnthAjax.putRoles({{user.id}},toSend);
         if (theVal == "patient") {
-          // If patient, then we always show bdGroup
-          $("#bdGroup").fadeIn();
-          // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-          if ($("#year").val() != "") {
-            $("#year").blur();
-            $('html, body').animate({
-              scrollTop: $('#patientQ').offset().top
-            }, 500);
-          } else {
-            $('html, body').animate({
-              scrollTop: $('#bdGroup').offset().top
-            }, 500);
-          }
-          $("#clinics").hide();
+            // If patient, then we always show bdGroup
+            var fname = $("#firstname"), lname = $("#lastname");
+            if (fname.length > 0 && lname.length > 0 && (fname.val() == "" || lname.val() == "")) {
+                if (!hasValue(fname.val())) fname.trigger("blur");
+                if (!hasValue(lname.val())) lname.trigger("blur");
+            } else {
+              if ($("#bdGroup").length > 0) {
+                $("#bdGroup").fadeIn();
+              };
+              // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
+
+              if ($("#bdGroup").length > 0) {
+                $('html, body').animate({
+                  scrollTop: $('#bdGroup').offset().top
+                }, 500);
+                if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
+              } else fc.getNextField($(this).attr("sectionIndex"), $(this));
+
+              //$("#clinics").hide();
+
+              $("#patientQ").attr("skipped", "false");
+              $("#bdGroup").attr("skipped", "false");
+              $("#clinics").attr("skipped", "false");
+
+
+              if (fc.allFieldsCompleted()) {
+                continueOn();
+              } else {
+                stopContinue();
+              };
+            };
+
         } else {
-          // If partner, they skip questions, fadeIn Clinics
-          $("#clinics").fadeIn();
-          $("#patientQ").hide();
-          $("#bdGroup").hide();
-          $('html, body').animate({
-            scrollTop: $('#clinics').offset().top
-          }, 500);
+          // If partner, skip all questions
+          if (theVal == "partner") {
+            $("#patientQ").attr("skipped", "true").hide();
+            $("#bdGroup").attr("skipped", "true").hide();
+            $("#clinics").attr("skipped", "true").hide();
+            continueOn();
+          };
         };
-    });
+    };
 
-  $(".pat-q input:radio").on("click",function(){
-      var thisItem = $(this);
-      var toCall = thisItem.attr("name")
-      // Get value from div - either true or false
-      var toSend = thisItem.val();
-      tnthAjax.putClinical({{user.id}},toCall,toSend);
-      if (toSend == "true" || toCall ==  "pca_localized") {
-        thisItem.parents(".pat-q").next().fadeIn();
-        if (toCall == "tx") {
-          $("#clinics").fadeIn();
-        }
-      } else {
-        if (toCall == "biopsy") {
-          ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
-              $("input[name='" + fieldName + "']").each(function() {
-                  $(this).prop("checked", false);
+
+
+    var patientQClickEvent = function(){
+          var thisItem = $(this);
+          var toCall = thisItem.attr("name")
+          // Get value from div - either true or false
+          var toSend = thisItem.val();
+          //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
+          if (toCall != "tx") {
+            tnthAjax.putClinical({{user.id}},toCall,toSend);
+          };
+          if (toSend == "true" || toCall ==  "pca_localized") {
+
+            thisItem.parents(".pat-q").next().fadeIn();
+            $("#clinics").hide(); //this is hard coded, ARGHHH!!
+
+            var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
+            var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
+            if (nextItem.length > 0) {
+                $('html, body').animate({
+                  scrollTop: nextItem.offset().top
+                }, 500);
+                nextItem.find("input[type='radio']").each(function() {
+                  $(this).attr("skipped", "false");
+                });
+                //console.log( thisItem.closest(".pat-q").nextAll())
+                //console.log(thisItem)
+                thisItem.closest(".pat-q").nextAll().each(function() {
+                    var dataTopic = $(this).attr("data-topic");
+                    $(this).find("input[name='" + dataTopic + "']").each(function() {
+                        $(this).attr("skipped", "false");
+                    });
+                });
+
+                if (fc.sectionCompleted('patientQ')) fc.getNextField(null, $(this));
+
+            } else {
+                fc.getNextField(null, $(this));
+            };
+          } else {
+            if (toCall == "biopsy") {
+              ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
+                  $("input[name='" + fieldName + "']").each(function() {
+                      $(this).prop("checked", false);
+                      $(this).attr("skipped", "true");
+                  });
               });
-          });
-          tnthAjax.putClinical({{user.id}},"pca_diag","false");
-          tnthAjax.putClinical({{user.id}},"pca_localized","false");
-          tnthAjax.putClinical({{user.id}},"tx","false");
-        } else if (toCall == "pca_diag") {
-          ["pca_localized", "tx"].forEach(function(fieldName) {
-              $("input[name='" + fieldName + "']").each(function() {
-                  $(this).prop("checked", false);
+              if ($("input[name='pca_diag']").length > 0) tnthAjax.putClinical({{user.id}},"pca_diag","false");
+              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
+              if ($("input[name='tx']").length > 0) {
+                tnthAjax.deleteTreatment({{user.id}});
+              };
+            } else if (toCall == "pca_diag") {
+              ["pca_localized", "tx"].forEach(function(fieldName) {
+                  $("input[name='" + fieldName + "']").each(function() {
+                      $(this).prop("checked", false);
+                      $(this).attr("skipped", "true");
+                  });
               });
-          });
-          tnthAjax.putClinical({{user.id}},"pca_localized","false");
-          tnthAjax.putClinical({{user.id}},"tx","false");
-        }
-        thisItem.parents(".pat-q").nextAll().fadeOut();
-        $("#clinics").fadeIn();
+              if ($("input[name='pca_localized']").length > 0) tnthAjax.putClinical({{user.id}},"pca_localized","false");
+
+              //tnthAjax.putClinical({{user.id}},"tx","false");
+              if ($("input[name='tx']").length > 0) {
+                tnthAjax.deleteTreatment({{user.id}});
+              };
+            }
+            thisItem.parents(".pat-q").nextAll().fadeOut();
+            /********** to skip all questions ********/
+            /**hate this part, need to hard-code here****/
+            if ($("#clinics").length > 0) {
+              $("#clinics").fadeIn();
+              $('html, body').animate({
+                  scrollTop: $('#clinics').offset().top
+              }, 500);
+              if (fc.sectionCompleted('clinics')) continueOn();
+              return true;
+            } else {
+              continueOn();
+              return true;
+            };
+          };
+
+          if (fc.allFieldsCompleted()) {
+            continueOn();
+          } else stopContinue();
       };
-  });
 
-  $("#userOrgs").on("change", "input", function() {
-      //console.log("changed?")
-      assembleContent.demo({{ user.id }});
-      $("#continueText").fadeIn();
-      $("#updateProfile").removeAttr("disabled");
-  });
+    var userOrgChangeEvent = function() {
+      assembleContent.demo({{ user.id }},null, null, true);
+      if ($(this).prop("checked")) {
+        if (fc.allFieldsCompleted()) {
+          continueOn();
+        } else {
+          stopContinue();
+        };
+      } else stopContinue();
+    };
 
-  $("#agreeLabel").on("click",function(){
+
+    $("#agreeLabel").on("click",function(){
       if ($(this).attr("data-agree") == "false") {
         var theTerms = {};
-        //theTerms["text"] = $(this).attr('data-terms');
-        // Grab the current text of the Terms of Use
-        theTerms["text"] = $("#termsText").text();
+        theTerms["agreement_url"] = $("#termsURL").data().url;
         // Post terms agreement via API
         tnthAjax.postTerms(theTerms);
         // Update UI
@@ -280,20 +517,65 @@ $(document).ready(function(){
         $("#aboutForm").fadeOut();
         $(this).attr("data-agree","false");
       };
-  });
+    });
 
-  //if term of use form not present - need to show the form
-  if ($("#topTerms").length == 0)  $("#aboutForm").fadeIn();
+    //if term of use form not present - need to show the form
+    if ($("#topTerms").length == 0)  {
+        $("#aboutForm").fadeIn();
+        if ($("#aboutForm").length == 0) {
+          continueOn();
+        };
+    };
 
-  $('#queriesForm').validator().on('submit', function (e) {
-      if (e.isDefaultPrevented()) {
-        alert("There's a problem with your submission. Please check your answers, then try again.");
-      } else {
-        assembleContent.demo({{ user.id }});
-      }
-  });
+    $('#queriesForm').validator().on('submit', function (e) {
+        if (e.isDefaultPrevented()) {
+          alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid.");
+        } else {
+          assembleContent.demo({{ user.id }},null, null, true);
+        }
+    });
 
-  /*
+
+    /**** main object
+          this will help keeping track of missing fields
+     *****/
+    mainSections = {
+
+      'nameGroup':  {
+                      fields: [$("#firstname"), $("#lastname")],
+                      event: null
+                    },
+      'rolesGroup': {
+                      fields: [$("input[name='user_type']")],
+                      event: rolesGroupClickEvent
+                    },
+      'bdGroup':    {
+                      fields: [$("#month"), $("#date"), $("#year")],
+                      event: bdChangeEvent
+                    },
+      'patientQ':   {
+                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
+                      event: patientQClickEvent
+                    },
+      'clinics':    {
+                      fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
+                      event: userOrgChangeEvent
+                    }
+    };
+
+    {% if not ('localized' in still_needed) %} $("#patMeta").remove(); {% endif %}
+
+    fc = new FieldsChecker(mainSections);
+    setTimeout("initIncompleteFields();", 500);
+
+    /** 1st - get all current info **/
+    /***done in macros now*****/
+    //tnthAjax.getRoles({{ user.id }});
+    //tnthAjax.getOrgs({{ user.id }});
+    //tnthAjax.getDemo({{ user.id}});
+    //tnthAjax.getClinical({{ user.id }});
+
+  /************** old consent stuff
   $("#userOrgs input[name='organization']").each(function() {
       $(this).on("click", function() {
           var parentOrg = $(this).attr("data-parent-id");
@@ -306,7 +588,7 @@ $(document).ready(function(){
                       if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
                       else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
                       $("#" + parentOrg + "_consentItem").show();
-                      console.log($("#" + parentOrg + "_consentItem"))
+                      //console.log($("#" + parentOrg + "_consentItem"))
                   };
               } else {
                   $("#consentContainer .consent").hide();
@@ -317,8 +599,7 @@ $(document).ready(function(){
 
 
       });
-    });*/
+    });********************************/
   });
 {% endblock %}
-
 

@@ -5,6 +5,7 @@ import json
 import re
 import urllib
 from sqlalchemy import and_
+from datetime import datetime
 from tests import TestCase, TEST_USER_ID, FIRST_NAME
 
 from portal.extensions import db
@@ -15,7 +16,7 @@ from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship, UserTimezone
-from portal.models.user_consent import UserConsent
+from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
 from portal.models.user import UserIndigenousStatusExtension
 from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
@@ -27,12 +28,12 @@ class TestUser(TestCase):
         self.login()
 
         # bad email param should raise 400
-        rv = self.app.get('/api/unique_email?email=h2@1')
+        rv = self.client.get('/api/unique_email?email=h2@1')
         self.assert400(rv)
 
         email = 'john+test@example.com'
         request = '/api/unique_email?email={}'.format(urllib.quote(email))
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -41,7 +42,7 @@ class TestUser(TestCase):
         self.test_user.email = email
         with SessionScope(db):
             db.session.commit()
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -49,7 +50,7 @@ class TestUser(TestCase):
         # but a second user should see false
         second = self.add_user(username='second@foo.com')
         self.login(second.id)
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], False)
@@ -58,7 +59,7 @@ class TestUser(TestCase):
         request = '/api/unique_email?email={}&user_id={}'.format(
             urllib.quote(email), TEST_USER_ID)
         self.promote_user(second, ROLE.ADMIN)
-        rv = self.app.get(request)
+        rv = self.client.get(request)
         self.assert200(rv)
         results = rv.json
         self.assertEqual(results['unique'], True)
@@ -175,7 +176,7 @@ class TestUser(TestCase):
         user_id, actor_id = user.id, actor.id
         self.promote_user(user=actor, role_name=ROLE.ADMIN)
         self.login(user_id=actor_id)
-        rv = self.app.delete('/api/user/{}'.format(user_id))
+        rv = self.client.delete('/api/user/{}'.format(user_id))
         self.assert200(rv)
         user = db.session.merge(user)
         self.assertTrue(user.deleted_id)
@@ -196,14 +197,14 @@ class TestUser(TestCase):
         data = {"resourceType": "Patient",
                 "extension": [{"url": UserTimezone.extension_url,
                                "timezone": "bogus"}]}
-        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+        rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert400(rv)
 
         # Valid setting should work
         data['extension'][0]['timezone'] = 'US/Eastern'
-        rv = self.app.put('/api/demographics/{}'.format(TEST_USER_ID),
+        rv = self.client.put('/api/demographics/{}'.format(TEST_USER_ID),
                           content_type='application/json',
                           data=json.dumps(data))
         self.assert200(rv)
@@ -222,14 +223,14 @@ class TestUser(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'organizations': [{'organization_id':None}]}
-        rv = self.app.post('/api/account', data=json.dumps(data),
+        rv = self.client.post('/api/account', data=json.dumps(data),
                            content_type='application/json')
         self.assert400(rv)
 
     def test_account_creation(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        rv = self.app.post('/api/account')
+        rv = self.client.post('/api/account')
 
         self.assert200(rv)
         self.assertTrue(rv.json['user_id'] > 0)
@@ -245,7 +246,7 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        rv = self.app.put('/api/demographics/{}'.format(user_id),
+        rv = self.client.put('/api/demographics/{}'.format(user_id),
                 content_type='application/json',
                 data=json.dumps(data))
         new_user = User.query.get(user_id)
@@ -254,7 +255,7 @@ class TestUser(TestCase):
         self.assertEquals(new_user.username, None)
         self.assertEquals(len(new_user.roles), 0)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
-        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+        rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
@@ -263,6 +264,7 @@ class TestUser(TestCase):
 
     def test_account_creation_by_provider(self):
         # permission challenges when done as provider
+        self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
@@ -271,10 +273,17 @@ class TestUser(TestCase):
         provider.organizations.append(org2)
         provider_id = provider.id
         self.promote_user(user=provider, role_name=ROLE.PROVIDER)
-        data = {'organizations': [{'organization_id': org_id},
-                                  {'organization_id': org2_id}]}
+        data = {
+            'organizations': [{'organization_id': org_id},
+                              {'organization_id': org2_id}],
+            'consents': [{'organization_id': org_id,
+                        'agreement_url': 'http://fake.org',
+                        'staff_editable': True,
+                        'send_reminders': False}],
+            'roles': [{'name': ROLE.PATIENT}],
+            }
         self.login(user_id=provider_id)
-        rv = self.app.post('/api/account',
+        rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -292,7 +301,7 @@ class TestUser(TestCase):
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "communication": [{"language": {"coding": [coding]}}]}
-        rv = self.app.put('/api/demographics/{}'.format(user_id),
+        rv = self.client.put('/api/demographics/{}'.format(user_id),
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
@@ -300,15 +309,41 @@ class TestUser(TestCase):
         self.assertEquals(new_user.first_name, given)
         self.assertEquals(new_user.last_name, family)
         self.assertEquals(new_user.username, None)
-        self.assertEquals(len(new_user.roles), 0)
+        self.assertEquals(len(new_user.roles), 1)
         roles = {"roles": [ {"name": ROLE.PATIENT}, ]}
-        rv = self.app.put('/api/user/{}/roles'.format(user_id),
+        rv = self.client.put('/api/user/{}/roles'.format(user_id),
                           content_type='application/json',
                           data=json.dumps(roles))
         self.assertEquals(len(new_user.roles), 1)
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
+
+    def test_failed_account_creation_by_provider(self):
+        # without the right set of consents & roles, should fail
+        self.shallow_org_tree()
+        org, org2 = [org for org in Organization.query.filter(
+            Organization.id > 0).limit(2)]
+        org_id, org2_id = org.id, org2.id
+        provider = self.add_user('provider@example.com')
+        provider.organizations.append(org)
+        provider.organizations.append(org2)
+        provider_id = provider.id
+        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        data = {
+            'organizations': [{'organization_id': org_id},
+                              {'organization_id': org2_id}],
+            'consents': [{'organization_id': org_id,
+                        'agreement_url': 'http://fake.org',
+                        'staff_editable': True,
+                        'send_reminders': False}],
+            'roles': [{'name': ROLE.PARTNER}],
+            }
+        self.login(user_id=provider_id)
+        rv = self.client.post('/api/account',
+                content_type='application/json',
+                data=json.dumps(data))
+        self.assert400(rv)
 
     def test_user_by_organization(self):
         # generate a handful of users in different orgs
@@ -340,7 +375,7 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.PATIENT)
         self.promote_user(role_name=ROLE.PROVIDER)
         self.login()
-        rv = self.app.get('/api/user/{0}/roles'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), 2)
@@ -350,12 +385,12 @@ class TestUser(TestCase):
 
     def test_unauth_role(self):
         self.login()
-        rv = self.app.get('/api/user/66/roles')
+        rv = self.client.get('/api/user/66/roles')
         self.assert404(rv)
 
     def test_all_roles(self):
         self.login()
-        rv = self.app.get('/api/roles')
+        rv = self.client.get('/api/roles')
 
         result_roles = json.loads(rv.data)
         self.assertEquals(len(result_roles['roles']), len(STATIC_ROLES))
@@ -369,7 +404,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -387,7 +422,7 @@ class TestUser(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -409,7 +444,7 @@ class TestUser(TestCase):
                 ]}
 
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -427,7 +462,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -446,7 +481,7 @@ class TestUser(TestCase):
 
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.put('/api/user/%s/roles' % TEST_USER_ID,
+        rv = self.client.put('/api/user/%s/roles' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -456,14 +491,20 @@ class TestUser(TestCase):
         org = Organization(name='members only')
         user = self.test_user
         user.organizations.append(org)
-        self.promote_user(user, ROLE.PROVIDER)
         u2 = self.add_user(username='u2@foo.com')
         member_of = self.add_user(username='member_of@example.com')
         member_of.organizations.append(org)
-        audit = Audit(comment='test data', user_id=TEST_USER_ID)
+        audit = Audit(comment='test data', user_id=TEST_USER_ID,
+            subject_id=TEST_USER_ID)
+        self.promote_user(user, ROLE.PROVIDER)
+        self.promote_user(u2, ROLE.PATIENT)
+        self.promote_user(member_of, ROLE.PATIENT)
+        user, org, u2, member_of = map(
+            db.session.merge, (user, org, u2, member_of))
         consent = UserConsent(
             user_id=member_of.id, organization_id=org.id,
-            audit=audit, agreement_url='http://example.org')
+            audit=audit, agreement_url='http://example.org',
+            options=STAFF_EDITABLE_MASK)
         with SessionScope(db):
             db.session.add(consent)
             db.session.commit()
@@ -485,9 +526,148 @@ class TestUser(TestCase):
         kwargs = {'permission': 'view', 'other_id': member_of.id}
         self.assertTrue(user.check_role(**kwargs))
 
+    def test_deep_tree_check_role(self):
+        self.deepen_org_tree()
+
+        org_102 = Organization.query.get(102)
+        org_1002 = Organization.query.get(1002)
+        org_10031 = Organization.query.get(10031)
+        org_10032 = Organization.query.get(10032)
+        audit = Audit(comment="testing", user_id=TEST_USER_ID,
+                      subject_id=TEST_USER_ID, context='consent')
+
+        staff_top = self.add_user('Staff 102')
+        self.promote_user(staff_top, ROLE.PROVIDER)
+        staff_top.organizations.append(org_102)
+
+        staff_leaf = self.add_user('Staff 10031')
+        self.promote_user(staff_leaf, ROLE.PROVIDER)
+        staff_leaf.organizations.append(org_10031)
+
+        staff_mid = self.add_user('Staff 1002')
+        self.promote_user(staff_mid, ROLE.PROVIDER)
+        staff_mid.organizations.append(org_1002)
+
+        patient_w = self.add_user('patient w')
+        patient_w_id = patient_w.id
+        self.promote_user(patient_w, ROLE.PATIENT)
+        patient_w.organizations.append(org_10032)
+        uc_w = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_w_id, organization=org_10032,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_x = self.add_user('patient x')
+        patient_x_id = patient_x.id
+        self.promote_user(patient_x, ROLE.PATIENT)
+        patient_x.organizations.append(org_10032)
+        uc_x = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_x_id, organization=org_102,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_y = self.add_user('patient y')
+        patient_y_id = patient_y.id
+        self.promote_user(patient_y, ROLE.PATIENT)
+        patient_y.organizations.append(org_102)
+        uc_y = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_y_id, organization=org_10031,
+            options=STAFF_EDITABLE_MASK)
+
+        patient_z = self.add_user('patient z')
+        patient_z_id = patient_z.id
+        self.promote_user(patient_z, ROLE.PATIENT)
+        patient_z.organizations.append(org_10031)
+        uc_z = UserConsent(
+            audit=audit, agreement_url='http://fake.org',
+            user_id=patient_z_id, organization=org_10031,
+            options=STAFF_EDITABLE_MASK)
+
+        with SessionScope(db):
+            db.session.add(uc_w)
+            db.session.add(uc_x)
+            db.session.add(uc_y)
+            db.session.add(uc_z)
+            db.session.commit()
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+            patient_w, patient_x, patient_y, patient_z))
+
+        ###
+        # Setup complete - test access
+        ###
+
+        # top level staff can view/edit all
+        staff_top = db.session.merge(staff_top)
+        for perm in ('view', 'edit'):
+            for patient in (
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_top.check_role(perm, other_id=patient))
+
+        # mid level staff can view/edit all
+        staff_mid = db.session.merge(staff_mid)
+        for perm in ('view', 'edit'):
+            for patient in (
+                patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_mid.check_role(perm, other_id=patient))
+
+        # low level staff can view/edit only those w/ same org
+        staff_leaf = db.session.merge(staff_leaf)
+        for perm in ('view', 'edit'):
+            for patient in (patient_w_id, patient_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_leaf.check_role, perm, patient)
+        for perm in ('view', 'edit'):
+            for patient in (patient_y_id, patient_z_id):
+                self.assertTrue(
+                    staff_leaf.check_role(perm, other_id=patient))
+
+        # Now remove the staff editable flag from the consents, which should
+        # preserve view but remove edit permission
+        for uc in (uc_w, uc_x, uc_y, uc_z):
+            uc = db.session.merge(uc)
+            uc.staff_editable = False
+
+        with SessionScope(db):
+            db.session.commit()
+        patient_w, patient_x, patient_y, patient_z = map(db.session.merge,(
+            patient_w, patient_x, patient_y, patient_z))
+
+        # top level staff can view all, edit none
+        staff_top = db.session.merge(staff_top)
+        for patient in (
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_top.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_top.check_role, 'edit', other_id=patient)
+
+        # mid level staff can view all, edit none
+        staff_mid = db.session.merge(staff_mid)
+        for patient in (
+            patient_w_id, patient_x_id, patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_mid.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_mid.check_role, 'edit', other_id=patient)
+
+        # low level staff can view only those w/ same org; edit none
+        staff_leaf = db.session.merge(staff_leaf)
+        for perm in ('view', 'edit'):
+            for patient in (patient_w_id, patient_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_leaf.check_role, perm, patient)
+        for patient in (patient_y_id, patient_z_id):
+            self.assertTrue(
+                staff_leaf.check_role('view', other_id=patient))
+            self.assertRaises(
+                Unauthorized, staff_leaf.check_role, 'edit', patient)
+
     def test_all_relationships(self):
         # obtain list of all relationships
-        rv = self.app.get('/api/relationships')
+        rv = self.client.get('/api/relationships')
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
@@ -510,7 +690,7 @@ class TestUser(TestCase):
         # make sure we get relationships for both subject and predicate
         self.create_fake_relationships()
         self.login()
-        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertTrue(len(rv.json['relationships']) >= 2)  # we'll add more
 
@@ -521,7 +701,7 @@ class TestUser(TestCase):
                                   'with': other_user.id},]
                }
         self.login()
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -540,7 +720,7 @@ class TestUser(TestCase):
         self.assertEquals(len(self.test_user.relationships), 1)
 
         self.login()
-        rv = self.app.get('/api/user/{}/relationships'.format(TEST_USER_ID))
+        rv = self.client.get('/api/user/{}/relationships'.format(TEST_USER_ID))
         self.assert200(rv)
         data = rv.json
 
@@ -551,7 +731,7 @@ class TestUser(TestCase):
         data['relationships'] = [r for r in data['relationships'] if
                                  r['user'] == self.test_user.id]
         self.assertEquals(len(data['relationships']), 1)
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -567,7 +747,7 @@ class TestUser(TestCase):
                                   'with': TEST_USER_ID},]
                }
         self.login()
-        rv = self.app.put('/api/user/{}/relationships'.format(TEST_USER_ID),
+        rv = self.client.put('/api/user/{}/relationships'.format(TEST_USER_ID),
                          content_type='application/json',
                          data=json.dumps(data))
         self.assert200(rv)
@@ -592,15 +772,20 @@ class TestUser(TestCase):
                                  birthdate=user.birthdate)
         self.assertEquals(score, 100)  # should be perfect match
 
+        score = user.fuzzy_match(first_name=user.first_name,
+                                 last_name=user.last_name,
+                                 birthdate=datetime.strptime("01-31-1951",'%m-%d-%Y'))
+        self.assertEquals(score, 0)  # incorrect birthdate returns 0
+
         score = user.fuzzy_match(first_name=user.first_name + 's',
                                  last_name='O' + user.last_name,
                                  birthdate=user.birthdate)
-        self.assertTrue(score > 90)  # should be close
+        self.assertTrue(score > 88)  # should be close
 
         score = user.fuzzy_match(first_name=user.first_name,
                                  last_name='wrong',
                                  birthdate=user.birthdate)
-        self.assertTrue(score < 67)  # 2/3 correct
+        self.assertTrue(score < 51)  # Name 1/2 correct
 
     def test_merge(self):
         with SessionScope(db):
@@ -609,9 +794,13 @@ class TestUser(TestCase):
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
+            self.shallow_org_tree()
             orgs = Organization.query.limit(2)
             other.organizations.append(orgs[0])
             other.organizations.append(orgs[1])
+            deceased_audit = Audit(user_id=TEST_USER_ID, comment='n/a',
+                subject_id=TEST_USER_ID)
+            other.deceased = deceased_audit
             db.session.commit()
             user, other = map(db.session.merge, (self.test_user, other))
             user.merge_with(other.id)
@@ -622,3 +811,4 @@ class TestUser(TestCase):
             self.assertEquals(user.gender, 'male')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
+            self.assertTrue(user.deceased)

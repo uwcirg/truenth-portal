@@ -11,20 +11,20 @@ from urlparse import urlparse
 
 from ..extensions import db, oauth
 from .relationship import RELATIONSHIP
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user
 
-providers_list = ENUM('facebook', 'google', 'twitter', 'truenth',
+providers_list = ENUM(*SUPPORTED_OAUTH_PROVIDERS,
         name='providers', create_type=False)
-
 
 class AuthProvider(db.Model):
     __tablename__ = 'auth_providers'
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column('provider', providers_list)
     provider_id = db.Column(db.String(40))
-    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'))
+    user_id = db.Column(db.ForeignKey('users.id', ondelete='CASCADE'),
+                        nullable=False)
     user = db.relationship('User')
 
     def as_fhir(self):
@@ -34,7 +34,6 @@ class AuthProvider(db.Model):
         d['use'] = 'secondary'
         d['system'] = '{system}/{provider}'.format(
             system=TRUENTH_IDENTITY_SYSTEM, provider=self.provider)
-        d['assigner'] = {'display': self.provider}
         d['value'] = self.provider_id
         return d
 
@@ -148,8 +147,13 @@ class Client(db.Model):
         # Use celery asynchronous task 'post_request'
         kwargs = {'url': self.callback_url, 'data': formdata}
         res = post_request.apply_async(kwargs=kwargs)
-        context = {"id": res.task_id, "url": kwargs['url'],
-                "data": kwargs['data']}
+
+        context = {
+            "id": res.task_id,
+            "url": self.callback_url,
+            "formdata": formdata,
+            "data": data,
+        }
         current_app.logger.debug(str(context))
 
     def lookup_service_token(self):

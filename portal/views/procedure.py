@@ -1,10 +1,12 @@
 from flask import abort, jsonify, Blueprint, request
+from collections import defaultdict
 
 from ..audit import auditable_event
 from ..extensions import db, oauth
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
 from ..models.procedure import Procedure
+from ..models.procedure_codes import TxStartedConstants, TxNotStartedConstants
 
 
 procedure_api = Blueprint('procedure_api', __name__, url_prefix='/api')
@@ -17,6 +19,11 @@ def procedure(patient_id):
     Returns a patient's procedures data as a FHIR
     bundle of procedures (http://www.hl7.org/fhir/procedure.html)
     in JSON.
+
+    NB a procedure code may enumerate multiple coding values, from different
+    coding systems.  Clients will typically react on (code, system) values of
+    interest.
+
     ---
     tags:
       - Procedure
@@ -63,6 +70,14 @@ def post_procedure():
         Performed datetime, either a single moment as
             **performedDateTime** or a range in **performedPeriod**
 
+    NB although the system will maintain CodeableConcepts with codings for
+    all synonymous codes from different systems, only one code need be defined
+    in the submission, say just the ICHOM system and code value.
+
+    Valuesets available at `/api/procedure/valueset/{valueset}` list
+    respective code values known to the system for procedures indicating
+    patient treatment status.
+
     Raises 401 if logged-in user lacks permission to edit referenced
     patient.
 
@@ -102,6 +117,7 @@ def post_procedure():
           to edit referenced patient
 
     """
+
     # patient_id must first be parsed from the JSON subject field
     # standard role check is below after parse
 
@@ -109,8 +125,14 @@ def post_procedure():
             request.json['resourceType'] != 'Procedure':
         abort(400, "Requires FHIR resourceType of 'Procedure'")
 
-    audit = Audit(user_id=current_user().id)
-    procedure = Procedure.from_fhir(request.json, audit)
+    audit = Audit(user_id=current_user().id, subject_id=current_user().id,
+        context='procedure')
+    try:
+        procedure = Procedure.from_fhir(request.json, audit)
+    except ValueError as e:
+        abort(400, str(e))
+    if procedure.start_time.year < 1900:
+        abort(400, "Invalid datetime; pre 1900")
 
     # check the permission now that we know the subject
     patient_id = procedure.user_id
@@ -118,7 +140,8 @@ def post_procedure():
     patient = get_user(patient_id)
     patient.procedures.append(procedure)
     db.session.commit()
-    auditable_event("added {}".format(procedure), user_id=current_user().id)
+    auditable_event("added {}".format(procedure), user_id=current_user().id,
+        subject_id=patient_id, context='procedure')
     return jsonify(message='added procedure', procedure_id=str(procedure.id))
 
 
@@ -167,5 +190,64 @@ def procedure_delete(procedure_id):
     current_user().check_role(permission='edit', other_id=patient_id)
     db.session.delete(procedure)
     db.session.commit()
-    auditable_event("deleted {}".format(procedure), user_id=current_user().id)
+    auditable_event("deleted {}".format(procedure), user_id=current_user().id,
+        subject_id=patient_id, context='procedure')
     return jsonify(message='deleted procedure')
+
+
+@procedure_api.route('/procedure/valueset/<valueset>')
+def procedure_value_sets(valueset):
+    """Returns Valueset for treatment {started,not-started} codes
+
+    ---
+    tags:
+      - Procedure
+      - Valueset
+    operationId: procedure_value_sets
+    produces:
+      - application/json
+    parameters:
+      - name: valueset
+        in: path
+        description: Named valueset (either 'tx-started' or 'tx-not-started')
+        required: true
+        type: string
+    responses:
+      200:
+        description:
+          Returns FHIR like Valueset (https://www.hl7.org/FHIR/valueset.html)
+          for requested coding type.
+
+    """
+    options = ('tx-started', 'tx-not-started')
+    if valueset not in options:
+        abort(400, 'unknown valueset, supported options: {}'.format(options))
+
+    if valueset == 'tx-started':
+        condition = 'has'
+        constants_class = TxStartedConstants
+    else:
+        condition = 'has not'
+        constants_class = TxNotStartedConstants
+
+    valueset = {
+        "resourceType": "ValueSet",
+        "title": valueset,
+        "description": (
+            "List of procedure codes known to indicate treatment {} "
+            "stared.".format(condition)),
+        "url": request.url,
+        "compose": {"include": []}
+    }
+
+    code_by_system = defaultdict(list)
+    for concept in constants_class():
+        for code in concept.codings:
+            code_by_system[code.system].append(code)
+
+    for system in code_by_system.keys():
+        item = {"system": system,
+                "concept": [c.as_fhir() for c in code_by_system[system]]}
+        valueset["compose"]["include"].append(item)
+
+    return jsonify(**valueset)

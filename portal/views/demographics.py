@@ -26,6 +26,9 @@ def demographics(patient_id):
     list.  This includes 'race' and 'ethnicity'.  See example usage
     (http://hl7.org/fhir/patient-example-us-extensions.json.html)
 
+    A deceased patient will include ONE of 'deceasedBoolean' or
+    'deceasedDateTime' - preferring deceasedDateTime if it is known.
+
     At some point this may be extended to return a more role specific FHIR
     resource.  At this time, all users, regardless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's roles.
@@ -91,6 +94,9 @@ def demographics_set(patient_id):
     clinic must already be a registered organization.  See the
     [organization endpoints](/dist/#!/Organization).
 
+    For deceased patients, include ONE of 'deceasedBoolean' or
+    'deceasedDateTime' - preferring deceasedDateTime if it is known.
+
     At some point this may be extended to consume a more role specific FHIR
     resource.  At this time, all users, regarless of role, work with the
     FHIR patient resource type.  This API has no effect on the user's role.
@@ -143,8 +149,12 @@ def demographics_set(patient_id):
     except MissingReference, e:
         current_app.logger.debug("Demographics PUT failed: {}".format(e))
         abort(400, str(e))
+    except ValueError, e:
+        current_app.logger.debug("Demographics PUT failed: {}".format(e))
+        abort(400, str(e))
     db.session.commit()
     auditable_event("updated demographics on user {0} from input {1}".format(
-        patient_id, json.dumps(request.json)), user_id=current_user().id)
+        patient_id, json.dumps(request.json)), user_id=current_user().id,
+        subject_id=patient_id, context='user')
     return jsonify(patient.as_fhir())
 

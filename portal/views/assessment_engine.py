@@ -3,12 +3,15 @@ from flask import abort, Blueprint, current_app, jsonify, request, redirect
 from flask import session
 from flask_swagger import swagger
 import jsonschema
+import requests
+from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
+from ..models.fhir import AssessmentStatus
 from ..models.fhir import FHIR_datetime, QuestionnaireResponse
 from ..models.intervention import INTERVENTION
-from ..models.user import current_user, get_user
+from ..models.user import current_user, get_user, User
 from ..extensions import oauth
 from ..extensions import db
 
@@ -562,7 +565,7 @@ def assessment(patient_id, instrument_id):
     patient = get_user(patient_id)
     if patient.deleted:
         abort(400, "deleted user - operation not permitted")
-    questionnaire_responses = QuestionnaireResponse.query.filter_by(user_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter_by(subject_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
 
     if instrument_id is not None:
         questionnaire_responses = questionnaire_responses.filter(
@@ -587,6 +590,118 @@ def assessment(patient_id, instrument_id):
 
     return jsonify(bundle)
 
+@assessment_engine_api.route('/patient/assessment')
+@oauth.require_oauth()
+def get_assessments():
+    """
+    Return multiple patient's responses to all questionnaires
+
+
+    ---
+    operationId: getQuestionnaireResponses
+    tags:
+      - Assessment Engine
+    parameters:
+      - name: instrument_id
+        in: query
+        description:
+          ID of the instrument, eg "epic26", "eq5d"
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: assessments_bundle
+          required:
+            - type
+          properties:
+            type:
+                description:
+                  Indicates the purpose of this bundle- how it was
+                  intended to be used.
+                type: string
+                enum:
+                  - document
+                  - message
+                  - transaction
+                  - transaction-response
+                  - batch
+                  - batch-response
+                  - history
+                  - searchset
+                  - collection
+            link:
+              description:
+                A series of links that provide context to this bundle.
+              items:
+                properties:
+                  relation:
+                    description:
+                      A name which details the functional use for
+                      this link - see [[http://www.iana.org/assignments/link-relations/link-relations.xhtml]].
+                  url:
+                    description: The reference details for the link.
+            total:
+                description:
+                  If a set of search matches, this is the total number of
+                  matches for the search (as opposed to the number of
+                  results in this bundle).
+                type: integer
+            entry:
+              type: array
+              items:
+                $ref: "#/definitions/FHIRPatient"
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+
+    annotated_questionnaire_responses = []
+    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+
+    if "instrument_id" in request.args:
+        instrument_filters = (
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id)
+            for instrument_id in request.args.getlist('instrument_id')
+        )
+        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
+
+    patient_fields = ("careProvider", "identifier")
+
+    for questionnaire_response in questionnaire_responses:
+        subject = questionnaire_response.subject
+        questionnaire_response.document["subject"] = {
+            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+        }
+
+        annotated_questionnaire_responses.append(questionnaire_response.document)
+
+    bundle = {
+        'resourceType':'Bundle',
+        'updated':FHIR_datetime.now(),
+        'total':len(annotated_questionnaire_responses),
+        'type': 'searchset',
+        'link': {
+            'rel':'self',
+            'href':request.url,
+        },
+        'entry':annotated_questionnaire_responses,
+    }
+
+    return jsonify(bundle)
 
 @assessment_engine_api.route('/patient/<int:patient_id>/assessment',
                              methods=('POST', 'PUT'))
@@ -1057,14 +1172,15 @@ def assessment_set(patient_id):
     })
 
     questionnaire_response = QuestionnaireResponse(
-        user_id=patient_id,
+        subject_id=patient_id,
         document=request.json,
     )
 
     db.session.add(questionnaire_response)
     db.session.commit()
     auditable_event("added {}".format(questionnaire_response),
-                    user_id=current_user().id)
+                    user_id=current_user().id, subject_id=patient_id,
+                    context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
     return jsonify(response)
 
@@ -1095,12 +1211,29 @@ def present_assessment(instruments=None):
             - epic26
             - eq5d
         collectionFormat: multi
+      - name: resume_instrument_id
+        in: query
+        description:
+          ID of the instrument, eg "epic26", "eq5d"
+        required: true
+        type: array
+        items:
+          type: string
+          enum:
+            - epic26
+            - eq5d
+        collectionFormat: multi
       - name: next
         in: query
         description: Intervention URL to return to after assessment completion
         required: true
         type: string
         format: url
+      - name: subject_id
+        in: query
+        description: User ID to Collect QuestionnaireResponses as
+        required: false
+        type: integer
     responses:
       303:
         description: successful operation
@@ -1119,25 +1252,41 @@ def present_assessment(instruments=None):
     configured_instruments = current_app.config['INSTRUMENTS']
 
     queued_instruments = request.args.getlist('instrument_id')
+    resume_instruments = request.args.getlist('resume_instrument_id')
 
     # Hack to allow deprecated API to piggyback
     # Remove when deprecated_present_assessment() is fully removed
     if instruments is not None:
         queued_instruments = instruments
 
+    # Combine requested instruments into single list, maintaining order
+    common_instruments = queued_instruments + resume_instruments
+    common_instruments = sorted(
+        set(common_instruments),
+        key=lambda x: common_instruments.index(x)
+    )
 
-    if set(queued_instruments) - set(configured_instruments):
+    if set(common_instruments) - set(configured_instruments):
         abort(
             404,
             "No matching assessment found: %s" % (
-                ", ".join(set(queued_instruments) - set(configured_instruments))
+                ", ".join(set(common_instruments) - set(configured_instruments))
             )
         )
 
-    assessment_url = "%s/surveys/new_session?project=%s" % (
+    assessment_params = {
+        "project": ",".join(common_instruments),
+        "resume_instrument_id": ",".join(resume_instruments),
+        "subject_id": request.args.get('subject_id'),
+    }
+    # Clear empty querystring params
+    assessment_params = {k:v for k,v in assessment_params.items() if v}
+
+    assessment_url = "".join((
         INTERVENTION.ASSESSMENT_ENGINE.link_url,
-        ",".join(queued_instruments),
-    )
+        "/surveys/new_session?",
+        requests.compat.urlencode(assessment_params),
+    ))
 
     if 'next' in request.args:
         next_url = request.args.get('next')
@@ -1194,3 +1343,82 @@ def complete_assessment():
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
+
+
+@assessment_engine_api.route('/consent-assessment-status')
+@oauth.require_oauth()
+def batch_assessment_status():
+    """Return a batch of consent and assessment states for list of users
+
+    ---
+    operationId: batch_assessment_status
+    tags:
+      - Internal
+    parameters:
+      - name: user_id
+        in: query
+        description:
+          TrueNTH user ID for assessment status lookup.  Any number of IDs
+          may be provided
+        required: true
+        type: array
+        items:
+          type: integer
+          format: int64
+        collectionFormat: multi
+    produces:
+      - application/json
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: batch_assessment_response
+          properties:
+            status:
+              type: array
+              items:
+                type: object
+                required:
+                  - user_id
+                  - consents
+                properties:
+                  user_id:
+                    type: integer
+                    format: int64
+                    description: TrueNTH ID for user
+                  consents:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - consent
+                        - assessment_status
+                      properties:
+                        consent:
+                          type: string
+                          description: Details of the consent
+                        assessment_status:
+                          type: string
+                          description: User's assessment status
+      401:
+        description: if missing valid OAuth token
+
+    """
+    acting_user = current_user()
+    user_ids = request.args.getlist('user_id')
+    if not user_ids:
+        abort(400, "Requires at least one user_id")
+    results = []
+    users = User.query.filter(User.id.in_(user_ids))
+    for user in users:
+        if not acting_user.check_role('view', user.id):
+            continue
+        details = []
+        for consent in user.all_consents:
+            a_s = AssessmentStatus(user=user, consent=consent)
+            details.append(
+                {'consent': consent.as_json(),
+                 'assessment_status': a_s.overall_status})
+        results.append({'user_id': user.id, 'consents': details})
+
+    return jsonify(status=results)

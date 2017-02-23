@@ -1,48 +1,140 @@
 language: python
 python: "2.7"
-
+sudo: false
 cache: pip
 addons:
   postgresql: "9.4"
+
 services:
   - postgresql
   - redis-server
 env:
+  matrix:
+    - TOXENV=py27
   global:
     - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
-    - PERSISTENCE_FILE='https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json'
+    - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
+    - IMAGE_NAME=${IMAGE_NAME:-portal_web}
+    - BINTRAY_DEB_REPO=${BINTRAY_DEB_REPO:-true_nth}
+    - BINTRAY_DOCKER_REPO=${BINTRAY_DOCKER_REPO:-portal}
+    - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
 
 matrix:
   include:
     - env: TOXENV=docs
-    - env:
-        - TOXENV=ui
-
-        # _SAUCE_USERNAME
-        - secure: "Hc5NUBDw0sUdXVTn0s8NqcmabMYZiMrpq3x5+Nytze4JKRxk0kmhyt IurC/C3A6bDM622ZFVtTCAs8k4Cg4GBfuGrdC/EaVaolw7trhWY9TUEuwWSPlmdTs ChPDQpGxXngxEA7ij2D6BOUR97l3UrXtMQ24syVHJl8MiLoZelNKSnQCs8yeNMw+j iLTvCyAXTl4hfoUiRidVxUlCTcSgJ4xajBDPEgAIm82Oo4qnCz7PSt/9GSG7cC5qH +KllMGbn/a8kTM+kJxiWA1QLQ7+DNo0TiYX1dMyZQPhPE/8H7EfLLvIuEAAvKNg3Y VxfpZYNDOKadP28HjSUqexbh75KBt8KZGweymLKPK/bt8zwAtWufEqW2iESlOfURz jKZ451oaBmCEpaFbbsxc6lnGQxnKB4/YTx6jClXTjii2dqUUw/lUIYgFXfnRYoyfo HGrl+AzZiVV4knJfQFHNT7rZoKfzgqzLUlkMYQu9sLKzfSb4ZT3MSFUnATfHmczmC 9JnX0aCtSj6V6ab6+PovFyFHRKhmn/zVAxUq0hFVdqZQj7A6nIU+vx8fpa42BRjA9 muaz3MwYIr5dAAlF1wPh3XRWx0mRW6YK4WYQ3HaV1nol9wGAnnTM0l949CN0u3IS6 WorfdmGuccFT0DT39qNyu5tnJ2W2hab7Dg2fJ+oabhEQ="
-
-        # _SAUCE_ACCESS_KEY
-        - secure: "jj5q57S8VzAHlNUlSrKtRdoCbFKFig75CFA8AxAQ0lyoMi9VOzwoNQ S3A50I0OYONhqiMWOeyxaBX+eS6y50kYoholJ8yy2DEzaYAJKGGrCh/S6YsGqBo9w jqODynf8c9uDeq4uyNqm3xrOuOBhYUWlmzczILkegw9cvBmKjMM8KK0OxwoEZlQC+ XqZMtUj0oxjiqyK5BiSDBt1TM8pLbZDUup0JTXzuxrRKjZnmw/LtMRqE5P64JeM7d 7qvcYwFrAMydUZSCIO9hguRjmL+kX2cl7Z0lTk5fAtcsroeDy63ClA2v/I90D4Bq2 v90jujU38P7ukJFLR4ji8HRKTllIJ1ouYoR4gzrWLQt7vXL7tHfByaCf4jFOqRaSd dEzj7xn4dXA/CbmbsNQSb+vFMVJMdND3RQDNYXcnGe/jlrn01UdHkouVui0SGtdl2 CHd8GfynkWhlw8XnZ6YZwdM8TVkYrFJPyD2hh7RyOzjytQb6gGdPVbztfEbgAjwXe af9/+Hi/aNdTlvF+KOZYr1Jkf5L2XTUxQhsNt+M2VMLzX03VOivlXZbRKC72b+hGv q93ENiMOt4uhT4d74KuTeXU19QelUWD5tYUiWEsIFvzz/g1+xVShU4DcNLKRIoYZY 1H4w95+QFRBZ9oXHRO7auua4QneIsFBq1ghQ/E7jfVOs="
+      services: []
+      addons: {}
+    - env: TOXENV=ui
       addons:
         postgresql: "9.4"
         sauce_connect: true
+    - env: TOXENV=build
+      services:
+        - docker
+  # Build artifacts only (no testing)
+  allow_failures:
+    - env: TOXENV=build
+      services:
+        - docker
 
 before_install:
-  # Set TOXENV default (if not overridden by matrix environmental variables)
+  # Set Github env vars
+  - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
+  - export GH_USERNAME GH_REPO
+  - export SHORT_HASH=${TRAVIS_COMMIT::8}
+
+  # Only deploy from develop and master branches, and not previously configured
+  - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then export DEPLOY=true;fi
+
+  # Set TOXENV default (if not already set by matrix environmental variables)
   - if [[ ! -v TOXENV ]]; then export TOXENV=py27;fi
 
-  # Allow environmental variables configured per-repo on TravisCI website to override .travis.yml defaults
-  - if [[ ! -v SAUCE_USERNAME ]]; then export SAUCE_USERNAME=$_SAUCE_USERNAME;fi
-  - if [[ ! -v SAUCE_ACCESS_KEY ]]; then export SAUCE_ACCESS_KEY=$_SAUCE_ACCESS_KEY;fi
+  # Fetch all remote branches instead of just the currently checked out one
+  - git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
+  - git fetch --unshallow
 
+  - psql --command 'create database portal_unit_tests owner postgres;' --username postgres
 
-  - psql -c 'create database portal_unit_tests owner postgres;' -U postgres
-
-  - pip install --upgrade pip
+  - pip install --upgrade pip setuptools
+  - export PORTAL_VERSION="$(python setup.py --version)"
 
 install:
   - pip install tox
 
 script:
   - tox
+
+after_success:
+  # Only run build steps in corresponding tox env
+  - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
+
+  # Set docker tag based on branch
+  - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
+
+  - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
+  - docker volume create --name debian-repo
+  # Build artifacts from current repo and branch (else "develop")
+  - docker run --volume debian-repo:/tmp/artifacts --env REPO_SLUG=$TRAVIS_REPO_SLUG --env BRANCH=${TRAVIS_BRANCH:-develop} "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
+
+  # Copy artifacts off volume mounted on previous container
+  - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-docker-true_nth.bintray.io/deb_builder:latest"):/tmp/artifacts /tmp
+  # Copy artifacts to current directory to allow local installation
+  - cp --recursive --verbose /tmp/artifacts artifacts
+  - docker build --file docker/Dockerfile --tag "$IMAGE_NAME:$SHORT_HASH" --tag "$IMAGE_NAME:$TAG" --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER" .
+
+before_deploy:
+  - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
+  - docker login --username "$BINTRAY_USERNAME" --password "$BINTRAY_API_KEY" "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io"
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker login --username "$DOCKER_CLOUD_USERNAME" --password "$DOCKER_CLOUD_API_KEY" https://index.docker.io/v1/;fi
+
+  # Build bintray descriptor file dynamically
+  - >
+    printf '
+    {
+        "package": {
+            "name": "$PACKAGE_NAME",
+            "repo": "$BINTRAY_DEB_REPO",
+            "subject": "$GH_USERNAME",
+            "public_download_numbers": false,
+            "public_stats": false
+        },
+        "version": {
+            "name": "$PORTAL_VERSION",
+            "gpgSign": true
+        },
+        "files": [
+            {
+                "includePattern": "artifacts/(.+\\.deb)$",
+                "uploadPattern": "artifacts/$1",
+                "matrixParams": {
+                    "deb_distribution": "stable",
+                    "deb_component": "main",
+                    "deb_architecture": "amd64"
+                }
+            }
+        ],
+        "publish": true
+    }
+    ' | envsubst | tee "${TRAVIS_BUILD_DIR}/bintray.json"
+
+# Only deploy from default virtual env TravisCI job
+deploy:
+  on:
+    all_branches: true
+    condition:
+      - $TOXENV = build
+      - $DEPLOY = true
+      - -v BINTRAY_API_KEY
+  provider: bintray
+  file: "bintray.json"
+  user: $BINTRAY_USERNAME
+  key: $BINTRAY_API_KEY
+
+after_deploy:
+  - docker tag $IMAGE_NAME:latest "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
+  - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
+
+  - docker tag $IMAGE_NAME:latest "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:latest"
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker push "docker.io/$DOCKER_CLOUD_USERNAME/$IMAGE_NAME";fi

@@ -5,8 +5,10 @@ import os
 import pkginfo
 import sys
 import requests_cache
-from flask import Flask, current_app
+from flask import Flask
 from flask_webtest import get_scopefunc
+import redis
+from urlparse import urlparse
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
@@ -14,7 +16,7 @@ from .extensions import authomatic
 from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
-from .models.user import current_user
+from .models.i18n import get_locale
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
 from .views.auth import auth, capture_next_view_function
@@ -26,6 +28,7 @@ from .views.fhir import fhir_api
 from .views.filters import filters_blueprint
 from .views.group import group_api
 from .views.intervention import intervention_api
+from .views.patient import patient_api
 from .views.patients import patients
 from .views.procedure import procedure_api
 from .views.portal import portal, page_not_found, server_error
@@ -47,6 +50,7 @@ DEFAULT_BLUEPRINTS = (
     group_api,
     intervention_api,
     org_api,
+    patient_api,
     patients,
     procedure_api,
     portal,
@@ -147,6 +151,17 @@ def configure_blueprints(app, blueprints):
 
 def configure_logging(app):  # pragma: no cover
     """Configure logging."""
+    if app.config.get('LOG_SQL'):
+        sql_log_file = '/tmp/sql_log'
+        sql_file_handler = handlers.RotatingFileHandler(sql_log_file,
+                maxBytes=1000000, backupCount=20)
+        sql_file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(thread)d: %(message)s'
+        ))
+        sql_log = logging.getLogger('sqlalchemy.engine')
+        sql_log.setLevel(logging.INFO)
+        sql_log.addHandler(sql_file_handler)
+
     if app.testing:
         # Skip test mode. Just check standard output.
         return
@@ -215,7 +230,7 @@ def configure_metadata(app):
 
     # Get git hash from version if present
     # Todo: extend Develop instead of monkey patching
-    if '+ng' in metadata.version:
+    if metadata.version and '+ng' in metadata.version:
         metadata.git_hash = metadata.version.split('+ng')[-1].split('.')[0]
 
     app.config.metadata = metadata
@@ -223,11 +238,18 @@ def configure_metadata(app):
 
 def configure_cache(app):
     """Configure requests-cache"""
-    requests_cache.install_cache(cache_name=app.name, backend='redis',
-                                 expire_after=180, old_data_on_error=True)
+    REQUEST_CACHE_URL = app.config.get("REQUEST_CACHE_URL")
+    redis_url = urlparse(REQUEST_CACHE_URL)
 
-@babel.localeselector
-def get_locale():
-    if current_user() and current_user().locale_code:
-        return current_user().locale_code
-    return current_app.config.get("DEFAULT_LOCALE")
+    requests_cache.install_cache(
+        cache_name=app.name,
+        backend='redis',
+        expire_after=180,
+        include_get_headers=True,
+        old_data_on_error=True,
+        connection=redis.StrictRedis(
+            host=redis_url.hostname if redis_url.hostname else None,
+            port=redis_url.port if redis_url.port else None,
+            db=redis_url.path.split('/')[1] if redis_url.hostname else None,
+        ),
+    )

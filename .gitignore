@@ -14,3 +14,9 @@ include
 man
 pip-selfcheck.json
 log
+portal/test_uploads
+
+.idea
+.settings/
+.pydevproject
+.project

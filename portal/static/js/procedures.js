@@ -55,6 +55,8 @@ $.fn.extend({
 }); // $.fn.extend({
 
 var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+var procDateReg =  /(0[1-9]|1\d|2\d|3[01])/;
+var procYearReg = /(19|20)\d{2}/;
 
 $(document).ready(function() {
 
@@ -72,19 +74,6 @@ $(document).ready(function() {
     // Trigger eventInput on submit button
     $("button[id^='tnthproc-submit']").eventInput();
 
-    // Add/remove disabled from submit button
-
-    function checkSubmit(btnId) {
-
-        if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
-            // We trigger the click here. The button is actually hidden so user doesn't interact with it
-            // TODO - Remove the button completely and store the updated values elsewhere
-            $(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
-        } else {
-            $(btnId).addClass('disabled').attr('disabled',true);
-        };
-    };
-
     function isLeapYear(year)
     {
       return ((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0);
@@ -92,16 +81,34 @@ $(document).ready(function() {
 
     function checkDate() {
         var d = $("#procDay").val(), m = $("#procMonth").val(), y = $("#procYear").val();
-        var dTest = /([1-9]|[12][0-9]|3[01])/.test(d);
+        if (!isNaN(parseInt(d))) {
+            if (parseInt(d) > 0 && parseInt(d) < 10) d = "0" + d;
+        };
+
+        var dTest = procDateReg.test(d);
         var mTest = (m != "");
-        var yTest =  /\d{4}/.test(y);
-        var errorText = "Please match the requested format.";
+        var yTest = procYearReg.test(y);
+        var errorText = "The procedure date must be valid and in required format.";
         var dgField = $("#procDateGroup");
         var deField = $("#procDateErrorContainer");
         var errorColor = "#a94442";
         var validColor = "#777";
 
         if (dTest && mTest && yTest) {
+
+            var date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+            var today = new Date();
+            //console.log("dy: " + date.getFullYear() + " y: " + parseInt(y) + " dm: " + (date.getMonth() + 1) + " m: " + parseInt(m) + " dd: " + date.getDate() + " d: " + parseInt(d))
+            if (date.getFullYear() == parseInt(y) && ((date.getMonth() + 1) == parseInt(m)) && date.getDate() == parseInt(d)) {
+                if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                    deField.text("The procedure date must be in the past.").css("color", errorColor);
+                    return false;
+                };
+            } else {
+                deField.text(errorText).css("color", errorColor);
+                return false;
+            };
+
             if (parseInt(m) === 2) { //month of February
                 if (isLeapYear(parseInt(y))) {
                     if (parseInt(d) > 29)  {
@@ -117,26 +124,50 @@ $(document).ready(function() {
                 };
                 deField.text("").css("color", validColor);
                 return true;
-            } else return true;
+            } else {
+                deField.text("").css("color", validColor)
+                return true;
+            };
 
-        } else return false;
+        } else {
+            return false;
+        };
     };
 
     function setDate() {
-        var passedDate = dateFields.map(function(fn) {
+        var isValid = checkDate();
+        if (isValid) {
+            var passedDate = dateFields.map(function(fn) {
             fd = $("#" + fn);
             if (fd.attr("type") == "text") return fd.val();
             else return fd.find("option:selected").val();
-        }).join("/");
-        console.log("passedDate: " + passedDate);
-        $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
-        dateFormatted = tnthDates.swap_mm_dd(passedDate);
-        console.log("formatted date: " + dateFormatted);
-        $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+            }).join("/");
+            //console.log("passedDate: " + passedDate);
+            $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
+            dateFormatted = tnthDates.swap_mm_dd(passedDate);
+            //console.log("formatted date: " + dateFormatted);
+            $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
+        } else {
+            $("button[id^='tnthproc-submit']").attr('data-date-read',"");
+            $("button[id^='tnthproc-submit']").attr('data-date',"");
+        };
+
         checkSubmit("button[id^='tnthproc-submit']");
 
     };
 
+     // Add/remove disabled from submit button
+
+    function checkSubmit(btnId) {
+        if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
+            // We trigger the click here. The button is actually hidden so user doesn't interact with it
+            // TODO - Remove the button completely and store the updated values elsewhere
+            //$(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
+            $(btnId).removeClass('disabled').removeAttr('disabled');
+        } else {
+            $(btnId).addClass('disabled').attr('disabled',true);
+        };
+    };
 
     // Update submit button when select changes
     $("select[id^='tnthproc']").on('change', function() {
@@ -154,12 +185,9 @@ $(document).ready(function() {
     var dateFields = ["procDay", "procMonth", "procYear"];
 
     dateFields.forEach(function(fn) {
-        $("#" + fn).on("change", function() {
-            var isValid = checkDate();
-            console.log("isValid: " +  isValid)
-            if (isValid) {
+        var triggerEvent = $("#" + fn).attr("type") == "text" ? "keyup": "change";
+        $("#" + fn).on(triggerEvent, function() {
                 setDate();
-            }; 
         });
     });
 
@@ -173,7 +201,7 @@ $(document).ready(function() {
         if (passedDate && passedDate != '' && /^(0[1-9]|[12][0-9]|3[01])[\/](0[1-9]|1[012])[\/]\d{4}$/.test(passedDate)) {
             $("button[id^='tnthproc-submit']").attr('data-date-read',passedDate);
             dateFormatted = tnthDates.swap_mm_dd(passedDate);
-            console.log("formatted date: " + dateFormatted);
+            //console.log("formatted date: " + dateFormatted);
             $("button[id^='tnthproc-submit']").attr('data-date',dateFormatted);
             checkSubmit("button[id^='tnthproc-submit']");
         }

@@ -1,0 +1,140 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{ super() }}
+      <div class="page-intro page-intro--dark page-intro--about" style="background-image: url({{url_for('static', filename='img/About-Top-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com', target='_blank'>The Movember Foundation</a>.</h1>
+          <p class="page-intro__sub">Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers.</p>
+          <div class="button-callout">
+            <figure class="js-scroll-down" data-target=".page-intro"></figure>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/a49bd1bd181ae3c72c/b947ee462a45662e?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/About-Video-Export.jpg') }}">
+        <div class="module-wrap--inner">
+          <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-brown">
+        <div class="module module--theme-brown">
+          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools</div>
+          <p class="module__heading">Our Current Projects</p>
+          <p class="module__body">We have two tools currently running and more on the way.</p>
+          <div class="icon-box-group__wrapper">
+            <div class="icon-box-group">
+              <div class="icon-box-wrap icon-box-decision-support"><a class="icon-box icon-box--theme-compass decision-support-link" href="{{PORTAL}}/decision-support"><strong class="icon-box__subhead">Tool N<em>o</em>1: Post Diagnosis</strong>
+                  <h4 class="icon-box__head">Decision Support</h4><span class="icon-box__lowhead">Questionnaire / Education / Report</span>
+                  <svg class="icon-box__icon" width="92" height="92">
+                    <use xlink:href="#DS-Compass"></use>
+                  </svg></a></div>
+              <div class="icon-box-wrap icon-box-symptom-tracker"><a class="icon-box icon-box--theme-compass icon-box--theme-brown symptom-tracker-link" href="{{PORTAL}}/symptom-tracker"><strong class="icon-box__subhead">Tool N<em>o</em>2: Monitoring</strong>
+                  <h4 class="icon-box__head">Symptom Tracker</h4><span class="icon-box__lowhead">Questionnaire / Reports / Tips</span>
+                  <svg class="icon-box__icon" width="90" height="90">
+                    <use xlink:href="#ST-Graph"></use>
+                  </svg></a></div>
+              <div class="icon-box-wrap">
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>3: All Stages</strong>
+                  <h4 class="icon-box__head">Exercise And Diet</h4><span class="icon-box__lowhead">Personalized Guides</span>
+                  <svg class="icon-box__icon" width="90" height="90">
+                    <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
+                  </svg>
+                </div>
+              </div>
+              <div class="icon-box-wrap">
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>4: All Stages</strong>
+                  <h4 class="icon-box__head">Lived Experience</h4><span class="icon-box__lowhead">Shared Stories</span>
+                  <svg class="icon-box__icon" width="90" height="90">
+                    <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
+                  </svg>
+                </div>
+              </div>
+              <div class="icon-box-wrap">
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>5: All Stages</strong>
+                  <h4 class="icon-box__head">Sexual Health</h4><span class="icon-box__lowhead">Recovery Plans</span>
+                  <svg class="icon-box__icon" width="90" height="90">
+                    <use xlink:href="#Coming-Soon"></use>
+                  </svg>
+                </div>
+              </div>
+              <div class="icon-box-wrap">
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>6: Post Diagnosis</strong>
+                  <h4 class="icon-box__head">Care Plan</h4><span class="icon-box__lowhead">Navigation Resources</span>
+                  <svg class="icon-box__icon" width="90" height="90">
+                    <use xlink:href="#Coming-Soon"></use>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-gray-light">
+        <div class="module module--theme-gray">
+          <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
+          <p class="module__heading">Our USA Partners</p>
+          <p class="module__body">We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer.</p>
+          <div class="partner-grid">
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/colorado.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/DanaFarber.png') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/duke.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/emory.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/johnshopkins.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/karmanos.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/sloan.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/michigan.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/moffitt.gif') }}"></div>
+            <!-- <div class="partner-grid__item"><img src="./img/music.gif"></div> -->
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/OHSU.png') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucdavis.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucla.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/UCSF.png') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/unc.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/uw.gif') }}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-blue">
+        <div class="module module--theme-gray">
+          <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
+          <p class="module__heading">Global Strategy</p>
+          <p class="module__body">TrueNTH is currently active in 7 countries around the world:</p>
+          <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}">
+            <ul class="tooltips">
+              <li class="tooltips__item tooltips__item--usa"><strong>USA</strong><span>US</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--can"><strong>Canada</strong><span>CA</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--ire"><strong>Ireland</strong><span>IE</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--uk"><strong>UK</strong><span>UK</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--sing"><strong>Singapore</strong><span>SG</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--aus"><strong>Australia</strong><span>AU</span>
+                <figure></figure>
+              </li>
+              <li class="tooltips__item tooltips__item--nz"><strong>New Zealand</strong><span>NZ</span>
+                <figure></figure>
+              </li>
+            </ul>
+          </div>
+          <p class="module__body">TrueNTH has invested 42 million USD to support the work of more than 350 global experts in prostate cancer care in these countries.</p>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $("body").attr("class", "page-about theme--intro-light");
+            $("#repoVersion").show();
+            setSelectedNavItem($(".side-nav-items__item--about"));
+        });
+    </script>
+{% endblock %}

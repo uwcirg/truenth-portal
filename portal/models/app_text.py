@@ -7,9 +7,11 @@ SitePersistence mechanism, and looked up in a template using the
 `app_text(string)` method.
 
 """
+from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
-from abc import ABCMeta, abstractmethod
+import requests
+from requests.exceptions import MissingSchema
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -97,35 +99,6 @@ class ConsentATMA(AppTextModelAdapter):
             raise ValueError("required organization parameter not defined")
         return "{} organization consent URL".format(organization.name)
 
-    @staticmethod
-    def permanent_url(generic_url, version):
-        """Produce a permanent url from the metadata provided
-
-        Consent agreements are versioned - but the link maintained
-        in the app_text table is not.
-
-        On request for the consent URL, the effective version number is
-        returned.  This method returns a permanent URL including the version
-        number.
-
-        """
-        parsed = urlparse(generic_url)
-        qs = parse_qsl(parsed.query)
-        if not qs:
-            qs = []
-        if 'version' not in qs:
-            qs.append(('version', version))
-        path = parsed.path
-        if path.endswith('/detailed'):
-            path = path[:-(len('/detailed'))]
-        format_dict = {
-            'scheme': parsed.scheme,
-            'netloc': parsed.netloc,
-            'path': path,
-            'qs': urlencode(qs)}
-        url = "{scheme}://{netloc}{path}?{qs}".format(**format_dict)
-        return url
-
 
 class ToU_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Terms Of Use agreements - namely the URL"""
@@ -141,6 +114,21 @@ class ToU_ATMA(AppTextModelAdapter):
 
         """
         return "Terms of Use URL"
+
+class Terms_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for New Terms Of Use agreements - namely the URL"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a New Terms of Use agreement - new item just added
+
+        Not expecting any args at this time - may specialize per study
+        or organization in the future as needed.
+
+        :returns: string for AppText.name field
+
+        """
+        return "New Terms of Use URL"
 
 
 class AboutATMA(AppTextModelAdapter):
@@ -172,6 +160,66 @@ class LegalATMA(AppTextModelAdapter):
         return "Legal URL"
 
 
+class VersionedResource(object):
+    """Helper to manage versioned resource URLs (typically on Liferay)"""
+
+    @staticmethod
+    def permanent_url(generic_url, version):
+        """Produce a permanent url from the metadata provided
+
+        Resources are versioned - but the link maintained in the app_text
+        table is not.
+
+        When requesting the detailed resource, the effective version number is
+        returned.  This method returns a permanent URL including the version
+        number, useful for audit and tracking information.
+
+        """
+        parsed = urlparse(generic_url)
+        qs = dict(parse_qsl(parsed.query))
+        qs['version'] = version
+
+        path = parsed.path
+        if path.endswith('/detailed'):
+            path = path[:-(len('/detailed'))]
+        format_dict = {
+            'scheme': parsed.scheme,
+            'netloc': parsed.netloc,
+            'path': path,
+            'qs': urlencode(qs)}
+        url = "{scheme}://{netloc}{path}?{qs}".format(**format_dict)
+        return url
+
+
+    @staticmethod
+    def fetch_elements(url):
+        """Given a URL, fetch the asset and permanent version of URL
+
+        Pulls and returns the 'asset' (i.e. response.text) from the given URL.
+        If version info is provided in the `detailed` response, a permanent
+        version of the URL is also returned.
+
+        :param url: the URL to pull details and asset from
+        :returns: (asset, url)
+
+        """
+        try:
+            response = requests.get(url)
+        except MissingSchema:
+            # In testing, mocking of test data includes not loading
+            # app_text resources defining legit URLs.  punt if testing
+            if current_app.config.get('TESTING'):
+                return ("[TESTING - fake response]", 'http://fake.org')
+            raise  # reraise same exception if we're not testing
+        try:
+            return (
+                response.json()['asset'],
+                VersionedResource.permanent_url(
+                    version=response.json()['version'],
+                    generic_url=url))
+        except ValueError:  # thrown when no json is available in response
+            return (response.text, url)
+
 def app_text(name, *args):
     """Look up and return cusomized application text string
 
@@ -202,6 +250,8 @@ def app_text(name, *args):
     """
     item = AppText.query.filter_by(name=name).first()
     if not item:
+        if current_app.config.get('TESTING'):
+            return "[TESTING - ignore missing app_text '{}']".format(name)
         raise ValueError("unknown customized app string '{}'".format(name))
 
     text = str(item)

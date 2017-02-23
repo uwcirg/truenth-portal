@@ -1,0 +1,81 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main decision-support-main">
+     {{ super() }}
+      <div class="page-intro page-intro--dark page-intro--decision-support" style="background-image: url({{url_for('static', filename='img/DS-Top-Background.jpg') }})">
+        <div class="page-intro__content">
+          <h1 class="page-intro__main">Decision Support</h1>
+          <p class="page-intro__sub">Choosing which treatment path to go down can be confusing and overwhelming. Being informed of the different options and how each fits into your life is critical in making the best choice for you.</p>
+          <div class="button-callout button-callout--has-text">{% if not user %}<a href="#" class="button--teal icon-box__button icon-box__button--main decision-support-link" data-toggle="modal" data-target="#modal-register"><span>Start<figure></figure></span></a>{% endif %}<strong class="js-scroll-down" data-target=".page-intro">Learn More</strong>
+            <figure class="button-callout__scroll js-scroll-down" data-target=".page-intro"></figure>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/4c9ad9b61815eec5c4/882f75be6c8c66da?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/DS-Video-Export.jpg') }}">
+        <div class="module-wrap--inner">
+          <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-blue">
+        <div class="module module--theme-blue">
+          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools – Decision Support</div>
+          <p class="module__heading">Making Your Decision</p>
+          <p class="module__body">As you decide which treatment is best for you, it is important to prepare for the discussions with your doctor:</p>
+          <div class="list-module">
+            <div class="accent-heading">Helpful Tip N<em>o</em>3: Decision Making Checklist</div>
+            <ul class="list-module__items">
+              <li class="list-module__item checkbox-item">
+                <div class="checkbox-item__check">
+                  <figure></figure>
+                </div>
+                <div class="checkbox-item__copy">Make a list of your questions.</div>
+              </li>
+              <li class="list-module__item checkbox-item">
+                <div class="checkbox-item__check">
+                  <figure></figure>
+                </div>
+                <div class="checkbox-item__copy">Include people who are important to you in your decision making.</div>
+              </li>
+              <li class="list-module__item checkbox-item">
+                <div class="checkbox-item__check">
+                  <figure></figure>
+                </div>
+                <div class="checkbox-item__copy">Take your questions to your appointments.</div>
+              </li>
+              <li class="list-module__item checkbox-item"></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--confidence">
+        <div class="module">
+          <div class="accent-heading">Tool N<em>o</em>1: Post Diagnosis</div>
+          <h3 class="module__head">Decision Support Tool</h3>
+          <p class="module__body">Our tool was created to help you determine which option is best for you.</p>
+          <p class="module__body">After you have answered the questionnaire, you will receive personalized education and support to discuss the best path forward with your doctor.</p>
+          <p class="module__body">You can then download the report and share it with your doctor.</p>
+          <div class="icon-box-wrap">
+            <div class="icon-box-wrap__main icon-box icon-box--theme-compass">
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">Tool N<em>o</em>1: Post Diagnosis</strong>
+                <h4 class="icon-box__head">Decision Support</h4><span class="icon-box__lowhead">Questionnaire / Education / Report</span>
+                <svg class="icon-box__icon" width="92" height="92">
+                  <use xlink:href="#DS-Compass"></use>
+                </svg>
+              </div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main decision-support-link {% if not user %}icon-box__button--disabled{% endif %}" href="{%if user%}{{PORTAL}}/home{%else%}/{%endif%}"><span>Start<figure></figure></span></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}
+{% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $("body").attr("class", "page-about theme--intro-light");
+            setSelectedNavItem($(".side-nav-items__item--decisionsupport"));
+            $("footer a[href='/decision-support']").hide();
+            IO.clearSession("decision-support");
+        });
+    </script>
+{% endblock %}

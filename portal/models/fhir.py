@@ -1,7 +1,8 @@
 """Model classes for retaining FHIR data"""
-from datetime import date, datetime
-import dateutil
-from flask import current_app
+from collections import OrderedDict
+from datetime import date, datetime, timedelta
+from dateutil import parser
+from flask import abort, current_app
 import json
 import pytz
 from sqlalchemy import UniqueConstraint
@@ -41,13 +42,36 @@ class FHIR_datetime(object):
         return as_fhir(obj)
 
     @staticmethod
-    def parse(data):
-        """Parse input string to generate a UTC datetime instance"""
-        dt = dateutil.parser.parse(data)
+    def parse(data, error_subject=None):
+        """Parse input string to generate a UTC datetime instance
+
+        NB - date must be more recent than year 1900 or a ValueError
+        will be raised.
+
+        :param data: the datetime string to parse
+        :param error_subject: Subject string to use in error message
+
+        :return: UTC datetime instance from given data
+
+        """
+        # As we use datetime.strftime for display, and it can't handle dates
+        # older than 1900, treat all such dates as an error
+        epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')
+        try:
+            dt = parser.parse(data)
+        except ValueError:
+            msg = "Unable to parse {}: {}".format(error_subject, data)
+            current_app.logger.warn(msg)
+            abort(400, msg)
         if dt.tzinfo:
+            epoch = pytz.utc.localize(epoch)
             # Convert to UTC if necessary
             if dt.tzinfo != pytz.utc:
                 dt = dt.astimezone(pytz.utc)
+        # As we use datetime.strftime for display, and it can't handle dates
+        # older than 1900, treat all such dates as an error
+        if dt < epoch:
+            raise ValueError("Dates prior to year 1900 not supported")
         return dt
 
     @staticmethod
@@ -65,8 +89,8 @@ class CodeableConceptCoding(db.Model):
         'codeable_concepts.id'), nullable=False)
     coding_id =  db.Column(db.ForeignKey('codings.id'), nullable=False)
 
-    # Maintain a unique relationship between each codeable concepts
-    # and the its of codings.  Therefore, a CodeableConcept always
+    # Maintain a unique relationship between each codeable concept
+    # and it list of codings.  Therefore, a CodeableConcept always
     # contains the superset of all codings given for the concept.
     db.UniqueConstraint('codeable_concept_id', 'coding_id',
                         name='unique_codeable_concept_coding')
@@ -114,18 +138,26 @@ class CodeableConcept(db.Model):
         # we're imposing a constraint, where any CodeableConcept pointing
         # at a particular Coding will be the ONLY CodeableConcept for that
         # particular Coding.
-        coding_ids = [c.id for c in self.codings]
+        coding_ids = [c.id for c in self.codings if c.id]
         if not coding_ids:
-            current_app.logger.error("no coding_ids found for {}".format(self))
-        found = CodeableConceptCoding.query.filter(
-            CodeableConceptCoding.coding_id.in_(coding_ids)).first()
-        if not found:
+            raise ValueError("Can't add CodeableConcept without any codings")
+        query = CodeableConceptCoding.query.filter(
+            CodeableConceptCoding.coding_id.in_(coding_ids)).distinct(
+                CodeableConceptCoding.codeable_concept_id)
+        if query.count() > 1:
+            raise ValueError(
+                "DB problem - multiple CodeableConcepts {} found for "
+                "codings: {}".format(
+                    [cc.codeable_concept_id for cc in query],
+                    [str(c) for c in self.codings]))
+        if not query.count():
             # First time for this (set) of codes, add new rows
             db.session.add(self)
             if commit_immediately:
                 db.session.commit()
         else:
             # Build a union of all codings found, old and new
+            found = query.first()
             old = CodeableConcept.query.get(found.codeable_concept_id)
             self.text = self.text if self.text else old.text
             self.codings = list(set(old.codings).union(set(self.codings)))
@@ -154,7 +186,7 @@ class Coding(db.Model):
         for i in ("system", "code", "display"):
             if i in data:
                 cc.__setattr__(i, data[i])
-        return cc.add_if_not_found()
+        return cc.add_if_not_found(True)
 
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
@@ -164,7 +196,7 @@ class Coding(db.Model):
                 d[i] = getattr(self, i)
         return d
 
-    def add_if_not_found(self):
+    def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
         Queries for similar, existing CodeableConcept (matches on
@@ -179,6 +211,8 @@ class Coding(db.Model):
                 code=self.code).first()
         if not match:
             db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
         elif self is not match:
             self = db.session.merge(match)
         return self
@@ -213,14 +247,6 @@ class ClinicalConstants(object):
     def PCaLocalized(self):
         coding = Coding.query.filter_by(
             system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
-        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
-        assert coding in cc.codings
-        return cc
-
-    @lazyprop
-    def TX(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -424,7 +450,8 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey('users.id'))
+    subject_id = db.Column(db.ForeignKey('users.id'))
+    subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
 
     # Fields derived from document content
@@ -444,7 +471,7 @@ class QuestionnaireResponse(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "QuestionnaireResponse {0.id} for user {0.user_id} "\
+        return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
 
@@ -487,16 +514,16 @@ def add_static_concepts(only_quick=False):
         unless the test needs the slow to load race and ethnicity data.
 
     """
+    from .procedure_codes import TxStartedConstants, TxNotStartedConstants
+
     BIOPSY = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111',
                              display='biopsy')
     PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
                               display='PCa diagnosis')
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
-    TX = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='131',
-                         display='treatment begun')
 
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized, TX]
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
@@ -509,3 +536,213 @@ def add_static_concepts(only_quick=False):
     for clinical_concepts in CC:
         if not clinical_concepts in db.session():
             db.session.add(clinical_concepts)
+
+    for concept in TxStartedConstants(): pass  # looping is adequate
+    for concept in TxNotStartedConstants(): pass  # looping is adequate
+
+
+def localized_PCa(user):
+    """Look up user's value for localized PCa"""
+    from .organization import Organization, OrgTree
+
+    # Some systems use organization affiliation to note
+    # if a user has what we call a 'localized diagnosis'
+    if current_app.config.get('LOCALIZED_AFFILIATE_ORG', None):
+        localized_org = Organization.query.filter_by(
+            name=current_app.config.get('LOCALIZED_AFFILIATE_ORG')).one()
+        ot = OrgTree()
+        consented_orgs = [c.organization_id for c in user.valid_consents]
+        if ot.at_or_below_ids(localized_org.id, consented_orgs):
+            return True
+        return False
+    else:
+        codeable_concept = CC.PCaLocalized
+        value_quantities = user.fetch_values_for_concept(codeable_concept)
+        if value_quantities:
+            assert len(value_quantities) == 1
+            return value_quantities[0].value == 'true'
+        return False
+
+
+def most_recent_survey(user, instrument_id=None):
+    """Look up timestamp for recent QuestionnaireResponse for user
+
+    :param user: Patient to whom completed QuestionnaireResponses belong
+    :param instrument_id: Optional parameter to limit type of
+        QuestionnaireResponse in lookup.
+    :return: dictionary with authored (timestamp) of the most recent
+        QuestionnaireResponse keyed by status found
+
+    """
+    query = QuestionnaireResponse.query.distinct(
+        QuestionnaireResponse.status).filter(
+        QuestionnaireResponse.subject_id == user.id)
+    if instrument_id:
+        query = query.filter(
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id))
+
+    query = query.order_by(
+        QuestionnaireResponse.status,
+        QuestionnaireResponse.authored).limit(
+            5).with_entities(QuestionnaireResponse.status,
+                            QuestionnaireResponse.authored)
+    results = {}
+    for qr in query:
+        if qr[1] not in results:
+            results[qr[0]] = qr[1]
+    return results
+
+
+
+class AssessmentStatus(object):
+    """Lookup and hold assessment status detail for a user
+
+    Complicated task due to nature of multiple instruments which differ
+    depending on user state such as localized or metastatic.
+
+    """
+
+    def __init__(self, user, consent=None):
+        """Initialize assessment status object for given user/consent
+
+        :param user: The user in question - patient on whom to check status
+        :param consent: Consent agreement defining dates and which organization
+            to consider in the status check.  If not provided, use the first
+            valid consent found for the user.  Users w/o consents have
+            overall_status of `Expired`
+
+        """
+        self.user = user
+        self._consent = consent
+        self._overall_status, self._consent_date = None, None
+        self._localized = localized_PCa(user)
+        self.instrument_status = OrderedDict()
+
+    @property
+    def consent_date(self):
+        """Return timestamp of signed consent, if available, else None"""
+
+        if self._consent_date:
+            return self._consent_date
+
+        # If we aren't given a consent, use the first valid consent found
+        # for the user.
+        if not self._consent:
+            if self.user.valid_consents and len(list(self.user.valid_consents)) > 0:
+                self._consent = self.user.valid_consents[0]
+
+        if self._consent:
+            self._consent_date = self._consent.audit.timestamp
+        else:
+            # Tempting to call this invalid state, but it's possible
+            # the consent has been revoked, treat as expired.
+            self._consent_date = None
+        return self._consent_date
+
+    @property
+    def completed_date(self):
+        """Returns timestamp from completed assessment, if available"""
+        self.__obtain_status_details()
+        best_date = None
+        for instrument, details in self.instrument_status.items():
+            if 'completed' in details:
+                # TODO: in event of multiple completed instruments,
+                # not sure *which* date is best??
+                best_date = details['completed']
+        return best_date
+
+    @property
+    def localized(self):
+        return self._localized
+
+    @property
+    def overall_status(self):
+        """Returns display quality string for user's overall status"""
+        self.__obtain_status_details()
+        return self._overall_status
+
+    def instruments_needing_full_assessment(self):
+        self.__obtain_status_details()
+        results = []
+        for instrument_id, details in self.instrument_status.items():
+            if 'completed' in details or 'in-progress' in details:
+                continue
+            results.append(instrument_id)
+        return results
+
+    def instruments_in_process(self):
+        self.__obtain_status_details()
+        results = []
+        for instrument_id, details in self.instrument_status.items():
+            if 'in-progress' in details:
+                results.append(instrument_id)
+        return results
+
+    def __obtain_status_details(self):
+        # expensive process - do once
+        if hasattr(self, '_details_obtained'):
+            return
+        if not self.consent_date:
+            self._overall_status = 'Expired'
+            self._details_obtained = True
+            return
+        if self.localized:
+            thresholds = (
+                (7, "Due"),
+                (90, "Overdue"),
+            )
+            for instrument in ('epic26', 'eproms_add'):
+                self.__status_per_instrument(instrument, thresholds)
+        else:
+            # assuming metastaic - although it's possible the user just didn't
+            # answer the localized question
+            thresholds = (
+                (1, "Due"),
+                (30, "Overdue")
+            )
+            for instrument in ('eortc', 'hpfs', 'prems'):
+                self.__status_per_instrument(instrument, thresholds)
+
+        status_strings = [details['status'] for details in
+                          self.instrument_status.values()]
+
+        if all(status_strings[0] == status for status in status_strings):
+            # All intruments in the same state - use the common value
+            self._overall_status = status_strings[0]
+        else:
+            if any("Expired" == status for status in status_strings):
+                # At least one expired, but not all
+                self._overall_status = "Partially Completed"
+            self._overall_status = "In Progress"
+        self._details_obtained = True
+
+    def __status_per_instrument(self, instrument_id, thresholds):
+        """Returns status for one instrument
+
+        :param instrument_id: the instument in question
+        :param thresholds: series of day counts and status strings.
+            NB - these must be ordered with increasing values.
+
+        :return: matching status string from constraints
+
+        """
+        def status_from_recents(recents):
+            if 'completed' in recents:
+                return "Completed"
+            if 'in-progress' in recents:
+                return "In Progress"
+            today = datetime.utcnow()
+            delta = today - self.consent_date
+            for days_allowed, message in thresholds:
+                if delta < timedelta(days=days_allowed+1):
+                    return message
+            return "Expired"
+
+        if not instrument_id in self.instrument_status:
+            self.instrument_status[instrument_id] = most_recent_survey(
+                self.user, instrument_id)
+        if not 'status' in self.instrument_status[instrument_id]:
+            self.instrument_status[instrument_id]['status'] =\
+                    status_from_recents(self.instrument_status[instrument_id])

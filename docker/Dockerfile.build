@@ -1,0 +1,57 @@
+FROM debian:jessie
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# Use newest version of dh-virtualenv from testing release
+# Todo: try specifying version in `apt-get install` invocation
+RUN echo '\n\
+Package: dh-virtualenv\n\
+Pin: release a=testing\n\
+Pin-Priority: 750\n\
+\n'\
+> /etc/apt/preferences.d/dh-virtualenv.pref
+
+RUN echo '\n\
+Package: *\n\
+Pin: release a=testing\n\
+Pin-Priority: 75\n\
+\n'\
+> /etc/apt/preferences.d/testing.pref
+
+RUN echo deb http://httpredir.debian.org/debian/ testing main contrib non-free > /etc/apt/sources.list.d/testing.list
+
+RUN \
+    apt-get update && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --force-yes --no-install-recommends \
+        debhelper \
+        dh-virtualenv\
+        fakeroot \
+        git \
+        libc6-i386 \
+        libffi-dev \
+        libpq-dev \
+        python-dev \
+        python-pip && \
+    apt-get clean
+
+RUN pip install --upgrade pip setuptools
+RUN pip install make-deb
+
+RUN mkdir -p /tmp/artifacts
+
+# Allow branch to be overridden with environmental variable
+ENV BRANCH=${BRANCH:-develop}
+
+# Allow repo to be overridden with environmental variable
+ENV REPO_SLUG=${REPO_SLUG:-uwcirg/true_nth_usa_portal}
+
+CMD \
+    git clone --branch ${BRANCH} https://github.com/${REPO_SLUG}.git /root/portal && \
+    cd /root/portal && \
+    yes | make-deb && \
+    git checkout debian/rules && \
+    dpkg-buildpackage -us -uc && \
+    mv /root/portal_* /tmp/artifacts && \
+    cd /tmp/artifacts && \
+    dpkg-scanpackages . | gzip > /tmp/artifacts/Packages.gz

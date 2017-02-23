@@ -2,20 +2,19 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
-
-<!-- <div id="loadingIndicator" class="loading-indicator">
-    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
-</div> -->
-
 <br/>
 <div class="flex">
 <div class="profile-header">
-    {% if providerPerspective == 'true' %}
-        <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
-    {% elif current_user.has_role('admin') %}
-        <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+    {% if user and user.username %}
+      {% if providerPerspective == 'true' %}
+          <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+      {% elif current_user.has_role('admin') %}
+          <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+      {% else %}
+           <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+      {% endif %}
     {% else %}
-         <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+       <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
     {% endif %}
 </div>
 {{profileImage(user)}}
@@ -30,16 +29,13 @@
 {% endif %}
 <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
 {% if current_user.has_role('provider') and user.has_role('patient') %}
-
-<span id="assessPatient" data-toggle="modal" data-target="#assessmentModal" class="link">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></span>
-<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
+&nbsp;&nbsp;<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
 <!-- shown only in reduced browser size-->
-<div class="btn-group link-xs">
+<div id="navMenuXs" class="btn-group link-xs">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     {{ _("Select") }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li><a href="javacript:$('#assessmentModal').modal('show')" id="assessPatient" data-toggle="modal" data-target="#assessmentModal">{{ _("Assess this Patient") }} <em>{{ _("for Epic 26") }}</em></a></li>
     <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
   </ul>
 </div>
@@ -57,28 +53,8 @@
             <br/>
           </div>
           <div class="modal-footer">
-            <a href="/login-as/{{user.id}}" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+            <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
-          </div>
-        </div>
-      </div>
-</div>
-
-
-<div class="modal fade" id="assessmentModal" tabindex="-1" role="dialog" aria-labelledby="assessmentModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="myModalLabel">{{ _("Assessing Patient for EPIC-26") }}</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.8em">
-            <br/>
-            <p class="text-left">{{ _("Not yet implemented. This will launch the EPIC-26, for staff entry. In this use case, control of the website should not be given to the patient.") }}</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.7em">{{ _("Close") }}</button>
           </div>
         </div>
       </div>
@@ -86,27 +62,35 @@
 {% endif %}
 </nav>
 <div id="indexContainer">{{ _("Index List") }}</div>
-
-
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
-
-<div class="row" style="position: relative;">
-    <div class="col-md-12">
-        {{profile(user, current_user, consent_agreements)}}
-        <br/>
-        {% if providerPerspective == 'true' %}
-           <br/><br/> {{ back_btn('patients','Patients List') }}
-        {% else %}
-            <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
-        {% endif %}
-    </div>
-</div>
+  <div class="row">
+      <div class="col-md-12">
+          {{profile(user, current_user, consent_agreements)}}
+          <br/>
+          {% if providerPerspective == 'true' %}
+             <br/><br/> {{ back_btn('patients','Patients List') }}
+          {% else %}
+              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
+          {% endif %}
+      </div>
+  </div>
 </form>
-
 {% endblock %}
 
 {% block document_ready %}
+
+{% if user.has_role('patient')  and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
+
+function handleLoginAs() {
+    //sessionStorage does not work allow addition of item in private mode
+    try {
+      sessionStorage.setItem("loginAsPatient", "true");
+    } catch(e) {
+
+    }
+    location.replace('/login-as/{{user.id}}');
+};
 
 function goTo(event, id) {
     event.stopPropagation();
@@ -114,21 +98,23 @@ function goTo(event, id) {
     $("#indexContainer").removeClass("open");
 };
 
-
 $(document).ready(function(){
     $('#loginAsPatient a').tooltip();
 
     [{
         attachID: "month",
-        targetField: $("#month")
-     },
+        targetField: $("#month"),
+        customErrorField: $("#errorbirthday")
+      },
      {
         attachID: "date",
-        targetField: $("#date")
+        targetField: $("#date"),
+        customErrorField: $("#errorbirthday")
      },
      {
         attachID: "year",
-        targetField: $("#year")
+        targetField: $("#year"),
+        customErrorField: $("#errorbirthday")
      },
      {
         attachID: "firstname",
@@ -139,8 +125,7 @@ $(document).ready(function(){
         targetField: $("#lastname")
      },
      {
-        attachID: "email",
-        targetField: $("#email")
+        attachID: "email"
      },
      {
         attachID: "phone",
@@ -151,7 +136,7 @@ $(document).ready(function(){
         targetField: $("#locale")
      },
      {
-        attachID: "genderGroup",
+        attachID: "profile-gender-list",
         targetField: $("input[name='sex']")
      },
      {
@@ -163,24 +148,36 @@ $(document).ready(function(){
         targetField: $("input[name='ethnicity']")
      },
      {
-        attachID: "userEthnicity",
-        targetField: $("input[name='ethnicity']")
+        attachID: "profileStudyIDContainer",
+        targetField: $("#profileStudyId")
      },
      {
         attachID: "rolesGroup",
         targetField: $("input[name='user_type']")
      }].forEach(function(o) {
         /** see main.js **/
-        getSaveLoaderDiv("profileForm", o.attachID);
+        if (o.attachID) getSaveLoaderDiv("profileForm", o.attachID);
+        if (o.targetField) {
+          o.targetField.each(function() {
+              $(this).attr("save-container-id", o.attachID);
+              var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+              $(this).on(triggerEvent, function() {
+                if (this.validity.valid) {
+                  var hasError = false;
+                  if ($(this).attr("error-field")) {
+                    var customErrorField = $("#" + $(this).attr("error-field"));
+                    if (customErrorField.length > 0) {
+                      if (customErrorField.text() != "") hasError = true;
+                      else hasError = false;
+                    } else hasError = false;
+                  };
 
-        o.targetField.each(function() {
-            $(this).attr("save-container-id", o.attachID);
-            $(this).on("change", function() {
-              if (this.validity.valid) {
-                assembleContent.demo({{ user.id }},true, $(this));
-              };
-            });
-        });
+                  //console.log("hasError: " + hasError + " customText: " + customErrorField.text())
+                  if (!hasError) assembleContent.demo({{ user.id }},true, $(this));
+                };
+              });
+          });
+        };
     });
 
     if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
@@ -207,55 +204,5 @@ $(document).ready(function(){
     $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');
 
 });
-
-/** Remove patientQuestion functionality for now
-var getQs = [ "biopsy", "pca_diag", "tx"];
-$.each(getQs, function(i,val){
-    $.ajax ({
-        type: "GET",
-        url: '/api/patient/{{ user.id }}/clinical/'+val
-    }).done(function(data) {
-        var $radios = $('input:radio[name='+val+']');
-        if($radios.is(':checked') === false) {
-            $radios.filter('[value='+data.value+']').prop('checked', true);
-        }
-    }).fail(function() {
-        console.log("Problem retrieving data from server.")
-    });
-});
-
-$("#patientQuestions input").on("change", function(){
-    var toCall = $(this).attr("name");
-    var theVal = $(this).val();
-    $.ajax ({
-        type: "POST",
-        url: '/api/patient/{{ user.id }}/clinical/'+toCall,
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json',
-        data: JSON.stringify({value: theVal})
-    }).done(function() {
-        // Allow user to save with button, even though these answers have already been submitted
-        $('#updateProfile').removeClass("disabled")
-    }).fail(function() {
-        alert("There was a problem saving your answers. Please try again.");
-    });
-});
-**/
-
-/** Get and Put roles **/
-function setRoles() {
-    tnthAjax.getRoles({{ user.id }}, true);
-    $("#rolesGroup input:checkbox").on("click",function(){
-
-        var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-            return { name: $(this).val() };
-        }).get();
-        var toSend = {"roles": roles};
-        tnthAjax.putRoles({{user.id}},toSend);
-
-    });
-};
-/* done in on change event for role now*/
-//setRoles();
 
 {% endblock %}

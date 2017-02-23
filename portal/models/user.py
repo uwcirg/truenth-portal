@@ -2,37 +2,44 @@
 from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
-from flask import abort
+from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym
-from sqlalchemy import and_, UniqueConstraint
+from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
+import time
 
+from .audit import Audit
 from ..extensions import db
-from .fhir import as_fhir, Observation, UserObservation
+from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
+from .identifier import Identifier
 from .intervention import UserIntervention
 from .performer import Performer
-from .organization import Organization
+from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_IDENTITY_SYSTEM
+from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import Telecom
-import random
 
 INVITE_PREFIX = "__invite__"
+NO_EMAIL_PREFIX = "__no_email__"
 
 #https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
+
+internal_identifier_systems = (
+    TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS
+
 
 class Extension:
     """Abstract base class for common user extension FHIR objects"""
@@ -133,54 +140,92 @@ class UserTimezone(Extension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username):
+def permanently_delete_user(username, user_id=None, acting_user=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
+    May pass either username or user_id.  Will prompt for acting_user if not
+    provided.
+
+    :param username: username (email) for user to purge
+    :param user_id: id of user in liew of username
+    :param acting_user: user taking the action, for record keeping
 
     """
-    from .audit import Audit
+    from .auth import AuthProvider
     from .tou import ToU
-    from .intervention import UserIntervention
     from .user_consent import UserConsent
 
-    actor = raw_input("\n\nWARNING!!!\n\n"
-                      " This will permanently destroy user: {}\n"
-                      " and all their related data.\n\n"
-                      " If you want to contiue, enter a valid user\n"
-                      " email as the acting party for our records: ".\
-                      format(username))
-    acting_user = User.query.filter_by(username=actor).first()
-    if not acting_user or actor == username:
-        raise ValueError("Actor must be a current user other than the target")
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        raise ValueError("No such user: {}".format(username))
-    comment = "purged all trace of {}".format(user)  # while format works
+    if not acting_user:
+        actor = raw_input(
+            "\n\nWARNING!!!\n\n"
+            " This will permanently destroy user: {}\n"
+            " and all their related data.\n\n"
+            " If you want to contiue, enter a valid user\n"
+            " email as the acting party for our records: ".\
+            format(username))
+        acting_user = User.query.filter_by(username=actor).first()
+    if not acting_user:
+        raise ValueError("Acting user not found -- can't continue")
+    if not username:
+        if not user_id:
+            raise ValueError("Must provide username or user_id")
+        else:
+            user = User.query.get(user_id)
+    else:
+        user = User.query.filter_by(username=username).first()
+        if user_id and user.id != user_id:
+                raise ValueError(
+                    "Contridicting username and user_id values given")
 
-    # purge all the types with user foreign keys, then the user itself
-    UserIntervention.query.filter_by(user_id=user.id).delete()
-    consent_audits = Audit.query.join(
-        UserConsent, UserConsent.audit_id==Audit.id).filter(
-        UserConsent.user_id==user.id)
-    UserConsent.query.filter_by(user_id=user.id).delete()
-    for ca in consent_audits:
-        db.session.delete(ca)
-    tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
-    for t in tous:
-        db.session.delete(t)
-    for o in user.observations:
-        db.session.delete(o)
-    Audit.query.filter_by(user_id=user.id).delete()
+    def purge_user(user, acting_user):
+        if not user:
+            raise ValueError("No such user: {}".format(username))
+        if acting_user.id == user.id:
+            raise ValueError(
+                "Actor must be a current user other than the target")
 
-    # the rest should die on cascade rules
-    db.session.delete(user)
-    db.session.commit()
+        comment = "purged all trace of {}".format(user)  # while format works
 
-    # record this event
-    db.session.add(Audit(user_id=acting_user.id, comment=comment))
-    db.session.commit()
+        # purge all the types with user foreign keys, then the user itself
+        UserRelationship.query.filter(
+            or_(UserRelationship.user_id==user.id,
+                UserRelationship.other_user_id==user.id)).delete()
+        UserObservation.query.filter_by(user_id=user.id).delete()
+        UserIntervention.query.filter_by(user_id=user.id).delete()
+        consent_audits = Audit.query.join(
+            UserConsent, UserConsent.audit_id==Audit.id).filter(
+            UserConsent.user_id==user.id)
+        UserConsent.query.filter_by(user_id=user.id).delete()
+        for ca in consent_audits:
+            db.session.delete(ca)
+        tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
+        for t in tous:
+            db.session.delete(t)
+        for o in user.observations:
+            db.session.delete(o)
+        # Can't delete audit rows owned by this user, in cases like observations
+        # Update those to point to user doing the purge.
+        ob_audits = Audit.query.join(
+            Observation).filter(Audit.id==Observation.audit_id).filter(
+                Audit.user_id==user.id)
+        for au in ob_audits:
+            au.user_id = acting_user.id
+        Audit.query.filter_by(user_id=user.id).delete()
+        Audit.query.filter_by(subject_id=user.id).delete()
+        for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
+            db.session.delete(ap)
 
+        # the rest should die on cascade rules
+        db.session.delete(user)
+        db.session.commit()
+
+        # record this event
+        db.session.add(Audit(user_id=acting_user.id, comment=comment,
+            subject_id=acting_user.id, context='account'))
+        db.session.commit()
+
+    purge_user(user, acting_user)
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
@@ -209,6 +254,7 @@ def user_extension_map(user, extension):
 
 
 class User(db.Model, UserMixin):
+    ## PLEASE maintain merge_with() as user model changes ##
     __tablename__ = 'users'  # Override default 'user'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64))
@@ -226,6 +272,9 @@ class User(db.Model, UserMixin):
     deleted_id = db.Column(
         db.ForeignKey('audit.id', use_alter=True,
                       name='user_deleted_audit_id_fk'), nullable=True)
+    deceased_id = db.Column(
+        db.ForeignKey('audit.id', use_alter=True,
+                      name='user_deceased_audit_id_fk'), nullable=True)
 
     # We use email like many traditional systems use username.
     # Create a synonym to simplify integration with other libraries (i.e.
@@ -245,6 +294,8 @@ class User(db.Model, UserMixin):
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
             backref=db.backref('users', lazy='dynamic'))
+    questionnaire_responses = db.relationship('QuestionnaireResponse',
+            lazy='dynamic')
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
@@ -258,10 +309,17 @@ class User(db.Model, UserMixin):
     _locale = db.relationship(CodeableConcept, cascade="save-update")
     deleted = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deleted_id])
+    deceased = db.relationship('Audit', cascade="save-update",
+                              foreign_keys=[deceased_id])
+    documents = db.relationship('UserDocument', lazy='dynamic')
+    _identifiers = db.relationship(
+        'Identifier', lazy='dynamic', secondary='user_identifiers')
 
-    # FIXME kludge for random demo data
-    due_date = datetime(random.randint(2016, 2017), random.randint(1, 12), random.randint(1, 28))
-    random_due_date_status = 'due'
+    ###
+    ## PLEASE maintain merge_with() as user model changes ##
+    ###
+
+    assessment_status = 'undetermined'
 
     def __str__(self):
         """Print friendly format for logging, etc."""
@@ -274,6 +332,11 @@ class User(db.Model, UserMixin):
                 raise ValueError("can not update {} on deleted {}".format(
                     name, self))
         return super(User, self).__setattr__(name, value)
+
+    @property
+    def all_consents(self):
+        """Access to all consents including deleted and expired"""
+        return self._consents
 
     @property
     def valid_consents(self):
@@ -308,10 +371,11 @@ class User(db.Model, UserMixin):
         return None
 
     @locale.setter
-    def locale(self, code, name):
-        # IETF BCP 47 standard uses hyphens, but we instead store w/ underscores,
+    def locale(self, lang_info):
+        # lang_info is a tuple of format (language_code,language_name)
+        # IETF BCP 47 standard uses hyphens, bust we instead store w/ underscores,
         # to better integrate with babel/LR URLs/etc
-        data = {"coding": [{'code': code, 'display': name,
+        data = {"coding": [{'code': lang_info[0], 'display': lang_info[1],
                   'system': "urn:ietf:bcp:47"}]}
         self._locale = CodeableConcept.from_fhir(data)
 
@@ -322,13 +386,25 @@ class User(db.Model, UserMixin):
         # its being used in a query statement (email.ilike('foo'))
         if isinstance(self._email, basestring):
             if self._email.startswith(INVITE_PREFIX):
+                # strip the invite prefix for UI
                 return self._email[len(INVITE_PREFIX):]
+
+            if self._email.startswith(NO_EMAIL_PREFIX):
+                # return None as we don't have an email
+                return None
 
         return self._email
 
     @email.setter
     def email(self, email):
-        self._email = email
+        if email == NO_EMAIL_PREFIX:
+            # Need a unique value to avoid unique constraint
+            if self.id:
+                self._email = NO_EMAIL_PREFIX + str(self.id)
+            else:
+                self._email = NO_EMAIL_PREFIX + str(time.time())
+        else:
+            self._email = email
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
@@ -342,11 +418,74 @@ class User(db.Model, UserMixin):
         if not self._email.startswith(prefix):
             self._email = prefix + self._email
 
+    @property
+    def identifiers(self):
+        """Return list of identifiers
+
+        Several identifiers are "implicit", such as the primary key
+        from the user table, and any auth_providers associated with
+        this user.  Add those if not already found for this user
+        on request, and return with existing identifiers linked
+        with this account.
+
+        """
+        primary = Identifier(use='official', system=TRUENTH_ID, value=self.id)
+        if primary not in self._identifiers.all():
+            self._identifiers.append(primary)
+
+        if self.username:
+            secondary = Identifier(
+                use='secondary', system=TRUENTH_USERNAME, value=self.username)
+            if secondary not in self._identifiers.all():
+                self._identifiers.append(secondary)
+
+        for provider in self.auth_providers:
+            p_id = Identifier.from_fhir(provider.as_fhir())
+            if p_id not in self._identifiers.all():
+                self._identifiers.append(p_id)
+
+        return self._identifiers
+
+    @property
+    def org_coding_display_options(self):
+        """Collates all race/ethnicity/indigenous display options
+        from the user's orgs to establish which options to display"""
+        options = {}
+        orgs = self.organizations
+        if orgs:
+            options['race'] = any(o.race_codings for o in orgs)
+            options['ethnicity'] = any(o.ethnicity_codings for o in orgs)
+            options['indigenous'] = any(o.indigenous_codings for o in orgs)
+        else:
+            attrs = ('race','ethnicity','indigenous')
+            options = dict.fromkeys(attrs,True)
+        return options
+
+
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
         org = Organization.query.filter_by(name=organization_name).one()
         if org not in self.organizations:
             self.organizations.append(org)
+
+    def leaf_organizations(self):
+        """Return list of 'leaf' organization ids for user's orgs
+
+        Users, especially staff, have arbitrary number of organization
+        associations, at any level of the organization hierarchy.  This
+        method looks up all child leaf nodes from the users existing orgs.
+
+        """
+        leaves = set()
+        OT = OrgTree()
+        if self.organizations:
+            for org in self.organizations:
+                if org.id == 0:
+                    continue
+                leaves.update(OT.all_leaves_below_id(org.id))
+            return list(leaves)
+        else:
+            return None
 
     def add_observation(self, fhir, audit):
         if not 'coding' in fhir['code']:
@@ -495,27 +634,6 @@ class User(db.Model, UserMixin):
         return fhir
 
     def as_fhir(self):
-        def identifiers():
-            """build and return list of idetifiers"""
-            ids = []
-            ids.append(
-                {'use': 'official',
-                 'system': '{system}/{provider}'.format(
-                     system=TRUENTH_IDENTITY_SYSTEM,
-                     provider='TrueNTH-identity'),
-                 'assigner': {'display': 'TrueNTH'},
-                 'value': self.id})
-            ids.append(
-                {'use': 'secondary',
-                 'system': '{system}/{provider}'.format(
-                     system=TRUENTH_IDENTITY_SYSTEM,
-                     provider='TrueNTH-username'),
-                 'assigner': {'display': 'TrueNTH'},
-                 'value': self.username})
-            for provider in self.auth_providers:
-                ids.append(provider.as_fhir())
-            return ids
-
         def careProviders():
             """build and return list of careProviders (AKA clinics)"""
             orgs = []
@@ -523,9 +641,23 @@ class User(db.Model, UserMixin):
                 orgs.append(reference.Reference.organization(o.id).as_fhir())
             return orgs
 
+        def deceased():
+            """FHIR spec suggests ONE of deceasedBoolean or deceasedDateTime"""
+            if not self.deceased_id:
+                return {"deceasedBoolean": False}
+
+            # We maintain an audit row from when the user was marked
+            # as deceased.  If "time of death" is in the content, the
+            # audit timestamp is good - otherwise, return the boolean
+            audit = self.deceased
+            if "time of death" in audit.comment:
+                return {"deceasedDateTime":
+                        FHIR_datetime.as_fhir(audit.timestamp)}
+            return {"deceasedBoolean": True}
+
         d = {}
         d['resourceType'] = "Patient"
-        d['identifier'] = identifiers()
+        d['identifier'] = [id.as_fhir() for id in self.identifiers]
         d['name'] = {}
         if self.first_name:
             d['name']['given'] = self.first_name
@@ -533,6 +665,7 @@ class User(db.Model, UserMixin):
             d['name']['family'] = self.last_name
         if self.birthdate:
             d['birthDate'] = as_fhir(self.birthdate)
+        d.update(deceased())
         if self.gender:
             d['gender'] = self.gender
         d['status'] = 'registered' if self.registered else 'unknown'
@@ -556,6 +689,120 @@ class User(db.Model, UserMixin):
             d['deleted'] = FHIR_datetime.as_fhir(self.deleted.timestamp)
         return d
 
+    def update_consents(self, consent_list, acting_user):
+        """Update user's consents
+
+        Adds the provided list of consent agreements to the user.
+        If the user had pre-existing consent agreements between the
+        same organization_id, the new will replace the old
+
+        """
+        delete_consents = []  # capture consents being replaced
+        for consent in consent_list:
+            audit = Audit(user_id=acting_user.id, subject_id=self.id,
+                          comment="Adding consent agreement",context='consent')
+            # Look for existing consent for this user/org
+            for existing_consent in self.valid_consents:
+                if existing_consent.organization_id == int(
+                    consent.organization_id):
+                    current_app.logger.debug("deleting matching consent {} "
+                                             "replacing with {} ".format(
+                                                 existing_consent, consent))
+                    delete_consents.append(existing_consent)
+
+            if hasattr(consent, 'acceptance_date'):
+                # Move data to where it belongs, in the audit row
+                audit.timestamp = consent.acceptance_date
+                del consent.acceptance_date
+
+            consent.audit = audit
+            db.session.add(consent)
+        for replaced in delete_consents:
+            replaced.deleted = Audit(
+                comment="new consent replacing existing", user_id=self.id,
+                subject_id=self.id, context='consent')
+        db.session.commit()
+
+    def update_orgs(self, org_list, acting_user, excuse_top_check=False):
+        """Update user's organizations
+
+        Uses given list of organizations as the definitive list for
+        the user - meaning any current affiliations not mentioned will
+        be deleted.
+
+        :param org_list: list of organization objects for user's orgs
+        :param acting_user: user behind the request for permission checks
+        :param excuse_top_check: Set True to excuse check for changes
+          to top level orgs, say during initial account creation
+
+        """
+
+        def allow_org_change(org, user, acting_user):
+            """staff can not modify their own org affiliation at all
+
+            as per
+            https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
+            raise exception if staff or staff-admin  is attempting to
+            change their own org affiliations.
+
+            """
+            if (not acting_user.has_role(ROLE.ADMIN)
+                and acting_user.has_role(ROLE.PROVIDER)
+                and user.id == acting_user.id):
+                raise ValueError(
+                    "staff can't change their own organization affiliations")
+            return True
+
+        remove_if_not_requested = {org.id: org for org in
+                                   self.organizations}
+        for org in org_list:
+            if org.id in remove_if_not_requested:
+                remove_if_not_requested.pop(org.id)
+            if org not in self.organizations:
+                if not excuse_top_check:
+                    allow_org_change(org, user=self, acting_user=acting_user)
+                self.organizations.append(org)
+        for org in remove_if_not_requested.values():
+            if not excuse_top_check:
+                allow_org_change(org, user=self, acting_user=acting_user)
+            self.organizations.remove(org)
+
+    def update_roles(self, role_list, acting_user):
+        """Update user's roles
+
+        :param role_list: list of role objects defining exactly what
+          roles the user should have.  Any existing roles not mentioned
+          will be deleted from user's list
+        :param acting_user: user performing action, for permissions, etc.
+
+        """
+        # Don't allow promotion of service accounts
+        if self.has_role(ROLE.SERVICE):
+            abort(400, "Promotion of service users not allowed")
+
+        remove_if_not_requested = {role.id: role for role in self.roles}
+        for role in role_list:
+            # Don't allow others to add service to their accounts
+            if role.name == ROLE.SERVICE:
+                abort(400, "Service role is restricted to service accounts")
+            if role.id in remove_if_not_requested:
+                remove_if_not_requested.pop(role.id)
+            else:
+                self.roles.append(role)
+                audit = Audit(
+                    comment="added {} to user {}".format(
+                    role, self.id), user_id=acting_user.id,
+                    subject_id=self.id, context='role')
+                db.session.add(audit)
+
+        for stale_role in remove_if_not_requested.values():
+            self.roles.remove(stale_role)
+            audit = Audit(
+                comment="deleted {} from user {}".format(
+                stale_role, self.id), user_id=acting_user.id,
+                subject_id=self.id, context='role')
+            db.session.add(audit)
+
     def update_from_fhir(self, fhir, acting_user):
         """Update the user's demographics from the given FHIR
 
@@ -572,35 +819,69 @@ class User(db.Model, UserMixin):
             if value:
                 return value.rstrip() or None
 
-        def update_orgs():
-            def allow_org_change(org, user, acting_user):
-                """don't allow non-admin providers to change top level orgs
+        def update_deceased(fhir):
+            if 'deceasedDateTime' in fhir:
+                dt = FHIR_datetime.parse(fhir['deceasedDateTime'],
+                                         error_subject='deceasedDataTime')
+                if self.deceased_id:
+                    # only update if the datetime is different
+                    if dt == self.deceased.timestamp:
+                        return  # short circuit out of here
+                # Given a time, store and mark as "time of death"
+                audit = Audit(
+                    user_id=current_user().id, timestamp=dt,
+                    subject_id=self.id, context='user',
+                    comment="time of death for user {}".format(self.id))
+                self.deceased = audit
+            elif 'deceasedBoolean' in fhir:
+                if fhir['deceasedBoolean'] == False:
+                    if self.deceased_id:
+                        # Remove deceased record from the user, but maintain
+                        # the old audit row.
+                        self.deceased_id = None
+                        audit = Audit(
+                            user_id=current_user().id,
+                            subject_id=self.id, context='user',
+                            comment=("Remove existing deceased from "
+                                     "user {}".format(self.id)))
+                        db.session.add(audit)
+                else:
+                    # still marked with an audit, but without the special
+                    # comment syntax and using default (current) time.
+                    audit = Audit(
+                        user_id=current_user().id, subject_id=self.id,
+                        comment=("Marking user {} as "
+                                 "deceased".format(self.id)), context='user')
+                    self.deceased = audit
 
-                as per
-                https://www.pivotaltracker.com/n/projects/1225464/stories/133286317
-                raise exception if non-admin provider is attempting to
-                change their top level orgs
+        def update_identifiers(fhir):
+            """Given FHIR defines identifiers, but we never remove implicit
 
-                """
-                if org.partOf_id is None:  # top-level orgs
-                    if not acting_user.has_role(ROLE.ADMIN) and\
-                       user.has_role(ROLE.PROVIDER):
-                        raise ValueError("non-admin providers can't change "
-                                         "their high-level orgs")
-                return True
+            Implicit identifiers include user.id, user.email (username)
+            and any auth_providers.  Others may be manipulated via
+            this function like any PUT interface, where the given values
+            are conclusive - deleting unmentioned and adding new.
 
-            remove_if_not_requested = {org.id: org for org in
-                                       self.organizations}
-            for item in fhir['careProvider']:
-                org = reference.Reference.parse(item)
-                if org.id in remove_if_not_requested:
-                    remove_if_not_requested.pop(org.id)
-                if org not in self.organizations:
-                    allow_org_change(org, user=self, acting_user=acting_user)
-                    self.organizations.append(org)
-            for org in remove_if_not_requested.values():
-                allow_org_change(org, user=self, acting_user=acting_user)
-                self.organizations.remove(org)
+            """
+            if not 'identifier' in fhir:
+                return
+
+            # ignore internal system identifiers
+            pre_existing = [ident for ident in self._identifiers
+                            if ident.system not in internal_identifier_systems]
+            for identifier in fhir['identifier']:
+                new_id = Identifier.from_fhir(identifier)
+                if new_id.system in internal_identifier_systems:
+                    continue
+                new_id = new_id.add_if_not_found()
+                if new_id in pre_existing:
+                    pre_existing.remove(new_id)
+                else:
+                    self._identifiers.append(new_id)
+
+            # remove any pre existing that were not mentioned
+            for unmentioned in pre_existing:
+                self._identifiers.remove(unmentioned)
 
         if 'name' in fhir:
             self.first_name = v_or_n(
@@ -615,6 +896,8 @@ class User(db.Model, UserMixin):
             except (AttributeError, ValueError):
                 abort(400, "birthDate '{}' doesn't match expected format "
                       "'%Y-%m-%d'".format(fhir['birthDate']))
+        update_deceased(fhir)
+        update_identifiers(fhir)
         if 'gender' in fhir and fhir['gender']:
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
@@ -631,38 +914,59 @@ class User(db.Model, UserMixin):
                 instance = user_extension_map(self, e)
                 instance.apply_fhir()
         if 'careProvider' in fhir:
-            update_orgs()
+            org_list = [reference.Reference.parse(item) for item in
+                        fhir['careProvider']]
+            self.update_orgs(org_list, acting_user)
         db.session.add(self)
 
     def merge_with(self, other_id):
         """merge details from other user into self
 
-        Part of an account generation or login flow - scenarios include
-        a provider setting up an account (typically the *other_id*) and
-        then a user logs into an existing account or registers a new (self)
-        and now we need to pull the data set up by the provider into the
-        new account.
+        Part of an account generation or login flow.  Scenarios include
+        a provider or an intervention setting up a weakly authenticated
+        account (typically the *other_id*) for the invitation process.
+        Once the user logs into an existing account or registers a new (self)
+        we need to pull the data set up by the provider into this user account.
 
         """
         other = User.query.get(other_id)
         if not other:
             abort(404, 'other_id {} not found'.format(other_id))
 
+        # direct attributes on user
+        # intentionally skip {registered, password, confirmed_at,
+        # reset_password_token}
         for attr in ('email', 'first_name', 'last_name', 'birthdate',
-                     'gender', 'phone', 'locale_id', 'timezone'):
+                     'gender', 'phone', 'locale_id', 'timezone',
+                     'image_url', 'active', 'deleted_id', 'deceased_id',
+                    ):
             if not getattr(other, attr):
                 continue
             if not getattr(self, attr):
                 setattr(self, attr, getattr(other, attr))
             # value present in both.  assume user just set to best value
 
+        # n-to-n relationships on user
         for relationship in ('organizations', '_consents', 'procedures',
                              'observations', 'relationships', 'roles',
-                             'races', 'ethnicities', 'groups'):
+                             'races', 'ethnicities', 'groups',
+                             'questionnaire_responses', '_identifiers'):
             self_entity = getattr(self, relationship)
             other_entity = getattr(other, relationship)
-            append_list = [item for item in other_entity if item not in
-                           self_entity]
+            if relationship == 'roles':
+                # We don't copy over the roles used to mark the weak account
+                append_list = [item for item in other_entity if item not in
+                               self_entity and item.name not in
+                               ('write_only',
+                                'promote_without_identity_challenge')]
+            elif relationship == '_identifiers':
+                # Don't copy internal identifiers
+                append_list = [item for item in other_entity if item not in
+                               self_entity and item.system not in
+                               internal_identifier_systems]
+            else:
+                append_list = [item for item in other_entity if item not in
+                               self_entity]
             for item in append_list:
                 self_entity.append(item)
 
@@ -687,18 +991,52 @@ class User(db.Model, UserMixin):
         other = User.query.get(other_id)
         if not other:
             abort(404, "User not found {}".format(other_id))
-        for role in self.roles:
-            if role.name in (ROLE.ADMIN, ROLE.SERVICE):
-                # Admin and service accounts have carte blanche
-                return True
-            if role.name == ROLE.PROVIDER:
-                # Providers get carte blanche on members with a signed
-                # consent for the same parent organization
-                user_orgs = set((c.id for c in self.organizations))
-                others_orgs = set(
-                    (c.organization_id for c in other.valid_consents))
-                if user_orgs.intersection(others_orgs):
-                    return True
+
+        if self.has_role(ROLE.ADMIN):
+            return True
+        if self.has_role(ROLE.SERVICE):
+            # Ideally, only users attached to the same intervention
+            # as the service token would qualify.  Edge cases around
+            # account creation and loose coupling between patients
+            # and interventions result in carte blanche for service
+            return True
+
+        if self.has_role(ROLE.PROVIDER):
+            # Providers have full access to all patients with a valid consent
+            # at or below the same level of the org tree as provider has
+            # associations with.  Furthermore, a patient may have a consent
+            # agreement at a higher level in the orgtree than the provider,
+            # in which case the patient's organization must be a child
+            # of the provider's organization for access.
+
+            # As long as the consent is valid (not expired or deleted) it's
+            # adequate for 'view'.  'edit' requires the staff_editable option
+            # on the consent.
+            orgtree = OrgTree()
+            if other.has_role(ROLE.PATIENT):
+                if permission == 'edit':
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents
+                        if oc.staff_editable]
+                else:
+                    others_con_org_ids = [
+                        oc.organization_id for oc in other.valid_consents]
+                org_ids = [org.id for org in self.organizations]
+                for org_id in org_ids:
+                    if orgtree.at_or_below_ids(org_id, others_con_org_ids):
+                        return True
+                #Still here implies time to check 'furthermore' clause
+                others_orgs = [org.id for org in other.organizations]
+                for consented_org in others_con_org_ids:
+                    if orgtree.at_or_below_ids(consented_org, org_ids):
+                        # Okay, consent is partent of staff org
+                        # but it's only good if the patient's *org*
+                        # is at or below the staff's org (could be sibling
+                        # or down different branch of tree)
+                        for org_id in org_ids:
+                            if orgtree.at_or_below_ids(org_id, others_orgs):
+                                return True
+
         abort(401, "Inadequate role for %s of %d" % (permission, other_id))
 
     def has_role(self, role_name):
@@ -733,10 +1071,10 @@ class User(db.Model, UserMixin):
         scores.append(fuzz.ratio(lname.lower(), last_name.lower()))
 
         # birthdate is trickier - raw delta doesn't make sense.  treat
-        # it like a string, assuming only typos for a mismatch
+        # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
-        scores.append(fuzz.ratio(dob.strftime('%d%m%Y'),
-                                 birthdate.strftime('%d%m%Y')))
+        if (dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
+            return 0
         return sum(scores) / len(scores)
 
 
@@ -767,8 +1105,9 @@ class User(db.Model, UserMixin):
                                  [client.id for client in clients]))
 
         self.active = False
-        self.deleted = Audit(user_id=acting_user.id,
-                             comment="marking deleted {}".format(self))
+        self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
+                             comment="marking deleted {}".format(self),
+                             context='account')
 
         # purge any outstanding access tokens
         Token.query.filter_by(user_id=self.id).delete()

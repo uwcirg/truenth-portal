@@ -1,13 +1,15 @@
 {% macro tou(terms) -%}
-    <div id="topTerms">
+    <div id="topTerms" parent-section="true">
         <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
         <hr/>
         <br/>
         <p>{{ _("Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools") }}:</p>
         <div class="well">
             <div id="termsText">
-              {{ terms|safe if terms}}
+              {{ terms['asset']|safe if terms}}
             </div>
+            <meta id="termsURL"
+                  data-url="{{ terms['agreement_url']|safe if terms}}"/>
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
@@ -22,32 +24,34 @@
   {%- endmacro %}
 
   {% macro nameGroup() -%}
-    <div class="row" id="nameGroup">
-        <div class="col-xs-6">
+    <div class="row" id="nameGroup" parent-section="true">
+        <div class="col-md-4 col-xs-6">
           <div class="form-group float-input-label">
             <input class="form-control float-text init-queries-field" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" type="text" required="required" data-error="{{ _('First name is required') }}"  />
             <div class="help-block with-errors"></div>
           </div>
         </div>
-        <div class="col-xs-6">
+        <div class="col-md-4 col-xs-6">
           <div class="form-group float-input-label">
             <input class="form-control float-text init-queries-field" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" type="text" required="required" data-error="{{ _('Last name is required') }}" />
             <div class="help-block with-errors"></div>
           </div>
         </div>
     </div>
-    <script>$(function () {
-        tnthAjax.getName($("#iq_userId").val());
-        ["firstname", "lastname"].forEach(function(field) {
-            $("#" + field).on("blur", function() {
-                assembleContent.demo($("#iq_userId").val());
+    <script>
+      $(function () {
+        $("#firstname, #lastname").each(function() {
+            $(this).on("blur", function() {
+              if ($(this).val() != "") assembleContent.demo($("#iq_userId").val());
             });
         });
-      });</script>
+
+      });
+    </script>
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
-      <div class="form-group" id="rolesGroup">
+      <div class="form-group" id="rolesGroup" parent-section="true">
           <div class="radio">
             <label>
               <input type="radio" class="init-queries-field" name="user_type" id="role_patient" value="patient"> {{ _("I'm a man who is concerned about prostate cancer for myself") }}
@@ -65,18 +69,18 @@
   {{tou()}}
 
   {% macro dobGroup() -%}
-      <div class="tnth-hide" id="bdGroup">
+      <div class="tnth-hide" id="bdGroup" parent-section="true">
           <hr />
           <p>{{ _("When is your birthday?") }}</p>
           <input type="hidden" name="birthDate" id="birthday" value="">
           <div class="form-group">
             <label>{{ _("Birth Date") }}</label>
             <div class="row">
-              <div class="col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" data-birthday="true" required />
+              <div class="col-md-3 col-xs-4">
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="The birth day field is required and must be valid format" required />
               </div>
-              <div class="col-xs-4">
-                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-birthday="true" required>
+              <div class="col-md-3 col-xs-4">
+                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="-- A birth month must be selected" required>
                   <option value="">{{ _("Month") }}...</option>
                   <option value="01">{{ _("January") }}</option>
                   <option value="02">{{ _("February") }}</option>
@@ -92,24 +96,17 @@
                   <option value="12">{{ _("December") }}</option>
                 </select>
               </div>
-              <div class="col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" required />
+              <div class="col-md-3 col-xs-4">
+                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="The birth year is required and must be in valid format" required />
               </div>
             </div>
-            <span id="errorbirthday" class="help-block tnth-hide">A block of help text that breaks onto a new line and may extend beyond one line.</span>
+            <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>
+            <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
         </div>
       </div>
-       <script>$(function () {
-            tnthAjax.getDob($("#iq_userId").val());
-            ["month", "date", "year"].forEach(function(field) {
-              $("#" + field).on("blur", function() {
-                  assembleContent.demo($("#iq_userId").val());
-              });
-            });
-          });</script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}
-    <div id="patientQ">
+    <div id="patientQ" class="tnth-hide" parent-section="true">
         <hr />
         <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
           <br />
@@ -144,63 +141,91 @@
             </div>
           </div>
         </div>
-
-        <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
-          <br />
-          <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
-          <div class="form-group">
-            <div class="radio">
-              <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
-              </label>
-            </div>
-            <div class="radio">
-              <label>
-                <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (the cancer is in other parts of my body, too)") }}
-              </label>
-            </div>
+        {% if not config.LOCALIZED_AFFILIATE_ORG %}
+          <div id="patMeta" data-topic="pca_localized" class="tnth-hide pat-q">
+             <br />
+             <p>{{ _("Is the prostate cancer only within the prostate?") }}</p>
+             <div class="form-group">
+               <div class="radio">
+                 <label>
+                   <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_yes" value="true"> {{ _("Yes") }}
+                 </label>
+               </div>
+               <div class="radio">
+                 <label>
+                   <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="false"> {{ _("No (the cancer is in other parts of my body, too)") }}
+                 </label>
+               </div>
+             </div>
           </div>
-        </div>
-
+        {% endif %}
         <div id="patTx" data-topic="tx" class="tnth-hide pat-q">
           <br />
           <p>{{ _("Have you begun prostate cancer treatment?") }}</p>
           <div class="form-group">
             <div class="radio">
-              <label>
-                <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> {{ _("Yes") }}
-              </label>
+                <label>
+                  <input type="radio" class="init-queries-field" name="tx" id="tx_yes" value="true"> {{ _("Yes") }}
+                </label>
             </div>
             <div class="radio">
-              <label>
+                <label>
                 <input type="radio" class="init-queries-field" name="tx" id="tx_no" value="false"> {{ _("No") }}
-              </label>
+                </label>
             </div>
           </div>
         </div>
-
+        <br/>
       </div>
-      <script>$(function () { tnthAjax.getClinical($("#iq_userId").val());});</script>
+      <script>$(function () {
+
+        tnthAjax.getClinical($("#iq_userId").val());
+        tnthAjax.getTreatment($("#iq_userId").val());
+
+        $("input[name='tx']").each(function() {
+             $(this).on("click", function() {
+                if ($(this).val() == "true") {
+                    tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+                } else {
+                    tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+                };
+             });
+        });
+      });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
-    <div id="clinics" class="tnth-hide">
+    <div id="clinics" class="tnth-hide" parent-section="true">
       <hr />
       <h3 class="tnth-headline">{{ _("Your Clinic") }}</h3>
 
-      <p>{{ _("Where are you receiving your care?") }}</p>
+      <p>{{ _("What is your main clinic for prostate cancer care?") }}</p>
 
       <div class="form-group" id="userOrgs">
         <div style="margin-left: 10px">
           <div id="fillOrgs"></div>
-          <div style="margin: 0.5em 0" class="checkbox"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0">{{ _("I'm not receiving care at any of the above clinics") }}</label></div>
+          <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("I'm not receiving care at any of the above clinics") }}</span></label></div>
         </div>
       </div>
       {{consent(consent_agreements)}}
     </div>
     <script>
+    function _orgsCallback() {
+      {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+          var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+          var checkedOrgs = {};
+          userOrgs.each(function() {
+              if ($(this).prop("checked")) {
+                  checkedOrgs[$(this).val()] = true;
+              };
+              $(this).attr("type", "radio");
+              if (checkedOrgs[$(this).val()]) $(this).prop("checked", true);
+          });
+      {% endif %}
+    };
     $(function () {
         //tnthAjax.getConsent($("#iq_userId").val(), true);
-        tnthAjax.getOrgs($("#iq_userId").val(), false,true);
+        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        tnthAjax.getOrgs($("#iq_userId").val(), false,true, _orgsCallback);
       });
     </script>
 
@@ -209,28 +234,7 @@
     {% if consent_agreements %}
         <div id="consentContainer" style="display:none">
           {% for org in consent_agreements %}
-            <div id="{{org}}_consentItem" class="well consent">
-              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
-              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox" /><label id="{{org}}_consent_label" labelfor="#{{org}}_consent"><!--text for sharing data--></label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
-              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
-                  <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">{{ _("Sharing Your Data") }}</h4>
-                        </div>
-                        <div class="modal-body">
-                          <br/>
-                           {{consent_agreements[org].asset|safe}}
-                          <br/>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
+            <div id="{{org}}_consentItem" class="well consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
           {% endfor %}
         </div>
       {% endif %}

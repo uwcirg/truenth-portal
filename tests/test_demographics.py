@@ -4,15 +4,17 @@ from tests import TestCase, IMAGE_URL, LAST_NAME, FIRST_NAME, TEST_USER_ID
 import json
 
 from portal.extensions import db
+from portal.models.auth import AuthProvider
 from portal.models.organization import Organization, OrgTree
 from portal.models.role import ROLE
+from portal.models.user import User
 
 
 class TestDemographics(TestCase):
 
     def test_demographicsGET(self):
         self.login()
-        rv = self.app.get('/api/demographics')
+        rv = self.client.get('/api/demographics')
 
         fhir = json.loads(rv.data)
         self.assertEquals(len(fhir['identifier']), 2)
@@ -24,11 +26,12 @@ class TestDemographics(TestCase):
         tz = [ext for ext in fhir['extension'] if
               ext['url'].endswith('timezone')]
         self.assertEquals('UTC', tz[0]['timezone'])
+        self.assertEquals(False, fhir['deceasedBoolean'])
 
     def test_demographics404(self):
         self.login()
         self.promote_user(role_name=ROLE.ADMIN)
-        rv = self.app.get('/api/demographics/666')
+        rv = self.client.get('/api/demographics/666')
         self.assert404(rv)
 
     def test_demographicsPUT(self):
@@ -36,6 +39,7 @@ class TestDemographics(TestCase):
         self.add_concepts()
 
         # clinic reference requires pre-existing organization
+        self.shallow_org_tree()
         (org_id, org_name), (org2_id, org2_name) = [
             (org.id, org.name) for org in Organization.query.filter(
                 Organization.id > 0).limit(2)]
@@ -43,14 +47,21 @@ class TestDemographics(TestCase):
         family = 'User'
         given = 'Test'
         dob = '1999-01-31'
+        dod = '2027-12-31T09:10:00'
         gender = 'Male'
+        phone = "867-5309"
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "birthDate": dob,
+                "deceasedDateTime": dod,
                 "gender": gender,
-                "telecom": [{
-                    "system": "phone",
-                    "value": "867-5309"
+                "telecom": [
+                    {
+                        "system": "phone",
+                        "value": phone,
+                    }, {
+                        "system": 'email',
+                        'value': '__no_email__'
                     }],
                 "extension": [{
                     "url":
@@ -73,12 +84,20 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
+        self.assert200(rv)
         fhir = json.loads(rv.data)
+        for item in fhir['telecom']:
+            if item['system'] == 'phone':
+                self.assertEquals(phone, item['value'])
+            else:
+                self.fail(
+                    'unexpected telecom system: {}'.format(item['system']))
         self.assertEquals(fhir['birthDate'], dob)
+        self.assertEquals(fhir['deceasedDateTime'], dod)
         self.assertEquals(fhir['gender'], gender.lower())
         self.assertEquals(fhir['name']['family'], family)
         self.assertEquals(fhir['name']['given'], given)
@@ -86,6 +105,8 @@ class TestDemographics(TestCase):
         self.assertEquals(2, len(fhir['careProvider']))
 
         user = db.session.merge(self.test_user)
+        self.assertTrue(user._email.startswith('__no_email__'))
+        self.assertTrue(user.email is None)
         self.assertEquals(user.first_name, given)
         self.assertEquals(user.last_name, family)
         self.assertEquals(['2162-6',], [c.code for c in user.ethnicities])
@@ -94,13 +115,40 @@ class TestDemographics(TestCase):
         self.assertEquals(user.organizations[0].name, org_name)
         self.assertEquals(user.organizations[1].name, org2_name)
 
+    def test_auth_identifiers(self):
+        # add a fake FB and Google auth provider for user
+        ap_fb = AuthProvider(provider='facebook', provider_id='fb-123',
+                             user_id=TEST_USER_ID)
+        ap_g = AuthProvider(provider='google', provider_id='google-123',
+                             user_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(ap_fb)
+            db.session.add(ap_g)
+            db.session.commit()
+        self.login()
+        rv = self.client.get('/api/demographics')
+
+        fhir = json.loads(rv.data)
+        self.assertEquals(len(fhir['identifier']), 4)
+
+        # put a study identifier
+        study_id = {
+            "system":"http://us.truenth.org/identity-codes/external-study-id",
+            "use":"secondary","value":"Test Study Id"}
+        fhir['identifier'].append(study_id)
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(fhir))
+        user = User.query.get(TEST_USER_ID)
+        self.assertEquals(user.identifiers.count(), 5)
+
     def test_demographics_bad_dob(self):
         data = {"resourceType": "Patient",
                 "birthDate": '10/20/1980'
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -112,7 +160,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -123,6 +171,7 @@ class TestDemographics(TestCase):
     def test_demographics_duplicate_ref(self):
         # adding duplicate careProvider
 
+        self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
         org_id, org_name = org.id, org.name
 
@@ -138,7 +187,7 @@ class TestDemographics(TestCase):
                }
 
         self.login()
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -177,7 +226,7 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        rv = self.app.put('/api/demographics/%s' % TEST_USER_ID,
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
                 content_type='application/json',
                 data=json.dumps(data))
 
@@ -204,7 +253,8 @@ class TestDemographics(TestCase):
                 "resourceType": "Patient",
                }
 
-        with self.assertRaises(ValueError):
-            self.app.put('/api/demographics/%s' % TEST_USER_ID,
-                         content_type='application/json',
-                         data=json.dumps(data))
+        rv = self.client.put(
+            '/api/demographics/%s' % TEST_USER_ID,
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert400(rv)

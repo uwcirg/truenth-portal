@@ -16,6 +16,7 @@
   text-decoration: none;
 }
 #tnthNavWrapper img {
+  margin: 0 0.5em;
   vertical-align: middle;
 }
 #tnthNavWrapper * {
@@ -33,8 +34,8 @@
   color: #ECF7E5;
   background-color: transparent;
   border-color: transparent;
-  transition: all 0.2s ease-in-out 0s;
-  -webkit-transition: all 0.2s ease-in-out 0s;
+  /*transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;*/
   text-shadow: none;
   background-image: none;
 }
@@ -52,7 +53,7 @@
   width: 100%;
   max-width: 100%;
   background-color: #1A1919;
-  background-image: url('../img/truenth_forest_background.jpg');
+  background-image: url('../img/header_background.jpg');
   height: 135px;
   background-size: cover;
   margin: 0;
@@ -67,15 +68,17 @@
   display: none;
   margin: 0;
   width: 100%;
-  background-color: #83885F;
-  background-image: url('../img/truenth_forest_background.jpg');
-  background-size: auto 81px;
+  max-width: 100%;
+  background-color: #171c20;
+  background-image: url('../img/header_background.jpg');
+  background-size: cover;
   background-repeat: no-repeat;
   padding: 10px 15px;
   z-index: 1000;
   border: none;
   position: relative;
   min-height: 50px;
+  overflow: hidden;
 }
 #tnthNavXs:after {
   clear: both;
@@ -86,7 +89,7 @@
   margin: 0;
   padding: 2px 2px 2px 20px;
   position: relative;
-  float: right;
+  float: left;
   background-repeat: no-repeat;
   background-position: 4px 16px;
   background-image: url('../img/fa_bars_ffffff.png');
@@ -110,7 +113,9 @@
 }
 /** Logo **/
 #tnthLogo {
-  float: left;
+  width: 200px;
+  margin: 0 auto;
+  transition: margin 10ms ease-in;
 }
 #tnthLogo img {
   height: 75px;
@@ -119,10 +124,13 @@
   padding: 0;
 }
 #tnthLogoXs img {
-  height: 50px;
+  height: 40px;
+  float: right;
 }
 #tnthTopLinks {
-  float: right;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 /** Buttons **/
 .tnth-btn-group {
@@ -137,6 +145,7 @@
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
+  margin-left: 0.2em;
   cursor: pointer;
   background-image: none;
   border: 1px solid transparent;
@@ -150,7 +159,7 @@
   background-color: #fff;
 }
 #tnthUserBtn {
-  padding: 6px 12px;
+  padding: 0 14px 0 0;
   height: inherit;
 }
 #tnthHomeBtn {
@@ -290,17 +299,24 @@
   color: #333;
 }
 /** Responsive sizes **/
-@media (max-width: 767px) {
+@media (max-width: 498px) {
+  #tnthLogoXs img {
+    margin-right: 2em !important;
+  }
+}
+@media (max-width: 991px) {
+  #tnthUserBtn {
+    padding: 6px 0px;
+    height: inherit;
+  }
   #tnthNavMain {
     display: none !important;
   }
   #tnthNavXs {
     display: block;
   }
-}
-@media (min-width: 768px) {
-  #tnthTopLinks {
-    margin-right: -28px;
+  #tnthLogoXs img {
+    margin-right: 40%;
   }
 }
 @media (min-width: 992px) {
@@ -308,11 +324,8 @@
     max-width: 940px;
   }
 }
-@media (min-width: 1200px) {
+@media (min-width: 1220px) {
   #tnthNavMainContainer {
     max-width: none;
-  }
-  #tnthTopLinks {
-    margin-right: 0;
   }
 }

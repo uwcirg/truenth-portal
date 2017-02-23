@@ -2,10 +2,11 @@
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
+from tests.test_assessment_status import mock_qr
 
 from portal.extensions import db
 from portal.models.audit import Audit
-from portal.models.fhir import CC, QuestionnaireResponse
+from portal.models.fhir import CC
 from portal.models.group import Group
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
@@ -13,24 +14,16 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import add_role
+from portal.system_uri import SNOMED
 
 class TestIntervention(TestCase):
-
-    def setUp(self):
-        super(TestIntervention, self).setUp()
-
-        # Remove the strategies read in from SitePersistence
-        # to isolate test behavior - i.e. just test what's being added
-        with SessionScope(db):
-            AccessStrategy.query.delete()
-            db.session.commit()
 
     def test_intervention_wrong_service_user(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
         data = {'user_id': TEST_USER_ID, 'access': 'granted'}
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert401(rv)
@@ -51,7 +44,7 @@ class TestIntervention(TestCase):
                 'provider_html': "unique HTML for /patients view"
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert200(rv)
@@ -75,7 +68,7 @@ class TestIntervention(TestCase):
                 'access': 'enabled',
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -91,7 +84,7 @@ class TestIntervention(TestCase):
                 'link_url': 'http://un-safe.com',
                }
 
-        rv = self.app.put('/api/intervention/sexual_recovery',
+        rv = self.client.put('/api/intervention/sexual_recovery',
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
@@ -168,7 +161,7 @@ class TestIntervention(TestCase):
         # Bless the test user with PCa diagnosis
         user.save_constrained_observation(
             codeable_concept=CC.PCaDIAG, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
@@ -183,10 +176,8 @@ class TestIntervention(TestCase):
         cp_id = cp.id
 
         with SessionScope(db):
-            d = {'function': 'observation_check',
-                 'kwargs': [{'name': 'display', 'value':
-                             CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]}
+            d = {'function': 'tx_begun',
+                 'kwargs': [{'name': 'boolean_value', 'value': 'false'}]}
             strat = AccessStrategy(
                 name="has not stared treatment",
                 intervention_id = cp_id,
@@ -196,27 +187,27 @@ class TestIntervention(TestCase):
         cp = INTERVENTION.CARE_PLAN
         user = db.session.merge(self.test_user)
 
-        # Prior to declaring TX, user shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
-
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
-        with SessionScope(db):
-            db.session.commit()
-        user, cp = map(db.session.merge, (user, cp))
-
-        # Declaring they started TX, should grant access
+        # Prior to declaring TX, user should have access
         self.assertTrue(cp.display_for_user(user).access)
 
-        # Say user starts treatment, should lose access
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         with SessionScope(db):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
+        # Declaring they started a non TX proc, should still have access
+        self.assertTrue(cp.display_for_user(user).access)
+
+        self.add_procedure(
+            code='26294005',
+            display='Radical prostatectomy (nerve-sparing)',
+            system=SNOMED)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        # Declaring they started a TX proc, should lose access
         self.assertFalse(cp.display_for_user(user).access)
 
     def test_exclusive_stategy(self):
@@ -319,10 +310,42 @@ class TestIntervention(TestCase):
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
 
+    def test_in_role(self):
+        user = self.test_user
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.public_access = False
+        d = {
+             'function': 'in_role_list',
+             'kwargs': [
+                 {'name': 'role_list',
+                  'value': [ROLE.PATIENT,]}]
+            }
+
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name="SELF_MANAGEMENT if PATIENT",
+                intervention_id = sm.id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+
+        # Prior to granting user PATIENT role, the strategy
+        # should not give access to SM
+        self.assertFalse(sm.display_for_user(user).access)
+
+        # Add PATIENT to user's roles
+        add_role(user, ROLE.PATIENT)
+        with SessionScope(db):
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertTrue(sm.display_for_user(user).access)
+
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
         ae  = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
+        self.bless_with_basics()
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',
@@ -339,13 +362,10 @@ class TestIntervention(TestCase):
         self.assertTrue(
             user.display_name in ae.display_for_user(user).card_html)
 
-        # Add a fake assessment and see a change
-        with SessionScope(db):
-            a = QuestionnaireResponse(
-                user_id=user.id, authored='2007-01-10 16:19:23',
-                status='completed')
-            db.session.add(a)
-            db.session.commit()
+        # Add a fake assessments and see a change
+        mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='hpfs')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
         self.assertTrue(
@@ -377,13 +397,13 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert200(rv)
 
         # fetch it back and compare
-        rv = self.app.get('/api/intervention/sexual_recovery/access_rule')
+        rv = self.client.get('/api/intervention/sexual_recovery/access_rule')
         self.assert200(rv)
         data = json.loads(rv.data)
         self.assertEqual(len(data['rules']), 1)
@@ -403,7 +423,7 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert200(rv)
@@ -416,7 +436,7 @@ class TestIntervention(TestCase):
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
              }
             }
-        rv = self.app.post('/api/intervention/sexual_recovery/access_rule',
+        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
                 content_type='application/json',
                 data=json.dumps(d))
         self.assert400(rv)
@@ -427,10 +447,10 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        uw = Organization.query.filter_by(
-            name='UW Medicine (University of Washington)').one()
+        uw = Organization(name='UW Medicine (University of Washington)')
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
+            db.session.add(uw)
             db.session.commit()
         user, uw = map(db.session.merge, (user, uw))
 
@@ -485,9 +505,13 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        ucsf = Organization.query.filter_by(name='UCSF Medical Center').one()
-        uw = Organization.query.filter_by(
-            name='UW Medicine (University of Washington)').one()
+        ucsf = Organization(name='UCSF Medical Center')
+        uw = Organization(
+            name='UW Medicine (University of Washington)')
+        with SessionScope(db):
+            db.session.add(ucsf)
+            db.session.add(uw)
+            db.session.commit()
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
@@ -531,11 +555,9 @@ class TestIntervention(TestCase):
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',
-                  'value': 'observation_check'},
+                  'value': 'tx_begun'},
                  {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]},
+                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
                  # Has Localized PCa (strat 4)
                  {'name': 'strategy_4',
                   'value': 'observation_check'},
@@ -559,12 +581,11 @@ class TestIntervention(TestCase):
         # only first two strats true so far, therfore, should be False
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -586,9 +607,13 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
-        ucsf = Organization.query.filter_by(name='UCSF Medical Center').one()
-        uw = Organization.query.filter_by(
-            name='UW Medicine (University of Washington)').one()
+        ucsf = Organization(name='UCSF Medical Center')
+        uw = Organization(
+            name='UW Medicine (University of Washington)')
+        with SessionScope(db):
+            db.session.add(ucsf)
+            db.session.add(uw)
+            db.session.commit()
         user.organizations.append(ucsf)
         user.organizations.append(uw)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
@@ -633,11 +658,9 @@ class TestIntervention(TestCase):
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',
-                  'value': 'observation_check'},
+                  'value': 'tx_begun'},
                  {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.TX.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'false'}]},
+                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
                  # Has Localized PCa (strat 4)
                  {'name': 'strategy_4',
                   'value': 'observation_check'},
@@ -667,12 +690,11 @@ class TestIntervention(TestCase):
         # only first two strats true so far, therfore, should be False
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
-        user.save_constrained_observation(
-            codeable_concept=CC.TX, value_quantity=CC.FALSE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+        self.add_procedure(
+            code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID))
+            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -698,7 +720,7 @@ class TestIntervention(TestCase):
     def test_get_empty_user_intervention(self):
         # Get on user w/o user_intervention
         self.login()
-        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SELF_MANAGEMENT.name, u=TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json.keys()), 1)
@@ -719,7 +741,7 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         self.login()
-        rv = self.app.get('/api/intervention/{i}/user/{u}'.format(
+        rv = self.client.get('/api/intervention/{i}/user/{u}'.format(
             i=INTERVENTION.SEXUAL_RECOVERY.name, u=TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(len(rv.json.keys()), 7)
@@ -746,7 +768,7 @@ class TestIntervention(TestCase):
                     'Review results at <a href="http://www.example.com">here</a>'
                }
         self.login()
-        rv = self.app.post('/api/intervention/{}/communicate'.format(
+        rv = self.client.post('/api/intervention/{}/communicate'.format(
                 INTERVENTION.DECISION_SUPPORT_P3P.name),
                 content_type='application/json',
                 data=json.dumps(data))

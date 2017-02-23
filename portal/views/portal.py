@@ -1,6 +1,4 @@
 """Portal view functions (i.e. not part of the API or auth)"""
-import requests
-
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask_login import login_user
@@ -10,12 +8,13 @@ from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
+import requests
 
 from .auth import next_after_login
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.app_text import app_text
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
+from ..models.app_text import app_text, VersionedResource
+from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
@@ -32,12 +31,14 @@ portal = Blueprint('portal', __name__)
 
 
 def page_not_found(e):
-    return render_template('error.html', no_nav="true"), 404
+    gil = current_app.config.get('GIL')
+    return render_template('404.html' if not gil else '/gil/404.html', no_nav="true", user=current_user()), 404
 
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
-    return render_template('error.html'), 500
+    gil = current_app.config.get('GIL')
+    return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
 
 @portal.before_app_request
 def debug_request_dump():
@@ -65,8 +66,77 @@ def landing():
     if current_user():
         current_app.logger.debug("landing (found user) -> next_after_login")
         return next_after_login()
-    return render_template('landing.html', user=None, no_nav="true")
 
+    timed_out = request.args.get('timed_out', False)
+    gil = current_app.config.get('GIL')
+    init_login_modal = False
+    if 'pending_authorize_args' in session:
+        init_login_modal = True
+    return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
+
+#from GIL
+@portal.route('/gil-interventions-items')
+@oauth.require_oauth()
+def gil_interventions_items():
+    """ this is needed to filter the GIL menu based on user's intervention(s)
+        trying to do this so code is more easily managed from front end side """
+    user = current_user()
+    user_interventions = []
+    interventions =\
+            Intervention.query.order_by(Intervention.display_rank).all()
+    for intervention in interventions:
+        display = intervention.display_for_user(user)
+        if display.access:
+            user_interventions.append({
+                "name": intervention.name,
+                "description": intervention.description if intervention.description else "",
+                "link_url": display.link_url if display.link_url is not None else "disabled",
+                "link_label": display.link_label if display.link_label is not None else ""
+            })
+
+    return jsonify(interventions=user_interventions)
+@portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
+def gil_shortcut_alias_validation(clinic_alias):
+    # Shortcut aliases are registered with the organization as identifiers.
+    # Confirm the requested alias exists or 404
+    identifier = Identifier.query.filter_by(system=SHORTCUT_ALIAS,
+                                            _value=clinic_alias).first()
+    if not identifier:
+        current_app.logger.debug("Clinic alias not found: %s", clinic_alias)
+        return jsonify({"error": "clinic alias not found"})
+
+    # Expecting exactly one organization for this alias, save ID in session
+    results = OrganizationIdentifier.query.filter_by(
+        identifier_id=identifier.id).one()
+    # Top-level orgs won't work, as the UI only lists the clinic level
+    org = Organization.query.get(results.organization_id)
+    if org.partOf_id is None:
+        return jsonify({"error": "alias points to top-level organization"})
+
+    identifier = {"name": org.name}
+
+
+    return jsonify(identifier)
+
+@portal.route('/symptom-tracker')
+def symptom_tracker():
+    return render_template('gil/symptom-tracker.html', user=current_user())
+
+@portal.route('/decision-support')
+def decision_support():
+    return render_template('gil/decision-support.html', user=current_user())
+
+@portal.route('/what-is-prostate-cancer')
+def prostate_cancer_facts():
+    return render_template('gil/what-is-prostate-cancer.html', user=current_user())
+
+@portal.route('/exercise-and-diet')
+def exercise_and_diet():
+    return render_template('gil/exercise-and-diet.html', user=current_user())
+
+@portal.route('/lived-experience')
+def lived_experience():
+    return render_template('gil/lived-experience.html', user=current_user())
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
@@ -76,7 +146,7 @@ class ShortcutAliasForm(FlaskForm):
         if len(field.data.strip()):
             try:
                 Identifier.query.filter_by(
-                    system=SHORTCUT_ALIAS, value=field.data).one()
+                    system=SHORTCUT_ALIAS, _value=field.data).one()
             except NoResultFound:
                 raise validators.ValidationError("Code not found")
 
@@ -91,7 +161,12 @@ def specific_clinic_entry():
     Store the clinic in the session for association with the user once
     registered and redirect to the standard landing page.
 
+    NB if already logged in - this will bounce user to home
+
     """
+    if current_user():
+        return redirect(url_for('portal.home'))
+
     form = ShortcutAliasForm(request.form)
 
     if not form.validate_on_submit():
@@ -111,7 +186,7 @@ def specific_clinic_landing(clinic_alias):
     # Shortcut aliases are registered with the organization as identifiers.
     # Confirm the requested alias exists or 404
     identifier = Identifier.query.filter_by(system=SHORTCUT_ALIAS,
-                                            value=clinic_alias).first()
+                                            _value=clinic_alias).first()
     if not identifier:
         current_app.logger.debug("Clinic alias not found: %s", clinic_alias)
         abort(404)
@@ -154,17 +229,21 @@ def access_via_token(token):
     if current_user():
         abort(500, "Already logged in - can't continue")
 
+    def verify_token(valid_seconds):
+        is_valid, has_expired, user_id =\
+                user_manager.token_manager.verify_token(token, valid_seconds)
+        if has_expired:
+            flash('Your access token has expired.', 'error')
+            return redirect(url_for('portal.landing'))
+        if not is_valid:
+            flash('Your access token is invalid.', 'error')
+            return redirect(url_for('portal.landing'))
+        return user_id
+
     # Confirm the token is valid, and not expired.
     valid_seconds = current_app.config.get(
         'TOKEN_LIFE_IN_DAYS', 30) * 24 * 3600
-    is_valid, has_expired, user_id = user_manager.token_manager.verify_token(
-        token, valid_seconds)
-    if has_expired:
-        flash('Your access token has expired.', 'error')
-        return redirect(url_for('portal.landing'))
-    if not is_valid:
-        flash('Your access token is invalid.', 'error')
-        return redirect(url_for('portal.landing'))
+    user_id = verify_token(valid_seconds)
 
     # Valid token - confirm user id looks legit
     user = get_user(user_id)
@@ -176,17 +255,28 @@ def access_via_token(token):
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
     if ROLE.WRITE_ONLY in has:
-        # legit - log in and redirect
-        auditable_event("login using access_via_token", user_id=user.id)
-        session['id'] = user.id
-        login_user(user)
-        return next_after_login()
+        # write only users with special role skip the challenge protocol
+        if ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE in has:
+            # only give such tokens 5 minutes - recheck validity
+            verify_token(valid_seconds=5*60)
+            auditable_event("promoting user without challenge via token, "
+                            "pending registration", user_id=user.id,
+                            subject_id=user.id, context='account')
+            user.mask_email()
+            db.session.commit()
+            session['invited_verified_user_id'] = user.id
+            return redirect(url_for('user.register', email=user.email))
+
+        # fall into else case below, at least for todays demo
+        # TODO: determine if there's a legit reason to login WRITE_ONLY
+        # w/o redirecting to challenge in this case
 
     # Without WRITE_ONLY, we don't log the user in, but preserve the
     # invited user id, should we need to merge associated details
     # after user proves themselves and logs in
     auditable_event("invited user entered using token, pending "
-                    "registration", user_id=user.id)
+                    "registration", user_id=user.id, subject_id=user.id,
+                    context='account')
     session['challenge.user_id'] = user.id
     session['challenge.next_url'] = url_for('user.register', email=user.email)
     session['challenge.merging_accounts'] = True
@@ -267,7 +357,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
         auditable_event("Failed identity challenge tests with values:"
                         "(first_name={}, last_name={}, birthdate={})".\
                         format(first_name, last_name, birthdate),
-                        user_id=user.id)
+                        user_id=user.id, subject_id=user.id,
+                        context='authentication')
         # very modest brute force test
         form.retry_count.data = int(form.retry_count.data) + 1
         if form.retry_count.data >= 1:
@@ -292,27 +383,23 @@ def initial_queries():
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
-        return redirect('portal.landing')
+        return redirect(url_for('portal.landing'))
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        response = requests.get(app_text(ToU_ATMA.name_key()))
-        terms = response.text
+        asset, url = VersionedResource.fetch_elements(
+            app_text(ToU_ATMA.name_key()))
+        terms = {'asset': asset, 'agreement_url': url}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
-            consent_url = app_text(ConsentATMA.name_key(organization=org))
-            response = requests.get(consent_url)
-            if response.json:
-                consent_agreements[org.id] = {
-                    'asset': response.json()['asset'],
-                    'agreement_url': ConsentATMA.permanent_url(
-                        version=response.json()['version'],
-                        generic_url=consent_url)}
-            else:
-                consent_agreements[org.id] = {
-                    'asset': response.text, 'agreement_url': consent_url}
+            asset, url = VersionedResource.fetch_elements(
+                app_text(ConsentATMA.name_key(organization=org)))
+            consent_agreements[org.id] = {
+                    'asset': asset, 'agreement_url': url}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -336,7 +423,7 @@ def home():
 
     # Enforce flow - expect authorized user for this view
     if not user:
-        abort (500, "unexpected lack of user in /home")
+        return redirect(url_for('portal.landing'))
 
     # Enforce flow - don't expect 'next' params here
     if 'next' in session and session['next']:
@@ -354,8 +441,25 @@ def home():
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
-    return render_template('portal.html', user=user,
-                           interventions=interventions)
+
+    gil = current_app.config.get('GIL')
+    consent_agreements = {}
+    if gil:
+        for org_id in OrgTree().all_top_level_ids():
+            current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
+            org = Organization.query.get(org_id)
+            asset, url = VersionedResource.fetch_elements(
+                app_text(ConsentATMA.name_key(organization=org)))
+            if url:
+                current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
+
+            consent_agreements[org.id] = {
+                    'organization_name': org.name,
+                    'asset': asset,
+                    'agreement_url': url}
+
+    return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
+                           interventions=interventions, consent_agreements=consent_agreements)
 
 
 @portal.route('/admin')
@@ -381,6 +485,8 @@ def invite():
     body = request.form.get('body')
     recipients = request.form.get('recipients')
     user = current_user()
+    if not user.email:
+        abort(400, "Users without an email address can't send email")
     email = EmailMessage(subject=subject, body=body,
             recipients=recipients, sender=user.email,
             user_id=user.id)
@@ -414,45 +520,39 @@ def profile(user_id):
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        consent_url = app_text(ConsentATMA.name_key(organization=org))
-        response = requests.get(consent_url)
-        if response.json:
-            consent_agreements[org.id] = {
+        asset, url = VersionedResource.fetch_elements(
+            app_text(ConsentATMA.name_key(organization=org)))
+        consent_agreements[org.id] = {
                 'organization_name': org.name,
-                'asset': response.json()['asset'],
-                'agreement_url': ConsentATMA.permanent_url(
-                    version=response.json()['version'],
-                    generic_url=consent_url)}
-        else:
-            consent_agreements[org.id] = {
-                'asset': response.text, 'agreement_url': consent_url, 'organization_name': org.name}
-    return render_template('profile.html', user=user, consent_agreements=consent_agreements)
-
-@portal.route('/profile-test', defaults={'user_id': None})
-@portal.route('/profile-test/<int:user_id>')
-@oauth.require_oauth()
-def profile_test(user_id):
-    """profile test view function"""
-    user = current_user()
-    if user_id:
-        user.check_role("edit", other_id=user_id)
-        user = get_user(user_id)
-    return render_template('profile_test.html', user=user)
-
+                'asset': asset,
+                'agreement_url': url}
+    return render_template(
+        'profile.html', user=user, consent_agreements=consent_agreements)
 
 @portal.route('/legal')
 def legal():
     """ Legal/terms of use page"""
+    gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
-    return render_template('legal.html', content=response.text)
+    return render_template('legal.html' if not gil else 'gil/legal.html',
+        content=response.text, user=current_user())
+
+@portal.route('/terms-and-conditions')
+def terms_and_conditions():
+    """ Legal/terms-and-conditions of use page"""
+    gil = current_app.config.get('GIL')
+    response = requests.get(app_text(Terms_ATMA.name_key()))
+    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
+        content=response.text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
     about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
     about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
-    return render_template('about.html', about_tnth=about_tnth.text,
-                           about_mo=about_mo.text)
+    gil = current_app.config.get('GIL')
+    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth.text,
+                           about_mo=about_mo.text, user=current_user())
 
 @portal.route('/explore')
 def explore():
@@ -474,8 +574,9 @@ def contact():
     if request.method == 'GET':
         sendername = user.display_name if user else ''
         email = user.email if user else ''
-        return render_template('contact.html', sendername=sendername,
-                               email=email)
+        gil = current_app.config.get('GIL')
+        return render_template('contact.html' if not gil else 'gil/contact.html', sendername=sendername,
+                               email=email, user=user)
 
     sender = request.form.get('email')
     sendername = request.form.get('sendername')
@@ -509,7 +610,8 @@ def questions():
     if not user:
         user = add_anon_user()
         db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id)
+        auditable_event("register new anonymous user", user_id=user.id,
+            subject_id=user.id, context='account')
         session['id'] = user.id
         login_user(user)
 
@@ -523,7 +625,8 @@ def questions_anon():
     if not user:
         user = add_anon_user()
         db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id)
+        auditable_event("register new anonymous user", user_id=user.id,
+            subject_id=user.id, context='account')
         session['id'] = user.id
         login_user(user)
     return render_template('questions_anon.html', user=user,

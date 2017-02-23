@@ -106,7 +106,7 @@ fi
 
 # DB Changes
 if [[
-    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/migrations) && $? -eq 0 )) &&
+    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/migrations) && $? -eq 0 )) &&
     -z $INIT
 ]]; then
     activate_once
@@ -114,7 +114,6 @@ if [[
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
-    cd "${GIT_WORK_TREE}"
     python "${GIT_WORK_TREE}/manage.py" db upgrade
 fi
 

@@ -4,6 +4,7 @@ Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
 from sqlalchemy import UniqueConstraint, and_
+from sqlalchemy.ext.hybrid import hybrid_property
 from flask import url_for
 
 import address
@@ -13,6 +14,10 @@ from .identifier import Identifier
 import reference
 from .telecom import Telecom
 
+USE_SPECIFIC_CODINGS_MASK = 0b0001
+RACE_CODINGS_MASK = 0b0010
+ETHNICITY_CODINGS_MASK = 0b0100
+INDIGENOUS_CODINGS_MASK = 0b1000
 
 class Organization(db.Model):
     """Model representing a FHIR organization
@@ -34,6 +39,7 @@ class Organization(db.Model):
     type_id = db.Column(db.ForeignKey('codeable_concepts.id',
                                       ondelete='cascade'))
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
+    coding_options = db.Column(db.Integer, nullable=False, default=0)
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
@@ -41,12 +47,78 @@ class Organization(db.Model):
             secondary="organization_identifiers")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
+    def __init__(self, **kwargs):
+        self.coding_options = 14
+        super(Organization, self).__init__(**kwargs)
+
     def __str__(self):
         part_of = 'partOf {} '.format(self.partOf_id) if self.partOf_id else ''
         addresses = '; '.join([str(a) for a in self.addresses])
 
         return 'Organization {0.name} {0.type} {0.phone} {0.email} '.format(
                 self) + part_of + addresses
+
+    @hybrid_property
+    def use_specific_codings(self):
+        return self.coding_options & USE_SPECIFIC_CODINGS_MASK
+
+    @use_specific_codings.setter
+    def use_specific_codings(self, value):
+        if value:
+            self.coding_options = self.coding_options | USE_SPECIFIC_CODINGS_MASK
+        else:
+            self.coding_options = self.coding_options & ~USE_SPECIFIC_CODINGS_MASK
+
+    @hybrid_property
+    def race_codings(self):
+        if self.use_specific_codings:
+            return self.coding_options & RACE_CODINGS_MASK
+        elif self.partOf_id:
+            org = Organization.query.get(self.partOf_id)
+            return org.race_codings
+        else:
+            return True
+
+    @race_codings.setter
+    def race_codings(self, value):
+        if value:
+            self.coding_options = self.coding_options | RACE_CODINGS_MASK
+        else:
+            self.coding_options = self.coding_options & ~RACE_CODINGS_MASK
+
+    @hybrid_property
+    def ethnicity_codings(self):
+        if self.use_specific_codings:
+            return self.coding_options & ETHNICITY_CODINGS_MASK
+        elif self.partOf_id:
+            org = Organization.query.get(self.partOf_id)
+            return org.ethnicity_codings
+        else:
+            return True
+
+    @ethnicity_codings.setter
+    def ethnicity_codings(self, value):
+        if value:
+            self.coding_options = self.coding_options | ETHNICITY_CODINGS_MASK
+        else:
+            self.coding_options = self.coding_options & ~ETHNICITY_CODINGS_MASK
+
+    @hybrid_property
+    def indigenous_codings(self):
+        if self.use_specific_codings:
+            return self.coding_options & INDIGENOUS_CODINGS_MASK
+        elif self.partOf_id:
+            org = Organization.query.get(self.partOf_id)
+            return org.indigenous_codings
+        else:
+            return True
+
+    @indigenous_codings.setter
+    def indigenous_codings(self, value):
+        if value:
+            self.coding_options = self.coding_options | INDIGENOUS_CODINGS_MASK
+        else:
+            self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
 
     @classmethod
     def from_fhir(cls, data):
@@ -69,10 +141,14 @@ class Organization(db.Model):
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:
             self.partOf_id = reference.Reference.parse(data['partOf']).id
+        for attr in ('use_specific_codings','race_codings',
+                    'ethnicity_codings','indigenous_codings'):
+            if attr in data:
+                setattr(self, attr, data.get(attr))
         if 'identifier' in data:
             for id in data['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
-                if identifier not in self.identifiers:
+                if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
         return self
 
@@ -92,6 +168,13 @@ class Organization(db.Model):
         if self.partOf_id:
             d['partOf'] = reference.Reference.organization(
                 self.partOf_id).as_fhir()
+        if self.coding_options:
+            for attr in ('use_specific_codings','race_codings',
+                         'ethnicity_codings','indigenous_codings'):
+                if getattr(self, attr):
+                    d[attr] = True
+                else:
+                    d[attr] = False
         if self.identifiers:
             d['identifier'] = []
         for id in self.identifiers:
@@ -289,6 +372,60 @@ class OrgTree(object):
     def all_top_level_ids(self):
         """Return list of all top level organization identifiers"""
         return self.root.children.keys()
+
+    def all_leaf_ids(self):
+        nodes = set()
+        for id in self.all_top_level_ids():
+            nodes.update(self.all_leaves_below_id(id))
+        return list(nodes)
+
+    def all_leaves_below_id(self, organization_id):
+        """Given org at arbitrary level, return list of leaf nodes below it"""
+        arb = self.find(organization_id)
+
+        def fetch_leaves(node):
+            stack = [node]
+            while stack:
+                node = stack.pop()
+                if not node.children:
+                    yield node.id
+                for child_node in node.children.values():
+                    stack.append(child_node)
+
+        return list(fetch_leaves(arb))
+
+    def here_and_below_id(self, organization_id):
+        """Given org at arbitrary level, return list at and below"""
+        arb = self.find(organization_id)
+
+        def fetch_nodes(node):
+            stack = [node]
+            while stack:
+                node = stack.pop()
+                yield node.id
+                for id, child_node in node.children.items():
+                    stack.append(child_node)
+
+        return list(fetch_nodes(arb))
+
+    def at_or_below_ids(self, organization_id, other_organizations):
+        """Check if the other_organizations are at or below given organization
+
+        :param organization_id: effective parent to check against
+        :param other_organizations: iterable of organization_ids as potential
+            children.
+
+        :return: True if any org in other_organizations is equal to the
+            given organization_id, or a child of it.
+
+        """
+        ## work through list - shortcircuit out if a qualified node is found
+        for other_organization_id in other_organizations:
+            if organization_id == other_organization_id:
+                return True
+            children = self.here_and_below_id(organization_id)
+            if other_organization_id in children:
+                return True
 
 
 def add_static_organization():

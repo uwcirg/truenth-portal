@@ -25,12 +25,12 @@ class TestAuth(TestCase):
 
     def test_nouser_logout(self):
         """Confirm logout works without a valid user"""
-        rv = self.app.get('/logout')
+        rv = self.client.get('/logout')
         self.assertEquals(302, rv.status_code)
 
     def test_nouser_creates_anon(self):
         """A request for the questions page results in anon user"""
-        rv = self.app.get('/questions')
+        rv = self.client.get('/questions')
         self.assert200(rv)
         anon_user = User.query.filter_by(username=None).first()
         self.assertTrue(anon_user.roles[0].name, ROLE.ANON)
@@ -42,7 +42,7 @@ class TestAuth(TestCase):
                 'retype_password': 'one2Three',
                 'email': 'otu@example.com',
                }
-        rv = self.app.post('/user/register', data=data)
+        rv = self.client.post('/user/register', data=data)
         self.assertEquals(rv.status_code, 302)
         new_user = User.query.filter_by(username=data['email']).first()
         self.assertEquals(new_user.active, True)
@@ -52,7 +52,7 @@ class TestAuth(TestCase):
         origins = "https://test.com https://two.com"
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
-        rv = self.app.post('/client', data=dict(
+        rv = self.client.post('/client', data=dict(
             application_origins=origins))
         self.assertEquals(302, rv.status_code)
 
@@ -63,7 +63,7 @@ class TestAuth(TestCase):
         """Test adding a bad client application"""
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         self.login()
-        rv = self.app.post('/client',
+        rv = self.client.post('/client',
                 data=dict(application_origins="bad data in"))
         self.assertTrue("Invalid URL" in rv.data)
 
@@ -71,7 +71,7 @@ class TestAuth(TestCase):
         """Test editing a client application"""
         client = self.add_client()
         self.login()
-        rv = self.app.post('/client/{0}'.format(client.client_id),
+        rv = self.client.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='http://tryme.com',
                          application_origins=client.application_origins,
                          application_role=INTERVENTION.DEFAULT.name))
@@ -103,7 +103,7 @@ class TestAuth(TestCase):
         """Confirm only valid urls can be set"""
         client = self.add_client()
         self.login()
-        rv = self.app.post('/client/{0}'.format(client.client_id),
+        rv = self.client.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url='badprotocol.com',
                     application_origins=client.application_origins))
         self.assertEquals(200, rv.status_code)
@@ -157,3 +157,30 @@ class TestAuth(TestCase):
         self.assertRaises(RoleError, add_role, service_user,
                           ROLE.APPLICATION_DEVELOPER)
         self.assertEquals(len(service_user.roles), 1)
+
+    def test_token_status(self):
+        with SessionScope(db):
+            client = Client(
+                client_id='test-id', client_secret='test-secret',
+                user_id=TEST_USER_ID)
+            token = Token(
+                access_token='test-token', client=client, user_id=TEST_USER_ID,
+                token_type='bearer',
+                expires=(datetime.datetime.utcnow() +
+                         datetime.timedelta(seconds=30)))
+            db.session.add(client)
+            db.session.add(token)
+            db.session.commit()
+
+        token = db.session.merge(token)
+        rv = self.client.get(
+            "/oauth/token-status",
+            headers={'Authorization': 'Bearer {}'.format(token.access_token)})
+        self.assert200(rv)
+        data = rv.json
+        self.assertAlmostEquals(30, data['expires_in'], delta=5)
+
+    def test_token_status_wo_header(self):
+        """Call for token_status w/o token should return 401"""
+        rv = self.client.get("/oauth/token-status")
+        self.assert401(rv)

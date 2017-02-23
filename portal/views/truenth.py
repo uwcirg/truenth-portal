@@ -66,8 +66,8 @@ def auditlog_addevent():
     message = request.form.get('message')
     if not message:
         return jsonify(message="missing required 'message' in post")
-    auditable_event('remote message: {0}'.format(message),
-                    user_id=current_user().id)
+    auditable_event('remote message: {0}'.format(message), context='other',
+                    user_id=current_user().id, subject_id=current_user().id)
     return jsonify(message='ok')
 
 
@@ -76,7 +76,7 @@ def auditlog_addevent():
 def portal_wrapper_html():
     """Returns portal wrapper for insertion at top of interventions
 
-    Get html for the portal site UI wrapper (top-level nav elements, etc)
+    Get html for the portal site UI wrapper (top-level nav elements, timeout code, piwik analytics, etc)
 
     CORS headers will only be included when the request includes well defined
     Origin header.
@@ -165,7 +165,7 @@ def portal_wrapper_html():
                         filename="img/{}.png".format(brand_name),
                         _external=True),
                 url_for('static',
-                        filename="img/{}-small.png".format(brand_name),
+                        filename="img/{}_sm.png".format(brand_name),
                         _external=True)
             )
 

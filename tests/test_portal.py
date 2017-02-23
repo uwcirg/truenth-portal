@@ -28,11 +28,11 @@ class TestPortal(TestCase):
         self.add_required_clinical_data()
         self.bless_with_basics()
         self.login()
-        rv = self.app.get('/home')
+        rv = self.client.get('/home')
 
         self.assertIn('Custom Label', rv.data)
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.card_html, rv.data)
+        self.assertIn(intervention.card_html, rv.data.decode('utf-8'))
 
     def test_user_card_html(self):
         """Interventions can further customize per user"""
@@ -54,14 +54,14 @@ class TestPortal(TestCase):
         user = db.session.merge(self.test_user)
         self.login()
 
-        rv = self.app.get('/home')
+        rv = self.client.get('/home')
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.card_html, rv.data)
-        self.assertIn(ui.link_label, rv.data)
-        self.assertIn(ui.link_url, rv.data)
+        self.assertIn(ui.card_html, rv.data.decode('utf-8'))
+        self.assertIn(ui.link_label, rv.data.decode('utf-8'))
+        self.assertIn(ui.link_url, rv.data.decode('utf-8'))
         intervention = db.session.merge(intervention)
-        self.assertIn(intervention.display_for_user(user).link_label, rv.data)
+        self.assertIn(intervention.display_for_user(user).link_label, rv.data.decode('utf-8'))
 
     def test_provider_html(self):
         """Interventions can customize the provider text """
@@ -82,9 +82,9 @@ class TestPortal(TestCase):
 
         # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the
         # 'reports' field
-        self.app.application.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
+        self.app.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
             'reports',]
-        rv = self.app.get('/patients/')
+        rv = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
         self.assertIn(ui.provider_html, rv.data)
@@ -99,7 +99,7 @@ class TestPortal(TestCase):
         self.add_required_clinical_data()
         self.bless_with_basics()
         self.login()
-        rv = self.app.get('/home')
+        rv = self.client.get('/home')
 
         self.assertNotIn('Sexual Recovery', rv.data)
 
@@ -111,7 +111,7 @@ class TestPortal(TestCase):
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
-        rv = self.app.get('/home')
+        rv = self.client.get('/home')
 
         self.assertIn('Sexual Recovery', rv.data)
 
@@ -126,7 +126,7 @@ class TestPortal(TestCase):
         # Test user needs admin role to view list
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        rv = self.app.get('/admin')
+        rv = self.client.get('/admin')
 
         # Should at least see an entry per user in system
         self.assertTrue(rv.data.count('/profile') >= User.query.count())
@@ -142,7 +142,7 @@ class TestPortal(TestCase):
         postdata = { 'subject': 'unittest subject',
                 'recipients': 'test_user@yahoo.com test_user@uw.edu',
                 'body': "Ode to joy" }
-        rv = self.app.post('/invite', data=postdata, follow_redirects=True)
+        rv = self.client.post('/invite', data=postdata, follow_redirects=True)
         self.assertTrue("Email Invite Sent" in rv.data)
 
     def test_message_sent(self):
@@ -157,7 +157,7 @@ class TestPortal(TestCase):
         db.session.commit()
 
         self.login()
-        rv = self.app.get('/invite/{0}'.format(message.id))
+        rv = self.client.get('/invite/{0}'.format(message.id))
         self.assertTrue(rv.data.find(sent_at.strftime('%m/%d/%Y %H:%M:%S'))
             > 0)
         self.assertTrue(rv.data.find('one@ex1.com two@two.org') > 0)
@@ -165,14 +165,14 @@ class TestPortal(TestCase):
     def test_missing_message(self):
         """Request to view non existant message should 404"""
         self.login()
-        rv = self.app.get('/invite/404')
+        rv = self.client.get('/invite/404')
         self.assertEquals(rv.status_code, 404)
 
     def test_celery_add(self):
         """Try simply add task handed off to celery"""
         x = 151
         y = 99
-        rv = self.app.get('/celery-test?x={x}&y={y}&redirect-to-result=True'.\
+        rv = self.client.get('/celery-test?x={x}&y={y}&redirect-to-result=True'.\
                           format(x=x, y=y), follow_redirects=True)
         self.assert200(rv)
         self.assertEquals(rv.data, str(x + y))
@@ -186,7 +186,7 @@ class TestPortal(TestCase):
             'swagger',
             'definitions',
         )
-        swag = swagger(self.app.application)
+        swag = swagger(self.client.application)
 
         for key in expected_keys:
             self.assertIn(key, swag)
@@ -199,7 +199,7 @@ class TestPortal(TestCase):
             suffix='.json',
             delete=True,
         ) as temp_spec:
-            temp_spec.write(self.app.get('/spec').data)
+            temp_spec.write(self.client.get('/spec').data)
             temp_spec.seek(0)
 
             validate_spec_url("file:%s" % temp_spec.name)

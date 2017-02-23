@@ -22,9 +22,12 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
 from ..extensions import db
-from .fhir import CC, Coding, CodeableConcept, QuestionnaireResponse
+from .fhir import CC, Coding, CodeableConcept
+from .fhir import AssessmentStatus
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
+from .procedure_codes import known_treatment_started
+from .procedure_codes import known_treatment_not_started
 from .role import Role
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
@@ -39,6 +42,7 @@ def _log(**kwargs):
     current_app.logger.debug(
         "{func_name} returning {result} for {user} on intervention "\
         "{intervention}".format(**kwargs) + msg)
+
 
 def limit_by_clinic_list(org_list, combinator='all'):
     """Requires user is associated with {any,all} clinics in the list
@@ -78,6 +82,7 @@ def limit_by_clinic_list(org_list, combinator='all'):
     return user_registered_with_all_clinics if combinator == 'all' else\
         user_registered_with_any_clinics
 
+
 def not_in_clinic_list(org_list):
     """Requires user isn't associated with any clinic in the list"""
     orgs = []
@@ -101,6 +106,32 @@ def not_in_clinic_list(org_list):
             return True
 
     return user_not_registered_with_clinics
+
+
+def in_role_list(role_list):
+    """Requires user is associated with any role in the list"""
+    roles = []
+    for role in role_list:
+        try:
+            role = Role.query.filter_by(
+                name=role).one()
+            roles.append(role)
+        except NoResultFound:
+            raise ValueError("role '{}' not found".format(role))
+        except MultipleResultsFound:
+            raise ValueError("more than one role named '{}'"
+                             "found".format(role))
+    required = set(roles)
+
+    def user_has_given_role(intervention, user):
+        has = set(user.roles)
+        if has.intersection(required):
+            _log(result=True, func_name='in_role_list', user=user,
+                 intervention=intervention.name)
+            return True
+
+    return user_has_given_role
+
 
 def not_in_role_list(role_list):
     """Requires user isn't associated with any role in the list"""
@@ -126,6 +157,7 @@ def not_in_role_list(role_list):
 
     return user_not_given_role
 
+
 def allow_if_not_in_intervention(intervention_name):
     """Returns function implementing strategy API checking that user does not belong to named intervention"""
 
@@ -140,44 +172,21 @@ def allow_if_not_in_intervention(intervention_name):
     return user_not_in_intervention
 
 
-def localized_PCa(user):
-    """Look up user's value for localized PCa"""
-    codeable_concept = CC.PCaLocalized
-    value_quantities = user.fetch_values_for_concept(codeable_concept)
-    if value_quantities:
-        assert len(value_quantities) == 1
-        return value_quantities[0].value == 'true'
-    return False
-
-def most_recent_survey(user):
-    """Look up timestamp for most recently completed QuestionnaireResponse
-
-    Returns authored (timestamp) of the most recent
-    QuestionnaireResponse, else None
-    """
-    qr = QuestionnaireResponse.query.filter(and_(
-        QuestionnaireResponse.user_id == user.id,
-        QuestionnaireResponse.status == 'completed')).order_by(
-            QuestionnaireResponse.authored).limit(
-                1).with_entities(QuestionnaireResponse.authored).first()
-    return qr[0] if qr else None
-
-
 def update_card_html_on_completion():
     """Update description and card_html depending on state"""
 
     def update_user_card_html(intervention, user):
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
-        authored = most_recent_survey(user)
-        localized = localized_PCa(user)
-        if not authored:
-            if localized:
+        assessment_status = AssessmentStatus(user=user)
+        if assessment_status.overall_status in (
+            'Due', 'Overdue', 'In Progress'):
+            if assessment_status.localized:
                 intro = """<p>
                 The questionnaire you are about to complete asks about your health.
                 Many of the questions relate to symptoms people with prostate
                 cancer may experience in their journey, as well as some general
-                health questions. It should take approximately 15 minutes
+                health questions.
                 </p>"""
             else:
                 intro = """<p>
@@ -193,7 +202,7 @@ def update_card_html_on_completion():
             <p>
             By having many people come back and complete this same
             questionnaire over time, we can collectively improve the care of
-            all men with prostate cancer.
+            other men through their prostate cancer journey.
             </p><p>
             It is important that you answer all questions honestly and
             completely. Information contained within this survey will remain
@@ -201,13 +210,14 @@ def update_card_html_on_completion():
             </p>
             """.format(user.display_name, intro=intro)
             link_label = 'Begin questionnaire'
-            instrument_id = ['epic26', 'eproms_add'] if localized else 'eortc'
+            if assessment_status.overall_status == 'In Progress':
+                link_label = 'Continue questionnaire in progress'
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
-               instrument_id=instrument_id,
-            )
-        if authored:
-            if localized:
+                instrument_id=assessment_status.instruments_needing_full_assessment(),
+                resume_instrument_id=assessment_status.instruments_in_process())
+        elif assessment_status.overall_status == "Completed":
+            if assessment_status.localized:
                 intro = """<p>
                 By contributing your information to this
                 project, we can collectively improve the care of all men with
@@ -227,25 +237,35 @@ def update_card_html_on_completion():
 
             {intro}
             <p>
-            You will be reminded by email on your email address {email} when
+            You will be reminded by email {email} when
             the next questionnaire is to be completed.
-            <a href={change_email_url}>Change email address</a>
-            </p><p>
-            <a class="btn-lg btn-tnth-primary disabled"
-                href=""> Next questionnaire to be completed {next_survey_date}
-            </a>
+            <a href={change_email_url}>Change email address here</a>.
             </p><p>
             Your most recently completed questionnaire was on
             {most_recent_survey_date}.
             You can view previous responses below.
             </p>
-            """.format(email=user.email,
-                       intro=intro,
-                       change_email_url=url_for("portal.profile"),
-                       next_survey_date=authored+timedelta(days=365),
-                       most_recent_survey_date=authored)
+            """.format(
+                email=user.email,
+                intro=intro,
+                change_email_url=url_for("portal.profile"),
+                next_survey_date=assessment_status.completed_date+timedelta(
+                    days=365),
+                most_recent_survey_date=assessment_status.completed_date)
             link_label = 'View previous questionnaire'
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
+        else:
+            # Should only land here in expired or partially completed state
+            if assessment_status.overall_status not in (
+                "Expired", "Partially Completed"):
+                current_app.logger.error(
+                    "Unexpected state {} for {}".format(
+                        assessment_status.overall_status, user))
+            card_html = (
+                "<p>The assessment is no longer available. "
+                "A research staff member will contact you for assistance.</p>")
+            link_label = "N/A"
+            link_url = None
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
@@ -273,6 +293,26 @@ def update_card_html_on_completion():
         return True
 
     return update_user_card_html
+
+
+def tx_begun(boolean_value):
+    """Returns strategy function testing if user is known to have started Tx
+
+    :param boolean_value: true for known treatment started (i.e. procedure
+        indicating tx has begun), false to confirm a user doesn't have
+        a procedure indicating tx has begun
+
+    """
+    if boolean_value == 'true':
+        check_func = known_treatment_started
+    elif boolean_value == 'false':
+        check_func = lambda u: not known_treatment_started(u)
+    else:
+        raise ValueError("expected 'true' or 'false' for boolean_value")
+
+    def user_has_desired_tx(intervention, user):
+        return check_func(user)
+    return user_has_desired_tx
 
 
 def observation_check(display, boolean_value):
@@ -303,7 +343,7 @@ def observation_check(display, boolean_value):
     def user_has_matching_observation(intervention, user):
         obs = [o for o in user.observations if o.codeable_concept_id == cc_id]
         if obs and obs[0].value_quantity == vq:
-            _log(result=True, func_name='diag_no_tx', user=user,
+            _log(result=True, func_name='observation_check', user=user,
                  intervention=intervention.name,
                  message='{}:{}'.format(coding.display, vq.value))
             return True
@@ -463,4 +503,3 @@ class AccessStrategy(db.Model):
         for argset in details['kwargs']:
             kwargs[argset['name']] = argset['value']
         return func(**kwargs)
-

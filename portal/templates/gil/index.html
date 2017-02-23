@@ -1,0 +1,144 @@
+{% extends "gil/base.html" %}
+  <!-- class="page-home" -->
+{% block main %}
+    <main class="main">
+      {{ super() }}
+      <div class="home-intro">
+        <div class="intro"><img class="intro__img intro__img--desktop" src="{{url_for('static', filename='img/Home-Truck-Top-001.jpg') }}"><img class="intro__img intro__img--mobile" src="{{url_for('static', filename='img/Home-Truck-Top-Mobile.jpg') }}">
+          <div class="intro__content">
+            <p class="intro__sub">TrueNTH is a collective approach to improving your quality of life throughout your prostate cancer journey.</p><a class="intro__down js-scroll-down" data-target=".home-intro .intro">
+              <figure></figure></a>
+          </div>
+        </div>
+        <div class="module">
+          <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
+          <p class="module__copy">We are here to help you navigate your prostate cancer journey.</p>
+          <div class="more-arrow"><a class="more-arrow__link more-arrow--teal" href="{{PORTAL}}/about"><span>More About TrueNTH <figure></figure></span></a></div>
+          <div class="photo-grid-container">
+            <div class="photo-grid">
+              <figure class="photo-grid__item"><strong>Jim Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Jim.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Jim-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Jon and Mark Hirsch</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Hirsch.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Hirsch-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Dr. Drew Peterson<span>UROLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Drew.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Drew-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Alonzo McCann</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Alonzo.jpg') }}"><img class="photo-grid__img--hovered" width="212" src="{{url_for('static', filename='img/Home-People-Alonzo-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Dr. Elisabeth Heath<span>ONCOLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Elisabeth.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Elisabeth-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Andrew Maguire<span>FILM MAKER</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Andrew.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Andrew-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Lois Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Lois.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Lois-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>David Perez</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-David.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-David-Over.jpg') }}"></figure>
+            </div>
+          </div>
+          <div class="button-callout"><a href="#" class="button button--large button--teal" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/e89bd1bd181ae4cf60/1e7fa0493e528f7c?type=hd&amp;playerColor=2f3437&amp;autoPlay=true"><img src="{{url_for('static', filename='img/Home-Video-Export.jpg') }}">
+        <div class="module-wrap--inner">
+          <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--theme-teal">
+        <div class="module">
+          <div class="accent-heading">Objective N<em>o</em>3: Useful Information</div>
+          <h3 class="module__head">What is Prostate Cancer?</h3>
+          <p class="module__body">Prostate cancer is the second most common cancer in men.</p>
+          <p class="module__body">1 in 7 men will be diagnosed with prostate cancer in their lifetime.</p>
+          <p class="module__body">In 2015, approximately 220,800 men will be diagnosed with prostate cancer in the USA.</p>
+          <div class="more-arrow"><a class="more-arrow__linka" href="{{PORTAL}}/what-is-prostate-cancer"><span>Prostate Cancer Facts <figure></figure></span></a></div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--confidence">
+        <div class="module">
+          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools – Decision Support</div>
+          <h3 class="module__head">Men have different stages of prostate cancer and have different treatment options available to them.</h3>
+          <div class="mini-boxes">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Preferences</h5>
+                <p class="mini-box__copy">Understanding what is important to you</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Education</h5>
+                <p class="mini-box__copy">Learning about the factors that impact your decision</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Reports</h5>
+                <p class="mini-box__copy">Results to use during the visit with your doctor</p>
+              </div>
+            </div>
+          </div>
+          <div class="next-down">
+            <p class="next-down__copy">We have tools to help you determine which treatment option is best for you.</p>
+          </div>
+          <div class="icon-box-wrap">
+            <div class="icon-box-wrap__main icon-box icon-box--theme-compass">
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">Tool N<em>o</em>1: Post Diagnosis</strong>
+                <h4 class="icon-box__head">Decision Support</h4><span class="icon-box__lowhead">Questionnaire / Education / Report</span>
+                <svg class="icon-box__icon" width="92" height="92">
+                  <use xlink:href="#DS-Compass"></use>
+                </svg>
+              </div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{PORTAL}}/decision-support"><span>More Info</span></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--symptom module-wrap--theme-brown">
+        <div class="module">
+          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools – Symptom Tracker</div>
+          <h3 class="module__head">Managing symptoms and side effects is an important part of the prostate cancer journey.</h3>
+          <div class="mini-boxes mini-boxes--theme-brown">
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Urinary Incontinence</h5>
+                <p class="mini-box__copy">Not being able to control your urine</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Sexual Health</h5>
+                <p class="mini-box__copy">Physical and emotional changes to your sex life and erectile function</p>
+              </div>
+            </div>
+            <div class="mini-boxes__item">
+              <div class="mini-box">
+                <h5 class="mini-box__head">Fatigue</h5>
+                <p class="mini-box__copy">Feeling tired due to treatment for prostate cancer</p>
+              </div>
+            </div>
+          </div>
+          <div class="next-down">
+            <p class="next-down__copy">We’ve created a tool to track your experience and symptoms over time and provide personal guidance.</p>
+          </div>
+          <div class="icon-box-wrap">
+            <div class="icon-box-wrap__main icon-box icon-box--theme-graph icon-box--theme-brown icon-box--theme-two">
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">Tool N<em>o</em>2: Monitoring</strong>
+                <h4 class="icon-box__head">Symptom Tracker</h4><span class="icon-box__lowhead">Questionnaire / Reports / Tips</span>
+                <svg class="icon-box__icon" width="92" height="92">
+                  <use xlink:href="#ST-Graph"></use>
+                </svg>
+              </div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{PORTAL}}/symptom-tracker"><span>More Info</span></a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  {% endblock %}
+  {% block document_ready %}
+    <script>
+        $(document).ready(function() {
+            $("body").attr("class", "page-home");
+            setSelectedNavItem($(".side-nav-items__item--home"));
+            {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
+            if (typeof sessionStorage != "undefined") {
+              try {
+                sessionStorage.clear();
+              } catch(e) {
+
+              };
+            };
+        });
+    </script>
+  {% endblock %}

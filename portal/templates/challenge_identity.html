@@ -45,44 +45,47 @@
             <br/>
             <p class="title">{{ _("Birth Date") }}</p>
             <hr class="hr"/>
-            <div class="form-group" id="bdGroup">
+            <div id="bdGroup">
                 <div class="row">
                     <div class="col-md-5 col-xs-10">
-                         <label class="label">{{ _("Day") }}</label>
-                        <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" data-birthday="true" required pattern="\d[\d]?">
+                        <div class="form-group">
+                            <label class="label">{{ _("Day") }}</label>
+                            <input class="form-control bd-element" id="date" name="birthdayDate"  placeholder="DD" maxlength="2" required pattern="\d[\d]?">
+                            <div class="help-block with-errors"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
-                        <label class="label">{{ _("Month") }}</label>
-                        <select class="form-control bd-element" name="birthdayMonth" id="month" data-birthday="true" required>
-                            <option value="">{{ _("Month") }}...</option>
-                            <option value="01">{{ _("January") }}</option>
-                            <option value="02">{{ _("February") }}</option>
-                            <option value="03">{{ _("March") }}</option>
-                            <option value="04">{{ _("April") }}</option>
-                            <option value="05">{{ _("May") }}</option>
-                            <option value="06">{{ _("June") }}</option>
-                            <option value="07">{{ _("July") }}</option>
-                            <option value="08">{{ _("August") }}</option>
-                            <option value="09">{{ _("September") }}</option>
-                            <option value="10">{{ _("October") }}</option>
-                            <option value="11">{{ _("November") }}</option>
-                            <option value="12">{{ _("December") }}</option>
-                        </select>
+                        <div class="form-group">
+                            <label class="label">{{ _("Month") }}</label>
+                            <select class="form-control bd-element" name="birthdayMonth" id="month"  required>
+                                <option value="">{{ _("Month") }}...</option>
+                                <option value="01">{{ _("January") }}</option>
+                                <option value="02">{{ _("February") }}</option>
+                                <option value="03">{{ _("March") }}</option>
+                                <option value="04">{{ _("April") }}</option>
+                                <option value="05">{{ _("May") }}</option>
+                                <option value="06">{{ _("June") }}</option>
+                                <option value="07">{{ _("July") }}</option>
+                                <option value="08">{{ _("August") }}</option>
+                                <option value="09">{{ _("September") }}</option>
+                                <option value="10">{{ _("October") }}</option>
+                                <option value="11">{{ _("November") }}</option>
+                                <option value="12">{{ _("December") }}</option>
+                            </select>
+                            <div class="help-block with-errors"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="row field">
                     <div class="col-md-5 col-xs-10">
-                        <label class="label">{{ _("Year") }}</label>
-                        <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" data-birthday="true" pattern = "\d{4}" required>
+                        <div class="form-group">
+                            <label class="label">{{ _("Year") }}</label>
+                            <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "\d{4}" required>
+                            <div class="help-block with-errors"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="row field">
-                     <div class="col-md-5 col-xs-10">
-                        <div class="help-block with-errors"></div>
-                        <span id="errorbirthday" class="help-block" style="display: none">A block of help text that breaks onto a new line and may extend beyond one line.</span>
-                     </div>
                 </div>
             </div>
             <hr/>
@@ -105,6 +108,10 @@ $(document).ready(function() {
         $("#date").val(arrDate[1]);
         $("#year").val(arrDate[2]);
     };
+
+    $("input[type='text']").on("blur", function() {
+        $(this).val($.trim($(this).val()));
+    });
 
     $('#challengeForm').validator().on('submit', function (e) {
           if (!e.isDefaultPrevented()) {

@@ -1,0 +1,13 @@
+{% extends "gil/base.html" %}
+{% block main %}
+    <main class="main">
+      {{ super()}}
+      <div class="page-intro page-intro--theme-brown-light">
+        <div class="page-intro__content">
+          <div class="simple-page-content">
+            <div>{{ content|safe}}</div>
+          </div>
+        </div>
+      </div>
+    </main>
+{% endblock %}

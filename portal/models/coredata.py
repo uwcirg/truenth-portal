@@ -100,6 +100,11 @@ class DobData(CoredataPoint):
         if ROLE.PROVIDER in roles or ROLE.PARTNER in roles:
             return True
         elif ROLE.PATIENT in roles:
+            # SR users get a pass
+            if UserIntervention.user_access_granted(
+                user_id=user.id,
+                intervention_id=INTERVENTION.SEXUAL_RECOVERY.id):
+                return True
             return user.birthdate is not None
         else:
             # If they haven't set a role, we don't know if we care yet
@@ -112,6 +117,10 @@ class RoleData(CoredataPoint):
         if len(user.roles) > 0:
             return True
 
+        # SR users get a pass
+        return UserIntervention.user_access_granted(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id)
 
 class OrgData(CoredataPoint):
     def hasdata(self, user):
@@ -121,7 +130,7 @@ class OrgData(CoredataPoint):
 
         Special "none of the above" org still counts.
         """
-        if user.has_role(ROLE.PROVIDER):
+        if user.has_role(ROLE.PROVIDER) or user.has_role(ROLE.PARTNER):
             return True
         if user.organizations.count() > 0:
             return True
@@ -130,13 +139,13 @@ class OrgData(CoredataPoint):
         # https://www.pivotaltracker.com/n/projects/1225464/stories/130776783
         # don't require clinics for SR and CP users
 
-        sr_id = INTERVENTION.SEXUAL_RECOVERY.id
-        cp_id = INTERVENTION.CARE_PLAN.id
-        q = UserIntervention.query.filter(and_(
-            UserIntervention.user_id == user.id,
-            UserIntervention.intervention_id.in_((sr_id, cp_id)),
-            UserIntervention.access == 'granted'))
-        return q.count() > 0
+        return (
+            UserIntervention.user_access_granted(
+                user_id=user.id,
+                intervention_id=INTERVENTION.SEXUAL_RECOVERY.id) or
+            UserIntervention.user_access_granted(
+                user_id=user.id,
+                intervention_id=INTERVENTION.CARE_PLAN.id))
 
 
 class ClinicalData(CoredataPoint):
@@ -146,8 +155,14 @@ class ClinicalData(CoredataPoint):
             # If they haven't set a role, we don't know if we care yet
             return len(user.roles) > 0
 
+        # SR users get a pass
+        if UserIntervention.user_access_granted(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id):
+            return True
+
         required = {item: False for item in (
-            CC.BIOPSY, CC.PCaDIAG, CC.TX, CC.PCaLocalized)}
+            CC.BIOPSY, CC.PCaDIAG)}
 
         for obs in user.observations:
             if obs.codeable_concept in required:
@@ -155,14 +170,51 @@ class ClinicalData(CoredataPoint):
         return all(required.values())
 
 
+class LocalizedData(CoredataPoint):
+    def hasdata(self, user):
+        """only need localized data from patients"""
+        if ROLE.PATIENT not in (r.name for r in user.roles) :
+            # If they haven't set a role, we don't know if we care yet
+            return len(user.roles) > 0
+
+        # SR users get a pass
+        if UserIntervention.user_access_granted(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id):
+            return True
+
+        # Some systems use organization affiliation to denote localized
+        if current_app.config.get('LOCALIZED_AFFILIATE_ORG'):
+            # on these systems, we don't ask about localized - let
+            # the org check worry about that
+            return True
+        else:
+            for obs in user.observations:
+                if obs.codeable_concept == CC.PCaLocalized:
+                    return True
+            return False
+
+
 class NameData(CoredataPoint):
     def hasdata(self, user):
-        return  user.first_name and user.last_name
+        # SR users get a pass
+        if UserIntervention.user_access_granted(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id):
+            return True
+
+        return user.first_name and user.last_name
 
 
 class TouData(CoredataPoint):
     def hasdata(self, user):
-        return  ToU.query.join(Audit).filter(
+        # SR users get a pass
+        if UserIntervention.user_access_granted(
+            user_id=user.id,
+            intervention_id=INTERVENTION.SEXUAL_RECOVERY.id):
+            return True
+
+        return ToU.query.join(Audit).filter(
             Audit.user_id==user.id).count() > 0
 
 
@@ -172,7 +224,8 @@ def configure_coredata(app):
 
     # Add static list of "configured" datapoints
     config_datapoints = app.config.get(
-        'REQUIRED_CORE_DATA', ['name', 'dob', 'role', 'org', 'clinical', 'tou'])
+        'REQUIRED_CORE_DATA',
+        ['name', 'dob', 'role', 'org', 'clinical', 'localized', 'tou'])
 
     for name in config_datapoints:
         # Camel case with 'Data' suffix - expect to find class in local

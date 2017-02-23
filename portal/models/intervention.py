@@ -1,5 +1,6 @@
 """Intervention Module"""
 from UserDict import IterableUserDict
+from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..extensions import db
@@ -182,6 +183,15 @@ class UserIntervention(db.Model):
             if getattr(self, field):
                 d[field] = getattr(self, field)
         return d
+
+    @classmethod
+    def user_access_granted(cls, intervention_id, user_id):
+        """Shortcut to query for specific (intervention, user) access"""
+        q = cls.query.filter(and_(
+            cls.user_id == user_id,
+            cls.intervention_id == intervention_id,
+            cls.access == 'granted'))
+        return q.count() > 0
 
 
 STATIC_INTERVENTIONS = IterableUserDict({

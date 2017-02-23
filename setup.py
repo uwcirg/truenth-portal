@@ -25,6 +25,8 @@ setup(
     long_description=long_description,
     author="CIRG, University of Washington",
     author_email="truenth-dev@uw.edu",
+    maintainer="CIRG, University of Washington",
+    maintainer_email="truenth-dev@uw.edu",
     classifiers=(
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
@@ -42,10 +44,12 @@ setup(
     use_scm_version=True,
     zip_safe=False,
     packages=["portal"],
+    scripts=["manage.py"],
     setup_requires=("setuptools_scm"),
     install_requires=(
         "Authomatic",
         "celery",
+        "enum34",
         "Flask",
         "Flask-Babel",
         "Flask-Celery-Helper",

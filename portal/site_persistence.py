@@ -4,7 +4,8 @@ from flask import current_app
 import json
 import os
 import requests
-from sqlalchemy import exc
+from sqlalchemy import exc, and_
+from StringIO import StringIO
 import tempfile
 
 from app import SITE_CFG
@@ -15,6 +16,51 @@ from models.intervention import Intervention, INTERVENTION
 from models.intervention_strategies import AccessStrategy
 from models.organization import Organization
 
+def dict_compare(d1, d2):
+    """Deep order independent comparison of two dictionaries
+
+    returns lists of: added, removed, modified, same
+    """
+    d1_keys = set(d1.keys())
+    d2_keys = set(d2.keys())
+    intersect_keys = d1_keys.intersection(d2_keys)
+    added = d1_keys - d2_keys
+    removed = d2_keys - d1_keys
+    modified = {o : (d1[o], d2[o]) for o in intersect_keys if d1[o] != d2[o]}
+    same = set(o for o in intersect_keys if d1[o] == d2[o])
+    return added, removed, modified, same
+
+def dict_match(newd, oldd, diff_stream):
+    """Returns true/false, if the two dicts contain same key/values
+
+    Compares deep structure, ignores key order
+
+    :param newd: First dict to compare, i.e. new state
+    :param oldd: Second dict, i.e. current or old state
+    :param diff_stream: StringIO like object to report dif details
+    :return: True if the two dictionaries match, False with details in
+        diff_stream otherwise
+
+    """
+    added, removed, modified, same = dict_compare(newd, oldd)
+    if len(same) == len(newd.keys()) and len(newd.keys()) == len(oldd.keys()):
+        assert not added
+        assert not removed
+        assert not modified
+        return True
+    else:
+        if added:
+            diff_stream.write(
+                "added {}\n".format({k:newd.get(k) for k in added}))
+        if removed:
+            diff_stream.write(
+                "removed {}\n".format({k:oldd.get(k) for k in removed}))
+        if modified:
+            for k in modified.keys():
+                diff_stream.write(
+                    "replace {} with {}\n".format(
+                        {k:oldd.get(k)},{k:newd.get(k)}))
+        return False
 
 class SitePersistence(object):
     """Manage import and export of dynamic site data"""
@@ -143,7 +189,7 @@ class SitePersistence(object):
 
         self.__write__(d)
 
-    def import_(self, include_interventions):
+    def import_(self, include_interventions, keep_unmentioned):
         """If persistence file is found, import the data
 
         :param include_interventions: if True, intervention data in the
@@ -151,9 +197,13 @@ class SitePersistence(object):
             existing intervention state).  if False, intervention data
             will be ignored.
 
+        :param keep_unmentioned: if True, unmentioned data, such as
+            an organization or intervention in the current database
+            but not in the persistence file, will be left in place.
+            if False, any unmentioned data will be purged as part of
+            the import process.
+
         """
-
-
         data = self.__read__()
         self.__verify_header__(data)
 
@@ -168,16 +218,12 @@ class SitePersistence(object):
             org = Organization.from_fhir(org_fhir)
             existing = Organization.query.get(org.id)
             if existing:
-                if org_fhir != existing.as_fhir():
+                details = StringIO()
+                if not dict_match(org_fhir, existing.as_fhir(), details):
                     self._log("Organization {id} collision on "
-                              "import.  Merging new: {new} with "
-                              "existing: {existing}".format(
-                                  id=org.id, new=org_fhir,
-                                  existing=existing.as_fhir()))
+                              "import.  {details}".format(
+                                  id=org.id, details=details.getvalue()))
                     existing.update_from_fhir(org_fhir)
-                else:
-                    self._log("org {} matches existing - skip "
-                              "import".format(org.id))
             else:
                 self._log("org {} not found - importing".format(org.id))
                 db.session.add(org)
@@ -186,44 +232,49 @@ class SitePersistence(object):
             strat = AccessStrategy.from_json(strat_json)
             existing = AccessStrategy.query.get(strat.id) if strat.id else None
             if existing:
-                if strat_json != existing.as_json():
+                details = StringIO()
+                if not dict_match(strat_json, existing.as_json(), details):
                     self._log("AccessStrategy {id} collision on "
-                              "import.  Replacing existing: {existing} with "
-                              "new: {new}".format(
-                                  id=strat.id, new=strat_json,
-                                  existing=existing.as_json()))
+                              "import.  {details}".format(
+                                  id=existing.id, details=details.getvalue()))
                     db.session.delete(existing)
                     db.session.add(strat)
-                else:
-                    self._log("AccessStrategy {} matches existing, skip "
-                              "import".format(strat.id))
             else:
                 self._log("AccessStrategy {} not found, "
                           "importing".format(strat.id))
                 db.session.add(strat)
 
         def update_intervention(intervention_json):
-            assert include_interventions
             existing = Intervention.query.filter_by(
                 name=intervention_json['name']).first()
             existing_json = existing.as_json() if existing else None
             intervention = Intervention.from_json(intervention_json)
             if existing:
-                if intervention_json != existing_json:
-                    self._log("Intervention {id} collision on "
-                              "import.  Replacing existing: {existing} with "
-                              "new: {new}".format(
-                                  id=intervention.id, new=intervention_json,
-                                  existing=existing.as_json()))
-                    db.session.delete(existing)
+                details = StringIO()
+                if not dict_match(intervention_json, existing_json, details):
+                    if include_interventions:
+                        self._log("Intervention {id} collision on "
+                                  "import.  {details}".format(
+                                      id=intervention.id,
+                                      details=details.getvalue()))
+                        db.session.delete(existing)
+                        db.session.add(intervention)
+                    else:
+                        print ("WARNING: include_interventions not set and "
+                               "'{}' differs with persistence".format(
+                                   intervention.description))
+                        print "{}".format(details.getvalue())
+                        db.session.expunge(intervention)
+            else:
+                if include_interventions:
+                    self._log("Intervention {} not found, "
+                              "importing".format(intervention.id))
                     db.session.add(intervention)
                 else:
-                    self._log("Intervention {} matches existing, skip "
-                              "import".format(intervention.id))
-            else:
-                self._log("Intervention {} not found, "
-                          "importing".format(intervention.id))
-                db.session.add(intervention)
+                    print ("WARNING: include_interventions not set and "
+                           "'{}' not present".format(
+                               intervention_json))
+                    db.session.expunge(intervention)
 
         # Orgs first:
         max_org_id = 0
@@ -237,27 +288,46 @@ class SitePersistence(object):
             db.session.commit()
 
         # Delete any orgs not named
-        for org in Organization.query.filter(~Organization.id.in_(orgs_seen)):
-            current_app.logger.info("Deleting organization not mentioned in "
-                                 "site_persistence: {}".format(org))
-            db.session.delete(org)
+        if not keep_unmentioned:
+            # partOf self reference demands these are taken down in order
+            # first the children naming a partOf reference
+            for org in Organization.query.filter(and_(
+                ~Organization.id.in_(orgs_seen),
+                Organization.partOf_id != None)):
+                current_app.logger.info(
+                    "Deleting organization not mentioned in "
+                    "site_persistence: {}".format(org))
+                db.session.delete(org)
+            # then the parents
+            for org in Organization.query.filter(and_(
+                ~Organization.id.in_(orgs_seen),
+                Organization.partOf_id == None)):
+                current_app.logger.info(
+                    "Deleting organization not mentioned in "
+                    "site_persistence: {}".format(org))
+                db.session.delete(org)
 
         # Intervention details
-        if include_interventions:
-            interventions_seen = []
-            for i in objs_by_type['Intervention']:
-                update_intervention(i)
-                interventions_seen.append(i['name'])
+        interventions_seen = []
+        for i in objs_by_type['Intervention']:
+            update_intervention(i)
+            interventions_seen.append(i['name'])
 
-            db.session.commit()  # strategies may use interventions, must exist
+        db.session.commit()  # strategies may use interventions, must exist
 
-            # Delete any interventions not named
+        # Delete any interventions not named
+        if not keep_unmentioned:
             for intervention in Intervention.query.filter(
                 ~Intervention.name.in_(interventions_seen)):
-                current_app.logger.info(
-                    "Deleting Intervention not mentioned in "
-                    "site_persistence: {}".format(intervention))
-                db.session.delete(intervention)
+                if include_interventions:
+                    current_app.logger.info(
+                        "Deleting Intervention not mentioned in "
+                        "site_persistence: {}".format(intervention))
+                    db.session.delete(intervention)
+                else:
+                    print ("WARNING: include_interventions not set and "
+                           "'{}' in db but not in persistence".format(
+                               intervention))
 
         # Access rules next
         max_strat_id = 0
@@ -268,11 +338,13 @@ class SitePersistence(object):
             strategies_seen.append(s['id'])
 
         # Delete any strategies not named
-        for strategy in AccessStrategy.query.filter(
-            ~AccessStrategy.id.in_(strategies_seen)):
-            current_app.logger.info("Deleting AccessStrategy not mentioned in "
-                                 "site_persistence: {}".format(strategy))
-            db.session.delete(strategy)
+        if not keep_unmentioned:
+            for strategy in AccessStrategy.query.filter(
+                ~AccessStrategy.id.in_(strategies_seen)):
+                current_app.logger.info(
+                    "Deleting AccessStrategy not mentioned in "
+                    "site_persistence: {}".format(strategy))
+                db.session.delete(strategy)
 
         # App Text shouldn't be order dependent, now is good.
         apptext_seen = []
@@ -281,11 +353,13 @@ class SitePersistence(object):
             apptext_seen.append(a['name'])
 
         # Delete any AppTexts not named
-        for apptext in AppText.query.filter(
-            ~AppText.name.in_(apptext_seen)):
-            current_app.logger.info("Deleting AppText not mentioned in "
-                                 "site_persistence: {}".format(repr(apptext)))
-            db.session.delete(apptext)
+        if not keep_unmentioned:
+            for apptext in AppText.query.filter(
+                ~AppText.name.in_(apptext_seen)):
+                current_app.logger.info(
+                    "Deleting AppText not mentioned in "
+                    "site_persistence: {}".format(repr(apptext)))
+                db.session.delete(apptext)
 
         # Config isn't order dependent, now is good.
         assert len(objs_by_type[SITE_CFG]) < 2

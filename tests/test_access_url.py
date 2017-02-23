@@ -1,10 +1,9 @@
 """Unit test module for access URLs"""
 from flask import url_for
-from flask_webtest import SessionScope
 
 from portal.extensions import db, user_manager
 from portal.models.role import ROLE
-from tests import TestCase, TEST_USER_ID
+from tests import TestCase
 
 
 class TestAccessUrl(TestCase):
@@ -16,7 +15,7 @@ class TestAccessUrl(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
         onetime = db.session.merge(onetime)
-        rv = self.app.get('/api/user/{}/access_url'.format(onetime.id))
+        rv = self.client.get('/api/user/{}/access_url'.format(onetime.id))
         self.assert200(rv)
 
         # confirm we obtained a valid token
@@ -29,6 +28,7 @@ class TestAccessUrl(TestCase):
         self.assertEquals(id, onetime.id)
 
     def test_use_access_url(self):
+        """The current flow forces access to the challenge page"""
         onetime = self.add_user('one@time.com')
         self.promote_user(user=onetime, role_name=ROLE.WRITE_ONLY)
         onetime = db.session.merge(onetime)
@@ -36,9 +36,5 @@ class TestAccessUrl(TestCase):
         token = user_manager.token_manager.generate_token(onetime.id)
         access_url = url_for('portal.access_via_token', token=token)
 
-        rv = self.app.get(access_url)
-
-        # onetime should now be "logged-in" - can we get /api/me?
-        results = self.app.get('/api/me')
-        self.assert200(results)
-        self.assertEquals(results.json['email'], 'one@time.com')
+        rv = self.client.get(access_url)
+        self.assert_redirects(rv, url_for('portal.challenge_identity'))
