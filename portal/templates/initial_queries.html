@@ -505,7 +505,7 @@ $(document).ready(function(){
         tnthAjax.postTerms(theTerms);
         // Update UI
         $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
-          .find("span").text("Yes, I agree");
+          .find("span").text("I consent and agree to the above terms.");
         $("#aboutForm").fadeIn();
         $('html, body').animate({
           scrollTop: $('#aboutForm').offset().top
@@ -513,7 +513,7 @@ $(document).ready(function(){
         $(this).attr("data-agree","true");
       } else {
         $(this).find("i").removeClass("fa-cehck-square-o").addClass("fa-square-o").end()
-          .find("span").text("Check here to agree to these terms");
+          .find("span").text("I consent and agree to the above terms.");
         $("#aboutForm").fadeOut();
         $(this).attr("data-agree","false");
       };
