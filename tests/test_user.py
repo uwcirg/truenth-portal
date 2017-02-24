@@ -789,8 +789,7 @@ class TestUser(TestCase):
 
     def test_merge(self):
         with SessionScope(db):
-            self.test_user.last_name = None  # or it'll prefer users
-            other = self.add_user('other@foo.com', first_name='keep users',
+            other = self.add_user('other@foo.com', first_name='newFirst',
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
@@ -806,9 +805,34 @@ class TestUser(TestCase):
             user.merge_with(other.id)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
-            self.assertEquals(user.first_name, FIRST_NAME)
+            self.assertEquals(user.first_name, 'newFirst')
             self.assertEquals(user.last_name, 'Better')
             self.assertEquals(user.gender, 'male')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
             self.assertTrue(user.deceased)
+
+
+    def test_promote(self):
+        with SessionScope(db):
+            self.test_user.birthdate = '02-05-1968'
+            other = self.add_user('other@foo.com', first_name='newFirst',
+                                  last_name='Better')
+            other.password = 'phoney'
+            other.gender = 'male'
+            self.shallow_org_tree()
+            orgs = Organization.query.limit(2)
+            self.test_user.organizations.append(orgs[0])
+            self.test_user.organizations.append(orgs[1])
+            db.session.commit()
+            user, other = map(db.session.merge, (self.test_user, other))
+            user.promote_to_registered(other)
+            db.session.commit()
+            user, other = map(db.session.merge, (user, other))
+            self.assertTrue(other.deleted)
+            self.assertEquals(user.first_name, 'newFirst')
+            self.assertEquals(user.last_name, 'Better')
+            self.assertEquals(user.gender, 'male')
+            self.assertEquals(user.password, 'phoney')
+            self.assertEquals({o.name for o in user.organizations},
+                            {o.name for o in orgs})
