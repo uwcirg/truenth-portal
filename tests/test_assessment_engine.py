@@ -11,9 +11,11 @@ class TestAssessmentEngine(TestCase):
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
         self.login()
-        rv = self.client.put('/api/patient/{}/assessment'.format(TEST_USER_ID),
-                         content_type='application/json',
-                         data=json.dumps(data))
+        rv = self.client.put(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data),
+        )
         self.assert200(rv)
         response = rv.json
         self.assertEquals(response['ok'], True)
