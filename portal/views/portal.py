@@ -10,7 +10,7 @@ from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
 import requests
 
-from .auth import next_after_login
+from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.app_text import app_text, VersionedResource
@@ -225,9 +225,10 @@ def access_via_token(token):
     aren't clear yet. ... TODO
 
     """
-    # Should never be here if already logged in - enforce
+    # logout current user if one is logged in.
     if current_user():
-        abort(500, "Already logged in - can't continue")
+        logout(prevent_redirect=True, reason="forced from /access_via_token")
+        assert(not current_user())
 
     def verify_token(valid_seconds):
         is_valid, has_expired, user_id =\

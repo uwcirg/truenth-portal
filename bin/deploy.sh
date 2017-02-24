@@ -21,6 +21,7 @@ update_repo(){
         git checkout $BRANCH
     fi
 
+    git fetch --tags
     git pull origin $BRANCH
 }
 
