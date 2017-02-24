@@ -479,7 +479,11 @@ class QuestionnaireResponse(db.Model):
                 "{0.status} {0.authored}".format(self)
 
 def aggregate_responses(instrument_ids):
+"""Build a bundle of QuestionnaireResponses
 
+:param instrument_ids: list of instrument_ids to restrict results to
+
+"""
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
 

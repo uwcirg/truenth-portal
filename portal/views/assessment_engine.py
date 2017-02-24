@@ -1,8 +1,9 @@
 """Assessment Engine API view functions"""
-from flask import abort, Blueprint, current_app, jsonify, request, redirect
+from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session
 from flask_swagger import swagger
 import jsonschema
+import json
 import requests
 
 from ..audit import auditable_event
@@ -601,6 +602,14 @@ def get_assessments():
     tags:
       - Assessment Engine
     parameters:
+      - name: format
+        in: query
+        description: format of file to download (CSV or JSON)
+        required: false
+        type: string
+        enum:
+          - json
+          - csv
       - name: instrument_id
         in: query
         description:
@@ -675,7 +684,64 @@ def get_assessments():
             'href':request.url,
         },
     })
-    return jsonify(bundle)
+
+    # Default to JSON output if format unspecified
+    if request.args.get('format', 'json') == 'json':
+        return jsonify(bundle)
+
+    def generate_qnr_csv(qnr_bundle):
+
+        columns = (
+            'identifier',
+            'patient_identifiers',
+            'authored',
+            'instrument',
+            'question_code',
+            'answer_type',
+            'answer',
+        )
+
+        yield ','.join(columns) + '\n'
+        for qnr in qnr_bundle['entry']:
+            row_data = {
+                'identifier': qnr['identifier'],
+                'patient_identifiers': qnr['subject']['identifier'],
+                'authored': qnr['authored'],
+                'instrument': qnr['questionnaire']['reference'].split('/')[-1],
+            }
+            for question in qnr['group']['question']:
+                row_data.update({
+                    'question_code': question['linkId'],
+                })
+                for answer in question['answer']:
+                    # Use first value of answer (most are single-entry dicts)
+                    answer_type = answer.keys()[0].split('value')[-1].lower()
+                    answer_data = {
+                        'answer': answer.values()[0],
+                        'answer_type': answer_type,
+                    }
+                    # ...unless nested code (ie valueCode)
+                    if answer_type == 'coding':
+                        answer_data['answer'] = answer['valueCoding']['code']
+                    row_data.update(answer_data)
+
+                    row = []
+                    for column_name in columns:
+                        column = row_data.get(column_name, "\N")
+                        # Handle JSON column escaping/enclosing
+                        if not isinstance(column, basestring):
+                            column = '"' + json.dumps(column).replace('"', '""') + '"'
+                        row.append(column)
+
+                    yield ','.join(row) + '\n'
+    return Response(
+        generate_qnr_csv(bundle),
+        mimetype='text/csv',
+        headers={
+            "Content-Disposition":
+                "attachment;filename=qnr_data-%s.csv" % FHIR_datetime.now()
+        }
+    )
 
 @assessment_engine_api.route('/patient/<int:patient_id>/assessment',
                              methods=('POST', 'PUT'))
