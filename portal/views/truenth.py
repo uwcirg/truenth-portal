@@ -175,9 +175,7 @@ def portal_wrapper_html():
         return expires
 
     cookie_timeout = request.cookies.get('SS_TIMEOUT')
-
     disable_links = True if 'disable_links' in request.args else False
-    login_as = True if 'login-as' in session else False
     html = render_template(
         'portal_wrapper.html',
         PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
@@ -186,7 +184,6 @@ def portal_wrapper_html():
         login_url=login_url,
         branded_logos=branded_logos(),
         enable_links = not disable_links,
-        login_as=login_as,
         expires_in = cookie_timeout if cookie_timeout else expires_in()
     )
     return make_response(html)
