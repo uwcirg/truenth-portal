@@ -5571,9 +5571,6 @@ a:hover {
     margin-left: -66px;
     margin-top: -8px;
 }
-.is-scrolled .header .copyright {
-   margin-top: -3em;
-}
 
 @media (max-width: 899px) {
     .header .logo {
@@ -6153,10 +6150,11 @@ figure.nav-overlay {
     font-weight: bold;
     text-align: center;
     margin: 0 0 40px;
+    padding: 0 1em;
 }
 @media (max-width: 767px) {
     .module__head {
-        font-size: 30px;
+        font-size: 28px;
         line-height: 40px;
     }
 }
@@ -6176,6 +6174,7 @@ figure.nav-overlay {
     margin: 0 auto 25px;
     max-width: 780px;
     text-align: center;
+    padding: 0 1em;
 }
 .module__body--left {
     text-align: left;
@@ -7013,24 +7012,13 @@ a.home--modal-link {
     padding: 0.2em;
     font-size: 1em;
 }
-
 .copyright {
-    width: 550px;
-    margin: 0 auto;
-    opacity: 0.7;
-    font-size: 0.85em;
-    color: #d2d1c5;
-    display: inline-block;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 12.5em;
+    margin-top: -2em;
+    padding-left: 2em;
+    padding-right: 2em;
     max-width: 100%;
-    text-align: center;
-}
-.page-home .copyright, .is-scrolled .header .copyright {
-    color: #9da4a7;
-    opacity: 0.6;
+    color: #8F9385;
+    opacity: 0.9;
 }
 @media (min-width: 1200px) {
     .home--item-container {
@@ -7068,11 +7056,6 @@ a.home--modal-link {
     }
     a.home--modal-link {
         display: inline-block;
-    }
-}
-@media (max-width: 767px) {
-    .copyright {
-        top: 10em;
     }
 }
 @media (max-width: 750px) {
@@ -7123,16 +7106,6 @@ a.home--modal-link {
     }
     #modal-register p, #modal-register .button {
         font-size: 14px;
-    }
-}
-@media (max-width: 643px) {
-    .copyright {
-        top: 6em;
-        padding: 2em;
-        margin: 0 0.8em 0 0.1em;
-    }
-    .is-scrolled .header .copyright {
-        margin-top: -1em;
     }
 }
 @media (max-width: 550px) {
