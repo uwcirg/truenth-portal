@@ -135,6 +135,7 @@ div.orglist-selector {
   margin: 0 auto;
   label {
     font-weight: normal;
+    font-size: 0.95em;
   }
   input[type="checkbox"] {
     position: relative;
@@ -1645,11 +1646,16 @@ div.org-container input[type="checkbox"] {
     width: 200px !important;
     overflow: auto;
   }
-  div.orglist-selector div.dropdown-menu #userOrgs{
-    width: 180px !important;
-  }
-  div.orglist-selector div.org-container label.org-label {
+  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
+  }
+
+  #adminTableToolbar #orglist-footer-container {
+    padding: 0.5em 1em;
+  }
+
+  #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+    top: 0;
   }
   .timezone-container {
     padding-bottom: 0;
