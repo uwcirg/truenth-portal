@@ -5,7 +5,7 @@ from dateutil import parser
 from flask import abort, current_app
 import json
 import pytz
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
@@ -448,6 +448,10 @@ class QuestionnaireResponse(db.Model):
         return FHIR_datetime.parse(
             context.current_parameters['document']['authored'])
 
+
+
+
+
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
     subject_id = db.Column(db.ForeignKey('users.id'))
@@ -473,6 +477,40 @@ class QuestionnaireResponse(db.Model):
         """Print friendly format for logging, etc."""
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
+
+def aggregate_responses(instrument_ids):
+
+    annotated_questionnaire_responses = []
+    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+
+    if instrument_ids:
+        instrument_filters = (
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id)
+            for instrument_id in instrument_ids
+        )
+        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
+
+    patient_fields = ("careProvider", "identifier")
+
+    for questionnaire_response in questionnaire_responses:
+        subject = questionnaire_response.subject
+        questionnaire_response.document["subject"] = {
+            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+        }
+
+        annotated_questionnaire_responses.append(questionnaire_response.document)
+
+    bundle = {
+        'resourceType':'Bundle',
+        'updated':FHIR_datetime.now(),
+        'total':len(annotated_questionnaire_responses),
+        'type': 'searchset',
+        'entry':annotated_questionnaire_responses,
+    }
+
+    return bundle
 
 
 def parse_concepts(elements, system):

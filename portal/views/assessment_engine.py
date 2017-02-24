@@ -4,12 +4,11 @@ from flask import session
 from flask_swagger import swagger
 import jsonschema
 import requests
-from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.fhir import AssessmentStatus
-from ..models.fhir import FHIR_datetime, QuestionnaireResponse
+from ..models.fhir import FHIR_datetime, QuestionnaireResponse, aggregate_responses
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User
 from ..extensions import oauth
@@ -667,40 +666,15 @@ def get_assessments():
 
     """
 
-    annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
-
-    if "instrument_id" in request.args:
-        instrument_filters = (
-            QuestionnaireResponse.document[
-                ("questionnaire", "reference")
-            ].astext.endswith(instrument_id)
-            for instrument_id in request.args.getlist('instrument_id')
-        )
-        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
-
-    patient_fields = ("careProvider", "identifier")
-
-    for questionnaire_response in questionnaire_responses:
-        subject = questionnaire_response.subject
-        questionnaire_response.document["subject"] = {
-            k:v for k,v in subject.as_fhir().items() if k in patient_fields
-        }
-
-        annotated_questionnaire_responses.append(questionnaire_response.document)
-
-    bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(annotated_questionnaire_responses),
-        'type': 'searchset',
+    bundle = aggregate_responses(
+        instrument_ids=request.args.getlist('instrument_id'),
+    )
+    bundle.update({
         'link': {
             'rel':'self',
             'href':request.url,
         },
-        'entry':annotated_questionnaire_responses,
-    }
-
+    })
     return jsonify(bundle)
 
 @assessment_engine_api.route('/patient/<int:patient_id>/assessment',
