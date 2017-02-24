@@ -339,6 +339,7 @@ def login_as(user_id):
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
     logout(prevent_redirect=True)
+    session['login-as'] = True
     login_user(get_user(user_id))
     return next_after_login()
 

@@ -27,6 +27,7 @@ body {
   color: #333;
   font-size: 16px;
 }
+
 #fullSizeBox a[href*="register"] {
   display: none;
 }
@@ -104,6 +105,7 @@ div.orglist-selector {
 }
 #adminTableToolbar #orglist-footer-container label {
   font-weight: normal;
+  font-size: 0.95em;
 }
 #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
   position: relative;
@@ -1500,12 +1502,23 @@ div.org-container input[type="checkbox"] {
     width: 200px !important;
     overflow: auto;
   }
-
+  #adminTableToolbar #orglistSelector {
+    width: 100%;
+    max-width: 100%;
+  }
   div.orglist-selector div.dropdown-menu #userOrgs{
     width: 180px !important;
   }
-  div.orglist-selector div.org-container label.org-label {
+  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
+  }
+
+  #adminTableToolbar #orglist-footer-container {
+    padding: 0.5em 1em;
+  }
+
+  #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+    top: 0;
   }
 
   .timezone-container {

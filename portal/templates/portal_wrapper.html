@@ -108,7 +108,7 @@
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu">
                             <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
-                            {% if user and not user.has_roles('write_only') %}
+                            {% if login_as or (user and not user.has_roles('write_only')) %}
                             <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
