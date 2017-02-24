@@ -605,7 +605,7 @@ def get_assessments():
         in: query
         description:
           ID of the instrument, eg "epic26", "eq5d"
-        required: true
+        required: false
         type: array
         items:
           type: string
