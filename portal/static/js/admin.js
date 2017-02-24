@@ -30,29 +30,31 @@ var AdminTool = function(userId) {
               var a = "", s = "", prevItem = {};
               if (c) {
               c.forEach(function(item) {
-                  if (!prevItem.consent_signed || ((prevItem.assessment_status != item.assessment_status)
-                      && (prevItem.consent_signed != item.consent.signed))){
-                    if (!(/null/.test(item.consent.agreement_url))) {
-                      var cl = "";
-                      var sd = item.consent.signed? (item.consent.signed).substring(0, 10) : "";
-                      switch(String(item.assessment_status).toLowerCase()) {
-                          case "completed":
-                            cl = "text-success";
-                            break;
-                          case "due":
-                            cl = "text-warning";
-                            break;
-                          case "overdue":
-                            cl = "text-danger";
-                            break;
+                  if (!item.consent.deleted && (!prevItem.consent_signed || (prevItem.assessment_status != item.assessment_status)
+                      || (String(prevItem.consent_signed).substring(0, 10) != String(item.consent.signed).substring(0, 10)))) {
+                      if (!(/null/.test(item.consent.agreement_url))) {
+                        var cl = "";
+                        var sd = item.consent.signed? (item.consent.signed).substring(0, 10) : "";
+                        var status = item.assessment_status;
+                        if (!item.consent.send_reminders) status = "withdrawn";
+                        switch(String(status).toLowerCase()) {
+                            case "completed":
+                              cl = "text-success";
+                              break;
+                            case "withdrawn":
+                            case "due":
+                              cl = "text-warning";
+                              break;
+                            case "overdue":
+                              cl = "text-danger";
+                              break;
+                        };
+                        a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " small-text'>" + status + "</span>";
+                        s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
+                        prevItem.assessment_status = item.assessment_status;
+                        prevItem.consent_signed = item.consent.signed;
                       };
-                      a += (a != "" ? "<br/>" : "") + "<span class='" + cl + " small-text'>" + item.assessment_status + "</span>";
-                      s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
-
-                      prevItem.assessment_status = item.assessment_status;
-                      prevItem.consent_signed = item.consent.signed;
                     };
-                  };
                 });
             };
               //console.log("user id: " + status.user_id)
