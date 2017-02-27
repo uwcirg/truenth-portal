@@ -701,7 +701,7 @@ def get_assessments():
             'answer',
         )
 
-        yield ','.join(columns) + '\n'
+        yield ','.join('"' + column + '"' for column in columns) + '\n'
         for qnr in qnr_bundle['entry']:
             row_data = {
                 'identifier': qnr['identifier'],
@@ -730,8 +730,8 @@ def get_assessments():
                         column = row_data.get(column_name, "\N")
                         # Handle JSON column escaping/enclosing
                         if not isinstance(column, basestring):
-                            column = '"' + json.dumps(column).replace('"', '""') + '"'
-                        row.append(column)
+                            column = json.dumps(column).replace('"', '""')
+                        row.append('"' + column + '"')
 
                     yield ','.join(row) + '\n'
     return Response(
