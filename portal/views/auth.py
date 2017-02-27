@@ -143,38 +143,15 @@ def next_after_login():
         # user has now finished p/w update - clear session variable
         del session['challenge_verified_user_id']
 
-    # Look for an invited user scenario - may need to merge provided
-    # info (what the provider set in invited user) with the current user.
+    # Look for an invited user scenario.  Landing here with
+    # invited_verified_user_id set indicates a fresh registered account
+    # for such; time to promote the invited account.  This also inverts
+    # current_user to the invited one once promoted.
     if 'invited_verified_user_id' in session:
-        invited_user_id = session['invited_verified_user_id']
-        assert user.id != invited_user_id
-        auditable_event("merge new registerd user account {} back "
-                        "into invited user {}".format(
-                            user.id, invited_user_id),
-                        user_id=invited_user_id, subject_id=invited_user_id,
-            context='account')
-        invited_user = User.query.get(invited_user_id)
-        # avoid unique probs during transition - clear and restore below
-        registered_email = user.email
-        user.email = None
-        invited_user.merge_with(user.id)
-        logout(prevent_redirect=True,
-               reason="registered user reverting to invited {}".format(
-               invited_user_id))
-        auditable_event(
-            "login user {}".format(invited_user_id),
-            user_id=invited_user_id, subject_id=invited_user_id,
-            context='authentication')
-        login_user(invited_user)
-        assert invited_user == current_user()
-        invited_user.update_roles(
-            [role for role in invited_user.roles if role.name not in (
-                 ROLE.WRITE_ONLY, ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE)],
-            acting_user=invited_user)
-        user.delete_user(acting_user=invited_user)
-        invited_user.email = registered_email
+        invited_user = User.query.get(session['invited_verified_user_id'])
+        invited_user.promote_to_registered(user)
         db.session.commit()
-        assert 'invited_verified_user_id' not in session
+        del session['invited_verified_user_id']
 
     # Present intial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
