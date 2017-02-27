@@ -1254,17 +1254,17 @@ def present_assessment(instruments=None):
     queued_instruments = request.args.getlist('instrument_id')
     resume_instruments = request.args.getlist('resume_instrument_id')
 
+    # Hack to allow deprecated API to piggyback
+    # Remove when deprecated_present_assessment() is fully removed
+    if instruments is not None:
+        queued_instruments = instruments
+
     # Combine requested instruments into single list, maintaining order
     common_instruments = queued_instruments + resume_instruments
     common_instruments = sorted(
         set(common_instruments),
         key=lambda x: common_instruments.index(x)
     )
-
-    # Hack to allow deprecated API to piggyback
-    # Remove when deprecated_present_assessment() is fully removed
-    if instruments is not None:
-        queued_instruments = instruments
 
     if set(common_instruments) - set(configured_instruments):
         abort(

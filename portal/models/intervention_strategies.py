@@ -43,6 +43,7 @@ def _log(**kwargs):
         "{func_name} returning {result} for {user} on intervention "\
         "{intervention}".format(**kwargs) + msg)
 
+
 def limit_by_clinic_list(org_list, combinator='all'):
     """Requires user is associated with {any,all} clinics in the list
 
@@ -81,6 +82,7 @@ def limit_by_clinic_list(org_list, combinator='all'):
     return user_registered_with_all_clinics if combinator == 'all' else\
         user_registered_with_any_clinics
 
+
 def not_in_clinic_list(org_list):
     """Requires user isn't associated with any clinic in the list"""
     orgs = []
@@ -105,6 +107,32 @@ def not_in_clinic_list(org_list):
 
     return user_not_registered_with_clinics
 
+
+def in_role_list(role_list):
+    """Requires user is associated with any role in the list"""
+    roles = []
+    for role in role_list:
+        try:
+            role = Role.query.filter_by(
+                name=role).one()
+            roles.append(role)
+        except NoResultFound:
+            raise ValueError("role '{}' not found".format(role))
+        except MultipleResultsFound:
+            raise ValueError("more than one role named '{}'"
+                             "found".format(role))
+    required = set(roles)
+
+    def user_has_given_role(intervention, user):
+        has = set(user.roles)
+        if has.intersection(required):
+            _log(result=True, func_name='in_role_list', user=user,
+                 intervention=intervention.name)
+            return True
+
+    return user_has_given_role
+
+
 def not_in_role_list(role_list):
     """Requires user isn't associated with any role in the list"""
     roles = []
@@ -128,6 +156,7 @@ def not_in_role_list(role_list):
             return True
 
     return user_not_given_role
+
 
 def allow_if_not_in_intervention(intervention_name):
     """Returns function implementing strategy API checking that user does not belong to named intervention"""
@@ -231,7 +260,7 @@ def update_card_html_on_completion():
                 "Expired", "Partially Completed"):
                 current_app.logger.error(
                     "Unexpected state {} for {}".format(
-                        assesment_status.overall_status, user))
+                        assessment_status.overall_status, user))
             card_html = (
                 "<p>The assessment is no longer available. "
                 "A research staff member will contact you for assistance.</p>")
@@ -270,14 +299,14 @@ def tx_begun(boolean_value):
     """Returns strategy function testing if user is known to have started Tx
 
     :param boolean_value: true for known treatment started (i.e. procedure
-        indicating tx has begun), false for known treatment not started,
-        (i.e. watchful waiting, etc.)
+        indicating tx has begun), false to confirm a user doesn't have
+        a procedure indicating tx has begun
 
     """
     if boolean_value == 'true':
         check_func = known_treatment_started
     elif boolean_value == 'false':
-        check_func = known_treatment_not_started
+        check_func = lambda u: not known_treatment_started(u)
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 
@@ -474,4 +503,3 @@ class AccessStrategy(db.Model):
         for argset in details['kwargs']:
             kwargs[argset['name']] = argset['value']
         return func(**kwargs)
-

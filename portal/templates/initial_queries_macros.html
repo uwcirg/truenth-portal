@@ -15,7 +15,7 @@
             </div>
             <div>
               <label id="agreeLabel" data-agree="false">
-                <i class="fa fa-square-o fa-lg"></i> <span>{{ _("Check here to agree to these terms") }}</span>
+                <i class="fa fa-square-o fa-lg"></i> <span>{{ _("I consent and agree to the above terms.") }}</span>
               </label>
             </div>
             <br/>
@@ -38,6 +38,16 @@
           </div>
         </div>
     </div>
+    <script>
+      $(function () {
+        $("#firstname, #lastname").each(function() {
+            $(this).on("blur", function() {
+              if ($(this).val() != "") assembleContent.demo($("#iq_userId").val());
+            });
+        });
+
+      });
+    </script>
   {%- endmacro %}
 
   {% macro rolesGroup() -%}
@@ -94,9 +104,6 @@
             <span id="errorbirthday" class="help-block tnth-hide custom-error" style="margin-top: 1em; padding-left: 1em; color: #a94442"></span>
         </div>
       </div>
-       <script>$(function () {
-            tnthAjax.getDob($("#iq_userId").val());
-          });</script>
   {%- endmacro %}
   {% macro patientQGroup(user) -%}
     <div id="patientQ" class="tnth-hide" parent-section="true">
@@ -227,28 +234,7 @@
     {% if consent_agreements %}
         <div id="consentContainer" style="display:none">
           {% for org in consent_agreements %}
-            <div id="{{org}}_consentItem" class="well consent">
-              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
-              <input id="{{org}}_consent" class="consent-checkbox" type="checkbox" /><label id="{{org}}_consent_label" labelfor="#{{org}}_consent"><!--text for sharing data--></label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
-              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
-                  <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">{{ _("Sharing Your Data") }}</h4>
-                        </div>
-                        <div class="modal-body">
-                          <br/>
-                           {{consent_agreements[org].asset|safe}}
-                          <br/>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-                        </div>
-                      </div>
-                    </div>
-                </div>
-              </div>
+            <div id="{{org}}_consentItem" class="well consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
           {% endfor %}
         </div>
       {% endif %}

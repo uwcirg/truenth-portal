@@ -85,10 +85,10 @@ def user_intervention_get(intervention_name, user_id):
               description:
                 Custom text to display in the status column for the referenced
                 user
-            provider_html:
+            staff_html:
               type: string
               description:
-                Custom HTML for display in patient list for care providers,
+                Custom HTML for display in patient list for care staff,
                 as seen on the /patients view, specific to the referenced
                 user..
       401:
@@ -179,10 +179,10 @@ def user_intervention_set(intervention_name):
               description:
                 Custom text to display in the status column for the referenced
                 user
-            provider_html:
+            staff_html:
               type: string
               description:
-                Custom HTML for display in patient list for care providers,
+                Custom HTML for display in patient list for care staff,
                 as seen on the /patients view, specific to the referenced
                 user
     responses:
@@ -238,7 +238,7 @@ def user_intervention_set(intervention_name):
     ui.card_html = request.json.get('card_html')
     ui.link_label = request.json.get('link_label')
     ui.status_text = request.json.get('status_text')
-    ui.provider_html = request.json.get('provider_html')
+    ui.staff_html = request.json.get('staff_html')
     db.session.commit()
     auditable_event("updated {0} using: {1}".format(
         intervention.description, json.dumps(request.json)),

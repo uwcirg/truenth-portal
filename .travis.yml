@@ -133,8 +133,8 @@ deploy:
   key: $BINTRAY_API_KEY
 
 after_deploy:
-  - docker tag $IMAGE_NAME:latest "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
-  - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:latest"
+  - docker tag "$IMAGE_NAME:$TAG" "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG"
+  - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG"
 
-  - docker tag $IMAGE_NAME:latest "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:latest"
+  - docker tag "$IMAGE_NAME:$TAG" "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$TAG"
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then docker push "docker.io/$DOCKER_CLOUD_USERNAME/$IMAGE_NAME";fi

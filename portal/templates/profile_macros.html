@@ -453,28 +453,7 @@
     {% if person and consent_agreements %}
         <div id="consentContainer">
             {% for org in consent_agreements %}
-              <div id="{{org}}_consentItem" class="consent">
-                <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
-                <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"  {% if current_user.id != person.id%} disabled {% endif %}/><label id="{{org}}_consent_label" labelfor="#{{org}}_consent">Sharing data with {{consent_agreements[org].organization_name}}?</label><br/><a href="javascript:void()" style="" data-toggle="modal" data-target="#{{org}}_consentModal"><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;view agreement</a>
-                <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">{{ _("Sharing your data") }}</h4>
-                          </div>
-                          <div class="modal-body">
-                            <br/>
-                             {{consent_agreements[org].asset|safe}}
-                            <br/>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-                          </div>
-                        </div>
-                      </div>
-                  </div>
-                </div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
             {% endfor %}
         </div>
     {% endif %}
@@ -1033,8 +1012,8 @@
                 <div class="profile-item-container">
                     <h4 id="interventionReportsLoc" class="profile-item-title">{{ _("Intervention Reports") }}</h4>
                     <div>
-                        {% if person and person.provider_html() %}
-                            {{person.provider_html() | safe}}
+                        {% if person and person.staff_html() %}
+                            {{person.staff_html() | safe}}
                         {% else %}
                             <div class="text-muted">{{ _("No Reports Available") }}</div>
                         {% endif %}
@@ -1061,7 +1040,6 @@
             <option value="Australia/Darwin">Australia/Darwin</option>
             <option value="Australia/Eucla">Australia/Eucla</option>
             <option value="Australia/Hobart">Australia/Hobart</option>
-            <option value="Australia/LHI">Australia/LHI</option>
             <option value="Australia/Lindeman">Australia/Lindeman</option>
             <option value="Australia/Lord_Howe">Australia/Lord_Howe</option>
             <option value="Australia/Melbourne">Australia/Melbourne</option>
@@ -1327,18 +1305,16 @@
     {% endif %}
 
     {% if person and person.has_role(ROLE.PATIENT) %}
-        <!--  hide the procedure section for now as more rules will be applied to this section
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
                     <div>
-                        {{profileProcedures(person, current_user)}}
+                        {{profileProcedures(person, current_user) | show_macro('procedures')}}
                     </div>
                 </div>
             </div>
         </div>
-        -->
     {% endif %}
 
     {% if person and person.has_role('patient') %}

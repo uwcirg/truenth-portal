@@ -133,10 +133,15 @@ div.orglist-selector {
   width: 250px;
   max-width: 100%;
   margin: 0 auto;
- label {
-  font-weight: normal;
+  label {
+    font-weight: normal;
+    font-size: 0.95em;
   }
-};
+  input[type="checkbox"] {
+    position: relative;
+    top: -1px;
+  }
+}
 
 #adminTableToolbar div.dropdown-menu {
   max-height: 550px;
@@ -145,6 +150,9 @@ div.orglist-selector {
 #adminTableToolbar div.org-container {
   display: block;
   margin: -0.4em 0;
+}
+#adminTable div.card-view {
+  display: flex;
 }
 div.orglist-selector div.dropdown-menu #userOrgs {
   width: 280px;
@@ -1028,6 +1036,7 @@ t
   padding: 0.5em;
   border-radius: 4px;
   text-align: left;
+  color: #a94442;
 }
 
 .report-error-message {
@@ -1637,11 +1646,16 @@ div.org-container input[type="checkbox"] {
     width: 200px !important;
     overflow: auto;
   }
-  div.orglist-selector div.dropdown-menu #userOrgs{
-    width: 180px !important;
-  }
-  div.orglist-selector div.org-container label.org-label {
+  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
+  }
+
+  #adminTableToolbar #orglist-footer-container {
+    padding: 0.5em 1em;
+  }
+
+  #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+    top: 0;
   }
   .timezone-container {
     padding-bottom: 0;

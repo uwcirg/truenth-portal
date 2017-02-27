@@ -5,9 +5,11 @@ import json
 import os
 import requests
 from sqlalchemy import exc, and_
+from StringIO import StringIO
 import tempfile
 
 from app import SITE_CFG
+from dict_tools import dict_match
 from extensions import db
 from models.app_text import AppText
 from models.fhir import FHIR_datetime
@@ -172,16 +174,12 @@ class SitePersistence(object):
             org = Organization.from_fhir(org_fhir)
             existing = Organization.query.get(org.id)
             if existing:
-                if org_fhir != existing.as_fhir():
+                details = StringIO()
+                if not dict_match(org_fhir, existing.as_fhir(), details):
                     self._log("Organization {id} collision on "
-                              "import.  Merging new: {new} with "
-                              "existing: {existing}".format(
-                                  id=org.id, new=org_fhir,
-                                  existing=existing.as_fhir()))
+                              "import.  {details}".format(
+                                  id=org.id, details=details.getvalue()))
                     existing.update_from_fhir(org_fhir)
-                else:
-                    self._log("org {} matches existing - skip "
-                              "import".format(org.id))
             else:
                 self._log("org {} not found - importing".format(org.id))
                 db.session.add(org)
@@ -190,44 +188,49 @@ class SitePersistence(object):
             strat = AccessStrategy.from_json(strat_json)
             existing = AccessStrategy.query.get(strat.id) if strat.id else None
             if existing:
-                if strat_json != existing.as_json():
+                details = StringIO()
+                if not dict_match(strat_json, existing.as_json(), details):
                     self._log("AccessStrategy {id} collision on "
-                              "import.  Replacing existing: {existing} with "
-                              "new: {new}".format(
-                                  id=strat.id, new=strat_json,
-                                  existing=existing.as_json()))
+                              "import.  {details}".format(
+                                  id=existing.id, details=details.getvalue()))
                     db.session.delete(existing)
                     db.session.add(strat)
-                else:
-                    self._log("AccessStrategy {} matches existing, skip "
-                              "import".format(strat.id))
             else:
                 self._log("AccessStrategy {} not found, "
                           "importing".format(strat.id))
                 db.session.add(strat)
 
         def update_intervention(intervention_json):
-            assert include_interventions
             existing = Intervention.query.filter_by(
                 name=intervention_json['name']).first()
             existing_json = existing.as_json() if existing else None
             intervention = Intervention.from_json(intervention_json)
             if existing:
-                if intervention_json != existing_json:
-                    self._log("Intervention {id} collision on "
-                              "import.  Replacing existing: {existing} with "
-                              "new: {new}".format(
-                                  id=intervention.id, new=intervention_json,
-                                  existing=existing.as_json()))
-                    db.session.delete(existing)
+                details = StringIO()
+                if not dict_match(intervention_json, existing_json, details):
+                    if include_interventions:
+                        self._log("Intervention {id} collision on "
+                                  "import.  {details}".format(
+                                      id=intervention.id,
+                                      details=details.getvalue()))
+                        db.session.delete(existing)
+                        db.session.add(intervention)
+                    else:
+                        print ("WARNING: include_interventions not set and "
+                               "'{}' differs with persistence".format(
+                                   intervention.description))
+                        print "{}".format(details.getvalue())
+                        db.session.expunge(intervention)
+            else:
+                if include_interventions:
+                    self._log("Intervention {} not found, "
+                              "importing".format(intervention.id))
                     db.session.add(intervention)
                 else:
-                    self._log("Intervention {} matches existing, skip "
-                              "import".format(intervention.id))
-            else:
-                self._log("Intervention {} not found, "
-                          "importing".format(intervention.id))
-                db.session.add(intervention)
+                    print ("WARNING: include_interventions not set and "
+                           "'{}' not present".format(
+                               intervention_json))
+                    db.session.expunge(intervention)
 
         # Orgs first:
         max_org_id = 0
@@ -261,22 +264,26 @@ class SitePersistence(object):
                 db.session.delete(org)
 
         # Intervention details
-        if include_interventions:
-            interventions_seen = []
-            for i in objs_by_type['Intervention']:
-                update_intervention(i)
-                interventions_seen.append(i['name'])
+        interventions_seen = []
+        for i in objs_by_type['Intervention']:
+            update_intervention(i)
+            interventions_seen.append(i['name'])
 
-            db.session.commit()  # strategies may use interventions, must exist
+        db.session.commit()  # strategies may use interventions, must exist
 
-            # Delete any interventions not named
-            if not keep_unmentioned:
-                for intervention in Intervention.query.filter(
-                    ~Intervention.name.in_(interventions_seen)):
+        # Delete any interventions not named
+        if not keep_unmentioned:
+            for intervention in Intervention.query.filter(
+                ~Intervention.name.in_(interventions_seen)):
+                if include_interventions:
                     current_app.logger.info(
                         "Deleting Intervention not mentioned in "
                         "site_persistence: {}".format(intervention))
                     db.session.delete(intervention)
+                else:
+                    print ("WARNING: include_interventions not set and "
+                           "'{}' in db but not in persistence".format(
+                               intervention))
 
         # Access rules next
         max_strat_id = 0

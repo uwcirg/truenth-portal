@@ -105,6 +105,9 @@ def capture_next_view_function(real_function):
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
+        if request.args.get('suspend_initial_queries'):
+            session['suspend_initial_queries'] = request.args.get(
+                'suspend_initial_queries')
         return real_function()
     return capture_next
 
@@ -145,17 +148,39 @@ def next_after_login():
     if 'invited_verified_user_id' in session:
         invited_user_id = session['invited_verified_user_id']
         assert user.id != invited_user_id
-        auditable_event("merging invited user {} into account {}".format(
-            invited_user_id, user.id), user_id=user.id, subject_id=user.id,
+        auditable_event("merge new registerd user account {} back "
+                        "into invited user {}".format(
+                            user.id, invited_user_id),
+                        user_id=invited_user_id, subject_id=invited_user_id,
             context='account')
-        user.merge_with(invited_user_id)
         invited_user = User.query.get(invited_user_id)
-        invited_user.delete_user(acting_user=user)
+        # avoid unique probs during transition - clear and restore below
+        registered_email = user.email
+        user.email = None
+        invited_user.merge_with(user.id)
+        logout(prevent_redirect=True,
+               reason="registered user reverting to invited {}".format(
+               invited_user_id))
+        auditable_event(
+            "login user {}".format(invited_user_id),
+            user_id=invited_user_id, subject_id=invited_user_id,
+            context='authentication')
+        login_user(invited_user)
+        assert invited_user == current_user()
+        invited_user.update_roles(
+            [role for role in invited_user.roles if role.name not in (
+                 ROLE.WRITE_ONLY, ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE)],
+            acting_user=invited_user)
+        user.delete_user(acting_user=invited_user)
+        invited_user.email = registered_email
         db.session.commit()
-        del session['invited_verified_user_id']
+        assert 'invited_verified_user_id' not in session
 
     # Present intial questions (TOU et al) if not already obtained
-    if not Coredata().initial_obtained(user):
+    # NB - this act may be suspended by request from an external
+    # client during patient registration
+    if (not session.get('suspend_initial_queries', None)
+       ) and not Coredata().initial_obtained(user):
         current_app.logger.debug("next_after_login: [need data] -> "
                                  "initial_queries")
         return redirect(url_for('portal.initial_queries'))
@@ -180,6 +205,8 @@ def next_after_login():
         del session['next']
         current_app.logger.debug("next_after_login: [have session['next']] "
                                  "-> {}".format(next_url))
+        if 'suspend_initial_queries' in session:
+            del session['suspend_initial_queries']
         return redirect(next_url)
 
     # No better place to go, send user home
@@ -317,8 +344,8 @@ def login_as(user_id):
     """Provide direct login w/o auth to user account, but only if qualified
 
     Special individuals may assume the identity of other users, but only
-    if the business rules validate.  For example, a provider may log in
-    as a patient who has a current consent on file for the provider's
+    if the business rules validate.  For example, staff may log in
+    as a patient who has a current consent on file for the staff's
     organization.
 
     If qualified, the current user's session is destroyed and the requested
@@ -330,13 +357,15 @@ def login_as(user_id):
     auditable_event("assuming identity of user {}".format(user_id),
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
-    logout(prevent_redirect=True)
+    
+    logout(prevent_redirect=True, reason="forced from login_as")
+    session['login-as'] = True
     login_user(get_user(user_id))
     return next_after_login()
 
 
 @auth.route('/logout')
-def logout(prevent_redirect=False):
+def logout(prevent_redirect=False, reason=None):
     """logout view function
 
     Logs user out by requesting the previously granted permission to
@@ -345,6 +374,8 @@ def logout(prevent_redirect=False):
 
     :param prevent_redirect: set only if calling this function during
         another process where redirection after logout is not desired
+    :param reason: set only if calling from another process where a driving
+        reason should be noted in the audit
 
     Optional query string parameter timed_out should be set to clarify the
     logout request is the result of a stale session
@@ -394,6 +425,8 @@ def logout(prevent_redirect=False):
 
     if user_id:
         event = 'logout' if not timed_out else 'logout due to timeout'
+        if reason:
+            event = ':'.join((event, reason))
         auditable_event(event, user_id=user_id, subject_id=user_id,
             context='login')
         # delete_facebook_authorization()  #Not using at this time

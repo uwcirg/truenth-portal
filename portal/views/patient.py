@@ -1,7 +1,7 @@
 """Patient API - implements patient specific views such as patient search
 
 NB - this is not to be confused with 'patients', which defines views
-for providers
+for staff
 
 """
 from flask import abort, Blueprint, request

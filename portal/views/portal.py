@@ -10,11 +10,11 @@ from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
 import requests
 
-from .auth import next_after_login
+from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA
+from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
@@ -93,7 +93,7 @@ def gil_interventions_items():
                 "link_url": display.link_url if display.link_url is not None else "disabled",
                 "link_label": display.link_label if display.link_label is not None else ""
             })
-   
+
     return jsonify(interventions=user_interventions)
 @portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
 def gil_shortcut_alias_validation(clinic_alias):
@@ -225,9 +225,10 @@ def access_via_token(token):
     aren't clear yet. ... TODO
 
     """
-    # Should never be here if already logged in - enforce
+    # logout current user if one is logged in.
     if current_user():
-        abort(500, "Already logged in - can't continue")
+        logout(prevent_redirect=True, reason="forced from /access_via_token")
+        assert(not current_user())
 
     def verify_token(valid_seconds):
         is_valid, has_expired, user_id =\
@@ -383,7 +384,7 @@ def initial_queries():
     if not user:
         # Shouldn't happen, unless user came in on a bookmark
         current_app.logger.debug("initial_queries (no user!) -> landing")
-        return redirect('portal.landing')
+        return redirect(url_for('portal.landing'))
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
 
@@ -534,14 +535,16 @@ def legal():
     """ Legal/terms of use page"""
     gil = current_app.config.get('GIL')
     response = requests.get(app_text(LegalATMA.name_key()))
-    return render_template('legal.html' if not gil else 'gil/legal.html', content=response.text, user=current_user())
+    return render_template('legal.html' if not gil else 'gil/legal.html',
+        content=response.text, user=current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
     """ Legal/terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(ToU_ATMA.name_key()))
-    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html', content=response.json()['asset'])
+    response = requests.get(app_text(Terms_ATMA.name_key()))
+    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
+        content=response.text)
 
 @portal.route('/about')
 def about():

@@ -5491,7 +5491,7 @@ a:hover {
     padding: 25px 80px;
     position: fixed;
     top: 0;
-    height: 92px;
+    height: 132px;
     background: #fff;
     z-index: 1500;
 }
@@ -5571,6 +5571,7 @@ a:hover {
     margin-left: -66px;
     margin-top: -8px;
 }
+
 @media (max-width: 899px) {
     .header .logo {
         margin-left: -66px;
@@ -6149,10 +6150,11 @@ figure.nav-overlay {
     font-weight: bold;
     text-align: center;
     margin: 0 0 40px;
+    padding: 0 1em;
 }
 @media (max-width: 767px) {
     .module__head {
-        font-size: 30px;
+        font-size: 28px;
         line-height: 40px;
     }
 }
@@ -6172,6 +6174,7 @@ figure.nav-overlay {
     margin: 0 auto 25px;
     max-width: 780px;
     text-align: center;
+    padding: 0 1em;
 }
 .module__body--left {
     text-align: left;
@@ -7009,7 +7012,14 @@ a.home--modal-link {
     padding: 0.2em;
     font-size: 1em;
 }
-
+.copyright {
+    margin-top: -2em;
+    padding-left: 2em;
+    padding-right: 2em;
+    max-width: 100%;
+    color: #8F9385;
+    opacity: 0.9;
+}
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;
@@ -7098,7 +7108,6 @@ a.home--modal-link {
         font-size: 14px;
     }
 }
-
 @media (max-width: 550px) {
     #portalMain .page-intro__main {
         font-size: 0.8em;

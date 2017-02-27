@@ -14,6 +14,7 @@ from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import add_role
+from portal.system_uri import SNOMED
 
 class TestIntervention(TestCase):
 
@@ -40,7 +41,7 @@ class TestIntervention(TestCase):
                 'link_label': 'link magic',
                 'link_url': 'http://safe.com',
                 'status_text': 'status example',
-                'provider_html': "unique HTML for /patients view"
+                'staff_html': "unique HTML for /patients view"
                }
 
         rv = self.client.put('/api/intervention/sexual_recovery',
@@ -55,7 +56,7 @@ class TestIntervention(TestCase):
         self.assertEquals(ui.link_label, data['link_label'])
         self.assertEquals(ui.link_url, data['link_url'])
         self.assertEquals(ui.status_text, data['status_text'])
-        self.assertEquals(ui.provider_html, data['provider_html'])
+        self.assertEquals(ui.staff_html, data['staff_html'])
 
     def test_intervention_bad_access(self):
         client = self.add_client()
@@ -186,8 +187,8 @@ class TestIntervention(TestCase):
         cp = INTERVENTION.CARE_PLAN
         user = db.session.merge(self.test_user)
 
-        # Prior to declaring TX, user shouldn't have access
-        self.assertFalse(cp.display_for_user(user).access)
+        # Prior to declaring TX, user should have access
+        self.assertTrue(cp.display_for_user(user).access)
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
@@ -195,8 +196,19 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, cp = map(db.session.merge, (user, cp))
 
-        # Declaring they started TX, should grant access
+        # Declaring they started a non TX proc, should still have access
         self.assertTrue(cp.display_for_user(user).access)
+
+        self.add_procedure(
+            code='26294005',
+            display='Radical prostatectomy (nerve-sparing)',
+            system=SNOMED)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+
+        # Declaring they started a TX proc, should lose access
+        self.assertFalse(cp.display_for_user(user).access)
 
     def test_exclusive_stategy(self):
         """Test exclusive intervention strategy"""
@@ -297,6 +309,37 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
         self.assertFalse(sm.display_for_user(user).access)
+
+    def test_in_role(self):
+        user = self.test_user
+        sm = INTERVENTION.SELF_MANAGEMENT
+        sm.public_access = False
+        d = {
+             'function': 'in_role_list',
+             'kwargs': [
+                 {'name': 'role_list',
+                  'value': [ROLE.PATIENT,]}]
+            }
+
+        with SessionScope(db):
+            strat = AccessStrategy(
+                name="SELF_MANAGEMENT if PATIENT",
+                intervention_id = sm.id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+
+        # Prior to granting user PATIENT role, the strategy
+        # should not give access to SM
+        self.assertFalse(sm.display_for_user(user).access)
+
+        # Add PATIENT to user's roles
+        add_role(user, ROLE.PATIENT)
+        with SessionScope(db):
+            db.session.commit()
+        user, sm = map(db.session.merge, (user, sm))
+        self.assertTrue(sm.display_for_user(user).access)
 
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
@@ -692,7 +735,7 @@ class TestIntervention(TestCase):
                               link_label='link magic',
                               link_url='http://example.com',
                               status_text='status example',
-                              provider_html='custom ph')
+                              staff_html='custom ph')
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
@@ -708,7 +751,7 @@ class TestIntervention(TestCase):
         self.assertEquals(rv.json['link_label'], "link magic")
         self.assertEquals(rv.json['link_url'], "http://example.com")
         self.assertEquals(rv.json['status_text'], "status example")
-        self.assertEquals(rv.json['provider_html'], "custom ph")
+        self.assertEquals(rv.json['staff_html'], "custom ph")
 
 
     def test_communicate(self):

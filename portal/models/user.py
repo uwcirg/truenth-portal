@@ -11,11 +11,13 @@ from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
+from StringIO import StringIO
 from flask_login import current_user as flask_login_current_user
 from fuzzywuzzy import fuzz
 import time
 
 from .audit import Audit
+from ..dict_tools import dict_match
 from ..extensions import db
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
@@ -415,8 +417,11 @@ class User(db.Model, UserMixin):
         collision.
 
         """
-        if not self._email.startswith(prefix):
-            self._email = prefix + self._email
+        if self._email:
+            if not self._email.startswith(prefix):
+                self._email = prefix + self._email
+        else:
+            self._email = prefix
 
     @property
     def identifiers(self):
@@ -922,11 +927,13 @@ class User(db.Model, UserMixin):
     def merge_with(self, other_id):
         """merge details from other user into self
 
-        Part of an account generation or login flow.  Scenarios include
-        a provider or an intervention setting up a weakly authenticated
-        account (typically the *other_id*) for the invitation process.
-        Once the user logs into an existing account or registers a new (self)
-        we need to pull the data set up by the provider into this user account.
+        Primary usage stems from different account registration flows.
+        For example, users are created when invited by staff to participate,
+        and when the same user later opts to register, a second account
+        is generated during the registration process (either by flask-user
+        or other mechanisms like add_authomatic_user).
+
+        NB - caller MUST manage email due to unique constraints
 
         """
         other = User.query.get(other_id)
@@ -934,17 +941,14 @@ class User(db.Model, UserMixin):
             abort(404, 'other_id {} not found'.format(other_id))
 
         # direct attributes on user
-        # intentionally skip {registered, password, confirmed_at,
-        # reset_password_token}
-        for attr in ('email', 'first_name', 'last_name', 'birthdate',
-                     'gender', 'phone', 'locale_id', 'timezone',
-                     'image_url', 'active', 'deleted_id', 'deceased_id',
-                    ):
+        # intentionally skip {email, reset_password_token}
+        for attr in (
+            'password', 'first_name', 'last_name', 'birthdate',
+            'gender', 'phone', 'locale_id', 'timezone', 'confirmed_at',
+            'registered', 'image_url', 'active', 'deleted_id', 'deceased_id'):
             if not getattr(other, attr):
                 continue
-            if not getattr(self, attr):
-                setattr(self, attr, getattr(other, attr))
-            # value present in both.  assume user just set to best value
+            setattr(self, attr, getattr(other, attr))
 
         # n-to-n relationships on user
         for relationship in ('organizations', '_consents', 'procedures',
@@ -969,6 +973,36 @@ class User(db.Model, UserMixin):
                                self_entity]
             for item in append_list:
                 self_entity.append(item)
+
+    def promote_to_registered(self, registered_user):
+        """Promote a weakly authenticated account to a registered one"""
+        assert self.id != registered_user.id
+        before = self.as_fhir()
+
+        # due to unique constraints, email is handled manually after
+        # registered_user is deleted (when email gets masked)
+        registered_email = registered_user.email
+
+        self.merge_with(registered_user.id)
+
+        # remove special roles from invited user, if present
+        self.update_roles(
+            [role for role in self.roles if role.name not in (
+                ROLE.WRITE_ONLY, ROLE.PROMOTE_WITHOUT_IDENTITY_CHALLENGE)],
+            acting_user=self)
+
+        # delete temporary registered user account
+        registered_user.delete_user(acting_user=self)
+
+        # restore email and record event
+        self.email = registered_email
+        after = self.as_fhir()
+        details = StringIO()
+        dict_match(newd=after, oldd=before, diff_stream=details)
+        db.session.add(Audit(
+            comment="registered invited user, {}".format(details.getvalue()),
+            user_id=self.id, subject_id=self.id,
+            context='account'))
 
     def check_role(self, permission, other_id):
         """check user for adequate role
@@ -1003,11 +1037,11 @@ class User(db.Model, UserMixin):
 
         if self.has_role(ROLE.STAFF):
             # Staff has full access to all patients with a valid consent
-            # at or below the same level of the org tree as provider has
+            # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
-            # agreement at a higher level in the orgtree than the provider,
+            # agreement at a higher level in the orgtree than the staff member,
             # in which case the patient's organization must be a child
-            # of the provider's organization for access.
+            # of the staff's organization for access.
 
             # As long as the consent is valid (not expired or deleted) it's
             # adequate for 'view'.  'edit' requires the staff_editable option
@@ -1042,24 +1076,24 @@ class User(db.Model, UserMixin):
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
 
-    def provider_html(self):
-        """Helper used from templates to display any custom provider text
+    def staff_html(self):
+        """Helper used from templates to display any custom staff/provider text
 
-        Interventions can add personalized HTML for care providers
+        Interventions can add personalized HTML for care staff
         to consume on the /patients list.  Look up any values for this user
         on all interventions.
 
         """
         uis = UserIntervention.query.filter(and_(
             UserIntervention.user_id == self.id,
-            UserIntervention.provider_html != None))
+            UserIntervention.staff_html != None))
         if uis.count() == 0:
             return ""
         if uis.count() == 1:
-            return uis[0].provider_html
+            return uis[0].staff_html
         else:
             return '<div>' + '</div><div>'.join(
-                [ui.provider_html for ui in uis]) + '</div>'
+                [ui.staff_html for ui in uis]) + '</div>'
 
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""
@@ -1089,7 +1123,6 @@ class User(db.Model, UserMixin):
         :param acting_user: individual executing the command, for audit trail
 
         """
-        from .audit import Audit
         from .auth import Client, Token
 
         if self == acting_user:
@@ -1105,6 +1138,7 @@ class User(db.Model, UserMixin):
                                  [client.id for client in clients]))
 
         self.active = False
+        self.mask_email(prefix='__deleted_{}__'.format(int(time.time())))
         self.deleted = Audit(user_id=acting_user.id, subject_id=self.id,
                              comment="marking deleted {}".format(self),
                              context='account')

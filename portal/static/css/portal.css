@@ -78,10 +78,18 @@ div.orglist-selector {
 }
 #adminTableToolbar #orglist-footer-container label {
   font-weight: normal;
+  font-size: 0.95em;
+}
+#adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+  position: relative;
+  top: -1px;
 }
 #adminTableToolbar div.org-container {
   display: block;
   margin: -0.1em 0 -0.2em 0;
+}
+#adminTable div.card-view {
+  display: flex;
 }
 div.orglist-selector div.dropdown-menu #userOrgs {
   width: 300px;
@@ -886,6 +894,7 @@ table.profile-audit-log TH,
   padding: 0.5em;
   border-radius: 4px;
   text-align: left;
+  color: #a94442;
 }
 .report-error-message {
   color: red;
@@ -1440,17 +1449,32 @@ div.org-container input[type="checkbox"] {
      width: 230px !important;
      overflow: auto;
    }
-   div.orglist-selector div.dropdown-menu #userOrgs{
-     width: 180px !important;
-   }
-   div.orglist-selector div.org-container label.org-label {
-     font-size: 0.8em;
-   }
+   #adminTableToolbar #orglistSelector {
+    width: 100%;
+    max-width: 100%;
+  }
+  div.orglist-selector div.dropdown-menu #userOrgs{
+    width: 180px !important;
+  }
+  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
+    font-size: 0.8em;
+  }
+
+  #adminTableToolbar #orglist-footer-container {
+    padding: 0.5em 1em;
+  }
+
+  #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+    top: 0;
+  }
   .side-custom {
     height: 37em;
   }
   .one-side {
     height: 24em;
+  }
+  .timezone-container {
+    padding-bottom: 0;
   }
 }
 @media (max-width: 730px) {
