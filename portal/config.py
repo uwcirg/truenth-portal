@@ -86,6 +86,8 @@ class BaseConfig(object):
     LR_ORIGIN = 'https://stg-cms.us.truenth.org'
     LR_GROUP = 20142
 
+    SYSTEM_TYPE = 'development'
+
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
