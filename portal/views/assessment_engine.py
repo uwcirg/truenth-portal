@@ -704,7 +704,7 @@ def get_assessments():
         yield ','.join('"' + column + '"' for column in columns) + '\n'
         for qnr in qnr_bundle['entry']:
             row_data = {
-                'identifier': qnr['identifier'],
+                'identifier': qnr['identifier']['value'],
                 'patient_identifiers': qnr['subject']['identifier'],
                 'authored': qnr['authored'],
                 'instrument': qnr['questionnaire']['reference'].split('/')[-1],
