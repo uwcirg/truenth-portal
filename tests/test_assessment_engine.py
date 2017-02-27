@@ -41,3 +41,22 @@ class TestAssessmentEngine(TestCase):
 
         self.assertEquals(response['total'], len(response['entry']))
         self.assertTrue(response['entry'][0]['questionnaire']['reference'].endswith(instrument_id))
+
+    def test_assessments_csv(self):
+        swagger_spec = swagger(self.app)
+        example_data = swagger_spec['definitions']['QuestionnaireResponse']['example']
+        instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
+
+        self.login()
+        upload_response = self.client.put(
+            '/api/patient/{}/assessment'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(example_data),
+        )
+
+        download_response = self.client.get(
+            '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),
+        )
+        csv_string = download_response.data
+        self.assertGreater(csv_string.split("\n"), 1)
+        # Todo: use csv module for more robust test
