@@ -448,10 +448,6 @@ class QuestionnaireResponse(db.Model):
         return FHIR_datetime.parse(
             context.current_parameters['document']['authored'])
 
-
-
-
-
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
     subject_id = db.Column(db.ForeignKey('users.id'))
@@ -479,11 +475,11 @@ class QuestionnaireResponse(db.Model):
                 "{0.status} {0.authored}".format(self)
 
 def aggregate_responses(instrument_ids):
-"""Build a bundle of QuestionnaireResponses
+    """Build a bundle of QuestionnaireResponses
 
-:param instrument_ids: list of instrument_ids to restrict results to
+    :param instrument_ids: list of instrument_ids to restrict results to
 
-"""
+    """
     annotated_questionnaire_responses = []
     questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
 
@@ -518,7 +514,7 @@ def aggregate_responses(instrument_ids):
 
 
 def parse_concepts(elements, system):
-    "recursive function to build array of concepts from nested structure"
+    """recursive function to build array of concepts from nested structure"""
     ccs = []
     for element in elements:
         ccs.append(Coding(code=element['code'],
