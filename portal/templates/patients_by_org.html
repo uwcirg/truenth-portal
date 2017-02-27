@@ -122,25 +122,14 @@ var org_list = {};
   {% endfor %}
 {% endif %}
 
-function handleOrgsListDropDown(obj) {
-  if (!obj) obj = $("#orglist-dropdown");
-  if ($("#org-menu").is(":visible")) {
-    $(obj).find("span.glyphicon-menu-down").show();
-    $(obj).find("span.glyphicon-menu-up").hide();
-  } else {
-    $(obj).find("span.glyphicon-menu-down").hide();
-    $(obj).find("span.glyphicon-menu-up").show();
-  };
-};
-
 var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
-  $("#adminTable").on("page-change.bs.table sort.bs.table reset-view.bs.table toggle.bs.table post-body.bs.table", function() {
+  $("#adminTable").on("sort.bs.table reset-view.bs.table toggle.bs.table", function() {
       AT.updateData();
    });
-  setTimeout(AT.updateData, 0);
+  setTimeout("AT.updateData();", 0);
 
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
