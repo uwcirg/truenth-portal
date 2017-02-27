@@ -26,7 +26,7 @@ AdminTool.prototype.getData = function(userString) {
         url: '/api/consent-assessment-status',
         contentType: "application/json; charset=utf-8",
         data: userString,
-        timeout: 10000,
+        timeout: 20000,
         dataType: 'json'
     }).done(function(data) {
        // console.log(data);
