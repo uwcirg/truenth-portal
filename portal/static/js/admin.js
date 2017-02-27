@@ -106,7 +106,6 @@ AdminTool.prototype.getData = function(userString) {
         self.requestsCounter -= 1;
         if(self.requestsCounter == 0) {
           self.fadeLoader();
-          $("#admin-table-error-message").text("");
         };
     }).fail(function(xhr) {
         //console.log("request failed.");
@@ -137,13 +136,12 @@ AdminTool.prototype.getUserIdArray = function() {
 
   return arrUsers;
 };
-
 AdminTool.prototype.updateData = function() {
-
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
     self.requestsCounter = arrUsers.length;
+    $("#admin-table-error-message").text("");
     loader(true);
     arrUsers.forEach(function(us) {
         try {
@@ -204,7 +202,6 @@ __getChildOrgs = function(orgs, ref) {
       return __getChildOrgs(childOrgs, ref);
     };
 };
-
 AdminTool.prototype.getHereBelowOrgs = function() {
   var userOrgs = this.userOrgs, mainOrgsList = OT.getOrgsList(), self = this;
   userOrgs.forEach(function(orgId) {
@@ -213,7 +210,6 @@ AdminTool.prototype.getHereBelowOrgs = function() {
       __getChildOrgs((co && co.children ? co.children : null), self);
   });
 };
-
 AdminTool.prototype.initOrgsList = function(request_org_list) {
     //set user orgs
     var self = this;
@@ -226,14 +222,12 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
         type: "GET",
         url: '/api/organization'
     }).done(function(data) {
-
         OT.populateOrgsList(data.entry);
         OT.populateUI();
         if (!noPatientData) {
           self.getHereBelowOrgs();
           OT.filterOrgs(self.here_below_orgs);
         };
-
         var ofields = $("#userOrgs input[name='organization']");
         ofields.each(function() {
             if ((self.here_below_orgs).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
@@ -275,6 +269,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
 
     }).fail(function() {
         //console.log("Problem retrieving data from server.");
+        $("#org-menu").append("<span class='indent text-danger'>Error occurred retrieving data from server.</span>");
     });
 
     //orglist-dropdown
@@ -284,7 +279,6 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
 
     if (noPatientData) $("#patientAssessmentDownload").hide();
 };
-
 __setOrgsMenuHeight = function(padding) {
   if (!padding) padding = 100;
   var h = parseInt($("#fillOrgs").height());
@@ -295,7 +289,6 @@ __setOrgsMenuHeight = function(padding) {
     };
   };
 };
-
 __clearFilterButtons = function() {
   $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
 };
