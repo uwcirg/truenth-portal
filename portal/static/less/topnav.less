@@ -30,6 +30,23 @@
     box-sizing: border-box;
   }
 }
+.watermark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #e4e6e4;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
+  filter: alpha(opacity=90); 
+  opacity: 0.9;
+  z-index: 1000;
+  font-weight: normal;
+  font-size: 0.85em;
+  text-align: center;
+  width: 100%;
+  background-color: #535454;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+}
 .tnth-white {
   color: #ECF7E5;
   background-color: transparent;
@@ -113,7 +130,7 @@
 
 /** Logo **/
 #tnthLogo {
-  width: 200px;
+  width: 160px;
   margin: 0 auto;
   transition: margin 10ms ease-in;
   img {
@@ -317,6 +334,14 @@
     margin-right: 2em !important;
   }
 }
+@media (max-width: 640px) {
+   .watermark {
+    top: 8em;
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.5em !important;
+  }
+}
 @media (max-width: 991px) {
   #tnthUserBtn {
     padding: 6px 0px;
@@ -330,6 +355,12 @@
   }
   #tnthLogoXs img {
     margin-right: 40%;
+  }
+  .watermark {
+    width: 270px;
+    padding: 1em;
+    font-size: 0.7em;
+    background-color: transparent;
   }
 }
 @media (min-width: 992px) {

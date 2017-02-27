@@ -824,13 +824,13 @@ div.noOrg-container span {
   background-image: -ms-linear-gradient(top, #fff, #eee);
   background-image: -o-linear-gradient(top, #fff, #eee);
   background-image: linear-gradient(to bottom, #fff, #eee);
-  -webkit-box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.4);
-  -moz-box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.4);
-  box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   border-radius: 4px;
-  padding: 0.4em;
+  padding: 0.39em;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
   filter: alpha(opacity=80);
   -moz-opacity: 0.8;
@@ -839,7 +839,8 @@ div.noOrg-container span {
   background-color: #FFF;
 }
 #userSessionReportDetailHeader span.glyphicon-user {
-  top: -0.01px;
+  padding: 0.42em 0.43em 0.42em 0.43em;
+  margin-top: -2.5px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover {
   color: #979a8d;
@@ -847,7 +848,7 @@ div.noOrg-container span {
 #userSessionReportDetailHeader span.glyphicon-home {
   top: 5px;
 }
-t #userSessionReportDetailTable caption {
+#userSessionReportDetailTable caption {
   padding: 0;
 }
 #userSessionsList {
@@ -1465,10 +1466,7 @@ div.org-container input[type="checkbox"] {
   }
   div.search,
   div.columns {
-    font-size: 0.9em;
-    margin-left: 0.1em;
-    margin-top: 0;
-    margin-bottom: 0.5em;
+   display: none;
   }
   div.columns {
     top: 4px;
@@ -1485,7 +1483,10 @@ div.org-container input[type="checkbox"] {
     height: 10em;
   }
   #userSessionReportDetailHeader span.glyphicon-user {
-    padding: 0.4em;
+    margin-top: 2px;
+  }
+  #userSessionReportDetailHeader span.glyphicon-home {
+    top: 5.7px;
   }
   button.btn-delete-consent {
     padding: 2px;
