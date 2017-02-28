@@ -770,7 +770,8 @@ def get_assessments():
                             'answer_code': answer['valueCoding']['code'],
 
                             # Add suplementary text added earlier
-                            'answer': answer['valueCoding'].get('text'),
+                            # 'answer': answer['valueCoding'].get('text'),
+                            'answer': None,
                         })
                     row_data.update(answer_data)
 
