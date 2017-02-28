@@ -731,9 +731,9 @@ def get_assessments():
 
         columns = (
             'identifier',
+            'study_id',
             'subject_id',
             'author_id',
-            'study_id',
             'authored',
             'instrument',
             'question_code',
