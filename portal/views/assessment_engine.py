@@ -731,7 +731,7 @@ def get_assessments():
 
         columns = (
             'identifier',
-            'truenth_id',
+            'subject_id',
             'study_id',
             'authored',
             'instrument',
@@ -744,7 +744,7 @@ def get_assessments():
         for qnr in qnr_bundle['entry']:
             row_data = {
                 'identifier': qnr['identifier']['value'],
-                'truenth_id': get_identifier(
+                'subject_id': get_identifier(
                     qnr['subject']['identifier'],
                     use='official'
                 ),
