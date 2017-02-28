@@ -59,7 +59,12 @@
                   .on("click", "#log-out", sessMon.logout)
                   .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
        {% endif %}
-     });
+
+       (function() {
+        var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+        if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
+       }) ();
+    });
 
 </script>
 {% if config.PIWIK_SITEID %}

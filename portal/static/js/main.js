@@ -1758,7 +1758,6 @@ funcWrapper = function(param) {
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
-        cache: true,
         //dataFilter:data_filter,
         //xhr: xhr_function,
         crossDomain: true
