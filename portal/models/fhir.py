@@ -513,7 +513,7 @@ def aggregate_responses(instrument_ids):
     return bundle
 
 def generate_qnr_csv(qnr_bundle):
-    """Function for generating a CSV from a bundle of QuestionnaireResponses"""
+    """Generate a CSV from a bundle of QuestionnaireResponses"""
     def get_identifier(id_list, **kwargs):
         """Return first identifier object matching kwargs"""
         for identifier in id_list:
