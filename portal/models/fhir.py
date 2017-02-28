@@ -526,9 +526,12 @@ def generate_qnr_csv(qnr_bundle):
 
     def consolidate_answer_pairs(answers):
         """
-        Merge paired answers (code and corresponding text) into single row/answer
+        Merge paired answers (code and corresponding text) into single
+            row/answer
 
-        Codes are the preferred way of referring to options but option text (at the time of administration) may be submitted alongside coded answers for ease of display
+        Codes are the preferred way of referring to options but option text
+            (at the time of administration) may be submitted alongside coded
+            answers for ease of display
         """
 
         answer_types = [a.keys()[0] for a in answers]
