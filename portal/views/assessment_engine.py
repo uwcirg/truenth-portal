@@ -729,9 +729,7 @@ def get_assessments():
                 'instrument': qnr['questionnaire']['reference'].split('/')[-1],
             }
             for question in qnr['group']['question']:
-                row_data.update({
-                    'question_code': question['linkId'],
-                })
+                row_data.update({'question_code': question['linkId']})
                 for answer in question['answer']:
                     # Use first value of answer (most are single-entry dicts)
                     answer_type = answer.keys()[0].split('value')[-1].lower()
