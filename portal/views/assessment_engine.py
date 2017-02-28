@@ -701,6 +701,34 @@ def get_assessments():
                     return identifier['value']
             return None
 
+        def consolidate_answer_pairs(answers):
+            """
+            Merge paired answers (code and corresponding text) into single row/answer
+
+            Codes are the preferred way of referring to options but option text (at the time of administration) may be submitted alongside coded answers for ease of display
+            """
+
+            answer_types = [a.keys()[0] for a in answers]
+
+            # Exit early if assumptions not met
+            if (
+                len(answers) % 2 or
+                answer_types.count('valueCoding') != answer_types.count('valueString')
+            ):
+                return answers
+
+            filtered_answers = []
+            for pair in zip(*[iter(answers)]*2):
+                # Sort so first pair is always valueCoding
+                pair = sorted(pair, key=lambda k: k.keys()[0])
+                coded_answer, string_answer = pair
+
+                coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+                filtered_answers.append(coded_answer)
+
+            return filtered_answers
+
         columns = (
             'identifier',
             'truenth_id',
@@ -708,7 +736,7 @@ def get_assessments():
             'authored',
             'instrument',
             'question_code',
-            'answer_type',
+            'answer_code',
             'answer',
         )
 
@@ -730,16 +758,20 @@ def get_assessments():
             }
             for question in qnr['group']['question']:
                 row_data.update({'question_code': question['linkId']})
-                for answer in question['answer']:
+
+                answers = consolidate_answer_pairs(question['answer'])
+                for answer in answers:
                     # Use first value of answer (most are single-entry dicts)
-                    answer_type = answer.keys()[0].split('value')[-1].lower()
-                    answer_data = {
-                        'answer': answer.values()[0],
-                        'answer_type': answer_type,
-                    }
+                    answer_data = {'answer': answer.values()[0]}
+
                     # ...unless nested code (ie valueCode)
-                    if answer_type == 'coding':
-                        answer_data['answer'] = answer['valueCoding']['code']
+                    if answer.keys()[0] == 'valueCoding':
+                        answer_data.update({
+                            'answer_code': answer['valueCoding']['code'],
+
+                            # Add suplementary text added earlier
+                            'answer': answer['valueCoding'].get('text'),
+                        })
                     row_data.update(answer_data)
 
                     row = []
