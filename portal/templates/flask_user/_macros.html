@@ -74,7 +74,6 @@
     </div>
     {% if current_user.roles %}
     <br />
-
     {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
     <div class="list-group tnth-nav-list">
         {% if current_user.has_roles('admin') %}
@@ -94,7 +93,7 @@
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
         <div class="col-xs-6 col-lg-8 footer-container">
-            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/legal">{{ _("Privacy") }}</a></small></p>
+            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
             <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p>
         </div>
         <div class="col-xs-6 col-lg-4 footer-container">
