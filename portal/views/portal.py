@@ -534,26 +534,26 @@ def profile(user_id):
 def legal():
     """ Legal/terms of use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(LegalATMA.name_key()))
+    response_text = VersionedResource.fetch_elements(app_text(LegalATMA.name_key()))[0]
     return render_template('legal.html' if not gil else 'gil/legal.html',
-        content=response.text, user=current_user())
+        content=response_text, user=current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
     """ Legal/terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(Terms_ATMA.name_key()))
+    response_text = VersionedResource.fetch_elements(app_text(Terms_ATMA.name_key()))[0]
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        content=response.text)
+        content=response_text)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
-    about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
+    about_tnth_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))[0]
+    about_mo_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))[0]
     gil = current_app.config.get('GIL')
-    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth.text,
-                           about_mo=about_mo.text, user=current_user())
+    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_text,
+                           about_mo=about_mo_text, user=current_user())
 
 @portal.route('/explore')
 def explore():

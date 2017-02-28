@@ -210,7 +210,13 @@ class VersionedResource(object):
             # app_text resources defining legit URLs.  punt if testing
             if current_app.config.get('TESTING'):
                 return ("[TESTING - fake response]", 'http://fake.org')
-            raise  # reraise same exception if we're not testing
+            error_msg = "Could not retrieve remote content - Invalid URL"
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
+        except:
+            error_msg =  "Could not retrieve remove content - Server could not be reached"
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
         try:
             return (
                 response.json()['asset'],
@@ -218,7 +224,12 @@ class VersionedResource(object):
                     version=response.json()['version'],
                     generic_url=url))
         except ValueError:  # thrown when no json is available in response
-            return (response.text, url)
+            if response.status_code == 200:
+                return (response.text, url)
+            error_msg = "Could not retrieve remote content - {} {}".format(
+                response.status_code, response.reason)
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
 
 def app_text(name, *args):
     """Look up and return cusomized application text string
