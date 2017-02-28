@@ -251,7 +251,7 @@ def access_via_token(token):
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.PROVIDER])
+                      ROLE.STAFF])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
@@ -438,7 +438,7 @@ def home():
               format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.PROVIDER):
+    if user.has_role(ROLE.STAFF):
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()

@@ -63,31 +63,31 @@ class TestPortal(TestCase):
         intervention = db.session.merge(intervention)
         self.assertIn(intervention.display_for_user(user).link_label, rv.data.decode('utf-8'))
 
-    def test_provider_html(self):
-        """Interventions can customize the provider text """
+    def test_staff_html(self):
+        """Interventions can customize the staff text """
         client = self.add_client()
         intervention = INTERVENTION.sexual_recovery
         client.intervention = intervention
         ui = UserIntervention(user_id=TEST_USER_ID,
                               intervention_id=intervention.id)
-        ui.provider_html = "Custom text for <i>provider</i>"
+        ui.staff_html = "Custom text for <i>staff</i>"
         with SessionScope(db):
             db.session.add(ui)
             db.session.commit()
 
         self.bless_with_basics()
         self.login()
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.promote_user(role_name=ROLE.PATIENT)
 
-        # This test requires PATIENTS_BY_PROVIDER_ADDL_FIELDS includes the
+        # This test requires PATIENT_LIST_ADDL_FIELDS includes the
         # 'reports' field
-        self.app.config['PATIENTS_BY_PROVIDER_ADDL_FIELDS'] = [
+        self.app.config['PATIENT_LIST_ADDL_FIELDS'] = [
             'reports',]
         rv = self.client.get('/patients/')
 
         ui = db.session.merge(ui)
-        self.assertIn(ui.provider_html, rv.data)
+        self.assertIn(ui.staff_html, rv.data)
 
     def test_public_access(self):
         """Interventions w/o public access should be hidden"""

@@ -13,13 +13,13 @@ from ..models.user import User, current_user, get_user, UserRoles
 patients = Blueprint('patients', __name__, url_prefix='/patients')
 
 @patients.route('/')
-@roles_required(ROLE.PROVIDER)
+@roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def patients_root():
-    """patients view function, intended for providers
+    """patients view function, intended for staff
 
-    Present the logged in provider the list of patients matching
-    the providers organizations (and any decendent organizations)
+    Present the logged in staff the list of patients matching
+    the staff's organizations (and any decendent organizations)
 
     """
     user = current_user()
@@ -63,7 +63,7 @@ def patients_root():
 
 
 @patients.route('/profile_create')
-@roles_required(ROLE.PROVIDER)
+@roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def profile_create():
     consent_agreements = get_orgs_consent_agreements()
@@ -85,10 +85,10 @@ def sessionReport(user_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required(ROLE.PROVIDER)
+@roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def patient_profile(patient_id):
-    """individual patient view function, intended for providers"""
+    """individual patient view function, intended for staff"""
     user = current_user()
     user.check_role("edit", other_id=patient_id)
     patient = get_user(patient_id)

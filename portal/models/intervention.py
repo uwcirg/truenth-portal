@@ -169,7 +169,7 @@ class UserIntervention(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     access = db.Column('access', access_types_enum, default='forbidden')
     card_html = db.Column(db.Text)
-    provider_html = db.Column(db.Text)
+    staff_html = db.Column(db.Text)
     link_label = db.Column(db.Text)
     link_url = db.Column(db.Text)
     status_text = db.Column(db.Text)
@@ -178,7 +178,7 @@ class UserIntervention(db.Model):
 
     def as_json(self):
         d = {'user_id': self.user_id}
-        for field in ('access', 'card_html', 'provider_html',
+        for field in ('access', 'card_html', 'staff_html',
                       'link_label', 'link_url', 'status_text'):
             if getattr(self, field):
                 d[field] = getattr(self, field)

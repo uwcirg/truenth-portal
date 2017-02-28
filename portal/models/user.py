@@ -752,7 +752,7 @@ class User(db.Model, UserMixin):
 
             """
             if (not acting_user.has_role(ROLE.ADMIN)
-                and acting_user.has_role(ROLE.PROVIDER)
+                and acting_user.has_role(ROLE.STAFF)
                 and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
@@ -1035,13 +1035,13 @@ class User(db.Model, UserMixin):
             # and interventions result in carte blanche for service
             return True
 
-        if self.has_role(ROLE.PROVIDER):
-            # Providers have full access to all patients with a valid consent
-            # at or below the same level of the org tree as provider has
+        if self.has_role(ROLE.STAFF):
+            # Staff has full access to all patients with a valid consent
+            # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
-            # agreement at a higher level in the orgtree than the provider,
+            # agreement at a higher level in the orgtree than the staff member,
             # in which case the patient's organization must be a child
-            # of the provider's organization for access.
+            # of the staff's organization for access.
 
             # As long as the consent is valid (not expired or deleted) it's
             # adequate for 'view'.  'edit' requires the staff_editable option
@@ -1076,24 +1076,24 @@ class User(db.Model, UserMixin):
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
 
-    def provider_html(self):
-        """Helper used from templates to display any custom provider text
+    def staff_html(self):
+        """Helper used from templates to display any custom staff/provider text
 
-        Interventions can add personalized HTML for care providers
+        Interventions can add personalized HTML for care staff
         to consume on the /patients list.  Look up any values for this user
         on all interventions.
 
         """
         uis = UserIntervention.query.filter(and_(
             UserIntervention.user_id == self.id,
-            UserIntervention.provider_html != None))
+            UserIntervention.staff_html != None))
         if uis.count() == 0:
             return ""
         if uis.count() == 1:
-            return uis[0].provider_html
+            return uis[0].staff_html
         else:
             return '<div>' + '</div><div>'.join(
-                [ui.provider_html for ui in uis]) + '</div>'
+                [ui.staff_html for ui in uis]) + '</div>'
 
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""

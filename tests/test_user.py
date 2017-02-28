@@ -262,17 +262,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
 
-    def test_account_creation_by_provider(self):
-        # permission challenges when done as provider
+    def test_account_creation_by_staff(self):
+        # permission challenges when done as staff
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -282,7 +282,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -319,17 +319,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
 
-    def test_failed_account_creation_by_provider(self):
+    def test_failed_account_creation_by_staff(self):
         # without the right set of consents & roles, should fail
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -339,7 +339,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PARTNER}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -373,7 +373,7 @@ class TestUser(TestCase):
 
     def test_default_role(self):
         self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.login()
         rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
@@ -381,7 +381,7 @@ class TestUser(TestCase):
         self.assertEquals(len(result_roles['roles']), 2)
         received = [r['name'] for r in result_roles['roles']]
         self.assertTrue(ROLE.PATIENT in received)
-        self.assertTrue(ROLE.PROVIDER in received)
+        self.assertTrue(ROLE.STAFF in received)
 
     def test_unauth_role(self):
         self.login()
@@ -496,7 +496,7 @@ class TestUser(TestCase):
         member_of.organizations.append(org)
         audit = Audit(comment='test data', user_id=TEST_USER_ID,
             subject_id=TEST_USER_ID)
-        self.promote_user(user, ROLE.PROVIDER)
+        self.promote_user(user, ROLE.STAFF)
         self.promote_user(u2, ROLE.PATIENT)
         self.promote_user(member_of, ROLE.PATIENT)
         user, org, u2, member_of = map(
@@ -537,15 +537,15 @@ class TestUser(TestCase):
                       subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
-        self.promote_user(staff_top, ROLE.PROVIDER)
+        self.promote_user(staff_top, ROLE.STAFF)
         staff_top.organizations.append(org_102)
 
         staff_leaf = self.add_user('Staff 10031')
-        self.promote_user(staff_leaf, ROLE.PROVIDER)
+        self.promote_user(staff_leaf, ROLE.STAFF)
         staff_leaf.organizations.append(org_10031)
 
         staff_mid = self.add_user('Staff 1002')
-        self.promote_user(staff_mid, ROLE.PROVIDER)
+        self.promote_user(staff_mid, ROLE.STAFF)
         staff_mid.organizations.append(org_1002)
 
         patient_w = self.add_user('patient w')
