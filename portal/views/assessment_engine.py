@@ -732,6 +732,7 @@ def get_assessments():
         columns = (
             'identifier',
             'subject_id',
+            'author_id',
             'study_id',
             'authored',
             'instrument',
@@ -748,6 +749,7 @@ def get_assessments():
                     qnr['subject']['identifier'],
                     use='official'
                 ),
+                'author_id': qnr['author']['reference'].split('/')[-1],
                 # Todo: correctly pick external study of interest
                 'study_id': get_identifier(
                     qnr['subject']['identifier'],
