@@ -5,6 +5,7 @@ Designed around FHIR guidelines for representation of encounters.
 from ..extensions import db
 from .fhir import as_fhir, CodeableConcept, FHIR_datetime
 from .reference import Reference
+from sqlalchemy.dialects.postgresql import ENUM
 
 
 # http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.status
@@ -63,9 +64,9 @@ class Encounter(db.Model):
         return d
 
     @classmethod
-    def from_fhir(cls, data, audit):
+    def from_fhir(cls, data):
         """Parses FHIR data to produce a new encounter instance"""
-        p = cls(audit=audit)
+        p = cls()
         p.status = data['status']
         p.user_id = Reference.parse(data['patient']).id
         period = data['period']

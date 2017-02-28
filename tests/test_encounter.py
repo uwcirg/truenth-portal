@@ -1,19 +1,13 @@
 """Unit test module for Procedure API and model"""
-from datetime import datetime, timedelta
 import dateutil
-from flask import current_app
 import json
 import os
-import pytz
-from sqlalchemy.orm.exc import NoResultFound
 from tests import TestCase, TEST_USER_ID
+from flask_webtest import SessionScope
 
 from portal.extensions import db
-from portal.models.audit import Audit
 from portal.models.fhir import FHIR_datetime
 from portal.models.encounter import Encounter
-from portal.models.reference import Reference
-from portal.system_uri import ICHOM, SNOMED, TRUENTH_CLINICAL_CODE_SYSTEM
 
 
 class TestProcedure(TestCase):
@@ -23,7 +17,7 @@ class TestProcedure(TestCase):
                                'encounter-example.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
-        enc = Encounter.from_fhir(data, Audit(user_id=TEST_USER_ID))
+        enc = Encounter.from_fhir(data)
         self.assertEquals(enc.status, 'finished')
         self.assertEquals(enc.auth_method, 'password_authenticated')
         self.assertEquals(enc.start_time, dateutil.parser.parse("2013-05-05"))
@@ -33,6 +27,11 @@ class TestProcedure(TestCase):
                         user_id=TEST_USER_ID,
                         start_time=dateutil.parser.parse("2013-07-07"))
         data = enc.as_fhir()
+        # confirm we can store
+        with SessionScope(db):
+            db.session.add(enc)
+            db.session.commit()
+        enc = db.session.merge(enc)
         self.assertEquals(enc.status, data['status'])
         self.assertEquals(enc.auth_method, data['auth_method'])
 
