@@ -691,9 +691,20 @@ def get_assessments():
 
     def generate_qnr_csv(qnr_bundle):
 
+        def get_identifier(id_list, **kwargs):
+            """Return first identifier object matching kwargs"""
+            for identifier in id_list:
+                for k,v in kwargs.items():
+                    if identifier.get(k) != v:
+                        break
+                else:
+                    return identifier['value']
+            return None
+
         columns = (
             'identifier',
-            'patient_identifiers',
+            'truenth_id',
+            'study_id',
             'authored',
             'instrument',
             'question_code',
@@ -705,7 +716,15 @@ def get_assessments():
         for qnr in qnr_bundle['entry']:
             row_data = {
                 'identifier': qnr['identifier']['value'],
-                'patient_identifiers': qnr['subject']['identifier'],
+                'truenth_id': get_identifier(
+                    qnr['subject']['identifier'],
+                    use='official'
+                ),
+                # Todo: correctly pick external study of interest
+                'study_id': get_identifier(
+                    qnr['subject']['identifier'],
+                    system='http://us.truenth.org/identity-codes/external-study-id'
+                ),
                 'authored': qnr['authored'],
                 'instrument': qnr['questionnaire']['reference'].split('/')[-1],
             }
