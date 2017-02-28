@@ -512,6 +512,105 @@ def aggregate_responses(instrument_ids):
 
     return bundle
 
+def generate_qnr_csv(qnr_bundle):
+    """Function for generating a CSV from a bundle of QuestionnaireResponses"""
+    def get_identifier(id_list, **kwargs):
+        """Return first identifier object matching kwargs"""
+        for identifier in id_list:
+            for k,v in kwargs.items():
+                if identifier.get(k) != v:
+                    break
+            else:
+                return identifier['value']
+        return None
+
+    def consolidate_answer_pairs(answers):
+        """
+        Merge paired answers (code and corresponding text) into single row/answer
+
+        Codes are the preferred way of referring to options but option text (at the time of administration) may be submitted alongside coded answers for ease of display
+        """
+
+        answer_types = [a.keys()[0] for a in answers]
+
+        # Exit early if assumptions not met
+        if (
+            len(answers) % 2 or
+            answer_types.count('valueCoding') != answer_types.count('valueString')
+        ):
+            return answers
+
+        filtered_answers = []
+        for pair in zip(*[iter(answers)]*2):
+            # Sort so first pair is always valueCoding
+            pair = sorted(pair, key=lambda k: k.keys()[0])
+            coded_answer, string_answer = pair
+
+            coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+            filtered_answers.append(coded_answer)
+
+        return filtered_answers
+
+    columns = (
+        'identifier',
+        'study_id',
+        'subject_id',
+        'author_id',
+        'authored',
+        'instrument',
+        'question_code',
+        'answer_code',
+        'answer',
+    )
+
+    yield ','.join('"' + column + '"' for column in columns) + '\n'
+    for qnr in qnr_bundle['entry']:
+        row_data = {
+            'identifier': qnr['identifier']['value'],
+            'subject_id': get_identifier(
+                qnr['subject']['identifier'],
+                use='official'
+            ),
+            'author_id': qnr['author']['reference'].split('/')[-1],
+            # Todo: correctly pick external study of interest
+            'study_id': get_identifier(
+                qnr['subject']['identifier'],
+                system='http://us.truenth.org/identity-codes/external-study-id'
+            ),
+            'authored': qnr['authored'],
+            'instrument': qnr['questionnaire']['reference'].split('/')[-1],
+        }
+        for question in qnr['group']['question']:
+            row_data.update({'question_code': question['linkId']})
+
+            answers = consolidate_answer_pairs(question['answer'])
+            for answer in answers:
+                # Use first value of answer (most are single-entry dicts)
+                answer_data = {'answer': answer.values()[0]}
+
+                # ...unless nested code (ie valueCode)
+                if answer.keys()[0] == 'valueCoding':
+                    answer_data.update({
+                        'answer_code': answer['valueCoding']['code'],
+
+                        # Add suplementary text added earlier
+                        # 'answer': answer['valueCoding'].get('text'),
+                        'answer': None,
+                    })
+                row_data.update(answer_data)
+
+                row = []
+                for column_name in columns:
+                    column = row_data.get(column_name)
+                    column = "\N" if column is None else column
+
+                    # Handle JSON column escaping/enclosing
+                    if not isinstance(column, basestring):
+                        column = json.dumps(column).replace('"', '""')
+                    row.append('"' + column + '"')
+
+                yield ','.join(row) + '\n'
 
 def parse_concepts(elements, system):
     """recursive function to build array of concepts from nested structure"""
