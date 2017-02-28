@@ -610,6 +610,7 @@ def get_assessments():
         enum:
           - json
           - csv
+        default: json
       - name: instrument_id
         in: query
         description:
