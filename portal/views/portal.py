@@ -14,7 +14,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA, Terms_ATMA
+from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention, INTERVENTION
@@ -373,7 +373,7 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 
 @portal.route('/initial-queries', methods=['GET','POST'])
 def initial_queries():
-    """Terms of use, initial queries view function"""
+    """Initial consent terms, initial queries view function"""
     if request.method == 'POST':
         # data submission all handled via ajax calls from initial_queries
         # template.  assume POST can only be sent when valid.
@@ -392,13 +392,13 @@ def initial_queries():
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
         asset, url = VersionedResource.fetch_elements(
-            app_text(ToU_ATMA.name_key()))
+            app_text(InitialConsent_ATMA.name_key()))
         terms = {'asset': asset, 'agreement_url': url}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
             asset, url = VersionedResource.fetch_elements(
-                app_text(ConsentATMA.name_key(organization=org)))
+                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             consent_agreements[org.id] = {
                     'asset': asset, 'agreement_url': url}
     return render_template(
@@ -450,7 +450,7 @@ def home():
             current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
             org = Organization.query.get(org_id)
             asset, url = VersionedResource.fetch_elements(
-                app_text(ConsentATMA.name_key(organization=org)))
+                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             if url:
                 current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
 
@@ -522,7 +522,7 @@ def profile(user_id):
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
         asset, url = VersionedResource.fetch_elements(
-            app_text(ConsentATMA.name_key(organization=org)))
+            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
@@ -530,21 +530,21 @@ def profile(user_id):
     return render_template(
         'profile.html', user=user, consent_agreements=consent_agreements)
 
-@portal.route('/legal')
+@portal.route('/privacy')
 def legal():
-    """ Legal/terms of use page"""
+    """ privacy use page"""
     gil = current_app.config.get('GIL')
-    response_text = VersionedResource.fetch_elements(app_text(LegalATMA.name_key()))[0]
-    return render_template('legal.html' if not gil else 'gil/legal.html',
-        content=response_text, user=current_user())
+    response = requests.get(app_text(PrivacyATMA.name_key()))
+    return render_template('privacy.html' if not gil else 'gil/privacy.html',
+        content=response.text, user=current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
-    """ Legal/terms-and-conditions of use page"""
+    """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     response_text = VersionedResource.fetch_elements(app_text(Terms_ATMA.name_key()))[0]
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        content=response_text)
+        content=response.json())
 
 @portal.route('/about')
 def about():

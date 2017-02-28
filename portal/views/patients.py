@@ -4,7 +4,7 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
-from ..models.app_text import app_text, ConsentATMA, VersionedResource
+from ..models.app_text import app_text, ConsentByOrg_ATMA, VersionedResource
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
@@ -106,7 +106,7 @@ def get_orgs_consent_agreements():
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
         asset, url = VersionedResource.fetch_elements(
-            app_text(ConsentATMA.name_key(organization=org)))
+            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
 
         consent_agreements[org.id] = {
                 'organization_name': org.name,

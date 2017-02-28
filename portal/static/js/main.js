@@ -418,7 +418,8 @@ var fillContent = {
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
-                async: false
+                async: false,
+                timeout: 20000
             }).done(function(data) {
                 if (data) {
                     data.entry.forEach(function(entry) {
