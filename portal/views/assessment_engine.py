@@ -744,7 +744,9 @@ def get_assessments():
 
                     row = []
                     for column_name in columns:
-                        column = row_data.get(column_name, "\N")
+                        column = row_data.get(column_name)
+                        column = "\N" if column is None else column
+
                         # Handle JSON column escaping/enclosing
                         if not isinstance(column, basestring):
                             column = json.dumps(column).replace('"', '""')
