@@ -1,0 +1,13 @@
+{
+  "resourceType": "Encounter",
+  "id": "example",
+  "patient": {
+    "reference": "Patient/1"
+  },
+  "status": "finished",
+  "period": {
+    "start": "2013-05-05",
+    "end": "2013-06-06"
+  },
+  "auth_method": "password_authenticated"
+}
