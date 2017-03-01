@@ -362,6 +362,7 @@
                   VO.showMain();
               };
           };
+
           function filterMenu() {
               $.ajax({
                 url: "{{PORTAL}}/gil-interventions-items",
@@ -507,6 +508,11 @@
          $(document).ready(function(){
 
             checkBannerStatus();
+
+            (function() {
+              var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+              if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
+            })();
 
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
