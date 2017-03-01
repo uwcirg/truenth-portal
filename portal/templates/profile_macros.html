@@ -1305,16 +1305,7 @@
     {% endif %}
 
     {% if person and person.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
-                    <div>
-                        {{profileProcedures(person, current_user) | show_macro('procedures')}}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{profileProcedures(person, current_user) | show_macro('procedures')}}
     {% endif %}
 
     {% if person and person.has_role('patient') %}
@@ -1424,75 +1415,84 @@
         #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
         #profileProcedureContainer button.btn {color:#777}
     </style>
-    <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
-        date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
-    <div id="profileProcedureContainer">
-        <form id="procedureForm" class="form-inline event-element">
-            <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
-            <div class="row">
-                <div class="col-md-6 col-xs-11">
-                    <div class='form-group'>
-                        <select class='form-control' id='tnthproc'>
-                            <option value=''>{{ _("Select") }}...</option>
-                            <option value='373818007'>{{ _("Started watchful waiting") }}</option>
-                            <option value='424313000'>{{ _("Started active surveillance") }}</option>
-                            <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
-                            <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
-                            <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
-                            <option value='228748004'>{{ _("Brachytherapy") }}</option>
-                            <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
-                            <option value='999999999'>{{ _("None of the above") }}</option>
-                        </select>
-                        <div class="help-block with-errors"></div>
+    <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
+                    <div>
+                        <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
+                            date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
+                        <div id="profileProcedureContainer">
+                            <form id="procedureForm" class="form-inline event-element">
+                                <p class="text-muted"><em>{{ _("Select")}}</em> {{ _("an option") }}:</p>
+                                <div class="row">
+                                    <div class="col-md-6 col-xs-11">
+                                        <div class='form-group'>
+                                            <select class='form-control' id='tnthproc'>
+                                                <option value=''>{{ _("Select") }}...</option>
+                                                <option value='373818007'>{{ _("Started watchful waiting") }}</option>
+                                                <option value='424313000'>{{ _("Started active surveillance") }}</option>
+                                                <option value='26294005'>{{ _("Radical prostatectomy (nerve-sparing)") }}</option>
+                                                <option value='26294005-nns'>{{ _("Radical prostatectomy (non-nerve-sparing)") }}</option>
+                                                <option value='33195004'>{{ _("External beam radiation therapy") }}</option>
+                                                <option value='228748004'>{{ _("Brachytherapy") }}</option>
+                                                <option value='707266006'>{{ _("Androgen deprivation therapy") }}</option>
+                                                <option value='999999999'>{{ _("None of the above") }}</option>
+                                            </select>
+                                            <div class="help-block with-errors"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br/>
+                                <div id="procDateGroup" class="form-group">
+                                    <label class="procedureDateLabel">{{ _("Date") }}:</label>
+                                    <div class="flex">
+                                        <div>
+                                            <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" >
+                                        </div>
+                                        <div>
+                                            <select class="form-control" name="procMonth" id="procMonth">
+                                                <option value="">{{ _("Month") }}...</option>
+                                                <option value="01">{{ _("January") }}</option>
+                                                <option value="02">{{ _("February") }}</option>
+                                                <option value="03">{{ _("March") }}</option>
+                                                <option value="04">{{ _("April") }}</option>
+                                                <option value="05">{{ _("May") }}</option>
+                                                <option value="06">{{ _("June") }}</option>
+                                                <option value="07">{{ _("July") }}</option>
+                                                <option value="08">{{ _("August") }}</option>
+                                                <option value="09">{{ _("September") }}</option>
+                                                <option value="10">{{ _("October") }}</option>
+                                                <option value="11">{{ _("November") }}</option>
+                                                <option value="12">{{ _("December") }}</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
+                                        </div>
+                                        <div>
+                                            <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                         <div class="col-md-9 col-xs-10">
+                                            <div id="procDateErrorContainer" class="help-block with-errors"></div>
+                                         </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <hr style="border-bottom: 1px solid #e5e5e5">
+                                <div class="inner">
+                                    <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                                    <div id="userProcedures"></div>
+                                </div>
+                            </form>
+                            <br/>
+                        <div>
                     </div>
                 </div>
             </div>
-            <br/>
-            <div id="procDateGroup" class="form-group">
-                <label class="procedureDateLabel">{{ _("Date") }}:</label>
-                <div class="flex">
-                    <div>
-                        <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" >
-                    </div>
-                    <div>
-                        <select class="form-control" name="procMonth" id="procMonth">
-                            <option value="">{{ _("Month") }}...</option>
-                            <option value="01">{{ _("January") }}</option>
-                            <option value="02">{{ _("February") }}</option>
-                            <option value="03">{{ _("March") }}</option>
-                            <option value="04">{{ _("April") }}</option>
-                            <option value="05">{{ _("May") }}</option>
-                            <option value="06">{{ _("June") }}</option>
-                            <option value="07">{{ _("July") }}</option>
-                            <option value="08">{{ _("August") }}</option>
-                            <option value="09">{{ _("September") }}</option>
-                            <option value="10">{{ _("October") }}</option>
-                            <option value="11">{{ _("November") }}</option>
-                            <option value="12">{{ _("December") }}</option>
-                        </select>
-                    </div>
-                    <div>
-                        <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
-                    </div>
-                    <div>
-                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
-                    </div>
-                </div>
-                <div class="row">
-                     <div class="col-md-9 col-xs-10">
-                        <div id="procDateErrorContainer" class="help-block with-errors"></div>
-                     </div>
-                </div>
-            </div>
-            <br />
-            <hr style="border-bottom: 1px solid #e5e5e5">
-            <div class="inner">
-                <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
-                <div id="userProcedures"></div>
-            </div>
-        </form>
-        <br/>
-    <div>
+    </div>
     <script>
         var subjectId = {{ person.id if person}};
         var currentUserId = {{ current_user.id if current_user}};
