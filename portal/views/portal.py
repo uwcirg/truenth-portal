@@ -542,9 +542,10 @@ def legal():
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    response_text = VersionedResource.fetch_elements(app_text(Terms_ATMA.name_key()))[0]
+    content, _ = VersionedResource.fetch_elements(
+            app_text(Terms_ATMA.name_key()))
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        content=response.json())
+        content=content)
 
 @portal.route('/about')
 def about():
