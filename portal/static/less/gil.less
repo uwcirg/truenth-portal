@@ -7210,6 +7210,23 @@ a.home--modal-link {
     color: #8F9385;
     opacity: 0.9;
 }
+.watermark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #4c5e6e;
+  z-index: 100000;
+  font-weight: bold;
+  font-size: 0.9em;
+  text-align: center;
+  width: 100%;
+  background-color: #eff2f5;
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  padding-top: 0.4em;
+  padding-bottom: 0.2em;
+  height: 2.15em;
+}
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;
@@ -7246,6 +7263,12 @@ a.home--modal-link {
     }
     a.home--modal-link {
         display: inline-block;
+    }
+}
+@media (max-width: 899px) {
+    .watermark {
+        height: 1.1em;
+        padding: 0;
     }
 }
 @media (max-width: 750px) {
