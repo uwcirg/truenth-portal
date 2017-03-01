@@ -1,4 +1,4 @@
-"""Unit test module for Procedure API and model"""
+"""Unit test module for Encounter API and model"""
 import dateutil
 import json
 import os
