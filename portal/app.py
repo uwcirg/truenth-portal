@@ -6,7 +6,6 @@ import pkginfo
 import sys
 import requests_cache
 from flask import Flask
-from flask_webtest import get_scopefunc
 import redis
 from urlparse import urlparse
 
@@ -109,7 +108,6 @@ def configure_extensions(app):
     db.init_app(app)
     if app.testing:
         session_options = {}
-        session_options['scopefunc'] = get_scopefunc()
         db.session_options = session_options
 
     # flask-user
