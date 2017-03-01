@@ -1161,22 +1161,6 @@ def add_authomatic_user(authomatic_user, image_url):
     return user
 
 
-def add_anon_user():
-    """Anonymous user generation.
-
-    Acts like real user without any authentication.  Used to persist
-    data and handle similar communication with client apps (interventions).
-
-    Bound to the session - an anonymous user can also be promoted to
-    a real user at a later time in the session.
-
-    """
-    user = User()
-    db.session.add(user)
-    add_role(user, ROLE.ANON)
-    return user
-
-
 class RoleError(ValueError):
     pass
 
