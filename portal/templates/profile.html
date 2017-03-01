@@ -2,24 +2,8 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
+<div id="stickyMenu"></div>
 <br/>
-<div class="flex">
-<div class="profile-header">
-    {% if user and user.username %}
-      {% if providerPerspective == 'true' %}
-          <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
-      {% elif current_user.has_role('admin') %}
-          <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
-      {% else %}
-           <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
-      {% endif %}
-    {% else %}
-       <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
-    {% endif %}
-</div>
-{{profileImage(user)}}
-</div>
-<nav id="indexNavBar">
 {% if providerPerspective == 'true' %}
 {{ back_link('patients', _('Patients List')) }}
 {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
@@ -27,45 +11,55 @@
 {% else %}
 {{ back_link(PORTAL, _('Home')) }}
 {% endif %}
-<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-{% if current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) %}
-&nbsp;&nbsp;<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
-<!-- shown only in reduced browser size-->
-<div id="navMenuXs" class="btn-group link-xs">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{ _("Select") }} <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
-  </ul>
-</div>
-
-<div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.9em">
-            <br/>
-            <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
-          </div>
-        </div>
+<a class="open" href="#"><span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="bottom" title="index list"></span></a>
+<div class="left-panel"></div>
+<div class="right-panel">
+<div class="flex">
+      <div id="profileHeader" class="profile-header">
+        {% if user and user.username %}
+          {% if providerPerspective == 'true' %}
+              <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+          {% elif current_user.has_role('admin') %}
+              <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+          {% else %}
+               <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+          {% endif %}
+        {% else %}
+           <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
+        {% endif %}
       </div>
+      {{profileImage(user)}}
 </div>
+{% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT)) %}
+    <nav id="indexNavBar">
+    <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
+    <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
+              </div>
+              <div class="modal-body" style="font-size:0.9em">
+                <br/>
+                <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
+                <br/>
+              </div>
+              <div class="modal-footer">
+                <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
+              </div>
+            </div>
+          </div>
+    </div>
+    </nav>
 {% endif %}
-</nav>
 <div id="indexContainer">{{ _("Index List") }}</div>
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
   <div class="row">
-      <div class="col-md-12">
+      <div class="col-lg-12 col-md-12 col-sm-12">
           {{profile(user, current_user, consent_agreements)}}
           <br/>
           {% if providerPerspective == 'true' %}
@@ -76,6 +70,7 @@
       </div>
   </div>
 </form>
+</div>
 {% endblock %}
 
 {% block document_ready %}
@@ -86,9 +81,7 @@ function handleLoginAs() {
     //sessionStorage does not work allow addition of item in private mode
     try {
       sessionStorage.setItem("loginAsPatient", "true");
-    } catch(e) {
-
-    }
+    } catch(e) {}
     location.replace('/login-as/{{user.id}}');
 };
 
@@ -98,8 +91,18 @@ function goTo(event, id) {
     $("#indexContainer").removeClass("open");
 };
 
+var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter;
+
 $(document).ready(function(){
+
     $('#loginAsPatient a').tooltip();
+
+    $("a.open").on("click", function(e) {
+      // stop default browser behavior
+      e.preventDefault();
+      $("body").toggleClass("open-nav");
+      $("#stickyMenu").toggleClass("sticky-show")
+    });
 
     [{
         attachID: "month",
@@ -180,7 +183,7 @@ $(document).ready(function(){
         };
     });
 
-    if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
+    if (!(_isTouchDevice())) $('span[data-toggle="tooltip"]').tooltip();
 
     $("html").click(function(event){
         $("#indexContainer").removeClass('open');
@@ -191,14 +194,29 @@ $(document).ready(function(){
         $('#indexContainer').toggleClass('open');
     });
 
-
-    var t = $("#profileForm").find("h4.profile-item-title");
-    var indexContent = "<ul style='padding:0; margin:0; list-style-type:square'>";
+    $(window).scroll(function() {
+        if (!(__navBar.isOnScreen())) {
+            __stickyMenu.css("top", "1em")
+        } else {
+          __stickyMenu.css("top",__stickyMenu_topPos);
+        };
+    });
+    $(window).resize(function() {
+        if (__stickyMenu.hasClass("sticky-show")) $("a.open").trigger("click");
+    });
+    var t = $("#profileForm").find("h4.index-item");
+    var indexContent = "<p class='title'><em>Click</em> each to go to section:</p><ul>";
         t.each(function() {
-        indexContent += "<li style='margin-bottom:4px; cursor:pointer' onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
+        if ($(this).is(":visible")) {
+          indexContent += "<li onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
+        };
     });
     indexContent += "</ul>";
     $("#indexContainer").html(indexContent);
+    $("#stickyMenu").html(indexContent);
+    __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter");
+
+    $("a.open").trigger("click");
 
     //in profile email is validated and updated after ajax call to check unique email
     $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');

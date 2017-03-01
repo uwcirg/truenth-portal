@@ -56,7 +56,8 @@
 {%- endmacro %}
 
 {% macro back_link(url,text) -%}
-<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="{{ _('back to') }} {{text}}"></span></a></div>
+<a class="back" href="{{PORTAL}}/{{url}}">
+<span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="back" data-original-title="back to Patients List"></span></a>
 {%- endmacro %}
 
 
