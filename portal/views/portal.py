@@ -17,11 +17,11 @@ from ..models.app_text import app_text, VersionedResource
 from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
-from ..models.intervention import Intervention, INTERVENTION
+from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
-from ..models.user import add_anon_user, current_user, get_user, User
+from ..models.user import current_user, get_user, User
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
@@ -605,34 +605,6 @@ def contact_sent(message_id):
         abort(404, "Message not found")
     return render_template('contact_sent.html', message=message)
 
-@portal.route('/questions')
-def questions():
-    """New user question view.  Creates anon user if none in session"""
-    user = current_user()
-    if not user:
-        user = add_anon_user()
-        db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id,
-            subject_id=user.id, context='account')
-        session['id'] = user.id
-        login_user(user)
-
-    return render_template('questions.html', user=user)
-
-
-@portal.route('/questions_anon')
-def questions_anon():
-    """Anonymous questions function"""
-    user = current_user()
-    if not user:
-        user = add_anon_user()
-        db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id,
-            subject_id=user.id, context='account')
-        session['id'] = user.id
-        login_user(user)
-    return render_template('questions_anon.html', user=user,
-                           interventions=INTERVENTION)
 
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',
