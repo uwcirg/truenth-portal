@@ -857,7 +857,7 @@
  <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
-                <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Question") }}</h4>
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{{ _("Clinical Question") }}</h4>
                 <p class="text-muted">{{ _("Question inquired of the patient at account creation") }}</p>
                 <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
                 <div id="pcaLocalizedContainer" class="well" style="margin-top: 1em; padding: 0.7em 2em 1em 2em">
@@ -904,7 +904,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="profile-item-container">
-                <h4 id="clinicalQuestionsLoc" class="profile-item-title">{{ _("Clinical Questions") }}</h4>
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{{ _("Clinical Questions") }}</h4>
                 <h4 class="text-muted">{{ _("Questions inquired of the patient at registration") }}</h4>
                 <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
                 <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 2em 2em">
@@ -1010,7 +1010,7 @@
     <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="interventionReportsLoc" class="profile-item-title">{{ _("Intervention Reports") }}</h4>
+                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Intervention Reports") }}</h4>
                     <div>
                         {% if person and person.staff_html() %}
                             {{person.staff_html() | safe}}
@@ -1079,7 +1079,7 @@
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">
-                <h4 id="deathLoc" class="profile-item-title">{{ _("Deceased Status") }}</h4>
+                <h4 id="deathLoc" class="profile-item-title index-item">{{ _("Deceased Status") }}</h4>
                 <br/>
                 <input type="hidden" id="deathDate" value="" />
                 <div class="checkbox" id="boolDeathGroup">
@@ -1194,7 +1194,6 @@
 {% macro profileCustomDetail(person) -%}
      <div class="row">
         <div class="col-md-12 col-xs-12">
-            <br/>
             <h4 class="profile-item-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
                 <div class="profile-item-container custom-container-item-right">
@@ -1241,7 +1240,7 @@
     {% if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <h4 class="profile-item-title">Patient Details</h4>
+            <h4 class="profile-item-title detail-title">Patient Details</h4>
         </div>
     </div>
     {% endif %}
@@ -1249,15 +1248,15 @@
          <div class="row">
             <div class="col-md-6 col-xs-12">
                 <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
-                    <h4 id="patientInformationLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                    <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                 </div>
             </div>
-            <div class="col-md-6 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-12">
                 <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg one-side{%endif%}{%else%}side-lg{%endif%}">
-                    <h4 id="communicationsLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     {{profilePhone(person)}}
                     {{profileEmail(person)}}
                     {{profileSendEmail(person)}}
@@ -1266,21 +1265,21 @@
         </div>
     {% else %}
         <div class="row">
-            <div class="col-md-7 col-xs-12">
+            <div class="col-md-7 col-sm-6 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role('patient') %}
-                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("Patient Information") }}</h4>
+                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("Patient Information") }}</h4>
                      {% else %}
-                        <h4 id="patientInformationLoc" class="profile-item-title">{{ _("User Information") }}</h4>
+                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("User Information") }}</h4>
                      {% endif %}
                      <br/>
                      {{profileName(person)}}
                      {{profileBirthDate(person)}}
                 </div>
             </div>
-            <div class="col-md-5 col-xs-12">
+            <div class="col-md-5 col-sm-6 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
-                    <h4 id="communicationLoc" class="profile-item-title">{{ _("Communications") }}</h4>
+                    <h4 id="communicationLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <br/>
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
@@ -1293,7 +1292,7 @@
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title">{{ _("PRO Questionnaires") }}</h4>
+                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("PRO Questionnaires") }}</h4>
                     {{profileSessionList(person, current_user)}}
                 </div>
             </div>
@@ -1315,7 +1314,7 @@
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">
-                <h4 id="orgsLoc" class="profile-item-title">{{ _("Organization Affiliation") }} / {{ _("Clinics") }}</h4>
+                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Organization Affiliation") }} / {{ _("Clinics") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
         </div>
@@ -1324,7 +1323,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="patientDetailLoc" class="profile-item-title">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
                     <div class="flex">
                         <div>
                             {{profileGender(person)}}
@@ -1346,7 +1345,7 @@
      <div class="row">
         <div class="col-md-12 col-xs-12">
             <div  class="profile-item-container">
-                <h4 id="timeZoneLocaleLoc" class="profile-item-title">Locale / Time Zone</h4>
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">Locale / Time Zone</h4>
                 <div class="flex">
                     <div class="timezone-container">
                         {{profileLocale(person)}}
@@ -1362,7 +1361,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="patientReportsLoc" class="profile-item-title">{{ _("Patient Reports") }}</h4>
+                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
                     {{patientReports(person)}}
                 </div>
             </div>
@@ -1372,7 +1371,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
                     {{profileConsent(person, current_user)}}
                 </div>
             </div>
@@ -1385,7 +1384,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                     <h4 id="rolesLoc" class="profile-item-title">{{ _("User Roles") }}</h4>
+                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("User Roles") }}</h4>
                     {{profileRole(person, current_user)}}
                 </div>
             </div>
@@ -1395,7 +1394,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="auditLogLoc" class="profile-item-title">{{ _("Audit Log") }}</h4>
+                    <h4 id="auditLogLoc" class="profile-item-title index-item">{{ _("Audit Log") }}</h4>
                     {{profileAuditLog(person, current_user)}}
                 </div>
             </div>
@@ -1418,7 +1417,7 @@
     <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="clinicalDataLoc" class="profile-item-title">{{ _("Clinical Data") }}</h4>
+                    <h4 id="clinicalDataLoc" class="profile-item-title index-item">{{ _("Clinical Data") }}</h4>
                     <div>
                         <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
                             date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>

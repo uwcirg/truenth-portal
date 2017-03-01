@@ -41,6 +41,92 @@ body {
 #mainNav {
   height: 71px;
 }
+#stickyMenu {
+  position: fixed;
+  top: 16em;
+  left: 0;
+  -webkit-transform: translate(-500px, 0);
+  transform(-500px, 0);
+  transition: transform 0.5s ease;
+  right: 0;
+  padding: 1.5em 0.8em;
+  font-size: 0.75em;
+  min-height: 370px;
+  height: 55%;
+  color: #4f5256;
+  width: 200px;
+  border: solid 1px #E0E6E3;
+  margin-left: 4em;
+  border-radius: 8px;
+  z-index: 11;
+  background-color: #FFF;
+  overflow: auto;
+  transition: all 500ms ease-in;
+}
+#stickyMenu .title {
+  color: #5b5e61;
+  font-weight: bold;
+}
+#stickyMenu ul {
+  padding:0;
+  margin:0;
+  list-style-type:none;
+}
+#stickyMenu li {
+  margin-bottom:6px;
+  cursor:pointer;
+}
+#stickyMenu li:hover {
+  color: #337ab7;
+}
+#stickyMenu.sticky-show {
+  -webkit-transform: translate(0, 0);
+  transform: translate(0, 0);
+}
+#stickyMenu::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
+    width: 0px;  /* remove scrollbar space */
+    background: transparent;  /* optional: just make scrollbar invisible */
+}
+a.open, a.back {
+  position: fixed;
+  left: 1em;
+  top: 12.3em;
+  z-index: 100;
+  cursor: pointer;
+  display: none;
+}
+a.open {
+  top: 14em;
+}
+div.left-panel {
+  position:fixed;
+  padding: 10px;
+  top: 0;
+  left: 0;
+  height:100%;
+  width:50px;
+  background:#d7dee6;
+  transition: width ease .5s;
+  z-index: -1;
+  display: none;
+}
+
+body.open-nav .left-panel {
+    width:270px;
+}
+div.right-panel {
+  position:relative;
+  margin-left:25px;
+  transition:margin-left ease .5s;
+}
+
+body.open-nav .right-panel {
+    margin-left:245px;
+}
+
+h4.detail-title {
+  display: none;
+}
 a.btn {
   font-size: 16px;
 }
@@ -137,8 +223,6 @@ div.orglist-selector div.org-container label.org-label {
 .access-button {
   opacity: 1;
   box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
-  /*border-color: rgb(221, 221, 221);
-    background-color: rgb(52, 152, 219);*/
   border-color: #E0E6E3;
   background-color: #606a73;
   background-image: none;
@@ -192,14 +276,12 @@ div.orglist-selector div.org-container label.org-label {
   display: block;
   padding: 1.8em 2em;
   position: absolute;
-  /*-webkit-transform: translate(-1000px, 0);
-transform(-1000px, 0);*/
   display: none;
   -webkit-transform: translate(0, -200px);
   transform: translate(0, -200px);
   transition: all 0.5s ease;
   z-index: 9;
-  width: 25%;
+  width: 50%;
   min-width: 200px;
   max-width: 100%;
   border-radius: 4px;
@@ -215,20 +297,21 @@ transform(-1000px, 0);*/
   transform: translate(0, 0);
   display: block;
 }
+#indexContainer li {
+  cursor: pointer;
+}
 #indexNavBar {
   width: 100%;
   max-width: 100%;
   color: #575F5C;
   border-top: 1px solid  #E0E6E3;
   border-bottom: 1px solid  #E0E6E3;
-  padding: 0.3em 0.25em;
-  /*background-image: linear-gradient(
-      to right,
-      #FFF, rgba(173, 193, 197, 0.16), rgba(173, 193, 197, 0.26)
-  );*/
-  /*background-image: linear-gradient( to right, #ffffff, rgba(183, 193, 195, 0.16), rgba(186, 190, 191, 0.18) );*/
+  padding: 0.5em 0.2em 0.7em 0.2em;
   background-image: linear-gradient(to right, #ffffff, rgba(159, 165, 167, 0.16), rgba(173, 193, 197, 0.18));
   vertical-align: center;
+}
+#indexNavBar span.index-list {
+  display: block;
 }
 #indexNavBar span.glyphicon {
   cursor: pointer;
@@ -246,8 +329,6 @@ transform(-1000px, 0);*/
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   border-radius: 4px;
-  /*position: relative;
-    top: 2px;*/
   margin-left: -4px;
   display: inline-block;
 }
@@ -283,10 +364,6 @@ transform(-1000px, 0);*/
 #indexNavBar #backLink span {
   position: relative;
   top: 1.7px;
-}
-#indexNavBar .link-xs {
-  margin-left: 8px;
-  display: none;
 }
 #patientList #_downloadLink {
    visibility: hidden;
@@ -1048,6 +1125,11 @@ table.profile-audit-log TH,
 .flex div {
   margin: 0.5em 1.2em 0.5em 0.1em;
 }
+#phone,
+#email {
+    width: 300px;
+    max-width: 100%;
+}
 .pagination {
   font-size: 0.93em;
 }
@@ -1328,15 +1410,8 @@ div.org-container input[type="checkbox"] {
   }
 
   #indexNavBar {
+    padding-top: 0.4em;
     max-width: 100%;
-  }
-  #indexNavBar .link-xs {
-    display: inline-block;
-    font-size: 1em;
-    margin-top: -1px;
-  }
-  #indexNavBar span.link {
-    display: none;
   }
   #indexNavBar span.glyphicon {
     margin-left: -2px;
@@ -1518,6 +1593,14 @@ div.org-container input[type="checkbox"] {
     font-size: 24px;
   }
 }
+@media (min-width: 797px) {
+  #indexNavBar span.index-list {
+    display: none;
+  }
+  div.left-panel, a.back, a.open {
+    display: block;
+  }
+}
 @media (min-width: 991px) {
   #mainNav {
     height: 135px;
@@ -1551,6 +1634,7 @@ div.org-container input[type="checkbox"] {
   .one-side {
     height: 23em;
   }
+
 }
 @media (min-width: 992px) {
   /** Font sizes changes above 992 **/
@@ -1612,6 +1696,13 @@ div.org-container input[type="checkbox"] {
     margin-top: 4px;
   }
 }
+
+@media (max-width: 1029px) {
+  div.right-panel {
+    margin-left: 45px;
+  }
+}
+
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1620,6 +1711,7 @@ div.org-container input[type="checkbox"] {
     display: none;
   }
 }
+
 @media (min-width: 1200px) {
   #fullSizeContainer {
     padding: 60px 0 60px;
@@ -1657,7 +1749,6 @@ div.org-container input[type="checkbox"] {
     height: 4em;
   }
 }
-
 @media (max-width: 1300px) {
  #fullSizeBox {
     height: 680px;
@@ -1697,6 +1788,8 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0.5em;
   }
 }
+
+
 /*** https://github.com/lipis/bootstrap-social ***/
 .btn-social {
   position: relative;
