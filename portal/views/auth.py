@@ -149,9 +149,12 @@ def next_after_login():
     # current_user to the invited one once promoted.
     if 'invited_verified_user_id' in session:
         invited_user = User.query.get(session['invited_verified_user_id'])
+        logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
-        del session['invited_verified_user_id']
+        login_user(invited_user)
+        assert (invited_user == current_user())
+        assert ('invited_verified_user_id' not in session)
 
     # Present intial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
