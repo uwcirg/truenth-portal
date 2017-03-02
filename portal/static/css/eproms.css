@@ -139,7 +139,7 @@ div.left-panel {
   left: 0;
   height:100%;
   width:50px;
-  background:#d7dee6;
+  background:#e2e4d9;
   transition: width ease .5s;
   z-index: -1;
   display: none;
