@@ -7024,18 +7024,20 @@ a.home--modal-link {
   position: absolute;
   top: 0;
   right: 0;
-  color: #4c5e6e;
+  color: #603b00;
   z-index: 100000;
   font-weight: bold;
   font-size: 0.9em;
   text-align: center;
   width: 100%;
-  background-color: #eff2f5;
+  background-color: #eeab50;
   letter-spacing: 1px;
   text-transform: capitalize;
   padding-top: 0.4em;
   padding-bottom: 0.2em;
-  height: 2.15em;
+  height: 2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 @media (min-width: 1200px) {
     .home--item-container {
