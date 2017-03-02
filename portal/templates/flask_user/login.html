@@ -10,6 +10,9 @@
     #mainDiv {
         background: none;
     }
+    .watermark {
+        display: none;
+    }
 </style>
 
 <div id="fullSizeBox" class="box-min-500">
@@ -78,6 +81,10 @@ $("document").ready(function() {
     //console.log(qs["email"])
 
     if (qs["email"]) $("#email").val(qs["email"]);
+    (function() {
+        var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+        if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark-nowrapper").length == 0)) $("<div class='watermark-nowrapper'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
+    }) ();
 });
 
 {% endblock %}
