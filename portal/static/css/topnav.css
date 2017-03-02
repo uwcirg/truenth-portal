@@ -34,16 +34,13 @@
   position: absolute;
   top: 0;
   right: 0;
-  color: #e4e6e4;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-  filter: alpha(opacity=80); 
-  opacity: 0.8;
+  color: #603b00;
   z-index: 1000;
   font-weight: normal;
   font-size: 0.85em;
   text-align: center;
   width: 100%;
-  background-color: #735949;
+  background-color: #eeab50;
   letter-spacing: 1px;
   text-transform: capitalize;
 }
@@ -348,6 +345,7 @@
     padding: 1em;
     font-size: 0.7em;
     background-color: transparent;
+    color: #FFF;
   }
 }
 @media (min-width: 992px) {
