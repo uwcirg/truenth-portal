@@ -1246,7 +1246,7 @@
     {% endif %}
     {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and (current_user.id != person.id) %}
          <div class="row">
-            <div class="col-md-6 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
                     <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
@@ -1254,7 +1254,7 @@
                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                 </div>
             </div>
-            <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg one-side{%endif%}{%else%}side-lg{%endif%}">
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     {{profilePhone(person)}}
@@ -1265,7 +1265,7 @@
         </div>
     {% else %}
         <div class="row">
-            <div class="col-md-7 col-sm-6 col-xs-12">
+            <div class="col-md-7 col-sm-12 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role('patient') %}
                         <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("Patient Information") }}</h4>
@@ -1277,7 +1277,7 @@
                      {{profileBirthDate(person)}}
                 </div>
             </div>
-            <div class="col-md-5 col-sm-6 col-xs-12">
+            <div class="col-md-5 col-sm-12 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
                     <h4 id="communicationLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <br/>
