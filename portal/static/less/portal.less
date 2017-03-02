@@ -76,7 +76,7 @@ body {
   padding: 1.5em 0.8em;
   font-size: 0.75em;
   min-height: 370px;
-  height: 55%;
+  height: 60%;
   color: #4f5256;
   width: 200px;
   border: solid 1px #E0E6E3;
@@ -86,6 +86,7 @@ body {
   background-color: #FFF;
   overflow: auto;
   transition: all 500ms ease-in;
+  display: block;
 }
 #stickyMenu .title {
   color: #5b5e61;
@@ -1750,7 +1751,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 797px) {
-  #indexNavBar span.index-list {
+  #indexNavBar span.index-list, #indexNavBar, #indexContainer {
     display: none;
   }
   div.left-panel, a.back, a.open {
@@ -1860,6 +1861,15 @@ div.org-container input[type="checkbox"] {
     margin-left: 45px;
   }
 }
+@media (max-width: 1073px) {
+  body.open-nav .right-panel {
+    margin-left: 210px !important;
+  }
+  #stickyMenu {
+    font-size: 0.7em !important;
+    width: 150px !important;
+  }
+}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1911,6 +1921,17 @@ div.org-container input[type="checkbox"] {
 @media (max-width: 1300px) {
  #fullSizeBox {
     height: 680px;
+  }
+  #stickyMenu {
+    width: 150px !important;
+    font-size: 0.7em !important;
+  }
+  body.open-nav .left-panel {
+    width: 210px;
+  }
+
+  body.open-nav .right-panel {
+    margin-left: 180px;
   }
 }
 

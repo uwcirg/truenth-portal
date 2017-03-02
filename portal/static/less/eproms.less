@@ -134,6 +134,7 @@ body {
   background-color: #FFF;
   overflow: auto;
   transition: all 500ms ease-in;
+  display: block;
 }
 #stickyMenu .title {
   color: #5b5e61;
@@ -177,7 +178,7 @@ div.left-panel {
   left: 0;
   height:100%;
   width:50px;
-  background:#d7dee6;
+  background:#e2e4d9;
   transition: width ease .5s;
   z-index: -1;
   display: none;
@@ -1780,7 +1781,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 797px) {
-  #indexNavBar, #indexNavBar span.index-list {
+  #indexNavBar, #indexNavBar span.index-list, #indexContainer {
     display: none;
   }
   div.left-panel, a.back, a.open {
@@ -1911,6 +1912,15 @@ div.org-container input[type="checkbox"] {
     margin-left: 45px;
   }
 }
+@media (max-width: 1073px) {
+  body.open-nav .right-panel {
+    margin-left: 210px !important;
+  }
+  #stickyMenu {
+    font-size: 0.7em !important;
+    width: 150px !important;
+  }
+}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1963,6 +1973,17 @@ div.org-container input[type="checkbox"] {
 @media(max-width: 1300px) {
   #fullSizeBox {
     height: 680px;
+  }
+  #stickyMenu {
+    width: 150px !important;
+    font-size: 0.7em !important;
+  }
+  body.open-nav .left-panel {
+    width: 210px;
+  }
+
+  body.open-nav .right-panel {
+    margin-left: 180px;
   }
 }
 
