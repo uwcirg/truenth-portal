@@ -91,7 +91,7 @@ function goTo(event, id) {
     $("#indexContainer").removeClass("open");
 };
 
-var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter;
+var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter, __indexContainer, __indexIcon, __leftPanel;
 
 $(document).ready(function(){
 
@@ -202,7 +202,12 @@ $(document).ready(function(){
         };
     });
     $(window).resize(function() {
-        if (__stickyMenu.hasClass("sticky-show")) $("a.open").trigger("click");
+        if (__stickyMenu.hasClass("sticky-show")) {
+          if (__indexIcon.is(":visible")) $("a.open").trigger("click");
+        }
+        else {
+          if (__leftPanel.is(":visible")) __indexContainer.removeClass("open");
+        }
     });
 
     (function() {
@@ -220,9 +225,9 @@ $(document).ready(function(){
       if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 40);
     })();
 
-    __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter");
+    __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter"), __indexContainer = $("#indexContainer"), __indexIcon = $("#indexNavBar span.index-list"), __leftPanel = $(".left-panel");
 
-    $("a.open").trigger("click");
+    if (__leftPanel.is(":visible")) $("a.open").trigger("click");
 
     //in profile email is validated and updated after ajax call to check unique email
     $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');

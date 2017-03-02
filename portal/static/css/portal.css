@@ -62,6 +62,7 @@ body {
   background-color: #FFF;
   overflow: auto;
   transition: all 500ms ease-in;
+  display: block;
 }
 #stickyMenu .title {
   color: #5b5e61;
@@ -1594,7 +1595,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 797px) {
-  #indexNavBar span.index-list {
+  #indexNavBar span.index-list, #indexContainer {
     display: none;
   }
   div.left-panel, a.back, a.open {
@@ -1703,6 +1704,16 @@ div.org-container input[type="checkbox"] {
   }
 }
 
+@media (max-width: 1073px) {
+  body.open-nav .right-panel {
+    margin-left: 210px !important;
+  }
+  #stickyMenu {
+    font-size: 0.7em !important;
+    width: 150px !important;
+  }
+}
+
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1752,6 +1763,16 @@ div.org-container input[type="checkbox"] {
 @media (max-width: 1300px) {
  #fullSizeBox {
     height: 680px;
+  }
+  #stickyMenu {
+    width: 150px !important;
+    font-size: 0.7em !important;
+  }
+  body.open-nav .left-panel {
+    width: 210px;
+  }
+  body.open-nav .right-panel {
+    margin-left: 180px;
   }
 }
 

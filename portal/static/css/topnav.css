@@ -35,15 +35,15 @@
   top: 0;
   right: 0;
   color: #e4e6e4;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
-  filter: alpha(opacity=90); 
-  opacity: 0.9;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+  filter: alpha(opacity=80); 
+  opacity: 0.8;
   z-index: 1000;
   font-weight: normal;
   font-size: 0.85em;
   text-align: center;
   width: 100%;
-  background-color: #535454;
+  background-color: #735949;
   letter-spacing: 1px;
   text-transform: capitalize;
 }
