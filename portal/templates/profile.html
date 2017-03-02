@@ -11,7 +11,7 @@
 {% else %}
 {{ back_link(PORTAL, _('Home')) }}
 {% endif %}
-<a class="open" href="#"><span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="bottom" title="index list"></span></a>
+<a class="open" href="#"><span class="glyphicon index-list glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="index list"></span></a>
 <div class="left-panel"></div>
 <div class="right-panel">
 <div class="flex">
@@ -32,7 +32,7 @@
 </div>
 {% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT)) %}
     <nav id="indexNavBar">
-    <span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
+    <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
     <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
     <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
           <div class="modal-dialog" role="document">
@@ -204,16 +204,22 @@ $(document).ready(function(){
     $(window).resize(function() {
         if (__stickyMenu.hasClass("sticky-show")) $("a.open").trigger("click");
     });
-    var t = $("#profileForm").find("h4.index-item");
-    var indexContent = "<p class='title'><em>Click</em> each to go to section:</p><ul>";
-        t.each(function() {
-        if ($(this).is(":visible")) {
-          indexContent += "<li onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
-        };
-    });
-    indexContent += "</ul>";
-    $("#indexContainer").html(indexContent);
-    $("#stickyMenu").html(indexContent);
+
+    (function() {
+      var t = $("#profileForm").find("h4.index-item");
+      var indexContent = "<p class='title'><em>Click</em> each to go to section:</p><ul>";
+          t.each(function() {
+          if ($(this).is(":visible")) {
+            indexContent += "<li onclick=' goTo(event, \"" + $(this).attr("id") + "\");'>" + $(this).text() + "</li>";
+          };
+      });
+      indexContent += "</ul>";
+      $("#indexContainer").html(indexContent);
+      $("#stickyMenu").html(indexContent);
+      var listHeight = $("#stickyMenu ul").height();
+      if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 40);
+    })();
+
     __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter");
 
     $("a.open").trigger("click");
