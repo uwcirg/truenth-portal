@@ -77,7 +77,7 @@ body {
   margin-bottom:6px;
   cursor:pointer;
 }
-#stickyMenu li:hover {
+#stickyMenu a:hover {
   color: #337ab7;
 }
 #stickyMenu.sticky-show {
@@ -292,6 +292,9 @@ div.orglist-selector div.org-container label.org-label {
   -webkit-box-shadow: 3px 4px 5px 0px #c5c7c5;
   -moz-box-shadow: 3px 4px 5px 0px #c5c7c5;
   box-shadow: 3px 4px 5px 0px #c5c7c5;
+}
+#indexContainer a {
+  color: #FFF;
 }
 #indexContainer.open {
   -webkit-transform: translate(0, 0);
