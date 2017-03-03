@@ -1257,7 +1257,7 @@ def present_assessment(instruments=None):
         queued_instruments = instruments
 
     # Combine requested instruments into single list, maintaining order
-    common_instruments = queued_instruments + resume_instruments
+    common_instruments = resume_instruments + queued_instruments
     common_instruments = sorted(
         set(common_instruments),
         key=lambda x: common_instruments.index(x)
