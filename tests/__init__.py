@@ -17,6 +17,7 @@ from portal.config import TestConfig
 from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.auth import Client
+from portal.models.coredata import configure_coredata
 from portal.models.fhir import CC, Coding, CodeableConcept
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
@@ -27,7 +28,9 @@ from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
 from portal.models.user import User, UserRoles
-from portal.models.user_consent import UserConsent
+from portal.models.user_consent import UserConsent, SEND_REMINDERS_MASK
+from portal.models.user_consent import STAFF_EDITABLE_MASK
+from portal.models.user_consent import INCLUDE_IN_REPORTS_MASK
 from portal.system_uri import SNOMED
 
 TEST_USER_ID = 1
@@ -167,8 +170,11 @@ class TestCase(Base):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         tou = ToU(audit=audit, agreement_url='http://not.really.org')
         parent_org = OrgTree().find(org.id).top_level()
-        consent = UserConsent(user_id=TEST_USER_ID, organization_id=parent_org,
-                              audit=audit, agreement_url='http://fake.org')
+        options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
+                   SEND_REMINDERS_MASK)
+        consent = UserConsent(
+            user_id=TEST_USER_ID, organization_id=parent_org,
+            options=options, audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
             db.session.add(tou)
             db.session.add(consent)
@@ -223,6 +229,13 @@ class TestCase(Base):
         self.init_data()
 
         self.client = self.__app.test_client()
+
+        # removed unwanted config items if present
+        for item in ('REQUIRED_CORE_DATA', 'LOCALIZED_AFFILIATE_ORG'):
+            if item in self.client.application.config:
+                del self.client.application.config[item]
+        # reload coredata config
+        configure_coredata(self.client.application)
 
     def tearDown(self):
         """Clean db session.
