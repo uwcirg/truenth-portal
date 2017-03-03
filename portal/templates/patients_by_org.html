@@ -171,8 +171,8 @@ $(document).ready(function() {
         $("#_downloadLink")[0].click();
         //$("#dataDownloadModal").modal("hide");
     } else {
-        var message = (instruments == "" ? "Please choose at least one instrument.": "");
-        message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+        message = (instruments == "" ? "Please choose at least one instrument.": "");
+        if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
         $("#_downloadMessage").html(message);
     };
   });
