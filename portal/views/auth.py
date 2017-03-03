@@ -9,7 +9,7 @@ from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
-from flask_login import login_user, logout_user
+from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import user_logged_in, user_registered
 from flask_wtf import FlaskForm
@@ -23,7 +23,9 @@ from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
 from ..models.coredata import Coredata
+from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
+from ..models.login import login_user
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
@@ -75,6 +77,8 @@ def deauthorized():
 def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
+    login_user(user, 'password_authenticated')
+
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event("local user registered", user_id=user.id, subject_id=user.id,
@@ -208,7 +212,7 @@ def login(provider_name):
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
         user = current_user()
-        login_user(user)
+        login_user(user, 'password_authenticated')
         return next_after_login()
 
     def picture_url(result):
@@ -311,7 +315,7 @@ def login(provider_name):
                 db.session.commit()
             session['id'] = user.id
             session['remote_token'] = result.provider.credentials.token
-            login_user(user)
+            login_user(user, 'password_authenticated')
             return next_after_login()
     else:
         return response
@@ -320,7 +324,7 @@ def login(provider_name):
 @auth.route('/login-as/<user_id>')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
-def login_as(user_id):
+def login_as(user_id, auth_method):
     """Provide direct login w/o auth to user account, but only if qualified
 
     Special individuals may assume the identity of other users, but only
@@ -331,16 +335,20 @@ def login_as(user_id):
     If qualified, the current user's session is destroyed and the requested
     user is logged in - passing control to 'next_after_login'
 
+    :param user_id: User (patient) to assume identity of
+    :param auth_method: Expected values include 'staff_authenticated' and
+      'staff_handed_to_patient', depending on context.
+
     """
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
     auditable_event("assuming identity of user {}".format(user_id),
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
-    
+
     logout(prevent_redirect=True, reason="forced from login_as")
     session['login-as'] = True
-    login_user(get_user(user_id))
+    login_user(get_user(user_id), auth_method)
     return next_after_login()
 
 
@@ -414,6 +422,9 @@ def logout(prevent_redirect=False, reason=None):
     logout_user()
     session.clear()
     notify_clients(user_id)
+    if user:
+        finish_encounter(user)
+    db.session.commit()
     if prevent_redirect:
         return
     return redirect('/' if not timed_out else '/?timed_out=1')
