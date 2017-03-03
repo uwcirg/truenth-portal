@@ -2,6 +2,18 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
+<style>
+/*inline styling specific to profile page due to new two panel layout*/
+@media (max-width: 1737px) {
+  .footer-container {
+    clear: both;
+    border-top: 0 !important;
+  }
+  .container {
+    overflow: hidden;
+  }
+}
+</style>
 <div id="stickyMenu"></div>
 <br/>
 {% if providerPerspective == 'true' %}
@@ -11,7 +23,7 @@
 {% else %}
 {{ back_link(PORTAL, _('Home')) }}
 {% endif %}
-<a class="open" href="#"><span class="glyphicon index-list glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="show/hide index list"></span></a>
+<a class="open" href="#"><span class="glyphicon index-list glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="expand/collapse index list"></span></a>
 <div class="left-panel"></div>
 <div class="right-panel">
 <div class="flex">

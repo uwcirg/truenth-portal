@@ -28,7 +28,7 @@
 @sectionTitleColor: #5b5e61;
 @sectionBorderColor: #E0E6E3;
 @rowBackgroundColor: #8a8e90;
-@tooltipColor: #575a4d;
+@tooltipColor: #39464e;
 
 html {
   -webkit-box-sizing: border-box;
@@ -123,6 +123,9 @@ a.open, a.back {
 a.open {
   top: 14em;
 }
+a.open:hover, a.back:hover {
+  color: #3f51b5
+}
 div.left-panel {
   position:fixed;
   padding: 10px;
@@ -141,7 +144,7 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position:relative;
-  margin-left:25px;
+  margin-left: 1em;
   transition:margin-left ease .5s;
 }
 
@@ -418,19 +421,28 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   height: 2.6em;
 }
 
-#patientsInstrumentList div.checkbox label {
-  font-size: 0.8em;
+#dataDownloadModal {
+  .modal-body {
+    padding: 1em
+  }
+  button {
+    font-size:0.8em;
+  }
+  .profile-radio-list {
+    margin-left:1em
+  }
+  div.checkbox label{
+    font-size: 0.8em;
+  }
+  label.radio-inline {
+    font-size: 0.8em;
+  }
+  input[type="radio"] {
+    position: relative;
+    top: -1px;
+    left: -1px;
+  }
 }
-
-#dataDownloadModal .modal-body {
-   padding: 1em
- }
- #dataDownloadModal button {
-   font-size:0.8em;
- }
- #dataDownloadModal .profile-radio-list {
-   margin-left:1em
- }
  #_downloadMessage {
    color:#a94442
  }
@@ -1343,7 +1355,7 @@ color: #777
     background-color: @tooltipColor;
     border: 1px solid @tooltipColor;
     padding: 0.3em;
-    width: 150%;
+    width: 170%;
     font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
@@ -1711,7 +1723,6 @@ div.org-container input[type="checkbox"] {
   }
 }
 
-
 @media (min-width: 768px) {
   #fullSizeBox {
     /*background-image: none;
@@ -1856,20 +1867,7 @@ div.org-container input[type="checkbox"] {
     }
   }
 }
-@media (max-width: 1029px) {
-  div.right-panel {
-    margin-left: 45px;
-  }
-}
-@media (max-width: 1073px) {
-  body.open-nav .right-panel {
-    margin-left: 210px !important;
-  }
-  #stickyMenu {
-    font-size: 0.7em !important;
-    width: 150px !important;
-  }
-}
+
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1927,11 +1925,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 210px;
-  }
-
-  body.open-nav .right-panel {
-    margin-left: 190px;
+    width: 220px;
   }
 }
 
@@ -1963,6 +1957,58 @@ div.org-container input[type="checkbox"] {
     .btn {
       margin-bottom: 0.5em;
     }
+  }
+}
+@media (max-width: 1745px) {
+  body.open-nav .right-panel {
+    margin-left: 60px;
+}
+@media (max-width: 1632px) {
+  body.open-nav .right-panel {
+    margin-left: 100px;
+}
+@media (max-width: 1560px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+}
+@media (max-width: 1491px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+@media (max-width: 1399px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
+  }
+}
+@media (max-width: 1341px) {
+  body.open-nav .right-panel {
+    margin-left:220px;
+  }
+}
+@media (max-width: 1271px) {
+  div.right-panel {
+    margin-left: 2.5em;
+  }
+}
+@media (max-width: 1199px) {
+  body.open-nav .right-panel {
+    margin-left:190px;
+  }
+}
+@media (max-width: 1070px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
+  }
+}
+@media (max-width: 991px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+@media (max-width: 881px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
   }
 }
 

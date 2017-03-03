@@ -133,6 +133,9 @@ a.open, a.back {
 a.open {
   top: 14em;
 }
+a.open:hover, a.back:hover {
+  color: #356d43
+}
 div.left-panel {
   position:fixed;
   padding: 10px;
@@ -151,13 +154,10 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position:relative;
-  margin-left:25px;
+  margin-left:1em;
   transition:margin-left ease .5s;
 }
 
-body.open-nav .right-panel {
-    margin-left:245px;
-}
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -406,11 +406,16 @@ div.orglist-selector div.org-container label.org-label {
 #dataDownloadModal .profile-radio-list {
   margin-left:1em
 }
+#dataDownloadModal div.checkbox label, #dataDownloadModal label.radio-inline {
+  font-size: 0.8em;
+}
+#dataDownloadModal input[type="radio"] {
+  position: relative;
+  top: -1px;
+  left: -1px;
+}
 #_downloadMessage {
   color:#a94442
-}
-#patientsInstrumentList div.checkbox label {
-  font-size: 0.8em;
 }
 .orglist-download-container {
   display: inline-block;
@@ -1255,7 +1260,7 @@ sub.pointer:hover {
   background-color: #575a4d;
   border: 1px solid #575a4d;
   padding: 0.3em;
-  width: 150%;
+  width: 170%;
   font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
@@ -1764,15 +1769,6 @@ div.org-container input[type="checkbox"] {
     margin-top: 4px;
   }
 }
-@media (max-width: 1073px) {
-  body.open-nav .right-panel {
-    margin-left: 210px !important;
-  }
-  #stickyMenu {
-    font-size: 0.7em !important;
-    width: 150px !important;
-  }
-}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1828,11 +1824,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 210px;
-  }
-
-  body.open-nav .right-panel {
-    margin-left: 190px;
+    width: 220px;
   }
 }
 @media (min-width: 1400px) {
@@ -1866,6 +1858,68 @@ div.org-container input[type="checkbox"] {
   }
   .btn-set .btn {
     margin-bottom: 0.5em;
+  }
+}
+@media (max-width: 1745px) {
+  body.open-nav .right-panel {
+    margin-left: 60px;
+}
+
+@media (max-width: 1632px) {
+  body.open-nav .right-panel {
+    margin-left: 100px;
+}
+
+@media (max-width: 1560px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+}
+
+@media (max-width: 1491px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+
+@media (max-width: 1399px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
+  }
+}
+
+@media (max-width: 1341px) {
+  body.open-nav .right-panel {
+    margin-left:220px;
+  }
+}
+
+@media (max-width: 1271px) {
+  div.right-panel {
+    margin-left: 2.5em;
+  }
+}
+
+@media (max-width: 1199px) {
+  body.open-nav .right-panel {
+    margin-left:190px;
+  }
+}
+
+@media (max-width: 1070px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
+  }
+}
+
+@media (max-width: 991px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+
+@media (max-width: 881px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/

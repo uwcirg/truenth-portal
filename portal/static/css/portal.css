@@ -99,6 +99,9 @@ a.open, a.back {
 a.open {
   top: 14em;
 }
+a.open:hover, a.back:hover {
+  color: #3f51b5
+}
 div.left-panel {
   position:fixed;
   padding: 10px;
@@ -116,13 +119,9 @@ body.open-nav .left-panel {
     width:270px;
 }
 div.right-panel {
-  position:relative;
-  margin-left:25px;
+  position: relative;
   transition:margin-left ease .5s;
-}
-
-body.open-nav .right-panel {
-    margin-left:245px;
+  margin-left: 1em;
 }
 
 h4.detail-title {
@@ -286,7 +285,7 @@ div.orglist-selector div.org-container label.org-label {
   min-width: 200px;
   max-width: 100%;
   border-radius: 4px;
-  background-color: #9b9c95;
+  background-color: #79838a;
   color: #FFF;
   font-size: 0.85em;
   -webkit-box-shadow: 3px 4px 5px 0px #c5c7c5;
@@ -377,9 +376,6 @@ div.orglist-selector div.org-container label.org-label {
   font-size: 1.1em;
   height: 2.6em;
 }
-#patientsInstrumentList div.checkbox label {
-  font-size: 0.8em;
-}
 #dataDownloadModal .modal-body {
    padding: 1em
  }
@@ -389,6 +385,14 @@ div.orglist-selector div.org-container label.org-label {
  #dataDownloadModal .profile-radio-list {
    margin-left:1em
  }
+ #dataDownloadModal div.checkbox label, #dataDownloadModal label.radio-inline {
+  font-size: 0.8em;
+}
+#dataDownloadModal input[type="radio"] {
+  position: relative;
+  top: -1px;
+  left: -1px;
+}
  #_downloadMessage {
    color:#a94442
  }
@@ -1216,23 +1220,23 @@ sub.pointer:hover {
   color: #777;
 }
 .tooltip > .tooltip-inner {
-  background-color: #575a4d;
-  border: 1px solid #575a4d;
+  background-color: #39464e;
+  border: 1px solid #39464e;
   padding: 0.3em;
-  width: 150%;
+  width: 170%;
   font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
-  border-top-color: #575a4d;
+  border-top-color: #39464e;
 }
 .tooltip.right .tooltip-arrow {
-  border-right-color: #575a4d;
+  border-right-color: #39464e;
 }
 .tooltip.bottom .tooltip-arrow {
-  border-bottom-color: #575a4d;
+  border-bottom-color: #39464e;
 }
 .tooltip.left .tooltip-arrow {
-  border-left-color: #575a4d;
+  border-left-color: #39464e;
 }
 #consentContainer .consent {
   display: none;
@@ -1700,23 +1704,6 @@ div.org-container input[type="checkbox"] {
     margin-top: 4px;
   }
 }
-
-@media (max-width: 1029px) {
-  div.right-panel {
-    margin-left: 45px;
-  }
-}
-
-@media (max-width: 1073px) {
-  body.open-nav .right-panel {
-    margin-left: 210px !important;
-  }
-  #stickyMenu {
-    font-size: 0.7em !important;
-    width: 150px !important;
-  }
-}
-
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1772,10 +1759,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 210px;
-  }
-  body.open-nav .right-panel {
-    margin-left: 190px;
+    width: 220px;
   }
 }
 
@@ -1813,6 +1797,58 @@ div.org-container input[type="checkbox"] {
   }
 }
 
+@media (max-width: 1745px) {
+  body.open-nav .right-panel {
+    margin-left: 60px;
+}
+@media (max-width: 1632px) {
+  body.open-nav .right-panel {
+    margin-left: 100px;
+}
+@media (max-width: 1560px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+}
+@media (max-width: 1491px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+@media (max-width: 1399px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
+  }
+}
+@media (max-width: 1341px) {
+  body.open-nav .right-panel {
+    margin-left:220px;
+  }
+}
+@media (max-width: 1271px) {
+  div.right-panel {
+    margin-left: 2.5em;
+  }
+}
+@media (max-width: 1199px) {
+  body.open-nav .right-panel {
+    margin-left:190px;
+  }
+}
+@media (max-width: 1070px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
+  }
+}
+@media (max-width: 991px) {
+  body.open-nav .right-panel {
+    margin-left:180px;
+  }
+}
+@media (max-width: 881px) {
+  body.open-nav .right-panel {
+    margin-left:210px;
+  }
+}
 
 /*** https://github.com/lipis/bootstrap-social ***/
 .btn-social {
