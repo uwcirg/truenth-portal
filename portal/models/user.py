@@ -1087,7 +1087,7 @@ class User(db.Model, UserMixin):
                             if orgtree.at_or_below_ids(org_id, others_orgs):
                                 return True
 
-        abort(401, "Inadequate role for %s of %d" % (permission, other_id))
+        abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]
