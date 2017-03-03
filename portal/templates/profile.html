@@ -5,14 +5,20 @@
 <style>
 /*inline styling specific to profile page due to new two panel layout*/
 @media (max-width: 1737px) {
-  .footer-container {
-    clear: both;
-    border-top: 0 !important;
-  }
-  .container {
-    overflow: hidden;
-  }
+  body.open-nav .footer-container { border-top: 0 !important;}
+  .container { overflow: hidden;}
+  body.open-nav .copyright-container {padding-left: 4em; }
 }
+@media (max-width: 1611px) {body.open-nav .copyright-container {padding-left: 8em; }}
+@media (max-width: 1493px) {body.open-nav .copyright-container {margin-left: 12em; }}
+@media (max-width: 1361px) {body.open-nav .footer-container {text-align: right; padding-left: 1em;}}
+@media (max-width: 1351px) {body.open-nav .footer-container .pull-right { margin-right: -2em; }}
+@media (max-width: 1293px) {.copyright-container {padding-left: 2em;}}
+@media (max-width: 1082px) {
+  .copyright-container {margin-left: 2em;}
+  .footer-container {border-top: 0 !important;}
+}
+@media (max-width: 991px) { #homeFooter {padding-left: 3em !important;}}
 </style>
 <div id="stickyMenu"></div>
 <br/>
