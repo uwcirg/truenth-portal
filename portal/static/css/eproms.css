@@ -1873,15 +1873,34 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0.5em;
   }
 }
+@media (max-width: 1745px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
+  }
+}
 @media (max-width: 1417px) {
   body.open-nav .right-panel {
     margin-left:195px !important;
   }
 }
-
-@media (max-width: 1745px) {
+@media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:160px;
+    margin-left:120px !important;
+  }
+}
+@media (max-width: 1180px) {
+  body.open-nav .right-panel {
+    margin-left:140px !important;
+  }
+}
+@media (max-width: 1140px) {
+  body.open-nav .right-panel {
+    margin-left:190px !important;
+  }
+}
+@media (max-width: 1034px) {
+  body.open-nav .right-panel {
+    margin-left:210px !important;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/
