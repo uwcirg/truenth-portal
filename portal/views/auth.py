@@ -324,7 +324,7 @@ def login(provider_name):
 @auth.route('/login-as/<user_id>')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
-def login_as(user_id, auth_method):
+def login_as(user_id, auth_method='staff_authenticated'):
     """Provide direct login w/o auth to user account, but only if qualified
 
     Special individuals may assume the identity of other users, but only

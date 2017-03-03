@@ -7,6 +7,9 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.encounter import Encounter
+from portal.models.organization import Organization
+from portal.models.role import ROLE
+from portal.views.auth import login_as
 
 
 class TestEncounter(TestCase):
@@ -54,3 +57,23 @@ class TestEncounter(TestCase):
         self.assertEquals(
             service_user.current_encounter.auth_method,
             'service_token_authenticated')
+
+    def test_login_as(self):
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.PATIENT)
+        self.test_user = db.session.merge(self.test_user)
+        consented_org = self.test_user.valid_consents[0].organization_id
+        staff_user = self.add_user(username='staff@example.com')
+        staff_user.organizations.append(Organization.query.get(consented_org))
+        self.promote_user(user=staff_user, role_name=ROLE.STAFF)
+        staff_user = db.session.merge(staff_user)
+        self.login(user_id=staff_user.id)
+        self.assertTrue(staff_user.current_encounter)
+
+        # Switch to test_user using login_as, test the encounter
+        self.test_user = db.session.merge(self.test_user)
+        rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
+        self.assertEquals(302, rv.status_code)  # sent to next_after_login
+        self.assertEquals(
+            self.test_user.current_encounter.auth_method,
+            'staff_authenticated')
