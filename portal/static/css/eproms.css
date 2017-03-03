@@ -1863,16 +1863,19 @@ div.org-container input[type="checkbox"] {
 @media (max-width: 1745px) {
   body.open-nav .right-panel {
     margin-left: 60px;
+  }
 }
 
 @media (max-width: 1632px) {
   body.open-nav .right-panel {
     margin-left: 100px;
+  }
 }
 
 @media (max-width: 1560px) {
   body.open-nav .right-panel {
     margin-left:140px;
+  }
 }
 
 @media (max-width: 1491px) {
