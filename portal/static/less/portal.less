@@ -28,7 +28,7 @@
 @sectionTitleColor: #5b5e61;
 @sectionBorderColor: #E0E6E3;
 @rowBackgroundColor: #8a8e90;
-@tooltipColor: #575a4d;
+@tooltipColor: #39464e;
 
 html {
   -webkit-box-sizing: border-box;
@@ -122,6 +122,9 @@ a.open, a.back {
 }
 a.open {
   top: 14em;
+}
+a.open:hover, a.back:hover {
+  color: #3f51b5
 }
 div.left-panel {
   position:fixed;
@@ -418,19 +421,28 @@ box-shadow: 3px 4px 5px 0px rgba(197,199,197,1);
   height: 2.6em;
 }
 
-#patientsInstrumentList div.checkbox label {
-  font-size: 0.8em;
+#dataDownloadModal {
+  .modal-body {
+    padding: 1em
+  }
+  button {
+    font-size:0.8em;
+  }
+  .profile-radio-list {
+    margin-left:1em
+  }
+  div.checkbox label{
+    font-size: 0.8em;
+  }
+  label.radio-inline {
+    font-size: 0.8em;
+  }
+  input[type="radio"] {
+    position: relative;
+    top: -1px;
+    left: -1px;
+  }
 }
-
-#dataDownloadModal .modal-body {
-   padding: 1em
- }
- #dataDownloadModal button {
-   font-size:0.8em;
- }
- #dataDownloadModal .profile-radio-list {
-   margin-left:1em
- }
  #_downloadMessage {
    color:#a94442
  }
@@ -1343,7 +1355,7 @@ color: #777
     background-color: @tooltipColor;
     border: 1px solid @tooltipColor;
     padding: 0.3em;
-    width: 150%;
+    width: 170%;
     font-size: 0.9em;
 }
 .tooltip.top .tooltip-arrow {
@@ -1963,6 +1975,18 @@ div.org-container input[type="checkbox"] {
     .btn {
       margin-bottom: 0.5em;
     }
+  }
+}
+
+@media (max-width: 1417px) {
+  body.open-nav .right-panel {
+    margin-left:210px !important;
+  }
+}
+
+@media (max-width: 1745px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
   }
 }
 
