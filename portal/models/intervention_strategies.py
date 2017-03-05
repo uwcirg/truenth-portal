@@ -215,7 +215,8 @@ def update_card_html_on_completion():
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
                 instrument_id=assessment_status.instruments_needing_full_assessment(),
-                resume_instrument_id=assessment_status.instruments_in_process())
+                resume_instrument_id=assessment_status.instruments_in_process()),
+                initial='true'
         elif assessment_status.overall_status == "Completed":
             if assessment_status.localized:
                 intro = """<p>
