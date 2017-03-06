@@ -9,7 +9,7 @@ from portal.extensions import db
 from portal.models.encounter import Encounter
 from portal.models.organization import Organization
 from portal.models.role import ROLE
-from portal.views.auth import login_as
+from portal.models.user import INVITE_PREFIX
 
 
 class TestEncounter(TestCase):
@@ -61,6 +61,7 @@ class TestEncounter(TestCase):
     def test_login_as(self):
         self.bless_with_basics()
         self.promote_user(role_name=ROLE.PATIENT)
+        self.promote_user(role_name=ROLE.WRITE_ONLY)
         self.test_user = db.session.merge(self.test_user)
         consented_org = self.test_user.valid_consents[0].organization_id
         staff_user = self.add_user(username='staff@example.com')
@@ -77,3 +78,4 @@ class TestEncounter(TestCase):
         self.assertEquals(
             self.test_user.current_encounter.auth_method,
             'staff_authenticated')
+        self.assertTrue(self.test_user._email.startswith(INVITE_PREFIX))

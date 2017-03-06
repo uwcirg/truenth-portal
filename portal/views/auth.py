@@ -147,18 +147,29 @@ def next_after_login():
         # user has now finished p/w update - clear session variable
         del session['challenge_verified_user_id']
 
-    # Look for an invited user scenario.  Landing here with
-    # invited_verified_user_id set indicates a fresh registered account
-    # for such; time to promote the invited account.  This also inverts
+    # Look for an invited user scenario.  Landing here with:
+    #   `invited_verified_user_id` set indicates a fresh
+    #   registered account for a user who followed an invite email.
+    #
+    #   `login_as_id` set indicates a fresh registered account during
+    #   a login-as session.  In such a case, ignore when the user first
+    #   becomes the target login-as user, we need to capture landing here
+    #   once a newly registered account has been created.
+    #
+    # time to promote the invited account.  This also inverts
     # current_user to the invited one once promoted.
-    if 'invited_verified_user_id' in session:
-        invited_user = User.query.get(session['invited_verified_user_id'])
+    if 'invited_verified_user_id' in session or (
+        'login_as_id' in session and user.id != int(session['login_as_id'])) :
+        invited_id = session.get('invited_verified_user_id') or session.get(
+            'login_as_id')
+        invited_user = User.query.get(invited_id)
         logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
-        login_user(invited_user)
+        login_user(invited_user, 'password_authenticated')
         assert (invited_user == current_user())
         assert ('invited_verified_user_id' not in session)
+        assert ('login_as_id' not in session)
 
     # Present intial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
@@ -347,8 +358,11 @@ def login_as(user_id, auth_method='staff_authenticated'):
                     context='authentication')
 
     logout(prevent_redirect=True, reason="forced from login_as")
-    session['login-as'] = True
-    login_user(get_user(user_id), auth_method)
+    session['login_as_id'] = user_id
+    target_user = get_user(user_id)
+    if target_user.has_role(role_name=ROLE.WRITE_ONLY):
+        target_user.mask_email()  # necessary in case registration is attempted
+    login_user(target_user, auth_method)
     return next_after_login()
 
 
