@@ -1,6 +1,6 @@
 # Do not install binary wheels for certain packages
 # See https://github.com/spotify/dh-virtualenv/issues/150
---no-binary billiard,cffi
+--no-binary billiard,cffi,psycopg2
 
 alabaster==0.7.10
 alembic==0.9.1
