@@ -1263,13 +1263,13 @@ div.noOrg-container {
   }
 }
 .side {
-  height: 28em
+  height: 27em
 }
 .side-md {
   height: 24em
 }
 .side-lg {
-  height: 29em
+  height: 28em
 }
 .custom-container {
   display: flex;
@@ -1554,6 +1554,23 @@ div.org-container input[type="checkbox"] {
 .timezone-container {
   padding-bottom: 2em;
 }
+#profileForm {
+  #firstname {
+    width: 300px;
+    max-width: 100%;
+  }
+  #lastname {
+    width: 300px;
+    max-width: 100%;
+  }
+ #month {
+    margin-left: -1em;
+    width: 105px;
+  }
+  #bdGroup .flex {
+    flex-wrap: nowrap;
+  }
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -1697,14 +1714,12 @@ div.org-container input[type="checkbox"] {
     width: 100%;
     max-width: 100%;
   }
-
-  #profileForm #bdGroup div.row {
-    height: 10em;
+  #profileForm {
+    #month {
+      margin-left: -1em;
+      width: 105px;
+    }
   }
-  #profileForm div.name-section {
-    height: 10em;
-  }
-
   #userSessionReportDetailHeader span.glyphicon-user {
     margin-top: 2px;
   }
@@ -1740,9 +1755,12 @@ div.org-container input[type="checkbox"] {
   .timezone-container {
     padding-bottom: 0;
   }
-
 }
-
+@media (max-width: 400px) {
+    .side-lg {
+      height: 50em !important;
+    }
+}
 @media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
@@ -1815,13 +1833,13 @@ div.org-container input[type="checkbox"] {
     height: 10em;
   }
   .side {
-    height: 40em;
+    height: 28em;
   }
   .side-md {
-    height: 36em;
+    height: 30em;
   }
   .side-lg {
-    height: 41em;
+    height: 34em;
   }
   .side-xs {
     height: 22em;
@@ -1846,6 +1864,9 @@ div.org-container input[type="checkbox"] {
   .custom-container #profileEmailSelect {
     width: 90%;
     max-width: 100%;
+  }
+  #profileStudyIDContainer {
+    margin-top: -1.5em;
   }
 }
 @media (min-width: 992px) {
@@ -1917,6 +1938,23 @@ div.org-container input[type="checkbox"] {
     }
   }
 }
+@media (max-width: 1070px) {
+  #profileForm {
+    #date {
+      width: 50px;
+      max-width: 100%;
+    }
+    #year {
+      width: 65px;
+      max-width: 100%;
+      margin-left: -4px;
+    }
+    #month {
+      width: 110px;
+      max-width: 100%;
+    }
+  }
+}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1975,7 +2013,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 220px;
+    width: 215px;
   }
 }
 
@@ -2036,7 +2074,12 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1341px) {
   body.open-nav .right-panel {
-    margin-left:220px;
+    margin-left:197px;
+  }
+}
+@media (max-width: 1243px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
   }
 }
 @media (max-width: 1271px) {
@@ -2046,7 +2089,17 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:190px;
+    margin-left:120px;
+  }
+}
+@media (max-width: 1169px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+  }
+}
+@media (max-width: 1130px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
   }
 }
 @media (max-width: 1070px) {
@@ -2056,7 +2109,7 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 991px) {
   body.open-nav .right-panel {
-    margin-left:180px;
+    margin-left:160px;
   }
 }
 @media (max-width: 881px) {
