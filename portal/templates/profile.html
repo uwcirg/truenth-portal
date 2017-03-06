@@ -207,7 +207,7 @@ $(document).ready(function(){
     });
     $(window).resize(function() {
         if (__stickyMenu.hasClass("sticky-show")) {
-          if (__indexIcon.is(":visible")) $("a.open").trigger("click");
+          if (__indexIcon.is(":visible") || !(__leftPanel.is(":visible"))) $("a.open").trigger("click");
         }
         else {
           if (__leftPanel.is(":visible")) __indexContainer.removeClass("open");

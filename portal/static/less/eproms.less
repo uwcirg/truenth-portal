@@ -1269,7 +1269,7 @@ div.noOrg-container {
   height: 24em
 }
 .side-lg {
-  height: 28em
+  height: 30em
 }
 .custom-container {
   display: flex;
@@ -1565,7 +1565,8 @@ div.org-container input[type="checkbox"] {
   }
  #month {
     margin-left: -1em;
-    width: 105px;
+    width: 180px;
+    max-width: 100%;
   }
   #bdGroup .flex {
     flex-wrap: nowrap;
@@ -1587,6 +1588,17 @@ div.org-container input[type="checkbox"] {
     }
     p:last-child {
       margin-bottom: 0;
+    }
+  }
+  #profileStudyIDContainer {
+    margin-top: -2.5em !important;
+  }
+  #profileForm {
+    #month {
+      width: 140px !important;
+    }
+    #year {
+      margin-left: -2.5em !important;
     }
   }
 }
@@ -1714,12 +1726,6 @@ div.org-container input[type="checkbox"] {
     width: 100%;
     max-width: 100%;
   }
-  #profileForm {
-    #month {
-      margin-left: -1em;
-      width: 105px;
-    }
-  }
   #userSessionReportDetailHeader span.glyphicon-user {
     margin-top: 2px;
   }
@@ -1755,11 +1761,6 @@ div.org-container input[type="checkbox"] {
   .timezone-container {
     padding-bottom: 0;
   }
-}
-@media (max-width: 400px) {
-    .side-lg {
-      height: 50em !important;
-    }
 }
 @media (max-width: 730px) {
   #userSessionsList {
@@ -1836,16 +1837,16 @@ div.org-container input[type="checkbox"] {
     height: 28em;
   }
   .side-md {
-    height: 30em;
+    height: 30em !important;
   }
   .side-lg {
-    height: 34em;
+    height: 34em !important;
   }
   .side-xs {
     height: 22em;
   }
   .one-side {
-    height: 24em;
+    height: 24em !important;
   }
   .load-container {
     min-height: 1.5em;
@@ -1938,29 +1939,31 @@ div.org-container input[type="checkbox"] {
     }
   }
 }
-@media (max-width: 1070px) {
-  #profileForm {
-    #date {
-      width: 50px;
-      max-width: 100%;
-    }
-    #year {
-      width: 65px;
-      max-width: 100%;
-      margin-left: -4px;
-    }
-    #month {
-      width: 110px;
-      max-width: 100%;
-    }
-  }
-}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
   }
   #adminTable .organization-field {
     display: none;
+  }
+  #profileForm {
+    #date {
+      width: 50px;
+      max-width: 100%;
+    }
+    #year {
+      width: 90px;
+      max-width: 100%;
+    }
+    #bdGroup .flex {
+      flex-wrap: wrap;
+    }
+  }
+  .side-md {
+    height: 26em;
+  }
+  .side-lg {
+    height: 30em;
   }
 }
 @media (min-width: 1200px) {

@@ -1426,7 +1426,8 @@ div.org-container input[type="checkbox"] {
 }
 #profileForm #month {
   margin-left: -1em;
-  width: 105px;
+  width: 180px;
+  max-width: 100%;
 }
 #profileForm #bdGroup .flex {
   flex-wrap: nowrap;
@@ -1448,6 +1449,18 @@ div.org-container input[type="checkbox"] {
   }
   .text-on-img p:last-child {
     margin-bottom: 0;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: nowrap !important;
+  }
+  #profileStudyIDContainer {
+    margin-top: -2.5em !important;
+  }
+  #profileForm #month {
+    width: 140px !important;
+  }
+  #profileForm #year {
+    margin-left: -2.5em !important;
   }
 }
 @media (max-width: 506px) {
@@ -1629,11 +1642,6 @@ div.org-container input[type="checkbox"] {
     padding-bottom: 0;
   }
 }
-@media (max-width: 400px) {
-    .side-lg {
-      height: 50em !important;
-    }
-}
 @media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
@@ -1702,16 +1710,16 @@ div.org-container input[type="checkbox"] {
     height: 28em;
   }
   .side-md {
-    height: 30em;
+    height: 30em !important;
   }
   .side-lg {
-    height: 34em;
+    height: 34em !important;
   }
   .side-xs {
     height: 22em;
   }
   .one-side {
-    height: 24em;
+    height: 24em !important;
   }
   .load-container {
     min-height: 1.5em;
@@ -1805,27 +1813,29 @@ div.org-container input[type="checkbox"] {
     margin-top: 4px;
   }
 }
-@media (max-width: 1070px) {
-  #profileForm #date {
-    width: 50px;
-    max-width: 100%;
-  }
-  #profileForm #year {
-    width: 65px;
-    max-width: 100%;
-    margin-left: -4px;
-  }
-  #profileForm #month {
-    width: 110px;
-    max-width: 100%;
-  }
-}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
   }
   #adminTable .organization-field {
     display: none;
+  }
+  #profileForm #date {
+    width: 50px;
+    max-width: 100%;
+  }
+  #profileForm #year {
+    width: 90px;
+    max-width: 100%;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: wrap;
+  }
+  .side-md {
+    height: 26em;
+  }
+  .side-lg {
+    height: 30em;
   }
 }
 @media (min-width: 1200px) {

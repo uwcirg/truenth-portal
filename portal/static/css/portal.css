@@ -1379,7 +1379,8 @@ div.org-container input[type="checkbox"] {
 }
 #profileForm #month {
   margin-left: -1em;
-  width: 105px;
+  width:180px;
+  max-width: 100%;
 }
 #profileForm #bdGroup .flex {
   flex-wrap: nowrap;
@@ -1735,27 +1736,23 @@ div.org-container input[type="checkbox"] {
     margin-top: 4px;
   }
 }
-@media (max-width: 1070px) {
-  #profileForm #date {
-    width: 50px;
-    max-width: 100%;
-  }
-  #profileForm #year {
-    width: 65px;
-    max-width: 100%;
-    margin-left: -4px;
-  }
-  #profileForm #month {
-    width: 110px;
-    max-width: 100%;
-  }
-}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
   }
   #adminTable .organization-field {
     display: none;
+  }
+  #profileForm #date {
+    width: 50px;
+    max-width: 100%;
+  }
+  #profileForm #year {
+    width: 90px;
+    max-width: 100%;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: wrap;
   }
 }
 
