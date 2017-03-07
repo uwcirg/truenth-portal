@@ -705,7 +705,7 @@ def get_assessments():
     methods=('POST'),
 )
 @oauth.require_oauth()
-def assessment_set(patient_id):
+def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
 
     Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
