@@ -700,8 +700,10 @@ def get_assessments():
         }
     )
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment',
-                             methods=('POST', 'PUT'))
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment',
+    methods=('POST', 'PUT'),
+)
 @oauth.require_oauth()
 def assessment_set(patient_id):
     """Add a questionnaire response to a patient's record
