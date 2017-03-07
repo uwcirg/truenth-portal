@@ -10,7 +10,7 @@ options:
 from datetime import datetime
 from flask_testing import TestCase as Base
 from flask_webtest import SessionScope
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 
 from portal.app import create_app
 from portal.config import TestConfig
@@ -209,7 +209,14 @@ class TestCase(Base):
     def setUp(self):
         """Reset all tables before testing."""
 
-        db.drop_all()  # clean up from previous tests
+        try:
+            # clean up from previous tests
+            db.drop_all()
+        except ProgrammingError:
+            # Schema changed between tests, re-analyze database before dropping
+            db.reflect()
+            db.drop_all()
+
         db.create_all()
         with SessionScope(db):
             # concepts take forever, only load the quick ones.
