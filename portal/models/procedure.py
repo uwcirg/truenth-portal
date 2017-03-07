@@ -33,6 +33,7 @@ class Procedure(db.Model):
     code_id = db.Column(db.ForeignKey('codeable_concepts.id'), nullable=False)
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'))
 
     audit = db.relationship('Audit', cascade="save-update", lazy='joined')
     """tracks when and by whom the `procedure` was retained, included
@@ -43,6 +44,8 @@ class Procedure(db.Model):
     """procedure.code (a `CodeableConcept`) defines the procedure.
     coding.system is required to be `http://snomed.info/sct`
     """
+
+    encounter = db.relationship('Encounter', lazy='joined')
 
     def as_fhir(self):
         """produces FHIR representation of procedure in JSON format"""
