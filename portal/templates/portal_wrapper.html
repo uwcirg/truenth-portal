@@ -111,7 +111,7 @@
                 <div class="tnth-btn-group">
                     {% if user %}
                         {% if enable_links %}
-                        <ul class="tnth-dropdown-menu">
+                        <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login-as' in session or (user and not user.has_roles('write_only')) %}
                             <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
@@ -167,7 +167,7 @@
             </div>
             {% if enable_links %}
             <div id="tnthNavbarXs">
-                <ul class="tnth-navbar-xs">
+                <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}
                     <li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>
                     {% endif %}
