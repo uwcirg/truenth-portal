@@ -20,6 +20,10 @@ class TestAssessmentEngine(TestCase):
         response = rv.json
         self.assertEquals(response['ok'], True)
         self.assertEquals(response['valid'], True)
+        self.assertTrue(self.test_user.questionnaire_responses.count(), 1)
+        self.assertEquals(
+            self.test_user.questionnaire_responses[0].encounter.auth_method,
+            'password_authenticated')
 
     def test_assessments_bundle(self):
         swagger_spec = swagger(self.app)

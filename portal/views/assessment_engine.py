@@ -1171,6 +1171,7 @@ def assessment_set(patient_id):
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         document=request.json,
+        encounter=current_user().current_encounter
     )
 
     db.session.add(questionnaire_response)

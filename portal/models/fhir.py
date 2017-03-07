@@ -456,6 +456,8 @@ class QuestionnaireResponse(db.Model):
     subject_id = db.Column(db.ForeignKey('users.id'))
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'))
+    encounter = db.relationship("Encounter")
 
     # Fields derived from document content
     status = db.Column(
