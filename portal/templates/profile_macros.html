@@ -1307,7 +1307,7 @@
         {{profileProcedures(person, current_user) | show_macro('procedures')}}
     {% endif %}
 
-    {% if person and person.has_role('patient') %}
+    {% if person and person.has_role(ROLE.PATIENT) %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
     {% endif %}
 
@@ -1323,7 +1323,7 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
                     <div class="flex">
                         <div>
                             {{profileGender(person)}}
@@ -1367,7 +1367,7 @@
             </div>
         </div>
     {% endif %}
-    {% if person and (person.has_role('patient') or person.has_role('partner'))%}
+    {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
