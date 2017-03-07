@@ -534,7 +534,10 @@ class User(db.Model, UserMixin):
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
                 observation.performers.append(performer)
-        UserObservation(user_id=self.id,
+        # The audit defines the acting user, to which the current
+        # encounter is attached.
+        encounter = get_user(audit.user_id).current_encounter
+        UserObservation(user_id=self.id, encounter=encounter,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 

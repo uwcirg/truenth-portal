@@ -385,6 +385,9 @@ class UserObservation(db.Model):
                        nullable=False)
     observation_id = db.Column(db.ForeignKey('observations.id'),
                               nullable=False)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'))
+
+    encounter = db.relationship('Encounter')
 
     __table_args__ = (UniqueConstraint('user_id', 'observation_id',
         name='_user_observation'),)
