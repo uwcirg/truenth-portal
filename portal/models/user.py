@@ -293,7 +293,7 @@ class User(db.Model, UserMixin):
     _consents = db.relationship('UserConsent', lazy='dynamic')
     indigenous = db.relationship(Coding, lazy='dynamic',
             secondary="user_indigenous")
-    encounters = db.relationship('Encounter', lazy='dynamic')
+    encounters = db.relationship('Encounter')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',

@@ -45,7 +45,7 @@ class Procedure(db.Model):
     coding.system is required to be `http://snomed.info/sct`
     """
 
-    encounter = db.relationship('Encounter', lazy='joined')
+    encounter = db.relationship('Encounter')
 
     def as_fhir(self):
         """produces FHIR representation of procedure in JSON format"""
