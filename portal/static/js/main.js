@@ -1728,21 +1728,25 @@ function getIEVersion() {
 
 function newHttpRequest(url,callBack, noCache)
 {
+    attempts++;
     var xmlhttp;
     if (window.XDomainRequest)
     {
         xmlhttp=new XDomainRequest();
         xmlhttp.onload = function(){callBack(xmlhttp.responseText)};
-    }
-    else if (window.XMLHttpRequest)
-        xmlhttp=new XMLHttpRequest();
-    else
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    } else if (window.XMLHttpRequest) xmlhttp=new XMLHttpRequest();
+    else xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
     xmlhttp.onreadystatechange=function()
     {
-        if (xmlhttp.readyState==4 && xmlhttp.status==200)
-            callBack(xmlhttp.responseText);
-    }
+        if (xmlhttp.readyState==4) {
+            if (xmlhttp.status==200) {
+                if (callBack) callBack(xmlhttp.responseText);
+            } else {
+                if (attempts < 3) setTimeout ( function(){ newHttpRequest(url,callBack, noCache); }, 3000 );
+                else loader();
+            };
+        };
+    };
     if (noCache) url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     xmlhttp.open("GET",url,true);
     xmlhttp.send();
@@ -1762,7 +1766,8 @@ funcWrapper = function(param) {
         contentType:'text/plain',
         //dataFilter:data_filter,
         //xhr: xhr_function,
-        crossDomain: true
+        crossDomain: true, 
+        cache: false
         //xhrFields: {withCredentials: true},
     }, 'html')
     .done(function(data) {
