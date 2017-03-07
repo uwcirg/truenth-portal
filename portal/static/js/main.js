@@ -168,7 +168,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
 function getUserTimeZone(userId) {
     var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
     var userTimeZone = "";
-    if (selectVal.toLowerCase() ==  "utc" || selectVal == "") {
+    if (selectVal == "") {
         if (userId) {
             $.ajax ({
                 type: "GET",
@@ -1726,7 +1726,7 @@ function getIEVersion() {
     return match ? parseInt(match[1]) : undefined;
 };
 
-function newHttpRequest(url,callBack)
+function newHttpRequest(url,callBack, noCache)
 {
     var xmlhttp;
     if (window.XDomainRequest)
@@ -1743,6 +1743,7 @@ function newHttpRequest(url,callBack)
         if (xmlhttp.readyState==4 && xmlhttp.status==200)
             callBack(xmlhttp.responseText);
     }
+    if (noCache) url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     xmlhttp.open("GET",url,true);
     xmlhttp.send();
 };
@@ -1786,8 +1787,8 @@ $(document).ready(function() {
         loader(true);
 
         var isIE = getIEVersion();
-        if (isIE && isIE <= 9) {
-            newHttpRequest(PORTAL_NAV_PAGE, embed_page);
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
         } else {
             funcWrapper();
         };

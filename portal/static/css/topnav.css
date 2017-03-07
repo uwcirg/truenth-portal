@@ -203,7 +203,7 @@
   display: none;
   float: left;
   min-width: 160px;
-  padding: 5px 0;
+  padding: 7px 0;
   margin: 2px 0 0;
   font-size: 14px;
   text-align: left;
@@ -216,6 +216,7 @@
   border-radius: 4px;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  list-style-position: inside;
 }
 .tnth-dropdown-menu.pull-right {
   right: 0;
@@ -267,6 +268,18 @@
 }
 .tnth-open > a {
   outline: 0;
+}
+@media screen\0 {
+  /* IE9+ */
+  .tnth-dropdown-menu li {
+    list-style-image: url(data:0);
+  }
+}
+@media all and (-ms-high-contrast: none),(-ms-high-contrast: active) {
+  /* IE10+ */
+  .tnth-dropdown-menu li {
+    list-style-image: url(data:0);
+  }
 }
 /*** Styles for responsive xs size ***/
 .tnth-container-fluid {
