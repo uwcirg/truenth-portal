@@ -6,12 +6,12 @@ from tests import TestCase, TEST_USER_ID
 
 class TestAssessmentEngine(TestCase):
 
-    def test_assessment_PUT(self):
+    def test_submit_assessment(self):
         swagger_spec = swagger(self.app)
         data = swagger_spec['definitions']['QuestionnaireResponse']['example']
 
         self.login()
-        rv = self.client.put(
+        rv = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(data),
@@ -27,7 +27,7 @@ class TestAssessmentEngine(TestCase):
         instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
 
         self.login()
-        upload = self.client.put(
+        upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(example_data),
@@ -48,7 +48,7 @@ class TestAssessmentEngine(TestCase):
         instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
 
         self.login()
-        upload_response = self.client.put(
+        upload_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(example_data),

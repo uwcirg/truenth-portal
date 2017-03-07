@@ -702,7 +702,7 @@ def get_assessments():
 
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment',
-    methods=('POST', 'PUT'),
+    methods=('POST'),
 )
 @oauth.require_oauth()
 def assessment_set(patient_id):
