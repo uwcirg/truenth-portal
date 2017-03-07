@@ -46,7 +46,7 @@ body {
   top: 16em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
-  transform: (-500px, 0);
+  transform: translate(-500px, 0);
   transition: transform 0.5s ease;
   right: 0;
   padding: 1.5em 0.8em;
