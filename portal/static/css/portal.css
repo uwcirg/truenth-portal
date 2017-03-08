@@ -214,8 +214,6 @@ div.orglist-selector div.org-container label.org-label {
   -webkit-transition: opacity 0.8s ease-in;
   transition: opacity 0.8s ease-in;
   position: absolute;
-  top: 2px;
-  left: 0;
   font-size: 0.90em;
 }
 #accessCodeWrapper {
