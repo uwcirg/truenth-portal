@@ -46,7 +46,7 @@ body {
   top: 16em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
-  transform(-500px, 0);
+  transform: translate(-500px, 0);
   transition: transform 0.5s ease;
   right: 0;
   padding: 1.5em 0.8em;
@@ -84,11 +84,14 @@ body {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
-#stickyMenu::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
+#stickyMenu::-webkit-scrollbar, 
+div.home--item-container::-webkit-scrollbar, 
+div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
-a.open, a.back {
+a.open, 
+a.back {
   position: fixed;
   left: 1em;
   top: 12.3em;
@@ -99,7 +102,8 @@ a.open, a.back {
 a.open {
   top: 14em;
 }
-a.open:hover, a.back:hover {
+a.open:hover, 
+a.back:hover {
   color: #3f51b5
 }
 div.left-panel {
@@ -201,7 +205,8 @@ div.orglist-selector div.org-container label.org-label {
   padding: 0.1em auto;
   color: #5a5a5a;
 }
-#profileStudyIDContainer, #studyIdContainer{
+#profileStudyIDContainer, 
+#studyIdContainer{
   display: none;
 }
 .save-info {
@@ -209,7 +214,7 @@ div.orglist-selector div.org-container label.org-label {
   -webkit-transition: opacity 0.8s ease-in;
   transition: opacity 0.8s ease-in;
   position: absolute;
-  top: 2px
+  top: 2px;
   left: 0;
   font-size: 0.90em;
 }
@@ -385,7 +390,8 @@ div.orglist-selector div.org-container label.org-label {
  #dataDownloadModal .profile-radio-list {
    margin-left:1em
  }
- #dataDownloadModal div.checkbox label, #dataDownloadModal label.radio-inline {
+ #dataDownloadModal div.checkbox label, 
+ #dataDownloadModal label.radio-inline {
   font-size: 0.8em;
 }
 #dataDownloadModal input[type="radio"] {
@@ -821,7 +827,8 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm input[type="text"], #createProfileForm select{
+#createProfileForm input[type="text"], 
+#createProfileForm select {
   height: 40px !important;
 }
 #noEmailContainer {
@@ -1124,7 +1131,6 @@ table.profile-audit-log TH,
 .side-md {
   height: 22em;
 }
-
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -1363,6 +1369,22 @@ div.org-container input[type="checkbox"] {
 .timezone-container {
   padding-bottom: 2em;
 }
+#profileForm #firstname, #profileForm #lastname {
+  width: 300px;
+  max-width: 100%;
+}
+#profileForm #firstname, #profileForm #lastname {
+  width: 300px;
+  max-width: 100%;
+}
+#profileForm #month {
+  margin-left: -1em;
+  width:180px;
+  max-width: 100%;
+}
+#profileForm #bdGroup .flex {
+  flex-wrap: nowrap;
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -1513,6 +1535,11 @@ div.org-container input[type="checkbox"] {
   #profileForm div.name-section {
     height: 10em;
   }
+  #profileForm #firstname, 
+  #profileForm #lastname {
+    width: 100%;
+    max-width: 100%;
+  }
   #userSessionReportDetailHeader span.glyphicon-user {
     padding: 0.4em;
   }
@@ -1536,7 +1563,8 @@ div.org-container input[type="checkbox"] {
   div.orglist-selector div.dropdown-menu #userOrgs{
     width: 180px !important;
   }
-  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
+  div.orglist-selector div.org-container label.org-label, 
+  #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
   }
 
@@ -1561,7 +1589,8 @@ div.org-container input[type="checkbox"] {
   #userSessionsList {
     font-size: 0.9em;
   }
-  #adminTable .status-field, #adminTable .reports-field {
+  #adminTable .status-field, 
+  #adminTable .reports-field {
     display: none;
   }
 }
@@ -1626,6 +1655,9 @@ div.org-container input[type="checkbox"] {
   }
   .side {
     height: 37em;
+  }
+  .side-xs-one {
+    height: 29em;
   }
   .side-xs {
     height: 22em;
@@ -1711,6 +1743,17 @@ div.org-container input[type="checkbox"] {
   #adminTable .organization-field {
     display: none;
   }
+  #profileForm #date {
+    width: 50px;
+    max-width: 100%;
+  }
+  #profileForm #year {
+    width: 90px;
+    max-width: 100%;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: wrap;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -1759,7 +1802,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 220px;
+    width: 215px;
   }
 }
 
@@ -1796,7 +1839,6 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0.5em;
   }
 }
-
 @media (max-width: 1745px) {
   body.open-nav .right-panel {
     margin-left: 60px;
@@ -1824,7 +1866,12 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1341px) {
   body.open-nav .right-panel {
-    margin-left:220px;
+    margin-left:197px;
+  }
+}
+@media (max-width: 1243px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
   }
 }
 @media (max-width: 1271px) {
@@ -1834,7 +1881,17 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:190px;
+    margin-left:120px;
+  }
+}
+@media (max-width: 1169px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+  }
+}
+@media (max-width: 1130px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
   }
 }
 @media (max-width: 1070px) {
@@ -1844,7 +1901,7 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 991px) {
   body.open-nav .right-panel {
-    margin-left:180px;
+    margin-left:160px;
   }
 }
 @media (max-width: 881px) {
@@ -2053,7 +2110,8 @@ fieldset[disabled] .btn-google.active {
   max-width: 100%;
   margin: 0 auto;
 }
-#socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"]  {
+#socialMediaRegistrationContainer .btn-social, 
+#regForm input[type="submit"]  {
     margin: 0.2em auto;
     display: inline-block;
     width: 400px;
@@ -2127,7 +2185,8 @@ div.or {
     width: 100%;
 }
 @media (max-width: 640px) {
-  #regForm input, #socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"] {
+  #regForm input, #socialMediaRegistrationContainer .btn-social, 
+  #regForm input[type="submit"] {
     font-size: 0.9em;
   }
   #socialMediaRegistrationContainer .btn-social {
