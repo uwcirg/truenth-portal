@@ -142,6 +142,9 @@ $(document).ready(function() {
   $("#adminTable").on("sort.bs.table reset-view.bs.table toggle.bs.table", function() {
       AT.updateData();
    });
+  $("#adminTable").on("page-change.bs.table", function() {
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},800);
+  });
   setTimeout("AT.updateData();", 0);
 
   $(".tnth-admin-table").bootstrapTable({
