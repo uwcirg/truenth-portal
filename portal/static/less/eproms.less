@@ -2150,7 +2150,11 @@ div.org-container input[type="checkbox"] {
   max-width: 100%;
   margin: 0 auto;
 }
-#socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"]  {
+#socialMediaRegistrationContainer .btn-social, 
+#regForm input[type="submit"],
+#socialMediaLoginContainer .btn-social, 
+#socialMediaLoginContainer input[type="submit"]
+{
     margin: 0.2em auto;
     display: inline-block;
     width: 400px;
@@ -2168,16 +2172,20 @@ div.org-container input[type="checkbox"] {
     text-align: left;
 }
 
-#socialMediaRegistrationContainer .btn-social > :first-child {
+#socialMediaRegistrationContainer .btn-social > :first-child,
+#socialMediaLoginContainer .btn-social > :first-child {
   width: 40px;
   top: 0.4em;
 }
 
-#socialMediaRegistrationContainer .divider {
+#socialMediaRegistrationContainer .divider,
+#socialMediaLoginContainer .divider 
+ {
   height: 0.5em;
 }
 
-#regForm input {
+#regForm input,
+#loginForm input {
   background: #f1f0ef;
   height: 44px;
   padding: 5px;
@@ -2187,10 +2195,14 @@ div.org-container input[type="checkbox"] {
   max-width: 100%;
 }
 
-#regForm input[type="submit"] {
+#regForm input[type="submit"],
+#loginForm input[type="submit"] {
    background-color: #79815d;
    text-align: center;
    padding: 1.2em 2em 1em 2em;
+}
+#loginForm input[type="submit"] {
+  height: 69px;
 }
 .reg-title {
   font-size: 1.4em;
@@ -2228,10 +2240,19 @@ div.or {
 }
 
 @media (max-width: 640px) {
-  #regForm input, #socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"] {
+  #regForm input, 
+  #socialMediaRegistrationContainer .btn-social, 
+  #regForm input[type="submit"],
+  #loginForm input, 
+  #socialMediaLoginContainer .btn-social,
+  #loginForm input[type="submit"]
+  {
     font-size: 0.9em;
+    height: 52px;
   }
-  #socialMediaRegistrationContainer .btn-social {
-    padding-top: 2em;
+  #socialMediaRegistrationContainer .btn-social,
+  #socialMediaLoginContainer .btn-social
+  {
+    padding-top: 1.7em;
   }
 }
