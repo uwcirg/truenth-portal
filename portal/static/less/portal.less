@@ -1808,6 +1808,9 @@ div.org-container input[type="checkbox"] {
   .side {
     height: 37em;
   }
+  .side-md {
+    height: 28em !important;
+  }
   .side-xs-one {
     height: 29em;
   }
@@ -1825,6 +1828,12 @@ div.org-container input[type="checkbox"] {
   }
   .one-side {
     height: 23em;
+  }
+}
+/*NOTE, the placement, overriding the previous media query match for this class*/
+@media (max-width: 480px) {
+   .side-md {
+    height: 34em !important;
   }
 }
 @media (min-width: 992px) {
@@ -1888,6 +1897,11 @@ div.org-container input[type="checkbox"] {
     .form-group input[type=checkbox], .form-group  input[type=radio] {
       margin-top: 4px;
     }
+  }
+}
+@media (max-width: 1070px) {
+  .side-md {
+    height: 26em;
   }
 }
 @media (max-width: 1199px) {

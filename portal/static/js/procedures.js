@@ -11,6 +11,16 @@ $.fn.extend({
             var selectDate = $(this).attr('data-date');
             // Only continue if both values are filled in
             if (selectVal !== undefined && selectDate !== undefined) {
+                 //remove any procedure on prostate or none treatment
+                $("#userProcedures tr[data-id]").each(function() {
+                    var code = $(this).attr("data-code"), procId = $(this).attr("data-id");
+                    if (code == CANCER_TREATMENT_CODE) {
+                        tnthAjax.deleteProc(procId);
+                    };
+                    if (code == NONE_TREATMENT_CODE) {
+                        tnthAjax.deleteProc(procId);
+                    };
+                });
 
                 // Submit the data
                 var procArray = {};
@@ -44,7 +54,7 @@ $.fn.extend({
                     // more obvious when the updated list loads
                     setTimeout(function(){
                         tnthAjax.getProc(subjectId,true);
-                    },1000);
+                    },1500);
 
                 });
             }
@@ -161,7 +171,6 @@ $(document).ready(function() {
     function checkSubmit(btnId) {
         if ($(btnId).attr("data-name") != "" && $(btnId).attr("data-date-read") != "") {
             // We trigger the click here. The button is actually hidden so user doesn't interact with it
-            // TODO - Remove the button completely and store the updated values elsewhere
             //$(btnId).removeClass('disabled').removeAttr('disabled').trigger("click");
             $(btnId).removeClass('disabled').removeAttr('disabled');
         } else {

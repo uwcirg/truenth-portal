@@ -613,7 +613,7 @@ var fillContent = {
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
         $.each(data.entry,function(i,val){
-            var procID = val.resource.id;
+            var procID = val.resource.id, code = val.resource.code.coding[0].code;        
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
@@ -629,17 +629,47 @@ var fillContent = {
             else if (creator == subjectId) {
                 creator = "this patient";
             }
-            else creator = "staff member " + creator;
+            else creator = "staff member <span class='creator'>" + creator + "</span>";
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
-            proceduresHtml += "<tr data-id='" + procID + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
-
+            proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
             if (procID > highestId) {
                 highestId = procID;
-            }
+            };
         });
         proceduresHtml += '</table>';
+
         $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+
+        var dataRows = $("#userProcedures tr[data-id]");
+        if (dataRows.length == $("#userProcedures tr[class='tnth-hide']").length) $(dataRows.get(0)).removeClass("tnth-hide");
+
+        /******* comment this part out for now, getting unauthorized error to access other user's demographics, which makes sense
+        $("#userProcedures .creator").each(function() {
+            var uid = $.trim($(this).text()), self=this, userIdentity="";
+            if (hasValue(uid)) {
+                $.ajax ({
+                    type: "GET",
+                    url: '/api/demographics/'+uid
+                }).done(function(data) {
+                    console.log(data)
+                    if (data) {
+                        if (data.name) {
+                            userIdentity = (hasValue(data.name.given) ? data.name.given: "") + " " + (hasValue(data.name.family) ? data.name.family : "");
+                        }
+                        if (!hasValue($.trim(userIdentity))) {
+                            if (data.telecom) {
+                                (data.telecom).forEach(function(item) {
+                                    if (item.system == "email") userIdentity = item.value;
+                                });
+                            };
+                        };
+                    };
+                    if (hasValue(userIdentity)) $(self).text(userIdentity);
+                }).fail(function() {
+                });
+            };
+        });*****/
         // If newEntry, then add icon to what we just added
         if (newEntry) {
             $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
@@ -663,7 +693,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' >" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1509,10 +1539,11 @@ var tnthAjax = {
                 if (!found) {
                     var resourceItemCode = item.resource.code.coding[0].code;
                     var system = item.resource.code.coding[0].system;
+                    var procId = item.resource.id;
 
                    // console.log(resourceItemCode)
                    if ((resourceItemCode == CANCER_TREATMENT_CODE && (system == SNOMED_SYS_URL)) || (resourceItemCode == NONE_TREATMENT_CODE && (system == CLINICAL_SYS_URL))) {
-                        found = resourceItemCode;
+                        found = {"code": resourceItemCode, "id": procId};
                     }
 
                 };
@@ -1535,7 +1566,7 @@ var tnthAjax = {
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
         if (!userId) return false;
-
+        tnthAjax.deleteTreatment(userId, targetField);
         var code = NONE_TREATMENT_CODE;
         var display = "None";
         var system = CLINICAL_SYS_URL;
@@ -1567,14 +1598,15 @@ var tnthAjax = {
         var self = this;
         $.ajax ({
             type: "GET",
-            url: '/api/patient/'+userId+'/procedure'
+            url: '/api/patient/'+userId+'/procedure',
+            async: false
         }).done(function(data) {
-            var treatmentCode = self.hasTreatment(data);
-            if (treatmentCode) {
-                if (treatmentCode == CANCER_TREATMENT_CODE) {
-                    tnthAjax.deleteProc(CANCER_TREATMENT_CODE, targetField, true);
+            var treatmentData = self.hasTreatment(data);
+            if (treatmentData) {
+                if (treatmentData.code == CANCER_TREATMENT_CODE) {
+                    tnthAjax.deleteProc(treatmentData.id, targetField, true);
                 } else {
-                    tnthAjax.deleteProc(NONE_TREATMENT_CODE, targetField, true);
+                    tnthAjax.deleteProc(treatmentData.id, targetField, true);
                 };
             };
         }).fail(function() {
@@ -1766,7 +1798,7 @@ funcWrapper = function(param) {
         contentType:'text/plain',
         //dataFilter:data_filter,
         //xhr: xhr_function,
-        crossDomain: true, 
+        crossDomain: true,
         cache: false
         //xhrFields: {withCredentials: true},
     }, 'html')
