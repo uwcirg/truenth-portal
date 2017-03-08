@@ -12,9 +12,13 @@ from .reference import Reference
 def lookup_version():
     return current_app.config.metadata.version
 
+
 class Context(Enum):
     # only add new contexts to END of list, otherwise ordering gets messed up
-    other, login, assessment, authentication, intervention, account, consent, user, observation, organization, group, procedure, relationship, role, tou = range(15)
+    (other, login, assessment, authentication, intervention, account,
+     consent, user, observation, organization, group, procedure,
+     relationship, role, tou) = range(15)
+
 
 class Audit(db.Model):
     """ORM class for audit data
@@ -33,8 +37,9 @@ class Audit(db.Model):
     comment = db.Column(db.Text)
 
     def __str__(self):
-        return "Audit by user {0.user_id} on user {0.subject_id} at {0.timestamp}: {0.context}: {0.comment}".\
-                format(self)
+        return (
+            "Audit by user {0.user_id} on user {0.subject_id} at "
+            "{0.timestamp}: {0.context}: {0.comment}".format(self))
 
     @property
     def context(self):
@@ -42,15 +47,16 @@ class Audit(db.Model):
 
     @context.setter
     def context(self, ct_string):
-        self._context = getattr(Context,ct_string).name
-
+        self._context = getattr(Context, ct_string).name
 
     def as_fhir(self):
         """Typically included as *meta* data in containing FHIR resource"""
+        from .user import get_user  # avoid ciclic import
         d = {}
         d['version'] = self.version
         d['lastUpdated'] = FHIR_datetime.as_fhir(self.timestamp)
         d['by'] = Reference.patient(self.user_id).as_fhir()
+        d['by']['display'] = get_user(self.user_id).display_name
         d['on'] = Reference.patient(self.subject_id).as_fhir()
         d['context'] = self.context
         if self.comment:
@@ -67,12 +73,13 @@ class Audit(db.Model):
 
         """
 
-        #2016-02-23 10:07:05,953: performed by 10033 on 10033: login: logout
+        # 2016-02-23 10:07:05,953: performed by 10033 on 10033: login: logout
         fields = entry.split(':')
         dt = parser.parse(':'.join(fields[0:2]))
         user_id = int(fields[3].split()[2])
         subject_id = int(fields[3].split()[4])
         context = fields[4].strip()
         message = ':'.join(fields[5:])
-        return cls(user_id=user_id, subject_id=subject_id, context=context,
-                timestamp=dt, comment=message)
+        return cls(
+            user_id=user_id, subject_id=subject_id, context=context,
+            timestamp=dt, comment=message)

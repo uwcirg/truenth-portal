@@ -59,8 +59,12 @@ class TestAudit(TestCase):
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
-        self.assertEquals(rv.json['audits'][0]['by'],
-                          Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(
+            rv.json['audits'][0]['by']['reference'],
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+        self.assertEquals(
+            rv.json['audits'][0]['by']['display'],
+            'First Last')
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['context'], 'other')
