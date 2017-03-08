@@ -5,6 +5,7 @@ from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import and_
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
 import requests
@@ -16,11 +17,11 @@ from ..models.app_text import app_text, VersionedResource
 from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
-from ..models.intervention import Intervention
+from ..models.intervention import Intervention, UserIntervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
-from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
-from ..models.user import current_user, get_user, User
+from ..models.role import ROLE, ALL_BUT_WRITE_ONLY, Role
+from ..models.user import current_user, get_user, User, UserRoles
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
@@ -472,6 +473,32 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true")
+
+
+@portal.route('/admin/intervention')
+@roles_required(ROLE.INTERVENTION_STAFF)
+@oauth.require_oauth()
+def intervention_admin():
+    """patient view function for intervention staff"""
+    user = current_user()
+
+    # Create list of UserInterventions for the current user
+    uis = UserIntervention.query.filter(UserIntervention.user_id == user.id)
+    ui_list = [ui.intervention_id for ui in uis]
+
+    # Gather up all patients belonging to any of the interventions
+    # this intervention_staff user belongs to
+    patient_role_id = Role.query.filter(
+        Role.name==ROLE.PATIENT).with_entities(Role.id).first()
+    patients = User.query.join(UserRoles).filter(
+        and_(User.id==UserRoles.user_id,
+             UserRoles.role_id==patient_role_id,
+             User.deleted_id==None)
+             ).join(UserIntervention).filter(
+            and_(UserIntervention.user_id==User.id,
+                 UserIntervention.intervention_id.in_(ui_list)))
+
+    return render_template('intervention_admin.html', patients=patients, wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
