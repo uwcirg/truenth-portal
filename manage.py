@@ -76,6 +76,7 @@ def purge_user(username):
     """Purge the given user from the system"""
     permanently_delete_user(username)
 
+
 @manager.command
 def mark_test():
     """Designate all current users as test users"""

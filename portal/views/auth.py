@@ -9,7 +9,7 @@ from authomatic.adapters import WerkzeugAdapter
 from authomatic.exceptions import CancellationError
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
-from flask_login import login_user, logout_user
+from flask_login import logout_user
 from flask_user import roles_required
 from flask_user.signals import user_logged_in, user_registered
 from flask_wtf import FlaskForm
@@ -23,7 +23,9 @@ from ..audit import auditable_event
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
 from ..models.coredata import Coredata
+from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
+from ..models.login import login_user
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
@@ -75,6 +77,8 @@ def deauthorized():
 def flask_user_login_event(app, user, **extra):
     auditable_event("local user login", user_id=user.id, subject_id=user.id,
                     context='login')
+    login_user(user, 'password_authenticated')
+
 
 def flask_user_registered_event(app, user, **extra):
     auditable_event("local user registered", user_id=user.id, subject_id=user.id,
@@ -143,18 +147,29 @@ def next_after_login():
         # user has now finished p/w update - clear session variable
         del session['challenge_verified_user_id']
 
-    # Look for an invited user scenario.  Landing here with
-    # invited_verified_user_id set indicates a fresh registered account
-    # for such; time to promote the invited account.  This also inverts
+    # Look for an invited user scenario.  Landing here with:
+    #   `invited_verified_user_id` set indicates a fresh
+    #   registered account for a user who followed an invite email.
+    #
+    #   `login_as_id` set indicates a fresh registered account during
+    #   a login-as session.  In such a case, ignore when the user first
+    #   becomes the target login-as user, we need to capture landing here
+    #   once a newly registered account has been created.
+    #
+    # time to promote the invited account.  This also inverts
     # current_user to the invited one once promoted.
-    if 'invited_verified_user_id' in session:
-        invited_user = User.query.get(session['invited_verified_user_id'])
+    if 'invited_verified_user_id' in session or (
+        'login_as_id' in session and user.id != int(session['login_as_id'])) :
+        invited_id = session.get('invited_verified_user_id') or session.get(
+            'login_as_id')
+        invited_user = User.query.get(invited_id)
         logout(prevent_redirect=True, reason='reverting to invited account')
         invited_user.promote_to_registered(user)
         db.session.commit()
-        login_user(invited_user)
+        login_user(invited_user, 'password_authenticated')
         assert (invited_user == current_user())
         assert ('invited_verified_user_id' not in session)
+        assert ('login_as_id' not in session)
 
     # Present intial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
@@ -208,7 +223,7 @@ def login(provider_name):
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
         user = current_user()
-        login_user(user)
+        login_user(user, 'password_authenticated')
         return next_after_login()
 
     def picture_url(result):
@@ -311,7 +326,7 @@ def login(provider_name):
                 db.session.commit()
             session['id'] = user.id
             session['remote_token'] = result.provider.credentials.token
-            login_user(user)
+            login_user(user, 'password_authenticated')
             return next_after_login()
     else:
         return response
@@ -320,7 +335,7 @@ def login(provider_name):
 @auth.route('/login-as/<user_id>')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
-def login_as(user_id):
+def login_as(user_id, auth_method='staff_authenticated'):
     """Provide direct login w/o auth to user account, but only if qualified
 
     Special individuals may assume the identity of other users, but only
@@ -331,16 +346,23 @@ def login_as(user_id):
     If qualified, the current user's session is destroyed and the requested
     user is logged in - passing control to 'next_after_login'
 
+    :param user_id: User (patient) to assume identity of
+    :param auth_method: Expected values include 'staff_authenticated' and
+      'staff_handed_to_patient', depending on context.
+
     """
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
     auditable_event("assuming identity of user {}".format(user_id),
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
-    
+
     logout(prevent_redirect=True, reason="forced from login_as")
-    session['login-as'] = True
-    login_user(get_user(user_id))
+    session['login_as_id'] = user_id
+    target_user = get_user(user_id)
+    if target_user.has_role(role_name=ROLE.WRITE_ONLY):
+        target_user.mask_email()  # necessary in case registration is attempted
+    login_user(target_user, auth_method)
     return next_after_login()
 
 
@@ -414,6 +436,9 @@ def logout(prevent_redirect=False, reason=None):
     logout_user()
     session.clear()
     notify_clients(user_id)
+    if user:
+        finish_encounter(user)
+    db.session.commit()
     if prevent_redirect:
         return
     return redirect('/' if not timed_out else '/?timed_out=1')

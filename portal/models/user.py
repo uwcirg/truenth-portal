@@ -18,6 +18,7 @@ import time
 
 from .audit import Audit
 from ..dict_tools import dict_match
+from .encounter import Encounter
 from ..extensions import db
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
@@ -292,6 +293,7 @@ class User(db.Model, UserMixin):
     _consents = db.relationship('UserConsent', lazy='dynamic')
     indigenous = db.relationship(Coding, lazy='dynamic',
             secondary="user_indigenous")
+    encounters = db.relationship('Encounter')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
@@ -353,6 +355,20 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    @property
+    def current_encounter(self):
+        """Shortcut to current encounter, if present
+
+        An encounter is typically bound to the logged in user, not
+        the subject, if a different user is performing the action.
+        """
+        query = Encounter.query.filter(Encounter.user_id==self.id).filter(
+            Encounter.status=='in-progress')
+        if query.count() == 0:
+            return None
+        assert (query.count() == 1)  # shouldn't have more than one active
+        return query.one()
 
     @property
     def locale(self):
@@ -518,7 +534,10 @@ class User(db.Model, UserMixin):
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
                 observation.performers.append(performer)
-        UserObservation(user_id=self.id,
+        # The audit defines the acting user, to which the current
+        # encounter is attached.
+        encounter = get_user(audit.user_id).current_encounter
+        UserObservation(user_id=self.id, encounter=encounter,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 
@@ -1071,7 +1090,7 @@ class User(db.Model, UserMixin):
                             if orgtree.at_or_below_ids(org_id, others_orgs):
                                 return True
 
-        abort(401, "Inadequate role for %s of %d" % (permission, other_id))
+        abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]

@@ -90,6 +90,9 @@ class TestClinical(TestCase):
         self.assert200(rv)
         fhir = json.loads(rv.data)
         self.assertIn('28540-3', fhir['message'])
+        self.assertEquals(self.test_user.observations.count(), 1)
+        uo = UserObservation.query.filter_by(user_id=TEST_USER_ID).one()
+        self.assertEquals(uo.encounter.auth_method, 'password_authenticated')
 
     def test_empty_clinical_get(self):
         """Access clinical on user w/o any clinical info"""
