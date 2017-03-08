@@ -620,6 +620,7 @@ var fillContent = {
             var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
             //console.log("date: " + performedDateTime + " cdate: " + performedDate);
             var deleteInvocation = '';
+            var creatorDisplay = val.resource.meta.by.display;
             var creator = val.resource.meta.by.reference;
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
             if (creator == currentUserId) {
@@ -629,7 +630,7 @@ var fillContent = {
             else if (creator == subjectId) {
                 creator = "this patient";
             }
-            else creator = "staff member <span class='creator'>" + creator + "</span>";
+            else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
             proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
@@ -644,32 +645,6 @@ var fillContent = {
         var dataRows = $("#userProcedures tr[data-id]");
         if (dataRows.length == $("#userProcedures tr[class='tnth-hide']").length) $(dataRows.get(0)).removeClass("tnth-hide");
 
-        /******* comment this part out for now, getting unauthorized error to access other user's demographics, which makes sense
-        $("#userProcedures .creator").each(function() {
-            var uid = $.trim($(this).text()), self=this, userIdentity="";
-            if (hasValue(uid)) {
-                $.ajax ({
-                    type: "GET",
-                    url: '/api/demographics/'+uid
-                }).done(function(data) {
-                    console.log(data)
-                    if (data) {
-                        if (data.name) {
-                            userIdentity = (hasValue(data.name.given) ? data.name.given: "") + " " + (hasValue(data.name.family) ? data.name.family : "");
-                        }
-                        if (!hasValue($.trim(userIdentity))) {
-                            if (data.telecom) {
-                                (data.telecom).forEach(function(item) {
-                                    if (item.system == "email") userIdentity = item.value;
-                                });
-                            };
-                        };
-                    };
-                    if (hasValue(userIdentity)) $(self).text(userIdentity);
-                }).fail(function() {
-                });
-            };
-        });*****/
         // If newEntry, then add icon to what we just added
         if (newEntry) {
             $("#eventListtnthproc").find("tr[data-id='" + highestId + "'] td.lastCell").append("&nbsp; <small class='text-success'><i class='fa fa-check-square-o'></i> <em>Added!</em></small>");
