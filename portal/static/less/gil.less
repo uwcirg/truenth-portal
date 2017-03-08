@@ -6999,7 +6999,10 @@ figure.nav-overlay {
     top: 210px;
     background-color: rgba(95, 103, 110, 1);
 }
-.home--item-container, .home--item-container-full, .home--registration-container {
+.home--item-container, 
+.home--item-container-full, 
+.home--registration-container,
+.link-box {
     background: inherit;
     background-color: #43484d;
     box-sizing: border-box;
@@ -7063,7 +7066,8 @@ figure.nav-overlay {
 .home--registraion-wrapper {
     margin-top: 1.3em;
 }
-.home--item-container-full, .home--registration-container {
+.home--item-container-full,
+.home--registration-container {
     margin: 0 1em 0 1.1em;
     width: 100%;
     max-width: 100%;
@@ -7073,16 +7077,47 @@ figure.nav-overlay {
     line-height: 26px;
     padding: 20px;
 }
+.home--items-wrapper {
+    .link-container {
+        margin: 0 1em 2em 1.1em;
+        display: flex;
+        justify-content: center;
+        flex-flow: row wrap;
+    }
+    .link-box {
+        padding: 1em;
+        height: 5em;
+        min-height: 4em;
+        max-width: 100%;
+        margin: 0.5em 0.2em;
+        text-align: center;
+        color: #BCC2A6;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        background-color: rgba(57, 56, 51, 0.8);
+        cursor: pointer;
+        a {
+            color: #BCC2A6;
+        }
+        a:hover {
+            color: #FFF;
+        }
+    }
+}
 .home--registration-container p {
     font-size: 1.2em;
     padding: 1em 0;
 }
-nav.side-nav::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
+nav.side-nav::-webkit-scrollbar,
+div.home--item-container::-webkit-scrollbar,
+div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb, div.home--item-container::-webkit-scrollbar-thumb, div.modal.fade::-webkit-scrollbar-thumb {
+nav.side-nav::-webkit-scrollbar-thumb,
+div.home--item-container::-webkit-scrollbar-thumb,
+div.modal.fade::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
 .home--item-text {
@@ -7100,10 +7135,6 @@ a.home--modal-link {
 }
 
 .home--item-text * {
-    /*overflow:hidden;
-    text-overflow-multiline:ellipsis;
-    white-space: nowrap;
-    text-overflow: ellipsis;*/
     font-size: 0.97em;
 }
 #portalScrollArrow {
@@ -7237,7 +7268,9 @@ a.home--modal-link {
     }
 }
 @media (max-width: 1199px) {
-    .home--item-container, .home--registration-container, .home--item-container-full {
+    .home--item-container, 
+    .home--registration-container, 
+    .home--item-container-full {
         width: 95%;
         max-width: 100%;
         margin: 1em 1.5em 1em 1.6em;
@@ -7247,7 +7280,9 @@ a.home--modal-link {
     }
 }
 @media (max-width: 990px) {
-    .home--item-container, .home--registration-container, .home--item-container-full  {
+    .home--item-container, 
+    .home--registration-container, 
+    .home--item-container-full  {
         width: 90%;
         max-width: 100%;
         margin: 1em 2.5em 1em 2.6em;
@@ -7274,14 +7309,18 @@ a.home--modal-link {
     }
 }
 @media (max-width: 750px) {
-    .home--item-container, .home--registration-container, .home--item-container-full  {
+    .home--item-container, 
+    .home--registration-container, 
+    .home--item-container-full  {
         max-width: 100%;
         margin: 5%;
     }
     #modal-org, #modal-org h4 {
         font-size: 14px !important;
     }
-    #fillOrgs *, .noOrg-container label span, #submit-orgs {
+    #fillOrgs *, 
+    .noOrg-container label span, 
+    #submit-orgs {
         font-size: 12px !important;
     }
     .noOrg-container input {
@@ -7311,15 +7350,19 @@ a.home--modal-link {
     #portalMain .icon-box__button--main {
         height: 66px;
     }
-    .side-nav-items__item, .side-nav-items__item a {
+    .side-nav-items__item, 
+    .side-nav-items__item a {
         font-size: 1em !important;
         line-height: 1.2em;
     }
-    .home--item-container, .home--item-container h4, .home--item-text * {
+    .home--item-container, 
+    .home--item-container h4, 
+    .home--item-text * {
         font-size: 1em !important;
         padding: 0.5em;
     }
-    #modal-register p, #modal-register .button {
+    #modal-register p, 
+    #modal-register .button {
         font-size: 14px;
     }
     #session-warning-modal * {
@@ -7329,6 +7372,18 @@ a.home--modal-link {
         font-size: 1em !important;
         width: 100%;
         max-width: 100%;
+    }
+    .home--items-wrapper {
+        top: 190px;
+        .link-box {
+            width: 100%;
+            max-width: 100%;
+            margin-right: 3em;
+            margin-left: 0.7em;
+            h4{
+            figureont-size: 0.9em;
+            }
+        }
     }
 }
 @media (max-width: 550px) {
