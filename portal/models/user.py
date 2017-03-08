@@ -36,7 +36,7 @@ from .telecom import Telecom
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
 
-#https://www.hl7.org/fhir/valueset-administrative-gender.html
+# https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
@@ -57,10 +57,11 @@ class Extension:
 
     def as_fhir(self):
         if self.children.count():
-            return {'url': self.extension_url,
-                    'valueCodeableConcept': {
-                        'coding': [c.as_fhir() for c in self.children]}
-                   }
+            return {
+                'url': self.extension_url,
+                'valueCodeableConcept': {
+                    'coding': [c.as_fhir() for c in self.children]}
+            }
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
@@ -165,7 +166,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
             " This will permanently destroy user: {}\n"
             " and all their related data.\n\n"
             " If you want to contiue, enter a valid user\n"
-            " email as the acting party for our records: ".\
+            " email as the acting party for our records: ".
             format(username))
         acting_user = User.query.filter_by(username=actor).first()
     if not acting_user:
@@ -207,8 +208,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
             db.session.delete(t)
         for o in user.observations:
             db.session.delete(o)
-        # Can't delete audit rows owned by this user, in cases like observations
-        # Update those to point to user doing the purge.
+        # Can't delete audit rows owned by this user, in cases like
+        # observations. Update those to point to user doing the purge.
         ob_audits = Audit.query.join(
             Observation).filter(Audit.id==Observation.audit_id).filter(
                 Audit.user_id==user.id)
@@ -224,14 +225,16 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         db.session.commit()
 
         # record this event
-        db.session.add(Audit(user_id=acting_user.id, comment=comment,
-            subject_id=acting_user.id, context='account'))
+        db.session.add(
+            Audit(user_id=acting_user.id, comment=comment,
+                  subject_id=acting_user.id, context='account'))
         db.session.commit()
 
     purge_user(user, acting_user)
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
+
 
 def user_extension_map(user, extension):
     """Map the given extension to the User
@@ -268,8 +271,8 @@ class User(db.Model, UserMixin):
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
-    active = db.Column('is_active', db.Boolean(), nullable=False,
-            server_default='1')
+    active = db.Column(
+        'is_active', db.Boolean(), nullable=False, server_default='1')
     locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
     deleted_id = db.Column(
