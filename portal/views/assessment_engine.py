@@ -1,6 +1,7 @@
 """Assessment Engine API view functions"""
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session
+from sqlalchemy.orm.exc import NoResultFound
 from flask_swagger import swagger
 import jsonschema
 import json
@@ -700,10 +701,115 @@ def get_assessments():
         }
     )
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment',
-                             methods=('POST', 'PUT'))
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment',
+    methods=('PUT',),
+)
 @oauth.require_oauth()
-def assessment_set(patient_id):
+def assessment_update(patient_id):
+    """Update an existing questionnaire response on a patient's record
+
+    Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
+    resource type.
+    ---
+    operationId: updateQuestionnaireResponse
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          $ref: "#/definitions/QuestionnaireResponse"
+    responses:
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+      404:
+        description: existing QuestionnaireResponse not found
+    """
+
+    if not hasattr(request, 'json') or not request.json:
+        abort(400, 'Invalid request')
+
+    # Verify the current user has permission to edit given patient
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    swag = swagger(current_app)
+
+    draft4_schema = {
+        '$schema': 'http://json-schema.org/draft-04/schema#',
+        'type': 'object',
+        'definitions': swag['definitions'],
+    }
+
+    validation_schema = 'QuestionnaireResponse'
+    # Copy desired schema (to validate against) to outermost dict
+    draft4_schema.update(swag['definitions'][validation_schema])
+
+    response = {
+        'ok': False,
+        'message': 'error updating questionnaire response',
+        'valid': False,
+    }
+
+    updated_qnr = request.json
+
+    try:
+        jsonschema.validate(updated_qnr, draft4_schema)
+    except jsonschema.ValidationError as e:
+        return jsonify({
+            'ok': False,
+            'message': e.message,
+            'reference': e.schema,
+        })
+    else:
+        response.update({
+            'ok': True,
+            'message': 'questionnaire response valid',
+            'valid': True,
+        })
+
+    # Todo: enforce identifier uniqueness at initial submission
+    try:
+        existing_qnr = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.document["identifier"] == updated_qnr["identifier"]
+        ).one()
+    # except NoResultException:
+    except NoResultFound:
+        abort(404,"existing QuestionnaireResponse not found")
+    else:
+        response.update({'message': 'previous questionnaire response found'})
+
+    existing_qnr.document = updated_qnr
+    db.session.add(existing_qnr)
+    db.session.commit()
+    auditable_event(
+        "updated {}".format(existing_qnr),
+        user_id=current_user().id,
+        subject_id=patient_id,
+        context='assessment',
+    )
+    response.update({'message': 'questionnaire response updated successfully'})
+    return jsonify(response)
+
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment',
+    methods=('POST',),
+)
+@oauth.require_oauth()
+def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
 
     Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
