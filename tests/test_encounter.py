@@ -2,6 +2,7 @@
 import dateutil
 import json
 import os
+import time
 from tests import TestCase, TEST_USER_ID
 from flask_webtest import SessionScope
 
@@ -39,21 +40,24 @@ class TestEncounter(TestCase):
 
     def test_encounter_on_login(self):
         self.login()
-        self.assertTrue(self.test_user.encounters.count() > 0)
+        self.assertEquals(len(self.test_user.encounters), 1)
         self.assertEquals(
             self.test_user.current_encounter.auth_method,
             'password_authenticated')
 
     def test_encounter_after_logout(self):
         self.login()
+        time.sleep(0.1)
+        self.login()  # generate a second encounter - should logout the first
         self.client.get('/logout', follow_redirects=True)
-        self.assertTrue(self.test_user.encounters.count() > 0)
+        self.assertTrue(len(self.test_user.encounters) > 1)
+        self.assertTrue(all(e.status == 'finished' for e in
+                            self.test_user.encounters))
         self.assertFalse(self.test_user.current_encounter)
 
     def test_service_encounter_on_login(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
-        self.assertTrue(service_user.encounters.count() > 0)
         self.assertEquals(
             service_user.current_encounter.auth_method,
             'service_token_authenticated')
