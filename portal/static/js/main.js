@@ -168,7 +168,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
 function getUserTimeZone(userId) {
     var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
     var userTimeZone = "";
-    if (selectVal.toLowerCase() ==  "utc" || selectVal == "") {
+    if (selectVal == "") {
         if (userId) {
             $.ajax ({
                 type: "GET",
@@ -1726,23 +1726,28 @@ function getIEVersion() {
     return match ? parseInt(match[1]) : undefined;
 };
 
-function newHttpRequest(url,callBack)
+function newHttpRequest(url,callBack, noCache)
 {
+    attempts++;
     var xmlhttp;
     if (window.XDomainRequest)
     {
         xmlhttp=new XDomainRequest();
         xmlhttp.onload = function(){callBack(xmlhttp.responseText)};
-    }
-    else if (window.XMLHttpRequest)
-        xmlhttp=new XMLHttpRequest();
-    else
-        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+    } else if (window.XMLHttpRequest) xmlhttp=new XMLHttpRequest();
+    else xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
     xmlhttp.onreadystatechange=function()
     {
-        if (xmlhttp.readyState==4 && xmlhttp.status==200)
-            callBack(xmlhttp.responseText);
-    }
+        if (xmlhttp.readyState==4) {
+            if (xmlhttp.status==200) {
+                if (callBack) callBack(xmlhttp.responseText);
+            } else {
+                if (attempts < 3) setTimeout ( function(){ newHttpRequest(url,callBack, noCache); }, 3000 );
+                else loader();
+            };
+        };
+    };
+    if (noCache) url = url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     xmlhttp.open("GET",url,true);
     xmlhttp.send();
 };
@@ -1761,7 +1766,8 @@ funcWrapper = function(param) {
         contentType:'text/plain',
         //dataFilter:data_filter,
         //xhr: xhr_function,
-        crossDomain: true
+        crossDomain: true, 
+        cache: false
         //xhrFields: {withCredentials: true},
     }, 'html')
     .done(function(data) {
@@ -1786,8 +1792,8 @@ $(document).ready(function() {
         loader(true);
 
         var isIE = getIEVersion();
-        if (isIE && isIE <= 9) {
-            newHttpRequest(PORTAL_NAV_PAGE, embed_page);
+        if (isIE) {
+            newHttpRequest(PORTAL_NAV_PAGE, embed_page, true);
         } else {
             funcWrapper();
         };

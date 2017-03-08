@@ -36,6 +36,9 @@ STATIC_ROLES = IterableUserDict({
     'content_manager':
         'Gives user permission to add/view/edit associated content '
         'managment systems',
+    'intervention_staff':
+        'Grants user permission to view patient information (name, DOB, etc) '
+        'from relevant intervention patients',
     'partner':
         "An intimate partner, use the partner relationship to define "
         "whom the patient's partner is",

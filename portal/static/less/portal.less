@@ -70,7 +70,7 @@ body {
   top: 16em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
-  transform(-500px, 0);
+  transform: translate(-500px, 0);
   transition: transform 0.5s ease;
   right: 0;
   padding: 1.5em 0.8em;
@@ -240,7 +240,7 @@ div.orglist-selector div.org-container label.org-label {
    -webkit-transition: opacity 0.8s ease-in;
   transition: opacity 0.8s ease-in;
   position: absolute;
-  top: 2px
+  top: 2px;
   left: 0;
   font-size: 0.90em;
 }
@@ -1508,6 +1508,24 @@ div.org-container input[type="checkbox"] {
 .timezone-container {
   padding-bottom: 2em;
 }
+#profileForm {
+  #firstname {
+    width: 300px;
+    max-width: 100%;
+  }
+  #lastname {
+    width: 300px;
+    max-width: 100%;
+  }
+ #month {
+    margin-left: -1em;
+    width: 180px;
+    max-width: 100%;
+  }
+  #bdGroup .flex {
+    flex-wrap: nowrap;
+  }
+}
 
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1660,14 +1678,19 @@ div.org-container input[type="checkbox"] {
     width: 100%;
     max-width: 100%;
   }
-
-  #profileForm #bdGroup div.row {
-    height: 12em;
+  #profileForm {
+    #firstname {
+      width: 300px;
+      max-width: 100%;
+    }
+    #lastname {
+      width: 300px;
+      max-width: 100%;
+    }
+    #bdGroup .flex {
+      flex-wrap: nowrap;
+    }
   }
-  #profileForm div.name-section {
-    height: 10em;
-  }
-
   #userSessionReportDetailHeader span.glyphicon-user {
     padding: 0.4em;
   }
@@ -1712,7 +1735,6 @@ div.org-container input[type="checkbox"] {
     }
 
 }
-
 @media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.9em;
@@ -1787,6 +1809,9 @@ div.org-container input[type="checkbox"] {
   }
   .side {
     height: 37em;
+  }
+  .side-xs-one {
+    height: 29em;
   }
   .side-xs {
     height: 22em;
@@ -1867,13 +1892,25 @@ div.org-container input[type="checkbox"] {
     }
   }
 }
-
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
   }
   #adminTable .organization-field {
     display: none;
+  }
+   #profileForm {
+    #date {
+      width: 50px;
+      max-width: 100%;
+    }
+    #year {
+      width: 90px;
+      max-width: 100%;
+    }
+    #bdGroup .flex {
+      flex-wrap: wrap;
+    }
   }
 }
 @media (min-width: 1200px) {
@@ -1925,7 +1962,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 220px;
+    width: 215px;
   }
 }
 
@@ -1986,7 +2023,12 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1341px) {
   body.open-nav .right-panel {
-    margin-left:220px;
+    margin-left:190px;
+  }
+}
+@media (max-width: 1243px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
   }
 }
 @media (max-width: 1271px) {
@@ -1996,7 +2038,17 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:190px;
+    margin-left:120px;
+  }
+}
+@media (max-width: 1169px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+  }
+}
+@media (max-width: 1130px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
   }
 }
 @media (max-width: 1070px) {
@@ -2006,7 +2058,7 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 991px) {
   body.open-nav .right-panel {
-    margin-left:180px;
+    margin-left:160px;
   }
 }
 @media (max-width: 881px) {
@@ -2014,7 +2066,6 @@ div.org-container input[type="checkbox"] {
     margin-left:210px;
   }
 }
-
 /*** https://github.com/lipis/bootstrap-social ***/
 .btn-social{position:relative;padding-left:44px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.btn-social>:first-child{position:absolute;left:0;top:0;bottom:0;width:32px;line-height:39px;font-size:1.6em;text-align:center;border-right:1px solid rgba(0,0,0,0.2)}
 .btn-social.btn-lg{padding-left:61px}.btn-social.btn-lg>:first-child{line-height:45px;width:45px;font-size:1.8em}

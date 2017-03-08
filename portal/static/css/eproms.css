@@ -80,7 +80,7 @@ body {
   top: 16em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
-  transform(-500px, 0);
+  transform: translate(-500px, 0);
   transition: transform 0.5s ease;
   right: 0;
   padding: 1.5em 0.8em;
@@ -118,11 +118,14 @@ body {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
-#stickyMenu::-webkit-scrollbar, div.home--item-container::-webkit-scrollbar, div.modal.fade::-webkit-scrollbar {
+#stickyMenu::-webkit-scrollbar, 
+div.home--item-container::-webkit-scrollbar, 
+div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
-a.open, a.back {
+a.open,
+a.back {
   position: fixed;
   left: 1em;
   top: 12.3em;
@@ -133,7 +136,8 @@ a.open, a.back {
 a.open {
   top: 14em;
 }
-a.open:hover, a.back:hover {
+a.open:hover, 
+a.back:hover {
   color: #356d43
 }
 div.left-panel {
@@ -230,7 +234,7 @@ div.orglist-selector div.org-container label.org-label {
   -webkit-transition: opacity 0.8s ease-in;
   transition: opacity 0.8s ease-in;
   position: absolute;
-  top: 2px
+  top: 2px;
   left: 0;
   font-size: 0.90em;
 }
@@ -406,7 +410,8 @@ div.orglist-selector div.org-container label.org-label {
 #dataDownloadModal .profile-radio-list {
   margin-left:1em
 }
-#dataDownloadModal div.checkbox label, #dataDownloadModal label.radio-inline {
+#dataDownloadModal div.checkbox label, 
+#dataDownloadModal label.radio-inline {
   font-size: 0.8em;
 }
 #dataDownloadModal input[type="radio"] {
@@ -853,7 +858,8 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm input[type="text"], #createProfileForm select{
+#createProfileForm input[type="text"], 
+#createProfileForm select{
   height: 40px !important;
 }
 #noEmailContainer {
@@ -1156,13 +1162,13 @@ table.profile-audit-log TH,
   }
 }
 .side {
-  height: 28em;
+  height: 27em;
 }
 .side-md {
   height: 24em;
 }
 .side-lg {
-  height: 29em;
+  height: 28em;
 }
 .flex {
   display: flex;
@@ -1390,7 +1396,8 @@ div.org-container input[type="checkbox"] {
   border-bottom: 1px solid #E0E6E3;
   padding: 0.1em 0 1.5em 0;
 }
-.custom-container-item, .custom-container-item-right {
+.custom-container-item, 
+.custom-container-item-right {
   width: 33%;
   max-width: 100%;
 }
@@ -1412,6 +1419,19 @@ div.org-container input[type="checkbox"] {
 .timezone-container {
   padding-bottom: 2em;
 }
+#profileForm #firstname, 
+#profileForm #lastname {
+  width: 300px;
+  max-width: 100%;
+}
+#profileForm #month {
+  margin-left: -1em;
+  width: 180px;
+  max-width: 100%;
+}
+#profileForm #bdGroup .flex {
+  flex-wrap: nowrap;
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {
@@ -1429,6 +1449,18 @@ div.org-container input[type="checkbox"] {
   }
   .text-on-img p:last-child {
     margin-bottom: 0;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: nowrap !important;
+  }
+  #profileStudyIDContainer {
+    margin-top: -2.5em !important;
+  }
+  #profileForm #month {
+    width: 140px !important;
+  }
+  #profileForm #year {
+    margin-left: -2.5em !important;
   }
 }
 @media (max-width: 506px) {
@@ -1538,7 +1570,8 @@ div.org-container input[type="checkbox"] {
     width: 100%;
     max-width: 100%;
   }
-  .download-wrapper, .download-break {
+  .download-wrapper, 
+  .download-break {
     display: none;
   }
   div.search,
@@ -1558,6 +1591,11 @@ div.org-container input[type="checkbox"] {
   }
   #profileForm div.name-section {
     height: 10em;
+  }
+  #profileForm #firstname, 
+  #profileForm #lastname {
+    width: 100%;
+    max-width: 100%;
   }
   #userSessionReportDetailHeader span.glyphicon-user {
     margin-top: 2px;
@@ -1587,7 +1625,8 @@ div.org-container input[type="checkbox"] {
   div.orglist-selector div.dropdown-menu #userOrgs{
     width: 180px !important;
   }
-  div.orglist-selector div.org-container label.org-label, #adminTableToolbar #orglist-footer-container label span {
+  div.orglist-selector div.org-container label.org-label, 
+  #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
   }
 
@@ -1607,7 +1646,8 @@ div.org-container input[type="checkbox"] {
   #userSessionsList {
     font-size: 0.9em;
   }
-  #adminTable .status-field, #adminTable .reports-field {
+  #adminTable .status-field, 
+  #adminTable .reports-field {
     display: none;
   }
 }
@@ -1667,19 +1707,19 @@ div.org-container input[type="checkbox"] {
     height: 10em;
   }
   .side {
-    height: 40em;
+    height: 28em;
   }
   .side-md {
-    height: 36em;
+    height: 30em !important;
   }
   .side-lg {
-    height: 41em;
+    height: 34em !important;
   }
   .side-xs {
     height: 22em;
   }
   .one-side {
-    height: 24em;
+    height: 24em !important;
   }
   .load-container {
     min-height: 1.5em;
@@ -1690,7 +1730,8 @@ div.org-container input[type="checkbox"] {
   .custom-container {
     display: block;
   }
-  .custom-container-item, .custom-container-item-right {
+  .custom-container-item, 
+  .custom-container-item-right {
     font-size: 0.9em;
     width: 100%;
     max-width: 100%;
@@ -1698,6 +1739,9 @@ div.org-container input[type="checkbox"] {
   .custom-container #profileEmailSelect {
     width: 90%;
     max-width: 100%;
+  }
+  #profileStudyIDContainer {
+    margin-top: -1.5em;
   }
 }
 @media (min-width: 991px) {
@@ -1776,6 +1820,23 @@ div.org-container input[type="checkbox"] {
   #adminTable .organization-field {
     display: none;
   }
+  #profileForm #date {
+    width: 50px;
+    max-width: 100%;
+  }
+  #profileForm #year {
+    width: 90px;
+    max-width: 100%;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: wrap;
+  }
+  .side-md {
+    height: 26em;
+  }
+  .side-lg {
+    height: 30em;
+  }
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -1824,7 +1885,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.7em !important;
   }
   body.open-nav .left-panel {
-    width: 220px;
+    width: 215px;
   }
 }
 @media (min-width: 1400px) {
@@ -1865,61 +1926,66 @@ div.org-container input[type="checkbox"] {
     margin-left: 60px;
   }
 }
-
 @media (max-width: 1632px) {
   body.open-nav .right-panel {
     margin-left: 100px;
   }
 }
-
 @media (max-width: 1560px) {
   body.open-nav .right-panel {
     margin-left:140px;
   }
 }
-
 @media (max-width: 1491px) {
   body.open-nav .right-panel {
     margin-left:180px;
   }
 }
-
 @media (max-width: 1399px) {
   body.open-nav .right-panel {
     margin-left:200px;
   }
 }
-
 @media (max-width: 1341px) {
   body.open-nav .right-panel {
-    margin-left:220px;
+    margin-left:197px;
   }
 }
-
+@media (max-width: 1243px) {
+  body.open-nav .right-panel {
+    margin-left:200px;
+  }
+}
 @media (max-width: 1271px) {
   div.right-panel {
     margin-left: 2.5em;
   }
 }
-
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:190px;
+    margin-left:120px;
   }
 }
-
+@media (max-width: 1169px) {
+  body.open-nav .right-panel {
+    margin-left:140px;
+  }
+}
+@media (max-width: 1130px) {
+  body.open-nav .right-panel {
+    margin-left:160px;
+  }
+}
 @media (max-width: 1070px) {
   body.open-nav .right-panel {
     margin-left:210px;
   }
 }
-
 @media (max-width: 991px) {
   body.open-nav .right-panel {
-    margin-left:180px;
+    margin-left:160px;
   }
 }
-
 @media (max-width: 881px) {
   body.open-nav .right-panel {
     margin-left:210px;
@@ -2128,7 +2194,8 @@ fieldset[disabled] .btn-google.active {
   max-width: 100%;
   margin: 0 auto;
 }
-#socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"]  {
+#socialMediaRegistrationContainer .btn-social, 
+#regForm input[type="submit"]  {
     margin: 0.2em auto;
     display: inline-block;
     width: 400px;
@@ -2206,7 +2273,8 @@ div.or {
 }
 
 @media (max-width: 640px) {
-  #regForm input, #socialMediaRegistrationContainer .btn-social, #regForm input[type="submit"] {
+  #regForm input, #socialMediaRegistrationContainer .btn-social, 
+  #regForm input[type="submit"] {
     font-size: 0.9em;
   }
   #socialMediaRegistrationContainer .btn-social {

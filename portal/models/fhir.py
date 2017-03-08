@@ -385,6 +385,10 @@ class UserObservation(db.Model):
                        nullable=False)
     observation_id = db.Column(db.ForeignKey('observations.id'),
                               nullable=False)
+    encounter_id = db.Column(
+        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'))
+
+    encounter = db.relationship('Encounter')
 
     __table_args__ = (UniqueConstraint('user_id', 'observation_id',
         name='_user_observation'),)
@@ -453,6 +457,9 @@ class QuestionnaireResponse(db.Model):
     subject_id = db.Column(db.ForeignKey('users.id'))
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
+    encounter_id = db.Column(
+        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'))
+    encounter = db.relationship("Encounter")
 
     # Fields derived from document content
     status = db.Column(

@@ -12,11 +12,11 @@
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
     <div class="form-group profile-section" id="bdGroup">
         <label>{{ _("Birth Date") }}</label>
-        <div class="row">
-            <div class="col-md-4 col-xs-6">
+        <div class="flex">
+            <div>
                 <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="((0)?[1-9]|1\d|2\d|3[01])" maxlength="2" data-error="Birthday must be valid and in required format." required />
             </div>
-            <div class="col-md-4 col-xs-10">
+            <div>
                 <select class="form-control bd-element" name="birthdayMonth" id="month" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -33,7 +33,7 @@
                     <option value="12">{{ _("December") }}</option>
                 </select>
             </div>
-            <div class="col-md-4 col-xs-6">
+            <div>
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
@@ -1056,7 +1056,7 @@
     </div>
     <div class="timezone-warning"></div>
     <div class="timezone-error"></div>
-    <script>
+    <script async>
     {% if person %}
     $(function() {
         getSaveLoaderDiv("profileForm", "profileTimeZone");
@@ -1130,7 +1130,7 @@
             </div>
         </div>
     </div>
-    <script>
+    <script async>
         $(document).ready(
             function() {
                 getSaveLoaderDiv("profileForm", "boolDeathGroup");
@@ -1247,8 +1247,8 @@
     {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and (current_user.id != person.id) %}
          <div class="row">
             <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg{%endif%}">
-                    <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg side-xs-one{%endif%}">
+                    <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
@@ -1267,7 +1267,7 @@
         <div class="row">
             <div class="col-md-7 col-sm-12 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
-                     {% if person.has_role('patient') %}
+                     {% if person.has_role(ROLE.PATIENT) %}
                         <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("Patient Information") }}</h4>
                      {% else %}
                         <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("User Information") }}</h4>
@@ -1319,11 +1319,11 @@
             </div>
         </div>
     </div>
-    {%if person and person.has_role('patient')%}
+    {%if person and person.has_role(ROLE.PATIENT)%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
                     <div class="flex">
                         <div>
                             {{profileGender(person)}}
@@ -1338,6 +1338,16 @@
                             {{profileIndigenous(person)|show_macro('indigenous')}}
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>
@@ -1363,16 +1373,6 @@
                 <div class="profile-item-container">
                     <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
                     {{patientReports(person)}}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>

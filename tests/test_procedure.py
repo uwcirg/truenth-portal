@@ -94,6 +94,7 @@ class TestProcedure(TestCase):
         self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
         self.assertEquals(proc.user_id, 1)
         self.assertEquals(proc.end_time, datetime(2011, 6, 27))
+        self.assertEquals(proc.encounter.user_id, TEST_USER_ID)
 
     def test_timezone_procedure_POST(self):
         with open(os.path.join(os.path.dirname(__file__),

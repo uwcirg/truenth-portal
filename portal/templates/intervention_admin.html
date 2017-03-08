@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<div class="reduce-font-sizes">
+
+    <h3 class="tnth-headline">{{ _("Intervention Patients") }}</h3>
+
+    <div class="intervention-patients-table table-responsive smaller-text">
+        <div id="interventionPatientsTableToolbar" class="intervention-patients-toolbar"><span id="tableCount"></span></div>
+        <table id="interventionPatientsTable"
+               class="table table-striped table-condensed"
+               data-toggle="table"
+               data-sort-name="userid"
+               data-sort-order="desc"
+               data-search="true"
+               data-pagination="true"
+               data-page-size="50"
+               data-page-list="[25,50,100,ALL]"
+               data-toolbar="#interventionPatientsToolbar"
+               data-show-toggle="true"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
+                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("Username") }}</th>
+                <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
+                <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                <th data-field="birthdate" data-sortable="true">{{ _("Birthdate") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for user in patients %}
+            <tr id="data_row_{{user.id}}">
+                <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email if user.email }}</td>
+                <td>{{ user.first_name if user.first_name }}</td>
+                <td>{{ user.last_name if user.last_name }}</td>
+                <td>{{ user.birthdate if user.birthdate }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
+{% block document_ready %}
+$("#interventionPatientsTable").bootstrapTable({
+    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+        var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" patients";
+        $("#tableCount").html(rowInfo);
+        return rowInfo;
+    }
+});
+
+/***Function for instantly triggering password reset email, if needed later
+function resetPassword(event, email) {
+    if (email) {
+       user_manager.send_reset_password_email(email)
+    };
+};***/
+{% endblock %}
