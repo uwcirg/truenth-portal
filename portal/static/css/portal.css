@@ -84,13 +84,13 @@ body {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
-#stickyMenu::-webkit-scrollbar, 
-div.home--item-container::-webkit-scrollbar, 
+#stickyMenu::-webkit-scrollbar,
+div.home--item-container::-webkit-scrollbar,
 div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
-a.open, 
+a.open,
 a.back {
   position: fixed;
   left: 1em;
@@ -102,7 +102,7 @@ a.back {
 a.open {
   top: 14em;
 }
-a.open:hover, 
+a.open:hover,
 a.back:hover {
   color: #3f51b5
 }
@@ -205,7 +205,7 @@ div.orglist-selector div.org-container label.org-label {
   padding: 0.1em auto;
   color: #5a5a5a;
 }
-#profileStudyIDContainer, 
+#profileStudyIDContainer,
 #studyIdContainer{
   display: none;
 }
@@ -390,7 +390,7 @@ div.orglist-selector div.org-container label.org-label {
  #dataDownloadModal .profile-radio-list {
    margin-left:1em
  }
- #dataDownloadModal div.checkbox label, 
+ #dataDownloadModal div.checkbox label,
  #dataDownloadModal label.radio-inline {
   font-size: 0.8em;
 }
@@ -827,7 +827,7 @@ div.noOrg-container span {
   width:350px;
   max-width: 100%;
 }
-#createProfileForm input[type="text"], 
+#createProfileForm input[type="text"],
 #createProfileForm select {
   height: 40px !important;
 }
@@ -1535,7 +1535,7 @@ div.org-container input[type="checkbox"] {
   #profileForm div.name-section {
     height: 10em;
   }
-  #profileForm #firstname, 
+  #profileForm #firstname,
   #profileForm #lastname {
     width: 100%;
     max-width: 100%;
@@ -1563,7 +1563,7 @@ div.org-container input[type="checkbox"] {
   div.orglist-selector div.dropdown-menu #userOrgs{
     width: 180px !important;
   }
-  div.orglist-selector div.org-container label.org-label, 
+  div.orglist-selector div.org-container label.org-label,
   #adminTableToolbar #orglist-footer-container label span {
     font-size: 0.8em;
   }
@@ -1589,7 +1589,7 @@ div.org-container input[type="checkbox"] {
   #userSessionsList {
     font-size: 0.9em;
   }
-  #adminTable .status-field, 
+  #adminTable .status-field,
   #adminTable .reports-field {
     display: none;
   }
@@ -2110,8 +2110,10 @@ fieldset[disabled] .btn-google.active {
   max-width: 100%;
   margin: 0 auto;
 }
-#socialMediaRegistrationContainer .btn-social, 
-#regForm input[type="submit"]  {
+#socialMediaRegistrationContainer .btn-social,
+#regForm input[type="submit"],
+#socialMediaLoginContainer .btn-social,
+#loginForm input[type="submit"] {
     margin: 0.2em auto;
     display: inline-block;
     width: 400px;
@@ -2128,17 +2130,17 @@ fieldset[disabled] .btn-google.active {
     text-transform: uppercase;
     text-align: left;
 }
-
-#socialMediaRegistrationContainer .btn-social > :first-child {
+#socialMediaRegistrationContainer .btn-social > :first-child,
+#socialMediaLoginContainer .btn-social > :first-child {
   width: 40px;
   top: 0.4em;
 }
-
-#socialMediaRegistrationContainer .divider {
+#socialMediaRegistrationContainer .divider,
+#socialMediaLoginContainer .divider {
   height: 0.5em;
 }
-
-#regForm input {
+#regForm input,
+#loginForm input {
   background: #f1f0ef;
   height: 44px;
   padding: 5px;
@@ -2147,18 +2149,23 @@ fieldset[disabled] .btn-google.active {
   width: 400px;
   max-width: 100%;
 }
-
-#regForm input[type="submit"] {
+#regForm input[type="submit"],
+#loginForm input[type="submit"] {
    background-color: #7C959E;
    text-align: center;
    padding: 1.2em 2em 1em 2em;
+   letter-spacing: 3px;
+}
+#loginForm input[type="submit"] {
+  height: 69px;
 }
 .reg-title {
   font-size: 1.4em;
   line-height: 33px;
-  color: #4B5E6F;
+  color: #494a45;
   position: relative;
   padding: 0.6em 0 20px;
+  margin: 1.5em 0 25px;
   font-weight: bold;
 }
 
@@ -2185,11 +2192,19 @@ div.or {
     width: 100%;
 }
 @media (max-width: 640px) {
-  #regForm input, #socialMediaRegistrationContainer .btn-social, 
-  #regForm input[type="submit"] {
+  #regForm input,
+  #socialMediaRegistrationContainer .btn-social,
+  #regForm input[type="submit"],
+  #loginForm input,
+  #socialMediaLoginContainer .btn-social,
+  #loginForm input[type="submit"]
+  {
     font-size: 0.9em;
+    height: 52px;
   }
-  #socialMediaRegistrationContainer .btn-social {
-    padding-top: 2em;
+  #socialMediaRegistrationContainer .btn-social,
+  #socialMediaLoginContainer .btn-social
+  {
+    padding-top: 1.7em;
   }
 }
