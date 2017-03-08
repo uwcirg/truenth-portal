@@ -33,15 +33,16 @@ class Encounter(db.Model):
     """
     __tablename__ = 'encounters'
     id = db.Column(db.Integer, primary_key=True)
-    status = db.Column('status', status_types)
-    user_id = db.Column(db.ForeignKey('users.id'))
+    status = db.Column('status', status_types, nullable=False)
+    user_id = db.Column(
+        db.ForeignKey('users.id', name='encounters_user_id_fk'), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     """required whereas end_time is optional
     """
     end_time = db.Column(db.DateTime, nullable=True)
     """when not defined, Period is assumed to be ongoing
     """
-    auth_method = db.Column('auth_method', auth_method_types)
+    auth_method = db.Column('auth_method', auth_method_types, nullable=False)
 
     def __str__(self):
         """Log friendly string format"""
