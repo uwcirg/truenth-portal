@@ -53,8 +53,8 @@ class TestClinical(TestCase):
             json.dumps(Reference.patient(TEST_USER_ID).as_fhir()),
             clinical_data['entry'][0]['content']['performer'][0])
         self.assertEquals(
-            Reference.patient(TEST_USER_ID).as_fhir(),
-            clinical_data['entry'][0]['content']['meta']['by'])
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'],
+            clinical_data['entry'][0]['content']['meta']['by']['reference'])
         found = parser.parse(
                 clinical_data['entry'][0]['content']['meta']['lastUpdated'])
         found = found.replace(tzinfo=None)
