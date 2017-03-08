@@ -1358,7 +1358,7 @@
                 <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">Locale / Time Zone</h4>
                 <div class="flex">
                     <div class="timezone-container">
-                        {{profileLocale(person)}}
+                        {{profileLocale(person)|show_macro('language')}}
                     </div>
                     <div class="timezone-container">
                         {{profileTimeZone(person)}}
