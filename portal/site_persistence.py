@@ -230,7 +230,8 @@ class SitePersistence(object):
                     print ("WARNING: include_interventions not set and "
                            "'{}' not present".format(
                                intervention_json))
-                    db.session.expunge(intervention)
+                    if intervention in db.session:
+                        db.session.expunge(intervention)
 
         # Orgs first:
         max_org_id = 0

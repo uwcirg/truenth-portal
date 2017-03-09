@@ -27,7 +27,6 @@ from .fhir import AssessmentStatus
 from .organization import Organization
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .procedure_codes import known_treatment_started
-from .procedure_codes import known_treatment_not_started
 from .role import Role
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
 
@@ -435,7 +434,8 @@ class AccessStrategy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text)
-    intervention_id = db.Column(db.ForeignKey('interventions.id'))
+    intervention_id = db.Column(
+        db.ForeignKey('interventions.id'), nullable=False)
     rank = db.Column(db.Integer)
     function_details = db.Column(JSONB, nullable=False)
 
@@ -455,8 +455,14 @@ class AccessStrategy(db.Model):
             if 'id' in data:
                 obj.id = data['id']
             if 'intervention_name' in data:
-                obj.intervention_id = Intervention.query.filter_by(
-                    name=data['intervention_name']).one().id
+                intervention = Intervention.query.filter_by(
+                    name=data['intervention_name']).first()
+                if not intervention:
+                    raise ValueError(
+                        'Intervention not found {}.  (NB: new interventions '
+                        'require `seed -i` to import)'.format(
+                            data['intervention_name']))
+                obj.intervention_id = intervention.id
             if 'description' in data:
                 obj.description = data['description']
             if 'rank' in data:
