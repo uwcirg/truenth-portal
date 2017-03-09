@@ -1,0 +1,28 @@
+{
+  "name": "TrueNTH USA Portal",
+  "description": "Movember TrueNTH USA Shared Services",
+  "keywords": [
+    "CIRG"
+    "fhir"
+  ],
+  "website": "https://github.com/uwcirg/true_nth_usa_portal",
+  "repository": "https://github.com/uwcirg/true_nth_usa_portal",
+  "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
+  "success_url": "/about",
+  "env": {
+    "SECRET_TOKEN": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    },
+  },
+  "image": "uwcirg-docker-true_nth.bintray.io/portal_web:latest",
+  "addons": [
+    "heroku-redis",
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "9.5"
+      }
+    }
+  ],
+}
