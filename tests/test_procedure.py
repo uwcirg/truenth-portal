@@ -37,8 +37,8 @@ class TestProcedure(TestCase):
         self.assertEquals('Chemotherapy',
             data['entry'][0]['resource']['code']['coding'][0]['display'])
         self.assertEquals(
-            Reference.patient(TEST_USER_ID).as_fhir(),
-            data['entry'][0]['resource']['meta']['by'])
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'],
+            data['entry'][0]['resource']['meta']['by']['reference'])
         last_updated = FHIR_datetime.parse(
             data['entry'][0]['resource']['meta']['lastUpdated'])
         self.assertAlmostEquals(
