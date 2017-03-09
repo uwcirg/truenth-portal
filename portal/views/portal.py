@@ -275,7 +275,6 @@ def access_via_token(token):
         auditable_event("invited user entered using token, pending "
                         "registration", user_id=user.id, subject_id=user.id,
                         context='account')
-        existing_user = User.query.filter_by(email=user.email).first()
         session['challenge.user_id'] = user.id
         session['challenge.next_url'] = url_for('user.register', email=user.email)
         session['challenge.merging_accounts'] = True
