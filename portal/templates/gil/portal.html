@@ -57,7 +57,8 @@
                 <div class="home--registration-container">
                     <h4 class="icon-box__lowhead">{{ _("Complete Registration") }}</h4>
                     <p class="text-left">{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
-                    <a class="icon-box__button icon-box__button--main" href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a>
+                    <div class="home--registration-button-container">
+                    <a class="icon-box__button icon-box__button--main" href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a></div>
                 </div>
             </div>
         {% endif %}

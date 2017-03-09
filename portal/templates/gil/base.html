@@ -77,7 +77,7 @@
               <li class="side-nav-items__item"><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}/about">About TrueNTH</a></li>
-          {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}
+          {% if user and (user.has_role(ROLE.APPLICATION_DEVELOPER) or user.has_role(ROLE.ADMIN)) %}
               <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}/clients">Client Applications</a></li>
           {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
@@ -92,10 +92,8 @@
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>Symptom Tracker</a></li>
-         {% if not user or (user and user.has_role(ROLE.PATIENT)) %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
-         {% endif %}
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
           <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
           <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">Contact</a></li>
           {% if not user %}
