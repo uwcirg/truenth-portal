@@ -13,7 +13,8 @@ RUN \
     apt-get clean
 
 RUN printf '\n\
-<VirtualHost *:80>\n\
+Listen 0.0.0.0:${PORT}\n\
+<VirtualHost *:${PORT}>\n\
   ServerName ${APACHE_SERVER_NAME}\n\
   LogLevel info\n\
   ErrorLog /dev/stderr\n\
@@ -56,6 +57,7 @@ ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
+    PORT="${PORT:-80}" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
 RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
@@ -63,8 +65,7 @@ RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
 RUN a2ensite portal
-
-EXPOSE 80
+EXPOSE ${PORT}
 
 
 
