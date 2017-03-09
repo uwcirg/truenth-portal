@@ -849,7 +849,7 @@ class AssessmentStatus(object):
                 (1, "Due"),
                 (30, "Overdue")
             )
-            for instrument in ('eortc', 'hpfs', 'prems', 'irondemog'):
+            for instrument in ('eortc', 'hpfs', 'prems', 'irondemog', 'comorb'):
                 self.__status_per_instrument(instrument, thresholds)
 
         status_strings = [details['status'] for details in
