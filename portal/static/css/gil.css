@@ -6881,6 +6881,11 @@ figure.nav-overlay {
     max-width: 100%;
     padding: 3em 4em 1.5em 3em
 }
+.home--registration-button-container {
+    width: 300px;
+    max-width: 100%;
+    margin: 2em auto;
+}
 .home--items-wrapper .icon-box__button {
     line-height: 26px;
     padding: 20px;
