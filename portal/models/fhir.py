@@ -840,7 +840,7 @@ class AssessmentStatus(object):
                 (7, "Due"),
                 (90, "Overdue"),
             )
-            for instrument in ('epic26', 'eproms_add'):
+            for instrument in ('epic26', 'eproms_add', 'comorb'):
                 self.__status_per_instrument(instrument, thresholds)
         else:
             # assuming metastaic - although it's possible the user just didn't
