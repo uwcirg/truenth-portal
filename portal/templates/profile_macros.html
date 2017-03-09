@@ -1327,7 +1327,7 @@
                     <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
                     <div class="flex">
                         <div>
-                            {{profileGender(person)}}
+                            {{profileGender(person)|show_macro('gender')}}
                         </div>
                         <div>
                             {{profileEthnicity(person)|show_macro('ethnicity')}}
