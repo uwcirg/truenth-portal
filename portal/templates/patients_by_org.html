@@ -89,12 +89,12 @@
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                   <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field">{{ _("ID") }}</th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
-                  <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
-                  <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                  <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
+                  <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
                    <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -105,7 +105,7 @@
                       <td>{{patient.id}}</td>
                       <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                      <td>{{ patient.first_name if patient.first_name }}</td>
+                      <td style="width: 10%; word-wrap:break-word;">{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
