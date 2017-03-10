@@ -7,8 +7,8 @@
     <div class="row">
         <div class="col-md-push-3 col-md-5 col-xs-11">
              <div class="btn-social-container">
-                <h4 class="tnth-headline reg-title">Register for TrueNTH</h4>
-                <p id="createAcctTxt" class="profile-item-title">Create an account:</p>
+                <h4 class="tnth-headline reg-title">{{ app_text('registration title') }}</h4>
+                <p id="createAcctTxt" class="profile-item-title">{{ app_text('registration prompt') }}</p>
                 {{ form.hidden_tag() }}
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
