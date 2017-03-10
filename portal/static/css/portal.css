@@ -1661,7 +1661,7 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 797px) {
-  #indexNavBar,
+  #indexNavBar span.index-list,
   #indexContainer {
     display: none;
   }
