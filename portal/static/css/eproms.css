@@ -443,7 +443,10 @@ div.right-panel {
 }
 #patientAssessmentDownload {
   padding: 0.65em;
-  height: 2.6em;
+  height: 2.86em;
+  font-size: 1em;
+  vertical-align: middle;
+  border-radius: 4px;
 }
 #dataDownloadModal .modal-body {
   padding: 1em;
@@ -1265,6 +1268,9 @@ table.profile-audit-log TH,
 .radio input[type=radio],
 .radio-inline input[type=radio] {
   margin-top: 4px;
+}
+.radio input[type=radio],
+.radio-inline input[type=radio] {
   position: relative;
   left: 1px;
   margin-right: 6px;
