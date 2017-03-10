@@ -72,6 +72,33 @@ body {
   font-size: @baseFontSize;
 }
 
+.btn {
+  font-size: @btnSize;
+  letter-spacing: 1px;
+}
+.btn-set {
+  margin-bottom: 1.5em;
+  .btn {
+    margin-bottom: 0.5em;
+  }
+}
+
+.btn-tnth-primary {
+  color: #fff;
+  background-color: @btnColor;
+  border-color: @btnColor;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  &:hover,
+  &:focus,
+  &.active,
+  .open > .dropdown-toggle& {
+    color: #fff;
+    background-color: #2a4531;
+    border-color: #1c2f21;
+  }
+}
+
 a {
   color: @linkColor;
 }
@@ -673,31 +700,7 @@ div.right-panel {
     width: 100%;
   }
 }
-.btn {
-  font-size: @btnSize;
-}
-.btn-set {
-  margin-bottom: 1.5em;
-  .btn {
-    margin-bottom: 0.5em;
-  }
-}
 
-.btn-tnth-primary {
-  color: #fff;
-  background-color: @btnColor;
-  border-color: @btnColor;
-  transition: all 0.3s ease-in-out 0s;
-  -webkit-transition: all 0.3s ease-in-out 0s;
-  &:hover,
-  &:focus,
-  &.active,
-  .open > .dropdown-toggle& {
-    color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
-  }
-}
 .btn-tnth-back {
   color: #777;
   padding: 0 5px 0 0;
@@ -1010,10 +1013,9 @@ div.noOrg-container {
 
 #btnProfileSendEmail {
   margin-top: 5%;
-  font-size: @smallText;
   padding: 0.5em;
-  border-radius: 6px;
-  color: #FFF
+  border-radius: 4px;
+  color: #FFF;
 }
 
 #profileEmailMessage {
@@ -1307,16 +1309,35 @@ div.noOrg-container {
   margin-bottom: 2em;
   border-bottom: 1px solid #E0E6E3;
   padding: 0.1em 0 1.5em 0;
-}
-.custom-container-item, .custom-container-item-right {
-  width: 33%;
-  max-width: 100%;
-}
-.custom-container-item-right {
-  margin-right: 0.12em;
-}
-.custom-container-content {
-  font-size: 0.95em;
+  h4 {
+    margin-bottom: 1em;
+  }
+  button, a {
+    padding: 0.5em;
+  }
+  #btnProfileSendEmail {
+    width: 100%;
+  }
+  .custom-container-item, .custom-container-item-right {
+    width: 33%;
+    max-width: 100%;
+    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .custom-container-item-right {
+    margin-right: 0.12em;
+  }
+  .custom-container-content {
+    font-size: 0.95em;
+  }
+  .custom-btn {
+    margin-bottom: 0.9em;
+  }
+  .enter-manual-container {
+    flex-grow: 1.5;
+  }
 }
 
 .flex {
@@ -1900,15 +1921,19 @@ div.org-container {
   }
   .custom-container {
     display: block;
-  }
-  .custom-container-item, .custom-container-item-right {
-    font-size: @smallText;
-    width: 100%;
-    max-width: 100%;
-  }
-  .custom-container #profileEmailSelect {
-    width: 90%;
-    max-width: 100%;
+    .custom-container-item, .custom-container-item-right {
+      font-size: @smallText;
+      width: 100%;
+      max-width: 100%;
+    }
+    #profileEmailSelect {
+      width: 90%;
+      max-width: 100%;
+    }
+    #btnProfileSendEmail, .custom-btn {
+      width: 280px;
+      max-width: 100%;
+    }
   }
   #profileStudyIDContainer {
     margin-top: -1.5em;

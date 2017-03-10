@@ -53,6 +53,7 @@ a.btn {
 }
 .btn {
   font-size: 1em;
+  letter-spacing: 1px;
 }
 .btn-set {
   margin-bottom: 1.5em;
