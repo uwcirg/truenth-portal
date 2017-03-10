@@ -8,6 +8,9 @@
 /**
  * = Colors =
  **/
+/**
+ *  Font-family
+ **/
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -27,7 +30,40 @@ body {
   color: #333;
   font-size: 16px;
 }
-
+a {
+  color: #57675B;
+}
+a:hover,
+a:active {
+  color: #2a4531;
+}
+a.btn {
+  cursor: pointer;
+}
+.tnth-hide {
+  display: none;
+}
+.tnth-headline {
+  margin: 30px 0 20px;
+  font-size: 1.25em;
+}
+.tnth-subhead {
+  font-size: 1.2em;
+}
+.feature-btn {
+  transition: all 0.2s ease-in-out 0s;
+  -webkit-transition: all 0.2s ease-in-out 0s;
+  border: 2px solid #333;
+}
+.feature-btn-primary {
+  background-color: #FFF;
+  color: #333;
+}
+.feature-btn-primary:hover,
+.feature-btn-primary:active {
+  color: #FFF;
+  background-color: #000;
+}
 #fullSizeBox a[href*="register"] {
   display: none;
 }
@@ -51,9 +87,6 @@ body {
 }
 #socialMediaRegistrationContainer,
 #socialMediaLoginContainer {
-  display: none;
-}
-#emailInfoText {
   display: none;
 }
 #mainHolder {
@@ -99,31 +132,33 @@ body {
   transition: all 500ms ease-in;
   display: block;
 }
-#stickyMenu .title {
-  color: #5b5e61;
-  font-weight: bold;
-}
-#stickyMenu ul {
-  padding:0;
-  margin:0;
-  list-style-type:none;
-}
-#stickyMenu li {
-  margin-bottom:6px;
-  cursor:pointer;
-}
-#stickyMenu a:hover {
-  color: #337ab7;
-}
 #stickyMenu.sticky-show {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
 #stickyMenu::-webkit-scrollbar,
-div.home--item-container::-webkit-scrollbar,
-div.modal.fade::-webkit-scrollbar {
-    width: 0px;  /* remove scrollbar space */
-    background: transparent;  /* optional: just make scrollbar invisible */
+#stickyMenu div.home--item-container::-webkit-scrollbar,
+#stickyMenu div.modal.fade::-webkit-scrollbar {
+  width: 0px;
+  /* remove scrollbar space */
+  background: transparent;
+  /* make scrollbar invisible */
+}
+#stickyMenu .title {
+  color: #5b5e61;
+  font-weight: bold;
+}
+#stickyMenu ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+#stickyMenu li {
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+#stickyMenu li:hover {
+  color: #337ab7;
 }
 a.open,
 a.back {
@@ -137,41 +172,42 @@ a.back {
 a.open {
   top: 14em;
 }
-a.open:hover,
+a.open:hover {
+  color: #2a4531;
+}
 a.back:hover {
-  color: #356d43
+  color: #2a4531;
 }
 div.left-panel {
-  position:fixed;
+  position: fixed;
   padding: 10px;
   top: 0;
   left: 0;
-  height:100%;
-  width:50px;
-  background:#e2e4d9;
+  height: 100%;
+  width: 50px;
+  background: #e2e4d9;
   transition: width ease .5s;
   z-index: -1;
   display: none;
 }
-
 body.open-nav .left-panel {
-    width:270px;
+  width: 270px;
 }
 div.right-panel {
-  position:relative;
-  margin-left:1em;
-  transition:margin-left ease .5s;
+  position: relative;
+  margin-left: 1em;
+  transition: margin-left ease 0.5s;
 }
-
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
 }
-
-div.orglist-selector {
+#adminTable div.card-view {
+  display: flex;
+}
+#adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
-
 #adminTableToolbar div.orglist-selector button {
   background-color: #FFF;
   border: 1px solid #ccc;
@@ -180,75 +216,50 @@ div.orglist-selector {
   border-radius: 4px;
   font-size: 0.9em;
 }
-#adminTableToolbar div.dropdown-menu {
-  max-height: 550px;
-  transition: height 300ms ease-in;
-}
-#adminTableToolbar #orglist-footer-container {
-  padding: 0 0.5em;
-  width: 250px;
-  max-width: 100%;
-  margin: 0 auto;
-}
-#adminTableToolbar #orglist-footer-container label {
-  font-weight: normal;
-  font-size: 0.95em;
-}
-#adminTableToolbar #orglist-footer-container input[type="checkbox"] {
-  position: relative;
-  top: -1px;
-}
-#adminTableToolbar div.org-container {
-  display: block;
-  margin: -0.4em 0;
-}
-#adminTable div.card-view {
-  display: flex;
-}
-div.orglist-selector div.dropdown-menu #userOrgs {
+#adminTableToolbar div.orglist-selector div.dropdown-menu #userOrgs {
   width: 300px;
   max-width: 100%;
   padding: 0 0.5em 0 1em;
   margin: 0 auto;
 }
-div.orglist-selector div.dropdown-menu #userOrgs input {
-  cursor: pointer;
-}
-div.orglist-selector div.dropdown-menu #fillOrgs .divider {
+#adminTableToolbar div.orglist-selector div.dropdown-menu #fillOrgs .divider {
   display: none;
 }
-div.orglist-selector div.org-container label.org-label {
+#adminTableToolbar div.orglist-selector div.org-container {
+  display: block;
+  margin: -0.4em 0;
+}
+#adminTableToolbar div.orglist-selector div.org-container label.org-label {
   margin: -5em 0;
   font-size: 0.95em;
   display: inline;
 }
-
-#profileStudyIDContainer {
-  margin-top: -1em;
-}
-#profileStudyIDContainer input {
-  width: 50%;
+#adminTableToolbar div.orglist-selector #orglist-footer-container {
+  padding: 0 0.5em;
+  width: 250px;
   max-width: 100%;
+  margin: 0 auto;
+}
+#adminTableToolbar div.orglist-selector #orglist-footer-container label {
+  font-weight: normal;
+  font-size: 0.95em;
+}
+#adminTableToolbar div.orglist-selector #orglist-footer-container input[type="checkbox"] {
+  position: relative;
+  top: -1px;
 }
 .save-info {
   opacity: 0;
   -webkit-transition: opacity 0.8s ease-in;
   transition: opacity 0.8s ease-in;
   position: absolute;
-  font-size: 0.90em;
-}
-#accessCodeWrapper {
-  height: 100%;
-  width: 100%;
-  min-height: 400px;
-  overflow: hidden;
-  margin: auto;
+  font-size: 0.9em;
 }
 .access-button {
   opacity: 1;
   box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
   border-color: #E0E6E3;
-  background-color: #606a73;
+  background-color: #79815D;
   background-image: none;
   color: #ffffff;
   font-weight: normal;
@@ -259,7 +270,7 @@ div.orglist-selector div.org-container label.org-label {
   background-size: auto;
   background-repeat: repeat;
   background-position: center center;
-  font-size: 14px;
+  font-size: 0.95em;
   font-style: normal;
   font-family: Arial;
   text-align: center;
@@ -276,18 +287,19 @@ div.orglist-selector div.org-container label.org-label {
   width: 600px;
   max-width: 100%;
   min-height: 500px;
+  overflow: hidden;
 }
 #accessCodeWrapper .main {
   padding: 4em;
+}
+#accessCodeWrapper .disabled {
+  background-color: #999;
+  opacity: 0.65;
 }
 #shortcut_alias {
   width: 140px;
   max-width: 100%;
   height: 34px;
-}
-#accessCodeWrapper .disabled {
-  background-color: #999;
-  opacity: 0.65;
 }
 #registerLink {
   position: relative;
@@ -317,15 +329,16 @@ div.orglist-selector div.org-container label.org-label {
 #indexContainer li {
   cursor: pointer;
 }
+#indexContainer a {
+  color: #FFF;
+}
 #indexContainer.open {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
   display: block;
 }
-#indexContainer a {
-  color: #FFF;
-}
 #indexNavBar {
+  display: none;
   width: 100%;
   max-width: 100%;
   color: #575F5C;
@@ -334,7 +347,6 @@ div.orglist-selector div.org-container label.org-label {
   padding: 0.5em 0.2em 0.7em 0.2em;
   background-image: linear-gradient(to right, #ffffff, rgba(159, 165, 167, 0.16), rgba(173, 193, 197, 0.18));
   vertical-align: center;
-  display: block;
 }
 #indexNavBar span.index-list {
   display: block;
@@ -379,8 +391,8 @@ div.orglist-selector div.org-container label.org-label {
   border: solid #ccc 1px;
   text-decoration: none;
 }
-#indexNavBar #indexNavBar span:hover {
-  color: #79815D;
+#indexNavBar span:hover {
+  color: #2a4531;
   cursor: pointer;
 }
 #indexNavBar #backLink {
@@ -395,21 +407,31 @@ div.orglist-selector div.org-container label.org-label {
 #patientList #_downloadLink {
   visibility: hidden;
 }
+#patientList .firstname-field,
+#patientList .lastname-field {
+  max-width: 150px;
+  word-wrap: break-word;
+}
+#patientList .email-field {
+  max-width: 230px;
+  word-wrap: break-word;
+}
 #patientAssessmentDownload {
   padding: 0.65em;
-  font-size: 1.1em;
   height: 2.6em;
 }
 #dataDownloadModal .modal-body {
-  padding: 1em
+  padding: 1em;
 }
 #dataDownloadModal button {
-  font-size:0.8em;
+  font-size: 0.8em;
 }
 #dataDownloadModal .profile-radio-list {
-  margin-left:1em
+  margin-left: 1em;
 }
-#dataDownloadModal div.checkbox label,
+#dataDownloadModal div.checkbox label {
+  font-size: 0.8em;
+}
 #dataDownloadModal label.radio-inline {
   font-size: 0.8em;
 }
@@ -419,7 +441,7 @@ div.orglist-selector div.org-container label.org-label {
   left: -1px;
 }
 #_downloadMessage {
-  color:#a94442
+  color: #a94442;
 }
 .orglist-download-container {
   display: inline-block;
@@ -434,39 +456,15 @@ div.orglist-selector div.org-container label.org-label {
 .orglist-download-container a {
   color: #57675B;
 }
-
-a {
-  color: #57675B;
-}
-a:hover,
-a:active {
-  color: #2a4531;
-}
-a.btn {
-  cursor: pointer;
-}
-.tnth-hide {
-  display: none;
-}
-.tnth-headline {
-  margin: 30px 0 20px;
-  font-size: 1.25em;
-}
-.tnth-subhead {
-  font-size: 1.2em;
-}
 .smaller-text {
   font-size: 0.85em;
 }
 .smaller-text .form-control {
   font-size: 0.85em;
-  height: 1.6em;
+  height: 1.7em;
 }
 .smaller-text .btn {
-  font-size: 0.8em;
-}
-.small-text {
-  font-size: 0.96em;
+  font-size: 0.85em;
 }
 .loading {
   opacity: 0.3;
@@ -488,20 +486,6 @@ a.btn {
   font-weight: bold;
   font-size: 16px;
   line-height: 21.28px;
-}
-.feature-btn {
-  transition: all 0.2s ease-in-out 0s;
-  -webkit-transition: all 0.2s ease-in-out 0s;
-  border: 2px solid #ccc;
-}
-.feature-btn-primary {
-  background-color: #fff;
-  color: #333;
-}
-.feature-btn-primary:hover,
-.feature-btn-primary:active {
-  color: #fff;
-  background-color: #000;
 }
 #fullSizeBox {
   position: relative;
@@ -641,7 +625,7 @@ a.btn {
 }
 .form-control {
   font-size: 16px;
-  height: 36px;
+  height: 39px;
 }
 .form-group .help-block {
   font-size: 0.95em;
@@ -650,8 +634,7 @@ a.btn {
   font-weight: normal;
 }
 .profile-img {
-  /*float: right;*/
-  display: inline-block;
+  display: inline:block;
   margin-top: -66px;
 }
 .profile-img img {
@@ -773,7 +756,7 @@ a.btn {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
   /*background-color: rgba(204, 206, 204, 0.25);*/
-  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%) ;
+  background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
   padding: 1.5em 2.2em 2em 2.2em;
   border-radius: 8px;
   margin: 0.5em auto;
@@ -782,7 +765,6 @@ a.btn {
   overflow-x: hidden;
 }
 .profile-item-title {
-  /*color: #575F5C;*/
   color: #526960;
   margin-bottom: 18px;
 }
@@ -801,6 +783,22 @@ a.btn {
 #profileForm div.name-section {
   height: 4.5em;
 }
+#profileForm #firstname {
+  width: 300px;
+  max-width: 100%;
+}
+#profileForm #lastname {
+  width: 300px;
+  max-width: 100%;
+}
+#profileForm #month {
+  margin-left: -1em;
+  width: 180px;
+  max-width: 100%;
+}
+#profileForm #bdGroup .flex {
+  flex-wrap: nowrap;
+}
 #userEthnicity label {
   margin-bottom: 0;
 }
@@ -817,7 +815,7 @@ a.btn {
   margin-bottom: 0;
 }
 #userOrgs {
-  font-size: 0.99em;
+  font-size: 0.95em;
 }
 #fillOrgs legend {
   font-size: 0.92em;
@@ -837,13 +835,12 @@ input.clinic {
   right: 5px !important;
   top: -1px !important;
 }
-div.noOrg-container input[type="radio"]
-{
-  font-size:0.95em;
+div.noOrg-container input[type="radio"] {
+  font-size: 0.95em;
   top: 2px;
 }
 div.noOrg-container span {
-  margin-left:5px;
+  margin-left: 5px;
   position: relative;
   top: 1px;
 }
@@ -854,19 +851,32 @@ div.noOrg-container span {
   margin-top: 0.5em;
 }
 #createProfileForm #studyId {
-  width:350px;
+  width: 350px;
   max-width: 100%;
 }
-#createProfileForm input[type="text"],
-#createProfileForm select{
+#createProfileForm input[type="text"] {
   height: 40px !important;
 }
-#noEmailContainer {
+#createProfileForm select {
+  height: 40px !important;
+}
+#createProfileForm #phone,
+#createProfileForm #email {
+  width: 350px;
+  max-width: 100%;
+}
+#createProfileForm #userOrgs .smaller-text {
+  display: none;
+}
+#createProfileForm #noEmailContainer {
   margin-top: 0.3em;
 }
-#noEmail {
-  position:relative;
-  top:-1px
+#createProfileForm #noEmail {
+  position: relative;
+  top: -1px;
+}
+#emailInfoText {
+  display: none;
 }
 #profileSendEmailContainer {
   padding-bottom: 5%;
@@ -900,6 +910,13 @@ div.noOrg-container span {
   margin-top: 1em;
   margin-left: 0.5em;
 }
+#profileStudyIDContainer {
+  margin-top: -1em;
+}
+#profileStudyIDContainer input {
+  width: 50%;
+  max-width: 100%;
+}
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
@@ -929,7 +946,7 @@ div.noOrg-container span {
   margin-top: -2.5px;
 }
 #userSessionReportDetailHeader span.glyphicon:hover {
-  color: #979a8d;
+  color: #2a4531;
 }
 #userSessionReportDetailHeader span.glyphicon-home {
   top: 5px;
@@ -977,14 +994,6 @@ table.profile-audit-log TH,
 #agreeLabel {
   margin-left: 2em;
 }
-#createProfileForm #phone,
-#createProfileForm #email {
-  width: 350px;
-  max-width: 100%;
-}
-#createProfileForm #userOrgs .smaller-text {
-  display: none;
-}
 .create-user-link {
   border-radius: 4px;
   color: #57675B;
@@ -998,11 +1007,7 @@ table.profile-audit-log TH,
   transition: all 300ms ease-in;
 }
 .profile-header {
-  /*
-  width: 100%%;
-  max-width: 100%;
-  */
-  display:inline-block;
+  display: inline-block;
 }
 .profile-section {
   margin-bottom: 1.5em;
@@ -1027,7 +1032,7 @@ table.profile-audit-log TH,
   color: #a94442;
 }
 .report-error-message {
-  color: red;
+  color: #a94442;
   background-color: #f5f5f5;
   margin-left: 8px;
   display: none;
@@ -1169,6 +1174,23 @@ table.profile-audit-log TH,
 .side-lg {
   height: 28em;
 }
+.custom-container {
+  display: flex;
+  margin-bottom: 2em;
+  border-bottom: 1px solid #E0E6E3;
+  padding: 0.1em 0 1.5em 0;
+}
+.custom-container-item,
+.custom-container-item-right {
+  width: 33%;
+  max-width: 100%;
+}
+.custom-container-item-right {
+  margin-right: 0.12em;
+}
+.custom-container-content {
+  font-size: 0.95em;
+}
 .flex {
   display: flex;
   flex-wrap: wrap;
@@ -1177,7 +1199,8 @@ table.profile-audit-log TH,
 .flex div {
   margin: 0.5em 1.7em 0.5em 0.1em;
 }
-#phone, #email {
+#phone,
+#email {
   width: 300px;
   max-width: 100%;
 }
@@ -1238,9 +1261,6 @@ sub.pointer {
 sub.pointer:hover {
   color: #79815D;
 }
-.gradient {
-  background-image: linear-gradient(to top right, #FFF, #e1e2e1);
-}
 .report-custom-header {
   padding: 0.3em 0.5em;
   border-radius: 4px;
@@ -1272,7 +1292,7 @@ sub.pointer:hover {
   border-top-color: #575a4d;
 }
 .tooltip.right .tooltip-arrow {
-  border-right-color: #575a4d
+  border-right-color: #575a4d;
 }
 .tooltip.bottom .tooltip-arrow {
   border-bottom-color: #575a4d;
@@ -1314,9 +1334,8 @@ sub.pointer:hover {
   padding: 0.1em;
 }
 #profileConsentList a {
-  text-decoration:underline;
+  text-decoration: underline;
 }
-
 #profileConsentList a:hover {
   color: #3c763d;
 }
@@ -1324,20 +1343,18 @@ sub.pointer:hover {
   background-color: #7d826e;
   color: #FFF;
   font-weight: normal;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-}
-#profileConsentList .consentlist-cell{
-  background-color: #fbf9f9;
   padding-left: 0.6em;
   padding-right: 0.6em;
 }
-.btn-delete-consent, .btn-add-consent {
-  color: #79815d;
+#profileConsentList .consentlist-cell {
+  background-color: #fbf9f9;
+}
+.btn-delete-consent,
+.btn-add-consent {
+  color: #7d826e;
   font-size: 0.9em;
   font-weight: bold;
 }
-
 #identityVerificationContainer {
   padding: 2em 1.5em;
   margin: 1em auto;
@@ -1365,29 +1382,28 @@ div.input-group.date {
   margin-top: -2px;
 }
 div.org-container legend {
-  color: #474848;
+  color: #595F57;
 }
-div.org-container label.org-label{
-  margin: 0.1em 0 0.22em 0;
+div.org-container label.org-label {
+  margin: 0.2em 0;
 }
-
 div.org-container .text-muter {
   margin-bottom: 4px;
-  margin-top:4px;
+  margin-top: 4px;
   font-size: 0.97em;
-  color: #989696;
+  color: #777474;
 }
 div.org-container input[type="checkbox"] {
-  position:relative;
-  top:-1px;
-  right:4px;
+  position: relative;
+  top: -1px;
+  right: 4px;
 }
 #fillOrgs .divider {
-  display:block;
-  height:0.25em;
+  display: block;
+  height: 0.25em;
 }
 .indent {
-  padding: 0 1.4em;
+  padding: 0 1em;
 }
 .custom-container {
   display: flex;
@@ -1407,29 +1423,16 @@ div.org-container input[type="checkbox"] {
   font-size: 0.95em;
 }
 .registration-status-container {
-  margin:0 0 0.8em 0;
+  margin: 0 0 0.8em 0;
   font-size: 0.95em;
 }
 .registration-label {
-  display:inline-block;
+  display: inline-block;
   opacity: 0.7;
   font-size: 0.99em;
 }
 .timezone-container {
   padding-bottom: 2em;
-}
-#profileForm #firstname,
-#profileForm #lastname {
-  width: 300px;
-  max-width: 100%;
-}
-#profileForm #month {
-  margin-left: -1em;
-  width: 180px;
-  max-width: 100%;
-}
-#profileForm #bdGroup .flex {
-  flex-wrap: nowrap;
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1449,11 +1452,11 @@ div.org-container input[type="checkbox"] {
   .text-on-img p:last-child {
     margin-bottom: 0;
   }
-  #profileForm #bdGroup .flex {
-    flex-wrap: nowrap !important;
-  }
   #profileStudyIDContainer {
     margin-top: -2.5em !important;
+  }
+  #profileForm #bdGroup .flex {
+    flex-wrap: nowrap !important;
   }
   #profileForm #month {
     width: 140px !important;
@@ -1485,16 +1488,15 @@ div.org-container input[type="checkbox"] {
   h4,
   h5,
   label,
+  legend,
   .tnth-form .form-group > label {
     font-size: 13px;
   }
+  .flex div {
+    margin-left: 0.1em;
+  }
   .create-user-link {
     font-size: 0.95em;
-  }
-
-  #backLink a {
-    position: relative;
-    top: -1px;
   }
   #indexNavBar {
     display: block;
@@ -1503,7 +1505,9 @@ div.org-container input[type="checkbox"] {
   #indexNavBar span.glyphicon {
     margin-left: -2px;
   }
-
+  #indexNavBar #backLink a {
+    top: -0.1px;
+  }
   #indexNavBar span.index-list {
     display: inline-block;
   }
@@ -1517,7 +1521,8 @@ div.org-container input[type="checkbox"] {
   .fixed-table-pagination {
     font-size: 0.9em;
   }
-  #userSessionsList {
+  #userSessionsList,
+  #fillOrgs legend {
     font-size: 0.85em;
   }
   .side {
@@ -1526,12 +1531,18 @@ div.org-container input[type="checkbox"] {
   .one-side {
     height: 24em !important;
   }
-  #phone,
-  #email {
+  #createProfileForm #phone,
+  #createProfileForm #email,
+  #createProfileForm #studyId {
     width: 100%;
     max-width: 100%;
   }
-  #profileStudyIDContainer input {
+  #createProfileForm .btn-tnth-back {
+    margin-left: 2.5em;
+  }
+  #profileForm #phone,
+  #profileForm #email,
+  #profileForm #profileStudyIDContainer input {
     width: 100%;
     max-width: 100%;
   }
@@ -1548,7 +1559,6 @@ div.org-container input[type="checkbox"] {
   table.profile-audit-log {
     font-size: 0.7em;
   }
-
   #profileConsentList {
     font-size: 0.5em;
   }
@@ -1575,7 +1585,7 @@ div.org-container input[type="checkbox"] {
   }
   div.search,
   div.columns {
-   display: none;
+    display: none;
   }
   div.columns {
     top: 4px;
@@ -1608,42 +1618,32 @@ div.org-container input[type="checkbox"] {
   #adminTable .email-field {
     display: none;
   }
-
   #adminTableToolbar div.indent {
     padding: 0 0.2em;
   }
-
   #adminTableToolbar div.dropdown-menu {
     width: 200px !important;
     overflow: auto;
   }
-  #adminTableToolbar #orglistSelector {
-    width: 100%;
-    max-width: 100%;
-  }
-  div.orglist-selector div.dropdown-menu #userOrgs{
-    width: 180px !important;
-  }
-  div.orglist-selector div.org-container label.org-label,
-  #adminTableToolbar #orglist-footer-container label span {
+  #adminTableToolbar div.dropdown-menu div.org-container label.org-label {
     font-size: 0.8em;
   }
-
-  #adminTableToolbar #orglist-footer-container {
+  #adminTableToolbar div.orglist-selector #orglist-footer-container {
     padding: 0.5em 1em;
   }
-
-  #adminTableToolbar #orglist-footer-container input[type="checkbox"] {
+  #adminTableToolbar div.orglist-selector #orglist-footer-container label {
+    font-size: 0.8em !important;
+  }
+  #adminTableToolbar div.orglist-selector #orglist-footer-container input[type="checkbox"] {
     top: 0;
   }
-
   .timezone-container {
     padding-bottom: 0;
   }
 }
 @media (max-width: 730px) {
   #userSessionsList {
-    font-size: 0.9em;
+    font-size: 0.85em;
   }
   #adminTable .status-field,
   #adminTable .reports-field {
@@ -1651,7 +1651,6 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 768px) {
-
   #fullSizeBox {
     /*background-image: none;
     min-height: auto;*/
@@ -1688,11 +1687,19 @@ div.org-container input[type="checkbox"] {
   }
 }
 @media (min-width: 797px) {
- #indexNavBar, #indexContainer {
+  #indexNavBar,
+  #indexContainer {
     display: none;
   }
-  div.left-panel, a.back, a.open {
+  div.left-panel,
+  a.back,
+  a.open {
     display: block;
+  }
+}
+@media (min-width: 991px) {
+  #mainNav {
+    height: 135px;
   }
 }
 @media (max-width: 991px) {
@@ -1741,11 +1748,6 @@ div.org-container input[type="checkbox"] {
   }
   #profileStudyIDContainer {
     margin-top: -1.5em;
-  }
-}
-@media (min-width: 991px) {
-  #mainNav {
-    height: 135px;
   }
 }
 @media (min-width: 992px) {
@@ -1932,27 +1934,27 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1560px) {
   body.open-nav .right-panel {
-    margin-left:140px;
+    margin-left: 140px;
   }
 }
 @media (max-width: 1491px) {
   body.open-nav .right-panel {
-    margin-left:180px;
+    margin-left: 180px;
   }
 }
 @media (max-width: 1399px) {
   body.open-nav .right-panel {
-    margin-left:200px;
+    margin-left: 200px;
   }
 }
 @media (max-width: 1341px) {
   body.open-nav .right-panel {
-    margin-left:197px;
+    margin-left: 197px;
   }
 }
 @media (max-width: 1243px) {
   body.open-nav .right-panel {
-    margin-left:200px;
+    margin-left: 200px;
   }
 }
 @media (max-width: 1271px) {
@@ -1962,32 +1964,32 @@ div.org-container input[type="checkbox"] {
 }
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:120px;
+    margin-left: 120px;
   }
 }
 @media (max-width: 1169px) {
   body.open-nav .right-panel {
-    margin-left:140px;
+    margin-left: 140px;
   }
 }
 @media (max-width: 1130px) {
   body.open-nav .right-panel {
-    margin-left:160px;
+    margin-left: 160px;
   }
 }
 @media (max-width: 1070px) {
   body.open-nav .right-panel {
-    margin-left:210px;
+    margin-left: 210px;
   }
 }
 @media (max-width: 991px) {
   body.open-nav .right-panel {
-    margin-left:160px;
+    margin-left: 160px;
   }
 }
 @media (max-width: 881px) {
   body.open-nav .right-panel {
-    margin-left:210px;
+    margin-left: 210px;
   }
 }
 /*** https://github.com/lipis/bootstrap-social ***/
@@ -2196,22 +2198,21 @@ fieldset[disabled] .btn-google.active {
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #socialMediaLoginContainer .btn-social,
-#loginForm input[type="submit"] {
-    margin: 0.2em auto;
-    display: inline-block;
-    width: 400px;
-    max-width: 100%;
-    margin: 0 auto;
-    overflow: hidden;
-    height: 62px;
-    font-size: 17px;
-    line-height: 1;
-    margin: 0 auto;
-    letter-spacing: 3px;
-    border-radius: 0px;
-    padding: 1.2em 2em 1em 4em;
-    text-transform: uppercase;
-    text-align: left;
+#socialMediaLoginContainer input[type="submit"] {
+  margin: 0.2em auto;
+  display: inline-block;
+  width: 400px;
+  max-width: 100%;
+  overflow: hidden;
+  height: 62px;
+  font-size: 17px;
+  line-height: 1;
+  margin: 0 auto;
+  letter-spacing: 3px;
+  border-radius: 0px;
+  padding: 1.2em 2em 1em 4em;
+  text-transform: uppercase;
+  text-align: left;
 }
 #socialMediaRegistrationContainer .btn-social > :first-child,
 #socialMediaLoginContainer .btn-social > :first-child {
@@ -2234,10 +2235,9 @@ fieldset[disabled] .btn-google.active {
 }
 #regForm input[type="submit"],
 #loginForm input[type="submit"] {
-   background-color: #79815d;
-   text-align: center;
-   padding: 1.2em 2em 1em 2em;
-   letter-spacing: 3px;
+  background-color: #79815d;
+  text-align: center;
+  padding: 1.2em 2em 1em 2em;
 }
 #loginForm input[type="submit"] {
   height: 69px;
@@ -2252,41 +2252,41 @@ fieldset[disabled] .btn-google.active {
   font-weight: bold;
 }
 div.or {
-    display: none;
-    background: #aeb4b9;
-    border-radius: 12px;
-    color: #fff;
-    font-size: 9px;
-    font-weight: bold;
-    height: 25px;
-    line-height: 27px;
-    text-align: center;
-    text-transform: uppercase;
-    width: 25px;
-    margin: 1em auto;
-    position: relative;
-    z-index: 1;
+  display: none;
+  background: #aeb4b9;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 9px;
+  font-weight: bold;
+  height: 25px;
+  line-height: 27px;
+  text-align: center;
+  text-transform: uppercase;
+  width: 25px;
+  margin: 1em auto;
+  position: relative;
+  z-index: 1;
 }
 .or-divider {
-    display: none;
-    height: 1px;
-    background: #ebebeb;
-    position: relative;
-    margin: -1.3em auto 20px auto;
-    width: 100%;
+  display: none;
+  height: 1px;
+  background: #ebebeb;
+  position: relative;
+  margin: -1.3em auto 20px auto;
+  width: 100%;
 }
 @media (max-width: 640px) {
   #regForm input,
+  #socialMediaRegistrationContainer .btn-social,
   #regForm input[type="submit"],
   #loginForm input,
-  #loginForm input[type="submit"]
-  {
+  #socialMediaLoginContainer .btn-social,
+  #loginForm input[type="submit"] {
     font-size: 0.9em;
     height: 52px;
   }
   #socialMediaRegistrationContainer .btn-social,
-  #socialMediaLoginContainer .btn-social
-  {
+  #socialMediaLoginContainer .btn-social {
     padding-top: 1.7em;
   }
 }
