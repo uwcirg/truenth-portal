@@ -6,14 +6,23 @@ from flask_script import Server
 
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
+
+
+    # Allow Heroku env vars to override most defaults
+    # NB: The value of REDIS_URL may change at any point
+    REDIS_URL = os.environ.get(
+        'REDIS_URL',
+        'redis://localhost:6379'
+    )
+
     ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = os.environ.get(
         'CELERY_BROKER_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
     REQUEST_CACHE_URL = os.environ.get(
         'REQUEST_CACHE_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis'
@@ -48,10 +57,9 @@ class BaseConfig(object):
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
 
-
     SESSION_REDIS_URL = os.environ.get(
         'SESSION_REDIS_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
 
     # Todo: create issue @ fengsp/flask-session
