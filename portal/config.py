@@ -51,7 +51,10 @@ class BaseConfig(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'SQLALCHEMY_DATABASE_URI',
-        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+        os.environ.get(
+            'DATABASE_URL',
+            'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+        )
     )
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
