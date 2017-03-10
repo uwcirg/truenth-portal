@@ -88,7 +88,7 @@ speaklater==1.3
 Sphinx==1.5.3
 sphinx-rtd-theme==0.2.4
 SQLAlchemy==1.1.6
-swagger-spec-validator==2.0.4 # pyup: !=2.0.3 # see https://github.com/Yelp/swagger_spec_validator/issues/59
+swagger-spec-validator==2.0.4
 tox==2.6.0
 traitlets==4.3.2
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
