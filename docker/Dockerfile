@@ -57,10 +57,7 @@ ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}" \
-    SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
-    CELERY_BROKER_URL="redis://redis:6379/0" \
-    REQUEST_CACHE_URL="redis://redis:6379/0" \
-    SESSION_REDIS_URL="redis://redis:6379/0"
+    SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres"
 RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
