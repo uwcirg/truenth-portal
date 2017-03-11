@@ -64,7 +64,7 @@ RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
-RUN a2ensite portal
+RUN a2ensite portal && a2dissite 000-default
 EXPOSE ${PORT}
 
 
