@@ -706,7 +706,8 @@ h4.detail-title {
 }
 .profile-img {
   display: inline-block;
-  margin-top: -66px;
+   margin-top: 10px;
+   margin-left: 6px;
   img {
     width: 60px;
     border-radius: 45px;
@@ -1119,9 +1120,11 @@ div.noOrg-container {
   display:inline-block;
 }
 .profile-section {
-  margin-bottom: 1.5em;
   overflow-y: hidden;
   overflow-x: hidden;
+}
+.patient-detail-container .flex-item {
+  margin-right: 2em;
 }
 .name-section {
   margin-bottom: 1.2em;
@@ -1296,8 +1299,8 @@ div.noOrg-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  div {
-    margin: 0.5em 1.2em 0.5em 0.1em;
+  div.flex-item {
+    padding: 8px 24px 8px 0;
   }
 }
 
@@ -1354,8 +1357,13 @@ div.noOrg-container {
 .checkbox-inline input[type=checkbox], 
 .radio input[type=radio], 
 .radio-inline input[type=radio] {
-  /*margin-top:6px;*/
   margin-top: 4px;
+}
+.radio input[type=radio], 
+.radio-inline input[type=radio] {
+  position: relative;
+  left: 1px;
+  margin-right: 6px;
 }
 
 div.modal-header, div.modal-footer {
@@ -1996,7 +2004,8 @@ div.org-container {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -66px;
+    margin-top: 10px;
+    margin-left: 6px;
     display: inline-block;
     img {
       width: 60px;

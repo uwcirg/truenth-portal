@@ -631,7 +631,8 @@ h4.detail-title {
 }
 .profile-img {
   display: inline-block;
-  margin-top: -66px;
+  margin-top: 10px;
+  margin-left: 6px;
 }
 .profile-img img {
   width: 60px;
@@ -1008,9 +1009,11 @@ table.profile-audit-log TH,
   display: inline-block;
 }
 .profile-section {
-  margin-bottom: 1.5em;
   overflow-y: hidden;
   overflow-x: hidden;
+}
+.patient-detail-container .flex-item {
+  margin-right: 2em;
 }
 .name-section {
   margin-bottom: 1.2em;
@@ -1177,8 +1180,8 @@ table.profile-audit-log TH,
   flex-wrap: wrap;
   justify-content: flex-start;
 }
-.flex div {
-  margin: 0.5em 1.2em 0.5em 0.1em;
+.flex div.flex-item {
+  padding: 8px 24px 8px 0;
 }
 #phone,
 #email {
@@ -1226,8 +1229,13 @@ table.profile-audit-log TH,
 .checkbox-inline input[type=checkbox],
 .radio input[type=radio],
 .radio-inline input[type=radio] {
-  /*margin-top:6px;*/
   margin-top: 4px;
+}
+.radio input[type=radio],
+.radio-inline input[type=radio] {
+  position: relative;
+  left: 1px;
+  margin-right: 6px;
 }
 div.modal-header,
 div.modal-footer {
@@ -1820,7 +1828,8 @@ div.org-container input[type="checkbox"] {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    margin-top: -66px;
+    margin-top: 10px;
+    margin-left: 6px;
     display: inline-block;
   }
   .profile-img img {

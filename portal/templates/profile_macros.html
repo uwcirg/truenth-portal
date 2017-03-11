@@ -13,10 +13,10 @@
     <div class="form-group profile-section" id="bdGroup">
         <label>{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div>
+            <div class="flex-item">
                 <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="((0)?[1-9]|1\d|2\d|3[01])" maxlength="2" data-error="Birthday must be valid and in required format." required />
             </div>
-            <div>
+            <div class="flex-item">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -33,7 +33,7 @@
                     <option value="12">{{ _("December") }}</option>
                 </select>
             </div>
-            <div>
+            <div class="flex-item">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
@@ -76,7 +76,7 @@
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
-    <div class="form-group float-input-label profile-section">
+    <div class="form-group float-input-label profile-section timezone-container flex-item">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
           <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
@@ -114,7 +114,7 @@
 {%- endmacro %}
 
 {% macro profileGender(person) -%}
-    <div class="form-group profile-section" id="genderGroup">
+    <div class="form-group profile-section flex-item" id="genderGroup">
         <label id="genderLabel">{{ _("Gender") }}</label>
         <div id="profile-gender-list" class="profile-radio-list">
             <label class="radio-inline">
@@ -135,7 +135,7 @@
 
 {% macro profileIndigenous(person) -%}
     {% if person and person.org_coding_display_options.indigenous %}
-        <div id="userIndigenousStatusContainer"></div>
+        <div id="userIndigenousStatusContainer" class="flex-item"></div>
         <script>
         $(function () {
             (function() {
@@ -172,7 +172,7 @@
 
 {% macro profileRace(person) -%}
     {% if person and person.org_coding_display_options.race %}
-        <div class="form-group profile-section" id="userRace">
+        <div class="form-group profile-section flex-item" id="userRace">
             <label>{{ _("Race") }}</label>
             <div class="profile-radio-list">
                 <div class="checkbox">
@@ -212,7 +212,7 @@
 
 {% macro profileEthnicity(person) -%}
     {% if person and person.org_coding_display_options.ethnicity %}
-        <div class="form-group profile-section" id="userEthnicity">
+        <div class="form-group profile-section flex-item" id="userEthnicity">
             <label>{{ _("Ethnicity") }}</label>
             <div class="profile-radio-list">
                 <div class="radio">
@@ -1025,7 +1025,7 @@
 {%- endmacro %}
 
 {% macro profileTimeZone(person) %}
-    <div id="profileTimeZoneGroup" class="form-group">
+    <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item">
         <label>Time Zone</label>
         <select class="form-control" id="profileTimeZone" save-container-id="profileTimeZone">
             <option value="UTC">-- Select --</option>
@@ -1325,21 +1325,13 @@
     {%if person and person.has_role(ROLE.PATIENT)%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
+                <div class="profile-item-container patient-detail-container">
                     <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
                     <div class="flex">
-                        <div>
-                            {{profileGender(person)|show_macro('gender')}}
-                        </div>
-                        <div>
-                            {{profileEthnicity(person)|show_macro('ethnicity')}}
-                        </div>
-                        <div>
-                            {{profileRace(person)|show_macro('race')}}
-                        </div>
-                        <div>
-                            {{profileIndigenous(person)|show_macro('indigenous')}}
-                        </div>
+                        {{profileGender(person)|show_macro('gender')}}
+                        {{profileEthnicity(person)|show_macro('ethnicity')}}
+                        {{profileRace(person)|show_macro('race')}}
+                        {{profileIndigenous(person)|show_macro('indigenous')}}
                     </div>
                 </div>
             </div>
@@ -1360,12 +1352,8 @@
             <div  class="profile-item-container">
                 <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">Locale / Time Zone</h4>
                 <div class="flex">
-                    <div class="timezone-container">
-                        {{profileLocale(person)|show_macro('language')}}
-                    </div>
-                    <div class="timezone-container">
-                        {{profileTimeZone(person)}}
-                    </div>
+                    {{profileLocale(person)|show_macro('language')}}
+                    {{profileTimeZone(person)}}
                 </div>
             </div>
         </div>
@@ -1449,10 +1437,10 @@
                                 <div id="procDateGroup" class="form-group">
                                     <label class="procedureDateLabel">{{ _("Date") }}:</label>
                                     <div class="flex">
-                                        <div>
+                                        <div class="flex-item">
                                             <input class="form-control" id="procDay" name="procDay" type="text" placeholder="DD" maxlength="2" >
                                         </div>
-                                        <div>
+                                        <div class="flex-item">
                                             <select class="form-control" name="procMonth" id="procMonth">
                                                 <option value="">{{ _("Month") }}...</option>
                                                 <option value="01">{{ _("January") }}</option>
@@ -1469,10 +1457,10 @@
                                                 <option value="12">{{ _("December") }}</option>
                                             </select>
                                         </div>
-                                        <div>
+                                        <div class="flex-item">
                                             <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4">
                                         </div>
-                                        <div>
+                                        <div class="flex-item">
                                             <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
                                         </div>
                                     </div>

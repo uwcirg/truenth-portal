@@ -639,7 +639,8 @@ div.right-panel {
 }
 .profile-img {
   display: inline:block;
-  margin-top: -66px;
+  margin-top: 10px;
+  margin-left: 6px;
 }
 .profile-img img {
   width: 60px;
@@ -796,7 +797,6 @@ div.right-panel {
   max-width: 100%;
 }
 #profileForm #month {
-  margin-left: -1em;
   width: 180px;
   max-width: 100%;
 }
@@ -913,9 +913,6 @@ div.noOrg-container span {
   margin-top: 1em;
   margin-left: 0.5em;
 }
-#profileStudyIDContainer {
-  margin-top: -1em;
-}
 #profileStudyIDContainer input {
   width: 50%;
   max-width: 100%;
@@ -1013,9 +1010,11 @@ table.profile-audit-log TH,
   display: inline-block;
 }
 .profile-section {
-  margin-bottom: 1.5em;
   overflow-y: hidden;
   overflow-x: hidden;
+}
+.patient-detail-container .flex-item {
+  margin-right: 2em;
 }
 .name-section {
   margin-bottom: 1.2em;
@@ -1219,8 +1218,8 @@ table.profile-audit-log TH,
   flex-wrap: wrap;
   justify-content: flex-start;
 }
-.flex div {
-  margin: 0.5em 1.7em 0.5em 0.1em;
+.flex div.flex-item {
+  padding: 8px 24px 8px 0;
 }
 #phone,
 #email {
@@ -1269,6 +1268,12 @@ table.profile-audit-log TH,
 .radio input[type=radio],
 .radio-inline input[type=radio] {
   margin-top: 4px;
+}
+.radio input[type=radio],
+.radio-inline input[type=radio] {
+  position: relative;
+  left: 1px;
+  margin-right: 6px;
 }
 div.modal-header,
 div.modal-footer {
@@ -1483,9 +1488,6 @@ div.org-container input[type="checkbox"] {
   }
   #profileForm #month {
     width: 140px !important;
-  }
-  #profileForm #year {
-    margin-left: -2.5em !important;
   }
 }
 @media (max-width: 506px) {
@@ -1864,7 +1866,7 @@ div.org-container input[type="checkbox"] {
     height: 26em;
   }
   .side-lg {
-    height: 30em;
+    height: 32em;
   }
 }
 @media (min-width: 1200px) {
@@ -1884,9 +1886,9 @@ div.org-container input[type="checkbox"] {
     margin: -1em 0 1.5em;
   }
   .profile-img {
-    /*float: right;*/
     display: inline-block;
-    margin-top: -66px;
+    margin-top: 10px;
+    margin-left: 6px;
   }
   .profile-img img {
     width: 60px;
