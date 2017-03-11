@@ -64,10 +64,10 @@ RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
-RUN a2ensite portal && a2dissite 000-default
+RUN \
+    a2ensite portal && a2dissite 000-default && \
+    sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf
 EXPOSE ${PORT}
-
-
 
 CMD \
     . /etc/apache2/envvars && \
