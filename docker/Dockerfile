@@ -14,8 +14,8 @@ RUN \
 
 RUN printf '\n\
 Listen 0.0.0.0:${PORT}\n\
+ServerName ${APACHE_SERVER_NAME}\n\
 <VirtualHost *:${PORT}>\n\
-  ServerName ${APACHE_SERVER_NAME}\n\
   LogLevel info\n\
   ErrorLog /dev/stderr\n\
   CustomLog /dev/stdout combined\n\
