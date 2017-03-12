@@ -57,7 +57,7 @@ ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
-    PORT="${PORT:-80}" \
+    PORT="${PORT:-8008}" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
 RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
