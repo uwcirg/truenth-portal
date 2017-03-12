@@ -13,6 +13,11 @@ services:
     environment:
       - APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
       - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
+      # compose-specific overrides
+      - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI:-postgresql://postgres:@db/postgres}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - REQUEST_CACHE_URL=${REQUEST_CACHE_URL:-redis://redis:6379/0}
+      - SESSION_REDIS_URL=${SESSION_REDIS_URL:-redis://redis:6379/0}
     depends_on:
       - db
       - redis
