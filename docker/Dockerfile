@@ -13,8 +13,9 @@ RUN \
     apt-get clean
 
 RUN printf '\n\
-<VirtualHost *:80>\n\
-  ServerName ${APACHE_SERVER_NAME}\n\
+Listen 0.0.0.0:${PORT}\n\
+ServerName ${APACHE_SERVER_NAME}\n\
+<VirtualHost *:${PORT}>\n\
   LogLevel info\n\
   ErrorLog /dev/stderr\n\
   CustomLog /dev/stdout combined\n\
@@ -56,21 +57,17 @@ ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     LOG_FOLDER="/tmp/shared_service_log" \
-    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}" \
-    SQLALCHEMY_DATABASE_URI="postgresql://postgres:@db/postgres" \
-    CELERY_BROKER_URL="redis://redis:6379/0" \
-    REQUEST_CACHE_URL="redis://redis:6379/0" \
-    SESSION_REDIS_URL="redis://redis:6379/0"
+    PORT="${PORT:-8008}" \
+    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
 RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
 
-RUN a2ensite portal
-
-EXPOSE 80
-
-
+RUN \
+    a2ensite portal && a2dissite 000-default && \
+    sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf
+EXPOSE ${PORT}
 
 CMD \
     . /etc/apache2/envvars && \
