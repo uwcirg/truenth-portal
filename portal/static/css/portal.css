@@ -40,6 +40,7 @@ a:active {
 a.btn {
   cursor: pointer;
   font-size: 16px;
+  border: none;
 }
 .tnth-hide {
   display: none;
@@ -52,8 +53,14 @@ a.btn {
   font-size: 1.2em;
 }
 .btn {
+  cursor: pointer;
+  border-radius: 0;
   font-size: 1em;
+  padding: 0.65em;
   letter-spacing: 1px;
+  color: #333f4b;
+  background-color: #FFF;
+  border: 1px solid #bdb9b9
 }
 .btn-set {
   margin-bottom: 1.5em;
@@ -79,6 +86,25 @@ a.btn {
 .btn-tnth-back {
   color: #777;
   padding: 0 5px 0 0;
+}
+.form-control {
+  font-size: 16px;
+  height: 39px;
+  border-radius: 0;
+}
+select:not([multiple]) {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-position: right 50%;
+    background-repeat: no-repeat;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=);
+    padding-right: 1em;
+}
+.form-group .help-block {
+  font-size: 0.95em;
+}
+.form-group label {
+  font-weight: normal;
 }
 .feature-btn {
   transition: all 0.2s ease-in-out 0s;
@@ -153,7 +179,7 @@ a.btn {
   list-style-type: none;
 }
 #stickyMenu li {
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   cursor: pointer;
 }
 #stickyMenu li:hover {
@@ -217,14 +243,6 @@ h4.detail-title {
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
-#adminTableToolbar div.orglist-selector button {
-  background-color: #FFF;
-  border: 1px solid #ccc;
-  padding: 0.65em;
-  height: 2.86em;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
 #adminTableToolbar div.orglist-selector div.dropdown-menu #userOrgs {
   width: 300px;
   max-width: 100%;
@@ -259,6 +277,9 @@ h4.detail-title {
 #adminTableToolbar div.orglist-selector #orglist-footer-container input[type="checkbox"] {
   position: relative;
   top: -1px;
+}
+#adminTable tr[data-uniqueid]:hover {
+  background-color: #ececea;
 }
 #loginEmailReminderText {
   margin-left: 8px;
@@ -400,15 +421,11 @@ h4.detail-title {
   background-image: -ms-linear-gradient(top, #fff, #eee, #d4d4d4);
   background-image: -o-linear-gradient(top, #fff, #eee, #d4d4d4);
   background-image: linear-gradient(to bottom, #fff, #eee, #d4d4d4);
-  -webkit-border-radius: 8;
-  -moz-border-radius: 8;
-  border-radius: 8px;
-  cursor: pointer;
   font-weight: 500;
   max-width: 100%;
   font-family: Arial;
   color: #4d4e50;
-  font-size: 0.90em;
+  font-size: 0.95em;
   padding: 0.5em 1em;
   border: solid #ccc 1px;
   text-decoration: none;
@@ -424,6 +441,10 @@ h4.detail-title {
 #indexNavBar #backLink span {
   position: relative;
   top: 1.7px;
+}
+#patientList div.or {
+  display: inline-block;
+  background-color: #888a8c;
 }
 #patientList #_downloadLink {
   visibility: hidden;
@@ -619,16 +640,6 @@ h4.detail-title {
 .tnth-splash #wellContent {
   width: 100%;
 }
-.form-control {
-  font-size: 16px;
-  height: 36px;
-}
-.form-group .help-block {
-  font-size: 0.95em;
-}
-.form-group label {
-  font-weight: normal;
-}
 .profile-img {
   display: inline-block;
   margin-top: 10px;
@@ -754,7 +765,7 @@ h4.detail-title {
   /*background-color: rgba(173, 193, 197, 0.16);*/
   /*background-color: rgba(204, 206, 204, 0.25);*/
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  padding: 1.5em 2.2em 2em 2.2em;
+  padding: 1.5em 2.5em 2em 2.5em;
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
@@ -765,20 +776,14 @@ h4.detail-title {
   color: #5b5e61;
   margin-bottom: 18px;
 }
-.profile-name-label {
-  margin-bottom: 2px;
+.profile-name-label, .profile-birthdate-label {
+  margin-bottom: -4px;
 }
 .profile-create-item-container {
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
   padding: 1.5em;
-}
-#profileForm #bdGroup div.row {
-  height: 4.5em;
-}
-#profileForm div.name-section {
-  height: 4.5em;
 }
 #profileForm #firstname {
   width: 300px;
@@ -883,10 +888,12 @@ div.noOrg-container span {
   margin-left: 2.8em;
 }
 #profileSendEmailContainer {
-  padding-bottom: 5%;
   background-color: #f9f9f9;
   background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
+  border: 1px solid #cec4c4;
+  padding-left: 2em;
+  padding-right: 2em;
 }
 #profileSendEmailContainer label {
   font-size: 0.95em;
@@ -895,7 +902,7 @@ div.noOrg-container span {
   margin-top: 5%;
   font-size: 0.9em;
   padding: 0.5em;
-  border-radius: 6px;
+  /*border-radius: 6px;*/
   color: #FFF;
 }
 #profileEmailMessage {
@@ -1011,12 +1018,8 @@ table.profile-audit-log TH,
 .profile-section {
   overflow-y: hidden;
   overflow-x: hidden;
-}
-.patient-detail-container .flex-item {
-  margin-right: 2em;
-}
-.name-section {
-  margin-bottom: 1.2em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 .orgLinks {
   margin-top: 4px;
@@ -1231,12 +1234,15 @@ table.profile-audit-log TH,
 .radio-inline input[type=radio] {
   margin-top: 4px;
 }
-.radio input[type=radio],
-.radio-inline input[type=radio] {
+.radio input[type=radio] {
   position: relative;
-  left: 1px;
+  left: 3px;
   margin-right: 6px;
 }
+.radio-inline input[type=radio] {
+	margin-left: -18px;
+}
+
 div.modal-header,
 div.modal-footer {
   background-color: #606a73;
@@ -1564,12 +1570,6 @@ div.org-container input[type="checkbox"] {
     width: 100%;
     max-width: 100%;
   }
-  #profileForm #bdGroup div.row {
-    height: 10em;
-  }
-  #profileForm div.name-section {
-    height: 10em;
-  }
   #profileForm #firstname {
     width: 100%;
     max-width: 100%;
@@ -1691,12 +1691,6 @@ div.org-container input[type="checkbox"] {
   .form-control {
     margin-bottom: 4px;
   }
-  #profileForm #bdGroup div.row {
-    height: 10em;
-  }
-  #profileForm div.name-section {
-    height: 10em;
-  }
   .side {
     height: 37em;
   }
@@ -1792,6 +1786,11 @@ div.org-container input[type="checkbox"] {
     height: 26em;
   }
 }
+@media (min-width: 1070px) {
+	#profileSendEmailContainer {
+	  margin-top: 1em;
+	}
+}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1842,11 +1841,14 @@ div.org-container input[type="checkbox"] {
   .btn-set .btn {
     margin-bottom: 0.5em;
   }
-  #profileForm #bdGroup div.row {
-    height: 3.8em;
+  #profileForm .patient-detail-container .flex-item {
+	margin-right: 2em;
   }
-  #profileForm div.name-section {
-    height: 3.8em;
+  #profileForm .communications-container .flex-item {
+	margin-right: 5em;
+  }
+  #profileForm #lastname {
+  	margin-left: -3em;
   }
 }
 @media (max-width: 1300px) {
@@ -1893,6 +1895,12 @@ div.org-container input[type="checkbox"] {
   .btn-set .btn {
     margin-bottom: 0.5em;
   }
+ 
+}
+@media (min-width: 1746px) {
+	#profileForm .last-name-container {
+		margin-left: -1em;
+	}
 }
 @media (max-width: 1745px) {
   body.open-nav .right-panel {

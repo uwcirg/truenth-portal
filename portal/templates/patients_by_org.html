@@ -3,7 +3,7 @@
   <div id="patientList" class="reduce-font-sizes">
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
-    <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button>&nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
+    <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="btn btn-lg">{{ _("Create a patient record") }}</button>&nbsp;&nbsp;<div class="or">or</div>&nbsp;&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
     <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
@@ -51,12 +51,11 @@
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
         {% if config.STAFF_BULK_DATA_ACCESS %}
-          <div class="orglist-download-container"><div><a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
-         </div>
+          <div class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
         {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-            <button id="orglist-dropdown" class="create-user-link btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer">
-              Filter List By Site &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
+            <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Filter list by site &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
             </button>
             <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
               <div class="form-group smaller-text" id="userOrgs">

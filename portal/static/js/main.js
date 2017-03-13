@@ -149,7 +149,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
             } else {
                 if (timeZone != "UTC") {
                     convertedDate = convertToLocalTime(dateString);
-                    $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion does not work in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                    $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
                     $(".gmt").each(function() { $(this).hide()});
                 };
             }
