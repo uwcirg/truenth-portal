@@ -15,9 +15,10 @@ RUN \
 RUN printf '\n\
 Listen 0.0.0.0:${PORT}\n\
 ServerName ${APACHE_SERVER_NAME}\n\
+ErrorLog /dev/stdout\n\
 <VirtualHost *:${PORT}>\n\
   LogLevel info\n\
-  ErrorLog /dev/stderr\n\
+  ErrorLog /dev/stdout\n\
   CustomLog /dev/stdout combined\n\
   WSGIPassAuthorization On\n\
   WSGIDaemonProcess stg_cs user=${APACHE_RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
