@@ -1887,9 +1887,6 @@ div.org-container input[type="checkbox"] {
   #profileForm .communications-container .flex-item {
     margin-right: 5em;
   }
-  #profileForm #lastname {
-    margin-left: -3em;
-  }
  
 }
 @media (max-width: 1300px) {
