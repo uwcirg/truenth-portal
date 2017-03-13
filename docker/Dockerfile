@@ -63,7 +63,7 @@ RUN \
     mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
     chown $APACHE_RUN_USER:$APACHE_RUN_USER ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
     sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf && \
-    a2ensite portal && a2dissite 000-default
+    a2ensite portal && a2dissite 000-default && a2disconf other-vhosts-access-log
 
 USER ${APACHE_RUN_USER}
 
