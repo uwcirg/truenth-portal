@@ -11,7 +11,7 @@
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
     <div class="form-group profile-section" id="bdGroup">
-        <label>{{ _("Birth Date") }}</label>
+        <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item">
                 <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="((0)?[1-9]|1\d|2\d|3[01])" maxlength="2" data-error="Birthday must be valid and in required format." required />
@@ -98,13 +98,13 @@
         <label>{{ _("Name") }}</label>
     </div>
     <div class="row profile-section name-section">
-        <div class="col-md-6 col-xs-12">
+        <div class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        <div class="col-md-6 col-xs-12">
+        <div class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
             <div class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
@@ -1248,27 +1248,53 @@
     </div>
     {% endif %}
     {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and (current_user.id != person.id) %}
-         <div class="row">
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg{%endif%}{%else%}side-lg side-xs-one{%endif%}">
-                    <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                    {{profileName(person)}}
-                    {{profileBirthDate(person)}}
-                    {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
+         {% if config.CUSTOM_PATIENT_DETAIL %}
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                        {{profileName(person)}}
+                        {{profileBirthDate(person)}}
+                        {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        {{profileEmail(person)}}
+                        {{profilePhone(person)}}
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="profile-item-container side {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%if person.has_role('patient')%} side-lg one-side{%endif%}{%else%}side-lg{%endif%}">
-                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    {{profilePhone(person)}}
-                    {{profileEmail(person)}}
-                    {{profileSendEmail(person)}}
+         {% else %}
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                        {{profileName(person)}}
+                        {{profileBirthDate(person)}}
+                        {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                        <div class="communications-container flex">
+                            <div class="flex-item">
+                                {{profileEmail(person)}}
+                                {{profilePhone(person)}}
+                            </div>
+                            <div class="flex-item">
+                                {{profileSendEmail(person)}}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+         {% endif %}
     {% else %}
         <div class="row">
-            <div class="col-md-7 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
                      {% if person.has_role(ROLE.PATIENT) %}
                         <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("Patient Information") }}</h4>
@@ -1280,7 +1306,7 @@
                      {{profileBirthDate(person)}}
                 </div>
             </div>
-            <div class="col-md-5 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-12 col-xs-12">
                 <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
                     <h4 id="communicationLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <br/>
