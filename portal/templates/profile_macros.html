@@ -464,6 +464,7 @@
     <div id="prTableToolBar"><span id="tableCount"></span></div>
     <table id="profilePatientReportTable" class="smaller-text">
     </table>
+    <div id="patientReportErrorMessage" class="text-muted"></div>
     <script async>
 
     $(function () {
@@ -538,13 +539,14 @@
                     ]
                 } );
             } else {
-                $("#profilePatientReportTable").closest("div.profile-item-container").hide();
+                //$("#profilePatientReportTable").closest("div.profile-item-container").hide();
+                $("#patientReportErrorMessage").text("No patient report found.").removeClass("error-message");
             }
 
 
         }).fail(function() {
             $("#profilePatientReportTable").closest("div.profile-item-container").hide();
-            console.log("Problem retrieving patient reports from server.");
+            $("#patientReportErrorMessage").text("Problem retrieving patient reports from server.").addClass("error-message");
         });
      });</script>
 {%- endmacro %}
@@ -1011,7 +1013,7 @@
     <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Intervention Reports") }}</h4>
+                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Reports") }}</h4>
                     <div>
                         {% if person and person.staff_html() %}
                             {{person.staff_html() | safe}}
@@ -1321,7 +1323,7 @@
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
-                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("PRO Questionnaires") }}</h4>
+                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{% if current_user and current_user.has_role(ROLE.PATIENT) %}{{ _("My Questionnaires") }}{% else %}{{ _("PRO Questionnaires") }}{% endif %}</h4>
                     {{profileSessionList(person, current_user)}}
                 </div>
             </div>
@@ -1384,7 +1386,7 @@
             </div>
         </div>
     </div>
-    {% if (person and current_user) %}
+    {% if (person and current_user) and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
