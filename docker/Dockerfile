@@ -15,9 +15,10 @@ RUN \
 RUN printf '\n\
 Listen 0.0.0.0:${PORT}\n\
 ServerName ${APACHE_SERVER_NAME}\n\
+ErrorLog /dev/stdout\n\
 <VirtualHost *:${PORT}>\n\
   LogLevel info\n\
-  ErrorLog /dev/stderr\n\
+  ErrorLog /dev/stdout\n\
   CustomLog /dev/stdout combined\n\
   WSGIPassAuthorization On\n\
   WSGIDaemonProcess stg_cs user=${APACHE_RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
@@ -30,8 +31,6 @@ ServerName ${APACHE_SERVER_NAME}\n\
 </VirtualHost>\n\
 \n'\
 > /etc/apache2/sites-available/portal.conf
-
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61
 
 ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
 
@@ -46,6 +45,7 @@ RUN \
     fi
 
 RUN \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 379CE192D401AB61 && \
     apt-get update && \
     apt-get install --yes --force-yes portal && \
     apt-get clean && \
@@ -53,20 +53,28 @@ RUN \
 
 COPY portal.wsgi /var/www/
 
-ENV PROJECT_DIR="/opt/venvs/portal"
 ENV \
-    FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
+    APACHE_RUN_USER="${APACHE_RUN_USER:-www-data}" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PORT="${PORT:-8008}" \
-    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
-RUN mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
-RUN chown www-data:www-data ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
-
-ENV APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
+    PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
-    a2ensite portal && a2dissite 000-default && \
-    sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf
+    mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
+    chown $APACHE_RUN_USER:$APACHE_RUN_USER \
+        /var/run/apache2/ \
+        ${LOG_FOLDER} \
+        ${PROJECT_DIR}/var/portal-instance/ && \
+    sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf && \
+    a2ensite portal && a2dissite 000-default && a2disconf other-vhosts-access-log
+
+USER ${APACHE_RUN_USER}
+
+ENV \
+    APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost} \
+    FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
+    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
+
 EXPOSE ${PORT}
 
 CMD \
