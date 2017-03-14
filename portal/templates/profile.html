@@ -3,6 +3,7 @@
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 <style>
+.footer-wrapper { position: inherit !important;}
 .footer-container.flex { clear: both; display:flex; justify-content: space-between; padding: 0.5em 0; margin: 1em 4em; border-top: 1px solid #ddd;}
 @media (max-width: 1199px) { .footer-container.flex{ justify-content: center;} }
 </style>
@@ -77,7 +78,7 @@
 </form>
 </div>
 {% endblock %}
-  {% block footer %}<div class="right-panel"><div class="flex footer-container"><div class="copyright-container">
+  {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">
       <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
       <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p></div><div class="logo-container"><a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a></div></div></div>{% endblock %}
 {% block document_ready %}
