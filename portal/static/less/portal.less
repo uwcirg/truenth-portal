@@ -889,6 +889,10 @@ h4.detail-title {
   #bdGroup .flex {
     flex-wrap: nowrap;
   }
+  #erroremail {
+    width: 300px;
+    max-width: 100%;
+  }
 }
 
 #userEthnicity label {
@@ -991,8 +995,6 @@ div.noOrg-container {
   border: 1px solid #cec4c4;
   padding-left: 2em;
   padding-right: 2em;
-  margin-left: 1.5em;
-  margin-right: 1.5em;
   label{
     font-size:@mediumText;
   }
@@ -1004,6 +1006,8 @@ div.noOrg-container {
   font-size: 0.87em;
   margin-top: 1em;
   margin-left:0.5em;
+  width: 300px;
+  max-width: 100%;
 }
 #userSessionReportDetailTable {
   margin-left: -1%;
@@ -1957,6 +1961,7 @@ div.org-container {
 @media (min-width: 1070px) {
   #profileSendEmailContainer {
     margin-top: 1em;
+    margin-left: 0.5em;
   }
 }
 @media (max-width: 1199px) {
@@ -2082,6 +2087,11 @@ div.org-container {
 @media (max-width: 1560px) {
   body.open-nav .right-panel {
     margin-left:140px;
+  }
+}
+@media (min-width: 1492px) {
+  #profileSendEmailContainer {
+    margin-left: 1.5em;
   }
 }
 @media (max-width: 1491px) {

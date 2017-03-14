@@ -3,14 +3,9 @@
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 <style>
-/*inline styling specific to profile page due to new two panel layout*/
-@media (max-width: 1737px) {.footer-container {border-top: 0 !important;}.container { overflow: hidden;}.logo-container { margin-right: 9em; } body.open-nav .footer-container { margin-left: 15%;} }
-@media (max-width: 1690px) {body.open-nav  #homeFooter {margin-left: 10%;}}
-@media (max-width: 1361px) {body.open-nav .footer-container {text-align: right; padding-left: 1em; padding-right: 5em;}}
-@media (max-width: 1293px) {.copyright-container {padding-left: 2em;}}
-@media (max-width: 1199px) {body.open-nav .footer-container { margin-left: 20%; }}
-@media (max-width: 1082px) {.copyright-container {margin-left: 2em;}}
-@media (max-width: 991px) { #homeFooter {padding-left: 3em !important;} body.open-nav .footer-container { margin-left: 7%; }}
+.footer-wrapper { position: inherit !important;}
+.footer-container.flex { clear: both; display:flex; justify-content: space-between; padding: 0.5em 0; margin: 1em 4em; border-top: 1px solid #ddd;}
+@media (max-width: 1199px) { .footer-container.flex{ justify-content: center;} }
 </style>
 <div id="stickyMenu"></div>
 <br/>
@@ -77,14 +72,16 @@
           {% else %}
               <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to home") }}</small></a>
           {% endif %}
+          <br/>
       </div>
   </div>
 </form>
 </div>
 {% endblock %}
-
+  {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">
+      <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
+      <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p></div><div class="logo-container"><a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a></div></div></div>{% endblock %}
 {% block document_ready %}
-
 {% if user.has_role('patient')  and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 
 function handleLoginAs() {
