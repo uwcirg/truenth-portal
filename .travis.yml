@@ -109,6 +109,13 @@ before_deploy:
       https://index.docker.io/v1/
     ;fi
 
+  - if [[ -v HEROKU_API_KEY ]]; then
+      docker login
+        --username "$HEROKU_USERNAME"
+        --password "$HEROKU_API_KEY"
+      https://registry.heroku.com/
+    ;fi
+
   # Build bintray descriptor file dynamically
   - >
     printf '
@@ -141,26 +148,34 @@ before_deploy:
 
 # Only deploy from default virtual env TravisCI job
 deploy:
-  on:
-    all_branches: true
-    condition:
-      - $TOXENV = build
-      - $DEPLOY = true
-      - -v BINTRAY_API_KEY
-  provider: bintray
-  file: "bintray.json"
-  user: $BINTRAY_USERNAME
-  key: $BINTRAY_API_KEY
+  - provider: bintray
+    on:
+      all_branches: true
+      condition:
+        - $TOXENV = build
+        - $DEPLOY = true
+        - -v BINTRAY_API_KEY
+    file: "bintray.json"
+    user: $BINTRAY_USERNAME
+    key: $BINTRAY_API_KEY
 
 after_deploy:
+  # Deploy images to Bintray
   - docker tag
     "$IMAGE_NAME:$TAG"
     "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG"
   - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG"
 
+  # Deploy to Docker Hub, if configured
   - docker tag
     "$IMAGE_NAME:$TAG"
     "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$TAG"
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
       docker push "docker.io/$DOCKER_CLOUD_USERNAME/$IMAGE_NAME"
     ;fi
+
+  # Deploy to Heroku, if configured
+  - if [[ -v HEROKU_API_KEY ]]; then
+      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
+      docker push "registry.heroku.com/$HEROKU_APP/web";
+    fi

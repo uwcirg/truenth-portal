@@ -80,6 +80,7 @@ EXPOSE ${PORT}
 CMD \
     . /etc/apache2/envvars && \
     . ${PROJECT_DIR}/bin/activate && \
+    env && \
     if [ -n "$(flask db current)" ]; then \
         flask db migrate; \
     else \
