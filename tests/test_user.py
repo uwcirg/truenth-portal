@@ -6,7 +6,7 @@ import re
 import urllib
 from sqlalchemy import and_
 from datetime import datetime
-from tests import TestCase, TEST_USER_ID, FIRST_NAME
+from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -664,6 +664,82 @@ class TestUser(TestCase):
                 staff_leaf.check_role('view', other_id=patient))
             self.assertRaises(
                 Unauthorized, staff_leaf.check_role, 'edit', patient)
+
+    def test_deep_tree_staff_check_role(self):
+        """Can staff-admin edit correct staff members"""
+        self.deepen_org_tree()
+
+        org_102 = Organization.query.get(102)
+        org_1002 = Organization.query.get(1002)
+        org_10031 = Organization.query.get(10031)
+        org_10032 = Organization.query.get(10032)
+
+        staff_admin_top = self.add_user('staff_admin 102')
+        self.promote_user(staff_admin_top, ROLE.STAFF_ADMIN)
+        staff_admin_top.organizations.append(org_102)
+
+        staff_admin_leaf = self.add_user('staff_admin 10031')
+        self.promote_user(staff_admin_leaf, ROLE.STAFF_ADMIN)
+        staff_admin_leaf.organizations.append(org_10031)
+
+        staff_admin_mid = self.add_user('staff_admin 1002')
+        self.promote_user(staff_admin_mid, ROLE.STAFF_ADMIN)
+        staff_admin_mid.organizations.append(org_1002)
+
+        staff_w = self.add_user('staff w')
+        staff_w_id = staff_w.id
+        self.promote_user(staff_w, ROLE.STAFF)
+        staff_w.organizations.append(org_10032)
+
+        staff_x = self.add_user('staff x')
+        staff_x_id = staff_x.id
+        self.promote_user(staff_x, ROLE.STAFF)
+        staff_x.organizations.append(org_10032)
+
+        staff_y = self.add_user('staff y')
+        staff_y_id = staff_y.id
+        self.promote_user(staff_y, ROLE.STAFF)
+        staff_y.organizations.append(org_102)
+
+        staff_z = self.add_user('staff z')
+        staff_z_id = staff_z.id
+        self.promote_user(staff_z, ROLE.STAFF)
+        staff_z.organizations.append(org_10031)
+
+        staff_x, staff_y, staff_z = map(db.session.merge,(
+            staff_x, staff_y, staff_z))
+
+        ###
+        # Setup complete - test access
+        ###
+
+        # top level staff_admin can view/edit all
+        staff_admin_top = db.session.merge(staff_admin_top)
+        for perm in ('view', 'edit'):
+            for staff in (
+                staff_x_id, staff_y_id, staff_z_id):
+                self.assertTrue(
+                    staff_admin_top.check_role(perm, other_id=staff))
+
+        # mid level staff_admin can view/edit all but top
+        staff_admin_mid = db.session.merge(staff_admin_mid)
+        for perm in ('view', 'edit'):
+            for staff in (
+                staff_x_id, staff_z_id):
+                self.assertTrue(
+                    staff_admin_mid.check_role(perm, other_id=staff))
+            self.assertRaises(
+                Unauthorized, staff_admin_mid.check_role,
+                perm, other_id=staff_y_id)
+
+        # low level staff_admin can view/edit only those w/ same org
+        staff_admin_leaf = db.session.merge(staff_admin_leaf)
+        for perm in ('view', 'edit'):
+            for staff in (staff_y_id, staff_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_admin_leaf.check_role, perm, staff)
+            self.assertTrue(
+                staff_admin_leaf.check_role(perm, other_id=staff_z_id))
 
     def test_all_relationships(self):
         # obtain list of all relationships
