@@ -1057,7 +1057,9 @@ class User(db.Model, UserMixin):
             # and interventions result in carte blanche for service
             return True
 
-        if self.has_role(ROLE.STAFF):
+        orgtree = OrgTree()
+        if any(self.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)
+           ) and other.has_role(ROLE.PATIENT):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
@@ -1068,30 +1070,35 @@ class User(db.Model, UserMixin):
             # As long as the consent is valid (not expired or deleted) it's
             # adequate for 'view'.  'edit' requires the staff_editable option
             # on the consent.
-            orgtree = OrgTree()
-            if other.has_role(ROLE.PATIENT):
-                if permission == 'edit':
-                    others_con_org_ids = [
-                        oc.organization_id for oc in other.valid_consents
-                        if oc.staff_editable]
-                else:
-                    others_con_org_ids = [
-                        oc.organization_id for oc in other.valid_consents]
-                org_ids = [org.id for org in self.organizations]
-                for org_id in org_ids:
-                    if orgtree.at_or_below_ids(org_id, others_con_org_ids):
-                        return True
-                #Still here implies time to check 'furthermore' clause
-                others_orgs = [org.id for org in other.organizations]
-                for consented_org in others_con_org_ids:
-                    if orgtree.at_or_below_ids(consented_org, org_ids):
-                        # Okay, consent is partent of staff org
-                        # but it's only good if the patient's *org*
-                        # is at or below the staff's org (could be sibling
-                        # or down different branch of tree)
-                        for org_id in org_ids:
-                            if orgtree.at_or_below_ids(org_id, others_orgs):
-                                return True
+            if permission == 'edit':
+                others_con_org_ids = [
+                    oc.organization_id for oc in other.valid_consents
+                    if oc.staff_editable]
+            else:
+                others_con_org_ids = [
+                    oc.organization_id for oc in other.valid_consents]
+            org_ids = [org.id for org in self.organizations]
+            for org_id in org_ids:
+                if orgtree.at_or_below_ids(org_id, others_con_org_ids):
+                    return True
+            #Still here implies time to check 'furthermore' clause
+            others_orgs = [org.id for org in other.organizations]
+            for consented_org in others_con_org_ids:
+                if orgtree.at_or_below_ids(consented_org, org_ids):
+                    # Okay, consent is partent of staff org
+                    # but it's only good if the patient's *org*
+                    # is at or below the staff's org (could be sibling
+                    # or down different branch of tree)
+                    for org_id in org_ids:
+                        if orgtree.at_or_below_ids(org_id, others_orgs):
+                            return True
+
+        if self.has_role(ROLE.STAFF_ADMIN) and other.has_role(ROLE.STAFF):
+            # Staff admin can do anything to staff at or below their level
+            for sa_org in self.organizations:
+                others_ids = [o.id for o in other.organizations]
+                if orgtree.at_or_below_ids(sa_org.id, others_ids):
+                    return True
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
