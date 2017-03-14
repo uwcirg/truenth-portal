@@ -277,7 +277,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
         setTimeout('__setOrgsMenuHeight(100); __clearFilterButtons();', 10);
     });
 
-    if (noPatientData) $("#patientAssessmentDownload").hide();
+    if (noPatientData) $("#patientListExportDataContainer").hide();
 };
 __setOrgsMenuHeight = function(padding) {
   if (!padding) padding = 100;

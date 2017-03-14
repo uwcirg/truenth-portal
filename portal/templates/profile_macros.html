@@ -286,9 +286,15 @@
             return url;
         };
 
+        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+        $("#email").on("blur", function() {
+            if ($(this).val() != "") $("#profileEmailSelect").attr("disabled", false);
+            else $("#profileEmailSelect").val("").attr("disabled", true);
+        });
+
         $('#profileEmailSelect').on('change', function() {
             var message = '';
-            if (this.value != '') {
+            if (this.value != '' && $("#email").val() != "" && $("#erroremail").text() == "") {
                 message =  $(this).children('option:selected').text() + ' email will be sent to ' + $('#email').val();
                 $('#profileEmailMessage').text(message);
                 $('#btnProfileSendEmail').removeClass('disabled');
@@ -585,6 +591,7 @@
         <div id="auditTableToolBar"><span id="tableCount"></span></div>
         <table id="profileAuditLogTable" class="smaller-text">
         </table>
+        <div id="profileAuditLogErrorMessage" class="error-message"></div>
         <script async>
         function _showText(obj) {
             if (obj) {
@@ -678,13 +685,12 @@
                         ]
                     } );
                 } else {
-                    $("#profileAuditLogTable").closest("div.profile-item-container").hide();
+                    $("#profileAuditLogErrorMessage").text("No audit log item found.");
                 }
 
 
             }).fail(function() {
-                $("#profileAuditLogTable").closest("div.profile-item-container").hide();
-                console.log("Problem retrieving audit log from server.");
+                $("#profileAuditLogErrorMessage").text("Problem retrieving audit log from server.");
             });
          });</script>
      {% endif %}
