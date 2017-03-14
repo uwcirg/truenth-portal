@@ -141,16 +141,16 @@ before_deploy:
 
 # Only deploy from default virtual env TravisCI job
 deploy:
-  on:
-    all_branches: true
-    condition:
-      - $TOXENV = build
-      - $DEPLOY = true
-      - -v BINTRAY_API_KEY
-  provider: bintray
-  file: "bintray.json"
-  user: $BINTRAY_USERNAME
-  key: $BINTRAY_API_KEY
+  - provider: bintray
+    on:
+      all_branches: true
+      condition:
+        - $TOXENV = build
+        - $DEPLOY = true
+        - -v BINTRAY_API_KEY
+    file: "bintray.json"
+    user: $BINTRAY_USERNAME
+    key: $BINTRAY_API_KEY
 
 after_deploy:
   - docker tag
