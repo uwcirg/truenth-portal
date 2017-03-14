@@ -1207,7 +1207,7 @@ table.profile-audit-log TH,
   justify-content: flex-start;
 }
 .flex div.flex-item {
-  padding: 8px 24px 8px 0;
+  padding: 8px 12px 8px 0;
 }
 #phone,
 #email {
@@ -1843,6 +1843,9 @@ div.org-container input[type="checkbox"] {
   #profileForm #bdGroup .flex {
     flex-wrap: wrap;
   }
+  .patient-detail-container .flex {
+    flex-direction: column;
+  }
   .side-md {
     height: 26em;
   }
@@ -1882,12 +1885,12 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0.5em;
   }
   #profileForm .patient-detail-container .flex-item {
-    margin-right: 2em;
+    margin-right: 4em;
   }
   #profileForm .communications-container .flex-item {
     margin-right: 5em;
   }
- 
+
 }
 @media (max-width: 1300px) {
   #fullSizeBox {

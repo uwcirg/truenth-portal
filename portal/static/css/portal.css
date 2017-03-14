@@ -794,7 +794,6 @@ h4.detail-title {
   max-width: 100%;
 }
 #profileForm #month {
-  margin-left: -1em;
   width: 180px;
   max-width: 100%;
 }
@@ -894,6 +893,8 @@ div.noOrg-container span {
   border: 1px solid #cec4c4;
   padding-left: 2em;
   padding-right: 2em;
+  margin-left: 1.5em;
+  margin-right: 1.5em;
 }
 #profileSendEmailContainer label {
   font-size: 0.95em;
@@ -1184,7 +1185,7 @@ table.profile-audit-log TH,
   justify-content: flex-start;
 }
 .flex div.flex-item {
-  padding: 8px 24px 8px 0;
+  padding: 8px 12px 8px 0;
 }
 #phone,
 #email {
@@ -1809,6 +1810,9 @@ div.org-container input[type="checkbox"] {
   #profileForm #bdGroup .flex {
     flex-wrap: wrap;
   }
+  .patient-detail-container .flex {
+    flex-direction: column;
+  }
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -1892,7 +1896,7 @@ div.org-container input[type="checkbox"] {
   .btn-set .btn {
     margin-bottom: 0.5em;
   }
- 
+
 }
 @media (max-width: 1745px) {
   body.open-nav .right-panel {

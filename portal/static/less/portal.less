@@ -26,7 +26,7 @@
 /**
  * = Colors =
  **/
-@bodyBgColor:      #FFF; 
+@bodyBgColor:      #FFF;
 @baseColor:       #333;
 @linkColor:       #4d4e50;
 @linkHover:       #2a4531;
@@ -883,7 +883,6 @@ h4.detail-title {
     max-width: 100%;
   }
  #month {
-    margin-left: -1em;
     width: 180px;
     max-width: 100%;
   }
@@ -992,6 +991,8 @@ div.noOrg-container {
   border: 1px solid #cec4c4;
   padding-left: 2em;
   padding-right: 2em;
+  margin-left: 1.5em;
+  margin-right: 1.5em;
   label{
     font-size:@mediumText;
   }
@@ -1300,7 +1301,7 @@ div.noOrg-container {
   flex-wrap: wrap;
   justify-content: flex-start;
   div.flex-item {
-    padding: 8px 24px 8px 0;
+    padding: 8px 12px 8px 0;
   }
 }
 
@@ -1977,6 +1978,9 @@ div.org-container {
     #bdGroup .flex {
       flex-wrap: wrap;
     }
+  }
+  .patient-detail-container .flex {
+    flex-direction: column;
   }
 }
 @media (min-width: 1200px) {
