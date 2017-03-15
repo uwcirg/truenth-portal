@@ -73,7 +73,7 @@ USER ${APACHE_RUN_USER}
 ENV \
     APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost} \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
-    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/master/site_persistence_file.json}"
+    PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}"
 
 EXPOSE ${PORT}
 
