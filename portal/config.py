@@ -4,6 +4,21 @@ import redis
 from flask_script import Server
 
 
+def best_sql_url():
+    """Return compliant sql url from available enviornment variables"""
+    env = os.environ
+    if 'PGDATABASE' in env:
+        return (
+            'postgresql://{PGUSER}:{PGPASSWORD}@{PGHOST}/{PGDATABASE}'.format(
+                PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
+                PGHOST=env.get('PGHOST'), PGDATABASE=env.get('PGDATABASE')))
+    else:
+        return env.get(
+            'SQLALCHEMY_DATABASE_URI',
+            'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+        )
+
+
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
     ANONYMOUS_USER_ACCOUNT = True
@@ -40,10 +55,7 @@ class BaseConfig(object):
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'SQLALCHEMY_DATABASE_URI',
-        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
-    )
+    SQLALCHEMY_DATABASE_URI = best_sql_url()
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
