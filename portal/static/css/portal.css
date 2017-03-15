@@ -32,6 +32,7 @@ body {
 }
 a {
   color: #4d4e50;
+  cursor: pointer;
 }
 a:hover,
 a:active {
@@ -86,6 +87,7 @@ a.btn {
 .btn-tnth-back {
   color: #777;
   padding: 0 5px 0 0;
+  margin: 1em 0;
 }
 .form-control {
   font-size: 16px;
@@ -136,14 +138,14 @@ select:not([multiple]) {
 }
 #stickyMenu {
   position: fixed;
-  top: 16em;
+  top: 14.5em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
   transform: translate(-500px, 0);
   transition: transform 0.5s ease;
   right: 0;
   padding: 1.5em 0.8em;
-  font-size: 0.75em;
+  font-size: 0.8em;
   min-height: 370px;
   height: 60%;
   color: #494e37;
@@ -179,7 +181,7 @@ select:not([multiple]) {
   list-style-type: none;
 }
 #stickyMenu li {
-  margin-bottom: 7px;
+  line-height: 2.2em;
   cursor: pointer;
 }
 #stickyMenu li:hover {
@@ -195,10 +197,13 @@ a.back {
   display: none;
 }
 a.open {
-  top: 14em;
+  top: 14.1em;
 }
 a.open:hover {
   color: #2a4531;
+}
+a.open .glyphicon, a.back .glyphicon {
+  font-size: 1.2em;
 }
 div.left-panel {
   position: fixed;
@@ -219,6 +224,7 @@ div.right-panel {
   position: relative;
   margin-left: 1em;
   transition: margin-left ease 0.5s;
+  max-width: 991px;
 }
 h4.detail-title {
   display: none;
@@ -387,7 +393,7 @@ h4.detail-title {
   color: #575F5C;
   border-top: 1px solid  #E0E6E3;
   border-bottom: 1px solid  #E0E6E3;
-  padding: 0.5em 0.2em 0.7em 0.2em;
+  padding: 0.6em 0.2em 0.63em 0.2em;
   background-image: linear-gradient(to right, #ffffff, rgba(159, 165, 167, 0.16), rgba(173, 193, 197, 0.18));
   vertical-align: center;
 }
@@ -409,7 +415,6 @@ h4.detail-title {
   box-shadow: 1px 1px 1px 0px #777;
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
-  border-radius: 4px;
   margin-left: -4px;
   display: inline-block;
 }
@@ -429,6 +434,7 @@ h4.detail-title {
   padding: 0.5em 1em;
   border: solid #ccc 1px;
   text-decoration: none;
+  letter-spacing: 1px;
 }
 #indexNavBar #indexNavBar span:hover {
   color: #2a4531;
@@ -765,7 +771,7 @@ h4.detail-title {
   /*background-color: rgba(173, 193, 197, 0.16);*/
   /*background-color: rgba(204, 206, 204, 0.25);*/
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  padding: 1.5em 2.5em 2em 2.5em;
+  padding: 2em 2.5em 2.5em 2.5em;
   border-radius: 8px;
   margin: 0.5em auto;
   border: 1px solid #E0E6E3;
@@ -1478,7 +1484,7 @@ div.org-container input[type="checkbox"] {
     top: -1px;
   }
   #indexNavBar {
-    padding-top: 0.4em;
+    padding-top: 0.1em;
     max-width: 100%;
   }
   #indexNavBar span.glyphicon {
@@ -1489,6 +1495,8 @@ div.org-container input[type="checkbox"] {
   }
   #indexNavBar span.index-list {
     display: inline-block;
+    position: relative;
+    top: 3px;
   }
   #wellContainer .tnth-well {
     height: 65%;
@@ -1497,7 +1505,7 @@ div.org-container input[type="checkbox"] {
     font-size: 0.9em;
   }
   .profile-item-container {
-    padding: 1em;
+    padding: 2em;
     max-width: 100%;
   }
   .fixed-table-pagination {
@@ -1529,12 +1537,11 @@ div.org-container input[type="checkbox"] {
     height: 34px;
     margin: 4px auto;
   }
-  table.profile-audit-log TH,
-  .checkbox input[type=checkbox],
-  .checkbox-inline input[type=checkbox],
-  .radio input[type=radio],
-  .radio-inline input[type=radio] {
-    margin-top: 4px;
+  .checkbox input[type=checkbox] {
+    top: -1px;
+  }
+  #profile-gender-list input[type=radio] {
+    top: -2px;
   }
   table.profile-audit-log {
     font-size: 0.7em;
@@ -1585,6 +1592,9 @@ div.org-container input[type="checkbox"] {
   }
   #profileForm #bdGroup .flex {
     flex-wrap: nowrap;
+  }
+  .profile-section {
+    padding: 0;
   }
   #userSessionReportDetailHeader span.glyphicon-user {
     margin-top: 2px;
@@ -1791,12 +1801,6 @@ div.org-container input[type="checkbox"] {
     height: 26em;
   }
 }
-@media (min-width: 1070px) {
-	#profileSendEmailContainer {
-	  margin-top: 1em;
-    margin-left: 0.5em;
-	}
-}
 @media (max-width: 1199px) {
   .profile-img {
     display: none;
@@ -1818,6 +1822,10 @@ div.org-container input[type="checkbox"] {
   .patient-detail-container .flex {
     flex-direction: column;
   }
+  #profileForm .communications-container .flex-item {
+    flex: 0.3 350px;
+  }
+
 }
 @media (min-width: 1200px) {
   #fullSizeContainer {
@@ -1851,10 +1859,10 @@ div.org-container input[type="checkbox"] {
     margin-bottom: 0.5em;
   }
   #profileForm .patient-detail-container .flex-item {
-	margin-right: 2em;
+    flex: 1;
   }
   #profileForm .communications-container .flex-item {
-	margin-right: 5em;
+    flex: 1 30%;
   }
 }
 @media (max-width: 1300px) {
@@ -1963,7 +1971,7 @@ div.org-container input[type="checkbox"] {
     margin-left: 160px;
   }
 }
-@media (max-width: 1070px) {
+@media (max-width: 1077px) {
   body.open-nav .right-panel {
     margin-left: 210px;
   }
