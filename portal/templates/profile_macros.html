@@ -374,6 +374,37 @@
     </div>
 {%- endmacro %}
 
+{% macro resetPassword(person) %}
+    <div id="resetPasswordGroup" class="form-group profile-section flex-item">
+        <button id="btnPasswordResetEmail" class="btn btn-tnth-primary">{{ _("Send email") }}</button>
+        <div id="passwordResetMessage" class="text-info"></div>
+    </div>
+    <script async>
+    {% if person %}
+    $(function() {
+        $('#btnPasswordResetEmail').on('click', function(event) {
+            event.preventDefault();
+            email = $('#email').val()
+            if (email) {
+                $.ajax ({
+                    type: 'POST',
+                    url: '/api/user/' + {{person.id}} + '/password_reset',
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
+                }).done(function(data) {
+                    $('#passwordResetMessage').text('Password reset email sent to ' + email);
+                }).fail(function() {
+                    console.log('failed request');
+                    $('#passwordResetMessage').text('Unable to send email.');
+                });
+            } else {
+                $('#passwordResetMessage').text('No email address found for user');
+            };
+        });
+    });
+    {% endif %}
+    </script>
+{%-endmacro %}
+
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
     <div class="form-group profile-section" id="userOrgs">
@@ -1321,6 +1352,17 @@
                     <br/>
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if (person and person.has_role(ROLE.PATIENT) and current_user and (current_user.id != person.id)) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="resetPasswordLoc" class="profile-item-title index-item">{{ _("Reset Password") }}</h4>
+                    {{resetPassword(person)}}
                 </div>
             </div>
         </div>
