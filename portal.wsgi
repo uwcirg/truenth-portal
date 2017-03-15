@@ -1,15 +1,12 @@
-import os, sys
-
-PROJECT_DIR = os.environ.get(
-	'PROJECT_DIR',
-	os.path.join(os.path.dirname(__file__), 'env/')
-)
-# activate virtualenv
-activate_this = os.path.join(PROJECT_DIR, 'bin/activate_this.py')
-execfile(activate_this, dict(__file__=activate_this))
-
-if PROJECT_DIR not in sys.path:
-    sys.path.append(PROJECT_DIR)
+# WSGI entry point
+#
+# NB - the python-home variable must be defined and point to the
+# root of the virtualenv - see:
+#   http://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
 
 from portal.app import create_app
+from portal.env import import_env
+
+
+import_env()
 application = create_app()
