@@ -7,6 +7,7 @@
 .coverage
 application.cfg
 site.cfg
+docker/.env
 env
 lib
 local

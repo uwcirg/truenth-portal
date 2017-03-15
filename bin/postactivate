@@ -1,0 +1,42 @@
+#!/bin/bash
+# This hook is sourced after this virtualenv is activated.
+
+# This file should be symlinked with the same named file in the
+# virtualenv bin directory, i.e.
+#   workon my_prj
+#   cdvirtualenv bin
+#   rm postactivate
+#   ln -siv <path_to_here>/postactivate .
+#
+# Subsequently, it'll get picked up when calling `workon my_prj`
+
+
+# use vars set by virtualenvwrapper to locate project root
+# logic found in virtualenvwrapper.sh function cdproject()
+function get_project_dir() {
+    if [ -f "$VIRTUAL_ENV/$VIRTUALENVWRAPPER_PROJECT_FILENAME" ]
+    then
+        typeset project_dir="$(cat "$VIRTUAL_ENV/$VIRTUALENVWRAPPER_PROJECT_FILENAME")"
+        if [ ! -z "$project_dir" ]
+        then
+            echo "$project_dir"
+            return 0
+        else
+            echo "Project directory $project_dir does not exist" 1>&2
+            return 1
+        fi
+    else
+        echo "No project set in $VIRTUAL_ENV/$VIRTUALENVWRAPPER_PROJECT_FILENAME" 1>&2
+        return 1
+    fi
+}
+
+## Pull in all environment variables defined in docker-compose .env file
+project_dir=`get_project_dir`
+env_file=${project_dir}/docker/.env
+if [ -f "$env_file" ]
+then
+    source "$env_file"
+else
+    echo "$env_file NOT FOUND"
+fi
