@@ -38,7 +38,7 @@ def initdb():
     """Init/reset database."""
     db.drop_all()
     db.create_all()
-    seed()
+    seed(include_interventions=True)
 
 
 @manager.command
