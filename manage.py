@@ -52,6 +52,10 @@ def seed(include_interventions=False, keep_unmentioned=False):
     db_maintenance()
     db.session.commit()
 
+    # Always update interventions on development systems
+    if app.config["SYSTEM_TYPE"].lower() == 'development':
+        include_interventions = True
+
     # import site export file if found
     SitePersistence().import_(include_interventions, keep_unmentioned)
 
