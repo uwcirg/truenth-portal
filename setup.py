@@ -72,6 +72,7 @@ setup(
         "recommonmark",
         "redis",
         "requests-cache",
+        "shellvars-py",
         "sphinx",
         "sphinx_rtd_theme",
         "validators",
