@@ -613,7 +613,7 @@ var fillContent = {
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
         $.each(data.entry,function(i,val){
-            var procID = val.resource.id, code = val.resource.code.coding[0].code;        
+            var procID = val.resource.id, code = val.resource.code.coding[0].code;
             var displayText = val.resource.code.coding[0].display;
             var performedDateTime = val.resource.performedDateTime;
             var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
@@ -625,7 +625,7 @@ var fillContent = {
             creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
             if (creator == currentUserId) {
                 creator = "you";
-                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='border-radius:4px; font-size:0.9em; padding: 0.2em 0.6em; color:#777' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn btn-default cancel-delete\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
             }
             else if (creator == subjectId) {
                 creator = "this patient";
@@ -633,7 +633,7 @@ var fillContent = {
             else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
             var dtEdited = val.resource.meta.lastUpdated;
             dateEdited = new Date(dtEdited);
-            proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+            proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-9 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-3 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
             if (procID > highestId) {
                 highestId = procID;
             };
