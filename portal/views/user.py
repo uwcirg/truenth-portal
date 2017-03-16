@@ -1607,6 +1607,7 @@ def upload_user_document(user_id):
 
 @user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
 @oauth.require_oauth()
+@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 def trigger_password_reset_email(user_id):
     """Trigger a password reset email for the specified user
 
@@ -1616,8 +1617,6 @@ def trigger_password_reset_email(user_id):
     ---
     tags:
       - User
-      - Password
-      - Access
     operationId: send_password_reset
     produces:
       - application/json
