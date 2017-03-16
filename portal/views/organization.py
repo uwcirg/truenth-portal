@@ -2,14 +2,16 @@
 from flask import abort, current_app, Blueprint, jsonify, request
 from flask_user import roles_required
 import json
-from sqlalchemy import exc
+from sqlalchemy import exc, and_
 
 from ..audit import auditable_event
 from ..extensions import db, oauth
-from ..models.organization import Organization, OrgTree
+from ..models.identifier import Identifier
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.reference import MissingReference
 from ..models.role import ROLE
 from ..models.user import current_user
+from ..system_uri import PRACTICE_REGION
 
 
 org_api = Blueprint('org_api', __name__, url_prefix='/api')
@@ -17,14 +19,31 @@ org_api = Blueprint('org_api', __name__, url_prefix='/api')
 
 @org_api.route('/organization')
 @oauth.require_oauth()
-def organization_list():
-    """Obtain a bundle (list) of all registered organizations
+def organization_search():
+    """Obtain a bundle (list) of all matching organizations
 
-    Returns the JSON FHIR bundle of organizations as known to the system.
+    Takes key=value pairs to look up.  At this time, only state is supported.
+
+    Example search:
+        /api/organization?state=NJ
+
+    Returns a JSON FHIR bundle of organizations as per given search terms.
+    Without any search terms, returns all organizations known to the system.
+    If search terms are provided but no matching organizations are found,
+    a 404 is returned.
+
     ---
-    operationId: organization_list
+    operationId: organization_search
     tags:
       - Organization
+    parameters:
+      - name: search_parameters
+        in: query
+        description:
+            Search parameters, such as `state`, which should be the two
+            letter state code.
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -38,7 +57,25 @@ def organization_list():
           to view requested patient
 
     """
-    bundle = Organization.generate_bundle()
+    found_ids = []
+    for k,v in request.args.items():
+        if k == 'state':
+            if not v or len(v) != 2:
+                abort(401, "state search requires two letter state code")
+            region = 'state:{}'.format(v.upper())
+
+            query = OrganizationIdentifier.query.join(
+                Identifier).filter(and_(
+                    OrganizationIdentifier.identifier_id==Identifier.id,
+                    Identifier.system==PRACTICE_REGION,
+                    Identifier._value==region))
+            found_ids = [oi.organization_id for oi in query]
+            if not found_ids:
+                abort(404, "no organzations found for state {}".format(v))
+        else:
+            abort(400, "can't search on '{}' at this time".format(k))
+
+    bundle = Organization.generate_bundle(found_ids)
     return jsonify(bundle)
 
 
