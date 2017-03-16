@@ -4,9 +4,10 @@ import json
 import os
 
 from portal.extensions import db
-from portal.system_uri import SHORTCUT_ALIAS
+from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
+from portal.models.organization import OrganizationIdentifier
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -94,6 +95,31 @@ class TestOrganization(TestCase):
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
         self.assertEquals(len(bundle['entry']), count)
+
+    def test_organization_search(self):
+        self.shallow_org_tree()
+        count = Organization.query.count()
+        self.assertTrue(count > 1)
+
+        # add region to one org, we should get only that one back
+        region = Identifier(value='state:NY', system=PRACTICE_REGION)
+        with SessionScope(db):
+            db.session.add(region)
+            db.session.commit()
+        region = db.session.merge(region)
+        oi = OrganizationIdentifier(organization_id=1001,
+                                    identifier_id=region.id)
+        with SessionScope(db):
+            db.session.add(oi)
+            db.session.commit()
+
+        # use api to obtain FHIR bundle
+        self.login()
+        rv = self.client.get('/api/organization?state=NY')
+        self.assert200(rv)
+        bundle = rv.json
+        self.assertTrue(bundle['resourceType'], 'Bundle')
+        self.assertEquals(len(bundle['entry']), 1)
 
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN)

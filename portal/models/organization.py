@@ -182,10 +182,17 @@ class Organization(db.Model):
         return d
 
     @classmethod
-    def generate_bundle(cls):
-        """Generate a FHIR bundle of existing orgs ordered by ID"""
+    def generate_bundle(cls, limit_to_ids):
+        """Generate a FHIR bundle of existing orgs ordered by ID
 
+        If limit_to_ids is defined, only return the matching set, otherwise
+        all organizations found.
+
+        """
         query = Organization.query.order_by(Organization.id)
+        if limit_to_ids:
+            query = query.filter(Organization.id.in_(limit_to_ids))
+
         orgs = [o.as_fhir() for o in query]
 
         bundle = {
@@ -196,7 +203,7 @@ class Organization(db.Model):
             'link': {
                 'rel':'self',
                 'href':url_for(
-                    'org_api.organization_list', _external=True),
+                    'org_api.organization_search', _external=True),
             },
             'entry':orgs,
         }
