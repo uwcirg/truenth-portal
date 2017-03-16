@@ -912,3 +912,13 @@ class TestUser(TestCase):
             self.assertEquals(user.password, 'phoney')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
+
+
+    def test_password_reset(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        rv = self.client.post('/api/user/{}/password_reset'.format(TEST_USER_ID),
+                content_type='application/json')
+
+        self.assertEquals(rv.status_code, 200)
