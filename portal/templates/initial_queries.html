@@ -3,6 +3,7 @@
 {% from "flask_user/_macros.html" import back_btn %}
 
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
+{% from "profile_macros.html" import profileOrgsSelector %}
 
 
   <!-- <div id="loadingIndicator" class="loading-indicator">
@@ -59,7 +60,13 @@
               {{patientQGroup(user)}}
             {% endif %}
             {% if 'org' in still_needed %}
-              {{clinic(consent_agreements)}}
+             {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                 <div id="clinics" class="tnth-hide" parent-section="true">
+                    {{profileOrgsSelector(user, "", consent_agreements)}}
+                  </div>
+             {% else %}
+                {{clinic(consent_agreements)}}
+              {% endif %}
             {% endif %}
             <br />
             <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
