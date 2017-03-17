@@ -407,7 +407,7 @@
 
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
     <div id="userOrgs" class="customized">
-       <p class="prompt text-muted">{{ _("In what state are you currently receiving prostate cancer care?") }}</p>
+       <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
        <div class="state-selector-container">
             <select id="stateSelector" class="form-control"></select>
        </div>
