@@ -243,9 +243,8 @@ select:not([multiple]) {
   z-index: 11;
   background-color: @bodyBgColor;
   overflow: auto;
-  transition: all 500ms ease-in;
+  transition: transform 500ms ease-out;
   display: block;
-
   &.sticky-show {
     -webkit-transform: translate(0, 0);
     transform: translate(0, 0);
@@ -264,11 +263,13 @@ select:not([multiple]) {
     list-style-type:none;
   }
   li {
-    line-height: 2.2em;
+    margin-bottom: 1em;
+    transform-origin: 0 100%;
     cursor:pointer;
   }
   li:hover {
     color: @menuTextHoverColor;
+    transform: scale(1.1);
   }
 }
 
@@ -876,6 +877,7 @@ div.right-panel {
   border: 1px solid #E0E6E3;
   overflow-y: hidden;
   overflow-x: hidden;
+  max-width: 100%;
  }
 
 .profile-item-title {
@@ -1010,6 +1012,7 @@ div.noOrg-container {
   background-color: #f9f9f9;
   background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
+  max-width: 100%;
   label{
     font-size:0.95em;
   }
@@ -1345,6 +1348,7 @@ div.noOrg-container {
   justify-content: flex-start;
   div.flex-item {
     padding: 8px 12px 8px 0;
+    max-width: 100%;
   }
 }
 
@@ -1668,12 +1672,12 @@ div.timezone-warning.text-warning {
   .tnth-form .form-group > label {
     font-size: 13px;
   }
-  .flex div {
-    margin-left: 0.1em;
-  }
   .create-user-link {
     font-size: @mediumText;
   }
+  div.right-panel {
+    margin-left: 0 !important;
+   }
   #indexNavBar {
     display: block;
     max-width: 100%;
@@ -1731,19 +1735,14 @@ div.timezone-warning.text-warning {
       max-width: 100%;
     }
   }
-
-  .form-control {
-    height: 34px;
-    margin: 4px auto;
-  }
   .checkbox input[type=checkbox] {
     top: -1px;
   }
   #profile-gender-list input[type=radio] {
     top: -2px;
    }
-  table.profile-audit-log {
-    font-size: @xxsmallText;
+  #profileAuditLogTable, #profileConsentList {
+    font-size: 0.6em;
   }
   #profileConsentList {
     font-size: 0.5em
