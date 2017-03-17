@@ -409,9 +409,7 @@
     <div id="userOrgs" class="customized">
        <p class="prompt text-muted">{{ _("In what state are you currently receiving prostate cancer care?") }}</p>
        <div class="state-selector-container">
-            <select id="stateSelector">
-
-            </select>
+            <select id="stateSelector" class="form-control"></select>
        </div>
        <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state">
            <p class="clinic-prompt text-muted">{{ _("Main clinic for prostate cancer care")}}</p>
@@ -497,7 +495,7 @@
                   var selectOptions = $("#stateSelector").sortOptions();
                   $("#stateSelector").empty().append(selectOptions)
                   .append("<option value='none'>Other</option>")
-                  .prepend("<option value=''>Select</option>");
+                  .prepend("<option value='' selected>Select</option>");
                   $(".state-container, .clinic-prompt").hide();
                   OT.handlePreSelectedClinic();
                   //case of pre-selected clinic, need to check if any clinic has prechecked
