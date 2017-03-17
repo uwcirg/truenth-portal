@@ -216,11 +216,13 @@ select:not([multiple]) {
   list-style-type: none;
 }
 #stickyMenu li {
-  line-height: 2.2em;
+  margin-bottom: 1em;
+  transform-origin: 0 100%;
   cursor: pointer;
 }
 #stickyMenu li:hover {
   color: #337ab7;
+  transform: scale(1.1);
 }
 a.open,
 a.back {
@@ -792,6 +794,7 @@ div.right-panel {
   border: 1px solid #E0E6E3;
   overflow-y: hidden;
   overflow-x: hidden;
+  max-width: 100%;
 }
 .profile-item-title {
   color: #526960;
@@ -905,6 +908,7 @@ div.noOrg-container span {
   background-color: #f9f9f9;
   background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
+  max-width: 100%;
 }
 #profileSendEmailContainer label {
   font-size: 0.95em;
@@ -1219,6 +1223,7 @@ table.profile-audit-log TH,
 }
 .flex div.flex-item {
   padding: 8px 12px 8px 0;
+  max-width: 100%;
 }
 #phone,
 #email {
@@ -1521,9 +1526,6 @@ div.timezone-warning.text-warning {
   .tnth-form .form-group > label {
     font-size: 13px;
   }
-  .flex div {
-    margin-left: 0.1em;
-  }
   .create-user-link {
     font-size: 0.95em;
   }
@@ -1581,21 +1583,14 @@ div.timezone-warning.text-warning {
     width: 100%;
     max-width: 100%;
   }
-  .form-control {
-    height: 34px;
-    margin: 4px auto;
-  }
   .checkbox input[type=checkbox] {
     top: -1px;
   }
   #profile-gender-list input[type=radio] {
     top: -2px;
   }
-  table.profile-audit-log {
-    font-size: 0.7em;
-  }
-  #profileConsentList {
-    font-size: 0.5em;
+  #profileAuditLogTable, #profileConsentList {
+    font-size: 0.6em;
   }
   .create-account-container {
     padding: 3.5em 3em;
