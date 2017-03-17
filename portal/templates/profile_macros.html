@@ -410,13 +410,7 @@
        <p class="prompt text-muted">{{ _("In what state are you currently receiving prostate cancer care?") }}</p>
        <div class="state-selector-container">
             <select id="stateSelector">
-                <option value="">Select</option>
-                <option value="CA">California</option>
-                <option value="MI">Michigan</option>
-                <option value="NJ">New Jersey</option>
-                <option value="NY">New York</option>
-                <option value="WA">Washington</option>
-                <option value="none">Other</option>
+
             </select>
        </div>
        <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state">
@@ -430,14 +424,17 @@
                 </div>
            </div>
        </div>
-       <div id="userOrgsInfo" class="text-muted">No clinic found in selected state.</div>
-       {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+       <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+       {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}}{% endif %}
     </div>
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         function handleCheckedItem() {
-            $("#userOrgs input[name='organization']:checked").closest(".state-container").show();
-            $(".clinic-prompt").show();
+            var o = $("#userOrgs input[name='organization']:checked");
+            if (o.length > 0 && o.val() != 0) {
+                o.closest(".state-container").show();
+                $(".clinic-prompt").show();
+            };
         };
         $(function () {
             $("#stateSelector").on("change", function() {
@@ -445,25 +442,26 @@
                 var defaultPrompt = "Main clinic for prostate cancer care";
                 $("#userOrgsInfo").hide();
                 if (selectedState.val() != "") {
-                    if (container.length > 0) {
-                        $(".state-container").hide();
-                        $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text()).show();
-                        $(".noOrg-container").show();
-                        $("#noOrgs").prop("checked", false);
-                        container.show();
+                    if (selectedState.val() == "none") {
+                        $(".state-container, .noOrg-container").hide();
+                        $(".clinic-prompt").text(defaultPrompt).hide();
+                        $("#noOrgs").prop("checked", true).trigger("click");
+                        //send of ajax to update org to 0 here
                     } else {
-                        $(".state-container, .clinic-prompt, .noOrg-container").hide();
-                        $("#userOrgsInfo").show();
+                        if (container.length > 0) {
+                            $(".state-container").hide();
+                            $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text()).show();
+                            $(".noOrg-container").show();
+                            $("#noOrgs").prop("checked", false);
+                            container.show();
+                        } else {
+                            $(".state-container, .clinic-prompt, .noOrg-container").hide();
+                            $("#userOrgsInfo").show();
+                        };
                     };
                 } else {
                     $(".state-container, .noOrg-container").hide();
                     $(".clinic-prompt").text(defaultPrompt).hide();
-                }
-                if (selectedState.val() == "none") {
-                    $(".state-container").hide();
-                    $(".clinic-prompt").text(defaultPrompt).hide();
-                    $("#noOrgs").prop("checked", true).trigger("click");
-                    //send of ajax to update org to 0 here
                 };
             });
             $.ajax ({
@@ -481,7 +479,7 @@
                                 if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
                                     __state = (region.value).split(":")[1];
                                     if (!states[__state]) {
-                                        //$("#stateSelector").append("<option value='" + __state + "'>" + __state + "</option>");
+                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
                                         if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
                                         states[__state] = true;
                                     };
@@ -495,7 +493,11 @@
                     };
 
                   });
-                  //$("#stateSelector").append("<option value='none'>Other</option>");
+
+                  var selectOptions = $("#stateSelector").sortOptions();
+                  $("#stateSelector").empty().append(selectOptions)
+                  .append("<option value='none'>Other</option>")
+                  .prepend("<option value=''>Select</option>");
                   $(".state-container, .clinic-prompt").hide();
                   OT.handlePreSelectedClinic();
                   //case of pre-selected clinic, need to check if any clinic has prechecked
@@ -1504,7 +1506,7 @@
             <div class="profile-item-container">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Organization Affiliation") }} / {{ _("Clinics") }}</h4>
                  {% if not session.get('associate_clinic_id', '') and ((person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                 {{profileOrgsSelector(person, current_user, consent_agreements)}} 
+                 {{profileOrgsSelector(person, current_user, consent_agreements)}}
                  {% else %}
                     {{profileOrg(person,None,consent_agreements, current_user)}}
                  {% endif %}
