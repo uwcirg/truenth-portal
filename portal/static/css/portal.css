@@ -159,9 +159,11 @@ select:not([multiple]) {
   border-radius: 8px;
   z-index: 11;
   background-color: #FFF;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   transition: all 500ms ease-out;
   display: block;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 #stickyMenu.sticky-show {
   -webkit-transform: translate(0, 0);
@@ -191,7 +193,7 @@ select:not([multiple]) {
 }
 #stickyMenu li:hover {
   color: #337ab7;
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 a.open,
 a.back {
