@@ -405,9 +405,117 @@
     </script>
 {%-endmacro %}
 
+{% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
+    <div id="userOrgs" class="customized">
+       <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
+       <div class="state-selector-container">
+            <select id="stateSelector" class="form-control"></select>
+       </div>
+       <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state">
+           <p class="clinic-prompt text-muted">{{ _("Main clinic for prostate cancer care")}}</p>
+           <div class="main-state-container">
+                <div class="noOrg-container" style="display: none">
+                    <label>
+                        <input id="noOrgs" class="clinic" type="radio" name="organization" value="0">
+                        <span>{{ _("None of the Above") }}</span>
+                    </label>
+                </div>
+           </div>
+       </div>
+       <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+       {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}}{% endif %}
+    </div>
+    <script>
+        var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
+        function handleCheckedItem() {
+            var o = $("#userOrgs input[name='organization']:checked");
+            if (o.length > 0 && o.val() != 0) {
+                o.closest(".state-container").show();
+                $(".clinic-prompt").show();
+            };
+        };
+        $(function () {
+            $("#stateSelector").on("change", function() {
+                var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
+                var defaultPrompt = "Main clinic for prostate cancer care";
+                $("#userOrgsInfo").hide();
+                if (selectedState.val() != "") {
+                    if (selectedState.val() == "none") {
+                        $(".state-container, .noOrg-container").hide();
+                        $(".clinic-prompt").text(defaultPrompt).hide();
+                        $("#noOrgs").prop("checked", true).trigger("click");
+                        //send of ajax to update org to 0 here
+                    } else {
+                        if (container.length > 0) {
+                            $(".state-container").hide();
+                            $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text()).show();
+                            $(".noOrg-container").show();
+                            $("#noOrgs").prop("checked", false);
+                            container.show();
+                        } else {
+                            $(".state-container, .clinic-prompt, .noOrg-container").hide();
+                            $("#userOrgsInfo").show();
+                        };
+                    };
+                } else {
+                    $(".state-container, .noOrg-container").hide();
+                    $(".clinic-prompt").text(defaultPrompt).hide();
+                };
+            });
+            $.ajax ({
+                type: "GET",
+                url: '/api/organization',
+                async: false
+            }).done(function(data) {
+                if (data && data.entry) {
+                  var entry = data.entry, states = {};
+                  entry.forEach(function(item) {
+                    if (item.partOf) { //don't render parent org
+                        var __state = "";
+                        if (item.identifier) {
+                            (item.identifier).forEach(function(region) {
+                                if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
+                                    __state = (region.value).split(":")[1];
+                                    if (!states[__state]) {
+                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                        if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                        states[__state] = true;
+                                    };
+                                    if (parseInt(item.id) != 0) {
+                                        var parentId = (item.partOf.reference).split("/")[2];
+                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
+                                    };
+                                };
+                            });
+                        };
+                    };
+
+                  });
+
+                  var selectOptions = $("#stateSelector").sortOptions();
+                  $("#stateSelector").empty().append(selectOptions)
+                  .append("<option value='none'>Other</option>")
+                  .prepend("<option value='' selected>Select</option>");
+                  $(".state-container, .clinic-prompt").hide();
+                  OT.handlePreSelectedClinic();
+                  //case of pre-selected clinic, need to check if any clinic has prechecked
+                  setTimeout("handleCheckedItem();", 500);
+
+                  OT.populateOrgsList(entry);
+                  {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                  OT.handleEvent();
+                };
+
+            }).fail(function() {
+
+            });
+        });
+    </script>
+{%- endmacro %}
+
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
-    <div class="form-group profile-section" id="userOrgs">
+    <div class="form-group profile-section standard" id="userOrgs">
         {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
         <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
         <div class="indent">
@@ -1395,7 +1503,11 @@
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Organization Affiliation") }} / {{ _("Clinics") }}</h4>
-                {{profileOrg(person,None,consent_agreements, current_user)}}
+                 {% if not session.get('associate_clinic_id', '') and ((person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                 {{profileOrgsSelector(person, current_user, consent_agreements)}}
+                 {% else %}
+                    {{profileOrg(person,None,consent_agreements, current_user)}}
+                 {% endif %}
             </div>
         </div>
     </div>
