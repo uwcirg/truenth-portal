@@ -299,6 +299,10 @@ h4.detail-title {
   tr[data-uniqueid]:hover {
     background-color: #ececea;
   }
+  TH {
+    background-image: linear-gradient(to bottom, #FFF, #efefef);
+    letter-spacing: 0.1px;
+  }
 }
 #adminTableToolbar {
   div.orglist-selector {
@@ -520,6 +524,7 @@ h4.detail-title {
   div.or {
     display: inline-block;
     background-color: #888a8c;
+    margin: 1.5em 1em 1em;
   }
 
   #_downloadLink {
@@ -534,7 +539,10 @@ h4.detail-title {
     word-wrap: break-word;
   }
 }
-
+#patientListOptions {
+  display:flex; 
+  flex-direction: column;
+}
 #patientAssessmentDownload {
   padding: 0.65em;
   height: 2.86em;
@@ -882,7 +890,11 @@ h4.detail-title {
 .profile-name-label, .profile-birthdate-label {
     margin-bottom: -4px;
  }
-
+#createUserLink {
+  height: 2.7em;
+  width: 250px;
+  max-width: 100%;
+}
 .profile-create-item-container {
   border-radius: 8px;
   margin: 0.5em auto;
@@ -989,7 +1001,7 @@ div.noOrg-container {
   top: 2px;
   }
   span {
-  margin-left:3px;
+  margin-left:2px;
   position: relative;
   top: 1px;
   font-weight: normal;
@@ -1416,6 +1428,15 @@ div.noOrg-container {
 }
 .radio-inline input[type=radio] {
   margin-left: -18px;
+}
+
+div.biopsy-option:last-of-type{
+  margin-top: 1px;
+}
+#biopsyDate {
+  width: 150px;
+  max-width: 100%;
+  display: inline-block;
 }
 
 div.modal-header, div.modal-footer {
@@ -1907,6 +1928,15 @@ div.timezone-warning.text-warning {
     background-repeat: no-repeat;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAMCAYAAABSgIzaAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NDZFNDEwNjlGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NDZFNDEwNkFGNzFEMTFFMkJEQ0VDRTM1N0RCMzMyMkIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NkU0MTA2N0Y3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo0NkU0MTA2OEY3MUQxMUUyQkRDRUNFMzU3REIzMzIyQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PuGsgwQAAAA5SURBVHjaYvz//z8DOYCJgUxAf42MQIzTk0D/M+KzkRGPoQSdykiKJrBGpOhgJFYTWNEIiEeAAAMAzNENEOH+do8AAAAASUVORK5CYII=);
     padding-right: 1.5em;
+  }
+  #patientListOptions {
+    flex-direction: row;
+    & > span:last-of-type {
+      margin-top: 0.7em;
+    }
+  }
+  #patientList div.or {
+    margin: 1.5em;
   }
 }
 @media (max-width: 991px) {
