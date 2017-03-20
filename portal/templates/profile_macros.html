@@ -452,6 +452,11 @@
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
+                            {% if person %}
+                                if (container.find("input[name='organization']:checked").length > 0) {
+                                   assembleContent.demo({{ person.id }},true, $(this), true);
+                                };
+                            {% endif %}
                         } else {
                             $(".state-container, .clinic-prompt, .noOrg-container").hide();
                             $("#userOrgsInfo").show();
