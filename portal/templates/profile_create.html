@@ -124,6 +124,11 @@ $(document).ready(function(){
     var hasError = false;
     var errorMessage = '';
 
+    $("#updateProfile").attr("disabled", true);
+    $("#createProfileForm input, #createProfileForm select").on("change", function() {
+        $("#updateProfile").attr("disabled", false);
+    });
+
     $("#noEmail").on("click", function() {
         if ($(this).is(":checked")) {
             $("#email").val("");
