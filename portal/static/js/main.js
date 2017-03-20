@@ -1750,7 +1750,7 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "postBiopsy": function(userId, issuedDate, value, targetField) {
+    "postBiopsy": function(userId, issuedDate, value, status, targetField) {
         flo.showLoader(targetField);
         if (!userId) return false;
         var code = '111';
@@ -1764,6 +1764,7 @@ var tnthAjax = {
         obsArray["performer"] = {"reference": "Patient/" + userId};
         obsArray["code"] = {"coding": obsCode};
         obsArray["issued"] = issuedDate ? issuedDate: "";
+        obsArray["status"] = status ? status: "";
         obsArray["valueQuatity"] = {"units":"boolean", "value":value}
         $.ajax ({
             type: "POST",
