@@ -1750,6 +1750,37 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
+    "postBiopsy": function(userId, issuedDate, value, status, targetField) {
+        flo.showLoader(targetField);
+        if (!userId) return false;
+        var code = '111';
+        var display = "biopsy";
+        var system = CLINICAL_SYS_URL;
+
+        var obsCode = [{ "code": code, "display": display, "system": system }];
+        var obsArray = {};
+
+        obsArray["resourceType"] = "Observation";
+        obsArray["performer"] = {"reference": "Patient/" + userId};
+        obsArray["code"] = {"coding": obsCode};
+        obsArray["issued"] = issuedDate ? issuedDate: "";
+        obsArray["status"] = status ? status: "";
+        obsArray["valueQuatity"] = {"units":"boolean", "value":value}
+        $.ajax ({
+            type: "POST",
+            url: '/api/patient/'+userId+'/clinical',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: JSON.stringify(obsArray)
+        }).done(function() {
+            $(".post-biopsy-error").remove();
+            flo.showUpdate(targetField);
+        }).fail(function() {
+            //alert("There was a problem saving your answers. Please try again.");
+            if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
+            flo.showError(targetField);
+        });
+    },
     "postTerms": function(toSend) {
         $.ajax ({
             type: "POST",
