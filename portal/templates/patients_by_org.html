@@ -3,7 +3,11 @@
   <div id="patientList" class="reduce-font-sizes">
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
-    <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="btn btn-lg">{{ _("Create a patient record") }}</button>&nbsp;&nbsp;<div class="or">or</div>&nbsp;&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
+    <div id="patientListOptions">
+      <button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="btn btn-lg">{{ _("Create a patient record") }}</button>
+      <div class="or">or</div>
+      <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
+    </div>
     <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
@@ -74,8 +78,8 @@
              data-sort-order="desc"
              data-search="true"
              data-pagination="true"
-             data-page-size="15"
-             data-page-list="[15, 25, 50]"
+             data-page-size="10"
+             data-page-list="[10, 20, 30]"
              data-toolbar="#adminTableToolbar"
              data-show-toggle="true"
              data-show-columns="true"
