@@ -189,7 +189,7 @@ after_deploy:
 
   # Deploy to Heroku, if configured
   - if [[ -v HEROKU_API_KEY ]]; then
-      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web"
+      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
 
