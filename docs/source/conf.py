@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import datetime
 import sys
 import os
 import pkginfo
@@ -49,8 +50,7 @@ source_parsers = {
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
-# source_suffix = ['.rst', '.md']
-source_suffix = ['.txt', '.md']
+source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
 #source_encoding = 'utf-8-sig'
@@ -62,8 +62,9 @@ master_doc = 'index'
 project = metadata.summary
 project_slug = project.replace(" ","")
 
+now = datetime.datetime.now()
 author = metadata.author
-copyright = u'2016, %s' % author
+copyright = u'{}, {}'.format(now.year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
