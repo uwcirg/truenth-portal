@@ -108,7 +108,7 @@ def sessionReport(user_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required(ROLE.STAFF)
+@roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""

@@ -301,6 +301,8 @@ class User(db.Model, UserMixin):
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
             backref=db.backref('users', lazy='dynamic'))
+    interventions = db.relationship('Intervention', lazy='dynamic',
+            secondary="user_interventions", backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',
             lazy='dynamic')
     races = db.relationship(Coding, lazy='dynamic',
@@ -1098,6 +1100,12 @@ class User(db.Model, UserMixin):
             for sa_org in self.organizations:
                 others_ids = [o.id for o in other.organizations]
                 if orgtree.at_or_below_ids(sa_org.id, others_ids):
+                    return True
+
+        if self.has_role(ROLE.INTERVENTION_STAFF) and other.has_role(ROLE.PATIENT):
+            # Intervention staff can access patients within that intervention
+            for intervention in self.interventions:
+                if intervention in other.interventions:
                     return True
 
         abort(401, "Inadequate role for {} of {}".format(permission, other_id))
