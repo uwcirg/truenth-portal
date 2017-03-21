@@ -118,7 +118,7 @@
               </label>
             </div>
             <div id="biopsyDateContainer" class="tnth-hide indent form-group">
-            	<label for="biopsyDate">{{_("Biopsy Date: ")}}</label>
+            	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
             	<input id="biopsyDate" type="text" class="form-control" placeholder="DD/MM/YYYY" maxlength="10">
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
             </div>
@@ -229,7 +229,7 @@
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
           var today = new Date();
-          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true}).on("changeDate", function() { return checkBiopsyDate($(this).val()); });
+          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true}).on("hide", function() { return checkBiopsyDate($(this).val()); });
           $("#biopsyDate").on("keydown", function() {
             $(this).datepicker("hide");
           });

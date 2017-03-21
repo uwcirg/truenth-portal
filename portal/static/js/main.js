@@ -252,25 +252,23 @@ var fillContent = {
 
         // sort from newest to oldest
         data.entry.sort(function(a,b){
-            var dateA = (new Date(a.content.meta.lastUpdated)).getTime() / 1000;
-            var dateB = (new Date(b.content.meta.lastUpdated)).getTime() / 1000;
-            if (dateB < dateA) {
-                return -1;
-            } else if (dateB > dateA) {
-                return 1;
-            } else {
-                return 0;
-            };
+            //date is in this format: 2017-03-21T22:25:03
+            var dateA = parseFloat((a.content.meta.lastUpdated).replace(/[\-T\:]/g, ""));
+            var dateB = parseFloat((b.content.meta.lastUpdated).replace(/[\-\T\:]/g, ""));
+            return dateB - dateA;
         });
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
+            //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
             var status = val.content.status;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
             };
+            var ci = $('div[data-topic="'+clinicalItem+'"]');
+            if (ci.length > 0) ci.fadeIn().next().fadeIn();
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if(!$radios.is(':checked')) {
@@ -278,11 +276,17 @@ var fillContent = {
                     else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
                     if (clinicalItem == "biopsy") {
                         if (clinicalValue == "true") {
-                            var issuedDate = val.content.issued;
-                            var d = issuedDate.substring(0, 10).split("-");
-                            //in DD/MM/YYYY format
-                            $("#biopsyDate").val(d[2] + "/" + d[1] + "/" + d[0]);
-                            $("#biopsyDateContainer").show();
+                            if (hasValue(val.content.issued)) {
+                                var issuedDate = "";
+                                //convert date string to a valid date format for conversion into Date object
+                                var d = (val.content.issued).replace(/-/g,"/");
+                                if (d.indexOf("T") != -1) d = d.substring(0, (d).indexOf("T"));
+                                issuedDate = new Date(d);
+                                var cDate = issuedDate.toLocaleDateString('en-GB');                 
+                                //in DD/MM/YYYY format
+                                $("#biopsyDate").val(cDate);
+                                $("#biopsyDateContainer").show();
+                            };
                         } else {
                             $("#biopsyDate").val("");
                             $("#biopsyDateContainer").hide();
