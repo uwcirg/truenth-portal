@@ -440,7 +440,7 @@ def home():
               format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF):
+    if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()

@@ -70,7 +70,7 @@
         <h3 class="side-nav__heading">Navigation</h3>
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="{{PORTAL}}/">Home</a></li>
-          {% if user and user.has_role(ROLE.STAFF) %}
+          {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/patients">Patients</a></li>
           {% endif %}
           {% if user %}
