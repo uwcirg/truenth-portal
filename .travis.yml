@@ -76,13 +76,8 @@ after_success:
   - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
     export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
   - export TAG=${TRAVIS_TAG:-${TAG}}
-  - export DOCKER_TAGS=(
-      "$TAG"
-      "$SHORT_HASH"
-      "$TRAVIS_COMMIT"
-      "$TRAVIS_BUILD_NUMBER"
-    )
-
+  - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
+  - echo ${DOCKER_TAGS}
   - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
   - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
@@ -166,32 +161,35 @@ deploy:
 
 after_deploy:
   # Apply all tags
-  - for tag in "${DOCKER_TAGS[@]}" do
+  - for tag in $DOCKER_TAGS; do
       docker tag
         "$IMAGE_NAME:$TAG"
-        "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag"
+        "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
     done
   # Deploy image (and all tags) to Bintray
-  - for tag in "${DOCKER_TAGS[@]}" do
-      docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag"
-    done
+  - for tag in $DOCKER_TAGS; do
+      docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+    done &
 
   # Deploy to Docker Hub, if configured
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      for tag in "${DOCKER_TAGS[@]}" do
+      for tag in $DOCKER_TAGS; do
         docker tag
           "$IMAGE_NAME:$TAG"
-          "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag"
+          "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
       done
     fi
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      for tag in "${DOCKER_TAGS[@]}" do
-        docker push "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag"
-      done
+      for tag in $DOCKER_TAGS; do
+        docker push "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
+      done &
     fi
 
   # Deploy to Heroku, if configured
   - if [[ -v HEROKU_API_KEY ]]; then
-      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
-      docker push "registry.heroku.com/$HEROKU_APP/web"
+      docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web"
+      docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
+
+  # Wait for background jobs to finish (if they haven't already)
+  - wait
