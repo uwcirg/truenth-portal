@@ -251,19 +251,29 @@ var fillContent = {
     "clinical": function(data) {
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
+            var clinicalValue = val.content.valueQuantity.value;
+            var status = val.content.status;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
+            } else if (clinicalItem == "biopsy") {
+                var issuedDate = val.content.issued;
+                if (hasValue(issuedDate) && clinicalValue == "true") {
+                    var d = issuedDate.substring(0, 10).split("-");
+                    //in DD/MM/YYYY format
+                    $("#biopsyDate").val(d[2] + "/" + d[1] + "/" + d[0]);
+                    $("#biopsyDateContainer").show();
+                };
             }
             var ci = $('div[data-topic="'+clinicalItem+'"]');
             if (ci.length > 0) ci.fadeIn().next().fadeIn();
-            var clinicalValue = val.content.valueQuantity.value;
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if($radios.is(':checked') === false) {
-                    $radios.filter('[value='+clinicalValue+']').prop('checked', true);
-                }
+                    if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                };
             };
         })
     },
@@ -325,8 +335,6 @@ var fillContent = {
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
-            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
-            if ($("#patBiopsy").length > 0) $("#patBiopsy").fadeIn();
         };
     },
     "ethnicity": function(data) {
@@ -1761,11 +1769,10 @@ var tnthAjax = {
         var obsArray = {};
 
         obsArray["resourceType"] = "Observation";
-        obsArray["performer"] = {"reference": "Patient/" + userId};
         obsArray["code"] = {"coding": obsCode};
         obsArray["issued"] = issuedDate ? issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuatity"] = {"units":"boolean", "value":value}
+        obsArray["valueQuantity"] = {"units":"boolean", "value":value}
         $.ajax ({
             type: "POST",
             url: '/api/patient/'+userId+'/clinical',

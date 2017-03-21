@@ -437,18 +437,18 @@
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
-                var defaultPrompt = "Main clinic for prostate cancer care";
+                var defaultPrompt = "What is your main clinic for prostate cancer care";
                 $("#userOrgsInfo").hide();
                 if (selectedState.val() != "") {
                     if (selectedState.val() == "none") {
                         $(".state-container, .noOrg-container").hide();
-                        $(".clinic-prompt").text(defaultPrompt).hide();
+                        $(".clinic-prompt").text("").hide();
                         $("#noOrgs").prop("checked", true).trigger("click");
                         //send of ajax to update org to 0 here
                     } else {
                         if (container.length > 0) {
                             $(".state-container").hide();
-                            $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text()).show();
+                            $(".clinic-prompt").text(defaultPrompt + " in " + selectedState.text() + "?").show();
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
@@ -1091,6 +1091,7 @@
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
+                $("#biopsyDate").attr("disabled", true);
             {% endif %}
 
             {% if person %}
@@ -1099,12 +1100,21 @@
                       var toCall = thisItem.attr("name")
                       // Get value from div - either true or false
                       var toSend = thisItem.val();
-                      tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
+                      if (toCall != "biopsy") tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
 
                       if (toSend == "true" || toCall ==  "pca_localized") {
+                        if (toCall == "biopsy") {
+                            if ($("#biopsyDate").val() == "") return true;
+                            else {
+                              //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
+                              var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
+                              tnthAjax.postBiopsy({{person.id}}, biopsyDate, toSend);
+                            };
+                        };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
                       } else {
                         if (toCall == "biopsy") {
+                            tnthAjax.postBiopsy({{person.id}}, "", "false", (toSend == "unknown"? toSend:""));
                             ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                                 $("input[name='" + fieldName + "']").each(function() {
                                     $(this).prop("checked", false);

@@ -412,10 +412,19 @@ $(document).ready(function(){
           // Get value from div - either true or false
           var toSend = thisItem.val();
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
-          if (toCall != "tx") {
-            tnthAjax.putClinical({{user.id}},toCall,toSend);
+          if (toCall != "tx" && toCall != "biopsy") {
+              tnthAjax.putClinical({{user.id}},toCall,toSend);
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
+
+            if (toCall == "biopsy") {
+                if ($("#biopsyDate").val() == "") return true;
+                else {
+                  //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
+                  var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
+                  tnthAjax.postBiopsy({{user.id}}, biopsyDate, toSend);
+                };
+            };
 
             thisItem.parents(".pat-q").next().fadeIn();
             $("#clinics").hide(); //this is hard coded, ARGHHH!!
@@ -425,7 +434,7 @@ $(document).ready(function(){
             if (nextItem.length > 0) {
                 $('html, body').animate({
                   scrollTop: nextItem.offset().top
-                }, 500);
+                }, 1000);
                 nextItem.find("input[type='radio']").each(function() {
                   $(this).attr("skipped", "false");
                 });
@@ -443,8 +452,12 @@ $(document).ready(function(){
             } else {
                 fc.getNextField(null, $(this));
             };
+
           } else {
             if (toCall == "biopsy") {
+
+              tnthAjax.postBiopsy({{user.id}}, "", "false", (toSend == "unknown"? toSend:""));
+
               ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);

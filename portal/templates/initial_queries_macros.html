@@ -112,14 +112,24 @@
           <br />
           <p>{{ _("Have you had a prostate cancer biopsy?") }}</p>
           <div class="form-group">
-            <div class="radio">
+            <div class="radio biopsy-option">
               <label>
                 <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
-            <div class="radio">
+            <div id="biopsyDateContainer" class="tnth-hide indent form-group">
+            	<label for="biopsyDate">{{_("Biopsy Date: ")}}&nbsp;</label>
+            	<input id="biopsyDate" type="text" class="form-control" placeholder="DD/MM/YYYY" maxlength="10">
+            	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
+            </div>
+            <div class="radio biopsy-option">
               <label>
                 <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_no" value="false"> {{ _("No") }}
+              </label>
+            </div>
+             <div class="radio biopsy-option">
+              <label>
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_unknown" value="unknown"> {{ _("I don't know") }}
               </label>
             </div>
           </div>
@@ -177,21 +187,76 @@
         </div>
         <br/>
       </div>
-      <script>$(function () {
+      <script>
+        function checkBiopsyDate(val) {
+           if (!hasValue(val)) return false;
+           var m = val.match(/(\/)/);
+           if (!m) return false;
+           if (m && m.length < 2) return false;
+           var initArray = val.split("/");
+           if (initArray[2].length < 4) return false;
+           if (/((0)?[1-9]|1\d|2\d|3[01])\/((0)?[1-9]|1\d|2\d)\/(19|20)\d{2}/.test(val)) {
+              var today = new Date();
+              // Check to see if this is a real date
+              var dArray = (val).split("/");
+              var iy = parseInt(dArray[2]), im = parseInt(dArray[1]), iid=parseInt(dArray[0]);
+              var date = new Date(iy,im-1,iid);
+              var errorMsg = "";
 
-        tnthAjax.getClinical($("#iq_userId").val());
-        tnthAjax.getTreatment($("#iq_userId").val());
+              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
+                  if (iy < 1900) errorMsg = "Year must be after 1900";
+                  // Only allow if date is before today
+                  if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                      errorMsg = "The date must not be in the future.";
+                  };
+              } else errorMsg = "Invalid Date. Please enter a valid date.";
 
-        $("input[name='tx']").each(function() {
-             $(this).on("click", function() {
-                if ($(this).val() == "true") {
-                    tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
-                } else {
-                    tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
-                };
-             });
-        });
-      });</script>
+              if (errorMsg == "") {
+                  $("#biopsyDateError").text("");
+                  setTimeout('$("#biopsy_yes").trigger("click");', 500);
+                  return true;
+              } else {
+                  $("#biopsyDateError").text(errorMsg);
+                  return false;
+              };
+           } else {
+              $("#biopsyDateError").text("Invalid date. Please enter the date in correct format (mm/dd/yyyy).");
+              return false;
+           };
+        };
+        $(function () {
+          tnthAjax.getClinical($("#iq_userId").val());
+          tnthAjax.getTreatment($("#iq_userId").val());
+          var today = new Date();
+          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true}).on("changeDate", function() { return checkBiopsyDate($(this).val()); });
+          $("#biopsyDate").on("keydown", function() {
+            $(this).datepicker("hide");
+          });
+          $("input[name='biopsy']").each(function() {
+          	$(this).on("click", function() {
+          		if ($(this).val() == "true") {
+          			$("#biopsyDateContainer").show();
+          		} else {
+          			$("#biopsyDate").val("");
+                $("#biopsyDateError").text("");
+          			$("#biopsyDateContainer").hide();
+          		};
+          	});
+          });
+          $("#biopsyDate").on("blur", function() {
+              return checkBiopsyDate($(this).val());
+          });
+
+          $("input[name='tx']").each(function() {
+               $(this).on("click", function() {
+                  if ($(this).val() == "true") {
+                      tnthAjax.postTreatment($("#iq_userId").val(), true, "", $(this));
+                  } else {
+                      tnthAjax.postTreatment($("#iq_userId").val(), false, "", $(this));
+                  };
+               });
+          });
+        });</script>
   {%- endmacro %}
   {% macro clinic(consent_agreements) -%}
     <div id="clinics" class="tnth-hide" parent-section="true">
