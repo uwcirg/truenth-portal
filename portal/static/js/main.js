@@ -249,6 +249,19 @@ var CONSENT_ENUM = {
 
 var fillContent = {
     "clinical": function(data) {
+
+        // sort from newest to oldest
+        data.entry.sort(function(a,b){
+            var dateA = (new Date(a.content.meta.lastUpdated)).getTime() / 1000;
+            var dateB = (new Date(b.content.meta.lastUpdated)).getTime() / 1000;
+            if (dateB < dateA) {
+                return -1;
+            } else if (dateB > dateA) {
+                return 1;
+            } else {
+                return 0;
+            };
+        });
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
@@ -257,22 +270,24 @@ var fillContent = {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
-            } else if (clinicalItem == "biopsy") {
-                var issuedDate = val.content.issued;
-                if (hasValue(issuedDate) && clinicalValue == "true") {
-                    var d = issuedDate.substring(0, 10).split("-");
-                    //in DD/MM/YYYY format
-                    $("#biopsyDate").val(d[2] + "/" + d[1] + "/" + d[0]);
-                    $("#biopsyDateContainer").show();
-                };
-            }
-            var ci = $('div[data-topic="'+clinicalItem+'"]');
-            if (ci.length > 0) ci.fadeIn().next().fadeIn();
+            };
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
-                if($radios.is(':checked') === false) {
+                if(!$radios.is(':checked')) {
                     if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
                     else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                    if (clinicalItem == "biopsy") {
+                        if (clinicalValue == "true") {
+                            var issuedDate = val.content.issued;
+                            var d = issuedDate.substring(0, 10).split("-");
+                            //in DD/MM/YYYY format
+                            $("#biopsyDate").val(d[2] + "/" + d[1] + "/" + d[0]);
+                            $("#biopsyDateContainer").show();
+                        } else {
+                            $("#biopsyDate").val("");
+                            $("#biopsyDateContainer").hide();
+                        };
+                    };
                 };
             };
         })
@@ -1758,21 +1773,23 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "postBiopsy": function(userId, issuedDate, value, status, targetField) {
+    "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
+        if (!params) params = {};
         var code = '111';
         var display = "biopsy";
         var system = CLINICAL_SYS_URL;
 
         var obsCode = [{ "code": code, "display": display, "system": system }];
         var obsArray = {};
-
         obsArray["resourceType"] = "Observation";
         obsArray["code"] = {"coding": obsCode};
         obsArray["issued"] = issuedDate ? issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuantity"] = {"units":"boolean", "value":value}
+        obsArray["valueQuantity"] = {"units":"boolean", "value":value};
+        if (params.performer) obsArray["performer"] = params.performer;
+
         $.ajax ({
             type: "POST",
             url: '/api/patient/'+userId+'/clinical',

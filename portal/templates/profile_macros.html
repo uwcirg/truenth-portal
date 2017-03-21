@@ -412,7 +412,7 @@
             <select id="stateSelector" class="form-control"></select>
        </div>
        <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state">
-           <p class="clinic-prompt text-muted">{{ _("Main clinic for prostate cancer care")}}</p>
+           <p class="clinic-prompt text-muted">{{ _("What is your main clinic for prostate cancer care?")}}</p>
            <div class="main-state-container">
                 <div class="noOrg-container" style="display: none">
                     <label>
@@ -453,8 +453,9 @@
                             $("#noOrgs").prop("checked", false);
                             container.show();
                             {% if person %}
-                                if (container.find("input[name='organization']:checked").length > 0) {
-                                   assembleContent.demo({{ person.id }},true, $(this), true);
+                                var checkedItem = container.find("input[name='organization']:checked");
+                                if (checkedItem.length > 0) {
+                                   checkedItem.trigger("click");
                                 };
                             {% endif %}
                         } else {
@@ -464,7 +465,7 @@
                     };
                 } else {
                     $(".state-container, .noOrg-container").hide();
-                    $(".clinic-prompt").text(defaultPrompt).hide();
+                    $(".clinic-prompt").text("").hide();
                 };
             });
             $.ajax ({
@@ -1108,13 +1109,13 @@
                             else {
                               //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
                               var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
-                              tnthAjax.postBiopsy({{person.id}}, biopsyDate, toSend);
+                              tnthAjax.postBiopsy({{person.id}}, biopsyDate, toSend, "", $(this));
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
                       } else {
                         if (toCall == "biopsy") {
-                            tnthAjax.postBiopsy({{person.id}}, "", "false", (toSend == "unknown"? toSend:""));
+                            tnthAjax.postBiopsy({{person.id}}, "", "false", (toSend == "unknown"? toSend:""), $(this));
                             ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                                 $("input[name='" + fieldName + "']").each(function() {
                                     $(this).prop("checked", false);
