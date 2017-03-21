@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import datetime
 import sys
 import os
 import pkginfo
@@ -61,8 +62,9 @@ master_doc = 'index'
 project = metadata.summary
 project_slug = project.replace(" ","")
 
+now = datetime.datetime.now()
 author = metadata.author
-copyright = u'2016, %s' % author
+copyright = u'{}, {}'.format(now.year, author)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
