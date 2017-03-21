@@ -76,8 +76,10 @@ after_success:
   - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
     export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
   - export TAG=${TRAVIS_TAG:-${TAG}}
+  # TravisCI doesn't support Bash arrays
+  # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
-  - echo ${DOCKER_TAGS}
+
   - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
   - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
@@ -116,7 +118,7 @@ before_deploy:
       https://registry.heroku.com/ ;
     fi
 
-  # Build bintray descriptor file dynamically
+  # Build Bintray descriptor file dynamically
   - >
     printf '
     {
