@@ -642,7 +642,7 @@ def fetch_HL7_V3_Namespace(valueSet):
     load = response.text
     data = json.loads(load)
     return parse_concepts(
-        data['codeSystem']['concept'],
+        data['concept'],
         system='http://hl7.org/fhir/v3/{}'.format(valueSet)
     )
 
