@@ -179,7 +179,7 @@
                     {% if user and user.has_roles('application_developer') %}
                     <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                     {% endif %}
-                    {% if user and user.has_roles(ROLE.STAFF) %}
+                    {% if user and (user.has_roles(ROLE.STAFF) or user.has_roles(ROLE.INTERVENTION_STAFF)) %}
                     <li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>
                     {% endif %}
                     {% if user and user.has_roles('admin') %}

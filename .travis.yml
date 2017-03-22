@@ -42,7 +42,7 @@ before_install:
   # Set Github env vars
   - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
   - export GH_USERNAME GH_REPO
-  - export SHORT_HASH=${TRAVIS_COMMIT::8}
+  - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
 
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
@@ -73,8 +73,12 @@ after_success:
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
   # Set docker tag based on branch
-  - declare -A TAGS=(["develop"]="latest" ["master"]="stable"); export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
+  - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
+    export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
   - export TAG=${TRAVIS_TAG:-${TAG}}
+  # TravisCI doesn't support Bash arrays
+  # See https://github.com/travis-ci/travis-ci/issues/3149
+  - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
 
   - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
   - docker volume create --name debian-repo
@@ -91,9 +95,7 @@ after_success:
   - cp --recursive --verbose /tmp/artifacts artifacts
   - docker build
       --file docker/Dockerfile
-      --tag "$IMAGE_NAME:$SHORT_HASH"
       --tag "$IMAGE_NAME:$TAG"
-      --tag "$IMAGE_NAME:$TRAVIS_BUILD_NUMBER"
     .
 
 before_deploy:
@@ -116,7 +118,7 @@ before_deploy:
       https://registry.heroku.com/ ;
     fi
 
-  # Build bintray descriptor file dynamically
+  # Build Bintray descriptor file dynamically
   - >
     printf '
     {
@@ -160,18 +162,29 @@ deploy:
     key: $BINTRAY_API_KEY
 
 after_deploy:
-  # Deploy images to Bintray
-  - docker tag
-    "$IMAGE_NAME:$TAG"
-    "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG"
-  - docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$TAG" &
+  # Apply all tags
+  - for tag in $DOCKER_TAGS; do
+      docker tag
+        "$IMAGE_NAME:$TAG"
+        "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+    done
+  # Deploy image (and all tags) to Bintray
+  - for tag in $DOCKER_TAGS; do
+      docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+    done &
 
   # Deploy to Docker Hub, if configured
-  - docker tag
-    "$IMAGE_NAME:$TAG"
-    "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$TAG"
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
-      docker push "docker.io/$DOCKER_CLOUD_USERNAME/$IMAGE_NAME" &
+      for tag in $DOCKER_TAGS; do
+        docker tag
+          "$IMAGE_NAME:$TAG"
+          "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
+      done
+    fi
+  - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
+      for tag in $DOCKER_TAGS; do
+        docker push "$DOCKER_CLOUD_USERNAME/$IMAGE_NAME:$tag";
+      done &
     fi
 
   # Deploy to Heroku, if configured
@@ -180,5 +193,5 @@ after_deploy:
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
 
-  # Wait for jobs sent to background to finish if they haven't already completed
+  # Wait for background jobs to finish (if they haven't already)
   - wait

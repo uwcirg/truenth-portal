@@ -1396,7 +1396,18 @@
         });
     });</script>
 {%- endmacro %}
-{% macro profile(person, current_user, consent_agreements) -%}
+{% macro profileInterventions(user_interventions) -%}
+    {% if user_interventions %}
+        {% if user_interventions.length != 0 %}<p class="text-muted">Patient is participating in the following intervention(s): </p>{% endif %}
+        {% for intervention in user_interventions %}
+            <div class="capitalize">{{intervention.name | replace("_", " ")}}</div>
+        {% endfor %}
+        {% if user_interventions.length == 0 %}<div class="text-muted">None</div>{% endif %}
+    {% else %}
+        <div class="text-muted">None</div>
+    {% endif %}
+{%- endmacro %}
+{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {% if config.CUSTOM_PATIENT_DETAIL %}
         {% if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) %}
@@ -1491,7 +1502,16 @@
             </div>
         </div>
     {% endif %}
-
+    {% if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="interventionsLoc" class="profile-item-title index-item">Interventions</h4>
+                    {{profileInterventions(user_interventions)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
     {% if (person and person.has_role(ROLE.PATIENT)) or (current_user.has_role(ROLE.STAFF) and current_user.id != person.id)%}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
@@ -1514,7 +1534,6 @@
     {% if person and person.has_role(ROLE.PATIENT) %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
     {% endif %}
-
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">

@@ -94,6 +94,22 @@ class TestClinical(TestCase):
         uo = UserObservation.query.filter_by(user_id=TEST_USER_ID).one()
         self.assertEquals(uo.encounter.auth_method, 'password_authenticated')
 
+    def test_clinicalPUT(self):
+        self.prep_db_for_clinical()
+        self.login()
+        obs = Observation.query.first()
+        new_issued = '2016-06-06T06:06:06'
+        data = {'status':'unknown', 'issued':new_issued}
+        data['valueQuantity'] = {'units':'boolean','value':'false'}
+        rv = self.client.put('/api/patient/{}/clinical/{}'.format(
+                TEST_USER_ID,obs.id), content_type='application/json',
+                data=json.dumps(data))
+        self.assert200(rv)
+        clinical_data = json.loads(rv.data)
+        self.assertEquals(clinical_data['status'], 'unknown')
+        self.assertEquals(clinical_data['issued'], new_issued)
+        self.assertEquals(clinical_data['valueQuantity']['value'], 'false')
+
     def test_empty_clinical_get(self):
         """Access clinical on user w/o any clinical info"""
         self.login()

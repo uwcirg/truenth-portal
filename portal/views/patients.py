@@ -5,7 +5,7 @@ from sqlalchemy import and_
 
 from ..extensions import oauth
 from ..models.app_text import app_text, ConsentByOrg_ATMA, VersionedResource
-from ..models.intervention import UserIntervention
+from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
@@ -108,7 +108,7 @@ def sessionReport(user_id, instrument_id, authored_date):
 
 
 @patients.route('/patient_profile/<int:patient_id>')
-@roles_required(ROLE.STAFF)
+@roles_required([ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 @oauth.require_oauth()
 def patient_profile(patient_id):
     """individual patient view function, intended for staff"""
@@ -119,9 +119,17 @@ def patient_profile(patient_id):
         abort(404, "Patient {} Not Found".format(patient_id))
     consent_agreements = get_orgs_consent_agreements()
 
+    user_interventions = []
+    interventions =\
+            Intervention.query.order_by(Intervention.display_rank).all()
+    for intervention in interventions:
+        display = intervention.display_for_user(patient)
+        if display.access and display.link_url is not None and display.link_label is not None:
+            user_interventions.append({"name": intervention.name})
+
     return render_template(
         'profile.html', user=patient,
-        providerPerspective="true", consent_agreements=consent_agreements)
+        providerPerspective="true", consent_agreements=consent_agreements, user_interventions=user_interventions)
 
 
 def get_orgs_consent_agreements():

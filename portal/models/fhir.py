@@ -346,11 +346,34 @@ class Observation(db.Model):
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
             fhir['status'] = self.status
+        fhir['id'] = self.id
         fhir['code'] = self.codeable_concept.as_fhir()
         fhir.update(self.value_quantity.as_fhir())
         if self.performers:
             fhir['performer'] = [p.as_fhir() for p in self.performers]
         return fhir
+
+    def update_from_fhir(self, data):
+        if 'issued' in data:
+            issued = FHIR_datetime.parse(data['issued'])
+            setattr(self, 'issued', issued)
+        if 'status' in data:
+            setattr(self, 'status', data['status'])
+        if 'performer' in data:
+            for p in data['performer']:
+                performer = Performer.from_fhir(p)
+                self.performers.append(performer)
+        if 'valueQuantity' in data:
+            v = data['valueQuantity']
+            current_v = self.value_quantity
+            vq = ValueQuantity(
+                value=v.get('value') or current_v.value,
+                units=v.get('units') or current_v.units,
+                system=v.get('system') or current_v.system,
+                code=v.get('code') or current_v.code).add_if_not_found(True)
+            setattr(self, 'value_quantity_id', vq.id)
+            setattr(self, 'value_quantity', vq)
+        return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
@@ -636,13 +659,15 @@ def parse_concepts(elements, system):
 
 def fetch_HL7_V3_Namespace(valueSet):
     """Pull and parse the published FHIR ethnicity namespace"""
-    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.json'.format(
+    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
         valueSet=valueSet)
     response = requests.get(src_url)
     load = response.text
     data = json.loads(load)
-    return parse_concepts(data['codeSystem']['concept'],
-                          system='http://hl7.org/fhir/v3/{}'.format(valueSet))
+    return parse_concepts(
+        data['concept'],
+        system='http://hl7.org/fhir/v3/{}'.format(valueSet)
+    )
 
 def fetch_local_valueset(valueSet):
     """Pull and parse the named valueSet from our local definition"""
