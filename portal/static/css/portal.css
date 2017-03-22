@@ -86,8 +86,8 @@ a.btn {
 }
 .btn-tnth-back {
   color: #777;
-  padding: 0 5px 0 0;
-  margin: 1em 0;
+  padding: 0;
+  margin: 1em 0.2em;
 }
 .form-control {
   font-size: 16px;
@@ -252,7 +252,7 @@ h4.detail-title {
   transition: all 0.5s ease-in;
 }
 #adminTable TH {
-  background-image: linear-gradient(to bottom, #FFF, #efefef);
+  background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
   letter-spacing: 0.1px;
 }
 #adminTable div.card-view {
@@ -478,7 +478,7 @@ h4.detail-title {
   word-wrap: break-word;
 }
 #patientListOptions {
-  display:flex; 
+  display:flex;
   flex-direction: column;
 }
 #patientAssessmentDownload {
@@ -532,7 +532,7 @@ h4.detail-title {
   height: 1.7em;
 }
 .smaller-text .btn {
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 .small-text {
   font-size: 1.02em;
@@ -541,7 +541,7 @@ h4.detail-title {
   opacity: 0.3;
 }
 .admin-table .search .form-control {
-  height: 34px;
+  height: 36px;
 }
 .table.rowlink td:not(.rowlink-skip),
 .table .rowlink td:not(.rowlink-skip) {
@@ -1771,7 +1771,7 @@ div.timezone-warning.text-warning {
     margin-top: 0.7em;
   }
   #patientList div.or {
-    margin: 1.5em;
+    margin: 1.3em 1em 1em 1.2em;
   }
 }
 @media (max-width: 991px) {
