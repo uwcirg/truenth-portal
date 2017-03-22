@@ -359,13 +359,20 @@ class Observation(db.Model):
             setattr(self, 'issued', issued)
         if 'status' in data:
             setattr(self, 'status', data['status'])
-        if ('valueQuantity' in data) and ('value' in data['valueQuantity']):
+        if 'performer' in data:
+            for p in data['performer']:
+                performer = Performer.from_fhir(p)
+                self.performers.append(performer)
+        if 'valueQuantity' in data:
             v = data['valueQuantity']
-            vq = ValueQuantity(value=v.get('value'),
-                    units=v.get('units'),
-                    system=v.get('system'),
-                    code=v.get('code')).add_if_not_found(True)
+            current_v = self.value_quantity
+            vq = ValueQuantity(
+                value=v.get('value') or current_v.value,
+                units=v.get('units') or current_v.units,
+                system=v.get('system') or current_v.system,
+                code=v.get('code') or current_v.code).add_if_not_found(True)
             setattr(self, 'value_quantity_id', vq.id)
+            setattr(self, 'value_quantity', vq)
         return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):
