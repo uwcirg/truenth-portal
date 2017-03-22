@@ -119,8 +119,8 @@ a.btn {
 }
 .btn-tnth-back {
   color: #777;
-  padding: 0 5px 0 0;
-  margin: 1em 0;
+  padding: 0;
+  margin: 1em 0.2em;
 }
 .form-control {
   font-size: @baseFontSize;
@@ -328,7 +328,7 @@ div.right-panel {
    background-color: #ececea;
   }
   TH {
-    background-image: linear-gradient(to bottom, #FFF, #efefef);
+    background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
     letter-spacing: 0.1px;
   }
 }
@@ -541,6 +541,7 @@ div.right-panel {
   div.or {
     display: inline-block;
     background-color: #888a8c;
+    margin: 1.5em 1em 1em 1.2em;
   }
   #_downloadLink {
     visibility: hidden;
@@ -608,7 +609,7 @@ div.right-panel {
     height: @smallerText * 2;
   }
   .btn {
-    font-size: @smallerText;
+    font-size: @smallText;
   }
 }
 .loading {
@@ -617,7 +618,7 @@ div.right-panel {
 
 .admin-table {
   .search .form-control {
-    height: 34px;
+    height: 36px;
   }
 }
 // For table rowlinks
@@ -1451,7 +1452,6 @@ float:left;
 }
 
 .report-custom-header .right {
-float:right; padding-top:1%;
 position: relative;
 z-index: 88;
 color: #777
@@ -1623,7 +1623,9 @@ div.org-container {
 div.timezone-warning.text-warning {
   flex: 1 100%;
 }
-
+.gradient {
+  background-image: linear-gradient(to top right, #FFF, #e1e2e1);
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   #footerLockup {

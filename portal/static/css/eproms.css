@@ -76,8 +76,8 @@ a.btn {
 }
 .btn-tnth-back {
   color: #777;
-  padding: 0 5px 0 0;
-  margin: 1em 0;
+  padding: 0;
+  margin: 1em 0.2em;
 }
 select:not([multiple]) {
   border: 1px solid #bdb9b9;
@@ -273,7 +273,7 @@ div.right-panel {
   transition: all 0.5s ease-in;
 }
 #adminTable TH {
-  background-image: linear-gradient(to bottom, #FFF, #efefef);
+  background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
   letter-spacing: 0.1px;
 }
 #adminTable div.card-view {
@@ -476,7 +476,7 @@ div.right-panel {
 #patientList div.or {
   display: inline-block;
   background-color: #888a8c;
-  margin: 1.5em 1em 1em;
+  margin: 1.5em 1em 1em 1.2em;
 }
 #patientList #_downloadLink {
   visibility: hidden;
@@ -491,7 +491,7 @@ div.right-panel {
   word-wrap: break-word;
 }
 #patientListOptions {
-  display:flex; 
+  display:flex;
   flex-direction: column;
 }
 #patientAssessmentDownload {
@@ -542,13 +542,13 @@ div.right-panel {
   height: 1.7em;
 }
 .smaller-text .btn {
-  font-size: 0.85em;
+  font-size: 0.9em;
 }
 .loading {
   opacity: 0.3;
 }
 .admin-table .search .form-control {
-  height: 34px;
+  height: 36px;
 }
 .table.rowlink td:not(.rowlink-skip),
 .table .rowlink td:not(.rowlink-skip) {
@@ -1333,7 +1333,6 @@ sub.pointer:hover {
 }
 .report-custom-header .right {
   float: right;
-  padding-top: 1%;
   position: relative;
   z-index: 88;
   color: #777;
@@ -1493,6 +1492,9 @@ div.org-container input[type="checkbox"] {
 }
 div.timezone-warning.text-warning {
   flex: 1 100%;
+}
+.gradient {
+  background-image: linear-gradient(to top right, #FFF, #e1e2e1);
 }
 /** Responsive sizes **/
 @media (max-width: 480px) {
@@ -1760,7 +1762,7 @@ div.timezone-warning.text-warning {
      flex-direction: row;
   }
   #patientList div.or {
-    margin: 1.5em;
+    margin: 1.3em 1.3em 1.3em 1.6em;
   }
   #patientListOptions > span:last-of-type {
     margin-top: 0.7em;
