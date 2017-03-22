@@ -69,7 +69,6 @@ setup(
         "psycopg2",
         "python-dateutil",
         "python-Levenshtein",
-        "recommonmark",
         "redis",
         "requests-cache",
         "sphinx",
