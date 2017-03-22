@@ -65,7 +65,7 @@
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
   <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-          {{profile(user, current_user, consent_agreements)}}
+          {{profile(user, current_user, consent_agreements, user_interventions)}}
           <br/>
           {% if providerPerspective == 'true' %}
              <br/><br/> {{ back_btn('patients','patients list') }}
