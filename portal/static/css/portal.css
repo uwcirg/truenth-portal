@@ -1486,6 +1486,9 @@ div.org-container input[type="checkbox"] {
 div.timezone-warning.text-warning {
   flex: 1 100%;
 }
+.capitalize {
+  text-transform: capitalize;
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   .side-xs-one {
