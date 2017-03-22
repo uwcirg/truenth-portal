@@ -5,9 +5,8 @@ import pytz
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
-from portal.models.audit import Audit
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
-from portal.models.fhir import QuestionnaireResponse, FHIR_datetime, Observation
+from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
 
 class TestFHIR(TestCase):
     """FHIR model tests"""
@@ -123,4 +122,3 @@ class TestFHIR(TestCase):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
         parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
         self.assertEquals(unaware, parsed)
-
