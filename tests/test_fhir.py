@@ -5,8 +5,9 @@ import pytz
 from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
+from portal.models.audit import Audit
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
-from portal.models.fhir import QuestionnaireResponse, FHIR_datetime
+from portal.models.fhir import QuestionnaireResponse, FHIR_datetime, Observation
 
 class TestFHIR(TestCase):
     """FHIR model tests"""
@@ -122,3 +123,27 @@ class TestFHIR(TestCase):
         unaware = datetime(2016, 7, 15, 9, 20, 37, 0)
         parsed = FHIR_datetime.parse(unaware.strftime("%Y-%m-%dT%H:%M:%S"))
         self.assertEquals(unaware, parsed)
+
+    def test_observation_update_from_fhir(self):
+        audit = Audit(comment='test data', user_id=TEST_USER_ID,
+            subject_id=TEST_USER_ID)
+        vq = ValueQuantity(value='true',
+                units='boolean').add_if_not_found(True)
+        coding = [{'code':'000','display':'test','system':'test-system'}]
+        cc = CodeableConcept.from_fhir({'coding':coding}).add_if_not_found()
+        obs = Observation(
+            audit=audit,
+            status=None,
+            issued='2012-12-12T12:12:12',
+            codeable_concept_id=cc.id,
+            value_quantity_id=vq.id)
+        db.session.add(obs)
+        db.session.commit()
+        new_issued = '2016-06-06T06:06:06'
+        obs_update = {'status':'unknown','issued':new_issued}
+        obs_update['valueQuantity'] = {'units':'boolean','value':'false'}
+        updated = obs.update_from_fhir(obs_update)
+        self.assertEquals(updated['status'], 'unknown')
+        self.assertEquals(updated['issued'], new_issued)
+        self.assertEquals(updated['valueQuantity']['value'], 'false')
+
