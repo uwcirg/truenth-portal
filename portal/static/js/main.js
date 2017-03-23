@@ -251,12 +251,12 @@ var fillContent = {
     "clinical": function(data) {
 
         // sort from newest to oldest
-        data.entry.sort(function(a,b){
-            //date is in this format: 2017-03-21T22:25:03
-            var dateA = parseFloat((a.content.meta.lastUpdated).replace(/[\-T\:]/g, ""));
-            var dateB = parseFloat((b.content.meta.lastUpdated).replace(/[\-\T\:]/g, ""));
-            return dateB - dateA;
-        });
+        // data.entry.sort(function(a,b){
+        //     //date is in this format: 2017-03-21T22:25:03
+        //     var dateA = parseFloat((a.content.meta.lastUpdated).replace(/[\-T\:]/g, ""));
+        //     var dateB = parseFloat((b.content.meta.lastUpdated).replace(/[\-\T\:]/g, ""));
+        //     return dateB - dateA;
+        // });
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
             var clinicalValue = val.content.valueQuantity.value;
@@ -1777,6 +1777,26 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
+    "getBiopsyId": function(userId) {
+        var obId = "", code="";
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/'+userId+'/clinical',
+            async: false
+        }).done(function(data) {
+            if (data && data.entry) {
+                (data.entry).forEach(function(item) {
+                    if (!hasValue(obId)) {
+                        code = item.content.code.coding[0].code;
+                        if (code == "111") obId = item.content.id;
+                    };
+                });
+            }
+           
+        }).fail(function() {
+        });
+        return obId;
+    },
     "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
@@ -1784,7 +1804,8 @@ var tnthAjax = {
         var code = '111';
         var display = "biopsy";
         var system = CLINICAL_SYS_URL;
-
+        var method = "POST";
+        var url = '/api/patient/'+userId+'/clinical';
         var obsCode = [{ "code": code, "display": display, "system": system }];
         var obsArray = {};
         obsArray["resourceType"] = "Observation";
@@ -1793,10 +1814,14 @@ var tnthAjax = {
         obsArray["status"] = status ? status: "";
         obsArray["valueQuantity"] = {"units":"boolean", "value":value};
         if (params.performer) obsArray["performer"] = params.performer;
-
+        var obsId = tnthAjax.getBiopsyId(userId);
+        if (hasValue(obsId)) {
+            method = "PUT";
+            url = url + "/" + obsId;
+        };
         $.ajax ({
-            type: "POST",
-            url: '/api/patient/'+userId+'/clinical',
+            type: method,
+            url: url,
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             data: JSON.stringify(obsArray)

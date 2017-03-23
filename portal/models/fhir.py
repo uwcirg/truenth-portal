@@ -355,7 +355,7 @@ class Observation(db.Model):
 
     def update_from_fhir(self, data):
         if 'issued' in data:
-            issued = FHIR_datetime.parse(data['issued'])
+            issued = FHIR_datetime.parse(data['issued']) if data['issued'] else None
             setattr(self, 'issued', issued)
         if 'status' in data:
             setattr(self, 'status', data['status'])
