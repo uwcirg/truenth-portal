@@ -1305,6 +1305,9 @@ table.profile-audit-log TH,
 .radio-inline input[type=radio] {
 	margin-left: -18px;
 }
+#biopsyDateContainer {
+  display: none;
+}
 #biopsyDateContainer label {
   margin-right: 0.2em;
 }
