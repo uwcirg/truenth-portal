@@ -432,7 +432,7 @@ var fillContent = {
                     orgStates.forEach(function(state) {
                         ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
                         ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).trigger("change");
+                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true);
                     });
                 } else {
                     var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
