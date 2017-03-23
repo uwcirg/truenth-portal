@@ -59,13 +59,14 @@
                 </div>
             </div>
         </div>
-
-        {% from "flask_user/_macros.html" import footer %}
-        {% if splashView %}
-            {{ footer(splash_style=true) }}
-        {% else %}
-            {{ footer() }}
-        {% endif %}
+        {% block footer %}
+            {% from "flask_user/_macros.html" import footer %}
+            {% if splashView %}
+                {{ footer(splash_style=true) }}
+            {% else %}
+                {{ footer() }}
+            {% endif %}
+        {% endblock %}
 
       </div> {# <!-- <div id="mainDiv"> --> #}
     </div> {# <!-- <div id="mainHolder"> --> #}

@@ -38,7 +38,7 @@ For adding new translations, you need to add the blank translation to the .pot f
 
 You can create a new .pot file with all extracted translations from the code by running the following pybabel command:
 
-   $ pybabel extract -F instance/babel.cfg -o portal/translations/messages.pot
+   $ pybabel extract -F instance/babel.cfg -o portal/translations/messages.pot portal/
    
 You should then update the .pot file with all translation strings from the apptext/interventions tables using the following:
 

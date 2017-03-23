@@ -1,7 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
-from flask_login import login_user
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
@@ -10,18 +9,18 @@ from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
 import requests
 
-from .auth import next_after_login
+from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentATMA, LegalATMA, ToU_ATMA, Terms_ATMA
+from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
-from ..models.intervention import Intervention, INTERVENTION
+from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
-from ..models.user import add_anon_user, current_user, get_user, User
+from ..models.user import current_user, get_user, User
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
@@ -225,9 +224,10 @@ def access_via_token(token):
     aren't clear yet. ... TODO
 
     """
-    # Should never be here if already logged in - enforce
+    # logout current user if one is logged in.
     if current_user():
-        abort(500, "Already logged in - can't continue")
+        logout(prevent_redirect=True, reason="forced from /access_via_token")
+        assert(not current_user())
 
     def verify_token(valid_seconds):
         is_valid, has_expired, user_id =\
@@ -250,7 +250,7 @@ def access_via_token(token):
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.PROVIDER])
+                      ROLE.STAFF])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
@@ -267,20 +267,23 @@ def access_via_token(token):
             session['invited_verified_user_id'] = user.id
             return redirect(url_for('user.register', email=user.email))
 
-        # fall into else case below, at least for todays demo
-        # TODO: determine if there's a legit reason to login WRITE_ONLY
-        # w/o redirecting to challenge in this case
+        # If WRITE_ONLY user does not have PROMOTE_WITHOUT_IDENTITY_CHALLENGE,
+        # challenge the user identity, followed by a redirect to the
+        # registration page. Preserve the invited user id, should we need to
+        # merge associated details after user proves themselves and logs in
+        auditable_event("invited user entered using token, pending "
+                        "registration", user_id=user.id, subject_id=user.id,
+                        context='account')
+        session['challenge.user_id'] = user.id
+        session['challenge.next_url'] = url_for('user.register', email=user.email)
+        session['challenge.merging_accounts'] = True
+        return redirect(url_for('portal.challenge_identity'))
 
-    # Without WRITE_ONLY, we don't log the user in, but preserve the
-    # invited user id, should we need to merge associated details
-    # after user proves themselves and logs in
-    auditable_event("invited user entered using token, pending "
-                    "registration", user_id=user.id, subject_id=user.id,
-                    context='account')
-    session['challenge.user_id'] = user.id
-    session['challenge.next_url'] = url_for('user.register', email=user.email)
-    session['challenge.merging_accounts'] = True
-    return redirect(url_for('portal.challenge_identity'))
+    # If not WRITE_ONLY user, redirect to login page
+    # Email field is auto-populated unless using alt auth (fb/google/etc)
+    if user.email and user.password:
+        return redirect(url_for('user.login', email=user.email))
+    return redirect(url_for('user.login'))
 
 
 class ChallengeIdForm(FlaskForm):
@@ -372,7 +375,7 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 
 @portal.route('/initial-queries', methods=['GET','POST'])
 def initial_queries():
-    """Terms of use, initial queries view function"""
+    """Initial consent terms, initial queries view function"""
     if request.method == 'POST':
         # data submission all handled via ajax calls from initial_queries
         # template.  assume POST can only be sent when valid.
@@ -391,13 +394,13 @@ def initial_queries():
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
         asset, url = VersionedResource.fetch_elements(
-            app_text(ToU_ATMA.name_key()))
+            app_text(InitialConsent_ATMA.name_key()))
         terms = {'asset': asset, 'agreement_url': url}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
             asset, url = VersionedResource.fetch_elements(
-                app_text(ConsentATMA.name_key(organization=org)))
+                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             consent_agreements[org.id] = {
                     'asset': asset, 'agreement_url': url}
     return render_template(
@@ -437,7 +440,7 @@ def home():
               format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.PROVIDER):
+    if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
@@ -449,7 +452,7 @@ def home():
             current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
             org = Organization.query.get(org_id)
             asset, url = VersionedResource.fetch_elements(
-                app_text(ConsentATMA.name_key(organization=org)))
+                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             if url:
                 current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
 
@@ -521,7 +524,7 @@ def profile(user_id):
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
         asset, url = VersionedResource.fetch_elements(
-            app_text(ConsentATMA.name_key(organization=org)))
+            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
@@ -529,30 +532,31 @@ def profile(user_id):
     return render_template(
         'profile.html', user=user, consent_agreements=consent_agreements)
 
-@portal.route('/legal')
+@portal.route('/privacy')
 def legal():
-    """ Legal/terms of use page"""
+    """ privacy use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(LegalATMA.name_key()))
-    return render_template('legal.html' if not gil else 'gil/legal.html',
+    response = requests.get(app_text(PrivacyATMA.name_key()))
+    return render_template('privacy.html' if not gil else 'gil/privacy.html',
         content=response.text, user=current_user())
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
-    """ Legal/terms-and-conditions of use page"""
+    """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(Terms_ATMA.name_key()))
+    content, _ = VersionedResource.fetch_elements(
+            app_text(Terms_ATMA.name_key()))
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        content=response.text)
+        content=content)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth = requests.get(app_text(AboutATMA.name_key(subject='TrueNTH')))
-    about_mo = requests.get(app_text(AboutATMA.name_key(subject='Movember')))
+    about_tnth_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))[0]
+    about_mo_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))[0]
     gil = current_app.config.get('GIL')
-    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth.text,
-                           about_mo=about_mo.text, user=current_user())
+    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_text,
+                           about_mo=about_mo_text, user=current_user())
 
 @portal.route('/explore')
 def explore():
@@ -603,34 +607,6 @@ def contact_sent(message_id):
         abort(404, "Message not found")
     return render_template('contact_sent.html', message=message)
 
-@portal.route('/questions')
-def questions():
-    """New user question view.  Creates anon user if none in session"""
-    user = current_user()
-    if not user:
-        user = add_anon_user()
-        db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id,
-            subject_id=user.id, context='account')
-        session['id'] = user.id
-        login_user(user)
-
-    return render_template('questions.html', user=user)
-
-
-@portal.route('/questions_anon')
-def questions_anon():
-    """Anonymous questions function"""
-    user = current_user()
-    if not user:
-        user = add_anon_user()
-        db.session.commit()
-        auditable_event("register new anonymous user", user_id=user.id,
-            subject_id=user.id, context='account')
-        session['id'] = user.id
-        login_user(user)
-    return render_template('questions_anon.html', user=user,
-                           interventions=INTERVENTION)
 
 class SettingsForm(FlaskForm):
     timeout = IntegerField('Session Timeout for This Web Browser (in seconds)',

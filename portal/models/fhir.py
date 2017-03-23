@@ -5,7 +5,7 @@ from dateutil import parser
 from flask import abort, current_app
 import json
 import pytz
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
@@ -346,11 +346,34 @@ class Observation(db.Model):
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
             fhir['status'] = self.status
+        fhir['id'] = self.id
         fhir['code'] = self.codeable_concept.as_fhir()
         fhir.update(self.value_quantity.as_fhir())
         if self.performers:
             fhir['performer'] = [p.as_fhir() for p in self.performers]
         return fhir
+
+    def update_from_fhir(self, data):
+        if 'issued' in data:
+            issued = FHIR_datetime.parse(data['issued']) if data['issued'] else None
+            setattr(self, 'issued', issued)
+        if 'status' in data:
+            setattr(self, 'status', data['status'])
+        if 'performer' in data:
+            for p in data['performer']:
+                performer = Performer.from_fhir(p)
+                self.performers.append(performer)
+        if 'valueQuantity' in data:
+            v = data['valueQuantity']
+            current_v = self.value_quantity
+            vq = ValueQuantity(
+                value=v.get('value') or current_v.value,
+                units=v.get('units') or current_v.units,
+                system=v.get('system') or current_v.system,
+                code=v.get('code') or current_v.code).add_if_not_found(True)
+            setattr(self, 'value_quantity_id', vq.id)
+            setattr(self, 'value_quantity', vq)
+        return self.as_fhir()
 
     def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
@@ -385,6 +408,10 @@ class UserObservation(db.Model):
                        nullable=False)
     observation_id = db.Column(db.ForeignKey('observations.id'),
                               nullable=False)
+    encounter_id = db.Column(
+        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'))
+
+    encounter = db.relationship('Encounter')
 
     __table_args__ = (UniqueConstraint('user_id', 'observation_id',
         name='_user_observation'),)
@@ -453,6 +480,9 @@ class QuestionnaireResponse(db.Model):
     subject_id = db.Column(db.ForeignKey('users.id'))
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
+    encounter_id = db.Column(
+        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'))
+    encounter = db.relationship("Encounter")
 
     # Fields derived from document content
     status = db.Column(
@@ -474,9 +504,149 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
+def aggregate_responses(instrument_ids):
+    """Build a bundle of QuestionnaireResponses
+
+    :param instrument_ids: list of instrument_ids to restrict results to
+
+    """
+    annotated_questionnaire_responses = []
+    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+
+    if instrument_ids:
+        instrument_filters = (
+            QuestionnaireResponse.document[
+                ("questionnaire", "reference")
+            ].astext.endswith(instrument_id)
+            for instrument_id in instrument_ids
+        )
+        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
+
+    patient_fields = ("careProvider", "identifier")
+
+    for questionnaire_response in questionnaire_responses:
+        subject = questionnaire_response.subject
+        questionnaire_response.document["subject"] = {
+            k:v for k,v in subject.as_fhir().items() if k in patient_fields
+        }
+
+        annotated_questionnaire_responses.append(questionnaire_response.document)
+
+    bundle = {
+        'resourceType':'Bundle',
+        'updated':FHIR_datetime.now(),
+        'total':len(annotated_questionnaire_responses),
+        'type': 'searchset',
+        'entry':annotated_questionnaire_responses,
+    }
+
+    return bundle
+
+def generate_qnr_csv(qnr_bundle):
+    """Generate a CSV from a bundle of QuestionnaireResponses"""
+    def get_identifier(id_list, **kwargs):
+        """Return first identifier object matching kwargs"""
+        for identifier in id_list:
+            for k,v in kwargs.items():
+                if identifier.get(k) != v:
+                    break
+            else:
+                return identifier['value']
+        return None
+
+    def consolidate_answer_pairs(answers):
+        """
+        Merge paired answers (code and corresponding text) into single
+            row/answer
+
+        Codes are the preferred way of referring to options but option text
+            (at the time of administration) may be submitted alongside coded
+            answers for ease of display
+        """
+
+        answer_types = [a.keys()[0] for a in answers]
+
+        # Exit early if assumptions not met
+        if (
+            len(answers) % 2 or
+            answer_types.count('valueCoding') != answer_types.count('valueString')
+        ):
+            return answers
+
+        filtered_answers = []
+        for pair in zip(*[iter(answers)]*2):
+            # Sort so first pair is always valueCoding
+            pair = sorted(pair, key=lambda k: k.keys()[0])
+            coded_answer, string_answer = pair
+
+            coded_answer['valueCoding']['text'] = string_answer['valueString']
+
+            filtered_answers.append(coded_answer)
+
+        return filtered_answers
+
+    columns = (
+        'identifier',
+        'study_id',
+        'subject_id',
+        'author_id',
+        'authored',
+        'instrument',
+        'question_code',
+        'answer_code',
+        'answer',
+    )
+
+    yield ','.join('"' + column + '"' for column in columns) + '\n'
+    for qnr in qnr_bundle['entry']:
+        row_data = {
+            'identifier': qnr['identifier']['value'],
+            'subject_id': get_identifier(
+                qnr['subject']['identifier'],
+                use='official'
+            ),
+            'author_id': qnr['author']['reference'].split('/')[-1],
+            # Todo: correctly pick external study of interest
+            'study_id': get_identifier(
+                qnr['subject']['identifier'],
+                system='http://us.truenth.org/identity-codes/external-study-id'
+            ),
+            'authored': qnr['authored'],
+            'instrument': qnr['questionnaire']['reference'].split('/')[-1],
+        }
+        for question in qnr['group']['question']:
+            row_data.update({'question_code': question['linkId']})
+
+            answers = consolidate_answer_pairs(question['answer'])
+            for answer in answers:
+                # Use first value of answer (most are single-entry dicts)
+                answer_data = {'answer': answer.values()[0]}
+
+                # ...unless nested code (ie valueCode)
+                if answer.keys()[0] == 'valueCoding':
+                    answer_data.update({
+                        'answer_code': answer['valueCoding']['code'],
+
+                        # Add suplementary text added earlier
+                        # 'answer': answer['valueCoding'].get('text'),
+                        'answer': None,
+                    })
+                row_data.update(answer_data)
+
+                row = []
+                for column_name in columns:
+                    column = row_data.get(column_name)
+                    column = "\N" if column is None else column
+
+                    # Handle JSON column escaping/enclosing
+                    if not isinstance(column, basestring):
+                        column = json.dumps(column).replace('"', '""')
+                    row.append('"' + column + '"')
+
+                yield ','.join(row) + '\n'
 
 def parse_concepts(elements, system):
-    "recursive function to build array of concepts from nested structure"
+    """recursive function to build array of concepts from nested structure"""
     ccs = []
     for element in elements:
         ccs.append(Coding(code=element['code'],
@@ -489,13 +659,15 @@ def parse_concepts(elements, system):
 
 def fetch_HL7_V3_Namespace(valueSet):
     """Pull and parse the published FHIR ethnicity namespace"""
-    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.json'.format(
+    src_url = 'http://hl7.org/fhir/v3/{valueSet}/v3-{valueSet}.cs.json'.format(
         valueSet=valueSet)
     response = requests.get(src_url)
     load = response.text
     data = json.loads(load)
-    return parse_concepts(data['codeSystem']['concept'],
-                          system='http://hl7.org/fhir/v3/{}'.format(valueSet))
+    return parse_concepts(
+        data['concept'],
+        system='http://hl7.org/fhir/v3/{}'.format(valueSet)
+    )
 
 def fetch_local_valueset(valueSet):
     """Pull and parse the named valueSet from our local definition"""
@@ -693,7 +865,7 @@ class AssessmentStatus(object):
                 (7, "Due"),
                 (90, "Overdue"),
             )
-            for instrument in ('epic26', 'eproms_add'):
+            for instrument in ('epic26', 'eproms_add', 'comorb'):
                 self.__status_per_instrument(instrument, thresholds)
         else:
             # assuming metastaic - although it's possible the user just didn't
@@ -702,7 +874,7 @@ class AssessmentStatus(object):
                 (1, "Due"),
                 (30, "Overdue")
             )
-            for instrument in ('eortc', 'hpfs', 'prems'):
+            for instrument in ('eortc', 'hpfs', 'prems', 'irondemog'):
                 self.__status_per_instrument(instrument, thresholds)
 
         status_strings = [details['status'] for details in

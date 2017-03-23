@@ -59,11 +59,14 @@ Remote Debian Repo
 To build an image of the portal (portal_web) with defaults::
 
     # Build the image
-    docker build --file docker/Dockerfile --build-arg --tag "portal_web:latest" .
+    docker build --file docker/Dockerfile --tag "portal_web:latest" .
 
 If you would like to use your own repo, the default Debian repo can be overridden as follows::
 
     docker build --file docker/Dockerfile --build-arg debian_repo="http://dl.bintray.com/v1/content/myaccount/myrepo" --tag "portal_web:myrepo" .
+
+.. note::
+    The artifacts/ directory must exist even if you don't build a package locally
 
 Local Debian Repo
 ~~~~~~~~~~~~~~~~~

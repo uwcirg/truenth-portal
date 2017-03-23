@@ -59,21 +59,25 @@ class TestAudit(TestCase):
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
-        self.assertEquals(rv.json['audits'][0]['by'],
-                          Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(
+            rv.json['audits'][0]['by']['reference'],
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'])
+        self.assertEquals(
+            rv.json['audits'][0]['by']['display'],
+            'First Last')
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['context'], 'other')
         self.assertEquals(
             rv.json['audits'][0]['comment'], 'just test data')
 
-    def test_provider_access(self):
-        provider = self.add_user('provider@example.com')
+    def test_staff_access(self):
+        staff = self.add_user('provider@example.com')
         self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(provider, role_name=ROLE.PROVIDER)
+        self.promote_user(staff, role_name=ROLE.STAFF)
         self.shallow_org_tree()
         org = Organization.query.filter(Organization.id > 0).first()
-        provider.organizations.append(org)
+        staff.organizations.append(org)
         self.test_user.organizations.append(org)
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
                     comment='just test data')
@@ -83,13 +87,14 @@ class TestAudit(TestCase):
             db.session.add(audit)
             db.session.add(consent)
             db.session.commit()
-        provider = db.session.merge(provider)
-        self.login(provider.id)
+        staff = db.session.merge(staff)
+        self.login(staff.id)
         rv = self.client.get('/api/user/{}/audit'.format(TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(1, len(rv.json['audits']))
-        self.assertEquals(rv.json['audits'][0]['by'],
-                          Reference.patient(TEST_USER_ID).as_fhir())
+        self.assertEquals(
+            rv.json['audits'][0]['by']['reference'],
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'])
         self.assertEquals(rv.json['audits'][0]['on'],
                           Reference.patient(TEST_USER_ID).as_fhir())
         self.assertEquals(rv.json['audits'][0]['context'], 'other')

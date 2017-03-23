@@ -83,7 +83,7 @@ class AppTextModelAdapter(object):
         raise NotImplemented
 
 
-class ConsentATMA(AppTextModelAdapter):
+class ConsentByOrg_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Consent agreements - namely the URL per org"""
 
     @staticmethod
@@ -100,12 +100,12 @@ class ConsentATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
 
-class ToU_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for Terms Of Use agreements - namely the URL"""
+class InitialConsent_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
 
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for a Terms of Use agreement
+        """Generate AppText name key for a Initial Consent Terms
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
@@ -113,14 +113,14 @@ class ToU_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
-        return "Terms of Use URL"
+        return "Initial Consent Terms URL"
 
 class Terms_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for New Terms Of Use agreements - namely the URL"""
 
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for a New Terms of Use agreement - new item just added
+        """Generate AppText name key for a Terms and Conditions - new item just added
 
         Not expecting any args at this time - may specialize per study
         or organization in the future as needed.
@@ -128,7 +128,7 @@ class Terms_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
-        return "New Terms of Use URL"
+        return "Terms and Conditions URL"
 
 
 class AboutATMA(AppTextModelAdapter):
@@ -147,17 +147,17 @@ class AboutATMA(AppTextModelAdapter):
         return "About {} URL".format(kwargs.get('subject'))
 
 
-class LegalATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for Legal - namely the URL"""
+class PrivacyATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Privacy - namely the URL"""
 
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for legal URL
+        """Generate AppText name key for privacy URL
 
         :returns: string for AppText.name field
 
         """
-        return "Legal URL"
+        return "Privacy URL"
 
 
 class VersionedResource(object):
@@ -210,7 +210,13 @@ class VersionedResource(object):
             # app_text resources defining legit URLs.  punt if testing
             if current_app.config.get('TESTING'):
                 return ("[TESTING - fake response]", 'http://fake.org')
-            raise  # reraise same exception if we're not testing
+            error_msg = "Could not retrieve remote content - Invalid URL"
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
+        except:
+            error_msg =  "Could not retrieve remove content - Server could not be reached"
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
         try:
             return (
                 response.json()['asset'],
@@ -218,7 +224,12 @@ class VersionedResource(object):
                     version=response.json()['version'],
                     generic_url=url))
         except ValueError:  # thrown when no json is available in response
-            return (response.text, url)
+            if response.status_code == 200:
+                return (response.text, url)
+            error_msg = "Could not retrieve remote content - {} {}".format(
+                response.status_code, response.reason)
+            current_app.logger.error(error_msg + ": {}".format(url))
+            return (error_msg, url)
 
 def app_text(name, *args):
     """Look up and return cusomized application text string

@@ -4,9 +4,10 @@ import json
 import os
 
 from portal.extensions import db
-from portal.system_uri import SHORTCUT_ALIAS
+from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
+from portal.models.organization import OrganizationIdentifier
 from portal.models.role import ROLE
 from tests import TestCase
 
@@ -94,6 +95,31 @@ class TestOrganization(TestCase):
         bundle = rv.json
         self.assertTrue(bundle['resourceType'], 'Bundle')
         self.assertEquals(len(bundle['entry']), count)
+
+    def test_organization_search(self):
+        self.shallow_org_tree()
+        count = Organization.query.count()
+        self.assertTrue(count > 1)
+
+        # add region to one org, we should get only that one back
+        region = Identifier(value='state:NY', system=PRACTICE_REGION)
+        with SessionScope(db):
+            db.session.add(region)
+            db.session.commit()
+        region = db.session.merge(region)
+        oi = OrganizationIdentifier(organization_id=1001,
+                                    identifier_id=region.id)
+        with SessionScope(db):
+            db.session.add(oi)
+            db.session.commit()
+
+        # use api to obtain FHIR bundle
+        self.login()
+        rv = self.client.get('/api/organization?state=NY')
+        self.assert200(rv)
+        bundle = rv.json
+        self.assertTrue(bundle['resourceType'], 'Bundle')
+        self.assertEquals(len(bundle['entry']), 1)
 
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN)
@@ -223,11 +249,11 @@ class TestOrganization(TestCase):
         self.assertTrue(10032 in leaves)
         self.assertTrue(10031 in leaves)
 
-    def test_provider_leaves(self):
-        # test provider with several org associations produces correct list
+    def test_staff_leaves(self):
+        # test staff with several org associations produces correct list
         self.deepen_org_tree()
-        # Make provider with org associations at two levels
-        self.promote_user(role_name=ROLE.PROVIDER)
+        # Make staff with org associations at two levels
+        self.promote_user(role_name=ROLE.STAFF)
 
         orgs = Organization.query.filter(Organization.id.in_((101, 102)))
         for o in orgs:

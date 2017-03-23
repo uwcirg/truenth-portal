@@ -4,16 +4,43 @@ import redis
 from flask_script import Server
 
 
+def best_sql_url():
+    """Return compliant sql url from available enviornment variables"""
+    env = os.environ
+    if 'PGDATABASE' in env:
+        return (
+            'postgresql://{PGUSER}:{PGPASSWORD}@{PGHOST}/{PGDATABASE}'.format(
+                PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
+                PGHOST=env.get('PGHOST', 'localhost'),
+                PGDATABASE=env.get('PGDATABASE')))
+    elif 'SQLALCHEMY_DATABASE_URI' in env:
+        return env.get('SQLALCHEMY_DATABASE_URI')
+    else:
+        return env.get(
+            'DATABASE_URL',
+            'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
+        )
+
+
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
+
+
+    # Allow Heroku env vars to override most defaults
+    # NB: The value of REDIS_URL may change at any point
+    REDIS_URL = os.environ.get(
+        'REDIS_URL',
+        'redis://localhost:6379'
+    )
+
     ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = os.environ.get(
         'CELERY_BROKER_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
     REQUEST_CACHE_URL = os.environ.get(
         'REQUEST_CACHE_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis'
@@ -40,30 +67,19 @@ class BaseConfig(object):
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        'SQLALCHEMY_DATABASE_URI',
-        'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
-    )
+    SQLALCHEMY_DATABASE_URI = best_sql_url()
     SECRET_KEY = 'override this secret key'
     SESSION_PERMANENT = True
     SESSION_TYPE = 'redis'
 
-
     SESSION_REDIS_URL = os.environ.get(
         'SESSION_REDIS_URL',
-        'redis://localhost:6379/0'
+        REDIS_URL + '/0'
     )
-
-    from urlparse import urlparse
-    redis_url = urlparse(SESSION_REDIS_URL)
 
     # Todo: create issue @ fengsp/flask-session
     # config values aren't typically objects...
-    SESSION_REDIS = redis.Redis(
-        host=redis_url.hostname if redis_url.hostname else None,
-        port=redis_url.port if redis_url.port else None,
-        db=redis_url.path.split('/')[1] if redis_url.hostname else None,
-    )
+    SESSION_REDIS = redis.from_url(SESSION_REDIS_URL)
 
     TESTING = False
     USER_APP_NAME = 'TrueNTH'  # used by email templates
@@ -73,8 +89,8 @@ class BaseConfig(object):
     USER_ENABLE_CHANGE_USERNAME = False  # prereq for disabling username
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
-    PROVIDER_BULK_DATA_ACCESS = True
-    PATIENTS_BY_PROVIDER_ADDL_FIELDS = [] # 'status', 'reports'
+    STAFF_BULK_DATA_ACCESS = True
+    PATIENT_LIST_ADDL_FIELDS = [] # 'status', 'reports'
 
     FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
     FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
@@ -85,6 +101,8 @@ class BaseConfig(object):
     FILE_UPLOAD_DIR = 'uploads'
     LR_ORIGIN = 'https://stg-cms.us.truenth.org'
     LR_GROUP = 20142
+
+    SYSTEM_TYPE = 'development'
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

@@ -3,6 +3,7 @@
 {% from "flask_user/_macros.html" import back_btn %}
 
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
+{% from "profile_macros.html" import profileOrgsSelector %}
 
 
   <!-- <div id="loadingIndicator" class="loading-indicator">
@@ -59,7 +60,13 @@
               {{patientQGroup(user)}}
             {% endif %}
             {% if 'org' in still_needed %}
-              {{clinic(consent_agreements)}}
+             {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                 <div id="clinics" class="tnth-hide" parent-section="true">
+                    {{profileOrgsSelector(user, "", consent_agreements)}}
+                  </div>
+             {% else %}
+                {{clinic(consent_agreements)}}
+              {% endif %}
             {% endif %}
             <br />
             <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
@@ -405,10 +412,19 @@ $(document).ready(function(){
           // Get value from div - either true or false
           var toSend = thisItem.val();
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
-          if (toCall != "tx") {
-            tnthAjax.putClinical({{user.id}},toCall,toSend);
+          if (toCall != "tx" && toCall != "biopsy") {
+              tnthAjax.putClinical({{user.id}},toCall,toSend);
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
+
+            if (toCall == "biopsy") {
+                if ($("#biopsyDate").val() == "") return true;
+                else {
+                  //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
+                  var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
+                  tnthAjax.postBiopsy({{user.id}}, biopsyDate, toSend);
+                };
+            };
 
             thisItem.parents(".pat-q").next().fadeIn();
             $("#clinics").hide(); //this is hard coded, ARGHHH!!
@@ -416,9 +432,13 @@ $(document).ready(function(){
             var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
             var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
             if (nextItem.length > 0) {
-                $('html, body').animate({
-                  scrollTop: nextItem.offset().top
-                }, 500);
+                var checkedRadio = nextItem.find("input[type='radio']:checked");
+                if (!(checkedRadio.length > 0) && !nextItem.isOnScreen()) {
+                  $('html, body').animate({
+                    scrollTop: nextItem.offset().top
+                  }, 1000);
+                };
+
                 nextItem.find("input[type='radio']").each(function() {
                   $(this).attr("skipped", "false");
                 });
@@ -436,8 +456,12 @@ $(document).ready(function(){
             } else {
                 fc.getNextField(null, $(this));
             };
+
           } else {
             if (toCall == "biopsy") {
+
+              tnthAjax.postBiopsy({{user.id}}, "", "false", (toSend == "unknown"? toSend:""));
+
               ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
                       $(this).prop("checked", false);

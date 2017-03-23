@@ -6,9 +6,7 @@ import pkginfo
 import sys
 import requests_cache
 from flask import Flask
-from flask_webtest import get_scopefunc
 import redis
-from urlparse import urlparse
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
@@ -17,6 +15,7 @@ from .extensions import babel, celery, db, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
 from .models.i18n import get_locale
+from .models.role import ROLE
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api
 from .views.auth import auth, capture_next_view_function
@@ -93,6 +92,7 @@ def configure_app(app, config):
 
 def configure_jinja(app):
     app.jinja_env.globals.update(app_text=app_text)
+    app.jinja_env.globals.update(ROLE=ROLE)
 
 
 def configure_error_handlers(app):
@@ -107,7 +107,6 @@ def configure_extensions(app):
     db.init_app(app)
     if app.testing:
         session_options = {}
-        session_options['scopefunc'] = get_scopefunc()
         db.session_options = session_options
 
     # flask-user
@@ -239,7 +238,6 @@ def configure_metadata(app):
 def configure_cache(app):
     """Configure requests-cache"""
     REQUEST_CACHE_URL = app.config.get("REQUEST_CACHE_URL")
-    redis_url = urlparse(REQUEST_CACHE_URL)
 
     requests_cache.install_cache(
         cache_name=app.name,
@@ -247,9 +245,5 @@ def configure_cache(app):
         expire_after=180,
         include_get_headers=True,
         old_data_on_error=True,
-        connection=redis.StrictRedis(
-            host=redis_url.hostname if redis_url.hostname else None,
-            port=redis_url.port if redis_url.port else None,
-            db=redis_url.path.split('/')[1] if redis_url.hostname else None,
-        ),
+        connection=redis.StrictRedis.from_url(REQUEST_CACHE_URL),
     )

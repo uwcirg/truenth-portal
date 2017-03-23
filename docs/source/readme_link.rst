@@ -1,4 +1,4 @@
 README
 ******
 .. _readme_link:
-.. include:: ../../README.md
+.. include:: ../../README.rst

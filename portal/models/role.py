@@ -27,7 +27,7 @@ class Role(db.Model):
 #Source definition for roles, as dictionary {name: description,}
 STATIC_ROLES = IterableUserDict({
     'admin':
-        'Administrator privledges, i.e. carte blanche',
+        'Administrator privileges, i.e. carte blanche',
     'anon':
         'Anonymous role - exclusive to accounts generated prior to '
         'user authentication',
@@ -36,6 +36,9 @@ STATIC_ROLES = IterableUserDict({
     'content_manager':
         'Gives user permission to add/view/edit associated content '
         'managment systems',
+    'intervention_staff':
+        'Grants user permission to view patient information (name, DOB, etc) '
+        'from relevant intervention patients',
     'partner':
         "An intimate partner, use the partner relationship to define "
         "whom the patient's partner is",
@@ -45,8 +48,11 @@ STATIC_ROLES = IterableUserDict({
     'promote_without_identity_challenge':
         'Users with "write_only" may be promoted without the standard '
         'identity challenge if they are also have this role',
-    'provider':
-        'Health care provider at a TrueNTH-collaborating clinic',
+    'staff':
+        'Health care provider or staff at a TrueNTH-collaborating clinic',
+    'staff_admin':
+        'Staff administrator, with access to both patients and staff '
+        'from their organization tree',
     'service':
         'Reserved for automated service accounts needing API access',
     'test':

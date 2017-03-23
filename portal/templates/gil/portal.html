@@ -6,8 +6,13 @@
     <section class="page-intro page-intro--dark home--header">
         <h3 class="page-intro__main">Welcome to your TrueNTH Dashboard{% if user.first_name %}, {{user.first_name}}{% endif %}</h3>
         <br/>
-        <p class="page-intro__sub">Below are the TrueNTH tools available to you.</p>
-        <p class="page-intro__sub">More will become available as TrueNTH evolves.</p>
+        {% if user.has_role(ROLE.PARTNER) %}
+            <p class="page-intro__sub">More tools for you will be available as TrueNTH develops.</p>
+            <p class="page-intro__sub">For now, learn more about TrueNTH:</p>
+        {% else %}
+            <p class="page-intro__sub">Below are the TrueNTH tools available to you.</p>
+            <p class="page-intro__sub">More will become available as TrueNTH evolves.</p>
+        {% endif %}
         <div class="button-callout">
             <figure id="portalScrollArrow"></figure>
         </div>
@@ -15,6 +20,19 @@
 
     {# present each intervention in turn if configured for user #}
      <section class="icon-box-group__wrapper home--items-wrapper">
+        {% if user.has_role(ROLE.PARTNER) %}
+            <div class="icon-box-group link-container">
+                <div class="link-box">
+                  <h4><a href="{{PORTAL}}/about">About TrueNTH</a></h4>
+                </div>
+                <div class="link-box">
+                  <h4><a href="{{PORTAL}}/what-is-prostate-cancer">About Prostate Cancer</a></h4>
+                </div>
+                <div class="link-box">
+                  <h4><a href="{{PORTAL}}/lived-experience">Lived Experience</a></h4>
+                </div>
+            </div>
+        {% endif %}
         <div id="homeItemsParentContainer" class="icon-box-group">
         {% for intervention in interventions %}
             {% set display = intervention.display_for_user(user) %}
@@ -24,10 +42,10 @@
                     <div class="home--item-text">{{ display.card_html | safe }}</div>
                     <br/>
                     <div>
-                    {% if display.link_url is none %}
-                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="javascript: loader(false);"><span class="home--disabled-button">{{_("Start")}}<figure></figure></span></a>
-                    {% else %}
-                        <a class="icon-box__button icon-box__button--main intervention-link" href="{{ display.link_url }}"><span>{{ display.link_label }}<figure></figure></span></a>
+                    {% if display.link_url %}
+                        <a class="icon-box__button icon-box__button--main intervention-link" href="{{ display.link_url }}"><span>{% if display.link_label %}{{_(display.link_label)}}{% else %}{{_("Start")}}{% endif %}<figure></figure></span></a>
+                    {% elif display.link_url is none and display.link_label %}
+                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="javascript: loader(false);"><span class="home--disabled-button">{{_(display.link_label)}}<figure></figure></span></a>
                     {% endif %}
                     </div>
                 </div>
@@ -39,7 +57,8 @@
                 <div class="home--registration-container">
                     <h4 class="icon-box__lowhead">{{ _("Complete Registration") }}</h4>
                     <p class="text-left">{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
-                    <a class="icon-box__button icon-box__button--main" href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a>
+                    <div class="home--registration-button-container">
+                    <a class="icon-box__button icon-box__button--main" href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a></div>
                 </div>
             </div>
         {% endif %}
@@ -56,7 +75,7 @@
         </ul>
         <ul class="nav-list nav-list--lower">
           <li class="nav-list__item"><a href="{{PORTAL}}/terms-and-conditions">Terms and Conditions</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/legal">Privacy</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}/privacy">Privacy</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/contact">Contact</a></li>
         </ul>
         <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
@@ -83,7 +102,7 @@
                         }, 1000);
                     };
                 });
-            } else $("#portalScrollArrow").hide();
+            };
             if (hc.length == 1) {
                 hc.removeClass("home--item-container").addClass("home--item-container-full");
             };

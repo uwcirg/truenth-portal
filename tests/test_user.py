@@ -6,7 +6,7 @@ import re
 import urllib
 from sqlalchemy import and_
 from datetime import datetime
-from tests import TestCase, TEST_USER_ID, FIRST_NAME
+from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -262,17 +262,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_code, language)
         self.assertEquals(new_user.locale_name, language_name)
 
-    def test_account_creation_by_provider(self):
-        # permission challenges when done as provider
+    def test_account_creation_by_staff(self):
+        # permission challenges when done as staff
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -282,7 +282,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PATIENT}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -319,17 +319,17 @@ class TestUser(TestCase):
         self.assertEquals(new_user.locale_name, language_name)
         self.assertEquals(new_user.organizations.count(), 2)
 
-    def test_failed_account_creation_by_provider(self):
+    def test_failed_account_creation_by_staff(self):
         # without the right set of consents & roles, should fail
         self.shallow_org_tree()
         org, org2 = [org for org in Organization.query.filter(
             Organization.id > 0).limit(2)]
         org_id, org2_id = org.id, org2.id
-        provider = self.add_user('provider@example.com')
-        provider.organizations.append(org)
-        provider.organizations.append(org2)
-        provider_id = provider.id
-        self.promote_user(user=provider, role_name=ROLE.PROVIDER)
+        staff = self.add_user('provider@example.com')
+        staff.organizations.append(org)
+        staff.organizations.append(org2)
+        staff_id = staff.id
+        self.promote_user(user=staff, role_name=ROLE.STAFF)
         data = {
             'organizations': [{'organization_id': org_id},
                               {'organization_id': org2_id}],
@@ -339,7 +339,7 @@ class TestUser(TestCase):
                         'send_reminders': False}],
             'roles': [{'name': ROLE.PARTNER}],
             }
-        self.login(user_id=provider_id)
+        self.login(user_id=staff_id)
         rv = self.client.post('/api/account',
                 content_type='application/json',
                 data=json.dumps(data))
@@ -373,7 +373,7 @@ class TestUser(TestCase):
 
     def test_default_role(self):
         self.promote_user(role_name=ROLE.PATIENT)
-        self.promote_user(role_name=ROLE.PROVIDER)
+        self.promote_user(role_name=ROLE.STAFF)
         self.login()
         rv = self.client.get('/api/user/{0}/roles'.format(TEST_USER_ID))
 
@@ -381,7 +381,7 @@ class TestUser(TestCase):
         self.assertEquals(len(result_roles['roles']), 2)
         received = [r['name'] for r in result_roles['roles']]
         self.assertTrue(ROLE.PATIENT in received)
-        self.assertTrue(ROLE.PROVIDER in received)
+        self.assertTrue(ROLE.STAFF in received)
 
     def test_unauth_role(self):
         self.login()
@@ -496,7 +496,7 @@ class TestUser(TestCase):
         member_of.organizations.append(org)
         audit = Audit(comment='test data', user_id=TEST_USER_ID,
             subject_id=TEST_USER_ID)
-        self.promote_user(user, ROLE.PROVIDER)
+        self.promote_user(user, ROLE.STAFF)
         self.promote_user(u2, ROLE.PATIENT)
         self.promote_user(member_of, ROLE.PATIENT)
         user, org, u2, member_of = map(
@@ -537,15 +537,15 @@ class TestUser(TestCase):
                       subject_id=TEST_USER_ID, context='consent')
 
         staff_top = self.add_user('Staff 102')
-        self.promote_user(staff_top, ROLE.PROVIDER)
+        self.promote_user(staff_top, ROLE.STAFF)
         staff_top.organizations.append(org_102)
 
         staff_leaf = self.add_user('Staff 10031')
-        self.promote_user(staff_leaf, ROLE.PROVIDER)
+        self.promote_user(staff_leaf, ROLE.STAFF)
         staff_leaf.organizations.append(org_10031)
 
         staff_mid = self.add_user('Staff 1002')
-        self.promote_user(staff_mid, ROLE.PROVIDER)
+        self.promote_user(staff_mid, ROLE.STAFF)
         staff_mid.organizations.append(org_1002)
 
         patient_w = self.add_user('patient w')
@@ -664,6 +664,82 @@ class TestUser(TestCase):
                 staff_leaf.check_role('view', other_id=patient))
             self.assertRaises(
                 Unauthorized, staff_leaf.check_role, 'edit', patient)
+
+    def test_deep_tree_staff_check_role(self):
+        """Can staff-admin edit correct staff members"""
+        self.deepen_org_tree()
+
+        org_102 = Organization.query.get(102)
+        org_1002 = Organization.query.get(1002)
+        org_10031 = Organization.query.get(10031)
+        org_10032 = Organization.query.get(10032)
+
+        staff_admin_top = self.add_user('staff_admin 102')
+        self.promote_user(staff_admin_top, ROLE.STAFF_ADMIN)
+        staff_admin_top.organizations.append(org_102)
+
+        staff_admin_leaf = self.add_user('staff_admin 10031')
+        self.promote_user(staff_admin_leaf, ROLE.STAFF_ADMIN)
+        staff_admin_leaf.organizations.append(org_10031)
+
+        staff_admin_mid = self.add_user('staff_admin 1002')
+        self.promote_user(staff_admin_mid, ROLE.STAFF_ADMIN)
+        staff_admin_mid.organizations.append(org_1002)
+
+        staff_w = self.add_user('staff w')
+        staff_w_id = staff_w.id
+        self.promote_user(staff_w, ROLE.STAFF)
+        staff_w.organizations.append(org_10032)
+
+        staff_x = self.add_user('staff x')
+        staff_x_id = staff_x.id
+        self.promote_user(staff_x, ROLE.STAFF)
+        staff_x.organizations.append(org_10032)
+
+        staff_y = self.add_user('staff y')
+        staff_y_id = staff_y.id
+        self.promote_user(staff_y, ROLE.STAFF)
+        staff_y.organizations.append(org_102)
+
+        staff_z = self.add_user('staff z')
+        staff_z_id = staff_z.id
+        self.promote_user(staff_z, ROLE.STAFF)
+        staff_z.organizations.append(org_10031)
+
+        staff_x, staff_y, staff_z = map(db.session.merge,(
+            staff_x, staff_y, staff_z))
+
+        ###
+        # Setup complete - test access
+        ###
+
+        # top level staff_admin can view/edit all
+        staff_admin_top = db.session.merge(staff_admin_top)
+        for perm in ('view', 'edit'):
+            for staff in (
+                staff_x_id, staff_y_id, staff_z_id):
+                self.assertTrue(
+                    staff_admin_top.check_role(perm, other_id=staff))
+
+        # mid level staff_admin can view/edit all but top
+        staff_admin_mid = db.session.merge(staff_admin_mid)
+        for perm in ('view', 'edit'):
+            for staff in (
+                staff_x_id, staff_z_id):
+                self.assertTrue(
+                    staff_admin_mid.check_role(perm, other_id=staff))
+            self.assertRaises(
+                Unauthorized, staff_admin_mid.check_role,
+                perm, other_id=staff_y_id)
+
+        # low level staff_admin can view/edit only those w/ same org
+        staff_admin_leaf = db.session.merge(staff_admin_leaf)
+        for perm in ('view', 'edit'):
+            for staff in (staff_y_id, staff_x_id):
+                self.assertRaises(
+                    Unauthorized, staff_admin_leaf.check_role, perm, staff)
+            self.assertTrue(
+                staff_admin_leaf.check_role(perm, other_id=staff_z_id))
 
     def test_all_relationships(self):
         # obtain list of all relationships
@@ -789,8 +865,7 @@ class TestUser(TestCase):
 
     def test_merge(self):
         with SessionScope(db):
-            self.test_user.last_name = None  # or it'll prefer users
-            other = self.add_user('other@foo.com', first_name='keep users',
+            other = self.add_user('other@foo.com', first_name='newFirst',
                                   last_name='Better')
             other.birthdate = '02-05-1968'
             other.gender = 'male'
@@ -806,9 +881,44 @@ class TestUser(TestCase):
             user.merge_with(other.id)
             db.session.commit()
             user, other = map(db.session.merge, (user, other))
-            self.assertEquals(user.first_name, FIRST_NAME)
+            self.assertEquals(user.first_name, 'newFirst')
             self.assertEquals(user.last_name, 'Better')
             self.assertEquals(user.gender, 'male')
             self.assertEquals({o.name for o in user.organizations},
                             {o.name for o in orgs})
             self.assertTrue(user.deceased)
+
+
+    def test_promote(self):
+        with SessionScope(db):
+            self.test_user.birthdate = '02-05-1968'
+            other = self.add_user('other@foo.com', first_name='newFirst',
+                                  last_name='Better')
+            other.password = 'phoney'
+            other.gender = 'male'
+            self.shallow_org_tree()
+            orgs = Organization.query.limit(2)
+            self.test_user.organizations.append(orgs[0])
+            self.test_user.organizations.append(orgs[1])
+            db.session.commit()
+            user, other = map(db.session.merge, (self.test_user, other))
+            user.promote_to_registered(other)
+            db.session.commit()
+            user, other = map(db.session.merge, (user, other))
+            self.assertTrue(other.deleted)
+            self.assertEquals(user.first_name, 'newFirst')
+            self.assertEquals(user.last_name, 'Better')
+            self.assertEquals(user.gender, 'male')
+            self.assertEquals(user.password, 'phoney')
+            self.assertEquals({o.name for o in user.organizations},
+                            {o.name for o in orgs})
+
+
+    def test_password_reset(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.login()
+
+        rv = self.client.post('/api/user/{}/password_reset'.format(TEST_USER_ID),
+                content_type='application/json')
+
+        self.assertEquals(rv.status_code, 200)

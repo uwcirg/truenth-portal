@@ -1,15 +1,16 @@
 """Assessment Engine API view functions"""
-from flask import abort, Blueprint, current_app, jsonify, request, redirect
+from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session
+from sqlalchemy.orm.exc import NoResultFound
 from flask_swagger import swagger
 import jsonschema
+import json
 import requests
-from sqlalchemy import or_
 
 from ..audit import auditable_event
 from ..models.auth import validate_client_origin
 from ..models.fhir import AssessmentStatus
-from ..models.fhir import FHIR_datetime, QuestionnaireResponse
+from ..models.fhir import FHIR_datetime, QuestionnaireResponse, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User
 from ..extensions import oauth
@@ -602,11 +603,20 @@ def get_assessments():
     tags:
       - Assessment Engine
     parameters:
+      - name: format
+        in: query
+        description: format of file to download (CSV or JSON)
+        required: false
+        type: string
+        enum:
+          - json
+          - csv
+        default: json
       - name: instrument_id
         in: query
         description:
           ID of the instrument, eg "epic26", "eq5d"
-        required: true
+        required: false
         type: array
         items:
           type: string
@@ -667,46 +677,139 @@ def get_assessments():
 
     """
 
-    annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
-
-    if "instrument_id" in request.args:
-        instrument_filters = (
-            QuestionnaireResponse.document[
-                ("questionnaire", "reference")
-            ].astext.endswith(instrument_id)
-            for instrument_id in request.args.getlist('instrument_id')
-        )
-        questionnaire_responses = questionnaire_responses.filter(or_(*instrument_filters))
-
-    patient_fields = ("careProvider", "identifier")
-
-    for questionnaire_response in questionnaire_responses:
-        subject = questionnaire_response.subject
-        questionnaire_response.document["subject"] = {
-            k:v for k,v in subject.as_fhir().items() if k in patient_fields
-        }
-
-        annotated_questionnaire_responses.append(questionnaire_response.document)
-
-    bundle = {
-        'resourceType':'Bundle',
-        'updated':FHIR_datetime.now(),
-        'total':len(annotated_questionnaire_responses),
-        'type': 'searchset',
+    bundle = aggregate_responses(
+        instrument_ids=request.args.getlist('instrument_id'),
+    )
+    bundle.update({
         'link': {
             'rel':'self',
             'href':request.url,
         },
-        'entry':annotated_questionnaire_responses,
+    })
+
+    # Default to JSON output if format unspecified
+    if request.args.get('format', 'json') == 'json':
+        return jsonify(bundle)
+
+
+    return Response(
+        generate_qnr_csv(bundle),
+        mimetype='text/csv',
+        headers={
+            "Content-Disposition":
+                "attachment;filename=qnr_data-%s.csv" % FHIR_datetime.now()
+        }
+    )
+
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment',
+    methods=('PUT',),
+)
+@oauth.require_oauth()
+def assessment_update(patient_id):
+    """Update an existing questionnaire response on a patient's record
+
+    Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
+    resource type.
+    ---
+    operationId: updateQuestionnaireResponse
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        schema:
+          $ref: "#/definitions/QuestionnaireResponse"
+    responses:
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+      404:
+        description: existing QuestionnaireResponse not found
+    """
+
+    if not hasattr(request, 'json') or not request.json:
+        abort(400, 'Invalid request')
+
+    # Verify the current user has permission to edit given patient
+    current_user().check_role(permission='edit', other_id=patient_id)
+    patient = get_user(patient_id)
+    if patient.deleted:
+        abort(400, "deleted user - operation not permitted")
+
+    swag = swagger(current_app)
+
+    draft4_schema = {
+        '$schema': 'http://json-schema.org/draft-04/schema#',
+        'type': 'object',
+        'definitions': swag['definitions'],
     }
 
-    return jsonify(bundle)
+    validation_schema = 'QuestionnaireResponse'
+    # Copy desired schema (to validate against) to outermost dict
+    draft4_schema.update(swag['definitions'][validation_schema])
 
-@assessment_engine_api.route('/patient/<int:patient_id>/assessment',
-                             methods=('POST', 'PUT'))
+    response = {
+        'ok': False,
+        'message': 'error updating questionnaire response',
+        'valid': False,
+    }
+
+    updated_qnr = request.json
+
+    try:
+        jsonschema.validate(updated_qnr, draft4_schema)
+    except jsonschema.ValidationError as e:
+        return jsonify({
+            'ok': False,
+            'message': e.message,
+            'reference': e.schema,
+        })
+    else:
+        response.update({
+            'ok': True,
+            'message': 'questionnaire response valid',
+            'valid': True,
+        })
+
+    # Todo: enforce identifier uniqueness at initial submission
+    try:
+        existing_qnr = QuestionnaireResponse.query.filter(
+            QuestionnaireResponse.document["identifier"] == updated_qnr["identifier"]
+        ).one()
+    # except NoResultException:
+    except NoResultFound:
+        abort(404,"existing QuestionnaireResponse not found")
+    else:
+        response.update({'message': 'previous questionnaire response found'})
+
+    existing_qnr.document = updated_qnr
+    db.session.add(existing_qnr)
+    db.session.commit()
+    auditable_event(
+        "updated {}".format(existing_qnr),
+        user_id=current_user().id,
+        subject_id=patient_id,
+        context='assessment',
+    )
+    response.update({'message': 'questionnaire response updated successfully'})
+    return jsonify(response)
+
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment',
+    methods=('POST',),
+)
 @oauth.require_oauth()
-def assessment_set(patient_id):
+def assessment_add(patient_id):
     """Add a questionnaire response to a patient's record
 
     Submit a minimal FHIR doc in JSON format including the 'QuestionnaireResponse'
@@ -1174,6 +1277,7 @@ def assessment_set(patient_id):
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         document=request.json,
+        encounter=current_user().current_encounter
     )
 
     db.session.add(questionnaire_response)
@@ -1260,7 +1364,7 @@ def present_assessment(instruments=None):
         queued_instruments = instruments
 
     # Combine requested instruments into single list, maintaining order
-    common_instruments = queued_instruments + resume_instruments
+    common_instruments = resume_instruments + queued_instruments
     common_instruments = sorted(
         set(common_instruments),
         key=lambda x: common_instruments.index(x)
@@ -1278,6 +1382,7 @@ def present_assessment(instruments=None):
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
         "subject_id": request.args.get('subject_id'),
+        "initial": request.args.get('initial'),
     }
     # Clear empty querystring params
     assessment_params = {k:v for k,v in assessment_params.items() if v}

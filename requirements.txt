@@ -1,23 +1,22 @@
 # Do not install binary wheels for certain packages
 # See https://github.com/spotify/dh-virtualenv/issues/150
---no-binary billiard,cffi
+--no-binary billiard,cffi,psycopg2
 
-alabaster==0.7.9
-alembic==0.8.10
+alabaster==0.7.10
+alembic==0.9.1
 amqp==2.1.4
 anyjson==0.3.3
 argcomplete==1.8.2
 Authomatic==0.1.0.post1
 Babel==2.3.4
 backports.shutil-get-terminal-size==1.0.0
-bcrypt==3.1.2
+bcrypt==3.1.3
 beautifulsoup4==4.5.3
 billiard==3.5.0.2
 blinker==1.4
 celery==4.0.2
-cffi==1.9.1
+cffi==1.10.0
 click==6.7
-CommonMark==0.5.4 # pyup: <=0.5.4  # pin as workaround to https://github.com/rtfd/recommonmark/issues/24
 coverage==4.3.4
 decorator==4.0.11
 docopt==0.6.2
@@ -31,9 +30,9 @@ Flask-Migrate==2.0.3
 Flask-OAuthlib==0.9.3
 Flask-Script==2.0.5
 Flask-Session==0.3.1
-Flask-SQLAlchemy==2.1
+Flask-SQLAlchemy==2.2
 flask-swagger==0.2.13
-Flask-Testing==0.6.1
+Flask-Testing==0.6.2
 Flask-User==0.6.11
 Flask-WebTest==0.0.8
 Flask-WTF==0.14.2
@@ -42,15 +41,15 @@ future==0.16.0
 fuzzywuzzy==0.15.0
 imagesize==0.7.1
 ipdb==0.10.2
-ipython==5.2.2
-ipython-genutils==0.1.0
+ipython==5.3.0
+ipython-genutils==0.2.0
 itsdangerous==0.24
 jedi==0.10.0
 Jinja2==2.9.5
 jsonschema==2.6.0
 kombu==4.0.2
 Mako==1.0.6
-MarkupSafe==0.23
+MarkupSafe==1.0
 nose==1.3.7
 oauthlib==1.1.2 # pyup: <= 1.1.2  # See oauthlib comment below
 page-objects==1.1.0
@@ -61,44 +60,43 @@ pickleshare==0.7.4
 pkginfo==1.4.1
 pluggy==0.4.0
 prompt-toolkit==1.0.13
-psycopg2==2.6.2
+psycopg2==2.7.1
 ptpython==0.36
 ptyprocess==0.5.1
-py==1.4.32
+py==1.4.33
 pycparser==2.17
 pycrypto==2.6.1
 pyflakes==1.5.0
 Pygments==2.2.0
-pytest==3.0.6
+pytest==3.0.7
 python-dateutil==2.6.0
 python-editor==1.0.3
 python-Levenshtein==0.12.0
 pytz==2016.10
 PyYAML==3.12
-recommonmark==0.4.0
 redis==2.10.5
 requests==2.13.0
 requests-cache==0.4.13
 requests-oauthlib==0.8.0
-selenium==3.0.2
+selenium==3.3.1
 simplegeneric==0.8.1
 six==1.10.0
 snowballstemmer==1.2.1
 speaklater==1.3
-Sphinx==1.5.2
-sphinx-rtd-theme==0.1.9
-SQLAlchemy==1.1.5
-swagger-spec-validator==2.0.2 # pyup: !=2.0.3 # see https://github.com/Yelp/swagger_spec_validator/issues/59
+Sphinx==1.5.3
+sphinx-rtd-theme==0.2.4
+SQLAlchemy==1.1.6
+swagger-spec-validator==2.1.0
 tox==2.6.0
-traitlets==4.3.1
+traitlets==4.3.2
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.3
 virtualenv==15.1.0
 waitress==1.0.2
 wcwidth==0.1.7
-WebOb==1.7.1
-WebTest==2.0.25
-Werkzeug==0.11.15
+WebOb==1.7.2
+WebTest==2.0.27
+Werkzeug==0.12.1
 WTForms==2.1
 xvfbwrapper==0.2.9
 -e .

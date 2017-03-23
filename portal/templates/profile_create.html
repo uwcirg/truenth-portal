@@ -87,7 +87,7 @@
             </div>
             <br/>
             <div>
-                {{ back_btn('patients','Patients List')}}
+                {{ back_btn('patients','patients list')}}
                 <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
             </div>
             </div>
@@ -123,6 +123,11 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _accountArray = {};
     var hasError = false;
     var errorMessage = '';
+
+    $("#updateProfile").attr("disabled", true);
+    $("#createProfileForm input, #createProfileForm select").on("change", function() {
+        $("#updateProfile").attr("disabled", false);
+    });
 
     $("#noEmail").on("click", function() {
         if ($(this).is(":checked")) {

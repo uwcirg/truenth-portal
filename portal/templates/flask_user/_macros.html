@@ -56,7 +56,8 @@
 {%- endmacro %}
 
 {% macro back_link(url,text) -%}
-<div id="backLink"><a href="{{PORTAL}}/{{url}}" class="btn btn-xs btn-tnth-back"><span class="glyphicon glyphicon-circle-arrow-left" data-toggle="tooltip" data-placement="right" title="{{ _('back to') }} {{text}}"></span></a></div>
+<a class="back" href="{{PORTAL}}/{{url}}">
+<span class="glyphicon glyphicon-home" data-toggle="tooltip" data-placement="top" title="back to home"></span></a>
 {%- endmacro %}
 
 
@@ -74,7 +75,6 @@
     </div>
     {% if current_user.roles %}
     <br />
-
     {% if current_user.has_roles('admin') or current_user.has_roles('application_developer') %}
     <div class="list-group tnth-nav-list">
         {% if current_user.has_roles('admin') %}
@@ -93,11 +93,11 @@
 {% macro footer(splash_style=false) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
-        <div class="col-xs-6 col-lg-8 footer-container">
-            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/legal">{{ _("Privacy") }}</a></small></p>
+        <div class="col-xs-6 col-lg-8 footer-container copyright-container">
+            <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
             <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p>
         </div>
-        <div class="col-xs-6 col-lg-4 footer-container">
+        <div class="col-xs-6 col-lg-4 footer-container logo-container">
             <div class="pull-right">
                 <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
             </div>

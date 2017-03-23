@@ -2,24 +2,13 @@
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
+<style>
+.footer-wrapper { position: inherit !important;}
+.footer-container.flex { clear: both; display:flex; justify-content: space-between; padding: 0.5em 0; margin: 1em 4em; border-top: 1px solid #ddd;}
+@media (max-width: 1199px) { .footer-container.flex{ justify-content: center;} }
+</style>
+<div id="stickyMenu"></div>
 <br/>
-<div class="flex">
-<div class="profile-header">
-    {% if user and user.username %}
-      {% if providerPerspective == 'true' %}
-          <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
-      {% elif current_user.has_role('admin') %}
-          <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
-      {% else %}
-           <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
-      {% endif %}
-    {% else %}
-       <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
-    {% endif %}
-</div>
-{{profileImage(user)}}
-</div>
-<nav id="indexNavBar">
 {% if providerPerspective == 'true' %}
 {{ back_link('patients', _('Patients List')) }}
 {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
@@ -27,79 +16,94 @@
 {% else %}
 {{ back_link(PORTAL, _('Home')) }}
 {% endif %}
-<span class="glyphicon index-list glyphicon-list" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-{% if current_user.has_role('provider') and user.has_role('patient') %}
-&nbsp;&nbsp;<span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
-<!-- shown only in reduced browser size-->
-<div id="navMenuXs" class="btn-group link-xs">
-  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{ _("Select") }} <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-    <li><a href="javascript:$('#loginAsModal').modal('show')" id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal">{{ _("Login as this Patient") }}</a></li>
-  </ul>
-</div>
-
-<div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
-          </div>
-          <div class="modal-body" style="font-size:0.9em">
-            <br/>
-            <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
-            <br/>
-          </div>
-          <div class="modal-footer">
-            <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
-          </div>
-        </div>
+<a class="open" href="#"><span class="glyphicon index-list glyphicon glyphicon-list-alt" data-toggle="tooltip" data-placement="bottom" title="expand/collapse index list"></span></a>
+<div class="left-panel"></div>
+<div class="right-panel">
+<div class="flex">
+      <div id="profileHeader" class="profile-header">
+        {% if user and user.username %}
+          {% if providerPerspective == 'true' %}
+              <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
+          {% elif current_user.has_role('admin') %}
+              <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
+          {% else %}
+               <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
+          {% endif %}
+        {% else %}
+           <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
+        {% endif %}
       </div>
+      {{profileImage(user)}}
 </div>
+{% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT)) %}
+    <nav id="indexNavBar">
+    <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
+    <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this patient") }}</a></span>
+    <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this patient") }}</h4>
+              </div>
+              <div class="modal-body" style="font-size:0.9em">
+                <br/>
+                <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
+                <br/>
+              </div>
+              <div class="modal-footer">
+                <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
+              </div>
+            </div>
+          </div>
+    </div>
+    </nav>
 {% endif %}
-</nav>
 <div id="indexContainer">{{ _("Index List") }}</div>
 <br/>
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
   <div class="row">
-      <div class="col-md-12">
-          {{profile(user, current_user, consent_agreements)}}
+      <div class="col-lg-12 col-md-12 col-sm-12">
+          {{profile(user, current_user, consent_agreements, user_interventions)}}
           <br/>
           {% if providerPerspective == 'true' %}
-             <br/><br/> {{ back_btn('patients','Patients List') }}
+             <br/><br/> {{ back_btn('patients','patients list') }}
           {% else %}
-              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
+              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to home") }}</small></a>
           {% endif %}
+          <br/>
       </div>
   </div>
 </form>
+</div>
 {% endblock %}
-
+  {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">
+      <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
+      <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p></div><div class="logo-container"><a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a></div></div></div>{% endblock %}
 {% block document_ready %}
-
 {% if user.has_role('patient')  and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 
 function handleLoginAs() {
     //sessionStorage does not work allow addition of item in private mode
     try {
       sessionStorage.setItem("loginAsPatient", "true");
-    } catch(e) {
-
-    }
+    } catch(e) {}
     location.replace('/login-as/{{user.id}}');
 };
 
-function goTo(event, id) {
-    event.stopPropagation();
-    window.location = "#" + id;
-    $("#indexContainer").removeClass("open");
-};
+var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter, __indexContainer, __indexIcon, __leftPanel;
 
 $(document).ready(function(){
+
     $('#loginAsPatient a').tooltip();
+
+    $("a.open").on("click", function(e) {
+      // stop default browser behavior
+      e.preventDefault();
+      $("body").toggleClass("open-nav");
+      $("#stickyMenu").toggleClass("sticky-show")
+    });
 
     [{
         attachID: "month",
@@ -180,7 +184,7 @@ $(document).ready(function(){
         };
     });
 
-    if (!(_isTouchDevice())) $('#indexNavBar span[data-toggle="tooltip"]').tooltip();
+    if (!(_isTouchDevice())) $('span[data-toggle="tooltip"]').tooltip();
 
     $("html").click(function(event){
         $("#indexContainer").removeClass('open');
@@ -191,14 +195,40 @@ $(document).ready(function(){
         $('#indexContainer').toggleClass('open');
     });
 
-
-    var t = $("#profileForm").find("h4.profile-item-title");
-    var indexContent = "<ul style='padding:0; margin:0; list-style-type:square'>";
-        t.each(function() {
-        indexContent += "<li style='margin-bottom:4px; cursor:pointer' onclick=' goTo(event, \"" + $(this).attr("id") + "\")'>" + $(this).text() + "</li>";
+    $(window).scroll(function() {
+        if (!(__navBar.isOnScreen())) {
+            __stickyMenu.css("top", "1em")
+        } else {
+          __stickyMenu.css("top",__stickyMenu_topPos);
+        };
     });
-    indexContent += "</ul>";
-    $("#indexContainer").html(indexContent);
+    $(window).resize(function() {
+        if (__stickyMenu.hasClass("sticky-show")) {
+          if (__indexIcon.is(":visible") || !(__leftPanel.is(":visible"))) $("a.open").trigger("click");
+        }
+        else {
+          if (__leftPanel.is(":visible")) __indexContainer.removeClass("open");
+        }
+    });
+
+    (function() {
+      var t = $("#profileForm").find("h4.index-item");
+      var indexContent = "<p class='title'><em>Click</em> each to go to section:</p><ul>";
+          t.each(function() {
+          if ($(this).is(":visible")) {
+            indexContent += "<li><a href='#" + $(this).attr("id") + "'>"  + $(this).text() + "</a></li>";
+          };
+      });
+      indexContent += "</ul>";
+      $("#indexContainer").html(indexContent);
+      $("#stickyMenu").html(indexContent);
+      var listHeight = $("#stickyMenu ul").height();
+      if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 70);
+    })();
+
+    __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter"), __indexContainer = $("#indexContainer"), __indexIcon = $("#indexNavBar span.index-list"), __leftPanel = $(".left-panel");
+
+    if (__leftPanel.is(":visible")) $("a.open").trigger("click");
 
     //in profile email is validated and updated after ajax call to check unique email
     $("#email").attr("update-on-validated", "true").attr("user-id", '{{user.id}}');

@@ -70,13 +70,20 @@
         <h3 class="side-nav__heading">Navigation</h3>
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="{{PORTAL}}/">Home</a></li>
-          {% if user and user.has_role('provider') %}
+          {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/patients">Patients</a></li>
           {% endif %}
           {% if user %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+          {% if user and (user.has_role(ROLE.APPLICATION_DEVELOPER) or user.has_role(ROLE.ADMIN)) %}
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}/clients">Client Applications</a></li>
+          {% endif %}
+          {% if user and user.has_role(ROLE.ADMIN) %}
+              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{PORTAL}}/admin">User Administration</a></li>
+              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{PORTAL}}/settings">Settings</a></li>
+          {% endif %}
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}/decision-support">
               <svg width="32" height="32">
                 <use xlink:href="#DS-Icon-Nav"></use>
@@ -85,10 +92,8 @@
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>Symptom Tracker</a></li>
-         {% if not user or (user and user.has_role('patient')) %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
-         {% endif %}
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
           <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
           <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">Contact</a></li>
           {% if not user %}
@@ -117,7 +122,6 @@
             </a>
           </div>
           <a class="logo" href="{{PORTAL}}/"></a>
-          <p class="copyright">&copy;2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization.</p>
           {% if not user %}
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">Log In</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
           {% endif %}
@@ -154,11 +158,12 @@
         </ul>
         <ul class="nav-list nav-list--lower">
           <li class="nav-list__item"><a href="{{PORTAL}}/terms-and-conditions">Terms and Conditions</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/legal">Privacy</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}/privacy">Privacy</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/contact">Contact</a></li>
         </ul>
         <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
             <figure class="footer__logo--movember"></figure></a></div>
+        <div class="footer__logo-area copyright">&copy;2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization.</div>
       </footer>
   {% endblock %}
   {% block version %}
@@ -208,7 +213,7 @@
              <form action="{{PORTAL}}/user/sign-in" method="POST" class="form" role="form">
               <input name="email" type="text" placeholder="Email Address" required>
               <input name="password" type="password" placeholder="Password" required>
-              <input class="button button-large button--teal button--login" type="submit" value="Log In">
+              <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
               <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Forgot your password?</span></a>
             </form>
@@ -358,7 +363,7 @@
               if (show) {
                   VO.showLoader();
               } else {
-                  {% if user and (not user.has_role("provider")) and (not user.has_role("admin")) %} filterMenu(); {% else %} VO.hideLoader(); {% endif %}
+                  {% if user and (not user.has_role(ROLE.STAFF)) and (not user.has_role(ROLE.ADMIN)) %} filterMenu(); {% else %} VO.hideLoader(); {% endif %}
                   VO.showMain();
               };
           };
@@ -509,6 +514,11 @@
 
             checkBannerStatus();
 
+            (function() {
+              var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
+              if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
+            })();
+
             $("#modal-login").on("show.bs.modal", function(e) {
                 loader(false);
             });
@@ -589,10 +599,18 @@
                   e.preventDefault();
                   handleAccessCode();
                 };
-            })
+            });
+
 
             $("#accessCodeLink").on("click", function() {
                 handleAccessCode();
+            });
+
+            $("#password").on("keyup", function() {
+                if (e.keyCode == 13) {
+                  e.preventDefault();
+                  if ($("input[name='email']").val() != "") $("#btnLogin").trigger("click");
+                };
             });
 
             // Configure and start the session timeout monitor

@@ -65,7 +65,7 @@ def me():
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                ROLE.PROVIDER])
+                ROLE.STAFF])
 def account():
     """Create a user account
 
@@ -300,7 +300,7 @@ def delete_user(user_id):
 @user_api.route('/user/<int:user_id>/access_url')
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                ROLE.PROVIDER])
+                ROLE.STAFF])
 def access_url(user_id):
     """Returns simple JSON with one-time, unique access URL for given user
 
@@ -350,7 +350,7 @@ def access_url(user_id):
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
     not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.PROVIDER])
+                      ROLE.STAFF])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
@@ -1603,4 +1603,63 @@ def upload_user_document(user_id):
     auditable_event("patient report {} posted for user {}".format(
         doc.uuid, user_id), user_id=current_user().id, subject_id=user_id,
         context='assessment')
+    return jsonify(message="ok")
+
+@user_api.route('/user/<int:user_id>/password_reset', methods=('POST',))
+@oauth.require_oauth()
+@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
+def trigger_password_reset_email(user_id):
+    """Trigger a password reset email for the specified user
+
+    Allows admins, staff, etc to manually trigger password reset emails to
+    patients, allowing them to easily change their passwords and login without
+    knowing their current password or email.
+    ---
+    tags:
+      - User
+    operationId: send_password_reset
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    responses:
+      200:
+        description: successful operation
+        schema:
+          id: response
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              description: Result, typically "ok"
+      400:
+        description: if the request incudes invalid data
+      401:
+        description:
+          if missing valid OAuth token or if the authorized user lacks
+          permission to edit requested user_id
+      404:
+        description: if user_id doesn't exist
+
+    """
+    user = current_user()
+    if user.id != user_id:
+        current_user().check_role(permission='edit', other_id=user_id)
+        user = get_user(user_id)
+    if user.deleted:
+        abort(400, "deleted user - operation not permitted")
+    if user.email:
+      try:
+          user_manager.send_reset_password_email(user.email)
+      except ValueError as e:
+          abort(400, str(e))
+    auditable_event("password reset email triggered for user {}".format(
+        user_id), user_id=current_user().id, subject_id=user_id,
+        context='login')
     return jsonify(message="ok")
