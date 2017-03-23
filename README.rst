@@ -87,7 +87,7 @@ Copy the default to the named configuration file
     $ cp $PROJECT_HOME/instance/application.cfg{.default,}
 
 Obtain ``consumer_key`` and ``consumer_secret`` values from
-https://developers.facebook.com/apps Write the values from Facebook to
+`Facebook App page <https://developers.facebook.com/apps>`__ and write the values to
 ``application.cfg``:
 
 .. code:: bash
@@ -97,8 +97,7 @@ https://developers.facebook.com/apps Write the values from Facebook to
     FB_CONSUMER_KEY = '<App ID From FB>'
     FB_CONSUMER_SECRET = '<App Secret From FB>'
 
-To enable Google OAuth, obtain similar values from
-https://console.developers.google.com/project/\_/apiui/credential?pli=1
+To enable Google OAuth, obtain similar values from the `Google API page <https://console.developers.google.com/project/_/apiui/credential?pli=1>`__.
 
 -  Under APIs Credentials, select ``OAuth 2.0 client ID``
 -  Set the ``Authorized redirect URIs`` to exactly match the location of
@@ -154,8 +153,7 @@ Run the Celery Worker
 
     $ celery worker -A portal.celery_worker.celery --loglevel=info
 
-Alternatively, install an init script and configure. See
-http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html
+Alternatively, install an init script and configure. See `Daemonizing Celery <http://docs.celeryproject.org/en/latest/tutorials/daemonizing.html>`__
 
 DATABASE
 --------
