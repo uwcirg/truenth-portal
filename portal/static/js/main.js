@@ -249,21 +249,55 @@ var CONSENT_ENUM = {
 
 var fillContent = {
     "clinical": function(data) {
+
+        // sort from newest to oldest
+        // data.entry.sort(function(a,b){
+        //     //date is in this format: 2017-03-21T22:25:03
+        //     var dateA = parseFloat((a.content.meta.lastUpdated).replace(/[\-T\:]/g, ""));
+        //     var dateB = parseFloat((b.content.meta.lastUpdated).replace(/[\-\T\:]/g, ""));
+        //     return dateB - dateA;
+        // });
         $.each(data.entry, function(i,val){
             var clinicalItem = val.content.code.coding[0].display;
+            var clinicalValue = val.content.valueQuantity.value;
+            //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
+            var status = val.content.status;
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {
                 clinicalItem = "pca_localized";
-            }
+            };
             var ci = $('div[data-topic="'+clinicalItem+'"]');
             if (ci.length > 0) ci.fadeIn().next().fadeIn();
-            var clinicalValue = val.content.valueQuantity.value;
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
-                if($radios.is(':checked') === false) {
-                    $radios.filter('[value='+clinicalValue+']').prop('checked', true);
-                }
+                if(!$radios.is(':checked')) {
+                    if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                    if (clinicalItem == "biopsy") {
+                        if (clinicalValue == "true") {
+                            if (hasValue(val.content.issued)) {
+                                var issuedDate = "";
+                                //convert date string to a valid date format for conversion into Date object
+                                var d = (val.content.issued).replace(/-/g,"/");
+                                if (d.indexOf("T") != -1) d = d.substring(0, (d).indexOf("T"));
+                                issuedDate = new Date(d);
+                                //dd/mm/yyyy format, NOTE, use native date object methods here
+                                //as toLocaleString is not supported in some browsers e.g. firefox
+                                var month = issuedDate.getMonth()+1;
+                                var day = issuedDate.getDate();
+                                var year = issuedDate.getFullYear();
+                                var cDate = (day < 10?("0"+day):day) + "/" + (month < 10?("0"+month): month)+"/"+year;
+                                //in DD/MM/YYYY format
+                                $("#biopsyDate").val(cDate);
+                                $("#biopsyDateContainer").show();
+                            };
+                        } else {
+                            $("#biopsyDate").val("");
+                            $("#biopsyDateContainer").hide();
+                        };
+                    };
+                };
             };
         })
     },
@@ -325,8 +359,6 @@ var fillContent = {
             $("#year").val(bdArray[0]);
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
-            // If there's already a birthday, then we should show the patientQ if this is a patient (determined with roles)
-            if ($("#patBiopsy").length > 0) $("#patBiopsy").fadeIn();
         };
     },
     "ethnicity": function(data) {
@@ -1750,25 +1782,51 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "postBiopsy": function(userId, issuedDate, value, status, targetField) {
+    "getBiopsyId": function(userId) {
+        var obId = "", code="";
+        $.ajax ({
+            type: "GET",
+            url: '/api/patient/'+userId+'/clinical',
+            async: false
+        }).done(function(data) {
+            if (data && data.entry) {
+                (data.entry).forEach(function(item) {
+                    if (!hasValue(obId)) {
+                        code = item.content.code.coding[0].code;
+                        if (code == "111") obId = item.content.id;
+                    };
+                });
+            }
+
+        }).fail(function() {
+        });
+        return obId;
+    },
+    "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
+        if (!params) params = {};
         var code = '111';
         var display = "biopsy";
         var system = CLINICAL_SYS_URL;
-
+        var method = "POST";
+        var url = '/api/patient/'+userId+'/clinical';
         var obsCode = [{ "code": code, "display": display, "system": system }];
         var obsArray = {};
-
         obsArray["resourceType"] = "Observation";
-        obsArray["performer"] = {"reference": "Patient/" + userId};
         obsArray["code"] = {"coding": obsCode};
         obsArray["issued"] = issuedDate ? issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuatity"] = {"units":"boolean", "value":value}
+        obsArray["valueQuantity"] = {"units":"boolean", "value":value};
+        if (params.performer) obsArray["performer"] = params.performer;
+        var obsId = tnthAjax.getBiopsyId(userId);
+        if (hasValue(obsId)) {
+            method = "PUT";
+            url = url + "/" + obsId;
+        };
         $.ajax ({
-            type: "POST",
-            url: '/api/patient/'+userId+'/clinical',
+            type: method,
+            url: url,
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
             data: JSON.stringify(obsArray)

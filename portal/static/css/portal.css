@@ -1054,7 +1054,7 @@ table.profile-audit-log TH,
   width: 90%;
 }
 .indent {
-  padding: 0 1em;
+  padding: 0 1.5em;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1304,6 +1304,12 @@ table.profile-audit-log TH,
 }
 .radio-inline input[type=radio] {
 	margin-left: -18px;
+}
+#biopsyDateContainer {
+  display: none;
+}
+#biopsyDateContainer label {
+  margin-right: 0.2em;
 }
 div.biopsy-option:last-of-type{
   margin-top: 1px;
