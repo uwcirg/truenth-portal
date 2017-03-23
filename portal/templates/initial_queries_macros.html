@@ -108,7 +108,7 @@
   {% macro patientQGroup(user) -%}
     <div id="patientQ" class="tnth-hide" parent-section="true">
         <hr />
-        <div id="patBiopsy" data-topic="biopsy" class="thn-hide pat-q">
+        <div id="patBiopsy" data-topic="biopsy" class="pat-q">
           <br />
           <p>{{ _("Have you had a prostate cancer biopsy?") }}</p>
           <div class="form-group">
@@ -117,7 +117,7 @@
                 <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_yes" value="true"> {{ _("Yes") }}
               </label>
             </div>
-            <div id="biopsyDateContainer" class="tnth-hide indent form-group">
+            <div id="biopsyDateContainer" class="indent form-group">
             	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
             	<input id="biopsyDate" type="text" class="form-control" placeholder="DD/MM/YYYY" maxlength="10">
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
@@ -191,9 +191,10 @@
         function checkBiopsyDate(val) {
            if (!hasValue(val)) return false;
            var m = val.match(/(\/)/);
-           if (!m) return false;
+           if (!m || !m.length) return false;
            if (m && m.length < 2) return false;
            var initArray = val.split("/");
+           if (initArray.length < 3) return false;
            //make sure at least all date items are there
            if (initArray[0].length == 0 || initArray[1].length == 0 || initArray[2].length < 4) return false;
            if (/((0)?[1-9]|1\d|2\d|3[01])\/((0)?[1-9]|1\d|2\d)\/(19|20)\d{2}/.test(val)) {
@@ -229,7 +230,7 @@
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
           var today = new Date();
-          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true}).on("hide", function() { return checkBiopsyDate($(this).val()); });
+          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true});
           $("#biopsyDate").on("keydown", function() {
             $(this).datepicker("hide");
           });
@@ -244,7 +245,7 @@
           		};
           	});
           });
-          $("#biopsyDate").on("blur", function() {
+          $("#biopsyDate").on("change", function() {
               return checkBiopsyDate($(this).val());
           });
           $("input[name='tx']").each(function() {
