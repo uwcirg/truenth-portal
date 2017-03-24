@@ -420,9 +420,7 @@ $(document).ready(function(){
             if (toCall == "biopsy") {
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
-                  var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
-                  tnthAjax.postBiopsy({{user.id}}, biopsyDate, toSend);
+                  tnthAjax.postBiopsy({{user.id}}, $("#biopsyDate").val(), toSend);
                 };
             };
 
