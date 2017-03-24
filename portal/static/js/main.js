@@ -282,13 +282,13 @@ var fillContent = {
                                 var d = (val.content.issued).replace(/-/g,"/");
                                 if (d.indexOf("T") != -1) d = d.substring(0, (d).indexOf("T"));
                                 issuedDate = new Date(d);
-                                //dd/mm/yyyy format, NOTE, use native date object methods here
+                                //mm/dd/yyyy format, NOTE, use native date object methods here
                                 //as toLocaleString is not supported in some browsers e.g. firefox
                                 var month = issuedDate.getMonth()+1;
                                 var day = issuedDate.getDate();
                                 var year = issuedDate.getFullYear();
-                                var cDate = (day < 10?("0"+day):day) + "/" + (month < 10?("0"+month): month)+"/"+year;
-                                //in DD/MM/YYYY format
+                                var cDate = (month < 10?("0"+month): month)+"/"+(day < 10?("0"+day):day)+"/"+year;
+                                //in MM/DD/YYYY format
                                 $("#biopsyDate").val(cDate);
                                 $("#biopsyDateContainer").show();
                             };

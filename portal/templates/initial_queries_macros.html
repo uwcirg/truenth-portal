@@ -119,7 +119,7 @@
             </div>
             <div id="biopsyDateContainer" class="indent form-group">
             	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
-            	<input id="biopsyDate" type="text" class="form-control" placeholder="DD/MM/YYYY" maxlength="10">
+            	<input id="biopsyDate" type="text" class="form-control" placeholder="MM/DD/YYYY" maxlength="10">
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
             </div>
             <div class="radio biopsy-option">
@@ -197,11 +197,11 @@
            if (initArray.length < 3) return false;
            //make sure at least all date items are there
            if (initArray[0].length == 0 || initArray[1].length == 0 || initArray[2].length < 4) return false;
-           if (/((0)?[1-9]|1\d|2\d|3[01])\/((0)?[1-9]|1\d|2\d)\/(19|20)\d{2}/.test(val)) {
+           if (/((0)?[1-9]|1\d|2\d)\/((0)?[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}/.test(val)) {
               var today = new Date();
               // Check to see if this is a real date
               var dArray = (val).split("/");
-              var iy = parseInt(dArray[2]), im = parseInt(dArray[1]), iid=parseInt(dArray[0]);
+              var iy = parseInt(dArray[2]), im = parseInt(dArray[0]), iid=parseInt(dArray[1]);
               var date = new Date(iy,im-1,iid);
               var errorMsg = "";
 
@@ -230,8 +230,9 @@
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
           var today = new Date();
-          $("#biopsyDate").datepicker({"format": "dd/mm/yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+          $("#biopsyDate").datepicker({"format": "mm/dd/yyyy", "forceParse": false, "endDate": today, "autoclose": true});
           $("#biopsyDate").on("keydown", function() {
+            $("#biopsyDateError").text("");
             $(this).datepicker("hide");
           });
           $("input[name='biopsy']").each(function() {
