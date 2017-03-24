@@ -165,12 +165,6 @@ select:not([multiple]) {
 #mainNav {
   height: 71px;
 }
-#tnthNavWrapper {
-  /*display: none;*/
-  visibility: hidden;
-  -webkit-transition: visibility 0.5s ease-in;
-  transition: visibility 0.5s ease-in;
-}
 #stickyMenu {
   position: fixed;
   top: 14.5em;
