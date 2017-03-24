@@ -1108,8 +1108,7 @@
                             if ($("#biopsyDate").val() == "") return true;
                             else {
                               //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
-                              var biopsyDate = tnthDates.swap_mm_dd($("#biopsyDate").val());
-                              tnthAjax.postBiopsy({{person.id}}, biopsyDate, toSend, "", $(this));
+                              tnthAjax.postBiopsy({{person.id}}, $("#biopsyDate").val(), toSend, "", $(this));
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
@@ -1510,9 +1509,9 @@
         </div>
     {% endif %}
     {% if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
-      
+
         {{profileInterventions(user_interventions) | show_macro('interventions')}}
-                
+
     {% endif %}
     {% if (person and person.has_role(ROLE.PATIENT)) or (current_user.has_role(ROLE.STAFF) and current_user.id != person.id)%}
         <div class="row" id="profileSessionListMainContainer">
