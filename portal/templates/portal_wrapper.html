@@ -58,7 +58,7 @@
 {% if not enable_links %}
 <style>#tnthNavXs .tnth-nav-btn{ display: none; }</style>
 {% endif %}
-{% if config.SYSTEM_TYPE and config.SYSTEM_TYPE != "Production" %}<div class='watermark'>TRUE<sup>NTH</sup> - {{config.SYSTEM_TYPE}} version - Not for study or clinical use</div>{% endif %}
+{% if config.SYSTEM_TYPE and config.SYSTEM_TYPE != "Production" and config.SYSTEM_TYPE != "production" %}<div class='watermark'>TRUE<sup>NTH</sup> - {{config.SYSTEM_TYPE}} version - Not for study or clinical use</div>{% endif %}
 <div id="tnthNavWrapper">
     <div id="tnthNavMain">
         <div id="tnthNavMainContainer">
