@@ -914,6 +914,7 @@ div.noOrg-container span {
 #createProfileForm #noEmail {
   position: relative;
   top: -1px;
+  left: 1px;
 }
 #emailInfoText {
   display: none;
