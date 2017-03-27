@@ -49,11 +49,6 @@ function embed_page(data){
             } else setTimeout("loader();", 0);
 
         });
-    // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
-    // $("img.tnth-topnav-wordmark").load(function(){
-
-    // });
-    // Todo: add "data-*" HTML attribute
 }
 
 function showMain() {
@@ -93,13 +88,9 @@ var loader = function(show) {
     };
 
     if (show) {
-        // $("#profileForm").addClass("loading");
         $("#loadingIndicator").show();
     } else {
-        // Otherwise we'll hide it
-        //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
-        showWrapper(true);
         if (!DELAY_LOADING) {
             setTimeout('$("#loadingIndicator").fadeOut();', 300);
         };
