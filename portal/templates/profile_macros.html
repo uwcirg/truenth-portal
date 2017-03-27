@@ -1107,7 +1107,6 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
                               tnthAjax.postBiopsy({{person.id}}, $("#biopsyDate").val(), toSend, "", $(this));
                             };
                         };
@@ -1374,8 +1373,40 @@
                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
-                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" href="/api/present-assessment?instrument_id=eortc&instrument_id=hpfs&instrument_id=prems&instrument_id=irondemog&subject_id={{person.id}}&initial=true">{{_("Enter manually")}}</a>
-
+                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
+                    <!--href="/api/present-assessment?instrument_id=eortc&instrument_id=hpfs&instrument_id=prems&instrument_id=irondemog&subject_id={{person.id}}&initial=true"-->
+                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="manualEntryModalLabel">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                              </div>
+                              <div class="modal-body">
+                                <br/>
+                                <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>
+                                 <div class="form-group">
+                                    <div class="profile-radio-list">
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                          <span>{{ _("Interview assisted") }}</span>
+                                      </label>
+                                      <br/>
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                          <span>{{ _("Paper") }}</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div id="manualEntryMessageContainer" class="error-message"></div>
+                              </div>
+                              <div class="modal-footer">
+                                <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1393,6 +1424,26 @@
             if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
             else $("#profileEmailSelect").attr("disabled", true);
         });
+        $(document).delegate("#meSubmit", "click", function(event){
+            var method = "";
+            $("input[name='entryMethod'").each(function() {
+                if ($(this).is(":checked")) {
+                    method = $(this).val();
+                };
+            });
+            if (method != "") {
+                //alert(instruments)
+                $("#manualEntryMessageContainer").text("");
+                window.location = "/api/present-assessment?instrument_id=eortc&instrument_id=hpfs&instrument_id=prems&instrument_id=irondemog&subject_id={{person.id}}&initial=true&entry_method=" + method
+                //$("#dataDownloadModal").modal("hide");
+            } else {
+                $("#manualEntryMessageContainer").html("You must select a method.");
+            };
+          });
+
+          $("input[name='entryMethod']").on("click", function() {
+              if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
+          });
     });</script>
 {%- endmacro %}
 {% macro profileInterventions(user_interventions) -%}
