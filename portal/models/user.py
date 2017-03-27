@@ -776,7 +776,8 @@ class User(db.Model, UserMixin):
 
             """
             if (not acting_user.has_role(ROLE.ADMIN)
-                and acting_user.has_role(ROLE.STAFF)
+                and (acting_user.has_role(ROLE.STAFF)
+                or acting_user.has_role(ROLE.STAFF_ADMIN))
                 and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
