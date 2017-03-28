@@ -23,7 +23,7 @@
                     <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
                     <div id="patientsInstrumentListWrapper">
                       <div id="patientsInstrumentList" class="profile-radio-list">
-                        {% for instrument_code in config["INSTRUMENTS"] %}
+                        {% for instrument_code in config["INSTRUMENTS"] | sort() %}
                         <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
                         </div>
                         {% endfor %}

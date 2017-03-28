@@ -249,8 +249,9 @@ h4.detail-title {
   transition: all 0.5s ease-in;
 }
 #adminTable TH {
-  background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
+  background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
   letter-spacing: 0.1px;
+  border-bottom: 1px solid #dad8d8;
 }
 #adminTable div.card-view {
   display: flex;

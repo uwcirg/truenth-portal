@@ -270,8 +270,9 @@ div.right-panel {
   transition: all 0.5s ease-in;
 }
 #adminTable TH {
-  background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
+  background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
   letter-spacing: 0.1px;
+  border-bottom: 1px solid #dad8d8;
 }
 #adminTable div.card-view {
   display: flex;
@@ -997,7 +998,7 @@ div.noOrg-container span {
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   color: #606a73;
-  padding: 0.4em;
+  padding: 0.25em 0.3em;
   margin-top: 0.5em;
 }
 #userSessionReportDetailHeader a[href]:hover {
