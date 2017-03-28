@@ -208,7 +208,7 @@ a.back {
   display: none;
 }
 a.open {
-  top: 14.1em;
+  top: 14.4em;
 }
 a.open:hover {
   color: #2a4531;
@@ -1018,6 +1018,9 @@ div.noOrg-container span {
   border-top: 1px solid #ddd;
   color: #606a73;
   padding: 0.4em;
+}
+#userSessionReportDetailHeader a[href]:hover {
+  color: #8c9094;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
