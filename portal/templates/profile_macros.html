@@ -982,12 +982,15 @@
                                         (String(userTimeZone).toLowerCase() == "utc" ? " <span class='gmt'>GMT</span>": "") + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
-                            var q = entry['text'] ? entry['text'] : '';
-                            if (hasValue(q)) q = q.replace(/^[\d\w]{1,3}\./, "");  //replace question # in the beginning of the question
-                            else {
-                                if (entry['answer'] && entry['answer'][1] && entry['answer'][1]['valueCoding']) q = entry['answer'][1]['valueCoding']['code'];
+                            var q = entry['text'] ? entry['text'] : '', a = '';
+                            if (hasValue(q)) q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
+                            if (entry['answer']) {
+                                (entry['answer']).forEach(function(item) {
+                                    if (!hasValue(a) && item.valueString) a = item.valueString;
+                                    if (!hasValue(q) && item.valueCoding && item.valueCoding.code) q = item.valueCoding.code;
+                                });
                             };
-                            var a = entry['answer'] && entry['answer'][0] && entry['answer'][0]['valueString'] ? entry['answer'][0]['valueString'] : 'undefined';
+                            if (!hasValue(q)) q = entry['linkId'];
                             reportHTML += '<tr><td>' + (hasValue(q)? q: "--") + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
                         });
                         $("#userSessionReportDetailTable").append(reportHTML);
