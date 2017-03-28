@@ -313,6 +313,7 @@ div.right-panel {
 }
 #adminTable tr[data-uniqueid]:hover {
   background-color: #ececea;
+  color: #606a73;
 }
 .save-info {
   opacity: 0;

@@ -295,6 +295,7 @@ h4.detail-title {
 }
 #adminTable tr[data-uniqueid]:hover {
   background-color: #ececea;
+  color: #606a73;
 }
 #loginEmailReminderText {
   margin-left: 8px;
@@ -1016,6 +1017,7 @@ div.noOrg-container span {
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
   color: #606a73;
+  padding: 0.4em;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
