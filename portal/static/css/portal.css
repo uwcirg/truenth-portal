@@ -43,6 +43,9 @@ a.btn {
   font-size: 16px;
   border: none;
 }
+.btn a {
+  text-decoration: none;
+}
 .tnth-hide {
   display: none;
 }
@@ -482,14 +485,21 @@ h4.detail-title {
   vertical-align: middle;
   border-radius: 4px;
 }
+#dataDownloadModal .modal-dialog {
+  max-width: 500px;
+}
+#dataDownloadModal .modal-header {
+  font-size: 1.1em;
+  padding: 1.1em;
+}
 #dataDownloadModal .modal-body {
-  padding: 1em;
+  padding: 2em;
 }
 #dataDownloadModal button {
   font-size: 0.8em;
 }
 #dataDownloadModal .profile-radio-list {
-  margin-left: 1em;
+  margin-left: 1.5em;
 }
 #dataDownloadModal div.checkbox label {
   font-size: 0.8em;
@@ -504,6 +514,31 @@ h4.detail-title {
 }
 #_downloadMessage {
   color: #a94442;
+}
+#patientsInstrumentListWrapper {
+  position: relative;
+  padding: 0.6em 0 0.3em 0;
+}
+#patientsInstrumentList {
+  opacity: 0;
+  transition: opacity 250ms ease-in;
+}
+#patientsInstrumentList.ready {
+  opacity: 1;
+}
+#patientsInstrumentList.ready + #instrumentListLoad {
+  opacity: 0;
+}
+#instrumentListLoad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1.5em;
+  opacity: 1;
+  transition: opacity 250ms ease-out;
+}
+#patientsDownloadTypeList {
+  margin-top: 0.5em;
 }
 .orglist-download-container {
   display: inline-block;
@@ -969,8 +1004,7 @@ div.noOrg-container span {
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
-#userSessionReportDetailHeader span.glyphicon {
-  background: #fff;
+#userSessionReportDetailHeader a[href] {
   background-image: -webkit-linear-gradient(top, #fff, #eee);
   background-image: -moz-linear-gradient(top, #fff, #eee);
   background-image: -ms-linear-gradient(top, #fff, #eee);
@@ -981,24 +1015,7 @@ div.noOrg-container span {
   box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.39em;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-  filter: alpha(opacity=80);
-  -moz-opacity: 0.8;
-  -khtml-opacity: 0.8;
-  opacity: 0.8;
-  background-color: #FFF;
-}
-#userSessionReportDetailHeader span.glyphicon-user {
-  padding: 0.42em 0.43em 0.42em 0.43em;
-  margin-top: -2.5px;
-}
-#userSessionReportDetailHeader span.glyphicon:hover {
-  color: #2a4531;
-}
-#userSessionReportDetailHeader span.glyphicon-home {
-  top: 5px;
+  color: #606a73;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1489,6 +1506,9 @@ div.timezone-warning.text-warning {
 .capitalize {
   text-transform: capitalize;
 }
+.gradient {
+  background-image: linear-gradient(to top right, #FFF, #e1e2e1);
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   .side-xs-one {
@@ -1653,12 +1673,6 @@ div.timezone-warning.text-warning {
   }
   .profile-section {
     padding: 0;
-  }
-  #userSessionReportDetailHeader span.glyphicon-user {
-    margin-top: 2px;
-  }
-  #userSessionReportDetailHeader span.glyphicon-home {
-    top: 5.7px;
   }
   button.btn-delete-consent {
     padding: 2px;

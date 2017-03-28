@@ -16,21 +16,24 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="dataDownloadLabel">{{ _("Export questionnaire data") }}</h4>
+                {{ _("Export questionnaire data") }}
               </div>
               <div class="modal-body">
                   <div class="form-group">
                     <label><em class="text-muted">{{ _("Instrument(s) to export data from:")}}</em></label>
-                    <div id="patientsInstrumentList" class="profile-radio-list">
-                      {% for instrument_code in config["INSTRUMENTS"] %}
-                      <div class="checkbox"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
+                    <div id="patientsInstrumentListWrapper">
+                      <div id="patientsInstrumentList" class="profile-radio-list">
+                        {% for instrument_code in config["INSTRUMENTS"] %}
+                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
+                        </div>
+                        {% endfor %}
                       </div>
-                      {% endfor %}
+                      <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
                     </div>
-                  </div>
+                    </div>
                   <div class="form-group">
                     <label><em class="text-muted">{{ _("Data type:")}}</em></label>
-                    <div class="profile-radio-list">
+                    <div id="patientsDownloadTypeList" class="profile-radio-list">
                       <label class="radio-inline">
                           <input type="radio" name="downloadType" id="csv" value="csv" checked/>
                           {{ _("CSV") }}
@@ -187,9 +190,7 @@ $(document).ready(function() {
       if ($(this).is(":checked")) $("#_downloadMessage").text("");
   });
 
-
   AT.initOrgsList(org_list);
-
 
 });
 

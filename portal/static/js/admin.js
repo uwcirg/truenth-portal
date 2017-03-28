@@ -210,6 +210,46 @@ AdminTool.prototype.getHereBelowOrgs = function() {
       __getChildOrgs((co && co.children ? co.children : null), self);
   });
 };
+AdminTool.prototype.inArray = function( n, array) {
+  if (n && array && Array.isArray(array)) {
+    var found = false;
+    for (var index = 0; !found && index < array.length; index++) {
+        if (array[index] == n) found = true;
+    };
+    return found;
+  } else return false;
+};
+AdminTool.prototype.getParentOrg = function(currentOrg) {
+  if (!currentOrg) return false;
+  var ml = this.getMainOrgList(), self = this;
+  if (ml && ml[currentOrg]) {
+    if (ml[currentOrg].isTopLevel) {
+      return currentOrg;
+    } else {
+      if (ml[currentOrg].parentOrgId) return self.getParentOrg(ml[currentOrg].parentOrgId);
+      else return currentOrg;
+    };
+  } else return false;
+};
+AdminTool.prototype.getUserParentOrgs = function() {
+  var uo = this.getUserOrgs(), parentList = [], self = this;
+  if (uo) {
+    uo.forEach(function(o) {
+      var p = self.getParentOrg(o);
+      if (p && !self.inArray(p, parentList))  {
+        parentList.push(p);
+      };
+    });
+    return parentList;
+  } else return false;
+};
+AdminTool.prototype.getTopLevelOrgs = function() {
+  var ml = this.getMainOrgList(), orgList = [];
+  for (var org in ml) {
+    if (ml[org].isTopLevel) orgList.push(org);
+  };
+  return orgList;
+};
 AdminTool.prototype.initOrgsList = function(request_org_list) {
     //set user orgs
     var self = this;
@@ -228,6 +268,28 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
           self.getHereBelowOrgs();
           OT.filterOrgs(self.here_below_orgs);
         };
+        $("#dataDownloadModal").on('shown.bs.modal', function () {
+              var parentOrgList = AT.getUserParentOrgs();
+              if (parentOrgList && parentOrgList.length > 0) {
+                 var instrumentList = AT.getInstrumentList();
+                 var instrumentItems = [];
+                 parentOrgList.forEach(function(o) {
+                    var il = instrumentList[o];
+                    if (il) {
+                      il.forEach(function(n) {
+                        instrumentItems.push(n);
+                      });
+                    };
+                 });
+                 if (instrumentItems.length > 0) {
+                    $(".instrument-container").hide();
+                    instrumentItems.forEach(function(item) {
+                      $("#" + item + "_container").show();
+                    });
+                 };
+              };
+              $("#patientsInstrumentList").addClass("ready");
+        });
         var ofields = $("#userOrgs input[name='organization']");
         ofields.each(function() {
             if ((self.here_below_orgs).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
@@ -278,6 +340,14 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
     });
 
     if (noPatientData) $("#patientListExportDataContainer").hide();
+};
+AdminTool.prototype.getInstrumentList = function() {
+  return {
+    //CRV
+    '10000': ['epic26', 'eproms_add', 'comorb'],
+    //IRONMAN
+    '20000': ['eortc', 'hpfs', 'prems', 'irondemog']
+  };
 };
 __setOrgsMenuHeight = function(padding) {
   if (!padding) padding = 100;
