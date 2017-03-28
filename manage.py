@@ -38,7 +38,7 @@ def initdb():
     """Init/reset database."""
     db.drop_all()
     db.create_all()
-    seed()
+    seed(include_interventions=True)
 
 
 @manager.command
@@ -51,6 +51,10 @@ def seed(include_interventions=False, keep_unmentioned=False):
     add_static_roles()
     db_maintenance()
     db.session.commit()
+
+    # Always update interventions on development systems
+    if app.config["SYSTEM_TYPE"].lower() == 'development':
+        include_interventions = True
 
     # import site export file if found
     SitePersistence().import_(include_interventions, keep_unmentioned)
@@ -75,6 +79,7 @@ def export_site():
 def purge_user(username):
     """Purge the given user from the system"""
     permanently_delete_user(username)
+
 
 @manager.command
 def mark_test():

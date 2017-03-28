@@ -37,8 +37,8 @@ class TestProcedure(TestCase):
         self.assertEquals('Chemotherapy',
             data['entry'][0]['resource']['code']['coding'][0]['display'])
         self.assertEquals(
-            Reference.patient(TEST_USER_ID).as_fhir(),
-            data['entry'][0]['resource']['meta']['by'])
+            Reference.patient(TEST_USER_ID).as_fhir()['reference'],
+            data['entry'][0]['resource']['meta']['by']['reference'])
         last_updated = FHIR_datetime.parse(
             data['entry'][0]['resource']['meta']['lastUpdated'])
         self.assertAlmostEquals(
@@ -94,6 +94,7 @@ class TestProcedure(TestCase):
         self.assertEquals(proc.code.codings[0].system, 'http://snomed.info/sct')
         self.assertEquals(proc.user_id, 1)
         self.assertEquals(proc.end_time, datetime(2011, 6, 27))
+        self.assertEquals(proc.encounter.user_id, TEST_USER_ID)
 
     def test_timezone_procedure_POST(self):
         with open(os.path.join(os.path.dirname(__file__),

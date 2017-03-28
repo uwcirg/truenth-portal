@@ -18,6 +18,7 @@ import time
 
 from .audit import Audit
 from ..dict_tools import dict_match
+from .encounter import Encounter
 from ..extensions import db
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
@@ -35,7 +36,7 @@ from .telecom import Telecom
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
 
-#https://www.hl7.org/fhir/valueset-administrative-gender.html
+# https://www.hl7.org/fhir/valueset-administrative-gender.html
 gender_types = ENUM('male', 'female', 'other', 'unknown', name='genders',
                     create_type=False)
 
@@ -56,10 +57,11 @@ class Extension:
 
     def as_fhir(self):
         if self.children.count():
-            return {'url': self.extension_url,
-                    'valueCodeableConcept': {
-                        'coding': [c.as_fhir() for c in self.children]}
-                   }
+            return {
+                'url': self.extension_url,
+                'valueCodeableConcept': {
+                    'coding': [c.as_fhir() for c in self.children]}
+            }
 
     def apply_fhir(self):
         assert self.extension['url'] == self.extension_url
@@ -164,7 +166,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
             " This will permanently destroy user: {}\n"
             " and all their related data.\n\n"
             " If you want to contiue, enter a valid user\n"
-            " email as the acting party for our records: ".\
+            " email as the acting party for our records: ".
             format(username))
         acting_user = User.query.filter_by(username=actor).first()
     if not acting_user:
@@ -206,8 +208,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
             db.session.delete(t)
         for o in user.observations:
             db.session.delete(o)
-        # Can't delete audit rows owned by this user, in cases like observations
-        # Update those to point to user doing the purge.
+        # Can't delete audit rows owned by this user, in cases like
+        # observations. Update those to point to user doing the purge.
         ob_audits = Audit.query.join(
             Observation).filter(Audit.id==Observation.audit_id).filter(
                 Audit.user_id==user.id)
@@ -223,14 +225,16 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
         db.session.commit()
 
         # record this event
-        db.session.add(Audit(user_id=acting_user.id, comment=comment,
-            subject_id=acting_user.id, context='account'))
+        db.session.add(
+            Audit(user_id=acting_user.id, comment=comment,
+                  subject_id=acting_user.id, context='account'))
         db.session.commit()
 
     purge_user(user, acting_user)
 
 user_extension_classes = (UserEthnicityExtension, UserRaceExtension,
                           UserTimezone, UserIndigenousStatusExtension)
+
 
 def user_extension_map(user, extension):
     """Map the given extension to the User
@@ -267,8 +271,8 @@ class User(db.Model, UserMixin):
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
-    active = db.Column('is_active', db.Boolean(), nullable=False,
-            server_default='1')
+    active = db.Column(
+        'is_active', db.Boolean(), nullable=False, server_default='1')
     locale_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     timezone = db.Column(db.String(20), default='UTC')
     deleted_id = db.Column(
@@ -292,10 +296,13 @@ class User(db.Model, UserMixin):
     _consents = db.relationship('UserConsent', lazy='dynamic')
     indigenous = db.relationship(Coding, lazy='dynamic',
             secondary="user_indigenous")
+    encounters = db.relationship('Encounter')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
             backref=db.backref('users', lazy='dynamic'))
+    interventions = db.relationship('Intervention', lazy='dynamic',
+            secondary="user_interventions", backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',
             lazy='dynamic')
     races = db.relationship(Coding, lazy='dynamic',
@@ -353,6 +360,20 @@ class User(db.Model, UserMixin):
             return ' '.join((self.first_name, self.last_name))
         else:
             return self.username
+
+    @property
+    def current_encounter(self):
+        """Shortcut to current encounter, if present
+
+        An encounter is typically bound to the logged in user, not
+        the subject, if a different user is performing the action.
+        """
+        query = Encounter.query.filter(Encounter.user_id==self.id).filter(
+            Encounter.status=='in-progress')
+        if query.count() == 0:
+            return None
+        assert (query.count() == 1)  # shouldn't have more than one active
+        return query.one()
 
     @property
     def locale(self):
@@ -518,7 +539,10 @@ class User(db.Model, UserMixin):
             for p in fhir['performer']:
                 performer = Performer.from_fhir(p)
                 observation.performers.append(performer)
-        UserObservation(user_id=self.id,
+        # The audit defines the acting user, to which the current
+        # encounter is attached.
+        encounter = get_user(audit.user_id).current_encounter
+        UserObservation(user_id=self.id, encounter=encounter,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 
@@ -752,7 +776,8 @@ class User(db.Model, UserMixin):
 
             """
             if (not acting_user.has_role(ROLE.ADMIN)
-                and acting_user.has_role(ROLE.STAFF)
+                and (acting_user.has_role(ROLE.STAFF)
+                or acting_user.has_role(ROLE.STAFF_ADMIN))
                 and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")
@@ -1035,7 +1060,9 @@ class User(db.Model, UserMixin):
             # and interventions result in carte blanche for service
             return True
 
-        if self.has_role(ROLE.STAFF):
+        orgtree = OrgTree()
+        if any(self.has_role(r) for r in (ROLE.STAFF, ROLE.STAFF_ADMIN)
+           ) and other.has_role(ROLE.PATIENT):
             # Staff has full access to all patients with a valid consent
             # at or below the same level of the org tree as the staff has
             # associations with.  Furthermore, a patient may have a consent
@@ -1046,32 +1073,43 @@ class User(db.Model, UserMixin):
             # As long as the consent is valid (not expired or deleted) it's
             # adequate for 'view'.  'edit' requires the staff_editable option
             # on the consent.
-            orgtree = OrgTree()
-            if other.has_role(ROLE.PATIENT):
-                if permission == 'edit':
-                    others_con_org_ids = [
-                        oc.organization_id for oc in other.valid_consents
-                        if oc.staff_editable]
-                else:
-                    others_con_org_ids = [
-                        oc.organization_id for oc in other.valid_consents]
-                org_ids = [org.id for org in self.organizations]
-                for org_id in org_ids:
-                    if orgtree.at_or_below_ids(org_id, others_con_org_ids):
-                        return True
-                #Still here implies time to check 'furthermore' clause
-                others_orgs = [org.id for org in other.organizations]
-                for consented_org in others_con_org_ids:
-                    if orgtree.at_or_below_ids(consented_org, org_ids):
-                        # Okay, consent is partent of staff org
-                        # but it's only good if the patient's *org*
-                        # is at or below the staff's org (could be sibling
-                        # or down different branch of tree)
-                        for org_id in org_ids:
-                            if orgtree.at_or_below_ids(org_id, others_orgs):
-                                return True
+            if permission == 'edit':
+                others_con_org_ids = [
+                    oc.organization_id for oc in other.valid_consents
+                    if oc.staff_editable]
+            else:
+                others_con_org_ids = [
+                    oc.organization_id for oc in other.valid_consents]
+            org_ids = [org.id for org in self.organizations]
+            for org_id in org_ids:
+                if orgtree.at_or_below_ids(org_id, others_con_org_ids):
+                    return True
+            #Still here implies time to check 'furthermore' clause
+            others_orgs = [org.id for org in other.organizations]
+            for consented_org in others_con_org_ids:
+                if orgtree.at_or_below_ids(consented_org, org_ids):
+                    # Okay, consent is partent of staff org
+                    # but it's only good if the patient's *org*
+                    # is at or below the staff's org (could be sibling
+                    # or down different branch of tree)
+                    for org_id in org_ids:
+                        if orgtree.at_or_below_ids(org_id, others_orgs):
+                            return True
 
-        abort(401, "Inadequate role for %s of %d" % (permission, other_id))
+        if self.has_role(ROLE.STAFF_ADMIN) and other.has_role(ROLE.STAFF):
+            # Staff admin can do anything to staff at or below their level
+            for sa_org in self.organizations:
+                others_ids = [o.id for o in other.organizations]
+                if orgtree.at_or_below_ids(sa_org.id, others_ids):
+                    return True
+
+        if self.has_role(ROLE.INTERVENTION_STAFF) and other.has_role(ROLE.PATIENT):
+            # Intervention staff can access patients within that intervention
+            for intervention in self.interventions:
+                if intervention in other.interventions:
+                    return True
+
+        abort(401, "Inadequate role for {} of {}".format(permission, other_id))
 
     def has_role(self, role_name):
         return role_name in [r.name for r in self.roles]

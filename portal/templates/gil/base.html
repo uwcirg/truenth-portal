@@ -70,13 +70,20 @@
         <h3 class="side-nav__heading">Navigation</h3>
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="{{PORTAL}}/">Home</a></li>
-          {% if user and user.has_role(ROLE.STAFF) %}
+          {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/patients">Patients</a></li>
           {% endif %}
           {% if user %}
               <li class="side-nav-items__item"><a href="{{PORTAL}}/profile">My TrueNTH Profile</a></li>
           {% endif %}
           <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}/about">About TrueNTH</a></li>
+          {% if user and (user.has_role(ROLE.APPLICATION_DEVELOPER) or user.has_role(ROLE.ADMIN)) %}
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}/clients">Client Applications</a></li>
+          {% endif %}
+          {% if user and user.has_role(ROLE.ADMIN) %}
+              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{PORTAL}}/admin">User Administration</a></li>
+              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{PORTAL}}/settings">Settings</a></li>
+          {% endif %}
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}/decision-support">
               <svg width="32" height="32">
                 <use xlink:href="#DS-Icon-Nav"></use>
@@ -85,10 +92,8 @@
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>Symptom Tracker</a></li>
-         {% if not user or (user and user.has_role('patient')) %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
-         {% endif %}
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">Exercise and Diet</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">Lived Experience</a></li>
           <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
           <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">Contact</a></li>
           {% if not user %}

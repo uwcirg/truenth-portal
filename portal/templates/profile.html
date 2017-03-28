@@ -3,22 +3,9 @@
 {% from "flask_user/_macros.html" import back_btn, back_link %}
 {% from "profile_macros.html" import profile, profileSaveBtn, profileImage %}
 <style>
-/*inline styling specific to profile page due to new two panel layout*/
-@media (max-width: 1737px) {
-  body.open-nav .footer-container { border-top: 0 !important;}
-  .container { overflow: hidden;}
-  body.open-nav .copyright-container {padding-left: 4em; }
-}
-@media (max-width: 1611px) {body.open-nav .copyright-container {padding-left: 8em; }}
-@media (max-width: 1493px) {body.open-nav .copyright-container {margin-left: 12em; }}
-@media (max-width: 1361px) {body.open-nav .footer-container {text-align: right; padding-left: 1em;}}
-@media (max-width: 1351px) {body.open-nav .footer-container .pull-right { margin-right: -2em; }}
-@media (max-width: 1293px) {.copyright-container {padding-left: 2em;}}
-@media (max-width: 1082px) {
-  .copyright-container {margin-left: 2em;}
-  .footer-container {border-top: 0 !important;}
-}
-@media (max-width: 991px) { #homeFooter {padding-left: 3em !important;}}
+.footer-wrapper { position: inherit !important;}
+.footer-container.flex { clear: both; display:flex; justify-content: space-between; padding: 0.5em 0; margin: 1em 4em; border-top: 1px solid #ddd;}
+@media (max-width: 1199px) { .footer-container.flex{ justify-content: center;} }
 </style>
 <div id="stickyMenu"></div>
 <br/>
@@ -51,13 +38,13 @@
 {% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT)) %}
     <nav id="indexNavBar">
     <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-    <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this Patient") }}</a></span>
+    <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this patient") }}</a></span>
     <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this Patient") }}</h4>
+                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this patient") }}</h4>
               </div>
               <div class="modal-body" style="font-size:0.9em">
                 <br/>
@@ -78,21 +65,23 @@
 <form id="profileForm" class="form tnth-form to-validate" role="form" data-toggle="validator">
   <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-          {{profile(user, current_user, consent_agreements)}}
+          {{profile(user, current_user, consent_agreements, user_interventions)}}
           <br/>
           {% if providerPerspective == 'true' %}
-             <br/><br/> {{ back_btn('patients','Patients List') }}
+             <br/><br/> {{ back_btn('patients','patients list') }}
           {% else %}
-              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to Home") }}</small></a>
+              <br/><br/><a href="{{PORTAL}}/home" class="btn btn-xs btn-tnth-back"><small><b>&lt;</b> {{ _("Back to home") }}</small></a>
           {% endif %}
+          <br/>
       </div>
   </div>
 </form>
 </div>
 {% endblock %}
-
+  {% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">
+      <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p>
+      <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p></div><div class="logo-container"><a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a></div></div></div>{% endblock %}
 {% block document_ready %}
-
 {% if user.has_role('patient')  and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 
 function handleLoginAs() {
@@ -215,7 +204,7 @@ $(document).ready(function(){
     });
     $(window).resize(function() {
         if (__stickyMenu.hasClass("sticky-show")) {
-          if (__indexIcon.is(":visible")) $("a.open").trigger("click");
+          if (__indexIcon.is(":visible") || !(__leftPanel.is(":visible"))) $("a.open").trigger("click");
         }
         else {
           if (__leftPanel.is(":visible")) __indexContainer.removeClass("open");
@@ -234,7 +223,7 @@ $(document).ready(function(){
       $("#indexContainer").html(indexContent);
       $("#stickyMenu").html(indexContent);
       var listHeight = $("#stickyMenu ul").height();
-      if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 40);
+      if (parseInt(listHeight) > 0) $("#stickyMenu").height(parseInt(listHeight) + 70);
     })();
 
     __stickyMenu = $("#stickyMenu"), __navBar = $("#profileHeader"), __stickyMenu_topPos = __stickyMenu.position().top, __homeFooter = $("#homeFooter"), __indexContainer = $("#indexContainer"), __indexIcon = $("#indexNavBar span.index-list"), __leftPanel = $(".left-panel");

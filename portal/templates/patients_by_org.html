@@ -3,7 +3,11 @@
   <div id="patientList" class="reduce-font-sizes">
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
-    <div><button id="createUserLink" onclick="location.replace('/patients/profile_create')" class="create-user-link btn btn-lg btn-tnth-primary">{{ _("Create a patient record") }}</button>&nbsp;<em>{{_("or ")}}</em>&nbsp;<span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span></div>
+    <div id="patientListOptions">
+      <a href="{{ url_for('patients.profile_create') }}"><button id="createUserLink" class="btn btn-lg">{{ _("Create a patient record") }}</button></a href="{{ url_for('patients.profile_create') }}">
+      <div class="or">or</div>
+      <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
+    </div>
     <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
@@ -51,12 +55,11 @@
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
         {% if config.STAFF_BULK_DATA_ACCESS %}
-          <div class="orglist-download-container"><div><a href="#" id="patientAssessmentDownload" class="create-user-link btn btn-lg btn-tnth-primary" data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
-         </div>
+          <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
         {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
-            <button id="orglist-dropdown" class="create-user-link btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="cursor: pointer">
-              Filter List By Site &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
+            <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Filter list by site &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
             </button>
             <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
               <div class="form-group smaller-text" id="userOrgs">
@@ -75,8 +78,8 @@
              data-sort-order="desc"
              data-search="true"
              data-pagination="true"
-             data-page-size="15"
-             data-page-list="[15, 25, 50]"
+             data-page-size="10"
+             data-page-list="[10, 20, 30]"
              data-toolbar="#adminTableToolbar"
              data-show-toggle="true"
              data-show-columns="true"
@@ -89,12 +92,12 @@
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
                   <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field">{{ _("ID") }}</th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
-                  <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
-                  <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                  <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
+                  <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
                    <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -105,7 +108,7 @@
                       <td>{{patient.id}}</td>
                       <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                      <td>{{ patient.first_name if patient.first_name }}</td>
+                      <td style="width: 10%; word-wrap:break-word;">{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
@@ -142,6 +145,9 @@ $(document).ready(function() {
   $("#adminTable").on("sort.bs.table reset-view.bs.table toggle.bs.table", function() {
       AT.updateData();
    });
+  $("#adminTable").on("page-change.bs.table", function() {
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},800);
+  });
   setTimeout("AT.updateData();", 0);
 
   $(".tnth-admin-table").bootstrapTable({

@@ -1,7 +1,6 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
-from flask_login import login_user
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
@@ -268,20 +267,23 @@ def access_via_token(token):
             session['invited_verified_user_id'] = user.id
             return redirect(url_for('user.register', email=user.email))
 
-        # fall into else case below, at least for todays demo
-        # TODO: determine if there's a legit reason to login WRITE_ONLY
-        # w/o redirecting to challenge in this case
+        # If WRITE_ONLY user does not have PROMOTE_WITHOUT_IDENTITY_CHALLENGE,
+        # challenge the user identity, followed by a redirect to the
+        # registration page. Preserve the invited user id, should we need to
+        # merge associated details after user proves themselves and logs in
+        auditable_event("invited user entered using token, pending "
+                        "registration", user_id=user.id, subject_id=user.id,
+                        context='account')
+        session['challenge.user_id'] = user.id
+        session['challenge.next_url'] = url_for('user.register', email=user.email)
+        session['challenge.merging_accounts'] = True
+        return redirect(url_for('portal.challenge_identity'))
 
-    # Without WRITE_ONLY, we don't log the user in, but preserve the
-    # invited user id, should we need to merge associated details
-    # after user proves themselves and logs in
-    auditable_event("invited user entered using token, pending "
-                    "registration", user_id=user.id, subject_id=user.id,
-                    context='account')
-    session['challenge.user_id'] = user.id
-    session['challenge.next_url'] = url_for('user.register', email=user.email)
-    session['challenge.merging_accounts'] = True
-    return redirect(url_for('portal.challenge_identity'))
+    # If not WRITE_ONLY user, redirect to login page
+    # Email field is auto-populated unless using alt auth (fb/google/etc)
+    if user.email and user.password:
+        return redirect(url_for('user.login', email=user.email))
+    return redirect(url_for('user.login'))
 
 
 class ChallengeIdForm(FlaskForm):
@@ -438,7 +440,7 @@ def home():
               format(still_needed))
 
     # All checks passed - present appropriate view for user role
-    if user.has_role(ROLE.STAFF):
+    if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()

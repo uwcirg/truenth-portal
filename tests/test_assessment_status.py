@@ -29,7 +29,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
         db.session.commit()
 
 
-localized_instruments = set(['eproms_add', 'epic26'])
+localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
 metastaic_instruments = set(['eortc', 'hpfs', 'prems', 'irondemog'])
 
 
@@ -62,6 +62,7 @@ class TestAssessment(TestCase):
         self.mark_localized()
         mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add')
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb')
 
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
@@ -78,6 +79,8 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='eproms_add',
                 status='in-progress')
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
+                status='in-progress')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='comorb',
                 status='in-progress')
 
         self.test_user = db.session.merge(self.test_user)
