@@ -83,6 +83,9 @@ a.btn {
   font-size: @baseFontSize;
   border: none;
 }
+.btn a {
+  text-decoration: none;
+}
 .tnth-hide {
   display: none;
 }
@@ -245,7 +248,7 @@ a.open, a.back {
   display: none;
 }
 a.open {
-  top: 14.1em;
+  top: 14.4em;
   &:hover {
     color:@linkHover;
   }
@@ -292,10 +295,12 @@ h4.detail-title {
   }
   tr[data-uniqueid]:hover {
     background-color: #ececea;
+    color: #606a73;
   }
   TH {
-    background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
+    background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
+    border-bottom: 1px solid #dad8d8;
   }
 }
 #adminTableToolbar {
@@ -546,14 +551,21 @@ h4.detail-title {
 }
 
 #dataDownloadModal {
+  .modal-dialog {
+    max-width: 500px;
+  }
+  .modal-header {
+    font-size: 1.1em;
+    padding: 1.1em;
+  }
   .modal-body {
-    padding: 1em
+    padding: 2em 2em 1em 2em;
   }
   button {
     font-size:0.8em;
   }
   .profile-radio-list {
-    margin-left:1em
+    margin-left:1.5em
   }
   div.checkbox label{
     font-size: 0.8em;
@@ -567,9 +579,34 @@ h4.detail-title {
     left: -1px;
   }
 }
- #_downloadMessage {
+#_downloadMessage {
    color: @errorMessageColor
- }
+}
+#patientsInstrumentListWrapper {
+  position: relative;
+  padding: 0.6em 0 0.3em 0;
+}
+#patientsInstrumentList {
+  opacity: 0;
+  transition: opacity 250ms ease-in;
+  &.ready {
+    opacity: 1;
+    & + #instrumentListLoad {
+      opacity: 0;
+    }
+  }
+}
+#instrumentListLoad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1.5em;
+  opacity: 1;
+  transition: opacity 250ms ease-out;
+}
+#patientsDownloadTypeList {
+  margin-top: 0.5em;
+}
 .orglist-download-container {
   display: inline-block;
   font-size: @smallText;
@@ -1062,39 +1099,22 @@ div.noOrg-container {
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
-
-#userSessionReportDetailHeader {
-  span.glyphicon {
-    background: #fff;
-    background-image: -webkit-linear-gradient(top, #fff, #eee);
-    background-image: -moz-linear-gradient(top, #fff, #eee);
-    background-image: -ms-linear-gradient(top, #fff, #eee);
-    background-image: -o-linear-gradient(top, #fff, #eee);
-    background-image: linear-gradient(to bottom, #fff, #eee);
-    -webkit-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
-    -moz-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
-    box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
-    border-left: 1px solid #ddd;
-    border-top: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 0.39em;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-    filter: alpha(opacity=80);
-    -moz-opacity: 0.8;
-    -khtml-opacity: 0.8;
-    opacity: 0.8;
-    background-color: #FFF;
-  }
-  span.glyphicon-user {
-    padding: 0.42em 0.43em 0.42em 0.43em;
-    margin-top: -2.5px;
-  }
-  span.glyphicon:hover {
-    color: @linkHover;
-  }
-  span.glyphicon-home {
-    top: 5px;
-  }
+#userSessionReportDetailHeader a[href] {
+  background-image: -webkit-linear-gradient(top, #fff, #eee);
+  background-image: -moz-linear-gradient(top, #fff, #eee);
+  background-image: -ms-linear-gradient(top, #fff, #eee);
+  background-image: -o-linear-gradient(top, #fff, #eee);
+  background-image: linear-gradient(to bottom, #fff, #eee);
+  -webkit-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
+  border-left: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  color: #606a73;
+  padding: 0.4em;
+}
+#userSessionReportDetailHeader a[href]:hover {
+  color: #8c9094;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1632,7 +1652,9 @@ div.timezone-warning.text-warning {
 .capitalize {
   text-transform: capitalize
 }
-
+.gradient {
+  background-image: linear-gradient(to top right, #FFF, #e1e2e1);
+}
 /** Responsive sizes **/
 @media (max-width: 480px) {
   .side-xs-one {
@@ -1807,14 +1829,6 @@ div.timezone-warning.text-warning {
       flex-wrap: nowrap;
     }
   }
- #userSessionReportDetailHeader {
-    span.glyphicon-user {
-      margin-top: 2px;
-    }
-    span.glyphicon-home {
-      top: 5.7px;
-    }
-  }
 
   button.btn-delete-consent {
     padding: 2px;
@@ -1964,7 +1978,7 @@ div.timezone-warning.text-warning {
     display: none;
   }
   .side-custom {
-    height: 36em
+    height: 36em;
   }
   .one-side {
     height: 23em;

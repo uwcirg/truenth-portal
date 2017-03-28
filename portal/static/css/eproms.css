@@ -74,6 +74,9 @@ a.btn {
   cursor: pointer;
   border: none;
 }
+.btn a {
+  text-decoration: none;
+}
 .btn-tnth-back {
   color: #777;
   padding: 0;
@@ -230,7 +233,7 @@ a.back {
   display: none;
 }
 a.open {
-  top: 14.1em;
+  top: 14.4em;
 }
 a.open:hover {
   color: #2a4531;
@@ -267,8 +270,9 @@ div.right-panel {
   transition: all 0.5s ease-in;
 }
 #adminTable TH {
-  background-image: linear-gradient(to bottom, #FFF, #F1F1F1);
+  background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
   letter-spacing: 0.1px;
+  border-bottom: 1px solid #dad8d8;
 }
 #adminTable div.card-view {
   display: flex;
@@ -310,6 +314,7 @@ div.right-panel {
 }
 #adminTable tr[data-uniqueid]:hover {
   background-color: #ececea;
+  color: #606a73;
 }
 .save-info {
   opacity: 0;
@@ -495,14 +500,21 @@ div.right-panel {
   vertical-align: middle;
   border-radius: 4px;
 }
+#dataDownloadModal .modal-dialog {
+  max-width: 500px;
+}
+#dataDownloadModal .modal-header {
+  font-size: 1.1em;
+  padding: 1.1em;
+}
 #dataDownloadModal .modal-body {
-  padding: 1em;
+  padding: 2em 2em 1em 2em;
 }
 #dataDownloadModal button {
   font-size: 0.8em;
 }
 #dataDownloadModal .profile-radio-list {
-  margin-left: 1em;
+  margin-left: 1.5em;
 }
 #dataDownloadModal div.checkbox label {
   font-size: 0.8em;
@@ -517,6 +529,31 @@ div.right-panel {
 }
 #_downloadMessage {
   color: #a94442;
+}
+#patientsInstrumentListWrapper {
+  position: relative;
+  padding: 0.6em 0 0.3em 0;
+}
+#patientsInstrumentList {
+  opacity: 0;
+  transition: opacity 250ms ease-in;
+}
+#patientsInstrumentList.ready {
+  opacity: 1;
+}
+#patientsInstrumentList.ready + #instrumentListLoad {
+  opacity: 0;
+}
+#instrumentListLoad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1.5em;
+  opacity: 1;
+  transition: opacity 250ms ease-out;
+}
+#patientsDownloadTypeList {
+  margin-top: 0.5em;
 }
 .orglist-download-container {
   display: inline-block;
@@ -949,36 +986,23 @@ div.noOrg-container span {
 #userSessionReportDetailTable {
   margin-left: -1%;
 }
-#userSessionReportDetailHeader span.glyphicon {
-  background: #fff;
+#userSessionReportDetailHeader a[href] {
   background-image: -webkit-linear-gradient(top, #fff, #eee);
   background-image: -moz-linear-gradient(top, #fff, #eee);
   background-image: -ms-linear-gradient(top, #fff, #eee);
   background-image: -o-linear-gradient(top, #fff, #eee);
-  baraidckground-image: linear-gradient(to bottom, #fff, #eee);
+  background-image: linear-gradient(to bottom, #fff, #eee);
   -webkit-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
   box-shadow: 2px 2px 1px 0px rgba(0, 0, 0, 0.4);
   border-left: 1px solid #ddd;
   border-top: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.39em;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-  filter: alpha(opacity=80);
-  -moz-opacity: 0.8;
-  -khtml-opacity: 0.8;
-  opacity: 0.8;
-  background-color: #FFF;
+  color: #606a73;
+  padding: 0.25em 0.3em;
+  margin-top: 0.5em;
 }
-#userSessionReportDetailHeader span.glyphicon-user {
-  padding: 0.42em 0.43em 0.42em 0.43em;
-  margin-top: -2.5px;
-}
-#userSessionReportDetailHeader span.glyphicon:hover {
-  color: #2a4531;
-}
-#userSessionReportDetailHeader span.glyphicon-home {
-  top: 5px;
+#userSessionReportDetailHeader a[href]:hover {
+  color: #8c9094;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1649,12 +1673,6 @@ div.timezone-warning.text-warning {
   #profileForm #lastname {
     width: 100%;
     max-width: 100%;
-  }
-  #userSessionReportDetailHeader span.glyphicon-user {
-    margin-top: 2px;
-  }
-  #userSessionReportDetailHeader span.glyphicon-home {
-    top: 5.7px;
   }
   button.btn-delete-consent {
     padding: 2px;
