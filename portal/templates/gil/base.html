@@ -633,8 +633,8 @@
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
             {% endif %}
 
-            // {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}$(".button--LR").addClass("show"); {% endif %}
-            setTimeout("LRKeyEvent();", 500);
+            //uncomment if want to allow LR edit link to display on hot key
+            //setTimeout("LRKeyEvent();", 500);
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("loader(false);", 0);

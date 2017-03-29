@@ -1932,7 +1932,7 @@ $(document).ready(function() {
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
 
-    setTimeout('LRKeyEvent();', 1500);
+    //setTimeout('LRKeyEvent();', 1500);
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
