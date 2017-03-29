@@ -101,7 +101,7 @@
                     {% if user_manager.enable_forgot_password %}
                     <div class="col-xs-6">
                         <a href="{{ url_for('user.forgot_password') }}" style="margin-top: 10px" class="pull-right">
-                            {%trans%}Forgot your Password?{%endtrans%}</a>
+                            {%trans%}Having trouble logging in?{%endtrans%}</a>
                     </div>
                     {% endif %}
                 </div>
@@ -149,7 +149,7 @@
         <p>
             <br/>
             <a href="{{ url_for('user.forgot_password') }}" tabindex='190'>
-            {%trans%}Forgot your Password?{%endtrans%}</a>
+            {%trans%}Having trouble logging in?{%endtrans%}</a>
         </p>
     {% endif %}
 
