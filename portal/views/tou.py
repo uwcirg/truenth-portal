@@ -28,8 +28,8 @@ def get_current_tou_url():
           system configuration in simple json {url:"http..."}
 
     """
-    _, url, _ = VersionedResource.fetch_elements(app_text(InitialConsent_ATMA.name_key()))
-    return jsonify(url=url)
+    dict_terms = VersionedResource.fetch_elements(app_text(InitialConsent_ATMA.name_key()))
+    return jsonify(url=dict_terms['url'])
 
 
 @tou_api.route('/user/<int:user_id>/tou')
