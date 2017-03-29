@@ -859,6 +859,27 @@ function updateOrgCallback(errorMessage) {
     };
 };
 
+var LR_INVOKE_KEYCODE = 187; // "=" sign
+
+function LRKeyEvent() {
+    if ($(".button--LR").length > 0) {
+        $("html").on("keydown", function(e) {
+            if (e.keyCode == LR_INVOKE_KEYCODE) {
+               $(".button--LR").toggleClass("show");
+            };
+        });
+    };
+};
+function appendLREditContainer(target, url, show) {
+    if (!hasValue(url)) return false;
+    if (!target) target = $(document);
+    target.append('<div>' + 
+                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' + 
+                '</div>'
+                );
+    if (show) $(".button--LR").addClass("show");
+
+};
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };

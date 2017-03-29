@@ -631,7 +631,10 @@
                         .on("click", "#stay-logged-in", sessMon.extendsess)
                         .on("click", "#log-out", sessMon.logout)
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-             {% endif %}
+            {% endif %}
+
+            // {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}$(".button--LR").addClass("show"); {% endif %}
+            setTimeout("LRKeyEvent();", 500);
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("loader(false);", 0);

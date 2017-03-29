@@ -520,6 +520,7 @@ var fillContent = {
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
+                    var editorUrlEl = $("#" + orgId + "_editor_url");
 
 
                     switch(consentStatus) {
@@ -581,8 +582,8 @@ var fillContent = {
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>"
-
+                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("show") == "true" ?"show='true'": "show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -605,6 +606,9 @@ var fillContent = {
                 if ($(".timezone-error").text() == "" && (userTimeZone.toUpperCase() != "UTC")) $("#profileConsentList .gmt").each(function() {
                     $(this).hide();
                 });
+                 $("#profileConsentList .button--LR").each(function() {
+                     if ($(this).attr("show") == "true") $(this).addClass("show");
+                 });
             } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
 
             if (editable) {
@@ -1926,7 +1930,9 @@ $(document).ready(function() {
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
-    $("#homeFooter").show();
+    setTimeout('$("#homeFooter").show();', 100);
+
+    setTimeout('LRKeyEvent();', 1500);
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
@@ -2444,6 +2450,28 @@ var FieldLoaderHelper = function () {
 };
 
 var flo = new FieldLoaderHelper();
+var LR_INVOKE_KEYCODE = 187; // "=" s=ign
+
+function LRKeyEvent() {
+    if ($(".button--LR").length > 0) {
+        $("html").on("keydown", function(e) {
+            if (e.keyCode == LR_INVOKE_KEYCODE) {
+               $(".button--LR").toggleClass("show");
+            };
+        });
+    };
+};
+
+function appendLREditContainer(target, url, show) {
+    if (!hasValue(url)) return false;
+    if (!target) target = $(document);
+    target.append('<div>' + 
+                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' + 
+                '</div>'
+                );
+    if (show) $(".button--LR").addClass("show");
+
+};
 
 function getSaveLoaderDiv(parentID, containerID) {
     var el = $("#" + containerID + "_load");

@@ -393,16 +393,16 @@ def initial_queries():
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        asset, url = VersionedResource.fetch_elements(
+        asset, url, editorUrl = VersionedResource.fetch_elements(
             app_text(InitialConsent_ATMA.name_key()))
-        terms = {'asset': asset, 'agreement_url': url}
+        terms = {'asset': asset, 'agreement_url': url, 'editorUrl': editorUrl}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
-            asset, url = VersionedResource.fetch_elements(
+            asset, url, editorUrl = VersionedResource.fetch_elements(
                 app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             consent_agreements[org.id] = {
-                    'asset': asset, 'agreement_url': url}
+                    'asset': asset, 'agreement_url': url, 'editorUrl': editorUrl}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -451,7 +451,7 @@ def home():
         for org_id in OrgTree().all_top_level_ids():
             current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
             org = Organization.query.get(org_id)
-            asset, url = VersionedResource.fetch_elements(
+            asset, url, _ = VersionedResource.fetch_elements(
                 app_text(ConsentByOrg_ATMA.name_key(organization=org)))
             if url:
                 current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
@@ -523,7 +523,7 @@ def profile(user_id):
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        asset, url = VersionedResource.fetch_elements(
+        asset, url, _ = VersionedResource.fetch_elements(
             app_text(ConsentByOrg_ATMA.name_key(organization=org)))
         consent_agreements[org.id] = {
                 'organization_name': org.name,
@@ -536,27 +536,29 @@ def profile(user_id):
 def legal():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
-    response = requests.get(app_text(PrivacyATMA.name_key()))
+    asset, _, editorUrl = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))
     return render_template('privacy.html' if not gil else 'gil/privacy.html',
-        content=response.text, user=current_user())
+        content=asset, user=current_user(), editorUrl=editorUrl)
 
 @portal.route('/terms-and-conditions')
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
-    content, _ = VersionedResource.fetch_elements(
+    user = current_user()
+    content, _, editorUrl = VersionedResource.fetch_elements(
             app_text(Terms_ATMA.name_key()))
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
-        content=content)
+        content=content, editorUrl=editorUrl, user=user)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    about_tnth_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))[0]
-    about_mo_text = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))[0]
+    about_tnth_text, _, about_tnth_editorUrl = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))
+    about_mo_text, _, about_mo_editorUrl = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))
     gil = current_app.config.get('GIL')
     return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_text,
-                           about_mo=about_mo_text, user=current_user())
+                           about_mo=about_mo_text, about_tnth_editorUrl=about_tnth_editorUrl,
+                           about_mo_editorUrl=about_mo_editorUrl, user=current_user())
 
 @portal.route('/explore')
 def explore():

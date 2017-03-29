@@ -604,7 +604,7 @@
     {% if person and consent_agreements %}
         <div id="consentContainer">
             {% for org in consent_agreements %}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/></div>
             {% endfor %}
         </div>
     {% endif %}

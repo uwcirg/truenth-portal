@@ -129,6 +129,20 @@ select:not([multiple]) {
   color: #FFF;
   background-color: #000;
 }
+.button--LR, 
+.button--LR.show {
+   opacity: 0;
+   width: 160px;
+   margin: 2em 0;
+}
+.button--LR.show {
+    opacity: 1;
+}
+#profileConsentList .button--LR,
+#profileConsentList .button--LR.show {
+  margin: 0 0.5em;
+  display: inline-block !important;
+}
 #fullSizeBox a[href*="register"] {
   display: none;
 }
