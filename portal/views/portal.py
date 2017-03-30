@@ -395,17 +395,17 @@ def initial_queries():
     if 'tou' in still_needed:
         dict_terms = VersionedResource.fetch_elements(
             app_text(InitialConsent_ATMA.name_key()))
-        asset = dict_terms['asset'] if 'asset' in dict_terms else None
-        url = dict_terms['url'] if 'url' in dict_terms else None
-        editorUrl = dict_terms['editorUrl'] if 'editorUrl' in dict_terms else None
+        asset = dict_terms.get('asset', None)
+        url = dict_terms.get('url', None)
+        editorUrl = dict_terms.get('editorUrl', None)
         terms = {'asset': asset, 'agreement_url': url, 'editorUrl': editorUrl}
     if 'org' in still_needed:
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
             dict_consent_by_org = VersionedResource.fetch_elements(
                 app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org['asset'] if 'asset' in dict_consent_by_org else None
-            url = dict_consent_by_org['url'] if 'url' in dict_consent_by_org else None
+            asset = dict_consent_by_org.get('asset', None)
+            url = dict_consent_by_org.get('url', None)
             consent_agreements[org.id] = {
                     'asset': asset, 'agreement_url': url}
     return render_template(
@@ -458,8 +458,8 @@ def home():
             org = Organization.query.get(org_id)
             dict_consent_by_org = VersionedResource.fetch_elements(
                 app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org['asset'] if 'asset' in dict_consent_by_org else None
-            url = dict_consent_by_org['url'] if 'url' in dict_consent_by_org else None
+            asset = dict_consent_by_org.get('asset', None)
+            url = dict_consent_by_org.get('url', None)
             if url:
                 current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
 
@@ -532,8 +532,8 @@ def profile(user_id):
         org = Organization.query.get(org_id)
         dict_consent_by_org = VersionedResource.fetch_elements(
             app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org['asset'] if 'asset' in dict_consent_by_org else None
-        url = dict_consent_by_org['url'] if 'url' in dict_consent_by_org else None
+        asset = dict_consent_by_org.get('asset', None)
+        url = dict_consent_by_org.get('url', None)
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
@@ -546,8 +546,8 @@ def legal():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
     dict_privacy = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))
-    content = dict_privacy['asset'] if 'asset' in dict_privacy else None
-    editorUrl = dict_privacy['editorUrl'] if 'editorUrl' in dict_privacy else None
+    content = dict_privacy.get('asset', None)
+    editorUrl = dict_privacy.get('editorUrl', None)
     return render_template('privacy.html' if not gil else 'gil/privacy.html',
         content=content, user=current_user(), editorUrl=editorUrl)
 
@@ -558,8 +558,8 @@ def terms_and_conditions():
     user = current_user()
     dict_terms = VersionedResource.fetch_elements(
             app_text(Terms_ATMA.name_key()))
-    content = dict_terms['asset'] if 'asset' in dict_terms else None
-    editorUrl = dict_terms['editorUrl'] if 'editorUrl' in dict_terms else None
+    content = dict_terms.get('asset', None)
+    editorUrl = dict_terms.get('editorUrl', None)
     return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
         content=content, editorUrl=editorUrl, user=user)
 
@@ -569,10 +569,10 @@ def about():
     dict_about_tnth = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))
     dict_about_mo = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))
     gil = current_app.config.get('GIL')
-    about_tnth_content = dict_about_tnth['asset'] if 'asset' in dict_about_tnth else None
-    about_mo_content = dict_about_mo['asset'] if 'asset' in dict_about_mo else None
-    about_tnth_editorUrl = dict_about_tnth['editorUrl'] if 'editorUrl' in dict_about_tnth else None
-    about_mo_editorUrl = dict_about_mo['editorUrl'] if 'editorUrl' in dict_about_mo else None
+    about_tnth_content = dict_about_tnth.get('asset', None)
+    about_mo_content = dict_about_mo.get('asset', None)
+    about_tnth_editorUrl = dict_about_tnth.get('editorUrl', None)
+    about_mo_editorUrl = dict_about_mo.get('editorUrl', None)
     return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_content,
                            about_mo=about_mo_content, about_tnth_editorUrl=about_tnth_editorUrl,
                            about_mo_editorUrl=about_mo_editorUrl, user=current_user())

@@ -29,7 +29,7 @@ def get_current_tou_url():
 
     """
     dict_terms = VersionedResource.fetch_elements(app_text(InitialConsent_ATMA.name_key()))
-    return jsonify(url=dict_terms['url'] if 'url' in dict_terms else None)
+    return jsonify(url=dict_terms.get('url', None))
 
 
 @tou_api.route('/user/<int:user_id>/tou')
