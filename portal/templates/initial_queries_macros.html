@@ -21,6 +21,7 @@
             <br/>
         </div>
     </div>
+    {% if terms and terms['editorUrl'] %}<script>appendLREditContainer($("#topTerms"), "{{terms['editorUrl']}}", false);</script>{% endif %}
   {%- endmacro %}
 
   {% macro nameGroup() -%}

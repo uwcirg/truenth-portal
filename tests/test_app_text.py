@@ -71,6 +71,6 @@ class TestAppText(TestCase):
         sample_url = "https://notarealwebsitebeepboop.com"
         sample_error = "Could not retrieve remove content - Server could not be reached"
         result = VersionedResource.fetch_elements(sample_url)
-        self.assertEquals(result[0],sample_error)
-        self.assertEquals(result[1],sample_url)
+        self.assertEquals(result['error_msg'],sample_error)
+        self.assertEquals(result['url'],sample_url)
 

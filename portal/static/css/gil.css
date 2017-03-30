@@ -6085,7 +6085,7 @@ figure.nav-overlay {
     color: #fff;
 }
 .page-intro--theme-brown-light {
-    background: #4D4E4C;
+    background: #797b77;
     color: #fff;
 }
 .page-intro__main {
@@ -6809,7 +6809,7 @@ figure.nav-overlay {
     top: 210px;
     background-color: rgba(95, 103, 110, 1);
 }
-.home--item-container, 
+.home--item-container,
 .home--item-container-full,
 .home--registration-container,
 .link-box {
@@ -6919,15 +6919,15 @@ figure.nav-overlay {
     font-size: 1.2em;
     padding: 1em 0;
 }
-nav.side-nav::-webkit-scrollbar, 
-div.home--item-container::-webkit-scrollbar, 
+nav.side-nav::-webkit-scrollbar,
+div.home--item-container::-webkit-scrollbar,
 div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb, 
-div.home--item-container::-webkit-scrollbar-thumb, 
+nav.side-nav::-webkit-scrollbar-thumb,
+div.home--item-container::-webkit-scrollbar-thumb,
 div.modal.fade::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
@@ -7069,6 +7069,16 @@ a.home--modal-link {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.button--LR,
+.button--LR.show {
+   opacity: 0;
+   width: 180px;
+   text-align: center;
+   margin: 2em 0.5em;
+}
+.button--LR.show {
+    opacity: 1;
+}
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;
@@ -7077,8 +7087,8 @@ a.home--modal-link {
     }
 }
 @media (max-width: 1199px) {
-    .home--item-container, 
-    .home--registration-container, 
+    .home--item-container,
+    .home--registration-container,
     .home--item-container-full {
         width: 95%;
         max-width: 100%;
@@ -7089,7 +7099,7 @@ a.home--modal-link {
     }
 }
 @media (max-width: 990px) {
-    .home--item-container, 
+    .home--item-container,
     .home--registration-container,
     .home--item-container-full  {
         width: 90%;
@@ -7118,18 +7128,18 @@ a.home--modal-link {
     }
 }
 @media (max-width: 750px) {
-    .home--item-container, 
-    .home--registration-container, 
+    .home--item-container,
+    .home--registration-container,
     .home--item-container-full  {
         max-width: 100%;
         margin: 5%;
     }
-    #modal-org, 
+    #modal-org,
     #modal-org h4 {
         font-size: 14px !important;
     }
-    #fillOrgs *, 
-    .noOrg-container label span, 
+    #fillOrgs *,
+    .noOrg-container label span,
     #submit-orgs {
         font-size: 12px !important;
     }
@@ -7170,7 +7180,7 @@ a.home--modal-link {
         font-size: 1em !important;
         padding: 0.5em;
     }
-    #modal-register p, 
+    #modal-register p,
     #modal-register .button {
         font-size: 14px;
     }

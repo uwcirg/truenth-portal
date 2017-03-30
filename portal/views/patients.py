@@ -136,12 +136,16 @@ def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        asset, url = VersionedResource.fetch_elements(
+        dict_consent_by_org = VersionedResource.fetch_elements(
             app_text(ConsentByOrg_ATMA.name_key(organization=org)))
+        asset = dict_consent_by_org.get('asset', None)
+        agreement_url = dict_consent_by_org.get('url', None)
+        editor_url = dict_consent_by_org.get('editorUrl', None)
 
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
-                'agreement_url': url}
+                'agreement_url': agreement_url,
+                'editor_url': editor_url}
 
     return consent_agreements
