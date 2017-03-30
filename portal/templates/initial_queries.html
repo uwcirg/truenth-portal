@@ -14,7 +14,7 @@
       .reg-complete-container {
         width: 100%;
         max-width: 100%;
-        margin: 0.2em auto;
+        margin: 0.5em auto;
         background-color: #f8f8f9;
         padding: 2em 2em 2.7em 2em;
         text-align: center;
@@ -71,13 +71,17 @@
             <br />
             <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
             <br />
-            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide" disabled>{{ _("Continue to TrueNTH") }}</button>
+            <div class="button-container">
+              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide" disabled>{{ _("Continue to TrueNTH") }}</button>
+            </div>
         {% else %}
            <div class="reg-complete-container">
               <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
               <p>{{ _("Click continue to start using TrueNTH") }}</p>
               <br/>
-              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide">{{ _("Continue to TrueNTH") }}</button>
+              <div class="button-container">
+                <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide">{{ _("Continue to TrueNTH") }}</button>
+              </div>
            </div>
         {% endif %}
 
@@ -549,12 +553,18 @@ $(document).ready(function(){
         };
     };
 
+    $(".button-container").each(function() {
+        $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    });
+
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
           alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid.");
         } else {
-          assembleContent.demo({{ user.id }},null, null, true);
-        }
+          $("#updateProfile").hide();
+          $(".loading-message-indicator").show();
+          setTimeout("assembleContent.demo({{ user.id }},null, null, true);", 250);
+        };
     });
 
 
