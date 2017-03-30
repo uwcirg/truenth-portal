@@ -138,11 +138,14 @@ def get_orgs_consent_agreements():
         org = Organization.query.get(org_id)
         dict_consent_by_org = VersionedResource.fetch_elements(
             app_text(ConsentByOrg_ATMA.name_key(organization=org)))
+        asset = dict_consent_by_org['asset'] if 'asset' in dict_consent_by_org else None
+        agreement_url = dict_consent_by_org['url'] if 'url' in dict_consent_by_org else None
+        editor_url = dict_consent_by_org['editorUrl'] if 'editorUrl' in dict_consent_by_org else None
 
         consent_agreements[org.id] = {
                 'organization_name': org.name,
-                'asset': dict_consent_by_org['asset'],
-                'agreement_url': dict_consent_by_org['url'],
-                'editor_url': dict_consent_by_org['editorUrl']}
+                'asset': asset,
+                'agreement_url': agreement_url,
+                'editor_url': editor_url}
 
     return consent_agreements

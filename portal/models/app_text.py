@@ -221,7 +221,7 @@ class VersionedResource(object):
             return {
                 'asset': response.json()['asset'] if 'asset' in response.json() else None,
                 'url': VersionedResource.permanent_url(
-                        version=response.json()['version'],
+                        version=response.json()['version'] if 'version' in response.json() else None,
                         generic_url=url),
                 'editorUrl': response.json()['editorUrl'] if 'editorUrl' in response.json() else None}
         except ValueError:  # thrown when no json is available in response
