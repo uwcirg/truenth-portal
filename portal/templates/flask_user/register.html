@@ -5,6 +5,7 @@
 <style>
     .password-popover { min-width: 200px; max-width: 290px; right: 50px !important;}
     .password-popover .popover-content { padding: 1.2em 1em 2em 1em; width: 100%; margin: 0 auto;}
+    #pwdHintList {padding: 0; margin:2px; list-style-type: none}
     .password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
     .success-text { color: green; font-weight: bold;}
     .default-text { color: #31708f; font-weight: normal;  }
@@ -122,7 +123,7 @@ $(document).ready(function(){
     })(window.location.search.substr(1).split('&'));
 
     if (qs["email"]) $("#email").val(qs["email"]);
-    $("#password").popover({"content": "<b>Password must:</b><ul id='pwdHintList' style='padding: 0; margin:2px; list-style-type: none'><li class='text-info eight-characters'>Have at least 8 characters</li><li class='text-info lowercase-letter'>Have at least one lowercase letter</li><li class='text-info uppercase-letter'>Have at least one uppercase letter</li><li class='text-info one-number'>Have at least one number</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "focus"}).click(function(e) {
+    $("#password").popover({"content": "<b>Password must:</b><ul id='pwdHintList'><li class='text-info eight-characters'>Have at least 8 characters</li><li class='text-info lowercase-letter'>Have at least one lowercase letter</li><li class='text-info uppercase-letter'>Have at least one uppercase letter</li><li class='text-info one-number'>Have at least one number</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "focus"}).click(function(e) {
         if (!$(".password-popover").is(":visible")) $(this).popover("show");
         e.stopPropagation();
     });
