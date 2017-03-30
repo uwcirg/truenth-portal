@@ -2,6 +2,15 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
+<style>
+    .password-popover { min-width: 200px; max-width: 290px; right: 50px !important;}
+    .password-popover .popover-content { padding: 1.2em 1em 2em 1em; width: 100%; margin: 0 auto;}
+    #pwdHintList {padding: 0; margin:2px; list-style-type: none}
+    .password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
+    .success-text { color: green; font-weight: bold;}
+    .default-text { color: #31708f; font-weight: normal;  }
+
+</style>
 <form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
 
     <div class="row">
@@ -17,9 +26,9 @@
                 {% if user_manager.enable_email and user_manager.enable_username %}
                 {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true" ) }}
                 {% endif %}
-
-                {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$",
-      infoText="Password must have at least 8 characters with one lowercase letter, one uppercase letter and one number", tabindex=230) }}
+                <div class="password-wrapper">
+                {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230) }}
+                </div>
 
                 {% if user_manager.enable_retype_password %}
                 {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240) }}
@@ -114,6 +123,35 @@ $(document).ready(function(){
     })(window.location.search.substr(1).split('&'));
 
     if (qs["email"]) $("#email").val(qs["email"]);
+    $("#password").popover({"content": "<b>Password must:</b><ul id='pwdHintList'><li class='text-info eight-characters'>Have at least 8 characters</li><li class='text-info lowercase-letter'>Have at least one lowercase letter</li><li class='text-info uppercase-letter'>Have at least one uppercase letter</li><li class='text-info one-number'>Have at least one number</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "focus"}).click(function(e) {
+        if (!$(".password-popover").is(":visible")) $(this).popover("show");
+        e.stopPropagation();
+    });
+    $("html").click(function(e) {
+        $("#password").popover("hide");
+    });
+    //[a-z])(?=.*[A-Z])(?=.*\d).{8
+    $("#password").on("keyup", function() {
+        var pwd = $(this).val();
+        var l = $('#password').data('bs.popover').tip().find("#pwdHintList");
+        if (/[a-z]/.test(pwd)) l.find(".lowercase-letter").addClass("success-text");
+        else l.find(".lowercase-letter").removeClass("success-text");
+        if (/[A-Z]/.test(pwd)) l.find(".uppercase-letter").addClass("success-text");
+        else l.find(".uppercase-letter").removeClass("success-text");
+        if (/\d/.test(pwd)) l.find(".one-number").addClass("success-text");
+        else l.find(".one-number").removeClass("success-text");
+        if (pwd.length >= 8) l.find(".eight-characters").addClass("success-text");
+        else l.find(".eight-characters").removeClass("success-text");
+        if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd)) {
+            $("#errorpassword").text("");
+        };
+    });
+    $("#password").on("blur", function() {
+        $(this).popover("hide");
+    });
+    $("#password").on("shown.bs.popover", function () {
+      $(this).trigger("keyup");
+    });
 
 });
 
