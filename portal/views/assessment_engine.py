@@ -792,6 +792,7 @@ def assessment_update(patient_id):
     else:
         response.update({'message': 'previous questionnaire response found'})
 
+    existing_qnr.status = updated_qnr["status"]
     existing_qnr.document = updated_qnr
     db.session.add(existing_qnr)
     db.session.commit()
@@ -1276,6 +1277,7 @@ def assessment_add(patient_id):
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
+        status=request.json["status"],
         document=request.json,
         encounter=current_user().current_encounter
     )
