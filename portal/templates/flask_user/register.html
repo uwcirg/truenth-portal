@@ -168,7 +168,7 @@ $(document).ready(function(){
     });
     $("#retype_password").on("blur", function() {
         if (!hasValue($(this).val())) {
-            $("#errorretype_password").addClass("has-error").text("Please re-type your password.");
+            $("#errorretype_password").addClass("has-error").text("{%trans%}Please re-type your password.{%endtrans%}");
         } else $("#errorretype_password").text("");
     });
 
