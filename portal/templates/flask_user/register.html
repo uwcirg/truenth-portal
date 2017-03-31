@@ -48,25 +48,23 @@
             </div>
             <div id="socialMediaRegistrationContainer">
                 <div class="btn-social-container">
-                     <p class="profile-item-title">Register using:</p>
+                     <p class="profile-item-title">{{ _("Register using:")}}</p>
                     <div>
                         <a href="{{ url_for('auth.login', provider_name='facebook', next=request.args.get('next')) }}"
                            class="btn btn-social btn-facebook">
-                            <i class="fa fa-facebook"></i>
-                           Log In With Facebook
+                            <i class="fa fa-facebook"></i>{{_("Log In With Facebook")}}
                         </a>
                     </div>
                     <div class="divider"></div>
                     <div>
                         <a href="{{ url_for('auth.login', provider_name='google', next=request.args.get('next')) }}"
                            class="btn btn-social btn-google">
-                            <i class="fa fa-google"></i>
-                            Log In With Google
+                            <i class="fa fa-google"></i>{{_("Log In With Google")}}
                         </a>
                     </div>
                     <div class="divider"></div>
                     <div>
-                        <a class="smaller-text text-muted" href="#" data-toggle="modal" data-target="#accountModal">Learn more about using Facebook or Google to sign up for TrueNTH.</a>
+                        <a class="smaller-text text-muted" href="#" data-toggle="modal" data-target="#accountModal">{{ _("Learn more about using Facebook or Google to sign up for TrueNTH.")}}</a>
                     </div>
                 </div>
             </div>
@@ -81,21 +79,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title" id="myModalLabel">About Using Google or Facebook for TrueNTH</h3>
+                <h3 class="modal-title" id="myModalLabel">{{ _("About Using Google or Facebook for TrueNTH")}}</h3>
             </div>
             <div class="modal-body">
 
                 {# TODO - move to CMS. example - fb_google_info|safe #}
 
-                <p>We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Google of Facebook provide a few additional benefits to you:</p>
+                <p>{{_("We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Google of Facebook provide a few additional benefits to you:")}}</p>
                 <ul>
-                    <li>A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button.</li>
-                    <li>TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image.</li>
-                    <li>Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts.</li>
+                    <li>{{_("A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button.")}}</li>
+                    <li>{{_("TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image.")}}</li>
+                    <li>{{_("Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts.")}}</li>
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-tnth-primary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-tnth-primary" data-dismiss="modal">{{_("Close")}}</button>
             </div>
         </div>
     </div>
@@ -129,7 +127,7 @@ $(document).ready(function(){
 
     if (qs["email"]) $("#email").val(qs["email"]);
 
-    $("#password").popover({"content": "<b>Password must have at least:</b><ul id='pwdHintList'><li class='text-info eight-characters'>Eight characters</li><li class='text-info lowercase-letter'>One lowercase letter</li><li class='text-info uppercase-letter'>One uppercase letter</li><li class='text-info one-number'>One number</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
+    $("#password").popover({"content": "<b>{%trans%}Password must have at least:{%endtrans%}</b><ul id='pwdHintList'><li class='text-info eight-characters'>{%trans%}Eight characters{%endtrans%}</li><li class='text-info lowercase-letter'>{%trans%}One lowercase letter{%endtrans%}</li><li class='text-info uppercase-letter'>{%trans%}One uppercase letter{%endtrans%}</li><li class='text-info one-number'>{%trans%}One number{%endtrans%}</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
         $(this).trigger("focus");
         e.stopPropagation();
     }).on("keyup", function() {
