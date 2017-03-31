@@ -159,7 +159,7 @@ $(document).ready(function(){
     }).on("focus", function() {
         var pwd = $(this).val();
         if (!__passwordReg.test(pwd)) {
-            $(this).popover("show");
+            if (!$(this).data('bs.popover').tip().hasClass('in')) $(this).popover("show");
         } else return true;
     }).on("shown.bs.popover", function () {
       $(this).trigger("keyup");
