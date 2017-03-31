@@ -85,7 +85,7 @@ snowballstemmer==1.2.1
 speaklater==1.3
 Sphinx==1.5.3
 sphinx-rtd-theme==0.2.4
-SQLAlchemy==1.1.7
+SQLAlchemy==1.1.8
 swagger-spec-validator==2.1.0
 tox==2.6.0
 traitlets==4.3.2
