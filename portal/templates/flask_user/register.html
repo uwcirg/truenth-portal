@@ -171,7 +171,7 @@ $(document).ready(function(){
     $("#retype_password").on("blur", function() {
         if (!hasValue($(this).val())) {
             $("#errorretype_password").addClass("has-error").text("Please re-type your password.");
-        };
+        } else $("#errorretype_password").text("");
     });
 
 });
