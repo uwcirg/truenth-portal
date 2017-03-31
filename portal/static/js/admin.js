@@ -310,8 +310,10 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
               e.stopPropagation();
               var orgsList = [];
               $("#userOrgs input[name='organization']").each(function() {
-                  $(this).prop("checked", true);
-                  orgsList.push($(this).val());
+                  if ($(this).is(":visible")) {
+                    $(this).prop("checked", true);
+                    orgsList.push($(this).val());
+                  };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
               location.replace("/patients/?org_list=" + orgsList.join(","));

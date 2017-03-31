@@ -161,6 +161,8 @@ $(document).ready(function(){
         } else return true;
     }).on("shown.bs.popover", function () {
       $(this).trigger("keyup");
+    }).on("paste", function() {
+      $(this).trigger("keyup");
     });
 
     $("html").click(function(e) {
