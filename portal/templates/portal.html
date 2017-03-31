@@ -1,6 +1,5 @@
 {% extends "layout.html" %}
 {% block main %}
-
 {#
 {% if not user.has_role('write_only') %}
 <div class="portal-item">
@@ -18,32 +17,32 @@
 </div>
 {% endif %}
 
+
 {# present each intervention in turn if configured for user #}
 {% for intervention in interventions %}
     {% set display = intervention.display_for_user(user) %}
     {% if display.access %}
         <div class="portal-item">
             {% if intervention.description and intervention.description != "" %}<h2 class="tnth-subhead">{{ intervention.description }}</h2>{% endif %}
-            <div>
-                {{ display.card_html | safe }}
-            </div>
-            <div>
-                {% if display.link_url is none %}
-                <div>
-                    <br/>
-                    <a class="btn-lg btn-tnth-primary disabled" href="#">
-                        {{ display.link_label }}
-                    </a>
+            {% if display.card_html %}
+                <div class="portal-description">
+                    {{ display.card_html | safe }}
                 </div>
-                {% else %}
-                <div>
-                    <br/>
-                    <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
-                        {{ display.link_label }}
-                    </a>
-                </div>
-                {% endif %}
-            </div>
+            {% endif %}
+            
+            {% if not display.link_url %}
+                   <div class="button-container">
+                        <a class="btn-lg btn-tnth-primary disabled" href="#">
+                            {{ display.link_label }}
+                        </a>
+                    </div>
+            {% else %}
+                    <div class="button-container">
+                        <a class="btn-lg btn-tnth-primary" href="{{ display.link_url }}">
+                            {{ display.link_label }}
+                        </a>
+                    </div>
+            {% endif %}
         </div>
     {% endif %}
 {% endfor %}
@@ -51,9 +50,8 @@
 {% if user.has_role('write_only') %}
     <div class="portal-item">
         <h2 class="tnth-subhead">{{ _("Complete Registration") }}</h2>
-        <p>{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
-        <br/>
-        <div>
+        <div class="portal-description">{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</div>
+        <div class="button-container">
             <a href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}" class="btn-lg btn-tnth-primary">{{ _("Registration") }}</a>
         </div>
     </div>
@@ -61,12 +59,21 @@
 
 <div class="img-with-text flush-with-footer full-width">
     <img src="{{ url_for('static', filename='img/man-with-canoe.jpg') }}" class="img-responsive" />
-    <!--
-    <div class="text-on-img text-bot">
-        <h2 class="tnth-subhead">LOREM IPSUM</h2>
-        <p>"Lorem ipsum dolor sit met, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."</p>
-    </div>
-    -->
 </div>
 
+{% endblock %}
+{% block document_ready %}
+    $(".button-container").each(function() {
+        $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    });
+
+    $(".btn-tnth-primary").on("click", function() {
+        var link = $(this).attr("href");
+        if (hasValue(link)) {
+            event.preventDefault();
+            $(this).hide();
+            $(this).prev(".loading-message-indicator").show();
+            setTimeout("window.location='" + link + "';", 300);
+        };
+    });
 {% endblock %}

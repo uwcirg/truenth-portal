@@ -38,7 +38,11 @@ body {
   letter-spacing: 1px;
   color: #333f4b;
   background-color: #FFF;
-  border: 1px solid #bdb9b9
+  border: 1px solid #bdb9b9;
+}
+.btn.disabled,
+.btn-tnth-primary.disabled {
+  opacity: 0.6;
 }
 .btn-set {
   margin-bottom: 1.5em;
@@ -53,6 +57,7 @@ body {
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
   padding-right: 1em;
+  border-radius: 0;
 }
 .btn-tnth-primary:hover,
 .btn-tnth-primary:focus,
@@ -728,7 +733,14 @@ div.right-panel {
   border-radius: 45px;
 }
 .portal-item {
-  margin: 2em 0 3em;
+  margin: 3em 0;
+}
+.portal-description {
+  margin-bottom: 1em;
+}
+.loading-message-indicator {
+  z-index: 10;
+  display: none;
 }
 .img-with-text {
   position: relative;

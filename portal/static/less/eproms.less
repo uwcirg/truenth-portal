@@ -83,6 +83,12 @@ body {
   background-color: #FFF;
   border: 1px solid #bdb9b9;
 }
+
+.btn.disabled,
+.btn-tnth-primary.disabled {
+  opacity: 0.6;
+}
+
 .btn-set {
   margin-bottom: 1.5em;
   .btn {
@@ -96,6 +102,7 @@ body {
   border-color: @btnColor;
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
+  border-radius: 0;
   &:hover,
   &:focus,
   &.active,
@@ -805,7 +812,13 @@ div.right-panel {
 .portal-item {
   margin: 2em 0 3em;
 }
-
+.portal-description {
+  margin-bottom: 1em;
+}
+.loading-message-indicator {
+  z-index: 10;
+  display: none;
+}
 .img-with-text {
   position: relative;
   &.flush-with-footer {
