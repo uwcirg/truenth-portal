@@ -4324,6 +4324,7 @@ only screen and (max-width: 899px) and (min-resolution: 2dppx) {
         background-size: 218px 95px;
         width: 218px;
         height: 95px;
+        color: #FFF;
     }
 }
 @media only screen and (min-width: 901px) and (-webkit-min-device-pixel-ratio: 2),
@@ -5164,6 +5165,9 @@ a {
     }
 }
 .header {
+    &.no-banner {
+        padding-top: 0;
+    }
     .dropdown-menu {
         left: auto;
         right: 0;
