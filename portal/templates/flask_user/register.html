@@ -3,8 +3,8 @@
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
 <style>
-    .password-popover { min-width: 200px; max-width: 290px; right: 50px !important;}
-    .password-popover .popover-content { padding: 1.2em 1em 2em 1em; width: 100%; margin: 0 auto;}
+    .password-popover { min-width: 200px; max-width: 250px; right: 50px !important;}
+    .password-popover .popover-content { padding: 1.2em 1em 1.5em 1em; width: 100%; margin: 0 auto;}
     #pwdHintList {padding: 0; margin:2px; list-style-type: none}
     .password-popover li { margin-left: 1em;}
     .password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
@@ -127,7 +127,7 @@ $(document).ready(function(){
 
     if (qs["email"]) $("#email").val(qs["email"]);
 
-    $("#password").popover({"content": "<b>{%trans%}Password must have at least:{%endtrans%}</b><ul id='pwdHintList'><li class='text-info eight-characters'>{%trans%}Eight characters{%endtrans%}</li><li class='text-info lowercase-letter'>{%trans%}One lowercase letter{%endtrans%}</li><li class='text-info uppercase-letter'>{%trans%}One uppercase letter{%endtrans%}</li><li class='text-info one-number'>{%trans%}One number{%endtrans%}</li></ul>", "placement": "top", "html": true, "title": "Requirements", "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
+    $("#password").popover({"content": "<b>{%trans%}Password must have at least:{%endtrans%}</b><ul id='pwdHintList'><li class='text-info eight-characters'>{%trans%}Eight characters{%endtrans%}</li><li class='text-info lowercase-letter'>{%trans%}One lowercase letter{%endtrans%}</li><li class='text-info uppercase-letter'>{%trans%}One uppercase letter{%endtrans%}</li><li class='text-info one-number'>{%trans%}One number{%endtrans%}</li></ul>", "placement": "top", "html": true, "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
         $(this).trigger("focus");
         e.stopPropagation();
     }).on("keyup", function() {
