@@ -551,7 +551,7 @@ def legal():
     return render_template('privacy.html' if not gil else 'gil/privacy.html',
         content=content, user=current_user(), editorUrl=editorUrl)
 
-@portal.route('/terms-and-conditions')
+@portal.route('/terms')
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
@@ -560,7 +560,7 @@ def terms_and_conditions():
             app_text(Terms_ATMA.name_key()))
     content = dict_terms.get('asset', None)
     editorUrl = dict_terms.get('editorUrl', None)
-    return render_template('terms-and-conditions.html' if not gil else 'gil/terms-and-conditions.html',
+    return render_template('terms.html' if not gil else 'gil/terms.html',
         content=content, editorUrl=editorUrl, user=user)
 
 @portal.route('/about')
