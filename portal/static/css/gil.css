@@ -4216,6 +4216,7 @@ only screen and (max-width: 899px) and (min-resolution: 2dppx) {
         background-size: 218px 95px;
         width: 218px;
         height: 95px;
+        color: #FFF;
     }
 }
 @media only screen and (min-width: 901px) and (-webkit-min-device-pixel-ratio: 2),
@@ -5474,6 +5475,9 @@ a:hover {
     width: 100%;
     height: 160px;
     z-index: 10;
+}
+.header.no-banner {
+    padding-top: 0;
 }
 @media (max-width: 899px) {
     .header {
