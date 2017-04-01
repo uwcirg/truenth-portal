@@ -118,48 +118,17 @@ before_deploy:
       https://registry.heroku.com/ ;
     fi
 
-  # Build Bintray descriptor file dynamically
-  - >
-    printf '
-    {
-        "package": {
-            "name": "$PACKAGE_NAME",
-            "repo": "$BINTRAY_DEB_REPO",
-            "subject": "$GH_USERNAME",
-            "public_download_numbers": false,
-            "public_stats": false
-        },
-        "version": {
-            "name": "$PORTAL_VERSION",
-            "gpgSign": true
-        },
-        "files": [
-            {
-                "includePattern": "artifacts/(.+\\.deb)$",
-                "uploadPattern": "artifacts/$1",
-                "matrixParams": {
-                    "deb_distribution": "stable",
-                    "deb_component": "main",
-                    "deb_architecture": "amd64"
-                }
-            }
-        ],
-        "publish": true
-    }
-    ' | envsubst | tee "${TRAVIS_BUILD_DIR}/bintray.json"
-
 # Only deploy from default virtual env TravisCI job
 deploy:
-  - provider: bintray
+  - provider: script
+    skip_cleanup: true
     on:
       all_branches: true
       condition:
         - $TOXENV = build
         - $DEPLOY = true
         - -v BINTRAY_API_KEY
-    file: "bintray.json"
-    user: $BINTRAY_USERNAME
-    key: $BINTRAY_API_KEY
+    script: curl -T artifacts/*.deb -u "$GH_USERNAME:$BINTRAY_API_KEY" https://api.bintray.com/content/$GH_USERNAME/$BINTRAY_DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
 after_deploy:
   # Apply all tags
