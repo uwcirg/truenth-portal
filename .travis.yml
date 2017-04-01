@@ -80,17 +80,17 @@ after_success:
   # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
 
-  - docker pull "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
+  - docker pull "uwcirg-portal-docker.jfrog.io/deb_builder:latest"
   - docker volume create --name debian-repo
   # Build artifacts from current repo and branch (else "develop")
   - docker run
       --volume debian-repo:/tmp/artifacts
       --env REPO_SLUG=$TRAVIS_REPO_SLUG
       --env BRANCH=${TRAVIS_BRANCH:-develop}
-    "uwcirg-docker-true_nth.bintray.io/deb_builder:latest"
+    "uwcirg-portal-docker.jfrog.io/deb_builder:latest"
 
   # Copy artifacts off volume mounted on previous container
-  - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-docker-true_nth.bintray.io/deb_builder:latest"):/tmp/artifacts /tmp
+  - docker cp $(docker ps --quiet --latest --filter ancestor="uwcirg-portal-docker.jfrog.io/deb_builder:latest"):/tmp/artifacts /tmp
   # Copy artifacts to current directory to allow local installation
   - cp --recursive --verbose /tmp/artifacts artifacts
   - docker build
