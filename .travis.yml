@@ -128,7 +128,11 @@ deploy:
         - $TOXENV = build
         - $DEPLOY = true
         - -v BINTRAY_API_KEY
-    script: curl -T artifacts/*.deb -u "$GH_USERNAME:$BINTRAY_API_KEY" https://api.bintray.com/content/$GH_USERNAME/$BINTRAY_DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
+    script:
+      curl
+        --upload-file artifacts/*.deb
+        --user "$GH_USERNAME:$BINTRAY_API_KEY"
+        https://api.bintray.com/content/$GH_USERNAME/$BINTRAY_DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
 after_deploy:
   # Apply all tags
