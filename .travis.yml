@@ -137,6 +137,7 @@ deploy:
         https://api.bintray.com/content/$GH_USERNAME/$DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
   - provider: script
+    skip_cleanup: true
     on:
       all_branches: true
       condition:
