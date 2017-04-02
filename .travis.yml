@@ -100,10 +100,12 @@ after_success:
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
-  - docker login
-      --username "$BINTRAY_USERNAME"
-      --password "$BINTRAY_API_KEY"
-    "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io"
+  - if [[ -v BINTRAY_API_KEY ]]; then
+      docker login
+        --username "$BINTRAY_USERNAME"
+        --password "$BINTRAY_API_KEY"
+      "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io" ;
+    fi
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
       docker login
         --username "$DOCKER_CLOUD_USERNAME"
@@ -135,16 +137,19 @@ deploy:
         https://api.bintray.com/content/$GH_USERNAME/$BINTRAY_DEB_REPO/$PACKAGE_NAME/$PORTAL_VERSION/artifacts/;deb_distribution=stable;deb_component=main;deb_architecture=amd64
 
 after_deploy:
-  # Apply all tags
-  - for tag in $DOCKER_TAGS; do
-      docker tag
-        "$IMAGE_NAME:$TAG"
-        "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
-    done
-  # Deploy image (and all tags) to Bintray
-  - for tag in $DOCKER_TAGS; do
-      docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
-    done &
+  # Deploy to Bintray, if configured
+  - if [[ -v BINTRAY_API_KEY ]]; then
+      for tag in $DOCKER_TAGS; do
+        docker tag
+          "$IMAGE_NAME:$TAG"
+          "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+      done
+    fi
+  - if [[ -v BINTRAY_API_KEY ]]; then
+      for tag in $DOCKER_TAGS; do
+        docker push "$GH_USERNAME-docker-$BINTRAY_DOCKER_REPO.bintray.io/$IMAGE_NAME:$tag";
+      done &
+    fi
 
   # Deploy to Docker Hub, if configured
   - if [[ -v DOCKER_CLOUD_API_KEY ]]; then
