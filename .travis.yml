@@ -147,7 +147,7 @@ deploy:
     script:
       curl
         --upload-file artifacts/*.deb
-        --user "$ARTIFACTORY_USERNAME:ARTIFACTORY_TOKEN"
+        --user "$ARTIFACTORY_USERNAME:$ARTIFACTORY_TOKEN"
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
 
 after_deploy:
