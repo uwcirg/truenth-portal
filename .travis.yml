@@ -151,6 +151,20 @@ deploy:
         "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
 
 after_deploy:
+  # Deploy to Artifactory, if configured
+  - if [[ -v ARTIFACTORY_TOKEN ]]; then
+      for tag in $DOCKER_TAGS; do
+        docker tag
+          "$IMAGE_NAME:$TAG"
+          "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
+      done
+    fi
+  - if [[ -v ARTIFACTORY_TOKEN ]]; then
+      for tag in $DOCKER_TAGS; do
+        docker push "uwcirg-$DOCKER_REPO.jfrog.io/$IMAGE_NAME:$tag";
+      done &
+    fi
+
   # Deploy to Bintray, if configured
   - if [[ -v BINTRAY_API_KEY ]]; then
       for tag in $DOCKER_TAGS; do
