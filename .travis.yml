@@ -100,6 +100,12 @@ after_success:
 
 before_deploy:
   - export DOCKER_CLOUD_USERNAME=${DOCKER_CLOUD_USERNAME:-${GH_USERNAME//-}}
+  - if [[ -v ARTIFACTORY_TOKEN ]]; then
+      docker login
+        --username "$ARTIFACTORY_USERNAME"
+        --password "$ARTIFACTORY_TOKEN"
+      "uwcirg-$DOCKER_REPO.jfrog.io" ;
+    fi
   - if [[ -v BINTRAY_API_KEY ]]; then
       docker login
         --username "$BINTRAY_USERNAME"
