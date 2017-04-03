@@ -16,7 +16,6 @@ env:
     - LOG_FOLDER='/tmp/shared_service_log'
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}
-    - ARTIFACTORY_DEB_REPO=${ARTIFACTORY_DEB_REPO:-portal-deb}
     - DEB_REPO=${DEB_REPO:-portal-deb}
     - DOCKER_REPO=${DOCKER_REPO:-portal-docker}
     - BINTRAY_USERNAME=${BINTRAY_USERNAME:-uwcirg}
@@ -149,7 +148,7 @@ deploy:
       curl
         --upload-file artifacts/*.deb
         --user "$ARTIFACTORY_USERNAME:ARTIFACTORY_TOKEN"
-        "$ARTIFACTORY_DEB_REPO/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
+        "$ARTIFACTORY_REPO_URL/$PACKAGE_NAME;deb_distribution=stable;deb_component=main;deb_architecture=amd64"
 
 after_deploy:
   # Deploy to Bintray, if configured
