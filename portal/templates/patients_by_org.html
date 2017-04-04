@@ -20,7 +20,7 @@
               </div>
               <div class="modal-body">
                   <div class="form-group">
-                    <label>{{ _("Instrument(s) to export data from:")}}</label>
+                    <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
                     <div id="patientsInstrumentListWrapper">
                       <div id="patientsInstrumentList" class="profile-radio-list">
                         {% for instrument_code in config["INSTRUMENTS"] | sort() %}
@@ -32,7 +32,7 @@
                     </div>
                     </div>
                   <div class="form-group">
-                    <label>{{ _("Data type:")}}</label>
+                    <label class="text-muted">{{ _("Data type:")}}</label>
                     <div id="patientsDownloadTypeList" class="profile-radio-list">
                       <label class="radio-inline">
                           <input type="radio" name="downloadType" id="csv" value="csv" checked/>

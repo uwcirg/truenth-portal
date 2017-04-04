@@ -1605,6 +1605,10 @@ div.biopsy-option:last-of-type{
 .modal-footer {
   padding: 1em;
 }
+.modal-header {
+  font-size: 1.2em;
+  min-height: 3em;
+}
 .modal-header button,
 .modal-header button * {
   color: #FFF;
@@ -1613,9 +1617,13 @@ div.biopsy-option:last-of-type{
 .modal label {
   font-size: 1em;
 }
+#patientsInstrumentList label,
+#patientsDownloadTypeList label {
+  font-size: 0.8em;
+}
 .modal button,
 .modal a.btn {
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 .hide {
   display: none;
