@@ -243,6 +243,8 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
 FieldsChecker.prototype.sectionCompleted = function(sectionId) {
   var isComplete = true;
   if (this.mainSections && this.mainSections[sectionId]) {
+    //count skipped section as complete
+    if ($("#" + sectionId).attr("skipped") == "true") return true;
     for (var id in (this.mainSections[sectionId]).subsections) {
       var fields = (this.mainSections[sectionId]).subsections[id].fields;
       if (fields) {
@@ -281,7 +283,6 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
   return isComplete;
 };
 
-
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
   var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
@@ -318,6 +319,7 @@ function continueToFinish() {
 
 function stopContinue(sectionId) {
   $("#updateProfile").attr("disabled", true).removeClass("open");
+  $("div.reg-complete-container").fadeOut();
   $("#next").show().attr("disabled", true);
   setProgressBar(sectionId);
 }
@@ -612,9 +614,11 @@ $(document).ready(function(){
         } else {
           assembleContent.demo({{ user.id }},null, null, true);
           if (fc.allFieldsCompleted()) {
-            $("#iqErrorMessage").text("");
             continueToFinish();
-          } else $("#iqErrorMessage").text("All fields must be completed.");
+          } else {
+            if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
+            else stopContinue("orgsContainer");
+          };
         };
       };
     };
@@ -625,7 +629,10 @@ $(document).ready(function(){
               assembleContent.demo({{ user.id }},null, null, true);
               if (fc.allFieldsCompleted()) {
                 continueToFinish();
-              } else continueToNext("orgsContainer");
+              } else {
+                if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
+                else stopContinue("orgsContainer");
+              };
             } else {
               $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
             };
