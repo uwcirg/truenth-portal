@@ -24,17 +24,25 @@
                 {{ form.hidden_tag() }}
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(field, label="Email address", label_visible=false, tabindex=220, required="required", data_error="Email address is required.", class="input-field" ) }}
+                {% set email_label = gettext('Email address') %}
+                {% set email_data_error = gettext('Email address is required.') %}
+                {{ render_field(field, label=email_label, label_visible=false, tabindex=220, required="required", data_error=email_data_error, class="input-field" ) }}
 
                 {% if user_manager.enable_email and user_manager.enable_username %}
-                {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true", class="input-field") }}
+                {% set email_field_name = gettext('Email') %}
+                {{ render_field(form.email, label=email_field_name, label_visible=false, tabindex=230, data_customemail="true", class="input-field") }}
                 {% endif %}
                 <div class="password-wrapper">
-                {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required", class="input-field") }}
+                {% set password_label = gettext('Password') %}
+                {% set password_data_error = gettext('Oops, the password does not meet the minimum requirements.') %}
+                {{ render_field(form.password, label=password_label, label_visible=false, data_error=password_data_error, pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required", class="input-field") }}
                 </div>
 
                 {% if user_manager.enable_retype_password %}
-                {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240, required="required", data_error="Please re-type your password.", class="input-field") }}
+                {% set retype_password_label = gettext('Retype Password') %}
+                {% set retype_data_match_error = gettext('Oops, the two password fields do not match.') %}
+                {% set retype_data_error = "Please re-type your password." %}
+                {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
                 <br/>
 

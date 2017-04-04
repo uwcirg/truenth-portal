@@ -542,7 +542,7 @@ def profile(user_id):
         'profile.html', user=user, consent_agreements=consent_agreements)
 
 @portal.route('/privacy')
-def legal():
+def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
     dict_privacy = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))

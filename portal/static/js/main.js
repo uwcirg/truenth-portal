@@ -1413,7 +1413,6 @@ var tnthAjax = {
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
                     item = d[0];
-                    console.log(item.expires)
                     expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     if (item.deleted) found = true;
                     if (expired > 0) found = true;
@@ -1913,12 +1912,7 @@ funcWrapper = function(param) {
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
-        //dataFilter:data_filter,
-        //xhr: xhr_function,
-        crossDomain: true,
         cache: (getIEVersion() ? false : true)
-        //cache: false
-        //xhrFields: {withCredentials: true},
     }, 'html')
     .done(function(data) {
         embed_page(data);
