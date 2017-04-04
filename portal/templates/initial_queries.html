@@ -4,104 +4,155 @@
 
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 {% from "profile_macros.html" import profileOrgsSelector %}
-
-
-  <!-- <div id="loadingIndicator" class="loading-indicator">
-    <i class="fa fa-circle-o-notch fa-spin fa-4x"></i>
-  </div> -->
-  <input type="hidden" id="iq_userId" value="{{user.id}}" />
-  <style>
-      .reg-complete-container {
-        width: 100%;
-        max-width: 100%;
-        margin: 0.5em auto;
-        background-color: #f8f8f9;
-        padding: 2em 2em 2.7em 2em;
-        text-align: center;
-        border-radius: 8px;
-      }
-  </style>
-
+<input type="hidden" id="iq_userId" value="{{user.id}}" />
+<style>.footerWrapper { display: none; border-top: solid 1px #eee; margin-top: 2em;}</style>
+<div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
   {% if 'tou' in still_needed %}
-    {{tou(terms)}}
+      {{tou(terms)}}
   {% endif %}
-
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
-        {% if 'name' in still_needed or 'role' in still_needed or 'dob' in still_needed or 'clinical' in still_needed or 'org' in still_needed or 'localized' in still_needed %}
-          <h3 class="tnth-headline">{{ _("About You") }}</h3>
-
-          <p class="profile-item-title">{{ _("Thank You! Now, please finish your registration by telling us about yourself.") }}</p>
-
-            {% if user and user._email %}
-                <input type="hidden" name="email" id="email" value="{{user._email}}" />
-            {% endif %}
-            {% if 'name' in still_needed %}
-              {{nameGroup()}}
-            {% else %}
-                {% if user and user.first_name and user.last_name %}
-                  <p>{{ _("Your") }} <em>{{ _("Name") }}</em>: {{user.first_name}} {{user.last_name}}</p>
-                  <br/>
-                  <input type="hidden" name="firstname" id="fistname" value="{{user.first_name}}"/>
-                  <input type="hidden" name="lastname" id="lastname" value="{{user.last_name}}"/>
+        {% if 'name' in still_needed or 'dob' in still_needed or 'role' in still_needed %}
+            <div id="demographicsContainer" class="iq-container" parent-section="true">
+                {% if user and user._email %}
+                  <input type="hidden" name="email" id="email" value="{{user._email}}" />
                 {% endif %}
-            {% endif %}
-            {% if 'role' in still_needed %}
-              {{rolesGroup()}}
-            {% endif %}
-            {% if 'dob' in still_needed %}
-              {{dobGroup()}}
-            {% else %}
-                {% if user and user.birthdate %}
-                  <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
-                {% endif %}
-            {% endif %}
-            {% if 'clinical' in still_needed  or 'localized' in still_needed%}
-              {{patientQGroup(user)}}
-            {% endif %}
-            {% if 'org' in still_needed %}
-             {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                 <div id="clinics" class="tnth-hide" parent-section="true">
-                    {{profileOrgsSelector(user, "", consent_agreements)}}
+                <div class="content">
+                  <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
+                  <div class="content-body">
+                    {{nameGroup()}}
+                    <br/><br/>
+                    {{dobGroup()}}
+                    <br/><br/>
+                    {{rolesGroup()}}
                   </div>
-             {% else %}
-                {{clinic(consent_agreements)}}
-              {% endif %}
-            {% endif %}
-            <br />
-            <p class="tnth-hide" id="continueText">{{ _("Great! Click continue to start using TrueNTH.") }}</p>
-            <br />
-            <div class="button-container">
-              <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide" disabled>{{ _("Continue to TrueNTH") }}</button>
+                </div>
             </div>
-        {% else %}
-           <div class="reg-complete-container">
-              <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
-              <p>{{ _("Click continue to start using TrueNTH") }}</p>
-              <br/>
-              <div class="button-container">
-                <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary tnth-hide">{{ _("Continue to TrueNTH") }}</button>
-              </div>
-           </div>
         {% endif %}
-
-  </form>
+        {% if 'clinical' in still_needed  or 'localized' in still_needed%}
+            <div id="clinicalContainer" class="iq-container" parent-section="true">
+              <div class="content">
+                <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
+                <div class="content-body">
+                  <p class="subtitle">The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.</p>
+                  {{patientQGroup(user)}}
+                </div>
+              </div>
+            </div>
+        {% endif %}
+        {% if 'org' in still_needed %}
+            <div id="orgsContainer" class="iq-container" parent-section="true">
+              <div class="content">
+                <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
+                <div class="content-body">
+                 {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                     <div id="clinics" parent-section="true">
+                        {{profileOrgsSelector(user, user, consent_agreements)}}
+                     </div>
+                 {% else %}
+                      {{clinic(consent_agreements)}}
+                 {% endif %}
+                  </div>
+              </div>
+            </div>
+        {% endif %}
+        <div class="reg-complete-container">
+            <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
+            <p>{{ _("Click continue to start using TrueNTH") }}</p>
+        </div>
+        <div id="buttonsContainer" class="button-container">
+          <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
+          <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+        </div>
+        <div id="iqErrorMessage" class="error-message text-danger"></div>
+    </form>
   </div>
-  <div>
-    <div class="error-message text-danger"></div>
-  <div>
-
+{% endblock %}
+{% from "flask_user/_macros.html" import footer %}
+{% block footer %}
+<!-- custom footer -->
+<div class="footerWrapper">
+  <div id="homeFooter" class="container-fluid">
+    <div class="row">
+        <div class="col-xs-6 col-lg-8 footer-container">
+            <div class="copyright-container">
+              <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }} | <a href="{{PORTAL}}/logout">Logout</a></small></p>
+              <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p>
+            </div>
+        </div>
+        <div class="col-xs-6 col-lg-4 footer-container logo-container">
+            <div class="pull-right">
+                <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
+            </div>
+        </div>
+      </div>
+  </div>
+</div>
 {% endblock %}
 {% block document_ready %}
 var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
-var fc, incompleteFields = [], mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
+
+var fc, mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
+
+var CONFIG_REQUIRED_CORE_DATA = {{config.REQUIRED_CORE_DATA|safe}};
+
+function inConfig(configMatch) {
+  if (! hasValue(configMatch)) return false;
+  else {
+    if (CONFIG_REQUIRED_CORE_DATA) {
+      var found = false;
+      var ma = configMatch.split(",");
+      ma.forEach(function(item) {
+        CONFIG_REQUIRED_CORE_DATA.forEach(function(v) {
+            if (!found && v == item) found = true;
+        });
+      });
+      return found;
+    } else return true;
+  };
+};
 
 /***** helper class to keep track of missing fields ***/
 var FieldsChecker = function(mainSections) {
-  this.mainSections = mainSections;
+  this.mainSections = {};
+  if (mainSections) {
+    for (var section in mainSections) {
+      if (inConfig(mainSections[section].config)) this.mainSections[section] = mainSections[section];
+    }
+  };
   this.incompleteFields = [];
+};
+
+FieldsChecker.prototype.getTotalSections = function() {
+  var ct=0;
+  for (var section in this.mainSections) {
+    ct++;
+  };
+  return ct;
+};
+
+FieldsChecker.prototype.getCompleteSections = function() {
+  var ct = 0, self = this;
+  for (var section in this.mainSections) {
+      if (self.sectionCompleted(section)) ct++;
+  };
+  return ct;
+};
+
+FieldsChecker.prototype.constructProgressBar = function() {
+  //don't construct progress bar when terms present
+  if ($("#topTerms").length > 0 && !fc.sectionCompleted("topTerms")) return false;
+  var totalSections = this.getTotalSections();
+  if (totalSections > 1) {
+      var w = (1/totalSections) * 100;
+      for (var section in this.mainSections) {
+          var active = fc.sectionCompleted(section);
+          $("#progressbar").append("<li sectionId='" + section + "' style='width:" + w + "%' " + (active? " class='active'": "") + ">" + this.mainSections[section].display + "</li>");
+      };
+      $("#progressWrapper").show();
+  } else $("#progressWrapper").remove();
 };
 
 FieldsChecker.prototype.getIncompleteFields = function() {
@@ -115,15 +166,16 @@ FieldsChecker.prototype.setIncompleteFields = function() {
     self.reset();
     for (var section in ms) {
       if (!self.sectionCompleted(section)) {
-          var fields = ms[section].fields;
-          fields.forEach(function(field) {
-            if (field.length > 0) {
-            self.incompleteFields.push({'sectionId': section, 'section': $('#'+ section), 'element':field});
-            };
-          });
+          for (var sectionId in ms[section].subsections) {
+            var fields = ms[section].subsections[sectionId].fields;
+            fields.forEach(function(field) {
+              if (field.length > 0) {
+                self.incompleteFields.push({'sectionId': section, 'subsectionId': sectionId, 'section': $('#'+ section), 'element':field});
+              };
+            });
+          };
       };
     };
-
     self.incompleteFields.forEach(function(field, index) {
       var fe = field.element;
       fe.each(function() {
@@ -131,7 +183,6 @@ FieldsChecker.prototype.setIncompleteFields = function() {
           f.attr('sectionIndex', index);
       });
     });
-
   };
 };
 
@@ -165,8 +216,6 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
       if (field) {
           var parentContainer = field.closest("[parent-section='true']");
           var found = false;
-          //console.log("parentContainer:")
-          //console.log(parentContainer)
           if (parentContainer.length > 0) {
               var nexts = parentContainer.nextAll("[parent-section='true']");
               nexts.each(function() {
@@ -179,10 +228,8 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
                       $('html, body').animate({
                           scrollTop: section.offset().top
                       }, 500);
-                      section.children().first().fadeIn();
                       found = true;
                   };
-
                   if (!found) {
                       if (self.sectionCompleted(parentId)) $(this).fadeIn();
                   };
@@ -190,42 +237,45 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
               });
           };
       };
-    }
+    };
 };
 
 FieldsChecker.prototype.sectionCompleted = function(sectionId) {
   var isComplete = true;
   if (this.mainSections && this.mainSections[sectionId]) {
-  //console.log(sectionId)
-    var fields = this.mainSections[sectionId].fields;
-    //console.log(fields)
-    if (fields) {
-        fields.forEach(function(field) {
-          if (field.length > 0 && (field.attr("skipped") != "true")) {
-            var type = field.attr('type');
-            switch(String(type).toLowerCase()) {
-            case 'checkbox':
-                  _isChecked = false;
-                  field.each(function() {
-                      if ($(this).is(":checked")) {
-                        _isChecked = true;
-                      };
-                  });
-                  if (!(_isChecked)) isComplete = false;
+    for (var id in (this.mainSections[sectionId]).subsections) {
+      var fields = (this.mainSections[sectionId]).subsections[id].fields;
+      if (fields) {
+          fields.forEach(function(field) {
+            if (field.length > 0 && (field.attr("skipped") != "true")) {
+              var type = field.attr('type');
+              switch(String(type).toLowerCase()) {
+              case 'checkbox':
+                    _isChecked = false;
+                    field.each(function() {
+                        if ($(this).is(":checked")) {
+                          _isChecked = true;
+                        };
+                    });
+                    if (!(_isChecked)) isComplete = false;
+                    break;
+              case 'radio':
+                  if (!field.is(":checked")) isComplete = false;
                   break;
-            case 'radio':
-                if (!field.is(":checked")) isComplete = false;
-                break;
-            case 'select':
-                if (field.val() == '') isComplete = false;
-                break;
-            case 'text':
-                if (field.val() == '') isComplete = false;
-                else if (!(field.get(0).validity.valid)) isComplete = false;
-                break;
+              case 'select':
+                  if (field.val() == '') isComplete = false;
+                  break;
+              case 'text':
+                  if (field.val() == '') isComplete = false;
+                  else if (!(field.get(0).validity.valid)) isComplete = false;
+                  break;
+              case 'terms':
+                  if (!(field.attr("data-agree") == "true")) isComplete = false;
+                  break;
+              };
             };
-          };
-      });
+        });
+      };
     };
   };
   return isComplete;
@@ -246,36 +296,75 @@ FieldsChecker.prototype.showAll = function() {
       var mf = $("#" + sec);
       if (mf.attr("skipped") == "true") continue;
       mf.fadeIn();
-      mainSections[sec].fields.forEach(function(field) {
-          if (field.attr("skipped") != "true") field.fadeIn();
-      });
+      for (var sectionId in mainSections[sec].subsections) {
+        mainSections[sec].subsections[sectionId].fields.forEach(function(field) {
+            if (field.attr("skipped") != "true") field.fadeIn();
+        });
+      };
     };
   };
 };
 
-function continueOn() {
-  $("#continueText").fadeIn();
-  $("#updateProfile").removeAttr("disabled").show();
+function continueToFinish() {
+  setProgressBar();
+  $("div.reg-complete-container").fadeIn();
+  $('html, body').animate({
+    scrollTop: $('div.reg-complete-container').offset().top
+  }, 1000);
+  $("#next").fadeOut();
+  $("#iqErrorMessage").text("");
+  $("#updateProfile").removeAttr("disabled").addClass("open");
 };
 
-function stopContinue() {
-  $("#continueText").fadeOut();
-  $("#updateProfile").attr("disabled", true).hide();
+function stopContinue(sectionId) {
+  $("#updateProfile").attr("disabled", true).removeClass("open");
+  $("#next").show().attr("disabled", true);
+  setProgressBar(sectionId);
+}
+
+function continueToNext(sectionId) {
+  setProgressBar(sectionId);
+  $("div.reg-complete-container").fadeOut();
+  $("#next").show().removeAttr("disabled");
+  if (!$("#next").isOnScreen()) {
+    $('html, body').animate({
+      scrollTop: $('#next').offset().top
+    }, 1000);
+  };
+  $("#updateProfile").attr("disabled", true).removeClass("open");
+};
+
+function getNext() {
+  var found = false;
+  for (var section in fc.mainSections) {
+    if (!found && !fc.sectionCompleted(section)) {
+      $("#" + section).fadeIn(500).addClass("open");
+      found = true;
+    };
+  };
+  if (!found) continueToFinish();
+};
+
+function setProgressBar(sectionId) {
+  if (fc.allFieldsCompleted()) $("#progressWrapper").hide();
+  else {
+    if (hasValue(sectionId)) {
+      if (fc.sectionCompleted(sectionId)) $("#progressbar li[sectionId='" + sectionId + "']").addClass("active");
+      else $("#progressbar li[sectionId='" + sectionId + "']").removeClass("active");
+    };
+  };
 };
 
 function initIncompleteFields() {
-
   fc.setIncompleteFields();
   incompleteFields = fc.getIncompleteFields();
   incompleteFields.forEach(function(field, index) {
-
     var fe = field.element;
-
     fe.each(function() {
         var f = $(this);
         var triggerEvent = ($(f).attr("type") == "text" ? "blur" : "click");
         if (f.get(0).nodeName.toLowerCase() == "select") triggerEvent = "change";
-        var customEvent = mainSections[field.sectionId].event;
+        var customEvent = fc.mainSections[field.sectionId].subsections[field.subsectionId].event;
 
         if (customEvent) {
           f.on(triggerEvent, customEvent);
@@ -283,27 +372,47 @@ function initIncompleteFields() {
         else {
             f.on(triggerEvent, function() {
                 if ($(this).value != "" && this.validity.valid) {
-                  fc.getNextField($(this).attr('sectionIndex'));
                   var isComplete = fc.allFieldsCompleted();
                   if (isComplete) {
-                     continueOn();
-                  }
+                     continueToFinish();
+                  };
+                } else {
+                    var parentSection = $(this).closest("div[parent-section]").attr("id");
+                    if (fc.sectionCompleted(parentSection)) continueToNext(parentSection);
+                    else stopContinue(parentSection);
                 };
-                //console.log('field index: ' + f.attr('sectionIndex'));
-                //console.log('incomplete fields length: ' + incompleteFields.length);
             });
         };
     });
   });
 
+  $(".button-container").each(function() {
+      $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+  });
 
-  if (fc.allFieldsCompleted()) {
-      $("#updateProfile").removeAttr("disabled").show();
+  fc.constructProgressBar();
+
+  //if term of use form not present - need to show the form
+  if ($("#topTerms").length == 0)  {
+      $("#aboutForm").fadeIn();
+      getNext();
+      if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+        continueToFinish();
+      };
   } else {
-       incompleteFields[0].section.show();
-       incompleteFields[0].element.show();
+    $("#topTerms").fadeIn();
+    if (window.performance) {
+      if (performance.navigation.type == 1) {
+        //page has been reloaded;
+        $("#termsReminderModal").modal("show");
+        $("#tnthLogo a, a[href]").not("a[href*='logout']").addClass("disabled").on("click", function(e) {
+            e.preventDefault();
+            return false;
+        });
+      };
+    };
   };
-
+  setTimeout('$(".footerWrapper").show()', 1000);
   /************
   incompleteFields.forEach(function(field, index) {
       console.log(field.section.attr("id") + " " + field.element.length);
@@ -312,13 +421,29 @@ function initIncompleteFields() {
   });
   ************/
 
-
-  //console.log("length: " + incompleteFields.length);
-
 };
 
-
 $(document).ready(function(){
+
+    $("#next").on("click", function() {
+        $(this).hide();
+        $(".loading-message-indicator").show();
+        setTimeout("window.location.reload()", 100);
+    });
+
+    $("div.heading").on("click", function() {
+       $('html, body').animate({
+          scrollTop: $(this).next('div.content-body').children().first().offset().top
+       }, 1000);
+    });
+
+    var namesChangeEvent = function() {
+       if (fc.allFieldsCompleted()) continueToFinish();
+       else {
+          if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
+          else stopContinue("demographicsContainer");
+       };
+    };
 
     var bdChangeEvent = function() {
        var d = $("#date");
@@ -344,19 +469,18 @@ $(document).ready(function(){
                   $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
                   $("#errorbirthday").text("").hide();
                   assembleContent.demo($("#iq_userId").val());
-                  //fc.getNextField($(this).attr('sectionIndex'));
-                  var isComplete = fc.allFieldsCompleted();
-                  if (isComplete) {
-                     continueOn();
-                  } else fc.getNextField(null, $("#year"));
+                  if (fc.allFieldsCompleted()) {
+                     continueToFinish();
+                  } else {
+                    if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
+                  };
               } else {
+                  stopContinue("demographicsContainer");
                   $("#errorbirthday").text(errorMsg).show();
-                  stopContinue();
               };
-          };
-      };
+          } else stopContinue("demographicsContainer");
+      } else stopContinue("demographicsContainer");
     };
-
 
     var rolesGroupClickEvent = function(){
         var roles = [];
@@ -364,83 +488,66 @@ $(document).ready(function(){
         roles.push({name: theVal});
         var toSend = {"roles": roles};
         tnthAjax.putRoles({{user.id}},toSend);
+
         if (theVal == "patient") {
-            // If patient, then we always show bdGroup
-            var fname = $("#firstname"), lname = $("#lastname");
-            if (fname.length > 0 && lname.length > 0 && (fname.val() == "" || lname.val() == "")) {
-                if (!hasValue(fname.val())) fname.trigger("blur");
-                if (!hasValue(lname.val())) lname.trigger("blur");
-            } else {
-              if ($("#bdGroup").length > 0) {
-                $("#bdGroup").fadeIn();
-              };
-              // Also, if they already have a valid birthday, then trigger blur to make patientQ appear
-
-              if ($("#bdGroup").length > 0) {
-                $('html, body').animate({
-                  scrollTop: $('#bdGroup').offset().top
-                }, 500);
-                if (fc.sectionCompleted('bdGroup')) fc.getNextField(null, $(this));
-              } else fc.getNextField($(this).attr("sectionIndex"), $(this));
-
-              //$("#clinics").hide();
-
-              $("#patientQ").attr("skipped", "false");
-              $("#bdGroup").attr("skipped", "false");
-              $("#clinics").attr("skipped", "false");
-
-
-              if (fc.allFieldsCompleted()) {
-                continueOn();
-              } else {
-                stopContinue();
-              };
-            };
-
+            $("#clinicalContainer").attr("skipped", "false");
+            $("#orgsContainer").attr("skipped", "false");
+            $("#date").attr("required", "required").attr("skipped", "false");
+            $("#month").attr("required", "required").attr("skipped", "false");
+            $("#year").attr("required", "required").attr("skipped", "false");
+            $(".bd-optional").hide();
         } else {
           // If partner, skip all questions
           if (theVal == "partner") {
-            $("#patientQ").attr("skipped", "true").hide();
-            $("#bdGroup").attr("skipped", "true").hide();
-            $("#clinics").attr("skipped", "true").hide();
-            continueOn();
+            $("#clinicalContainer").attr("skipped", "true");
+            $("#orgsContainer").attr("skipped", "true");
+            $("#date").removeAttr("required").attr("skipped", "true");
+            $("#month").removeAttr("required").attr("skipped", "true");
+            $("#year").removeAttr("required").attr("skipped", "true");
+            $(".bd-optional").show();
+           //continueToFinish();
+           // return true;
           };
+        };
+
+        if (fc.allFieldsCompleted()) {
+          continueToFinish();
+        } else {
+          if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
+          else stopContinue("demographicsContainer");
         };
     };
 
-
-
     var patientQClickEvent = function(){
           var thisItem = $(this);
-          var toCall = thisItem.attr("name")
+          var toCall = thisItem.attr("name");
           // Get value from div - either true or false
           var toSend = thisItem.val();
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
           if (toCall != "tx" && toCall != "biopsy") {
-              tnthAjax.putClinical({{user.id}},toCall,toSend);
+              tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("status"), false);
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
 
             if (toCall == "biopsy") {
+                $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  tnthAjax.postBiopsy({{user.id}}, $("#biopsyDate").val(), toSend);
+                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
             };
 
             thisItem.parents(".pat-q").next().fadeIn();
-            $("#clinics").hide(); //this is hard coded, ARGHHH!!
 
             var nextRadio = thisItem.closest(".pat-q").next(".pat-q");
             var nextItem = nextRadio.length > 0 ? nextRadio : thisItem.parents(".pat-q").next();
             if (nextItem.length > 0) {
                 var checkedRadio = nextItem.find("input[type='radio']:checked");
-                if (!(checkedRadio.length > 0) && !nextItem.isOnScreen()) {
+                if (!(checkedRadio.length > 0)) {
                   $('html, body').animate({
                     scrollTop: nextItem.offset().top
                   }, 1000);
                 };
-
                 nextItem.find("input[type='radio']").each(function() {
                   $(this).attr("skipped", "false");
                 });
@@ -453,16 +560,12 @@ $(document).ready(function(){
                     });
                 });
 
-                if (fc.sectionCompleted('patientQ')) fc.getNextField(null, $(this));
-
-            } else {
-                fc.getNextField(null, $(this));
             };
 
           } else {
             if (toCall == "biopsy") {
-
-              tnthAjax.postBiopsy({{user.id}}, "", "false", (toSend == "unknown"? toSend:""));
+              tnthAjax.postClinical({{user.id}}, toCall, "false", $(this).attr("status"));
+              $("#biopsyDate").attr("skipped", "true");
 
               ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {
                   $("input[name='" + fieldName + "']").each(function() {
@@ -491,147 +594,127 @@ $(document).ready(function(){
               };
             }
             thisItem.parents(".pat-q").nextAll().fadeOut();
-            /********** to skip all questions ********/
-            /**hate this part, need to hard-code here****/
-            if ($("#clinics").length > 0) {
-              $("#clinics").fadeIn();
-              $('html, body').animate({
-                  scrollTop: $('#clinics').offset().top
-              }, 500);
-              if (fc.sectionCompleted('clinics')) continueOn();
-              return true;
-            } else {
-              continueOn();
-              return true;
-            };
           };
 
           if (fc.allFieldsCompleted()) {
-            continueOn();
-          } else stopContinue();
+            continueToFinish();
+          } else {
+            if (fc.sectionCompleted("clinicalContainer")) continueToNext("clinicalContainer");
+            else stopContinue("clinicalContainer");
+          }
       };
 
     var userOrgChangeEvent = function() {
-      assembleContent.demo({{ user.id }},null, null, true);
       if ($(this).prop("checked")) {
-        if (fc.allFieldsCompleted()) {
-          continueOn();
+        var m = $("#consentContainer .modal");
+        if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
+          //do nothing
         } else {
-          stopContinue();
+          assembleContent.demo({{ user.id }},null, null, true);
+          if (fc.allFieldsCompleted()) {
+            $("#iqErrorMessage").text("");
+            continueToFinish();
+          } else $("#iqErrorMessage").text("All fields must be completed.");
         };
-      } else stopContinue();
-    };
-
-
-    $("#agreeLabel").on("click",function(){
-      if ($(this).attr("data-agree") == "false") {
-        var theTerms = {};
-        theTerms["agreement_url"] = $("#termsURL").data().url;
-        // Post terms agreement via API
-        tnthAjax.postTerms(theTerms);
-        // Update UI
-        $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
-          .find("span").text("I consent and agree to the above terms.");
-        $("#aboutForm").fadeIn();
-        $('html, body').animate({
-          scrollTop: $('#aboutForm').offset().top
-        }, 1000);
-        $(this).attr("data-agree","true");
-      } else {
-        $(this).find("i").removeClass("fa-cehck-square-o").addClass("fa-square-o").end()
-          .find("span").text("I consent and agree to the above terms.");
-        $("#aboutForm").fadeOut();
-        $(this).attr("data-agree","false");
       };
+    };
+
+    $("#consentContainer .modal").each(function() {
+        $(this).on("hidden.bs.modal", function() {
+            if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
+              assembleContent.demo({{ user.id }},null, null, true);
+              if (fc.allFieldsCompleted()) {
+                continueToFinish();
+              } else continueToNext("orgsContainer");
+            } else {
+              $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
+            };
+        });
     });
 
-    //if term of use form not present - need to show the form
-    if ($("#topTerms").length == 0)  {
-        $("#aboutForm").fadeIn();
-        if ($("#aboutForm").length == 0) {
-          continueOn();
+    var termsEvent = function(){
+        if ($(this).attr("data-agree") == "false") {
+          var theTerms = {};
+          theTerms["agreement_url"] = $("#termsURL").data().url;
+          // Post terms agreement via API
+          tnthAjax.postTerms(theTerms);
+          // Update UI
+          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
+            .find("span").text("I consent and agree to the above terms.");
+          $("#aboutForm").fadeIn();
+          $(this).attr("data-agree","true");
+          if (fc.allFieldsCompleted()) {
+              continueToFinish();
+          } else continueToNext("topTerms");
         };
     };
 
-    $(".button-container").each(function() {
-        $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-    });
 
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
           alert("There's a problem with your submission. Please check your answers, then try again.  Make sure all required fields are completed and valid.");
         } else {
           $("#updateProfile").hide();
+          $("#next").hide();
           $(".loading-message-indicator").show();
           setTimeout("assembleContent.demo({{ user.id }},null, null, true);", 250);
         };
     });
 
-
-    /**** main object
-          this will help keeping track of missing fields
-     *****/
+    /**** main object, this will help keeping track of missing fields *****/
     mainSections = {
-
-      'nameGroup':  {
-                      fields: [$("#firstname"), $("#lastname")],
-                      event: null
-                    },
-      'rolesGroup': {
-                      fields: [$("input[name='user_type']")],
-                      event: rolesGroupClickEvent
-                    },
-      'bdGroup':    {
-                      fields: [$("#month"), $("#date"), $("#year")],
-                      event: bdChangeEvent
-                    },
-      'patientQ':   {
-                      fields: [$("input[name='biopsy']"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
-                      event: patientQClickEvent
-                    },
-      'clinics':    {
-                      fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
-                      event: userOrgChangeEvent
-                    }
+      'topTerms': {
+          display: "terms",
+          config: "tou",
+          subsections: {
+            "termsCheckbox": {
+                fields: [$("#agreeLabel")],
+                event: termsEvent
+            }
+        }
+      },
+      'demographicsContainer': {
+          display: "your information",
+          config: "name,dob,role",
+          subsections:{
+          "nameGroup": {
+                          fields: [$("#firstname"), $("#lastname")],
+                          event: namesChangeEvent
+                       }
+          ,
+          "rolesGroup": {fields: [$("input[name='user_type']")],
+                          event: rolesGroupClickEvent
+                        }
+          ,
+          "bdGroup": {
+                        fields: [$("#month"), $("#date"), $("#year")],
+                        event: bdChangeEvent
+                     }
+          }},
+      'clinicalContainer': {
+          display: "your clinical profile",
+          config: "clinical",
+          subsections:
+          {"patientQ": {
+                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
+                        event: patientQClickEvent
+                        }
+          }},
+      'orgsContainer': {
+          display: "your clinic",
+          config: "org",
+          subsections:
+          {"clinics": {
+                        fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
+                        event: userOrgChangeEvent
+                      }
+          }}
     };
 
     {% if not ('localized' in still_needed) %} $("#patMeta").remove(); {% endif %}
 
     fc = new FieldsChecker(mainSections);
     setTimeout("initIncompleteFields();", 500);
-
-    /** 1st - get all current info **/
-    /***done in macros now*****/
-    //tnthAjax.getRoles({{ user.id }});
-    //tnthAjax.getOrgs({{ user.id }});
-    //tnthAjax.getDemo({{ user.id}});
-    //tnthAjax.getClinical({{ user.id }});
-
-  /************** old consent stuff
-  $("#userOrgs input[name='organization']").each(function() {
-      $(this).on("click", function() {
-          var parentOrg = $(this).attr("data-parent-id");
-          var parentName = $(this).attr("data-parent-name");
-          //console.log("parentOrg: " + parentOrg + " parentName: " + parentName);
-          if (parentOrg != "") {
-              if ($(this).prop("checked")) {
-                  if ($("#" + parentOrg + "_consent").length > 0 && !($("#" + parentOrg + "_consent").is(":checked"))) { //only show consent checkbox if consent was not previous given
-                      $("#consentContainer .consent").hide();
-                      if (parentName) $("#" + parentOrg + "_consent_label").text("Share data with " + parentName + "?");
-                      else $("#" + parentOrg + "_consent_label").text("Share data with this institution?");
-                      $("#" + parentOrg + "_consentItem").show();
-                      //console.log($("#" + parentOrg + "_consentItem"))
-                  };
-              } else {
-                  $("#consentContainer .consent").hide();
-              };
-          };
-
-          $("#userOrgs").find(".help-block").text("");
-
-
-      });
-    });********************************/
   });
 {% endblock %}
 

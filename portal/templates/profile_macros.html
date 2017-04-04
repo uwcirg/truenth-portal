@@ -411,8 +411,8 @@
        <div class="state-selector-container">
             <select id="stateSelector" class="form-control"></select>
        </div>
-       <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state">
-           <p class="clinic-prompt text-muted">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+       <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
+           <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
            <div class="main-state-container">
                 <div class="noOrg-container" style="display: none">
                     <label>
@@ -525,13 +525,13 @@
         {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
         <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
         <div class="indent">
-        <div id="fillOrgs"></div>
+        <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
         <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
         </div>
         {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
         <div class="help-block with-errors"></div>
     </div>
-    <script>
+    <script async>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
@@ -548,8 +548,8 @@
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
-            {% if consent_agreements %}tnthAjax.getConsent({{ person.id if person }}, true);{% endif %}
-            tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);
+            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
+            setTimeout('tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);', 500);
         });
 
         function _handleOrgs() {
@@ -604,9 +604,81 @@
     {% if person and consent_agreements %}
         <div id="consentContainer">
             {% for org in consent_agreements %}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/></div>
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
+              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModalLabel">
+              <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <h4>Terms</h4>
+                            <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreements[org].asset|safe}}</div>
+                            <br/>
+                            <p>{{_("Do you consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreements[org].organization_name}}</span>?</p>
+                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="consent_yes" org="{{org}}" value="yes"/>
+                                  {{ _("Yes") }}
+                              </label>
+                              <br/>
+                              <label class="radio-inline">
+                                  <input type="radio" name="toConsent" id="conset_no" org="{{org}}"value="no"/>
+                                  {{ _("No") }}
+                              </label>
+                            </div>
+                            <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                         </div>
+                         <br/>
+                         <div class="modal-footer" >
+                            <button type="button" class="btn btn-default btn-consent-close" org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                         </div>
+                    </div>
+                    </div>
+                </div>
             {% endfor %}
         </div>
+        <script>
+            $(function() {
+                $("#consentContainer input[name='toConsent']").each(function() {
+                    $(this).on("click", function() {
+                        var orgId = $(this).attr("org");
+                        if ($(this).val() == "yes") {
+                            var params = CONSENT_ENUM["consented"];
+                            params.org = orgId;
+                            params.agreementUrl = $("#" + orgId + "_agreement_url").val();
+                            tnthAjax.setConsent({{person.id}}, params);
+                        }
+                        else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
+                        if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
+                        setTimeout('$(".modal").modal("hide");', 250);
+                    });
+                });
+                // $("#consentContainer button.btn-consent-close").each(function() {
+                //     $(this).on("click", function() {
+                //         var orgId = $(this).attr("org");
+                //         if ($("#" + orgId +"_consentAgreementRadioList input[name='toConsent']:checked").length == 0) {
+                //             $("#" + orgId + "_consentAgreementMessage").text("Please select yes or no");
+
+                //         } else {
+                //             $("#" + orgId + "_consentAgreementMessage").text("");
+                //         };
+                //     });
+                // });
+                $("#consentContainer button[data-dismiss]").on("click", function() {
+                    $("#userOrgs input[name='organization']:checked").prop("checked", false);
+                });
+                $("#consentContainer .modal").each(function() {
+                    $(this).on("hidden.bs.modal", function() {
+                        if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
+                            var userId = $("#fillOrgs").attr("userId");
+                            assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
+                        };
+                    });
+                });
+            });
+        </script>
     {% endif %}
 {%- endmacro %}
 
@@ -1105,20 +1177,19 @@
                       var toCall = thisItem.attr("name")
                       // Get value from div - either true or false
                       var toSend = thisItem.val();
-                      if (toCall != "biopsy") tnthAjax.putClinical({{person.id}},toCall,toSend, $(this));
+                      if (toCall != "biopsy") tnthAjax.postClinical({{person.id}},toCall,toSend, $(this).attr("status"), $(this));
 
                       if (toSend == "true" || toCall ==  "pca_localized") {
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              //NOTE biopsy date is in dd/mm/yyyy format, need to convert it back to mm/dd/yyyy format for submission
-                              tnthAjax.postBiopsy({{person.id}}, $("#biopsyDate").val(), toSend, "", $(this));
+                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
                       } else {
                         if (toCall == "biopsy") {
-                            tnthAjax.postBiopsy({{person.id}}, "", "false", (toSend == "unknown"? toSend:""), $(this));
+                            tnthAjax.postClinical({{person.id}}, toCall, "false", $(this).attr("status"), $(this));
                             ["pca_diag", "pca_localized"].forEach(function(fieldName) {
                                 $("input[name='" + fieldName + "']").each(function() {
                                     $(this).prop("checked", false);
@@ -1632,7 +1703,7 @@
         #profileProcedureContainer .inner {margin: 1em 0.5em 1em 0.5em}
         #procedureForm { margin-left: 0.5em;}
         #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
-        #profileProcedureContainer button.btn {color:#777; font-size: 0.95em; height: 2.7em;}
+        #profileProcedureContainer button.btn {color:#777; font-size: 0.9em;}
     </style>
     <div class="row">
             <div class="col-md-12 col-xs-12">

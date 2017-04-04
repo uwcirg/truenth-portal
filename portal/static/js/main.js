@@ -253,6 +253,7 @@ var fillContent = {
             var clinicalValue = val.content.valueQuantity.value;
             //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
             var status = val.content.status;
+            console.log(clinicalItem + " " + status);
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {
@@ -263,8 +264,8 @@ var fillContent = {
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if(!$radios.is(':checked')) {
-                    if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
-                    else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                    if (status == "unknown") $radios.filter('[status="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').not("[status='unknown']").prop('checked', true);
                     if (clinicalItem == "biopsy") {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
@@ -1216,7 +1217,7 @@ var OrgTool = function() {
         getSaveLoaderDiv("profileForm", "userOrgs");
         $("#userOrgs input[name='organization']").each(function() {
             $(this).attr("save-container-id", "userOrgs");
-            $(this).on("click", function() {
+            $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
 
@@ -1239,9 +1240,13 @@ var OrgTool = function() {
                         if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                     };
                 };
-                assembleContent.demo(userId,true, $(this), true);
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
-                tnthAjax.handleConsent($(this));
+
+                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) $("#" + parentOrg + "_consentModal").modal("show");
+                else {
+                    assembleContent.demo(userId,true, $(this), true);
+                    if (typeof reloadConsentList != "undefined") reloadConsentList();
+                    tnthAjax.handleConsent($(this));
+                };
             });
         });
     };
@@ -1760,7 +1765,7 @@ var tnthAjax = {
            if ($(".get-clinical-error").length == 0) $(".error-message").append("<div class='get-clinical-error'>Server error occurred retrieving clinical data.</div>");
         });
     },
-    "putClinical": function(userId, toCall, toSend, targetField) {
+    "putClinical": function(userId, toCall, toSend, targetField, status) {
         flo.showLoader(targetField);
         $.ajax ({
             type: "POST",
@@ -1777,8 +1782,9 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "getBiopsyId": function(userId) {
-        var obId = "", code="";
+    "getObservationId": function(userId, code) {
+        if (!hasValue(userId) && !hasValue(code)) return false;
+        var obId = "", _code="";
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/clinical',
@@ -1787,8 +1793,8 @@ var tnthAjax = {
             if (data && data.entry) {
                 (data.entry).forEach(function(item) {
                     if (!hasValue(obId)) {
-                        code = item.content.code.coding[0].code;
-                        if (code == "111") obId = item.content.id;
+                        _code = item.content.code.coding[0].code;
+                        if (_code == code) obId = item.content.id;
                     };
                 });
             }
@@ -1797,12 +1803,25 @@ var tnthAjax = {
         });
         return obId;
     },
-    "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
+    "postClinical": function(userId, toCall, toSend, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
         if (!params) params = {};
-        var code = '111';
-        var display = "biopsy";
+        var code = "";
+        var display = "";
+        switch(toCall) {
+            case "biopsy":
+                code = "111";
+                display = "biopsy";
+                break;
+            case "pca_diag":
+                code = "121";
+                display = "PCa diagnosis";
+                break;
+            case "pca_localized":
+                code = "141";
+                display = "PCa localized diagnosis";
+        };
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -1810,11 +1829,11 @@ var tnthAjax = {
         var obsArray = {};
         obsArray["resourceType"] = "Observation";
         obsArray["code"] = {"coding": obsCode};
-        obsArray["issued"] = issuedDate ? issuedDate: "";
+        obsArray["issued"] = params.issuedDate ? params.issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuantity"] = {"units":"boolean", "value":value};
+        obsArray["valueQuantity"] = {"units":"boolean", "value": toSend};
         if (params.performer) obsArray["performer"] = params.performer;
-        var obsId = tnthAjax.getBiopsyId(userId);
+        var obsId = tnthAjax.getObservationId(userId, code);
         if (hasValue(obsId)) {
             method = "PUT";
             url = url + "/" + obsId;
@@ -1897,7 +1916,8 @@ funcWrapper = function(param) {
         //dataFilter:data_filter,
         //xhr: xhr_function,
         crossDomain: true,
-        cache: false
+        cache: (getIEVersion() ? false : true)
+        //cache: false
         //xhrFields: {withCredentials: true},
     }, 'html')
     .done(function(data) {
@@ -2465,8 +2485,8 @@ function LRKeyEvent() {
 function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
-    target.append('<div>' + 
-                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' + 
+    target.append('<div>' +
+                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' +
                 '</div>'
                 );
     if (show) $(".button--LR").addClass("show");

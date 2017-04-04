@@ -37,7 +37,7 @@
 {% if config.PIWIK_SITEID %}
 <script type="text/javascript">
     var _paq = _paq || [];
-	{% if config.PIWIK_DOMAINS %}
+    {% if config.PIWIK_DOMAINS %}
     _paq.push(["setDomains", {{ config.PIWIK_DOMAINS|safe }}]);
     {% endif %}
     {% if user %}
@@ -165,5 +165,3 @@ $(document).ready(function(){
 });
 </script>
 <script defer>setTimeout("$('.no-fouc').removeClass('no-fouc');", 300);</script>
-
-
