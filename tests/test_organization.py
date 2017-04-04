@@ -121,6 +121,40 @@ class TestOrganization(TestCase):
         self.assertTrue(bundle['resourceType'], 'Bundle')
         self.assertEquals(len(bundle['entry']), 1)
 
+    def test_organization_inheritence_search(self):
+        # Region at top should apply to leaves
+        self.deepen_org_tree()
+        count = Organization.query.count()
+        self.assertTrue(count > 3)
+
+        # add region to one mid-level parent org with two children,
+        # we should get only those three
+        region = Identifier(value='state:NY', system=PRACTICE_REGION)
+        with SessionScope(db):
+            db.session.add(region)
+            db.session.commit()
+        region = db.session.merge(region)
+        oi = OrganizationIdentifier(organization_id=1002,
+                                    identifier_id=region.id)
+        with SessionScope(db):
+            db.session.add(oi)
+            db.session.commit()
+
+        # use api to obtain FHIR bundle
+        self.login()
+        rv = self.client.get('/api/organization?state=NY')
+        self.assert200(rv)
+        bundle = rv.json
+        self.assertTrue(bundle['resourceType'], 'Bundle')
+        self.assertEquals(len(bundle['entry']), 3)
+
+        # add filter to restrict to just the leaves
+        rv = self.client.get('/api/organization?state=NY&filter=leaves')
+        self.assert200(rv)
+        bundle = rv.json
+        self.assertTrue(bundle['resourceType'], 'Bundle')
+        self.assertEquals(len(bundle['entry']), 2)
+
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
