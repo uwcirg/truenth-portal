@@ -253,7 +253,6 @@ var fillContent = {
             var clinicalValue = val.content.valueQuantity.value;
             //console.log(clinicalItem + " " + clinicalValue + " issued: " + val.content.issued + " last updated: " + val.content.meta.lastUpdated + " " + (new Date(val.content.meta.lastUpdated.replace(/\-/g, "/").replace("T", " ")).getTime()))
             var status = val.content.status;
-            console.log(clinicalItem + " " + status);
             if (clinicalItem == "PCa diagnosis") {
                 clinicalItem = "pca_diag";
             } else if (clinicalItem == "PCa localized diagnosis") {

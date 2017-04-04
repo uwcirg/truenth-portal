@@ -655,17 +655,6 @@
                         setTimeout('$(".modal").modal("hide");', 250);
                     });
                 });
-                // $("#consentContainer button.btn-consent-close").each(function() {
-                //     $(this).on("click", function() {
-                //         var orgId = $(this).attr("org");
-                //         if ($("#" + orgId +"_consentAgreementRadioList input[name='toConsent']:checked").length == 0) {
-                //             $("#" + orgId + "_consentAgreementMessage").text("Please select yes or no");
-
-                //         } else {
-                //             $("#" + orgId + "_consentAgreementMessage").text("");
-                //         };
-                //     });
-                // });
                 $("#consentContainer button[data-dismiss]").on("click", function() {
                     $("#userOrgs input[name='organization']:checked").prop("checked", false);
                 });
