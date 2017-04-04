@@ -513,7 +513,7 @@ var fillContent = {
                     } else orgName = orgs[orgId]._name;
 
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
-                    var expired = tnthDates.getDateDiff(item.expires);
+                    var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
@@ -1377,7 +1377,7 @@ var tnthAjax = {
                 if (d.length > 0) {
                     d.forEach(function(item) {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
-                        expired = tnthDates.getDateDiff(item.expires);
+                        expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
                             if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
@@ -1413,7 +1413,8 @@ var tnthAjax = {
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
                     item = d[0];
-                    expired = tnthDates.getDateDiff(item.expires);
+                    console.log(item.expires)
+                    expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     if (item.deleted) found = true;
                     if (expired > 0) found = true;
                     if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
@@ -2494,7 +2495,25 @@ function appendLREditContainer(target, url, show) {
 
 function getSaveLoaderDiv(parentID, containerID) {
     var el = $("#" + containerID + "_load");
-    if (el.length == 0) $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+    if (el.length == 0) {
+        var c = $("#" + parentID + " #" + containerID);
+        if (c.length > 0) {
+            var snippet = '<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>';
+            if (window.getComputedStyle) {
+                displayStyle = window.getComputedStyle(c.get(0), null).getPropertyValue('display');
+            } else {
+                displayStyle = (c.get(0)).currentStyle.display;
+            };
+            if (displayStyle == "block") {
+                c.append(snippet);
+            } else {
+                if (displayStyle == "none" || !hasValue(displayStyle)) {
+                    if (c.get(0).nodeName.toUpperCase() == "DIV" || c.get(0).nodeName.toUpperCase() == "P") c.append(snippet);
+                    else c.after(snippet);
+                } else c.after(snippet);
+            };
+        };
+    };
 };
 
 function _isTouchDevice(){

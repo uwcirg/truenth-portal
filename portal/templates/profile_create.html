@@ -139,7 +139,7 @@ $(document).ready(function(){
             $("#email").attr("disabled", true);
             $("#email").removeAttr("required");
             $("#email").removeAttr("data-customemail");
-            setTimeout('$("#erroremail").text("");', 500);
+            setTimeout('$("#erroremail").text(""); $("#email").closest("form-group").removeClass("has-error");', 500);
         }
         else {
             $("#email").attr("disabled", false);

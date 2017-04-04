@@ -106,37 +106,38 @@ $(document).ready(function(){
     });
 
     [{
-        attachID: "month",
+        attachID: "bdMonthContainer",
         targetField: $("#month"),
         customErrorField: $("#errorbirthday")
       },
      {
-        attachID: "date",
+        attachID: "bdDateContainer",
         targetField: $("#date"),
         customErrorField: $("#errorbirthday")
      },
      {
-        attachID: "year",
+        attachID: "bdYearContainer",
         targetField: $("#year"),
         customErrorField: $("#errorbirthday")
      },
      {
-        attachID: "firstname",
+        attachID: "firstNameContainer",
         targetField: $("#firstname")
      },
      {
-        attachID: "lastname",
+        attachID: "lastNameContainer",
         targetField: $("#lastname")
      },
      {
-        attachID: "email"
+        attachID: "emailGroup",
+        targetField: $("#emailGroup")
      },
      {
-        attachID: "phone",
+        attachID: "phoneGroup",
         targetField: $("#phone")
      },
      {
-        attachID: "locale",
+        attachID: "localeGroup",
         targetField: $("#locale")
      },
      {
@@ -166,7 +167,8 @@ $(document).ready(function(){
               $(this).attr("save-container-id", o.attachID);
               var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
               $(this).on(triggerEvent, function() {
-                if (this.validity.valid) {
+                var valid = this.validity ? this.validity.valid : true;
+                if (valid) {
                   var hasError = false;
                   if ($(this).attr("error-field")) {
                     var customErrorField = $("#" + $(this).attr("error-field"));

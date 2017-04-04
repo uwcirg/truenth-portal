@@ -13,10 +13,10 @@
     <div class="form-group profile-section" id="bdGroup">
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item">
+            <div class="flex-item" id="bdDateContainer">
                 <input class="form-control bd-element" id="date" name="birthdayDate" error-field="errorbirthday" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="Birthday must be valid and in required format." required />
             </div>
-            <div class="flex-item">
+            <div class="flex-item" id="bdMonthContainer">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -33,7 +33,7 @@
                     <option value="12">{{ _("December") }}</option>
                 </select>
             </div>
-            <div class="flex-item">
+            <div class="flex-item" id="bdYearContainer">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" error-field="errorbirthday" data-error="Birthday must be valid and in required format." required />
             </div>
         </div>
@@ -76,7 +76,7 @@
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
-    <div class="form-group float-input-label profile-section timezone-container flex-item">
+    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
           <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
@@ -98,13 +98,13 @@
         <label>{{ _("Name") }}</label>
     </div>
     <div class="row profile-section name-section">
-        <div class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
+        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
             <div class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        <div class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
+        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
             <div class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
@@ -233,7 +233,7 @@
 {% macro profileEmail(person) -%}
     <div class="form-group float-input-label profile-section" id="emailGroup">
         <label for="email">{{ _("Email Address") }}</label>
-        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" save-container-id="email" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" required>
+        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" save-container-id="emailGroup" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
 {%- endmacro %}
@@ -368,7 +368,7 @@
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
-    <div class="form-group float-input-label profile-section">
+    <div id="phoneGroup" class="form-group float-input-label profile-section">
         <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <input type="text" class="form-control" id="phone" name="phone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.phone if person and person.phone }}">
     </div>
@@ -1253,7 +1253,7 @@
 {% macro profileTimeZone(person) %}
     <div id="profileTimeZoneGroup" class="form-group timezone-container flex-item">
         <label>Time Zone</label>
-        <select class="form-control" id="profileTimeZone" save-container-id="profileTimeZone">
+        <select class="form-control" id="profileTimeZone" save-container-id="profileTimeZoneGroup">
             <option value="UTC">-- Select --</option>
             <option value="America/Denver">America/Denver</option>
             <option value="America/Los_Angeles">America/Los Angeles</option>
@@ -1286,7 +1286,7 @@
     <script async>
     {% if person %}
     $(function() {
-        getSaveLoaderDiv("profileForm", "profileTimeZone");
+        getSaveLoaderDiv("profileForm", "profileTimeZoneGroup");
         $('#profileTimeZone').on('change', function() {
             $(".timezone-error").html("");
             $(".timezone-warning").html("");
@@ -1320,14 +1320,14 @@
                 </div>
                 <div class="row" style="margin-top:-8px">
                     <div class="col-md-3 col-xs-6">
-                        <div class="form-group profile-section">
-                            <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDay" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                        <div id="deathDayContainer" class="form-group profile-section">
+                            <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
                              <div class="help-block with-errors"></div>
                         </div>
                     </div>
                     <div class="col-md-3 col-xs-10">
-                        <div class="form-group profile-section">
-                            <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonth" required>
+                        <div id="deathMonthContainer" class="form-group profile-section">
+                            <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonthContainer" required>
                                 <option value="">{{ _("Month") }}...</option>
                                 <option value="01">{{ _("January") }}</option>
                                 <option value="02">{{ _("February") }}</option>
@@ -1346,8 +1346,8 @@
                         </div>
                     </div>
                     <div class="col-md-3 col-xs-6">
-                        <div class="form-group profile-section">
-                            <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYear" required />
+                        <div id="deathYearContainer" class="form-group profile-section">
+                            <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYearContainer" required />
                             <div class="help-block with-errors"></div>
                         </div>
                     </div>
@@ -1372,7 +1372,7 @@
                 });
 
                 ["deathDay", "deathMonth", "deathYear"].forEach(function(fn) {
-                    getSaveLoaderDiv("profileForm", fn);
+                    getSaveLoaderDiv("profileForm", $("#"+fn).attr("save-container-id"));
                     var fd = $("#" + fn);
                     var triggerEvent = fd.attr("type") == "text" ? "blur": "change";
                     fd.on(triggerEvent, function() {
