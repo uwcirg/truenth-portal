@@ -39,6 +39,7 @@ Flask-WTF==0.14.2
 functools32==3.2.3.post2
 future==0.16.0
 fuzzywuzzy==0.15.0
+gunicorn==19.7.1
 imagesize==0.7.1
 ipdb==0.10.2
 ipython==5.3.0
