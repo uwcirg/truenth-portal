@@ -7,7 +7,6 @@
   "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
   "success_url": "/about",
   "env": {},
-  "image": "uwcirg-docker-true_nth.bintray.io/portal_web:latest",
   "addons": [
     "heroku-redis",
     {
