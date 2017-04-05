@@ -41,7 +41,7 @@
                 {% if user_manager.enable_retype_password %}
                 {% set retype_password_label = gettext('Retype Password') %}
                 {% set retype_data_match_error = gettext('Oops, the two password fields do not match.') %}
-                {% set retype_data_error = "Please re-type your password." %}
+                {% set retype_data_error = gettext('Please re-type your password.') %}
                 {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
                 <br/>
