@@ -7,7 +7,7 @@ to install:
     python setup.py install
 
 """
-
+import datetime, os
 from setuptools import setup
 
 project = "portal"
@@ -18,7 +18,8 @@ long_description =\
 """TrueNTH Shared Services RESTful API, to be used by TrueNTH intervention applications. This API attempts to conform with the HL7 FHIR specification as much as is reasonable.
 """
 
-setup(
+
+setup_kwargs = dict(
     name=project,
     url="https://github.com/uwcirg/true_nth_usa_portal",
     description="TrueNTH Shared Services",
@@ -41,11 +42,9 @@ setup(
     platforms = "any",
 
     include_package_data=True,
-    use_scm_version=True,
     zip_safe=False,
     packages=["portal"],
     scripts=["manage.py"],
-    setup_requires=("setuptools_scm"),
     install_requires=(
         "Authomatic",
         "celery",
@@ -88,3 +87,16 @@ setup(
     },
     test_suite="tests",
 )
+
+
+if os.path.exists('.git'):
+    version_kwargs = dict(
+        use_scm_version=True,
+        setup_requires=('setuptools_scm'),
+    )
+# Allow installation without git repository, e.g. inside Heroku
+else:
+    version_kwargs = dict(version='0+d'+datetime.date.today().strftime('%Y%m%d'))
+
+setup_kwargs.update(version_kwargs)
+setup(**setup_kwargs)
