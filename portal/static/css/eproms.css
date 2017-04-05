@@ -1246,7 +1246,8 @@ table.profile-audit-log TH,
   padding: 0.1em 0 1.5em 0;
 }
 .custom-container h4 {
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
+  margin-top: 0.5em;
 }
 .custom-container button,
 .custom-container a {
@@ -1341,6 +1342,9 @@ table.profile-audit-log TH,
 .radio-inline input[type=radio] {
   margin-left: -18px;
 }
+.radio-inline span {
+  margin-left: 4px;
+}
 div.biopsy-option:last-of-type{
   margin-top: 1px;
 }
@@ -1353,6 +1357,12 @@ div.modal-header,
 div.modal-footer {
   background-color: #79815D;
   color: #FFF;
+}
+div.modal-body {
+  padding: 0.8em 2em;
+}
+div.modal-footer .btn {
+  font-size: 0.9em;
 }
 .hide {
   display: none;
