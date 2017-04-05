@@ -656,7 +656,7 @@
                     });
                 });
                 $("#consentContainer button[data-dismiss]").on("click", function() {
-                    $("#userOrgs input[name='organization']:checked").prop("checked", false);
+                    setTimeout("location.reload();", 10);
                 });
                 $("#consentContainer .modal").each(function() {
                     $(this).on("hidden.bs.modal", function() {
