@@ -6,7 +6,12 @@
   "repository": "https://github.com/uwcirg/true_nth_usa_portal",
   "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
   "success_url": "/about",
-  "env": {},
+  "env": {
+    "LOG_FOLDER": {
+      "description": "Temporary log directory override; should write to stdout if unconfigured",
+      "value": "/tmp/logs"
+    }
+  },
   "addons": [
     "heroku-redis",
     {
