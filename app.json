@@ -10,6 +10,10 @@
     "LOG_FOLDER": {
       "description": "Temporary log directory override; should write to stdout if unconfigured",
       "value": "/tmp/logs"
+    },
+    "PERSISTENCE_FILE": {
+      "description": "Site-specific configuration file, defaults to TrueNTH",
+      "value": "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json"
     }
   },
   "addons": [
