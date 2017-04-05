@@ -21,4 +21,7 @@
       }
     }
   ],
+  "scripts": {
+    "postdeploy": "python manage.py initdb"
+  }
 }
