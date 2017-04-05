@@ -96,7 +96,7 @@ var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
 
 var fc, mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
-var CONFIG_REQUIRED_CORE_DATA = {{config.REQUIRED_CORE_DATA|safe}};
+var CONFIG_REQUIRED_CORE_DATA = {%if config.REQUIRED_CORE_DATA %}{{config.REQUIRED_CORE_DATA|safe}}{% else%}false{%endif%};
 
 function inConfig(configMatch) {
   if (! hasValue(configMatch)) return false;
