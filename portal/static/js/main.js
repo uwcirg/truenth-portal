@@ -263,8 +263,8 @@ var fillContent = {
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if(!$radios.is(':checked')) {
-                    if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
-                    else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                    if (status == "unknown") $radios.filter('[status="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').not("[status='unknown']").prop('checked', true);
                     if (clinicalItem == "biopsy") {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
@@ -513,7 +513,7 @@ var fillContent = {
                     } else orgName = orgs[orgId]._name;
 
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
-                    var expired = tnthDates.getDateDiff(item.expires);
+                    var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
@@ -1216,7 +1216,7 @@ var OrgTool = function() {
         getSaveLoaderDiv("profileForm", "userOrgs");
         $("#userOrgs input[name='organization']").each(function() {
             $(this).attr("save-container-id", "userOrgs");
-            $(this).on("click", function() {
+            $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
 
@@ -1239,9 +1239,13 @@ var OrgTool = function() {
                         if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                     };
                 };
-                assembleContent.demo(userId,true, $(this), true);
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
-                tnthAjax.handleConsent($(this));
+
+                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) $("#" + parentOrg + "_consentModal").modal("show");
+                else {
+                    assembleContent.demo(userId,true, $(this), true);
+                    if (typeof reloadConsentList != "undefined") reloadConsentList();
+                    tnthAjax.handleConsent($(this));
+                };
             });
         });
     };
@@ -1373,7 +1377,7 @@ var tnthAjax = {
                 if (d.length > 0) {
                     d.forEach(function(item) {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
-                        expired = tnthDates.getDateDiff(item.expires);
+                        expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
                             if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
@@ -1409,7 +1413,7 @@ var tnthAjax = {
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
                     item = d[0];
-                    expired = tnthDates.getDateDiff(item.expires);
+                    expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     if (item.deleted) found = true;
                     if (expired > 0) found = true;
                     if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
@@ -1760,7 +1764,7 @@ var tnthAjax = {
            if ($(".get-clinical-error").length == 0) $(".error-message").append("<div class='get-clinical-error'>Server error occurred retrieving clinical data.</div>");
         });
     },
-    "putClinical": function(userId, toCall, toSend, targetField) {
+    "putClinical": function(userId, toCall, toSend, targetField, status) {
         flo.showLoader(targetField);
         $.ajax ({
             type: "POST",
@@ -1777,8 +1781,9 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "getBiopsyId": function(userId) {
-        var obId = "", code="";
+    "getObservationId": function(userId, code) {
+        if (!hasValue(userId) && !hasValue(code)) return false;
+        var obId = "", _code="";
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/clinical',
@@ -1787,8 +1792,8 @@ var tnthAjax = {
             if (data && data.entry) {
                 (data.entry).forEach(function(item) {
                     if (!hasValue(obId)) {
-                        code = item.content.code.coding[0].code;
-                        if (code == "111") obId = item.content.id;
+                        _code = item.content.code.coding[0].code;
+                        if (_code == code) obId = item.content.id;
                     };
                 });
             }
@@ -1797,12 +1802,25 @@ var tnthAjax = {
         });
         return obId;
     },
-    "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
+    "postClinical": function(userId, toCall, toSend, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
         if (!params) params = {};
-        var code = '111';
-        var display = "biopsy";
+        var code = "";
+        var display = "";
+        switch(toCall) {
+            case "biopsy":
+                code = "111";
+                display = "biopsy";
+                break;
+            case "pca_diag":
+                code = "121";
+                display = "PCa diagnosis";
+                break;
+            case "pca_localized":
+                code = "141";
+                display = "PCa localized diagnosis";
+        };
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -1810,11 +1828,11 @@ var tnthAjax = {
         var obsArray = {};
         obsArray["resourceType"] = "Observation";
         obsArray["code"] = {"coding": obsCode};
-        obsArray["issued"] = issuedDate ? issuedDate: "";
+        obsArray["issued"] = params.issuedDate ? params.issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuantity"] = {"units":"boolean", "value":value};
+        obsArray["valueQuantity"] = {"units":"boolean", "value": toSend};
         if (params.performer) obsArray["performer"] = params.performer;
-        var obsId = tnthAjax.getBiopsyId(userId);
+        var obsId = tnthAjax.getObservationId(userId, code);
         if (hasValue(obsId)) {
             method = "PUT";
             url = url + "/" + obsId;
@@ -1894,11 +1912,7 @@ funcWrapper = function(param) {
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
-        //dataFilter:data_filter,
-        //xhr: xhr_function,
-        crossDomain: true,
-        cache: false
-        //xhrFields: {withCredentials: true},
+        cache: (getIEVersion() ? false : true)
     }, 'html')
     .done(function(data) {
         embed_page(data);
@@ -2465,8 +2479,8 @@ function LRKeyEvent() {
 function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
-    target.append('<div>' + 
-                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' + 
+    target.append('<div>' +
+                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' +
                 '</div>'
                 );
     if (show) $(".button--LR").addClass("show");
@@ -2475,7 +2489,25 @@ function appendLREditContainer(target, url, show) {
 
 function getSaveLoaderDiv(parentID, containerID) {
     var el = $("#" + containerID + "_load");
-    if (el.length == 0) $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+    if (el.length == 0) {
+        var c = $("#" + parentID + " #" + containerID);
+        if (c.length > 0) {
+            var snippet = '<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>';
+            if (window.getComputedStyle) {
+                displayStyle = window.getComputedStyle(c.get(0), null).getPropertyValue('display');
+            } else {
+                displayStyle = (c.get(0)).currentStyle.display;
+            };
+            if (displayStyle == "block") {
+                c.append(snippet);
+            } else {
+                if (displayStyle == "none" || !hasValue(displayStyle)) {
+                    if (c.get(0).nodeName.toUpperCase() == "DIV" || c.get(0).nodeName.toUpperCase() == "P") c.append(snippet);
+                    else c.after(snippet);
+                } else c.after(snippet);
+            };
+        };
+    };
 };
 
 function _isTouchDevice(){

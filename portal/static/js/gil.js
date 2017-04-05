@@ -784,6 +784,13 @@ function checkBannerStatus() {
     };
   }
 };
+
+function adjustHeaderHeight() {
+  if ($(".watermark").length > 0) {
+    $("header.no-banner ").css("padding-top", "35px");
+  };
+};
+
 function goToLogin() {
     $('#modal-login-register').modal('hide');
     setTimeout("$('#modal-login').modal('show'); ", 400);
@@ -873,8 +880,8 @@ function LRKeyEvent() {
 function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
-    target.append('<div>' + 
-                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' + 
+    target.append('<div>' +
+                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' +
                 '</div>'
                 );
     if (show) $(".button--LR").addClass("show");

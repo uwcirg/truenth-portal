@@ -24,17 +24,25 @@
                 {{ form.hidden_tag() }}
                 {# Username or Email #}
                 {% set field = form.username if user_manager.enable_username else form.email %}
-                {{ render_field(field, label="Email address", label_visible=false, tabindex=220, required="required", data_error="Email address is required." ) }}
+                {% set email_label = gettext('Email address') %}
+                {% set email_data_error = gettext('Email address is required.') %}
+                {{ render_field(field, label=email_label, label_visible=false, tabindex=220, required="required", data_error=email_data_error, class="input-field" ) }}
 
                 {% if user_manager.enable_email and user_manager.enable_username %}
-                {{ render_field(form.email, label="Email", label_visible=false, tabindex=230, data_customemail="true") }}
+                {% set email_field_name = gettext('Email') %}
+                {{ render_field(form.email, label=email_field_name, label_visible=false, tabindex=230, data_customemail="true", class="input-field") }}
                 {% endif %}
                 <div class="password-wrapper">
-                {{ render_field(form.password, label="Password", label_visible=false, data_error="Oops, the password does not meet the minimum requirements.", pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required") }}
+                {% set password_label = gettext('Password') %}
+                {% set password_data_error = gettext('Oops, the password does not meet the minimum requirements.') %}
+                {{ render_field(form.password, label=password_label, label_visible=false, data_error=password_data_error, pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", autocomplete="new-password", tabindex=230, required="required", class="input-field") }}
                 </div>
 
                 {% if user_manager.enable_retype_password %}
-                {{ render_field(form.retype_password, label="Retype Password", label_visible=false, data_match="#password", data_match_error="Oops, the two password fields do not match.", tabindex=240, required="required", data_error="Please re-type your password.") }}
+                {% set retype_password_label = gettext('Retype Password') %}
+                {% set retype_data_match_error = gettext('Oops, the two password fields do not match.') %}
+                {% set retype_data_error = gettext('Please re-type your password.') %}
+                {{ render_field(form.retype_password, label=retype_password_label, label_visible=false, data_match="#password", data_match_error=retype_data_match_error, tabindex=240, required="required", data_error=retype_data_error, class="input-field") }}
                 {% endif %}
                 <br/>
 
@@ -104,6 +112,17 @@
 
 var __passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
+function checkValidity(submit) {
+     var allowed = true;
+    ["#email", "#password", "#retype_password"].forEach(function(fieldId) {
+        if ($(fieldId).val() == "") allowed = false;
+    });
+    if ($(".form-group.has-error").length > 0) allowed = false;
+    if (allowed) $("input[type='submit']").removeClass("disabled");
+    else $("input[type='submit']").addClass("disabled");
+    if (submit) $("input[type='submit']").trigger("click");
+}
+
 $(document).ready(function(){
     // Need to properly form attribute name
     $("[data-match_error]").each(function(){
@@ -126,6 +145,19 @@ $(document).ready(function(){
     })(window.location.search.substr(1).split('&'));
 
     if (qs["email"]) $("#email").val(qs["email"]);
+
+    $('input[type="submit"]').addClass("disabled");
+    $('input.input-field').each(function() {
+        $(this).on("blur, change", function() {
+           setTimeout("checkValidity();", 350);
+        });
+        $(this).on("keydown", function(e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                setTimeout("checkValidity(true);", 350);
+            };
+        });
+    });
 
     $("#password").popover({"content": "<b>{%trans%}Password must have at least:{%endtrans%}</b><ul id='pwdHintList'><li class='text-info eight-characters'>{%trans%}Eight characters{%endtrans%}</li><li class='text-info lowercase-letter'>{%trans%}One lowercase letter{%endtrans%}</li><li class='text-info uppercase-letter'>{%trans%}One uppercase letter{%endtrans%}</li><li class='text-info one-number'>{%trans%}One number{%endtrans%}</li></ul>", "placement": "top", "html": true, "template": '<div class="password-popover popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>', "container": ".password-wrapper", "trigger": "manual"}).click(function(e) {
         $(this).trigger("focus");

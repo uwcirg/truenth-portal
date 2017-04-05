@@ -407,7 +407,7 @@ def initial_queries():
             asset = dict_consent_by_org.get('asset', None)
             url = dict_consent_by_org.get('url', None)
             consent_agreements[org.id] = {
-                    'asset': asset, 'agreement_url': url}
+                    'asset': asset, 'agreement_url': url, 'organization_name': org.name}
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -542,7 +542,7 @@ def profile(user_id):
         'profile.html', user=user, consent_agreements=consent_agreements)
 
 @portal.route('/privacy')
-def legal():
+def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
     dict_privacy = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))

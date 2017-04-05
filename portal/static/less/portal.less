@@ -9,17 +9,17 @@
 @headlineSize:    1.25em;
 @subheadSize:     1.20em;
 @lgFontSize:      1.6em;
-@lgHeadlineSize:  1.30em;
-@lgsubheadSize:   1.20em;
+@lgHeadlineSize:  1.40em;
+@lgsubheadSize:   1.30em;
 @smallText:       0.9em;
 @mediumText:      0.95em;
 @smallerText:     0.85em;
 @xsmallText:      0.75em;
 @xxsmallText:     0.70em;
-@btnSize:         1em;
+@btnSize:         0.9em;
 @legendSize:      0.92em;
 @sessionListSize: 0.95em;
-@orgSize:         0.95em;
+@orgSize:         1em;
 @modalButtonSize: 0.8em;
 @modalLabelSize:  0.8em;
 
@@ -35,6 +35,7 @@
 @featureBtnColor: #333;
 @featureBtnHoverColor: #FFF;
 @featureBtnHoverBgColor: #000;
+@featureBtnBgColor: #7C959E;
 @legendColor:    #595F57;
 @sectionTitleColor: #5b5e61;
 @sectionBorderColor: #E0E6E3;
@@ -79,6 +80,9 @@ a {
 a:hover, a:active {
   color: @linkHover;
 }
+a.disabled {
+  opacity: 0.6;
+}
 a.btn {
   font-size: @baseFontSize;
   border: none;
@@ -101,11 +105,13 @@ a.btn {
   cursor: pointer;
   border-radius: 0;
   font-size: @btnSize;
-  padding: 0.65em;
-  letter-spacing: 1px;
+  padding: 0.7em;
+  letter-spacing: 2px;
   color: #333f4b;
   background-color: #FFF;
   border: 1px solid @inputBorderColor;
+  text-transform: uppercase;
+  text-align: center;
 }
 .btn.disabled,
 .btn-tnth-primary.disabled {
@@ -119,11 +125,12 @@ a.btn {
 }
 .btn-tnth-primary {
   color: #fff;
-  background-color: @btnColor;
-  border-color: @btnColor;
+  background-color: @featureBtnBgColor;
+  border-color: @featureBtnBgColor;
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
   border-radius: 0;
+  letter-spacing: 2;
   &:hover,
   &:focus,
   &.active,
@@ -132,13 +139,16 @@ a.btn {
     background-color: #2a4531;
     border-color: #1c2f21;
   }
+  .glyphicon {
+    color: #FFF;
+  }
 }
 .btn-tnth-back {
   color: #777;
   padding: 0;
-  margin: 1em 0.2em;
+  margin: 1em 0.2em 2em 0.2em;
 }
-.button--LR, 
+.button--LR,
 .button--LR.show {
    opacity: 0;
    width: 160px;
@@ -156,7 +166,7 @@ a.btn {
 }
 .form-control {
   font-size: @baseFontSize;
-  height: 36px;
+  height: 40px;
   border-radius: 0;
 }
 select:not([multiple]) {
@@ -304,7 +314,251 @@ div.right-panel {
 h4.detail-title {
   display: none;
 }
+/***** initial queries page style ****/
+#aboutForm {
+  max-width: 100%;
+  padding: 1em;
+  margin: 3em auto;
+  min-height: 50vh;
+}
+#topTerms ~ #aboutForm {
+  margin: 1em 0;
+  min-height: 20vh;
+}
+#aboutForm {
+  .reg-complete-container {
+    width: 350px;
+    max-width: 100%;
+    margin: 1em 0;
+    padding: 0.5em 0;
+    display: none;
+  }
+  .iq-container {
+    font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
+    width: 100%;
+    min-height: 30vh;
+    margin-top: 11%;
+    display: none;
+  }
+  .iq-container .tnth-headline:first-of-type {
+    margin-bottom: 1.5em;
+    transform: translateY(-100%);
+    transition: transform 250ms ease-out .7s;
+    font-weight: bold;
+    color: #4B5E6F;
+    color: rgba(57, 56, 51, 0.8);
+    letter-spacing: 0.1px;
+    text-align: center;
+    margin-top: 1.2em;
+  }
+  .iq-container.open .tnth-headline:first-of-type {
+    transition: transform 250ms ease-out .1s;
+    transform: translateY(0);
+  }
+  .iq-container .content {
+    position: relative;
+    -webkit-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+    -moz-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+    box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+  }
+  .iq-container .content-body {
+    background: #FBFBFA;
+    background: rgba(203, 210, 217, 0.2);
+    padding: 8em 2.5em 5em 2.5em;
+    margin: 2em auto;
+  }
+  .iq-container .subtitle {
+    color: #595d4e;
+    margin: 1em auto;
+    font-size: 1.1em;
+    position: relative;
+  }
+  .iq-container #clinics {
+    margin-top: 2em;
+  }
+  input[type='text'],
+  select,
+  .form-group label,
+  label,
+  .pat-label {
+    font-size: 1.1em;
+  }
+  .modal label {
+    font-size: 1em;
+  }
+  input[type='text'],
+  select {
+    height: 42px;
+  }
+  .prompt {
+    color: #333;
+    font-size: 1.1em;
+  }
+  #nameGroup {
+    margin-top: 3em;
+    position: relative;
+  }
+  .bd-optional {
+    display: none;
+  }
+  #buttonsContainer {
+    width: 150px;
+    margin: 1em 0;
+    position: relative;
+  }
+  #next,  #updateProfile {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+    position: absolute;
+    left: 0;
+    top: 0;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 1em;
+  }
+  #next {
+    opacity: 1;
+    width: 110px;
+    max-width: 100%;
+    margin-left: 0.2em;
+  }
+  #next:disabled {
+    opacity: 0.6;
+  }
+  #next.open, #updateProfile.open {
+    opacity: 1;
+  }
+  #next span {
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+  }
+  .iq-container .heading {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    color: #fff;
+    display: block;
+    height: 5.5em;
+    line-height: 58px;
+    background-color: #FFF;
+    background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
+    border-bottom: 1px solid #FBFBFA;
+     border-top: 1px solid rgba(203, 210, 217, 0.2);
+    border-left: 1px solid rgba(203, 210, 217, 0.2);
+    font-size: 1.2em;
+  }
+}
+@media (min-width: 992px) {
+  #aboutForm {
+    max-width: 65%;
+  }
+  #aboutForm .iq-container {
+    margin-top: 5%;
+  }
+  #aboutForm .iq-container .tnth-headline:first-of-type {
+    font-size: 1.3em;
+  }
+}
+@media (min-width: 1200px) {
+  #aboutForm div.heading::before {
+   border-radius: 100%;
+   width: 52px;
+   height: 52px;
+   font-size: 2.5em;
+   line-height: 1;
+   content: "\2304";
+   display: inline-block;
+   font-family: "symbols";
+   font-style: normal;
+   font-weight: normal;
+   line-height: 1;
+   margin: 0 auto;
+   -webkit-font-smoothing: antialiased;
+   color: #ccc;
+   position: absolute;
+   top: 1.1em;
+   left: 0;
+   right: 0;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1em;
+   cursor: pointer;
 
+   }
+}
+#iqErrorMessage {
+  position: relative;
+  top: 4em;
+}
+#progressWrapper {
+  display: none;
+  width: 100%;
+  margin: 4% auto 9% auto;
+  position: relative;
+  .progressbar {
+    counter-reset: step;
+    position: relative;
+    left: -5%;
+    li {
+      list-style-type: none;
+      width: 20%;
+      float: left;
+      font-size: 10px;
+      position: relative;
+      text-align: center;
+      text-transform: uppercase;
+      color: #7d7d7d;
+    }
+    li:before {
+      width: 34px;
+      height: 34px;
+      content: counter(step);
+      counter-increment: step;
+      line-height: 30px;
+      border: 4px solid #7d7d7d;
+      display: block;
+      text-align: center;
+      margin: 0 auto 10px auto;
+      border-radius: 50%;
+      background-color: white;
+    }
+    li:after {
+      width: 100%;
+      height: 4px;
+      content: '';
+      position: absolute;
+      background-color: #7d7d7d;
+      top: 15px;
+      left: -50%;
+      z-index: -1;
+    }
+    li:first-child:after {
+      content: none;
+    }
+    li.active {
+     color: green;
+    }
+    li.active:before {
+      border-color: #55b776;
+    }
+    li.active + li:after {
+      background-color: #55b776;
+    }
+  }
+}
+@media (min-width: 992px) {
+    #progressWrapper {
+      width: 80%;
+    }
+    #progressWrapper .progressbar li {
+      font-size: 12px;
+    }
+    #progressWrapper .progressbar {
+      position: relative;
+      left: -3%;
+  }
+}
 #profileStudyIDContainer, #studyIdContainer {
   display: none;
 }
@@ -346,7 +600,7 @@ h4.detail-title {
       margin: -0.4em 0;
       label.org-label {
         margin: -5em 0;
-        font-size: @mediumText;
+        font-size: 1em;
         display: inline;
       }
     }
@@ -357,7 +611,7 @@ h4.detail-title {
       margin: 0 auto;
       label {
         font-weight: normal;
-        font-size: @mediumText;
+        font-size: 1em;
       }
       input[type="checkbox"] {
         position: relative;
@@ -478,9 +732,10 @@ h4.detail-title {
   color: #575F5C;
   border-top: 1px solid  #E0E6E3;
   border-bottom: 1px solid  #E0E6E3;
-  padding: 0.6em 0.2em 0.63em 0.2em;
+  padding: 0.7em 0.2em 0.83em 0.2em;
   background-image: linear-gradient( to right, #ffffff, rgba(159, 165, 167, 0.16), rgba(173, 193, 197, 0.18) );
   vertical-align: center;
+  text-transform: uppercase;
 
   span.index-list {
     display: block;
@@ -563,27 +818,9 @@ h4.detail-title {
   display:flex;
   flex-direction: column;
 }
-#patientAssessmentDownload {
-  padding: 0.65em;
-  height: 2.86em;
-  font-size: 1em;
-  vertical-align: middle;
-  border-radius: 4px;
-}
-
 #dataDownloadModal {
   .modal-dialog {
     max-width: 500px;
-  }
-  .modal-header {
-    font-size: 1.1em;
-    padding: 1.1em;
-  }
-  .modal-body {
-    padding: 2em 2em 1em 2em;
-  }
-  button {
-    font-size:0.8em;
   }
   .profile-radio-list {
     margin-left:1.5em
@@ -926,7 +1163,14 @@ h4.detail-title {
 
   }
 }
-
+.first-name-container .float-input-label,
+.last-name-container .float-input-label {
+  margin-bottom: 0;
+}
+.first-name-container,
+.last-name-container {
+  margin-bottom: 0.5em;
+}
 .profile-item-container {
   background-color: #EFF5F3;
   /*background-color: rgba(173, 193, 197, 0.16);*/
@@ -950,8 +1194,6 @@ h4.detail-title {
     margin-bottom: -4px;
  }
 #createUserLink {
-  height: 2.7em;
-  width: 250px;
   max-width: 100%;
 }
 .profile-create-item-container {
@@ -1486,11 +1728,44 @@ div.biopsy-option:last-of-type{
   display: inline-block;
 }
 
-div.modal-header, div.modal-footer {
-  background-color: @btnColor;
+.modal-dialog {
+  border-radius: 0;
+}
+.modal-header,
+.modal-footer {
+  background-color: #606a73;
   color: #FFF;
 }
-
+.modal-body {
+  padding: 2em 2.5em;
+}
+.modal-title {
+  font-weight: normal;
+  font-size: 1.1em;
+}
+.modal-footer {
+  padding: 1em;
+}
+.modal-header {
+  font-size: 1.2em;
+  min-height: 3em;
+}
+.modal-header button,
+.modal-header button * {
+  color: #FFF;
+  font-size: 1.3em;
+}
+.modal label {
+  font-size: 1em;
+}
+#patientsInstrumentList label,
+#patientsDownloadTypeList label {
+  font-size: 0.8em;
+}
+.modal button,
+.modal a.btn {
+  font-size: 0.85em;
+}
 .hide {
   display: none;
 }

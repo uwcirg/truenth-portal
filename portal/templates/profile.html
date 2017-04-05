@@ -35,7 +35,7 @@
       </div>
       {{profileImage(user)}}
 </div>
-{% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT)) %}
+{% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) and (current_user.id != user.id)) %}
     <nav id="indexNavBar">
     <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
     <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this patient") }}</a></span>
@@ -46,14 +46,14 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this patient") }}</h4>
               </div>
-              <div class="modal-body" style="font-size:0.9em">
+              <div class="modal-body">
                 <br/>
                 <p class="text-left">{{ _('This is intended for "kiosk" style administration of an assessment, wherein the staff person "logs in as the patient", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?') }}</p>
                 <br/>
               </div>
               <div class="modal-footer">
-                <a href="#" onclick="handleLoginAs();" class="btn btn-default" style="font-size:0.8em">{{ _("OK") }}</a>
-                <button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.8em">{{ _("Cancel") }}</button>
+                <a href="#" onclick="handleLoginAs();"><button type="button" class="btn btn-default">{{ _("OK") }}</button></a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
               </div>
             </div>
           </div>
@@ -106,37 +106,38 @@ $(document).ready(function(){
     });
 
     [{
-        attachID: "month",
+        attachID: "bdMonthContainer",
         targetField: $("#month"),
         customErrorField: $("#errorbirthday")
       },
      {
-        attachID: "date",
+        attachID: "bdDateContainer",
         targetField: $("#date"),
         customErrorField: $("#errorbirthday")
      },
      {
-        attachID: "year",
+        attachID: "bdYearContainer",
         targetField: $("#year"),
         customErrorField: $("#errorbirthday")
      },
      {
-        attachID: "firstname",
+        attachID: "firstNameContainer",
         targetField: $("#firstname")
      },
      {
-        attachID: "lastname",
+        attachID: "lastNameContainer",
         targetField: $("#lastname")
      },
      {
-        attachID: "email"
+        attachID: "emailGroup",
+        targetField: $("#emailGroup")
      },
      {
-        attachID: "phone",
+        attachID: "phoneGroup",
         targetField: $("#phone")
      },
      {
-        attachID: "locale",
+        attachID: "localeGroup",
         targetField: $("#locale")
      },
      {
@@ -166,7 +167,8 @@ $(document).ready(function(){
               $(this).attr("save-container-id", o.attachID);
               var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
               $(this).on(triggerEvent, function() {
-                if (this.validity.valid) {
+                var valid = this.validity ? this.validity.valid : true;
+                if (valid) {
                   var hasError = false;
                   if ($(this).attr("error-field")) {
                     var customErrorField = $("#" + $(this).attr("error-field"));

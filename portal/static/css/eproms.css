@@ -33,12 +33,14 @@ body {
 .btn {
   cursor: pointer;
   border-radius: 0;
-  font-size: 1em;
-  padding: 0.65em;
-  letter-spacing: 1px;
+  font-size: 0.9em;
+  padding: 0.7em;
+  letter-spacing: 2px;
   color: #333f4b;
   background-color: #FFF;
   border: 1px solid #bdb9b9;
+  text-transform: uppercase;
+  text-align: center;
 }
 .btn.disabled,
 .btn-tnth-primary.disabled {
@@ -58,6 +60,7 @@ body {
   -webkit-transition: all 0.3s ease-in-out 0s;
   padding-right: 1em;
   border-radius: 0;
+  letter-spacing: 2px;
 }
 .btn-tnth-primary:hover,
 .btn-tnth-primary:focus,
@@ -67,6 +70,9 @@ body {
   background-color: #2a4531;
   border-color: #1c2f21;
 }
+.btn-tnth-primary .glyphicon {
+  color: #FFF;
+}
 a {
   color: #57675B;
   cursor: pointer;
@@ -74,6 +80,9 @@ a {
 a:hover,
 a:active {
   color: #2a4531;
+}
+a.disabled {
+  opacity: 0.6;
 }
 a.btn {
   cursor: pointer;
@@ -101,7 +110,7 @@ select:not([multiple]) {
 }
 .form-control {
   font-size: 16px;
-  height: 36px;
+  height: 40px;
   border-radius: 0;
 }
 .form-group .help-block {
@@ -134,7 +143,7 @@ select:not([multiple]) {
   color: #FFF;
   background-color: #000;
 }
-.button--LR, 
+.button--LR,
 .button--LR.show {
    opacity: 0;
    width: 160px;
@@ -284,6 +293,250 @@ div.right-panel {
   transition: margin-left ease 0.5s;
   max-width: 991px;
 }
+/***** initial queries page style ****/
+#aboutForm {
+  max-width: 100%;
+  padding: 1em;
+  margin: 3em auto;
+  min-height: 50vh;
+}
+#topTerms ~ #aboutForm {
+  margin: 1em 0;
+  min-height: 20vh;
+}
+#aboutForm .reg-complete-container {
+  width: 350px;
+  max-width: 100%;
+  margin: 1em 0;
+  padding: 0.5em 0;
+  display: none;
+}
+#aboutForm .iq-container {
+  font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
+  width: 100%;
+  min-height: 30vh;
+  margin-top: 11%;
+  display: none;
+}
+#aboutForm .iq-container .tnth-headline:first-of-type {
+  margin-bottom: 1.5em;
+  transform: translateY(-100%);
+  transition: transform 250ms ease-out .7s;
+  font-weight: bold;
+  color: #4B5E6F;
+  color: rgba(57, 56, 51, 0.8);
+  letter-spacing: 0.1px;
+  text-align: center;
+  margin-top: 1.2em;
+}
+#aboutForm .iq-container.open .tnth-headline:first-of-type {
+  transition: transform 250ms ease-out .1s;
+  transform: translateY(0);
+}
+@media (min-width: 992px) {
+  #aboutForm {
+    max-width: 65%;
+  }
+  #aboutForm .iq-container {
+    margin-top: 5%;
+  }
+  #aboutForm .iq-container .tnth-headline:first-of-type {
+    font-size: 1.3em;
+  }
+}
+#aboutForm .iq-container .content {
+  position: relative;
+  -webkit-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+  -moz-box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+  box-shadow: 2px 2px 8px -2px rgba(143,142,139,0.4);
+}
+#aboutForm .iq-container .content-body {
+  background: #FBFBFA;
+  background: rgba(203, 210, 217, 0.2);
+  padding: 8em 2.5em 5em 2.5em;
+  margin: 2em auto;
+}
+#aboutForm .iq-container .subtitle {
+  color: #595d4e;
+  margin: 1em auto;
+  font-size: 1.1em;
+  position: relative;
+}
+#aboutForm .iq-container #clinics {
+  margin-top: 2em;
+}
+#aboutForm input[type='text'],
+#aboutForm select,
+#aboutForm .form-group label,
+#aboutForm label,
+#aboutForm .pat-label {
+  font-size: 1.1em;
+}
+#aboutForm .modal label {
+  font-size: 1em;
+}
+#aboutForm input[type='text'],
+#aboutForm select {
+  height: 42px;
+}
+#aboutForm .prompt {
+  color: #333;
+  font-size: 1.1em;
+}
+#aboutForm #nameGroup {
+  margin-top: 3em;
+  position: relative;
+}
+#aboutForm .bd-optional {
+  display: none;
+}
+#aboutForm #buttonsContainer {
+  width: 150px;
+  margin: 1em 0;
+  position: relative;
+}
+#aboutForm #next, #aboutForm #updateProfile {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+  position: absolute;
+  left: 0;
+  top: 0;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 1em;
+}
+#aboutForm #next {
+  opacity: 1;
+  width: 110px;
+  max-width: 100%;
+  margin-left: 0.2em;
+}
+#aboutForm #next:disabled {
+  opacity: 0.6;
+}
+#aboutForm #next.open, #aboutForm #updateProfile.open {
+  opacity: 1;
+}
+#aboutForm #next span {
+  margin-left: 0.3em;
+  margin-right: 0.3em;
+}
+#aboutForm .iq-container .heading {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  color: #fff;
+  display: block;
+  height: 5.5em;
+  line-height: 58px;
+  background-color: #FFF;
+  background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
+  border-bottom: 1px solid #FBFBFA;
+   border-top: 1px solid rgba(203, 210, 217, 0.2);
+  border-left: 1px solid rgba(203, 210, 217, 0.2);
+  font-size: 1.2em;
+}
+@media (min-width: 1200px) {
+  #aboutForm div.heading::before {
+   border-radius: 100%;
+   width: 52px;
+   height: 52px;
+   font-size: 2.5em;
+   line-height: 1;
+   content: "\2304";
+   display: inline-block;
+   font-family: "symbols";
+   font-style: normal;
+   font-weight: normal;
+   line-height: 1;
+   margin: 0 auto;
+   -webkit-font-smoothing: antialiased;
+   color: #ccc;
+   position: absolute;
+   top: 1.1em;
+   left: 0;
+   right: 0;
+   margin-left: auto;
+   margin-right: auto;
+   margin-bottom: 1em;
+   cursor: pointer;
+
+   }
+}
+#iqErrorMessage {
+  position: relative;
+  top: 4em;
+}
+#progressWrapper {
+  display: none;
+  width: 100%;
+  margin: 4% auto 9% auto;
+  position: relative;
+}
+#progressWrapper .progressbar {
+  counter-reset: step;
+  position: relative;
+  left: -5%;
+}
+#progressWrapper .progressbar li {
+  list-style-type: none;
+  width: 20%;
+  float: left;
+  font-size: 10px;
+  position: relative;
+  text-align: center;
+  text-transform: uppercase;
+  color: #7d7d7d;
+}
+#progressWrapper .progressbar li:before {
+  width: 34px;
+  height: 34px;
+  content: counter(step);
+  counter-increment: step;
+  line-height: 30px;
+  border: 4px solid #7d7d7d;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px auto;
+  border-radius: 50%;
+  background-color: white;
+}
+#progressWrapper .progressbar li:after {
+  width: 100%;
+  height: 4px;
+  content: '';
+  position: absolute;
+  background-color: #7d7d7d;
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+#progressWrapper .progressbar li:first-child:after {
+  content: none;
+}
+#progressWrapper .progressbar li.active {
+ color: green;
+}
+#progressWrapper .progressbar li.active:before {
+  border-color: #55b776;
+
+}
+#progressWrapper .progressbar li.active + li:after {
+  background-color: #55b776;
+}
+@media (min-width: 992px) {
+    #progressWrapper {
+      width: 80%;
+    }
+    #progressWrapper .progressbar li {
+      font-size: 12px;
+    }
+    #progressWrapper .progressbar {
+      position: relative;
+      left: -3%;
+  }
+}
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -314,7 +567,7 @@ div.right-panel {
 }
 #adminTableToolbar div.orglist-selector div.org-container label.org-label {
   margin: -5em 0;
-  font-size: 0.95em;
+  font-size: 1em;
   display: inline;
 }
 #adminTableToolbar div.orglist-selector #orglist-footer-container {
@@ -512,25 +765,8 @@ div.right-panel {
   display:flex;
   flex-direction: column;
 }
-#patientAssessmentDownload {
-  padding: 0.65em;
-  height: 2.86em;
-  font-size: 1em;
-  vertical-align: middle;
-  border-radius: 4px;
-}
 #dataDownloadModal .modal-dialog {
   max-width: 500px;
-}
-#dataDownloadModal .modal-header {
-  font-size: 1.1em;
-  padding: 1.1em;
-}
-#dataDownloadModal .modal-body {
-  padding: 2em 2em 1em 2em;
-}
-#dataDownloadModal button {
-  font-size: 0.8em;
 }
 #dataDownloadModal .profile-radio-list {
   margin-left: 1.5em;
@@ -836,6 +1072,14 @@ div.right-panel {
   position: relative;
   margin-top: 30px;
 }
+.first-name-container .float-input-label,
+.last-name-container .float-input-label {
+  margin-bottom: 0;
+}
+.first-name-container,
+.last-name-container {
+  margin-bottom: 0.5em;
+}
 .form-with-floats .float-input-label > label {
   position: absolute;
   top: 7px;
@@ -871,8 +1115,6 @@ div.right-panel {
   margin-bottom: -6px;
 }
 #createUserLink {
-  height: 2.7em;
-  width: 250px;
   max-width: 100%;
 }
 .profile-create-item-container {
@@ -915,7 +1157,7 @@ div.right-panel {
   font-size: 0.95em;
 }
 #fillOrgs legend {
-  font-size: 0.92em;
+  font-size: 1em;
   color: #595F57;
   margin: 4px 0 4px 0;
 }
@@ -1349,10 +1591,43 @@ div.biopsy-option:last-of-type{
   max-width: 100%;
   display: inline-block;
 }
-div.modal-header,
-div.modal-footer {
-  background-color: #79815D;
+.modal-dialog {
+  border-radius: 0;
+}
+.modal-header {
+  font-size: 1.2em;
+  min-height: 3em;
+}
+.modal-header,
+.modal-footer {
+  background-color: #606a73;
   color: #FFF;
+}
+.modal-body {
+  padding: 2em 2.5em;
+}
+.modal-title {
+  font-weight: normal;
+  font-size: 1.1em;
+}
+.modal-footer {
+  padding: 1em;
+}
+.modal-header button,
+.modal-header button * {
+  color: #FFF;
+  font-size: 1.3em;
+}
+.modal label {
+  font-size: 1em;
+}
+#patientsInstrumentList label,
+#patientsDownloadTypeList label {
+  font-size: 0.8em;
+}
+.modal button,
+.modal a.btn {
+  font-size: 0.85em;
 }
 .hide {
   display: none;
