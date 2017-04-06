@@ -12,50 +12,44 @@
   {% endif %}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
-        {% if 'name' in still_needed or 'dob' in still_needed or 'role' in still_needed %}
-            <div id="demographicsContainer" class="iq-container" parent-section="true">
-                {% if user and user._email %}
-                  <input type="hidden" name="email" id="email" value="{{user._email}}" />
-                {% endif %}
-                <div class="content">
-                  <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
-                  <div class="content-body">
-                    {{nameGroup()}}
-                    <br/><br/>
-                    {{dobGroup()}}
-                    <br/><br/>
-                    {{rolesGroup()}}
-                  </div>
-                </div>
-            </div>
-        {% endif %}
-        {% if 'clinical' in still_needed  or 'localized' in still_needed%}
-            <div id="clinicalContainer" class="iq-container" parent-section="true">
-              <div class="content">
-                <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
-                <div class="content-body">
-                  <p class="subtitle">The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.</p>
-                  {{patientQGroup(user)}}
-                </div>
+        <div id="demographicsContainer" class="iq-container" parent-section="true">
+            {% if user and user._email %}
+              <input type="hidden" name="email" id="email" value="{{user._email}}" />
+            {% endif %}
+            <div class="content">
+              <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
+              <div class="content-body">
+                {{nameGroup()}}
+                <br/><br/>
+                {{dobGroup()}}
+                <br/><br/>
+                {{rolesGroup()}}
               </div>
             </div>
-        {% endif %}
-        {% if 'org' in still_needed %}
-            <div id="orgsContainer" class="iq-container" parent-section="true">
-              <div class="content">
-                <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
-                <div class="content-body">
-                 {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                     <div id="clinics" parent-section="true">
-                        {{profileOrgsSelector(user, user, consent_agreements)}}
-                     </div>
-                 {% else %}
-                      {{clinic(consent_agreements)}}
-                 {% endif %}
-                  </div>
-              </div>
+        </div>
+        <div id="clinicalContainer" class="iq-container" parent-section="true">
+          <div class="content">
+            <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
+            <div class="content-body">
+              <p class="subtitle">The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.</p>
+              {{patientQGroup(user)}}
             </div>
-        {% endif %}
+          </div>
+        </div>
+        <div id="orgsContainer" class="iq-container" parent-section="true">
+          <div class="content">
+            <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
+            <div class="content-body">
+             {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                 <div id="clinics" parent-section="true">
+                    {{profileOrgsSelector(user, user, consent_agreements)}}
+                 </div>
+             {% else %}
+                  {{clinic(consent_agreements)}}
+             {% endif %}
+              </div>
+          </div>
+        </div>
         <div class="reg-complete-container">
             <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
             <p>{{ _("Click continue to start using TrueNTH") }}</p>
@@ -286,7 +280,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
   var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
-  if (completed) this.showAll();
+  //if (completed) this.showAll();
   return completed;
 };
 
