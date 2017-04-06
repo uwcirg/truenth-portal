@@ -20,24 +20,9 @@
                 <div class="content">
                   <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
                   <div class="content-body">
-                    {% if 'name' in still_needed %}
-                      {{nameGroup()}}
-                    {% else %}
-                      {% if user and user.first_name and user.last_name %}
-                        <p>{{ _("Your") }} <em>{{ _("Name") }}</em>: {{user.first_name}} {{user.last_name}}</p>
-                        <br/>
-                        <input type="hidden" name="firstname" id="fistname" value="{{user.first_name}}"/>
-                        <input type="hidden" name="lastname" id="lastname" value="{{user.last_name}}"/>
-                      {% endif %}
-                    {% endif %}
+                    {{nameGroup()}}
                     <br/><br/>
-                    {% if 'dob' in still_needed %}
-                      {{dobGroup()}}
-                    {% else %}
-                      {% if user and user.birthdate %}
-                        <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
-                      {% endif %}
-                    {% endif %}
+                    {{dobGroup()}}
                     <br/><br/>
                     {{rolesGroup()}}
                   </div>
