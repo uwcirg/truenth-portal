@@ -87,7 +87,7 @@ Sphinx==1.5.5
 sphinx-rtd-theme==0.2.4
 SQLAlchemy==1.1.9
 swagger-spec-validator==2.1.0
-tox==2.6.0
+tox==2.7.0
 traitlets==4.3.2
 validators==0.10.1 # pyup: <=0.10.1 # pin until require_tld supported again
 vine==1.1.3
