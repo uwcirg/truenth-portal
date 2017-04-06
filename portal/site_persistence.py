@@ -246,23 +246,13 @@ class SitePersistence(object):
 
         # Delete any orgs not named
         if not keep_unmentioned:
-            # partOf self reference demands these are taken down in order
-            # first the children naming a partOf reference
-            for org in Organization.query.filter(and_(
-                ~Organization.id.in_(orgs_seen),
-                Organization.partOf_id != None)):
+            query = Organization.query.filter(
+                ~Organization.id.in_(orgs_seen))
+            for org in query:
                 current_app.logger.info(
                     "Deleting organization not mentioned in "
                     "site_persistence: {}".format(org))
-                db.session.delete(org)
-            # then the parents
-            for org in Organization.query.filter(and_(
-                ~Organization.id.in_(orgs_seen),
-                Organization.partOf_id == None)):
-                current_app.logger.info(
-                    "Deleting organization not mentioned in "
-                    "site_persistence: {}".format(org))
-                db.session.delete(org)
+            query.delete(synchronize_session=False)
 
         # Intervention details
         interventions_seen = []
