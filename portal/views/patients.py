@@ -127,7 +127,9 @@ def patient_profile(patient_id):
         if display.access and display.link_url is not None and display.link_label is not None:
             user_interventions.append({"name": intervention.name})
         if intervention.name == 'assessment_engine':
-            patient.assessment_link = display.link_url
+            # Need to extend with subject_id as the staff user is driving
+            patient.assessment_link = '{url}&subject_id={id}'.format(
+                url=display.link_url, id=patient.id)
 
     return render_template(
         'profile.html', user=patient,
