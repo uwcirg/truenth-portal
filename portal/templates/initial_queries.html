@@ -11,18 +11,33 @@
       {{tou(terms)}}
   {% endif %}
   <div id="aboutForm" class="tnth-hide">
+    {% if user and user._email %}
+          <input type="hidden" name="email" id="email" value="{{user._email}}" />
+    {% endif %}
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
         {% if 'name' in still_needed or 'dob' in still_needed or 'role' in still_needed %}
             <div id="demographicsContainer" class="iq-container" parent-section="true">
-                {% if user and user._email %}
-                  <input type="hidden" name="email" id="email" value="{{user._email}}" />
-                {% endif %}
                 <div class="content">
                   <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
                   <div class="content-body">
-                    {{nameGroup()}}
+                    {% if 'name' in still_needed %}
+                      {{nameGroup()}}
+                    {% else %}
+                      {% if user and user.first_name and user.last_name %}
+                        <p>{{ _("Your") }} <em>{{ _("Name") }}</em>: {{user.first_name}} {{user.last_name}}</p>
+                        <br/>
+                        <input type="hidden" name="firstname" id="fistname" value="{{user.first_name}}"/>
+                        <input type="hidden" name="lastname" id="lastname" value="{{user.last_name}}"/>
+                      {% endif %}
+                    {% endif %}
                     <br/><br/>
-                    {{dobGroup()}}
+                    {% if 'dob' in still_needed %}
+                      {{dobGroup()}}
+                    {% else %}
+                      {% if user and user.birthdate %}
+                        <input type="hidden" name="birthDate" id="birthday" value="{{user.birthdate}}">
+                      {% endif %}
+                    {% endif %}
                     <br/><br/>
                     {{rolesGroup()}}
                   </div>
