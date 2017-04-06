@@ -42,6 +42,16 @@ class TestSitePersistence(TestCase):
         self.assertTrue('1447420906' in npis)  # UWMC
         self.assertTrue('1164512851' in npis)  # UCSF
 
+    def testMidLevelOrgDeletion(self):
+        """Test for problem scenario where mid level org should be removed"""
+        Organization.query.delete()
+        self.deepen_org_tree()
+
+        # with deep (test) org tree in place, perform a delete by
+        # repeating import w/o keep_unmentioned set
+        SitePersistence().import_(
+            include_interventions=True, keep_unmentioned=False)
+
     def testP3Pstrategy(self):
         # Prior to meeting conditions in strategy, user shouldn't have access
         # (provided we turn off public access)
