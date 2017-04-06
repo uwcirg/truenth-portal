@@ -445,6 +445,10 @@ class User(db.Model, UserMixin):
     def email(self, email):
         if email == NO_EMAIL_PREFIX:
             self._email = default_email()
+        elif self._email.startswith(NO_EMAIL_PREFIX) and not email:
+            # already a unique email, for a user w/o email, don't
+            # set to an empty string if they didn't give a value.
+            pass
         else:
             self._email = email
         assert(self._email and len(self._email))
