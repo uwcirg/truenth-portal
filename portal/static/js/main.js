@@ -930,9 +930,10 @@ var assembleContent = {
             demoArray["telecom"] = [];
 
             var emailVal = $("input[name=email]").val();
-            if ($.trim(emailVal) != "") {
-                demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
-            };
+            //__no_email__ for empty email
+            if (!hasValue($.trim(emailVal))) emailVal = "__no_email__";
+            demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
+
             demoArray["telecom"].push({ "system": "phone", "value": $.trim($("input[name=phone]").val()) });
            //console.log("demoArray", demoArray);
         };
