@@ -10,7 +10,7 @@
 
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
-    <div class="form-group profile-section" id="bdGroup">
+    <div class="form-group profile-section edit-container" id="bdGroup">
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer">
@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="help-block with-errors"></div>
-        <span id="errorbirthday" class="help-block" style="display: none; color:#a94442"></span>
+        <span id="errorbirthday" class="help-block error-message"></span>
      </div>
      <script>
         $(function () {// Fill in 3 birthday fields based on existing value - requires date format YYYY-MM-DD
@@ -99,13 +99,13 @@
     </div>
     <div class="row profile-section name-section">
         <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
-            <div class="form-group float-input-label">
+            <div id="firstNameGroup" class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
-            <div class="form-group float-input-label">
+            <div id="lastNameGroup" class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
@@ -131,6 +131,7 @@
             </label>
         </div>
     </div>
+     <script>$(function (){fillViews.gender();});</script>
 {%- endmacro %}
 
 {% macro profileIndigenous(person) -%}
@@ -236,6 +237,19 @@
         <input type="text" class="form-control" id="email" name="email" error-field="erroremail" save-container-id="emailGroup" place-holder="{{ _('Your email') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" required>
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
+    <script>$(function() {
+        //btnPasswordResetEmail
+        //btnProfileSendEmail
+        $("#email").on("keyup", function() {
+            if (hasValue($(this).val())) {
+                $("#btnPasswordResetEmail").attr("disabled", false);
+                $("#btnProfileSendEmail").attr("disabled", false);
+            } else {
+                $("#btnPasswordResetEmail").attr("disabled", true);
+                $("#btnProfileSendEmail").attr("disabled", true);
+            };
+        });
+    });</script>
 {%- endmacro %}
 
 {% macro profileEmailForm(person) -%}
@@ -382,6 +396,7 @@
     <script async>
     {% if person %}
     $(function() {
+        if (!hasValue($("#email").val())) $("#btnPasswordResetEmail").attr("disabled", true);
         $('#btnPasswordResetEmail').on('click', function(event) {
             event.preventDefault();
             email = $('#email').val()
@@ -406,24 +421,27 @@
 {%-endmacro %}
 
 {% macro profileOrgsSelector(person, current_user, consent_agreements) -%}
-    <div id="userOrgs" class="customized">
-       <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
-       <div class="state-selector-container">
-            <select id="stateSelector" class="form-control"></select>
-       </div>
-       <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-           <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
-           <div class="main-state-container">
-                <div class="noOrg-container" style="display: none">
-                    <label>
-                        <input id="noOrgs" class="clinic" type="radio" name="organization" value="0">
-                        <span>{{ _("None of the Above") }}</span>
-                    </label>
-                </div>
+    <div id="userOrgs_view" class="view-container"></div>
+    <div class="edit-container">
+        <div id="userOrgs" class="customized">
+           <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
+           <div class="state-selector-container">
+                <select id="stateSelector" class="form-control"></select>
            </div>
-       </div>
-       <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
-       {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}}{% endif %}
+           <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
+               <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+               <div class="main-state-container">
+                    <div class="noOrg-container" style="display: none">
+                        <label>
+                            <input id="noOrgs" class="clinic" type="radio" name="organization" value="0">
+                            <span>{{ _("None of the Above") }}</span>
+                        </label>
+                    </div>
+               </div>
+           </div>
+           <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+           {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}}{% endif %}
+        </div>
     </div>
     <script async>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
@@ -521,15 +539,18 @@
 
 <!--this has an ajax call to fill in the content-->
 {% macro profileOrg(person, removeNone, consent_agreements, current_user) -%}
-    <div class="form-group profile-section standard" id="userOrgs">
-        {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
-        <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
-        <div class="indent">
-        <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
-        <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+    <div id="userOrgs_view" class="view-container"></div>
+    <div class="edit-container">
+        <div class="form-group profile-section standard" id="userOrgs">
+            {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
+            <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
+            <div class="indent">
+            <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
+            <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+            </div>
+            {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
+            <div class="help-block with-errors"></div>
         </div>
-        {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}} {% endif %}
-        <div class="help-block with-errors"></div>
     </div>
     <script async>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
@@ -655,7 +676,8 @@
                         setTimeout('$(".modal").modal("hide");', 250);
                     });
                 });
-                $("#consentContainer button[data-dismiss]").on("click", function() {
+                $("#consentContainer button[data-dismiss]").on("click", function(e) {
+                    e.stopPropagation();
                     setTimeout("location.reload();", 10);
                 });
                 $("#consentContainer .modal").each(function() {
@@ -933,13 +955,12 @@
 {% macro profileSessionList(person, current_user) -%}
 
     <div class="form-group profile-section" id="userSessionsListContainer">
-
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
             <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT Time Zone") }} )</small></th></tr>
         </table>
-        <div id="profileSessionListError" style="color: #a94442"></div>
+        <div id="profileSessionListError" class="error-message"></div>
     </div>
     <script async>
         $(function () {
@@ -952,7 +973,8 @@
                 type: "GET",
                 url: '/api/patient/' + sessionUserId + '/assessment',
                 contentType: "application/json; charset=utf-8",
-                dataType: 'json'
+                dataType: 'json',
+                cache: false
             }).done(function(data) {
                 var entries = data.entry ? data.entry : null;
                 if (entries && entries.length > 0) {
@@ -1121,11 +1143,17 @@
 {% macro profileClinicalQuestions(person, current_user) -%}
     <div class="row">
         <div class="col-md-12">
-            <div class="profile-item-container">
-                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{{ _("Clinical Questions") }}</h4>
-                <h4 class="text-muted">{{ _("Questions asked of the patient at registration") }}</h4>
+            <div class="profile-item-container {% if person and current_user and person.id == current_user.id %}editable{% endif %}" sections="clinical">
+                <h4 id="clinicalQuestionsLoc" class="profile-item-title index-item">{% if person.id == current_user.id %}{{_("My Prostate Cancer Profile")}}{% else %}{{ _("Clinical Questions") }}{% endif %}</h4>
+                {% if person.id != current_user.id %}<p class="text-muted">{{ _("Questions asked of the patient at registration") }}</p>{% endif %}
                 <input type="hidden" id="iq_userId" value="{{person.id if person}}" />
-                <div id="patientQContainer" class="well" style="margin-top: 1em; padding: 0.8em 2em 2em 2em">
+                <div class="view-container">
+                     <table>
+                        <tr><td class="text-muted">{{_("Have you had a prostate cancer biopsy?")}}</td><td><div id="biopsy_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Have you been diagnosed with prostate cancer?")}}</td><td><div id="pca_diag_view"></div></td></tr>
+                   </table>
+                </div>
+                <div id="patientQContainer" class="edit-container well">
                     {{patientQGroup(current_user)}}
                 </div>
             </div>
@@ -1145,10 +1173,12 @@
                     $("#patientQContainer").append("<span class='text-muted'>{{ _('no answers provided') }}</span>");
                 };
             {% endif %}
+            fillViews.clinical();
 
         };
         $(function () {
             $("#patientQ").show();
+            //don't show treatment & pca localized questions
             $("#patTx").remove();
             $("#patMeta").remove();
 
@@ -1305,55 +1335,59 @@
 {% macro profileDeceased(person, current_user) -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container">
+            <div class="profile-item-container editable" sections="deceased">
                 <h4 id="deathLoc" class="profile-item-title index-item">{{ _("Deceased Status") }}</h4>
-                <br/>
                 <input type="hidden" id="deathDate" value="" />
-                <div class="checkbox" id="boolDeathGroup">
-                    <label>
-                        <input type="checkbox" name="boolDeath" id="boolDeath" value="1" save-container-id="boolDeathGroup">{{ _("Has the patient passed away?") }}
-                    </label>
+                <div class="view-container">
+                    <div id="boolDeath_view"></div>
+                    <div id="deathDate_view"></div>
                 </div>
-                <hr/>
-                <div class="form-group">
-                    <label class="text-muted">{{ _("Deceased Date") }}</label>
-                </div>
-                <div class="row" style="margin-top:-8px">
-                    <div class="col-md-3 col-xs-6">
-                        <div id="deathDayContainer" class="form-group profile-section">
-                            <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
-                             <div class="help-block with-errors"></div>
-                        </div>
+                <div class="edit-container">
+                    <div class="checkbox" id="boolDeathGroup">
+                        <label>
+                            <input type="checkbox" name="boolDeath" id="boolDeath" value="1" save-container-id="boolDeathGroup">{{ _("Has the patient passed away?") }}
+                        </label>
                     </div>
-                    <div class="col-md-3 col-xs-10">
-                        <div id="deathMonthContainer" class="form-group profile-section">
-                            <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonthContainer" required>
-                                <option value="">{{ _("Month") }}...</option>
-                                <option value="01">{{ _("January") }}</option>
-                                <option value="02">{{ _("February") }}</option>
-                                <option value="03">{{ _("March") }}</option>
-                                <option value="04">{{ _("April") }}</option>
-                                <option value="05">{{ _("May") }}</option>
-                                <option value="06">{{ _("June") }}</option>
-                                <option value="07">{{ _("July") }}</option>
-                                <option value="08">{{ _("August") }}</option>
-                                <option value="09">{{ _("September") }}</option>
-                                <option value="10">{{ _("October") }}</option>
-                                <option value="11">{{ _("November") }}</option>
-                                <option value="12">{{ _("December") }}</option>
-                            </select>
-                            <div class="help-block with-errors"></div>
-                        </div>
+                    <hr/>
+                    <div class="form-group">
+                        <label class="text-muted">{{ _("Deceased Date") }}</label>
                     </div>
-                    <div class="col-md-3 col-xs-6">
-                        <div id="deathYearContainer" class="form-group profile-section">
-                            <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYearContainer" required />
-                            <div class="help-block with-errors"></div>
+                    <div class="row" style="margin-top:-8px">
+                        <div class="col-md-3 col-xs-6">
+                            <div id="deathDayContainer" class="form-group profile-section">
+                                <input class="form-control" id="deathDay" name="deathDay" save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
+                                 <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-10">
+                            <div id="deathMonthContainer" class="form-group profile-section">
+                                <select class="form-control" name="deathMonth" id="deathMonth" save-container-id="deathMonthContainer" required>
+                                    <option value="">{{ _("Month") }}...</option>
+                                    <option value="01">{{ _("January") }}</option>
+                                    <option value="02">{{ _("February") }}</option>
+                                    <option value="03">{{ _("March") }}</option>
+                                    <option value="04">{{ _("April") }}</option>
+                                    <option value="05">{{ _("May") }}</option>
+                                    <option value="06">{{ _("June") }}</option>
+                                    <option value="07">{{ _("July") }}</option>
+                                    <option value="08">{{ _("August") }}</option>
+                                    <option value="09">{{ _("September") }}</option>
+                                    <option value="10">{{ _("October") }}</option>
+                                    <option value="11">{{ _("November") }}</option>
+                                    <option value="12">{{ _("December") }}</option>
+                                </select>
+                                <div class="help-block with-errors"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-6">
+                            <div id="deathYearContainer" class="form-group profile-section">
+                                <input class="form-control" id="deathYear" name="deathYear" placeholder="YYYY" pattern = "\d{4}" type="text" maxlength="4" save-container-id="deathYearContainer" required />
+                                <div class="help-block with-errors"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div id="errorDeathDate" style="color:#a94442"><div>
-                <br/>
             </div>
         </div>
     </div>
@@ -1421,7 +1455,7 @@
 {% macro profileCustomDetail(person) -%}
      <div class="row">
         <div class="col-md-12 col-xs-12">
-            <h4 class="profile-item-title">{{_("Three ways to complete questionnaire")}}</h4>
+            <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
@@ -1447,6 +1481,7 @@
     <script>
     $(document).ready(function() {
         $("#profileSendEmailContainer").hide();
+        $(".registration-email-prompt").hide();
         $("#sendEmailLabel").hide();
         $("#loginAsPatient").hide();
         $("#navMenuXs").hide();
@@ -1477,6 +1512,112 @@
             </div>
     </div>
 {%- endmacro %}
+
+{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
+     <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="profile-item-container editable" sections="demo">
+                <h4 id="patientInformationLoc" class="profile-item-title index-item">{{_("My Information") }}</h4>
+                <div class="view-container">
+                   <table>
+                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                        <tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone")}}</td><td><div id="phone_view"></div></td></tr>
+                   </table>
+                </div>
+                <div class="edit-container">
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
+                    {{profileStudyID(person)}}
+                    {{profileEmail(person)}}
+                    {{profilePhone(person)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if person and person.has_role(ROLE.PATIENT) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container patient-detail-container editable" sections="detail">
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{{ _("My Detail") }}</h4>
+                    <div class="view-container">
+                         <table>
+                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+                            <tr class="ethnicity-view"><td class="text-muted" valign="top">{{_("Ethnicity")}}</td><td valign="top"><div id="ethnicity_view"></td></div></tr>
+                            <tr class="race-view"><td class="text-muted" valign="top">{{_("Race")}}</td><td valign="top"><div id="race_view"></td></div></tr>
+                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                       </table>
+                    </div>
+                    <div class="flex edit-container">
+                        {{profileGender(person)|show_macro('gender')}}
+                        {{profileEthnicity(person)|show_macro('ethnicity')}}
+                        {{profileRace(person)|show_macro('race')}}
+                        {{profileIndigenous(person)|show_macro('indigenous')}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="profileSessionListMainContainer">
+            <div class="col-md-12 col-xs-12">
+                <div  class="profile-item-container">
+                     <h4 id="proAssessmentsLoc" class="profile-item-title index-item">{{ _("My Questionnaires") }}</h4>
+                    {{profileSessionList(person, current_user)}}
+                </div>
+            </div>
+        </div>
+        {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
+        {{profileProcedures(person, current_user) | show_macro('procedures')}}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container {% if ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES%}editable{% endif %}" sections="org">
+                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                     {{profileOrgsSelector(person, current_user, consent_agreements)}}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Clinic Agreement")}}</h4>
+                    {{profileConsent(person, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container {% if person and (person.has_role(ROLE.ADMIN) or person.has_role(ROLE.STAFF_ADMIN)) %}editable{% endif %}" sections="org">
+                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                    {{profileOrg(person,None,consent_agreements, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+     <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div  class="profile-item-container">
+                <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">{{_("My Locale / Time Zone")}}</h4>
+                <div class="flex">
+                    {{profileLocale(person)|show_macro('language')}}
+                    {{profileTimeZone(person)}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if person and person.has_role(ROLE.ADMIN) and not person.has_role(ROLE.SERVICE) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                     <h4 id="rolesLoc" class="profile-item-title index-item">{{ _("My Roles") }}</h4>
+                    {{profileRole(person, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{%- endmacro %}
+
 {% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {% if config.CUSTOM_PATIENT_DETAIL %}
@@ -1484,100 +1625,91 @@
             {{ profileCustomDetail(person) }}
         {% endif %}
     {% endif %}
-    {% if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">Patient Details</h4>
         </div>
     </div>
-    {% endif %}
-    {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and (current_user.id != person.id) %}
-         {% if config.CUSTOM_PATIENT_DETAIL %}
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="profile-item-container">
-                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                        {{profileName(person)}}
-                        {{profileBirthDate(person)}}
-                        {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
-                    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="profile-item-container editable" sections="demo">
+                <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
+                <div class="view-container">
+                   <table>
+                        <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone")}}</td><td><div id="phone_view"></div></td></tr>
+                   </table>
                 </div>
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="profile-item-container">
-                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                        {{profileEmail(person)}}
-                        {{profilePhone(person)}}
-                        {{profileSendEmail(person)}}
-                    </div>
-                </div>
-            </div>
-         {% else %}
-            <div class="row">
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="profile-item-container">
-                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{% if person.has_role(ROLE.PATIENT) %}{{ _("Patient Information") }}{%else%}{{ _("User Information") }}{%endif%}</h4>
-                        {{profileName(person)}}
-                        {{profileBirthDate(person)}}
-                        {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
-                    </div>
-                </div>
-                <div class="col-md-12 col-sm-12 col-xs-12">
-                    <div class="profile-item-container">
-                        <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                        <div class="communications-container flex">
-                            <div class="flex-item">
-                                {{profileEmail(person)}}
-                                {{profilePhone(person)}}
-                            </div>
-                            <div class="flex-item">
-                                {{profileSendEmail(person)}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-         {% endif %}
-    {% else %}
-        <div class="row">
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md{%else%}side-md side-custom{%endif%}">
-                     {% if person.has_role(ROLE.PATIENT) %}
-                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("Patient Information") }}</h4>
-                     {% else %}
-                        <h4 id="patientInformationLoc" class="profile-item-title index-item">{{ _("User Information") }}</h4>
-                     {% endif %}
-                     <br/>
-                     {{profileName(person)}}
-                     {{profileBirthDate(person)}}
-                </div>
-            </div>
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <div class="profile-item-container {% if config.CUSTOM_PATIENT_DETAIL %}side-md one-side{%else%}side-md side-custom one-side{%endif%}">
-                    <h4 id="communicationLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
-                    <br/>
+                <div class="edit-container">
+                    {{profileName(person)}}
+                    {{profileBirthDate(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
                 </div>
             </div>
         </div>
-    {% endif %}
-
-    {% if (person and person.has_role(ROLE.PATIENT) and current_user and (current_user.id != person.id)) %}
+    </div>
+    {%if person and person.has_role(ROLE.PATIENT)%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="resetPasswordLoc" class="profile-item-title index-item">{{ _("Reset Password") }}</h4>
-                    {{resetPassword(person)}}
+                <div class="profile-item-container patient-detail-container editable" sections="detail">
+                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
+                    <div class="view-container">
+                         <table>
+                            <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
+                            <tr class="ethnicity-view"><td class="text-muted" valign="top">{{_("Ethnicity")}}</td><td valign="top"><div id="ethnicity_view"></td></div></tr>
+                            <tr class="race-view"><td class="text-muted" valign="top">{{_("Race")}}</td><td valign="top"><div id="race_view"></td></div></tr>
+                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                       </table>
+                    </div>
+                    <div class="flex edit-container">
+                        {{profileGender(person)|show_macro('gender')}}
+                        {{profileEthnicity(person)|show_macro('ethnicity')}}
+                        {{profileRace(person)|show_macro('race')}}
+                        {{profileIndigenous(person)|show_macro('indigenous')}}
+                    </div>
                 </div>
             </div>
         </div>
     {% endif %}
-    {% if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
-
-        {{profileInterventions(user_interventions) | show_macro('interventions')}}
-
+    {% if person and person.has_role(ROLE.PATIENT) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div class="flex">
+                        <div id="resetPasswordContainer" class="flex-item">
+                            <p class="text-muted communication-prompt">Send reset password email to patient</p>
+                            {{resetPassword(person)}}
+                        </div>
+                        <div id="registrationEmailContainer" class="flex-item">
+                            <p class="text-muted communication-prompt registration-email-prompt">Send registration email to patient</p>
+                            {{profileSendEmail(person)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     {% endif %}
-    {% if (person and person.has_role(ROLE.PATIENT)) or (current_user.has_role(ROLE.STAFF) and current_user.id != person.id)%}
+
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="profile-item-container {% if current_user and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF_ADMIN)) %}editable{% endif %}" sections="org">
+                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
+                {{profileOrg(person,None,consent_agreements, current_user)}}
+            </div>
+        </div>
+    </div>
+
+    {% if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
+        {{profileInterventions(user_interventions) | show_macro('interventions')}}
+    {% endif %}
+
+    {% if person and person.has_role(ROLE.PATIENT)%}
         <div class="row" id="profileSessionListMainContainer">
             <div class="col-md-12 col-xs-12">
                 <div  class="profile-item-container">
@@ -1588,7 +1720,7 @@
         </div>
     {% endif %}
 
-    {% if (person.id == current_user.id and person.has_role(ROLE.PATIENT)) or (person.id != current_user.id and current_user.has_role(ROLE.STAFF))%}
+    {% if person and person.has_role(ROLE.PATIENT) %}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
     {% endif %}
 
@@ -1599,33 +1731,7 @@
     {% if person and person.has_role(ROLE.PATIENT) %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
     {% endif %}
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container">
-                <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Organization Affiliation") }} / {{ _("Clinics") }}</h4>
-                 {% if not session.get('associate_clinic_id', '') and ((person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                 {{profileOrgsSelector(person, current_user, consent_agreements)}}
-                 {% else %}
-                    {{profileOrg(person,None,consent_agreements, current_user)}}
-                 {% endif %}
-            </div>
-        </div>
-    </div>
-    {%if person and person.has_role(ROLE.PATIENT)%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container patient-detail-container">
-                    <h4 id="patientDetailLoc" class="profile-item-title index-item">{% if person.has_role('patient') %}{{ _("Patient Detail") }}{%else%}{{ _("User Detail") }}{%endif%}</h4>
-                    <div class="flex">
-                        {{profileGender(person)|show_macro('gender')}}
-                        {{profileEthnicity(person)|show_macro('ethnicity')}}
-                        {{profileRace(person)|show_macro('race')}}
-                        {{profileIndigenous(person)|show_macro('indigenous')}}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
+
     {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -1636,7 +1742,23 @@
             </div>
         </div>
     {% endif %}
-     <div class="row">
+
+    {% if (person and current_user) and person.has_role(ROLE.PATIENT) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
+                    {{patientReports(person)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if (person and current_user) and person.has_role(ROLE.PATIENT) %}
+        {{profileDeceased(person, current_user)}}
+    {% endif %}
+
+    <div class="row">
         <div class="col-md-12 col-xs-12">
             <div  class="profile-item-container">
                 <h4 id="timeZoneLocaleLoc" class="profile-item-title index-item">Locale / Time Zone</h4>
@@ -1647,19 +1769,7 @@
             </div>
         </div>
     </div>
-    {% if (person and current_user) and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("Patient Reports") }}</h4>
-                    {{patientReports(person)}}
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    {% if (person and current_user) and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) %}
-        {{profileDeceased(person, current_user)}}
-    {% endif %}
+
     {% if (person and current_user) and current_user.has_role(ROLE.ADMIN) and not person.has_role(ROLE.SERVICE) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -1670,6 +1780,7 @@
             </div>
         </div>
     {% endif %}
+
     {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF)) %}
         <div class="row">
             <div class="col-md-12 col-xs-12">
@@ -1693,11 +1804,12 @@
         #procedureForm { margin-left: 0.5em;}
         #profileProcedureContainer .procedureDateLabel { margin-bottom: 0;}
         #profileProcedureContainer button.btn {color:#777; font-size: 0.9em;}
+        #pastTreatmentsContainer, #eventListLoad {display: none; }
     </style>
     <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="clinicalDataLoc" class="profile-item-title index-item">{{ _("Clinical Data") }}</h4>
+                    <h4 id="clinicalDataLoc" class="profile-item-title index-item">{% if person.id == current_user.id %}{{_("My Treatments")}}{%else%}{{ _("Clinical Data") }}{% endif %}</h4>
                     <div>
                         <p style="color: #696767">{%if (current_user and person) and current_user.has_role(ROLE.STAFF) and current_user.id != person.id %}{{ _("Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess.") }}{%else%}{{ _("Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact
                             date, please make your best guess.") }}{%endif%}<span class="text-muted smaller-text"></span></p><br/>
@@ -1760,9 +1872,14 @@
                                     </div>
                                 </div>
                                 <br />
-                                <hr style="border-bottom: 1px solid #e5e5e5">
-                                <div class="inner">
-                                    <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                                <div id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
+                                <div id="pastTreatmentsContainer" class="inner">
+                                     <hr style="border-bottom: 1px solid #e5e5e5">
+                                    {% if person.id == current_user.id %}
+                                        <p class="text-muted">{{_("My History")}}:</p>
+                                    {% else %}
+                                        <p class="text-muted"><em>{{_("Past")}}</em>&nbsp;{{ _("Management(s)") }}:</p>
+                                    {% endif %}
                                     <div id="userProcedures"></div>
                                 </div>
                             </form>

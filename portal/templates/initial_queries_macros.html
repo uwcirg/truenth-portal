@@ -265,6 +265,7 @@
           	$(this).on("click", function() {
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
+                $("#biopsyDateError").text("Note: a biopsy date must be entered");
           		} else {
           			$("#biopsyDate").val("");
                 $("#biopsyDateError").text("");

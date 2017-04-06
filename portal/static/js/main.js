@@ -71,7 +71,7 @@ function showWrapper(hasLoader) {
             $("#tnthNavWrapper").css(cssProp).promise().done(function() {
                 //delay removal of loading div to prevent FOUC
                 if (!DELAY_LOADING) {
-                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
+                    setTimeout('$("#loadingIndicator").fadeOut();', 1000);
                 };
             });
         } else $("#tnthNavWrapper").css(cssProp);
@@ -92,7 +92,7 @@ var loader = function(show) {
     } else {
         showMain();
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 300);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
         };
     };
 };
@@ -237,6 +237,141 @@ var CONSENT_ENUM = {
     }
 };
 
+var fillViews = {
+    "org": function() {
+        var content = "";
+        $("#userOrgs input[name='organization']").each(function() {
+            if ($(this).is(":checked")) {
+                if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
+                else content += "<p>" + $(this).closest("label").text() + "</p>";
+            };
+        });
+        if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
+        $("#userOrgs_view").html(content);
+    },
+    "demo":function() {
+        this.name();
+        this.dob();
+        this.studyId();
+        this.phone();
+        this.email();
+        this.deceased();
+        this.detail();
+    },
+    "name": function() {
+        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+            var content = $("#firstname").val() + " " + $("#lastname").val();
+            if (hasValue($.trim(content))) $("#name_view").text(content);
+            else $("#name_view").text("Not provided");
+        };
+    },
+    "dob": function() {
+        if (!$("#bdGroup").hasClass("has-error")) {
+            if (hasValue($.trim($("#month").val()+$("#year").val()+$("#date").val()))) {
+                $("#dob_view").text($("#month").val() + "/" + $("#date").val() + "/" + $("#year").val());
+            } else $("#dob_view").text("Not provided");
+        };
+    },
+    "phone": function() {
+        if (!$("#phoneGroup").hasClass("has-error")) {
+            var content = $("#phone").val();
+            if (hasValue(content)) $("#phone_view").text(content);
+            else $("#phone_view").text("Not provided");
+        };
+    },
+    "email": function() {
+        if (!$("#emailGroup").hasClass("has-error")) {
+            var content = $("#email").val();
+            if (hasValue(content)) $("#email_view").text(content);
+            else $("#email_view").text("Not provided");
+        };
+    },
+    "studyId": function() {
+        if (!$("#profileStudyIDContainer").hasClass("has-error")) {
+            var content = $("#profileStudyId").val();
+            if (hasValue(content)) $("#study_id_view").text(content);
+            else $("#study_id_view").text("Not provided");
+        };
+    },
+    "detail": function() {
+        this.gender();
+        this.race();
+        this.ethnicity();
+        this.indigenous();
+    },
+    "gender": function() {
+        if ($("#genderGroup").length > 0) {
+            if (!$("#genderGroup").hasClass("has-error")) {
+                var content = $("input[name=sex]:checked").val();
+                if (hasValue(content)) $("#gender_view").text(content);
+                else $("#gender_view").text("Not provided");
+            };
+        } else $(".gender-view").hide();
+    },
+    "race": function() {
+        if ($("#userRace").length > 0) {
+            if (!$("#userRace").hasClass("has-error")) {
+                var content = "";
+                $("#userRace input:checkbox").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#race_view").html(content);
+                else $("#race_view").text("Not provided");
+            };
+        } else {
+            $(".race-view").hide();
+        }
+    },
+    "ethnicity": function() {
+        if ($("#userEthnicity").length > 0) {
+            if (!$("#userEthnicity").hasClass("has-error")) {
+                var content = "";
+                $("#userEthnicity input[type='radio']").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#ethnicity_view").html(content);
+                else $("#ethnicity_view").text("Not provided");
+            };
+        } else $(".ethnicity-view").hide();
+    },
+    "indigenous": function() {
+        if ($("#userIndigenousStatus").length > 0) {
+            if (!$("#userIndigenousStatus").hasClass("has-error")) {
+                var content = "";
+                $("#userIndigenousStatus input[type='radio']").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#indigenous_view").html(content);
+                else $("#indigenous_view").text("Not provided");
+            };
+        } else $(".indigenous-view").hide();
+    },
+    "clinical": function() {
+        var content = "";
+        if (!$("#biopsyDateContainer").hasClass("has-error")) {
+            var a = $("#patBiopsy input[name='biopsy']:checked").val();
+            var biopsyDate = $("#biopsyDate").val();
+            if (a == "true" && hasValue(biopsyDate)) {
+                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content += "&nbsp;&nbsp;" + $("#biopsyDate").val();
+            } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+            if (hasValue(content)) $("#biopsy_view").html(content);
+            else $("#biopsy_view").html("No answer provided");
+        };
+        content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
+        if (hasValue(content)) $("#pca_diag_view").text(content);
+        else $("#pca_diag_view").text("No answer provided");
+    },
+    "deceased": function() {
+        if ($("#boolDeath").is(":checked")) {
+            $("#boolDeath_view").text("Patient has deceased");
+            if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
+                $("#deathDate_view").text($("#deathDay").val() + "/" + $("#deathMonth").val() + "/" + $("#deathYear").val());
+            };
+        } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
+    }
+};
+
 
 var fillContent = {
     "clinical": function(data) {
@@ -290,12 +425,12 @@ var fillContent = {
                     };
                 };
             };
-        })
+        });
+        fillViews.clinical();
     },
     "demo": function(data) {
         //console.log("in demo");
         //console.log(data)
-
         $('#firstname').val(data.name.given);
         $('#lastname').val(data.name.family);
         if (data.birthDate) {
@@ -329,6 +464,7 @@ var fillContent = {
                 $("#boolDeath").prop("checked", true);
             } else $("#boolDeath").prop("checked", false);
         };
+        fillViews.demo();
         // TODO - add email and phone for profile page use
         // Only on profile page
         this.ethnicity(data);
@@ -342,6 +478,7 @@ var fillContent = {
             $('#firstname').val(data.name.given);
             $('#lastname').val(data.name.family);
         };
+        fillViews.name();
     },
     "dob": function(data) {
         if (data && data.birthDate) {
@@ -351,6 +488,7 @@ var fillContent = {
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
         };
+        fillViews.dob();
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
@@ -365,6 +503,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.ethnicity();
     },
     "race": function(data) {
         // Get Races
@@ -384,6 +523,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.race();
     },
     "indigenous": function(data) {
         data.extension.forEach(function(item, index) {
@@ -395,6 +535,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.indigenous();
     },
     "orgs": function(data) {
         $("#userOrgs input[name='organization']").each(function() {
@@ -434,8 +575,12 @@ var fillContent = {
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]").prop('checked', true);
+            var o = $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]");
+            o.prop('checked', true);
+            //clinicNames.push(o.closest("label").text());
+
         };
+        fillViews.org();
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -445,6 +590,7 @@ var fillContent = {
                 };
             });
         };
+        fillViews.studyId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
@@ -649,6 +795,7 @@ var fillContent = {
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
+            $("#pastTreatmentsContainer").hide();
             return false;
         }
 
@@ -656,42 +803,50 @@ var fillContent = {
         data.entry.sort(function(a,b){
             return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
         });
-        var proceduresHtml = '<table  class="table-responsive" width="100%" id="eventListtnthproc" cellspacing="4" cellpadding="6">';
 
+        var contentHTML = "", proceduresHtml = "";
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
         $.each(data.entry,function(i,val){
-            var procID = val.resource.id, code = val.resource.code.coding[0].code;
-            var displayText = val.resource.code.coding[0].display;
-            var performedDateTime = val.resource.performedDateTime;
-            var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
-            var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
-            //console.log("date: " + performedDateTime + " cdate: " + performedDate);
-            var deleteInvocation = '';
-            var creatorDisplay = val.resource.meta.by.display;
-            var creator = val.resource.meta.by.reference;
-            creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
-            if (creator == currentUserId) {
-                creator = "you";
-                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
-            }
-            else if (creator == subjectId) {
-                creator = "this patient";
-            }
-            else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
-            var dtEdited = val.resource.meta.lastUpdated;
-            dateEdited = new Date(dtEdited);
-            proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-9 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-3 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
-            if (procID > highestId) {
-                highestId = procID;
+            var code = val.resource.code.coding[0].code;
+            if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
+                var procID = val.resource.id;
+                var displayText = val.resource.code.coding[0].display;
+                var performedDateTime = val.resource.performedDateTime;
+                var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
+                var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
+                //console.log("date: " + performedDateTime + " cdate: " + performedDate);
+                var deleteInvocation = '';
+                var creatorDisplay = val.resource.meta.by.display;
+                var creator = val.resource.meta.by.reference;
+                creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
+                if (creator == currentUserId) {
+                    creator = "you";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                }
+                else if (creator == subjectId) {
+                    creator = "this patient";
+                }
+                else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
+                var dtEdited = val.resource.meta.lastUpdated;
+                dateEdited = new Date(dtEdited);
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+                if (procID > highestId) {
+                    highestId = procID;
+                };
             };
         });
-        proceduresHtml += '</table>';
 
-        $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+        if (hasValue(contentHTML)) {
+            proceduresHtml = '<table  class="table-responsive" width="100%" id="eventListtnthproc" cellspacing="4" cellpadding="6">';
+            proceduresHtml += contentHTML;
+            proceduresHtml += '</table>';
+            $("#userProcedures").html(proceduresHtml);
+            $("#pastTreatmentsContainer").fadeIn();
 
-        var dataRows = $("#userProcedures tr[data-id]");
-        if (dataRows.length == $("#userProcedures tr[class='tnth-hide']").length) $(dataRows.get(0)).removeClass("tnth-hide");
+        } else {
+            $("#pastTreatmentsContainer").fadeOut();
+        }
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
@@ -1542,6 +1697,9 @@ var tnthAjax = {
             //console.log(data);
             $(".put-demo-error").remove();
             flo.showUpdate(targetField);
+            fillViews.demo();
+            fillViews.detail();
+            fillViews.org();
         }).fail(function() {
             if ($(".put-demo-error").length == 0) $(".error-message").append("<div class='put-demo-error'>Server error occurred setting demographics information.</div>");
             flo.showError(targetField);
@@ -1663,6 +1821,7 @@ var tnthAjax = {
             type: "GET",
             url: '/api/patient/'+userId+'/procedure'
         }).done(function(data) {
+            $("#eventListLoad").hide();
             fillContent.proceduresContent(data,newEntry);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
@@ -1775,10 +1934,12 @@ var tnthAjax = {
         }).done(function() {
             $(".put-clinical-error").remove();
             flo.showUpdate(targetField);
+            fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
             if ($(".put-clinical-error").length == 0) $(".error-message").append("<div class='put-clinical-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
+            fillViews.clinical();
         });
     },
     "getObservationId": function(userId, code) {
@@ -1846,10 +2007,12 @@ var tnthAjax = {
         }).done(function() {
             $(".post-biopsy-error").remove();
             flo.showUpdate(targetField);
+            fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
             if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
+            fillViews.clinical();
         });
     },
     "postTerms": function(toSend) {
