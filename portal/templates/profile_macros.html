@@ -10,7 +10,7 @@
 
 {% macro profileBirthDate(person) -%}
     <input type="hidden" name="birthDate" id="birthday" value="{{ person and person.birthdate if person.birthdate }}">
-    <div class="form-group profile-section edit-container" id="bdGroup">
+    <div class="form-group profile-section" id="bdGroup">
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer">
