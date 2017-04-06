@@ -126,10 +126,14 @@ def patient_profile(patient_id):
         display = intervention.display_for_user(patient)
         if display.access and display.link_url is not None and display.link_label is not None:
             user_interventions.append({"name": intervention.name})
+        if intervention.name == 'assessment_engine':
+            patient.assessment_link = display.link_url
 
     return render_template(
         'profile.html', user=patient,
-        providerPerspective="true", consent_agreements=consent_agreements, user_interventions=user_interventions)
+        providerPerspective="true",
+        consent_agreements=consent_agreements,
+        user_interventions=user_interventions)
 
 
 def get_orgs_consent_agreements():
