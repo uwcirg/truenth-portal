@@ -1,0 +1,308 @@
+{% extends "layout.html" %}
+{% block main %}
+{% from "flask_user/_macros.html" import back_btn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
+<br/>
+<style>
+.pc-hr {
+    border-top: 1px solid #ddd;
+}</style>
+<form id="createProfileForm" class="form tnth-form to-validate" role="form">
+    <input type="hidden" id="current_user_email" value="{{user.email}}" />
+    <div class="row">
+        <div class="col-md-11">
+            <div class="row">
+                <div class="col-md-push-2 col-md-9 col-xs-12">
+                    <h4 class="tnth-headline left-indent-top">{{ _("New Staff") }}</h4>
+                    <hr/>
+                    <br/>
+                    <div class="profile-item-container create-account-container">
+                    <div class="row">
+                        <div class="col-md-11 col-xs-12">
+                            {{profileName(False)}}
+                            <br/>
+                        </div>
+                    </div>
+                    <div class="form-group float-input-label profile-section" id="emailGroup">
+                        <label for="email">{{ _("Email Address") }}</label>
+                        <input type="text" class="form-control" id="email" name="email" autocomplete="false" error-field="erroremail" placeholder="{{ _('Your email') }}" value="" data-customemail="true" required />
+                        <div class="help-block with-errors" id="erroremail"></div>
+                    </div>
+                    {{profilePhone(False)}}
+                    <div class="divider"></div>
+                    <hr/>
+                    <div class="form-group profile-section" id="userOrgs">
+                        <label>{{ _("Clinics") }}</label>
+                        <div id="fillOrgs"></div>
+                        <div class="help-block with-errors"></div>
+                    </div>
+                    <script>$(function () {
+                        /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
+                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+
+                        $.ajax ({
+                            type: "GET",
+                            url: '/api/organization'
+                        }).done(function(data) {
+
+                            OT.populateOrgsList(data.entry);
+                            OT.populateUI();
+
+                            if (leafOrgs) {
+                                OT.filterOrgs(leafOrgs);
+                            };
+
+                            var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                        
+                            //console.log(orgsList)
+                            $("#userOrgs input[name='organization']").each(function() {
+                                $(this).on("click", function() {
+                                    $("#userOrgs").find(".help-block").html("");
+                                });
+                            });
+
+                            var visibleOrgs = $("#userOrgs input[name='organization']:visible");
+                            if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+
+                        }).fail(function() {
+                            console.log("Problem retrieving data from server.");
+                        });
+
+                    });</script>
+                    <br/>
+                    {{profileSaveBtn()}}
+            </div>
+            <br/>
+            <div>
+                {{ back_btn('staff','Staff List')}}
+                <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+            </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    {% if consent_agreements %}
+        <div id="_consentContainer">
+          {% for org in consent_agreements %}
+            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].agreement_url}}" />
+          {% endfor %}
+        </div>
+    {% endif %}
+
+</form>
+<a id="redirectLink" href="">&nbsp;</a>
+
+{% endblock %}
+
+{% block document_ready %}
+
+
+function _redirect(userId) {
+    if (userId) {
+        $("#redirectLink").attr('href', '/profile/' + userId);
+        $("#redirectLink")[0].click();
+    };
+};
+
+$(document).ready(function(){
+
+    var _userId = '', _demoArray = {}, _accountArray = {};
+    var hasError = false;
+    var errorMessage = '';
+
+    $("#updateProfile").attr("disabled", true);
+    $("#createProfileForm input, #createProfileForm select").on("change", function() {
+        $("#updateProfile").attr("disabled", false);
+    });
+
+    function getParentOrgId(obj) {
+        var parentOrgId =  $(obj).attr("data-parent-id");
+        if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        return parentOrgId;
+    };
+
+    function getConsents() {
+        var orgs = {}, consents = [];
+        $("#createProfileForm input[name='organization']").each(function() {
+            if ($(this).prop("checked")) {
+                var consent_org_id;
+                {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
+                    consent_org_id = getParentOrgId(this);
+                {% else %}
+                    consent_org_id = $(this).val();
+                {% endif %}
+                if (!orgs[consent_org_id]) {
+                    orgs[consent_org_id] = true;
+                    consents.push({"organization_id": consent_org_id, "agreement_url": $("#" + getParentOrgId(this) + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
+                };
+            };
+        });
+        return consents;
+    };
+
+    function setHelpText(elementId, message, hasError) {
+        var WARNING_COLOR = "#a94442", NORMAL_COLOR = "#777";
+        if (hasError) $("#" + elementId).find(".help-block").text(message).css("color", WARNING_COLOR);
+        else $("#" + elementId).find(".help-block").text("").css("color", NORMAL_COLOR);
+    };
+
+    $('#createProfileForm').validator().on('submit', function (e) {
+          if (e.isDefaultPrevented()) {
+                // handle the invalid form...
+                $("#errorMsg").fadeIn("slow");
+                return false;
+          } else {
+
+                hasError = false;
+
+                if ($("#emailGroup").hasClass("has-error")) {
+                    hasError = true;
+                } else {
+
+                    if ($("#current_user_email").val() === $("#email").val()) {
+                        setHelpText("emailGroup", "Email is already in use.", true);
+                    } else {
+                        setHelpText("emailGroup", "", false);
+                    };
+                };
+
+                if ($("#userOrgs input:checked").length == 0) {
+                   setHelpText("userOrgs", "An organization must be selected.", true);
+                } else setHelpText("userOrgs", "", false);
+
+              
+                $("#createProfileForm .help-block.with-errors").each(function() {
+                    if (!hasError) { if ($(this).text() != "") hasError = true };
+                });
+
+                if (hasError) {
+                    $("#errorMsg").fadeIn("slow");
+                    return false;
+                } else {
+                    $("#errorMsg").hide();
+                    hasError = false;
+                };
+
+                // everything looks good!
+                e.preventDefault();
+                $('#errorMsg').hide();
+                $('#serviceErrorMsg').html('').hide();
+
+
+                $("#updateProfile").attr("disabled", true);
+
+                var orgIDs = $('#userOrgs input:checked').map(function(){
+                    return { organization_id: $(this).val() };
+                }).get();
+
+                _accountArray['organizations'] = orgIDs;
+                _accountArray['roles'] =  [{'name': 'staff'}];
+                _accountArray['consents'] = getConsents();
+                //console.log(_demoArray)
+
+                _get('/api/account', 'POST', JSON.stringify(_accountArray))
+                .then(function(responseData) {
+
+                    _userId = responseData['user_id'];
+
+                    _demoArray['resourceType'] = 'Patient';
+                    _demoArray['name'] = {
+                        'given': $.trim($('input[name=firstname]').val()),
+                        'family':$.trim($('input[name=lastname]').val())
+                    };
+
+                    //_demoArray['birthDate'] = $('input[name=birthDate]').val();
+
+                    _demoArray['telecom'] = [];
+
+                    var emailVal = $.trim($('input[name=email]').val());
+                    if (hasValue(emailVal)) {
+                        _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
+                    }
+                    _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
+
+                     var orgIDs = $('#userOrgs input:checked').map(function(){
+                        return { reference: 'api/organization/'+$(this).val() };
+                    }).get();
+
+                    _demoArray['careProvider'] = orgIDs;
+
+                    Promise.all([
+                       _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
+                    .then(function(results) {
+                        $('#confirmMsg').fadeIn();
+                        setTimeout("$('#confirmMsg').fadeOut();", 800);
+                        setTimeout("_redirect(" + _userId + ");", 1000);
+                        $("#updateProfile").attr("disabled", false);
+                        clear();
+                    }).catch(function(error) {
+                        errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                        $("#updateProfile").attr("disabled", false);
+                    });
+
+                }).catch(function(error) {
+                    //Display Error Here
+                    //console.log('error: ' + error);
+                    errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                    $("#updateProfile").attr("disabled", false);
+                });
+
+          };
+    });
+
+    function _get(apiUrl, requestType, requestData, sync) {
+        var errorMessage = '';
+        console.log('apiUrl: ' + apiUrl)
+        return new Promise (function(resolve, reject) {
+            $.ajax ({
+                type: (requestType ? requestType : 'GET'),
+                url: String(apiUrl).replace('//', '/'),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                async: sync ? false : true,
+                data: requestData
+            }).done(function(data) {
+                resolve(data);
+            }).fail(function(xhr) {
+                errorMessage = 'Error processing request: ' + apiUrl;
+                console.log(requestData);
+                console.log(errorMessage);
+                console.log("response Text: " + xhr.responseText);
+                console.log("response status: " +  xhr.status);
+                reject(Error(errorMessage));
+            });
+
+        });
+
+    };
+
+    function clear() {
+        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
+            var currentElement = $('#' + fieldName);
+            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
+            switch(_tagName.toLowerCase()) {
+                case 'input':
+                    currentElement.val('');
+                    break;
+                case 'select':
+                    currentElement.find('option').prop('selected', false);
+                    break;
+                default:
+                    currentElement.val('');
+            };
+
+            $('#month').find('option').prop('selected', false);
+
+        });
+
+    };
+
+    clear();
+
+});
+
+
+{% endblock %}

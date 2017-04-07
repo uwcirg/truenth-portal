@@ -85,15 +85,15 @@ def patients_root():
         wide_container="true")
 
 
-@patients.route('/profile_create')
+@patients.route('/patient-profile-create')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
-def profile_create():
+def patient_profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "profile_create.html", user = user,
+        "patient_profile_create.html", user = user,
         consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
