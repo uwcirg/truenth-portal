@@ -268,10 +268,10 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
-                console.log(requestData);
-                console.log(errorMessage);
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
+                //console.log(requestData);
+                //console.log(errorMessage);
+                //console.log("response Text: " + xhr.responseText);
+                //console.log("response status: " +  xhr.status);
                 reject(Error(errorMessage));
             });
 

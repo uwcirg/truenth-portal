@@ -44,13 +44,13 @@
         {% if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) and (current_user.id != user.id)) %}
             <nav id="indexNavBar">
             <span class="glyphicon index-list glyphicon-list-alt" data-toggle="tooltip" data-placement="top" title="{{ _('index list') }}"></span>
-            <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Login as this patient") }}</a></span>
+            <span id="loginAsPatient" data-toggle="modal" data-target="#loginAsModal" class="link"><a data-toggle="tooltip" data-placement="top" title="For 'kiosk' style administration of an assessment">{{ _("Log in as this patient") }}</a></span>
             <div class="modal fade" id="loginAsModal" tabindex="-1" role="dialog" aria-labelledby="loginAsModalLabel">
                   <div class="modal-dialog" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="loginAsModalLabel">{{ _("Login as this patient") }}</h4>
+                        <h4 class="modal-title" id="loginAsModalLabel">{{ _("Log in as this patient") }}</h4>
                       </div>
                       <div class="modal-body">
                         <br/>
@@ -58,7 +58,7 @@
                         <br/>
                       </div>
                       <div class="modal-footer">
-                        <a href="#" onclick="handleLoginAs();"><button type="button" class="btn btn-default">{{ _("OK") }}</button></a>
+                        <a href="#" onclick="handleLoginAs(event);"><button type="button" class="btn btn-default">{{ _("OK") }}</button></a>
                         <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
                       </div>
                     </div>
@@ -85,7 +85,12 @@
 {% block document_ready %}
 {% if user.has_role('patient')  and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 
-function handleLoginAs() {
+function handleLoginAs(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
     //sessionStorage does not work allow addition of item in private mode
     try {
       sessionStorage.setItem("loginAsPatient", "true");
