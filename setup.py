@@ -45,7 +45,7 @@ setup_kwargs = dict(
     zip_safe=False,
     packages=["portal"],
     scripts=["manage.py"],
-    install_requires=(
+    install_requires=[
         "Authomatic",
         "celery",
         "enum34",
@@ -73,7 +73,7 @@ setup_kwargs = dict(
         "sphinx",
         "sphinx_rtd_theme",
         "validators",
-    ),
+    ],
     extras_require = {
         "dev": (
             "coverage",
@@ -99,9 +99,12 @@ else:
     # Detect Heroku build environment
     BUILD_DIR = os.environ.get("BUILD_DIR", None)
     if BUILD_DIR:
-        build_version = BUILD_DIR.split("-")[-1]
         # Override version generation (setuptools-scm)
+        build_version = BUILD_DIR.split("-")[-1]
         version_kwargs = dict(version=build_version)
+
+        # Install gunicorn WSGI server
+        setup_kwargs["install_requires"].append("gunicorn")
     else:
         version_kwargs = dict(version='0+d'+datetime.date.today().strftime('%Y%m%d'))
 
