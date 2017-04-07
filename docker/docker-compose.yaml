@@ -11,7 +11,7 @@ services:
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     environment:
-      - APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost}
+      - SERVER_NAME=${SERVER_NAME:-localhost}
       - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
       # compose-specific overrides
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI:-postgresql://postgres:@db/postgres}

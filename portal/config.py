@@ -25,6 +25,10 @@ def best_sql_url():
 class BaseConfig(object):
     """Base configuration - override in subclasses"""
 
+    SERVER_NAME = os.environ.get(
+        'SERVER_NAME',
+        'localhost'
+    )
 
     # Allow Heroku env vars to override most defaults
     # NB: The value of REDIS_URL may change at any point
