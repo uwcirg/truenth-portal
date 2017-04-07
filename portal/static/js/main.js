@@ -1395,7 +1395,11 @@ var OrgTool = function() {
                     };
                 };
 
-                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) $("#" + parentOrg + "_consentModal").modal("show");
+                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
+                    if (tnthAjax.hasConsent(userId, parentOrg)) {
+                        assembleContent.demo(userId,true, $(this), true);
+                    } else $("#" + parentOrg + "_consentModal").modal("show");
+                }
                 else {
                     assembleContent.demo(userId,true, $(this), true);
                     if (typeof reloadConsentList != "undefined") reloadConsentList();
