@@ -12,11 +12,11 @@
   {% endif %}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
+        {% if user and user.email %}
+            <input type="hidden" name="email" id="email" value="{{user.email}}" />
+        {% endif %}
         {% if 'name' in still_needed or 'dob' in still_needed or 'role' in still_needed %}
             <div id="demographicsContainer" class="iq-container" parent-section="true">
-                {% if user and user._email %}
-                  <input type="hidden" name="email" id="email" value="{{user._email}}" />
-                {% endif %}
                 <div class="content">
                   <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
                   <div class="content-body">
@@ -311,7 +311,7 @@ function continueToFinish() {
   $("div.reg-complete-container").fadeIn();
   $('html, body').animate({
     scrollTop: $('div.reg-complete-container').offset().top
-  }, 1000);
+  }, 2000);
   $("#next").fadeOut();
   $("#iqErrorMessage").text("");
   $("#updateProfile").removeAttr("disabled").addClass("open");
@@ -407,13 +407,14 @@ function initIncompleteFields() {
       if (performance.navigation.type == 1) {
         //page has been reloaded;
         $("#termsReminderModal").modal("show");
-        $("#tnthLogo a, a[href]").not("a[href*='logout']").addClass("disabled").on("click", function(e) {
-            e.preventDefault();
-            return false;
-        });
       };
     };
+    $("#tnthLogo a, a[href]").not("a[href*='logout']").addClass("disabled").on("click", function(e) {
+        e.preventDefault();
+        return false;
+    });
   };
+
   setTimeout('$(".footerWrapper").show()', 1000);
   /************
   incompleteFields.forEach(function(field, index) {

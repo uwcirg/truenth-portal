@@ -35,28 +35,25 @@ $.fn.extend({
 
                 // Update the procedure list - we animate opacity to retain the
                 // width and height so lower content doesn't go up and down
-                $("#userProcedures").animate({opacity: 0}, function() {
-                    $(this).html(eventLoading).css('opacity',1);
-                    // Clear the inputs
-                    $("select[id^='tnthproc']").val('');
-                    $("input[id^='tnthproc-value']").val('');
-                    $("input[id^='tnthproc-date']").val('');
-                    $("#procDay").val("");
-                    $("#procMonth").val("");
-                    $("#procYear").val("");
-                    // Clear submit button
-                    $("button[id^='tnthproc-submit']").addClass('disabled').attr({
-                        "data-name": "",
-                        "data-date": "",
-                        "data-date-read": ""
-                    });
-                    // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
-                    // more obvious when the updated list loads
-                    setTimeout(function(){
-                        tnthAjax.getProc(subjectId,true);
-                    },1500);
-
+                $("#eventListLoad").show();
+                $("select[id^='tnthproc']").val('');
+                $("input[id^='tnthproc-value']").val('');
+                $("input[id^='tnthproc-date']").val('');
+                $("#procDay").val("");
+                $("#procMonth").val("");
+                $("#procYear").val("");
+                // Clear submit button
+                $("button[id^='tnthproc-submit']").addClass('disabled').attr({
+                    "data-name": "",
+                    "data-date": "",
+                    "data-date-read": ""
                 });
+                $("#pastTreatmentsContainer").hide();
+                // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
+                // more obvious when the updated list loads
+                setTimeout(function(){
+                    tnthAjax.getProc(subjectId,true);
+                },1500);
             }
 
             return false;
@@ -64,7 +61,6 @@ $.fn.extend({
     }
 }); // $.fn.extend({
 
-var eventLoading = '<div style="margin: 1em" id="eventListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
 var procDateReg =  /(0[1-9]|1\d|2\d|3[01])/;
 var procYearReg = /(19|20)\d{2}/;
 
@@ -230,7 +226,8 @@ $(document).ready(function() {
             // If there's no events left, add status msg back in
             if ($('#eventListtnthproc tr').length == 0) {
                 $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any treatments yet.</em></p>").animate({opacity: 1});
-            }
+                $("#pastTreatmentsContainer").css("opacity", 0);
+            };
         });
         // Post delete to server
         tnthAjax.deleteProc(procId);

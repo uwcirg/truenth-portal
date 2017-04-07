@@ -148,7 +148,7 @@ $(document).ready(function(){
 
     $('input[type="submit"]').addClass("disabled");
     $('input.input-field').each(function() {
-        $(this).on("blur, change", function() {
+        $(this).on("blur, change, keyup", function() {
            setTimeout("checkValidity();", 350);
         });
         $(this).on("keydown", function(e) {
