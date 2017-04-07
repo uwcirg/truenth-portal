@@ -101,7 +101,7 @@ else:
     if BUILD_DIR:
         # Override version generation (setuptools-scm)
         build_version = BUILD_DIR.split("-")[-1]
-        version_kwargs = dict(version=build_version)
+        version_kwargs = {"version": "0+ng"+build_version}
 
         # Install gunicorn WSGI server
         setup_kwargs["install_requires"].append("gunicorn")
