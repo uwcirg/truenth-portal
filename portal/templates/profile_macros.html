@@ -1467,7 +1467,7 @@
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
-                    <button class="btn btn-tnth-primary custom-btn" onclick="handleLoginAs();">{{_("Login as patient")}}</button>
+                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn">{{_("Log in as patient")}}</button>
                 </div>
                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
@@ -1491,6 +1491,11 @@
         $("#email").on("keyup", function() {
             if (hasValue($(this).val())) $("#profileEmailSelect").attr("disabled", false);
             else $("#profileEmailSelect").attr("disabled", true);
+        });
+        $("#loginAsButton").on("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleLoginAs(e);
         });
     });</script>
 {%- endmacro %}
