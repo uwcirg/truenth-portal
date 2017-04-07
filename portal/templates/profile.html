@@ -165,7 +165,8 @@ $(document).ready(function(){
           o.targetField.each(function() {
               $(this).attr("save-container-id", o.attachID);
               var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
-              $(this).on(triggerEvent, function() {
+              $(this).on(triggerEvent, function(e) {
+                e.stopPropagation();
                 var valid = this.validity ? this.validity.valid : true;
                 if (valid) {
                   var hasError = false;

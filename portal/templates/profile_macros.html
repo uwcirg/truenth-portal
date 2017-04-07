@@ -1522,7 +1522,7 @@
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        <tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>
+                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone")}}</td><td><div id="phone_view"></div></td></tr>
                    </table>
@@ -1530,7 +1530,7 @@
                 <div class="edit-container">
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
-                    {{profileStudyID(person)}}
+                    {% if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(person)}}{% endif %}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
                 </div>

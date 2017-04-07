@@ -5,6 +5,13 @@
  * Baseline font sizes: body: 18px, headlines: 24px, subheads: 22px, form fields: 18px, buttons: 18px, smaller-text: 14px
  * > 992 font sizes: body: 24px, headlines 32px, subheads: 29px, form fields: 18px, buttons: 18px, smaller-text: 14px
 **/
+@font-face {
+    font-family: "symbols";
+    src: url("../fonts/symbols.eot");
+    src: url("../fonts/symbols.eot?#iefix") format("eot"), url("../fonts/symbols.svg#symbols") format("svg"), url("../fonts/symbols.woff2") format("woff2"), url("../fonts/symbols.woff") format("woff"), url("../fonts/symbols.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
 @baseFontSize:    16px;
 @headlineSize:    1.25em;
 @subheadSize:     1.20em;
@@ -258,7 +265,7 @@ select:not([multiple]) {
   color: @menuTextColor;
   width: 200px;
   border: solid 1px @sectionBorderColor;
-  margin-left: 4em;
+  margin-left: 3.5em;
   z-index: 11;
   background-color: @bodyBgColor;
   overflow-y: auto;
@@ -460,12 +467,12 @@ h4.detail-title {
     left: 0;
     color: #fff;
     display: block;
-    height: 5.5em;
+    height: 6em;
     line-height: 58px;
     background-color: #FFF;
     background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
     border-bottom: 1px solid #FBFBFA;
-     border-top: 1px solid rgba(203, 210, 217, 0.2);
+    border-top: 1px solid rgba(203, 210, 217, 0.2);
     border-left: 1px solid rgba(203, 210, 217, 0.2);
     font-size: 1.2em;
   }
@@ -486,9 +493,9 @@ h4.detail-title {
    border-radius: 100%;
    width: 52px;
    height: 52px;
-   font-size: 3em;
+   font-size: 1.3em;
    line-height: 1;
-   content: "\2304";
+   content: "\EA03";
    display: inline-block;
    font-family: "symbols";
    font-style: normal;
@@ -498,14 +505,13 @@ h4.detail-title {
    -webkit-font-smoothing: antialiased;
    color: #ccc;
    position: absolute;
-   top: 0.8em;
+   top: 2.8em;
    left: 0;
    right: 0;
    margin-left: auto;
    margin-right: auto;
    margin-bottom: 1em;
    cursor: pointer;
-
    }
 }
 #iqErrorMessage {
@@ -1924,6 +1930,9 @@ color: #777
 
 
 #consentContainer {
+  .fade {
+    transition: opacity .45s ease-out;
+  }
   .consent {
   display: none;
   padding: 1.15em 1.3em;

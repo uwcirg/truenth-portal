@@ -11,6 +11,13 @@
 /**
  *  Font-family
  **/
+@font-face {
+    font-family: "symbols";
+    src: url("../fonts/symbols.eot");
+    src: url("../fonts/symbols.eot?#iefix") format("eot"), url("../fonts/symbols.svg#symbols") format("svg"), url("../fonts/symbols.woff2") format("woff2"), url("../fonts/symbols.woff") format("woff"), url("../fonts/symbols.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
 html {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -206,7 +213,7 @@ select:not([multiple]) {
   color: #494e37;
   width: 200px;
   border: solid 1px #bcc2a6;
-  margin-left: 4em;
+  margin-left: 3.5em;
   z-index: 11;
   background-color: #FFF;
   overflow-y: auto;
@@ -420,24 +427,23 @@ h4.detail-title {
   left: 0;
   color: #fff;
   display: block;
-  height: 5.5em;
+  height: 6em;
   line-height: 58px;
   background-color: #FFF;
   background: linear-gradient(to bottom, #FDFDFD , rgba(203, 210, 217, 0.3));
-  color: #FFF;
   border-bottom: 1px solid #FBFBFA;
   border-top: 1px solid rgba(203, 210, 217, 0.2);
   border-left: 1px solid rgba(203, 210, 217, 0.2);
   font-size: 1.2em;
 }
-@media (min-width: 640px) {
+@media (min-width: 1200px) {
   #aboutForm div.heading::before {
    border-radius: 100%;
    width: 52px;
    height: 52px;
-   font-size: 3em;
+   font-size: 1.3em;
    line-height: 1;
-   content: "\2304";
+   content: "\EA03";
    display: inline-block;
    font-family: "symbols";
    font-style: normal;
@@ -447,14 +453,13 @@ h4.detail-title {
    -webkit-font-smoothing: antialiased;
    color: #ccc;
    position: absolute;
-   top: 0.8em;
+   top: 2.8em;
    left: 0;
    right: 0;
    margin-left: auto;
    margin-right: auto;
    margin-bottom: 1em;
    cursor: pointer;
-
    }
 }
 #iqErrorMessage {
@@ -1766,6 +1771,9 @@ sub.pointer:hover {
 }
 .tooltip.left .tooltip-arrow {
   border-left-color: #39464e;
+}
+#consentContainer .fade {
+  transition: opacity .45s ease-out;
 }
 #consentContainer .consent {
   display: none;
