@@ -1705,6 +1705,17 @@
         </div>
     </div>
 
+    {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
+                    {{profileConsent(person, current_user)}}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
         {{profileInterventions(user_interventions) | show_macro('interventions')}}
     {% endif %}
@@ -1730,17 +1741,6 @@
 
     {% if person and person.has_role(ROLE.PATIENT) %}
         {{profileInterventionReports(person) | show_macro('intervention_reports')}}
-    {% endif %}
-
-    {% if person and (person.has_role(ROLE.PATIENT) or person.has_role(ROLE.PARTNER))%}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
-                </div>
-            </div>
-        </div>
     {% endif %}
 
     {% if (person and current_user) and person.has_role(ROLE.PATIENT) %}
