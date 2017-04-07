@@ -1698,7 +1698,7 @@
 
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if current_user and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF_ADMIN)) %}editable{% endif %}" sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF_ADMIN)) %}editable{% endif %}" sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>

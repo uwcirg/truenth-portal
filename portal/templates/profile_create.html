@@ -162,7 +162,7 @@ $(document).ready(function(){
 
     function getConsents() {
         var orgs = {}, consents = [];
-        $("#createProfileForm input[name='organization']:checkbox").each(function() {
+        $("#createProfileForm input[name='organization']").each(function() {
             if ($(this).prop("checked")) {
                 var consent_org_id;
                 {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
@@ -237,7 +237,7 @@ $(document).ready(function(){
 
                 $("#updateProfile").attr("disabled", true);
 
-                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                var orgIDs = $('#userOrgs input:checked').map(function(){
                     return { organization_id: $(this).val() };
                 }).get();
 
@@ -268,7 +268,7 @@ $(document).ready(function(){
                     };
                     _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
 
-                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                     var orgIDs = $('#userOrgs input:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
 
