@@ -76,18 +76,18 @@
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
                             <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
-                            {% if 'login_as_id' in session or (user and not user.has_roles('write_only')) %}
+                            {% if 'login_as_id' in session or (user and not user.has_role('write_only')) %}
                             <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
                             <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
-                            {% if user and user.has_roles('application_developer') %}
+                            {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}
                             <li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>
                             {% endif %}
                             {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
                             <li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>
                             {% endif %}
-                            {% if user and user.has_roles(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
-                            {% if user and user.has_roles('admin') %}
+                            {% if user and user.has_role(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
+                            {% if user and user.has_role(ROLE.ADMIN) %}
                             <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
                             <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                             {% endif %}
@@ -123,10 +123,10 @@
                     <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
                     {% if user %}<li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
-                    {% if user and user.has_roles('application_developer') %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
-                    {% if user and (user.has_roles(ROLE.STAFF) or user.has_roles(ROLE.INTERVENTION_STAFF)) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
-                    {% if user and user.has_roles(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
-                    {% if user and user.has_roles(ROLE.ADMIN) %}<li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>{% endif %}
+                    {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
+                    {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
+                    {% if user and user.has_role(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
+                    {% if user and user.has_role(ROLE.ADMIN) %}<li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>{% endif %}
                     {% if user %}<li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>
             </div>

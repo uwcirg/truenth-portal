@@ -501,7 +501,7 @@ def staff_profile_create():
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "staff_profile_create.html", user = user,
+        "staff_profile_create.html", user=user,
         consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 @portal.route('/staff')
