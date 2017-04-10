@@ -519,7 +519,8 @@
                   var selectOptions = $("#stateSelector").sortOptions();
                   $("#stateSelector").empty().append(selectOptions)
                   .append("<option value='none'>Other</option>")
-                  .prepend("<option value='' selected>Select</option>");
+                  .prepend("<option value='' selected>Select</option>")
+                  .val("");
                   $(".state-container, .clinic-prompt").hide();
                   OT.handlePreSelectedClinic();
                   //case of pre-selected clinic, need to check if any clinic has prechecked
