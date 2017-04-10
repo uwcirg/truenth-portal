@@ -398,8 +398,8 @@ var fillContent = {
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if(!$radios.is(':checked')) {
-                    if (status == "unknown") $radios.filter('[status="unknown"]').prop('checked', true);
-                    else $radios.filter('[value='+clinicalValue+']').not("[status='unknown']").prop('checked', true);
+                    if (status == "unknown") $radios.filter('[data-status="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').not("[data-status='unknown']").prop('checked', true);
                     if (clinicalItem == "biopsy") {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
@@ -556,7 +556,7 @@ var fillContent = {
             var orgID = val.reference.split("/").pop();
             if (orgID == "0") {
                 $("#userOrgs #noOrgs").prop("checked", true);
-                $("#stateSelector").find("option[value='none']").prop("selected", true);
+                $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
             }
             else {
                 var ckOrg;
@@ -564,7 +564,7 @@ var fillContent = {
                     orgStates.forEach(function(state) {
                         ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
                         ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true);
+                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(state);
                     });
                 } else {
                     var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
@@ -729,7 +729,7 @@ var fillContent = {
                         },
                         {
                             content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("show") == "true" ?"show='true'": "show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -822,7 +822,7 @@ var fillContent = {
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
                     creator = "you";
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.4em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
                 }
                 else if (creator == subjectId) {
                     creator = "this patient";
@@ -871,7 +871,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1370,7 +1370,7 @@ var OrgTool = function() {
     this.handleEvent = function() {
         getSaveLoaderDiv("profileForm", "userOrgs");
         $("#userOrgs input[name='organization']").each(function() {
-            $(this).attr("save-container-id", "userOrgs");
+            $(this).attr("data-save-container-id", "userOrgs");
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
@@ -1441,8 +1441,8 @@ var tnthAjax = {
        $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: (sync ? false : true),
-            cache: false
+            cache: false,
+            async: (sync ? false : true)
         }).done(function(data) {
             $(".get-consent-error").remove();
             if (data.consent_agreements) {
@@ -1501,8 +1501,8 @@ var tnthAjax = {
                         type: "DELETE",
                         url: '/api/user/' + userId + '/consent',
                         contentType: "application/json; charset=utf-8",
-                        cache: false,
                         async: false,
+                        cache: false,
                         dataType: 'json',
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
@@ -1528,8 +1528,8 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: false,
-            cache: false
+            cache: false,
+            async: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
@@ -1562,8 +1562,8 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: false,
-            cache: false
+            cache: false,
+            async: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
@@ -1666,7 +1666,8 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId,
-            async: (sync ? false: true)
+            async: (sync ? false: true),
+            cache: false
         }).done(function(data) {
             if (!noOverride) {
                 fillContent.race(data);
@@ -1763,7 +1764,8 @@ var tnthAjax = {
         if (!userId) return false;
         $.ajax ({
             type: "GET",
-            url: '/api/patient/'+userId+'/procedure'
+            url: '/api/patient/'+userId+'/procedure',
+            cache: false
         }).done(function(data) {
             fillContent.treatment(data);
         }).fail(function() {
@@ -1823,7 +1825,8 @@ var tnthAjax = {
     "getProc": function(userId,newEntry) {
         $.ajax ({
             type: "GET",
-            url: '/api/patient/'+userId+'/procedure'
+            url: '/api/patient/'+userId+'/procedure',
+            cache: false
         }).done(function(data) {
             $("#eventListLoad").hide();
             fillContent.proceduresContent(data,newEntry);
@@ -1877,7 +1880,8 @@ var tnthAjax = {
         var self = this;
         $.ajax ({
             type: "GET",
-            url: '/api/user/'+userId+'/roles'
+            url: '/api/user/'+userId+'/roles',
+            cache: false
         }).done(function(data) {
             //self.getRoleList();
             $(".get-roles-error").remove();
@@ -1952,6 +1956,7 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/clinical',
+            cache: false,
             async: false
         }).done(function(data) {
             if (data && data.entry) {
@@ -2007,6 +2012,7 @@ var tnthAjax = {
             url: url,
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
+            cache: false,
             data: JSON.stringify(obsArray)
         }).done(function() {
             $(".post-biopsy-error").remove();
@@ -2161,6 +2167,8 @@ $(document).ready(function() {
                 var addUserId = "";
                 if (typeof(patientId) !== "undefined") {
                     addUserId = "&user_id="+patientId;
+                } else if (hasValue($el.attr("data-user-id"))) {
+                    addUserId = "&user_id="+ $el.attr("data-user-id")
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
@@ -2171,8 +2179,9 @@ $(document).ready(function() {
                     }).done(function(data) {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
-                            if ($el.attr("update-on-validated") == "true" && $el.attr("user-id")) {
-                                assembleContent.demo($el.attr("user-id"),true, $el);
+                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
+                                console.log("user id: " + $el.attr("data-user-id"))
+                                assembleContent.demo($el.attr("data-user-id"),true, $el);
                             };
                         } else {
                             $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
@@ -2604,27 +2613,27 @@ function convertGMTToLocalTime(dateString, format) {
 var FieldLoaderHelper = function () {
     this.showLoader = function(targetField) {
         if(targetField && targetField.length > 0) {
-           $("#" + targetField.attr("save-container-id") + "_load").css("opacity", 1);
+           $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
         };
     };
 
     this.showUpdate = function(targetField) {
         if(targetField && targetField.length > 0) {
-             $("#" + targetField.attr("save-container-id") + "_error").text("").css("opacity", 0);
-             $("#"+ targetField.attr("save-container-id") + "_success").text("success");
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 2000);
+             $("#" + targetField.attr("data-save-container-id") + "_error").text("").css("opacity", 0);
+             $("#"+ targetField.attr("data-save-container-id") + "_success").text("success");
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_success").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_success").css("opacity", 0);', 2000);
         };
     };
 
     this.showError = function(targetField) {
         if(targetField && targetField.length > 0) {
-            $("#" + targetField.attr("save-container-id") + "_error").html("Unable to update. System/Server Error.");
-            $("#" + targetField.attr("save-container-id") + "_success").text("").css("opacity", 0);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 5000);
+            $("#" + targetField.attr("data-save-container-id") + "_error").html("Unable to update. System/Server Error.");
+            $("#" + targetField.attr("data-save-container-id") + "_success").text("").css("opacity", 0);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_error").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_error").css("opacity", 0);', 5000);
         };
     };
 
@@ -2637,7 +2646,7 @@ function LRKeyEvent() {
     if ($(".button--LR").length > 0) {
         $("html").on("keydown", function(e) {
             if (e.keyCode == LR_INVOKE_KEYCODE) {
-               $(".button--LR").toggleClass("show");
+               $(".button--LR").toggleClass("data-show");
             };
         });
     };
@@ -2650,7 +2659,7 @@ function appendLREditContainer(target, url, show) {
                 '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' +
                 '</div>'
                 );
-    if (show) $(".button--LR").addClass("show");
+    if (show) $(".button--LR").addClass("data-show");
 
 };
 

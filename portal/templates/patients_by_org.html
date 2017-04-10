@@ -4,14 +4,14 @@
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
     <div id="patientListOptions">
-      <a href="{{ url_for('patients.patient_profile_create') }}"><button id="createUserLink" class="btn btn-lg">{{ _("Create a patient record") }}</button></a>
+      <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
-      <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog" aria-labelledby="patientDataDownloadModalLabel">
+      <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">

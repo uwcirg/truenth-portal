@@ -21,7 +21,7 @@
             <br/>
         </div>
     </div>
-    <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog" aria-labelledby="termsReminderModalLabel">
+    <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
@@ -146,7 +146,7 @@
             </div>
              <div class="radio biopsy-option">
               <label>
-                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_unknown" value="false" status="unknown"> {{ _("I don't know") }}
+                <input type="radio" class="init-queries-field" name="biopsy" id="biopsy_unknown" value="false" data-status="unknown"> {{ _("I don't know") }}
               </label>
             </div>
           </div>
@@ -167,7 +167,7 @@
             </div>
             <div class="radio">
               <label>
-                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_unknown" value="false" status="unknown"> {{ _("I don't know") }}
+                <input type="radio" class="init-queries-field" name="pca_diag" id="pca_diag_unknown" value="false" data-status="unknown"> {{ _("I don't know") }}
               </label>
             </div>
           </div>
@@ -189,7 +189,7 @@
                </div>
                 <div class="radio">
                  <label>
-                   <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_no" value="true" status="unknown"> {{ _("I don't know") }}
+                   <input type="radio" class="init-queries-field" name="pca_localized" id="pca_localized_unknown" value="true" data-status="unknown"> {{ _("I don't know") }}
                  </label>
                </div>
              </div>
@@ -213,7 +213,7 @@
         </div>
         <br/>
       </div>
-      <script defer>
+      <script>
         function checkBiopsyDate(val) {
            if (!hasValue(val)) return false;
            var m = val.match(/(\/)/);
@@ -297,7 +297,7 @@
       </div>
       {{consent(consent_agreements)}}
     </div>
-    <script defer>
+    <script>
     function _orgsCallback() {
       {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
           var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
