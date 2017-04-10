@@ -6,7 +6,7 @@ Session timeouts are handled slightly differently in the browser and on the serv
 Backend
 =======
 
-After authenticating with the portal a cookie is set with an expiration time corresponding to the value of :term:`PERMANENT_SESSION_LIFETIME`, in seconds. If no requests are made in that duration, the cookie and corresponding redis-backed session automatically expire (via TTL). Subsequent requests will be effectively be unauthenticated and force redirection to the login page.
+After authenticating with Shared Services, a cookie is set with an expiration time corresponding to the value of :term:`PERMANENT_SESSION_LIFETIME`, in seconds. If no requests are made in that duration, the cookie and corresponding redis-backed session automatically expire (via TTL). Subsequent requests will be effectively be unauthenticated and force redirection to the login page.
 
 The backend session (the cookie and corresponding redis entry) can be refreshed from the front-end by sending a POST request to ``/api/ping`` that will modify the current backend session, refreshing the timeout duration (to the value specified by :term:`PERMANENT_SESSION_LIFETIME`).
 
@@ -20,7 +20,7 @@ The browser is made aware of the session duration specified by :term:`PERMANENT_
 Intervention
 ============
 
-After authenticating with Shared Services interventions are granted access through a bearer token that expires after a duration set by :term:`OAUTH2_PROVIDER_TOKEN_EXPIRES_IN` (defaults to 4 hours).
+After authenticating with Shared Services, interventions are granted access through a bearer token that expires after a duration set by :term:`OAUTH2_PROVIDER_TOKEN_EXPIRES_IN` (defaults to 4 hours).
 
 Subsequent requests with the same bearer token refresh its expiration each time.
 
