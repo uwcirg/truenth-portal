@@ -13,9 +13,11 @@
   <div class="row">
     <div class="col-lg-push-1 col-lg-11 col-md-push-1 col-md-11 col-sm-12">
       <br/>
-      {% if providerPerspective == 'true' %}
+      {% if current_user.has_role(ROLE.STAFF_ADMIN) and request.environ.HTTP_REFERER and (request.environ.HTTP_REFERER.endswith("staff") or request.environ.HTTP_REFERER.endswith("staff-profile-create")) %}
+      {{ back_link('staff', _('Staff List')) }}
+      {% elif providerPerspective == 'true' %}
       {{ back_link('patients', _('Patients List')) }}
-      {% elif current_user.has_role('admin') and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
+      {% elif current_user.has_role(ROLE.ADMIN) and request.environ.HTTP_REFERER and request.environ.HTTP_REFERER.endswith("admin") %}
       {{ back_link('admin', _('User List')) }}
       {% else %}
       {{ back_link(PORTAL, _('Home')) }}
@@ -88,6 +90,7 @@ function handleLoginAs(e) {
       e.preventDefault();
       e.stopPropagation();
     };
+
     //sessionStorage does not work allow addition of item in private mode
     try {
       sessionStorage.setItem("loginAsPatient", "true");

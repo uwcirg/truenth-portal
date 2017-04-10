@@ -4,6 +4,7 @@ from flask import abort, make_response, redirect, request, session, url_for
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
@@ -18,9 +19,9 @@ from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
-from ..models.organization import Organization, OrganizationIdentifier, OrgTree
-from ..models.role import ROLE, ALL_BUT_WRITE_ONLY
-from ..models.user import current_user, get_user, User
+from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
+from ..models.user import current_user, get_user, User, UserRoles
 from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
@@ -447,6 +448,7 @@ def home():
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
+
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
 
@@ -482,6 +484,71 @@ def admin():
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true")
+
+@portal.route('/staff-profile-create')
+@roles_required(ROLE.STAFF_ADMIN)
+@oauth.require_oauth()
+def staff_profile_create():
+    consent_agreements = {}
+    for org_id in OrgTree().all_top_level_ids():
+        org = Organization.query.get(org_id)
+        dict_consent_by_org = VersionedResource.fetch_elements(
+            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
+        asset = dict_consent_by_org.get('asset', None)
+        url = dict_consent_by_org.get('url', None)
+        consent_agreements[org.id] = {
+                'asset': asset, 'agreement_url': url, 'organization_name': org.name}
+    user = current_user()
+    leaf_organizations = user.leaf_organizations()
+    return render_template(
+        "staff_profile_create.html", user=user,
+        consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
+
+@portal.route('/staff')
+@roles_required(ROLE.STAFF_ADMIN)
+@oauth.require_oauth()
+def staff():
+    """staff view function, intended for staff admin
+
+    Present the logged in staff admin the list of staff matching
+    the staff admin's organizations (and any decendent organizations)
+
+    """
+    user = current_user()
+
+    OT = OrgTree()
+
+    staff_role_id = Role.query.filter(
+        Role.name==ROLE.STAFF).with_entities(Role.id).first()
+
+    # empty patient query list to start, unionize with other relevant lists
+    staff_list = User.query.filter(User.id==-1)
+
+    org_list = set()
+
+    # Build list of all organization ids, and their decendents, the
+    # user belongs to
+    for org in user.organizations:
+        if org.id == 0:  # None of the above doesn't count
+            continue
+        org_list.update(OT.here_and_below_id(org.id))
+
+    # Gather up all staff belonging to any of the orgs (and their children)
+    # this (staff) user belongs to.
+    org_staff = User.query.join(UserRoles).filter(
+        and_(User.id==UserRoles.user_id,
+             UserRoles.role_id==staff_role_id,
+             User.deleted_id==None
+             )
+        ).join(UserOrganization).filter(
+            and_(UserOrganization.user_id==User.id,
+                 UserOrganization.organization_id.in_(org_list)))
+    staff_list = staff_list.union(org_staff)
+
+    return render_template(
+        'staff_by_org.html', staff_list=staff_list.all(),
+        user=user, org_list=org_list,
+        wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))

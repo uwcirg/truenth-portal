@@ -857,6 +857,21 @@ div.right-panel {
     word-wrap: break-word;
   }
 }
+#staffList {
+  div.or {
+    display: inline-block;
+    background-color: #888a8c;
+    margin: 1.5em 1em 1em 1.2em;
+  }
+  .firstname-field, .lastname-field {
+    max-width: 150px;
+    word-wrap: break-word;
+  }
+  .email-field {
+    max-width: 235px;
+    word-wrap: break-word;
+  }
+}
 #dataDownloadModal {
   .modal-dialog {
     max-width: 500px;
@@ -934,7 +949,7 @@ div.right-panel {
 
 .admin-table {
   .search .form-control {
-    height: 36px;
+    height: 38.5px;
   }
 }
 // For table rowlinks
@@ -2114,6 +2129,9 @@ div.timezone-warning.text-warning {
     float: left !important;
     max-width: 100%;
   }
+  #adminTable .email-data-field {
+    display: none;
+  }
 }
 @media (max-width: 640px) {
   body,
@@ -2248,6 +2266,10 @@ div.timezone-warning.text-warning {
   #adminTable .email-field {
     display: none;
   }
+
+  #adminTable .org-data-field {
+    display: none;
+  }
    #adminTableToolbar {
      div.indent {
       padding: 0 0.2em;
@@ -2378,6 +2400,9 @@ div.timezone-warning.text-warning {
   #adminTable .consentdate-field {
     display: none;
   }
+  .admin-table .search .form-control {
+    height: 35px;
+  }
   .custom-container {
     display: block;
     #profileEmailSelect {
@@ -2429,6 +2454,19 @@ div.timezone-warning.text-warning {
   }
   .tnth-splash .headline {
     font-size: @lgHeadlineSize;
+  }
+
+  #patientListOptions,
+  #staffListOptions {
+     flex-direction: row;
+  }
+  #patientList div.or,
+  #staffList div.or {
+    margin: 1.3em 1.3em 1.3em 1.6em;
+  }
+  #patientListOptions > span:last-of-type,
+  #staffListOptions > span:last-of-type {
+    margin-top: 0.7em;
   }
   .pos-bottom-md {
     position: absolute;
