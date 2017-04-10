@@ -28,8 +28,8 @@ Subsequent requests with the same bearer token refresh its expiration each time.
 
     PERMANENT_SESSION_LIFETIME
         The lifetime of a permanent session, defaults to one hour. Configures session cookie and corresponding redis-backed session. Configuration value `provided by Flask
-        <http://flask.pocoo.org/docs/0.12/config/#builtin-configuration-values`_.
+        <http://flask.pocoo.org/docs/0.12/config/#builtin-configuration-values>`_.
 
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN
         Bearer token expires time, defaults to four hours. Configuration value provided by `Flask-OAuthlib
-        <https://flask-oauthlib.readthedocs.io/en/latest/oauth2.html#configuration>`_
+        <https://flask-oauthlib.readthedocs.io/en/latest/oauth2.html#configuration>`_.
