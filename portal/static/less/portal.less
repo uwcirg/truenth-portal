@@ -255,19 +255,19 @@ select:not([multiple]) {
     margin-left: 25%;
     position: inherit !important;
   }
-  .footer-container.flex { 
-    clear: both; 
-    display:flex; 
-    justify-content: space-between; 
-    padding: 0.5em 0; 
-    margin: 1em 4em; 
+  .footer-container.flex {
+    clear: both;
+    display:flex;
+    justify-content: space-between;
+    padding: 0.5em 0;
+    margin: 1em 4em;
     border-top: 1px solid #ddd;
   }
 }
-@media (max-width: 1199px) { 
-  #mainDiv.profile .footer-container.flex{ 
+@media (max-width: 1199px) {
+  #mainDiv.profile .footer-container.flex{
     justify-content: center;
-  } 
+  }
 }
 #tnthNavWrapper {
   z-index: 20;
@@ -1352,6 +1352,9 @@ h4.detail-title {
   max-width: 100%;
   border: 1px solid #bdb9b9;
   height: 3.2em;
+  display: inline-block;
+  width: 300px;
+  max-width: 100%;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -2108,7 +2111,7 @@ div.org-container {
   }
 }
 
-#procedureForm { 
+#procedureForm {
   margin-left: 0.5em;
 }
 
@@ -2127,22 +2130,22 @@ div.org-container {
   .inner {
     margin: 1em 0.5em 1em 0.5em
   }
-  .procedureDateLabel { 
+  .procedureDateLabel {
     margin-bottom: 0;
   }
   button.btn {
-    color:#777; 
+    color:#777;
     font-size: 0.9em;
   }
-  #pastTreatmentsContainer, 
+  #pastTreatmentsContainer,
   #eventListLoad {
-    display: none; 
+    display: none;
   }
 }
 
 #eventListtnthproc {
   margin-left: 0.5em
-  td { 
+  td {
     padding: 0.15em;
   }
 }
@@ -2221,7 +2224,7 @@ div.timezone-warning.text-warning {
   div.right-panel {
     margin-left: 0 !important;
   }
-  .create-user-link {
+  #createUserLink {
     font-size: @mediumText;
   }
 

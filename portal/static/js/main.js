@@ -195,6 +195,7 @@ function getUserLocale(userId) {
             $.ajax ({
                     type: "GET",
                     url: '/api/demographics/'+userId,
+                    cache: false,
                     async: false
             }).done(function(data) {
                 if (data && data.communication) {
@@ -464,6 +465,7 @@ var fillContent = {
                 $("#boolDeath").prop("checked", true);
             } else $("#boolDeath").prop("checked", false);
         };
+
         fillViews.demo();
         // TODO - add email and phone for profile page use
         // Only on profile page
@@ -1319,10 +1321,15 @@ var OrgTool = function() {
     this.populateUI = function() {
         var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs");
         for (org in orgsList) {
-            if (orgsList[org].isTopLevel && (orgsList[org].children.length > 0)) {
-                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
-            }
+            if (orgsList[org].isTopLevel) {
+                if (orgsList[org].children.length > 0) {
+                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                    parentOrgsCt++;
+                } else {
+                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
+            };
             // Fill in each child clinic
             if (orgsList[org].children.length > 0) {
                 var childClinic = "";

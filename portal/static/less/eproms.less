@@ -299,20 +299,20 @@ select:not([multiple]) {
     margin-left: 25%;
     position: inherit !important;
   }
-  .footer-container.flex { 
-    clear: both; 
-    display:flex; 
-    justify-content: space-between; 
-    padding: 0.5em 0; 
-    margin: 1em 4em; 
+  .footer-container.flex {
+    clear: both;
+    display:flex;
+    justify-content: space-between;
+    padding: 0.5em 0;
+    margin: 1em 4em;
     border-top: 1px solid #ddd;
   }
 }
 
-@media (max-width: 1199px) { 
-  #mainDiv.profile .footer-container.flex{ 
+@media (max-width: 1199px) {
+  #mainDiv.profile .footer-container.flex{
     justify-content: center;
-  } 
+  }
 }
 
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
@@ -1359,9 +1359,11 @@ div.right-panel {
 }
 
 #createUserLink {
-   max-width: 100%;
+  max-width: 100%;
   border: 1px solid #bdb9b9;
   height: 3.2em;
+  display: inline-block;
+  width: 300px;
 }
 
 .profile-create-item-container {
@@ -2191,7 +2193,7 @@ div.timezone-warning.text-warning {
   .tnth-form .form-group > label {
     font-size: 13px;
   }
-  .create-user-link {
+  #createUserLink {
     font-size: @mediumText;
   }
   div.right-panel {

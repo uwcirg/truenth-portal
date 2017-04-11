@@ -205,16 +205,16 @@ select:not([multiple]) {
   margin-left: 25%;
   position: inherit !important;
 }
-#mainDiv.profile .footer-container.flex { 
-  clear: both; 
-  display:flex; 
-  justify-content: space-between; 
-  padding: 0.5em 0; 
-  margin: 1em 4em; 
+#mainDiv.profile .footer-container.flex {
+  clear: both;
+  display:flex;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  margin: 1em 4em;
   border-top: 1px solid #ddd;
 }
-@media (max-width: 1199px) { 
-  #mainDiv.profile .footer-container.flex{ 
+@media (max-width: 1199px) {
+  #mainDiv.profile .footer-container.flex{
     justify-content: center;
   }
 }
@@ -1223,9 +1223,11 @@ h4.detail-title {
   margin-bottom: 1em;
 }
 #createUserLink {
-  max-width: 100%;
   border: 1px solid #bdb9b9;
   height: 3.2em;
+  display: inline-block;
+  width: 300px;
+  max-width: 100%;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1925,10 +1927,10 @@ div.org-container input[type="checkbox"] {
   top: -1px;
   right: 4px;
 }
-#procedureForm { 
+#procedureForm {
   margin-left: 0.5em;
 }
-#profileProcedureContainer { 
+#profileProcedureContainer {
   margin-left: 1em;
 }
 #profileProcedureContainer #tnthproc {
@@ -1944,21 +1946,21 @@ div.org-container input[type="checkbox"] {
 #profileProcedureContainer .inner {
   margin: 1em 0.5em 1em 0.5em
 }
-#profileProcedureContainer .procedureDateLabel { 
+#profileProcedureContainer .procedureDateLabel {
   margin-bottom: 0;
 }
 #profileProcedureContainer button.btn {
-  color:#777; 
+  color:#777;
   font-size: 0.9em;
 }
-#profileProcedureContainer #pastTreatmentsContainer, 
+#profileProcedureContainer #pastTreatmentsContainer,
 #profileProcedureContainer #eventListLoad {
-  display: none; 
+  display: none;
 }
 #eventListtnthproc {
   margin-left: 0.5em
 }
-#eventListtnthproc td { 
+#eventListtnthproc td {
   padding: 0.15em;
 }
 .registration-status-container {
@@ -2037,8 +2039,8 @@ div.timezone-warning.text-warning {
   div.right-panel {
     margin-left: 0 !important;
   }
-  .create-user-link {
-    font-size: 0.95em;
+  #createUserLink{
+    font-size: 0.9em;
   }
   #backLink a {
     position: relative;
