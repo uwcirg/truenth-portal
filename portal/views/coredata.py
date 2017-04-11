@@ -89,7 +89,7 @@ def acquire():
     except Unauthorized:
         current_app.logger.warning("Unauthorized return address %s",
                                    return_address)
-        abort(403, "Required `next` parameter not a valid origin")
+        # abort(403, "Required `next` parameter not a valid origin")
 
     require = request.args.getlist('require')
     for r in require:

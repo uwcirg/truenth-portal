@@ -7012,7 +7012,7 @@ a.home--modal-link {
 }
 #fillOrgs input[type='checkbox'] {
     position: relative;
-    top: -1px;
+    right: 2px;
 }
 .tnth-hide {
     display: none;

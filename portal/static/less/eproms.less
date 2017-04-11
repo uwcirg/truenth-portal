@@ -79,6 +79,9 @@ body {
   color: @baseColor;
   font-size: @baseFontSize;
 }
+.capitalize {
+  text-transform: capitalize;
+}
 
 .btn {
   cursor: pointer;
@@ -150,12 +153,18 @@ a.btn {
   margin: 1em 0.2em;
 }
 .button--LR,
-.button--LR.data-show {
+.button--LR.data-show,
+#profileConsentList .button--LR{
    opacity: 0;
    width: 160px;
    margin: 2em 0;
 }
-.button--LR.data-show {
+#profileConsentList .button--LR {
+  margin: 0 0.5em;
+  display: inline-block;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show] {
     opacity: 1;
 }
 #profileConsentList {
@@ -1264,14 +1273,16 @@ div.right-panel {
   overflow-x: hidden;
   max-width: 100%;
  }
-
+.core-data-procedure .profile-item-container {
+  background: none;
+  border: none;
+}
 .profile-item-title {
   color: @sectionTitleColor;
   margin-bottom: 1.5em;
   letter-spacing: 1px;
 }
-
-.profile-item-edit-btn {
+#mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2em;
   right: 2em;
@@ -1288,13 +1299,13 @@ div.right-panel {
   letter-spacing: 2px;
   font-size: 0.9em;
 }
-.profile-item-edit-btn:hover,
-.profile-item-edit-btn:active,
-.profile-item-edit-btn:focus {
+#mainDiv.profile .profile-item-edit-btn:hover,
+#mainDiv.profile .profile-item-edit-btn:active,
+#mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
   background-color: #5f676e;
 }
-.profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
   position: absolute;
   top: 0.5em;
@@ -1305,29 +1316,32 @@ div.right-panel {
 .content-container {
   position: relative;
 }
-.profile-item-container.edit .profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
   content: "DONE";
 }
-.profile-item-container .edit-container {
+#mainDiv.profile .profile-item-container .edit-container {
   display: none;
 }
-.profile-item-container.edit .edit-container {
+#mainDiv.profile .profile-item-container.edit .edit-container {
   display: inline-block;
 }
 .profile-item-container .view-container {
+  display: none;
+}
+#mainDiv.profile .profile-item-container .view-container {
   display: block;
 }
-.profile-item-container .view-container td:first-of-type {
+#mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
   vertical-align: top;
 }
-.profile-item-container .view-container td {
+#mainDiv.profile .profile-item-container .view-container td {
   padding: 0.8em 1em;
 }
 #aboutForm .view-container {
   display: none;
 }
-.profile-item-container.edit .view-container {
+#mainDiv.profile .profile-item-container.edit .view-container {
   display: none;
 }
 .profile-item-title {
