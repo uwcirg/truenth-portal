@@ -404,7 +404,7 @@ var fillViews = {
             });
             if (hasValue(content)) $("#procedure_view").html(content);
             else $("#procedure_view").html("<p class='text-muted'>No information provided</p>");
-        };
+        } else $("#procedure_view").html("<p class='text-muted'>No information available</p>");
     }
 };
 
@@ -837,8 +837,9 @@ var fillContent = {
         if (data.entry.length == 0) {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
             $("#pastTreatmentsContainer").hide();
+            fillViews.procedure();
             return false;
-        }
+        };
 
         // sort from newest to oldest
         data.entry.sort(function(a,b){
