@@ -3,10 +3,6 @@
 {% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
 <br/>
-<style>
-.pc-hr {
-    border-top: 1px solid #ddd;
-}</style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row">
@@ -21,6 +17,7 @@
                         <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
                             <br/>
+                            {{profileBirthDate(False)}}
                         </div>
                     </div>
                     <div class="form-group float-input-label profile-section" id="emailGroup">
@@ -29,8 +26,6 @@
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
                     {{profilePhone(False)}}
-                    <div class="divider"></div>
-                    <hr/>
                     <div class="form-group profile-section" id="userOrgs">
                         <label>{{ _("Clinics") }}</label>
                         <div id="fillOrgs"></div>
@@ -38,7 +33,7 @@
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+                        var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
 
                         $.ajax ({
                             type: "GET",
@@ -48,12 +43,10 @@
                             OT.populateOrgsList(data.entry);
                             OT.populateUI();
 
-                            if (leafOrgs) {
-                                OT.filterOrgs(leafOrgs);
-                            };
+                            if (orgList) {
+                                OT.filterOrgs(orgList);
+                             };
 
-                            var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-                        
                             //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
@@ -75,7 +68,7 @@
             <br/>
             <div>
                 {{ back_btn('staff','Staff List')}}
-                <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
+                <a href="#" style="visibility:hidden" id="profileBackLink"></a>
             </div>
             </div>
             </div>
@@ -197,7 +190,7 @@ $(document).ready(function(){
                 }).get();
 
                 _accountArray['organizations'] = orgIDs;
-                _accountArray['roles'] =  [{'name': 'staff'}];
+                _accountArray['roles'] = [{'name': 'staff'}];
                 _accountArray['consents'] = getConsents();
                 //console.log(_demoArray)
 
@@ -212,7 +205,7 @@ $(document).ready(function(){
                         'family':$.trim($('input[name=lastname]').val())
                     };
 
-                    //_demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
 
                     _demoArray['telecom'] = [];
 

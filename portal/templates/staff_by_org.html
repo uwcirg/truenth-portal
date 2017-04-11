@@ -39,14 +39,14 @@
             </thead>
             <tbody data-link="row" class="rowlink">
             {% for user in staff_list %}
-            <tr id="data_row_{{user.id}}">
-                <td>{{user.id}}</td>
-                <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
-                <td>{{ user.first_name if user.first_name }}</td>
-                <td>{{ user.last_name if user.last_name }}</td>
-                <td class="email-data-field">{{ user.email if user.email }}</td>
-                <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
-            </tr>
+                <tr id="data_row_{{user.id}}">
+                    <td>{{user.id}}</td>
+                    <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                    <td>{{ user.first_name if user.first_name }}</td>
+                    <td>{{ user.last_name if user.last_name }}</td>
+                    <td class="email-data-field">{{ user.email if user.email }}</td>
+                    <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>
