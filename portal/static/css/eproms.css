@@ -37,6 +37,9 @@ body {
   color: #333;
   font-size: 16px;
 }
+.capitalize {
+  text-transform: capitalize;
+}
 .btn {
   cursor: pointer;
   border-radius: 0;
@@ -166,18 +169,19 @@ select:not([multiple]) {
   background-color: #000;
 }
 .button--LR,
-.button--LR.data-show {
+.button--LR.data-show,
+#profileConsentList .button--LR{
    opacity: 0;
    width: 160px;
    margin: 2em 0;
 }
-.button--LR.show {
-    opacity: 1;
-}
-#profileConsentList .button--LR,
-#profileConsentList .button--LR.data-show {
+#profileConsentList .button--LR {
   margin: 0 0.5em;
-  display: inline-block !important;
+  display: inline-block;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show] {
+    opacity: 1;
 }
 #fullSizeBox a[href*="register"] {
   display: none;
@@ -1183,7 +1187,12 @@ div.right-panel {
   overflow-x: hidden;
   max-width: 100%;
 }
-.profile-item-edit-btn {
+.core-data-procedure .profile-item-container {
+  background: none;
+  border: none;
+}
+
+#mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2em;
   right: 2em;
@@ -1198,13 +1207,13 @@ div.right-panel {
   letter-spacing: 2px;
   font-size: 0.9em;
 }
-.profile-item-edit-btn:hover,
-.profile-item-edit-btn:active,
-.profile-item-edit-btn:focus {
+#mainDiv.profile .profile-item-edit-btn:hover,
+#mainDiv.profile .profile-item-edit-btn:active,
+#mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
   background-color: #5f676e;
 }
-.profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
   position: absolute;
   top: 0.5em;
@@ -1215,29 +1224,32 @@ div.right-panel {
 .content-container {
   position: relative;
 }
-.profile-item-container.edit .profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
   content: "DONE";
 }
-.profile-item-container .edit-container {
+#mainDiv.profile .profile-item-container .edit-container {
   display: none;
 }
-.profile-item-container.edit .edit-container {
+#mainDiv.profile .profile-item-container.edit .edit-container {
   display: inline-block;
 }
 .profile-item-container .view-container {
+  display: none;
+}
+#mainDiv.profile .profile-item-container .view-container {
   display: block;
 }
-.profile-item-container .view-container td {
+#mainDiv.profile .profile-item-container .view-container td {
   padding: 0.8em 1em;
 }
-.profile-item-container .view-container td:first-of-type {
+#mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
   vertical-align: top;
 }
 #aboutForm .view-container {
   display: none;
 }
-.profile-item-container.edit .view-container {
+#mainDiv.profile .profile-item-container.edit .view-container {
   display: none;
 }
 .profile-item-title {

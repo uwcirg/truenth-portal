@@ -609,7 +609,8 @@ $(document).ready(function(){
 
     var userOrgChangeEvent = function() {
       if ($(this).prop("checked")) {
-        var m = $("#consentContainer .modal");
+        var parentOrg = $(this).attr("data-parent-id");
+        var m = $("#" + parentOrg + "_consentModal");
         if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
           //do nothing
         } else {

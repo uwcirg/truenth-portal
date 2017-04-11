@@ -159,20 +159,20 @@ a.btn {
   margin: 1em 0.2em 2em 0.2em;
 }
 .button--LR,
-.button--LR.data-show {
+.button--LR.data-show,
+#profileConsentList .button--LR
+ {
    opacity: 0;
    width: 160px;
    margin: 2em 0;
 }
-.button--LR.show {
-    opacity: 1;
+#profileConsentList .button--LR {
+  margin: 0 0.5em;
+  display: inline-block;
 }
-#profileConsentList {
-  .button--LR,
-  .button--LR.data-show {
-    margin: 0 0.5em;
-    display: inline-block !important;
-  }
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show] {
+    opacity: 1;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
@@ -1260,13 +1260,16 @@ h4.detail-title {
   padding: 1.5em 2.5em 3.5em 2.5em;
   border-radius: 8px;
   margin: 0.5em auto;
-  border: 2px solid @containerBoderColor;
+  border: 1px solid #7C959E;
   overflow-y: hidden;
   overflow-x: hidden;
   max-width: 100%;
 }
-
-.profile-item-edit-btn {
+.core-data-procedure .profile-item-container {
+  background: none;
+  border: none;
+}
+#mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2em;
   right: 2em;
@@ -1275,21 +1278,20 @@ h4.detail-title {
   height: 2.5em;
   width: 70px;
   padding: 0 0.7em;
-  /*background: linear-gradient(to bottom, #FFF, #e4e4e4);
-  border: solid 1px #dad8d8;*/
   color: #FFF;
   background: @featureBtnBgColor;
+  border-color: @featureBtnBgColor;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.9em;
 }
-.profile-item-edit-btn:hover,
-.profile-item-edit-btn:active,
-.profile-item-edit-btn:focus {
+#mainDiv.profile .profile-item-edit-btn:hover,
+#mainDiv.profile .profile-item-edit-btn:active,
+#mainDiv.profile .profile-item-edit-btn:focus {
   color: @featureBtnHoverColor;
   background-color: @featureBtnHoverBgColor;
 }
-.profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
   position: absolute;
   top: 0.5em;
@@ -1300,29 +1302,32 @@ h4.detail-title {
 .content-container {
   position: relative;
 }
-.profile-item-container.edit .profile-item-edit-btn::before {
+#mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
   content: "DONE";
 }
-.profile-item-container .edit-container {
+.profile-item-container .view-container {
   display: none;
 }
-.profile-item-container.edit .edit-container {
+#mainDiv.profile .profile-item-container .edit-container {
+  display: none;
+}
+#mainDiv.profile .profile-item-container.edit .edit-container {
   display: inline-block;
 }
-.profile-item-container .view-container {
+#mainDiv.profile .profile-item-container .view-container {
   display: block;
 }
-.profile-item-container .view-container td {
+#mainDiv.profile .profile-item-container .view-container td {
   padding: 0.8em 1em;
 }
-.profile-item-container .view-container td:first-of-type {
+#mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
   vertical-align: top;
 }
 #aboutForm .view-container {
   display: none;
 }
-.profile-item-container.edit .view-container {
+#mainDiv.profile .profile-item-container.edit .view-container {
   display: none;
 }
 .profile-item-title {

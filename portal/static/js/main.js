@@ -241,10 +241,17 @@ var CONSENT_ENUM = {
 var fillViews = {
     "org": function() {
         var content = "";
+        //find if top level org first
+        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+        if (topLevelOrgs.length > 0) {
+            topLevelOrgs.each(function() {
+                content += "<p class='indent capitalize'>" + $(this).text() + "</p>";
+            });
+        };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
                 if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
-                else content += "<p>" + $(this).closest("label").text() + "</p>";
+                else content += "<p class='indent'>" + $(this).closest("label").text() + "</p>";
             };
         });
         if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
@@ -268,8 +275,8 @@ var fillViews = {
     },
     "dob": function() {
         if (!$("#bdGroup").hasClass("has-error")) {
-            if (hasValue($.trim($("#month").val()+$("#year").val()+$("#date").val()))) {
-                $("#dob_view").text($("#month").val() + "/" + $("#date").val() + "/" + $("#year").val());
+            if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
+                $("#dob_view").text($("#month option:selected").val() + "/" + $("#date").val() + "/" + $("#year").val());
             } else $("#dob_view").text("Not provided");
         };
     },
@@ -370,6 +377,34 @@ var fillViews = {
                 $("#deathDate_view").text($("#deathDay").val() + "/" + $("#deathMonth").val() + "/" + $("#deathYear").val());
             };
         } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
+    },
+    "locale": function() {
+        if ($("#locale").length > 0) {
+            var content = $("#locale option:selected").text();
+            if (hasValue(content)) $("#locale_view").text(content);
+            else $("#locale_view").html("<p class='text-muted'>No information provided.</p>");
+
+        } else $(".locale-view").hide();
+    },
+    "timezone": function() {
+        if ($("#profileTimeZone").length > 0) {
+            var content = $("#profileTimeZone option:selected").val();
+            if (hasValue(content)) $("#timezone_view").text(content);
+            else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
+        } else $(".timezone-view").hide();
+    },
+    "procedure": function() {
+        if ($("#userProcedures").length > 0) {
+            var content = "";
+            $("#userProcedures tr[data-id]").each(function() {
+                content += hasValue(content) ? "<br/>" : "";
+                $(this).find("td").each(function() {
+                    if (!$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                });
+            });
+            if (hasValue(content)) $("#procedure_view").html(content);
+            else $("#procedure_view").html("<p class='text-muted'>No information provided</p>");
+        } else $("#procedure_view").html("<p class='text-muted'>No information available</p>");
     }
 };
 
@@ -570,7 +605,11 @@ var fillContent = {
                     });
                 } else {
                     var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
-                    ckOrg.prop('checked', true);
+                    if (ckOrg.length > 0) ckOrg.prop('checked', true);
+                    else {
+                        var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
+                        if (topLevelOrg.length > 0) topLevelOrg.attr("data-checked", "true");
+                    };
                 };
             };
         });
@@ -798,8 +837,9 @@ var fillContent = {
         if (data.entry.length == 0) {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
             $("#pastTreatmentsContainer").hide();
+            fillViews.procedure();
             return false;
-        }
+        };
 
         // sort from newest to oldest
         data.entry.sort(function(a,b){
@@ -859,6 +899,7 @@ var fillContent = {
             placement: 'top',
             html: true
         });
+        fillViews.procedure();
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
@@ -870,6 +911,8 @@ var fillContent = {
                 });
             };
         });
+        fillViews.timezone();
+        fillViews.locale();
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
@@ -932,6 +975,18 @@ var assembleContent = {
                 };
             };
 
+        };
+
+        /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+        if (topLevelOrgs.length > 0)  {
+            topLevelOrgs.each(function() {
+                var tOrg = $(this).attr("orgid");
+                if (hasValue(tOrg)) {
+                    if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
+                    demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
+                };
+            });
         };
 
         if (hasValue($("#deathDate").val())) {
@@ -1405,7 +1460,11 @@ var OrgTool = function() {
                 if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                     if (tnthAjax.hasConsent(userId, parentOrg)) {
                         assembleContent.demo(userId,true, $(this), true);
-                    } else $("#" + parentOrg + "_consentModal").modal("show");
+                    } else {
+                        var __modal = $("#" + parentOrg + "_consentModal");
+                        if (__modal.length > 0) $("#" + parentOrg + "_consentModal").modal("show");
+                        else assembleContent.demo(userId,true, $(this), true);
+                    };
                 }
                 else {
                     assembleContent.demo(userId,true, $(this), true);

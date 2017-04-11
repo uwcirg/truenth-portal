@@ -706,10 +706,15 @@ module.exports = OrgTool = (function() {
     this.populateUI = function() {
         var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs();
         for (org in orgsList) {
-            if (orgsList[org].isTopLevel && (orgsList[org].children.length > 0)) {
-                $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
-            }
+            if (orgsList[org].isTopLevel) {
+                if (orgsList[org].children.length > 0) {
+                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                  parentOrgsCt++;
+                } else {
+                  $("#fillOrgs").append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
+            };
             // Fill in each child clinic
             if (orgsList[org].children.length > 0) {
                 var childClinic = "";
