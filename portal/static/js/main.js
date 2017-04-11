@@ -2186,7 +2186,6 @@ $(document).ready(function() {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
                             if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
-                                console.log("user id: " + $el.attr("data-user-id"))
                                 assembleContent.demo($el.attr("data-user-id"),true, $el);
                             };
                         } else {
