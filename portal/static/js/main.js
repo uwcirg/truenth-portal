@@ -911,11 +911,11 @@ var assembleContent = {
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        $.each($("#userOrgs input"),function(i,v){
-            if ($(this).attr("data-parent-id")) {
-                if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
-            };
-        });
+        // $.each($("#userOrgs input"),function(i,v){
+        //     if ($(this).attr("data-parent-id")) {
+        //         if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
+        //     };
+        // });
 
         if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
@@ -1428,7 +1428,6 @@ var tnthAjax = {
             url: '/api/organization',
             async: sync? false : true
         }).done(function(data) {
-
             $("#fillOrgs").attr("userId", userId);
             $(".get-orgs-error").remove();
             OT.handlePreSelectedClinic();

@@ -203,8 +203,14 @@ $(document).ready(function(){
     $("#retype_password").on("blur", function() {
         if (!hasValue($(this).val())) {
             $("#errorretype_password").addClass("has-error").text("{%trans%}Please re-type your password.{%endtrans%}");
-        } else $("#errorretype_password").text("");
+        } else {
+            $("#errorretype_password").text("");
+            checkValidity();
+        };
     });
+    $("#email").on("change", function() {
+        $("#erroremail").text("");
+    })
 
 });
 

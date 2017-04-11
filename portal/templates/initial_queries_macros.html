@@ -301,6 +301,7 @@
     function _orgsCallback() {
       {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
           var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+          if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
           var checkedOrgs = {};
           userOrgs.each(function() {
               if ($(this).prop("checked")) {
