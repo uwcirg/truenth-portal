@@ -115,6 +115,20 @@ select:not([multiple]) {
       padding-right: 0.5em !important;
   }
 }
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    #999;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #999;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #999;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color:    #999;
+}
 .form-control {
   font-size: 16px;
   height: 40px;
@@ -152,7 +166,7 @@ select:not([multiple]) {
   background-color: #000;
 }
 .button--LR,
-.button--LR.show {
+.button--LR.data-show {
    opacity: 0;
    width: 160px;
    margin: 2em 0;
@@ -161,7 +175,7 @@ select:not([multiple]) {
     opacity: 1;
 }
 #profileConsentList .button--LR,
-#profileConsentList .button--LR.show {
+#profileConsentList .button--LR.data-show {
   margin: 0 0.5em;
   display: inline-block !important;
 }
@@ -230,6 +244,20 @@ select:not([multiple]) {
 }
 #mainDiv.profile .footer-wrapper {
   margin-left: 25%;
+  position: inherit !important;
+}
+#mainDiv.profile .footer-container.flex {
+  clear: both;
+  display:flex;
+  justify-content: space-between;
+  padding: 0.5em 0;
+  margin: 1em 4em;
+  border-top: 1px solid #ddd;
+}
+@media (max-width: 1199px) {
+  #mainDiv.profile .footer-container.flex{
+    justify-content: center;
+  }
 }
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
@@ -328,7 +356,6 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position: relative;
-  margin-left: 1em;
   transition: margin-left ease 0.5s;
   max-width: 991px;
 }
@@ -918,7 +945,7 @@ div.right-panel {
 }
 #fullSizeBox.box-min-500 {
   min-height: 500px;
-  max-height: 600px;
+  max-height: 660px;
   margin: 2em;
   overflow: hidden;
 }
@@ -1200,8 +1227,12 @@ div.right-panel {
 .profile-item-container .view-container {
   display: block;
 }
-.view-container td {
+.profile-item-container .view-container td {
   padding: 0.8em 1em;
+}
+.profile-item-container .view-container td:first-of-type {
+  display: inline-block;
+  vertical-align: top;
 }
 #aboutForm .view-container {
   display: none;
@@ -1224,14 +1255,20 @@ div.right-panel {
 #resetPasswordContainer {
   flex-grow: 0.7;
 }
+#passwordResetMessage {
+  width: 300px;
+  max-width: 100%;
+  padding: 1em 0;
+}
 .communication-prompt {
   margin-bottom: 1em;
 }
-#registrationEmailContainer .communication-prompt{
-  margin-left: 1.7em;
-}
 #createUserLink {
   max-width: 100%;
+  border: 1px solid #bdb9b9;
+  height: 3.2em;
+  display: inline-block;
+  width: 300px;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1253,6 +1290,9 @@ div.right-panel {
 }
 #profileForm #bdGroup .flex {
   flex-wrap: nowrap;
+}
+#profileForm #errorbirthday {
+  display: none;
 }
 #userEthnicity label {
   margin-bottom: 0;
@@ -1302,6 +1342,12 @@ div.noOrg-container span {
 }
 #createProfileForm .title {
   margin-top: 5%;
+}
+#createProfileForm #phoneGroup {
+  margin-top: 1em;
+}
+#createProfileForm #studyIdContainer {
+  margin-top: 1.8em;
 }
 #createProfileForm .study-id-label {
   margin-top: 0.5em;
@@ -2004,8 +2050,8 @@ div.timezone-warning.text-warning {
   .tnth-form .form-group > label {
     font-size: 13px;
   }
-  .create-user-link {
-    font-size: 0.95em;
+  #createUserLink {
+    font-size: 0.9em;
   }
   #indexNavBar {
     display: block;
@@ -2452,11 +2498,6 @@ div.timezone-warning.text-warning {
   }
   .btn-set .btn {
     margin-bottom: 0.5em;
-  }
-}
-@media (min-width: 1492px) {
-  #profileSendEmailContainer {
-    margin-left: 1.5em;
   }
 }
 @media (max-width: 1745px) {

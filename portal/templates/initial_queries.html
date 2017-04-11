@@ -528,7 +528,7 @@ $(document).ready(function(){
           var toSend = thisItem.val();
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
           if (toCall != "tx" && toCall != "biopsy") {
-              tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("status"), false);
+              tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("data-status"), false);
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
 
@@ -567,7 +567,7 @@ $(document).ready(function(){
 
           } else {
             if (toCall == "biopsy") {
-              tnthAjax.postClinical({{user.id}}, toCall, "false", $(this).attr("status"));
+              tnthAjax.postClinical({{user.id}}, toCall, "false", $(this).attr("data-status"));
               $("#biopsyDate").attr("skipped", "true");
 
               ["pca_diag", "pca_localized", "tx"].forEach(function(fieldName) {

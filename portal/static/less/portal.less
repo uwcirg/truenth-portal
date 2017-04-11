@@ -55,6 +55,7 @@
 @leftPanelBgColor: #bac1ca;
 @errorMessageColor: #a94442;
 @containerBorderColor: #bcc2a6;
+@placeHolderColor: #999;
 
 /**
  *  Font-family
@@ -158,7 +159,7 @@ a.btn {
   margin: 1em 0.2em 2em 0.2em;
 }
 .button--LR,
-.button--LR.show {
+.button--LR.data-show {
    opacity: 0;
    width: 160px;
    margin: 2em 0;
@@ -168,10 +169,24 @@ a.btn {
 }
 #profileConsentList {
   .button--LR,
-  .button--LR.show {
+  .button--LR.data-show {
     margin: 0 0.5em;
     display: inline-block !important;
   }
+}
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    @placeHolderColor;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    @placeHolderColor;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    @placeHolderColor;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color:    @placeHolderColor;
 }
 .form-control {
   font-size: @baseFontSize;
@@ -238,7 +253,25 @@ select:not([multiple]) {
   }
   .footer-wrapper {
     margin-left: 25%;
+    position: inherit !important;
   }
+  .footer-container.flex {
+    clear: both;
+    display:flex;
+    justify-content: space-between;
+    padding: 0.5em 0;
+    margin: 1em 4em;
+    border-top: 1px solid #ddd;
+  }
+}
+@media (max-width: 1199px) {
+  #mainDiv.profile .footer-container.flex{
+    justify-content: center;
+  }
+}
+#tnthNavWrapper {
+  z-index: 20;
+  position: relative;
 }
 #tnthNavWrapper {
   z-index: 20;
@@ -334,7 +367,6 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position:relative;
-  margin-left: 1em;
   transition:margin-left ease .5s;
   max-width: 991px;
 }
@@ -1280,8 +1312,12 @@ h4.detail-title {
 .profile-item-container .view-container {
   display: block;
 }
-.view-container td {
+.profile-item-container .view-container td {
   padding: 0.8em 1em;
+}
+.profile-item-container .view-container td:first-of-type {
+  display: inline-block;
+  vertical-align: top;
 }
 #aboutForm .view-container {
   display: none;
@@ -1304,13 +1340,20 @@ h4.detail-title {
 #resetPasswordContainer {
   flex-grow: 0.7;
 }
+#passwordResetMessage {
+  width: 300px;
+  max-width: 100%;
+  padding: 1em 0;
+}
 .communication-prompt {
   margin-bottom: 1em;
 }
-#registrationEmailContainer .communication-prompt{
-  margin-left: 1.7em;
-}
 #createUserLink {
+  max-width: 100%;
+  border: 1px solid #bdb9b9;
+  height: 3.2em;
+  display: inline-block;
+  width: 300px;
   max-width: 100%;
 }
 .profile-create-item-container {
@@ -1329,9 +1372,12 @@ h4.detail-title {
     width: 300px;
     max-width: 100%;
   }
- #month {
+  #month {
     width: 180px;
     max-width: 100%;
+  }
+  #errorbirthday {
+    display: none;
   }
   #bdGroup .flex {
     flex-wrap: nowrap;
@@ -1429,6 +1475,12 @@ div.noOrg-container {
 #createProfileForm  {
   .title {
     margin-top: 5%;
+  }
+  #phoneGroup {
+    margin-top: 1em;
+  }
+  #studyIdContainer {
+    margin-top: 1.8em;
   }
   .study-id-label {
     margin-top: 0.5em;
@@ -2059,7 +2111,12 @@ div.org-container {
   }
 }
 
+#procedureForm {
+  margin-left: 0.5em;
+}
+
 #profileProcedureContainer {
+  margin-left: 1em;
   #tnthproc {
     max-width: 95%
   }
@@ -2067,7 +2124,32 @@ div.org-container {
     width: 60%;
     max-width: 100%;
   }
+  .treatment-container {
+    margin-left:0.5em;
+  }
+  .inner {
+    margin: 1em 0.5em 1em 0.5em
+  }
+  .procedureDateLabel {
+    margin-bottom: 0;
+  }
+  button.btn {
+    color:#777;
+    font-size: 0.9em;
+  }
+  #pastTreatmentsContainer,
+  #eventListLoad {
+    display: none;
+  }
 }
+
+#eventListtnthproc {
+  margin-left: 0.5em
+  td {
+    padding: 0.15em;
+  }
+}
+
 .registration-status-container {
   margin:0 0 0.8em 0;
   font-size: @mediumText;
@@ -2142,7 +2224,7 @@ div.timezone-warning.text-warning {
   div.right-panel {
     margin-left: 0 !important;
   }
-  .create-user-link {
+  #createUserLink {
     font-size: @mediumText;
   }
 
@@ -2639,11 +2721,6 @@ div.timezone-warning.text-warning {
 @media (max-width: 1560px) {
   body.open-nav .right-panel {
     margin-left:90px;
-  }
-}
-@media (min-width: 1492px) {
-  #profileSendEmailContainer {
-    margin-left: 1.5em;
   }
 }
 @media (max-width: 1491px) {
