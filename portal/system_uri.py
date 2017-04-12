@@ -23,8 +23,9 @@ TRUENTH_PROVIDER_SYSTEMS = tuple('{system}/{provider}'.format(
     system=TRUENTH_IDENTITY_SYSTEM, provider=provider) for
     provider in SUPPORTED_OAUTH_PROVIDERS)
 
+DECISION_SUPPORT_GROUP = '{}/decision-support-group'.format(
+    TRUENTH_IDENTITY_SYSTEM)
 PRACTICE_REGION = '{}/practice-region'.format(TRUENTH_IDENTITY_SYSTEM)
-
 SHORTCUT_ALIAS = '{}/shortcut-alias'.format(TRUENTH_IDENTITY_SYSTEM)
 
 TRUENTH_STRUCTURE_DEFINITION = '{}/fhir/StructureDefinition'.format(
