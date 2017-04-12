@@ -428,16 +428,13 @@ class User(db.Model, UserMixin):
         # value if it's a base string type, as opposed to when
         # its being used in a query statement (email.ilike('foo'))
         if isinstance(self._email, basestring):
-            emailstring = self._email
-            if emailstring.startswith(INVITE_PREFIX):
+            if self._email.startswith(INVITE_PREFIX):
                 # strip the invite prefix for UI
-                emailstring = emailstring[len(INVITE_PREFIX):]
+                return self._email[len(INVITE_PREFIX):]
 
-            if emailstring.startswith(NO_EMAIL_PREFIX):
+            if self._email.startswith(NO_EMAIL_PREFIX):
                 # return None as we don't have an email
                 return None
-
-            return emailstring
 
         return self._email
 
