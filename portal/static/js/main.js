@@ -49,11 +49,6 @@ function embed_page(data){
             } else setTimeout("loader();", 0);
 
         });
-    // Wait until TrueNTH logo loads before displaying the navWrapper. Avoid having content flash when CSS hasn't loaded
-    // $("img.tnth-topnav-wordmark").load(function(){
-
-    // });
-    // Todo: add "data-*" HTML attribute
 }
 
 function showMain() {
@@ -76,7 +71,7 @@ function showWrapper(hasLoader) {
             $("#tnthNavWrapper").css(cssProp).promise().done(function() {
                 //delay removal of loading div to prevent FOUC
                 if (!DELAY_LOADING) {
-                    setTimeout('$("#loadingIndicator").fadeOut();', 300);
+                    setTimeout('$("#loadingIndicator").fadeOut();', 1000);
                 };
             });
         } else $("#tnthNavWrapper").css(cssProp);
@@ -93,15 +88,11 @@ var loader = function(show) {
     };
 
     if (show) {
-        // $("#profileForm").addClass("loading");
         $("#loadingIndicator").show();
     } else {
-        // Otherwise we'll hide it
-        //issue with FOUC - need to delay showing wrapper until it is styled
         showMain();
-        showWrapper(true);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 300);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
         };
     };
 };
@@ -204,6 +195,7 @@ function getUserLocale(userId) {
             $.ajax ({
                     type: "GET",
                     url: '/api/demographics/'+userId,
+                    cache: false,
                     async: false
             }).done(function(data) {
                 if (data && data.communication) {
@@ -246,6 +238,176 @@ var CONSENT_ENUM = {
     }
 };
 
+var fillViews = {
+    "org": function() {
+        var content = "";
+        //find if top level org first
+        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+        if (topLevelOrgs.length > 0) {
+            topLevelOrgs.each(function() {
+                content += "<p class='indent capitalize'>" + $(this).text() + "</p>";
+            });
+        };
+        $("#userOrgs input[name='organization']").each(function() {
+            if ($(this).is(":checked")) {
+                if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
+                else content += "<p class='indent'>" + $(this).closest("label").text() + "</p>";
+            };
+        });
+        if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
+        $("#userOrgs_view").html(content);
+    },
+    "demo":function() {
+        this.name();
+        this.dob();
+        this.studyId();
+        this.phone();
+        this.email();
+        this.deceased();
+        this.detail();
+    },
+    "name": function() {
+        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+            var content = $("#firstname").val() + " " + $("#lastname").val();
+            if (hasValue($.trim(content))) $("#name_view").text(content);
+            else $("#name_view").text("Not provided");
+        };
+    },
+    "dob": function() {
+        if (!$("#bdGroup").hasClass("has-error")) {
+            if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
+                $("#dob_view").text($("#month option:selected").val() + "/" + $("#date").val() + "/" + $("#year").val());
+            } else $("#dob_view").text("Not provided");
+        };
+    },
+    "phone": function() {
+        if (!$("#phoneGroup").hasClass("has-error")) {
+            var content = $("#phone").val();
+            if (hasValue(content)) $("#phone_view").text(content);
+            else $("#phone_view").text("Not provided");
+        };
+    },
+    "email": function() {
+        if (!$("#emailGroup").hasClass("has-error")) {
+            var content = $("#email").val();
+            if (hasValue(content)) $("#email_view").text(content);
+            else $("#email_view").text("Not provided");
+        };
+    },
+    "studyId": function() {
+        if (!$("#profileStudyIDContainer").hasClass("has-error")) {
+            var content = $("#profileStudyId").val();
+            if (hasValue(content)) $("#study_id_view").text(content);
+            else $("#study_id_view").text("Not provided");
+        };
+    },
+    "detail": function() {
+        this.gender();
+        this.race();
+        this.ethnicity();
+        this.indigenous();
+    },
+    "gender": function() {
+        if ($("#genderGroup").length > 0) {
+            if (!$("#genderGroup").hasClass("has-error")) {
+                var content = $("input[name=sex]:checked").val();
+                if (hasValue(content)) $("#gender_view").text(content);
+                else $("#gender_view").text("Not provided");
+            };
+        } else $(".gender-view").hide();
+    },
+    "race": function() {
+        if ($("#userRace").length > 0) {
+            if (!$("#userRace").hasClass("has-error")) {
+                var content = "";
+                $("#userRace input:checkbox").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#race_view").html(content);
+                else $("#race_view").text("Not provided");
+            };
+        } else {
+            $(".race-view").hide();
+        }
+    },
+    "ethnicity": function() {
+        if ($("#userEthnicity").length > 0) {
+            if (!$("#userEthnicity").hasClass("has-error")) {
+                var content = "";
+                $("#userEthnicity input[type='radio']").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#ethnicity_view").html(content);
+                else $("#ethnicity_view").text("Not provided");
+            };
+        } else $(".ethnicity-view").hide();
+    },
+    "indigenous": function() {
+        if ($("#userIndigenousStatus").length > 0) {
+            if (!$("#userIndigenousStatus").hasClass("has-error")) {
+                var content = "";
+                $("#userIndigenousStatus input[type='radio']").each(function() {
+                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                })
+                if (hasValue(content)) $("#indigenous_view").html(content);
+                else $("#indigenous_view").text("Not provided");
+            };
+        } else $(".indigenous-view").hide();
+    },
+    "clinical": function() {
+        var content = "";
+        if (!$("#biopsyDateContainer").hasClass("has-error")) {
+            var a = $("#patBiopsy input[name='biopsy']:checked").val();
+            var biopsyDate = $("#biopsyDate").val();
+            if (a == "true" && hasValue(biopsyDate)) {
+                content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+                content += "&nbsp;&nbsp;" + $("#biopsyDate").val();
+            } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
+            if (hasValue(content)) $("#biopsy_view").html(content);
+            else $("#biopsy_view").html("No answer provided");
+        };
+        content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
+        if (hasValue(content)) $("#pca_diag_view").text(content);
+        else $("#pca_diag_view").text("No answer provided");
+    },
+    "deceased": function() {
+        if ($("#boolDeath").is(":checked")) {
+            $("#boolDeath_view").text("Patient has deceased");
+            if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
+                $("#deathDate_view").text($("#deathDay").val() + "/" + $("#deathMonth").val() + "/" + $("#deathYear").val());
+            };
+        } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
+    },
+    "locale": function() {
+        if ($("#locale").length > 0) {
+            var content = $("#locale option:selected").text();
+            if (hasValue(content)) $("#locale_view").text(content);
+            else $("#locale_view").html("<p class='text-muted'>No information provided.</p>");
+
+        } else $(".locale-view").hide();
+    },
+    "timezone": function() {
+        if ($("#profileTimeZone").length > 0) {
+            var content = $("#profileTimeZone option:selected").val();
+            if (hasValue(content)) $("#timezone_view").text(content);
+            else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
+        } else $(".timezone-view").hide();
+    },
+    "procedure": function() {
+        if ($("#userProcedures").length > 0) {
+            var content = "";
+            $("#userProcedures tr[data-id]").each(function() {
+                content += hasValue(content) ? "<br/>" : "";
+                $(this).find("td").each(function() {
+                    if (!$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                });
+            });
+            if (hasValue(content)) $("#procedure_view").html(content);
+            else $("#procedure_view").html("<p class='text-muted'>No information provided</p>");
+        } else $("#procedure_view").html("<p class='text-muted'>No information available</p>");
+    }
+};
+
 
 var fillContent = {
     "clinical": function(data) {
@@ -272,8 +434,8 @@ var fillContent = {
             var $radios = $('input:radio[name="'+clinicalItem+'"]');
             if ($radios.length > 0) {
                 if(!$radios.is(':checked')) {
-                    if (status == "unknown") $radios.filter('[value="unknown"]').prop('checked', true);
-                    else $radios.filter('[value='+clinicalValue+']').prop('checked', true);
+                    if (status == "unknown") $radios.filter('[data-status="unknown"]').prop('checked', true);
+                    else $radios.filter('[value='+clinicalValue+']').not("[data-status='unknown']").prop('checked', true);
                     if (clinicalItem == "biopsy") {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
@@ -299,12 +461,12 @@ var fillContent = {
                     };
                 };
             };
-        })
+        });
+        fillViews.clinical();
     },
     "demo": function(data) {
         //console.log("in demo");
         //console.log(data)
-
         $('#firstname').val(data.name.given);
         $('#lastname').val(data.name.family);
         if (data.birthDate) {
@@ -338,6 +500,8 @@ var fillContent = {
                 $("#boolDeath").prop("checked", true);
             } else $("#boolDeath").prop("checked", false);
         };
+
+        fillViews.demo();
         // TODO - add email and phone for profile page use
         // Only on profile page
         this.ethnicity(data);
@@ -351,6 +515,7 @@ var fillContent = {
             $('#firstname').val(data.name.given);
             $('#lastname').val(data.name.family);
         };
+        fillViews.name();
     },
     "dob": function(data) {
         if (data && data.birthDate) {
@@ -360,6 +525,7 @@ var fillContent = {
             $("#month").val(bdArray[1]);
             $("#date").val(bdArray[2]);
         };
+        fillViews.dob();
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
@@ -374,6 +540,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.ethnicity();
     },
     "race": function(data) {
         // Get Races
@@ -393,6 +560,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.race();
     },
     "indigenous": function(data) {
         data.extension.forEach(function(item, index) {
@@ -404,6 +572,7 @@ var fillContent = {
                 });
             };
         });
+        fillViews.indigenous();
     },
     "orgs": function(data) {
         $("#userOrgs input[name='organization']").each(function() {
@@ -424,7 +593,7 @@ var fillContent = {
             var orgID = val.reference.split("/").pop();
             if (orgID == "0") {
                 $("#userOrgs #noOrgs").prop("checked", true);
-                $("#stateSelector").find("option[value='none']").prop("selected", true);
+                $("#stateSelector").find("option[value='none']").prop("selected", true).val("none");
             }
             else {
                 var ckOrg;
@@ -432,19 +601,27 @@ var fillContent = {
                     orgStates.forEach(function(state) {
                         ckOrg = $("#userOrgs input.clinic[value="+orgID+"][state='" + state + "']");
                         ckOrg.prop("checked", true);
-                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true);
+                        $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(state);
                     });
                 } else {
                     var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
-                    ckOrg.prop('checked', true);
+                    if (ckOrg.length > 0) ckOrg.prop('checked', true);
+                    else {
+                        var topLevelOrg = $("#fillOrgs").find("legend[orgid='" + orgID + "']");
+                        if (topLevelOrg.length > 0) topLevelOrg.attr("data-checked", "true");
+                    };
                 };
             };
         });
 
         // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
         if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]").prop('checked', true);
+            var o = $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]");
+            o.prop('checked', true);
+            //clinicNames.push(o.closest("label").text());
+
         };
+        fillViews.org();
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -454,6 +631,7 @@ var fillContent = {
                 };
             });
         };
+        fillViews.studyId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
@@ -522,13 +700,14 @@ var fillContent = {
                     } else orgName = orgs[orgId]._name;
 
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
-                    var expired = tnthDates.getDateDiff(item.expires);
+                    var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
+                    var editorUrlEl = $("#" + orgId + "_editor_url");
 
 
                     switch(consentStatus) {
@@ -590,8 +769,8 @@ var fillContent = {
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>"
-
+                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -614,6 +793,9 @@ var fillContent = {
                 if ($(".timezone-error").text() == "" && (userTimeZone.toUpperCase() != "UTC")) $("#profileConsentList .gmt").each(function() {
                     $(this).hide();
                 });
+                 $("#profileConsentList .button--LR").each(function() {
+                     if ($(this).attr("show") == "true") $(this).addClass("show");
+                 });
             } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
 
             if (editable) {
@@ -654,49 +836,59 @@ var fillContent = {
     "proceduresContent": function(data,newEntry) {
         if (data.entry.length == 0) {
             $("body").find("#userProcedures").html("<p id='noEvents' style='margin: 0.5em 0 0 1em'><em>You haven't entered any management option yet.</em></p>").animate({opacity: 1});
+            $("#pastTreatmentsContainer").hide();
+            fillViews.procedure();
             return false;
-        }
+        };
 
         // sort from newest to oldest
         data.entry.sort(function(a,b){
             return new Date(b.resource.performedDateTime) - new Date(a.resource.performedDateTime);
         });
-        var proceduresHtml = '<table  class="table-responsive" width="100%" id="eventListtnthproc" cellspacing="4" cellpadding="6">';
 
+        var contentHTML = "", proceduresHtml = "";
         // If we're adding a procedure in-page, then identify the highestId (most recent) so we can put "added" icon
         var highestId = 0;
         $.each(data.entry,function(i,val){
-            var procID = val.resource.id, code = val.resource.code.coding[0].code;
-            var displayText = val.resource.code.coding[0].display;
-            var performedDateTime = val.resource.performedDateTime;
-            var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
-            var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
-            //console.log("date: " + performedDateTime + " cdate: " + performedDate);
-            var deleteInvocation = '';
-            var creatorDisplay = val.resource.meta.by.display;
-            var creator = val.resource.meta.by.reference;
-            creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
-            if (creator == currentUserId) {
-                creator = "you";
-                deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
-            }
-            else if (creator == subjectId) {
-                creator = "this patient";
-            }
-            else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
-            var dtEdited = val.resource.meta.lastUpdated;
-            dateEdited = new Date(dtEdited);
-            proceduresHtml += "<tr " + ((code == CANCER_TREATMENT_CODE || code == NONE_TREATMENT_CODE) ? "class='tnth-hide'" : "") + " data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-9 col-xs-9'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-3 col-xs-3 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
-            if (procID > highestId) {
-                highestId = procID;
+            var code = val.resource.code.coding[0].code;
+            if (code != CANCER_TREATMENT_CODE && code != NONE_TREATMENT_CODE) {
+                var procID = val.resource.id;
+                var displayText = val.resource.code.coding[0].display;
+                var performedDateTime = val.resource.performedDateTime;
+                var performedDate = new Date(String(performedDateTime).replace(/-/g,"/").substring(0, performedDateTime.indexOf('T')));
+                var cPerformDate = performedDate.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'});
+                //console.log("date: " + performedDateTime + " cdate: " + performedDate);
+                var deleteInvocation = '';
+                var creatorDisplay = val.resource.meta.by.display;
+                var creator = val.resource.meta.by.reference;
+                creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
+                if (creator == currentUserId) {
+                    creator = "you";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.4em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                }
+                else if (creator == subjectId) {
+                    creator = "this patient";
+                }
+                else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
+                var dtEdited = val.resource.meta.lastUpdated;
+                dateEdited = new Date(dtEdited);
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+                if (procID > highestId) {
+                    highestId = procID;
+                };
             };
         });
-        proceduresHtml += '</table>';
 
-        $("body").find("#userProcedures").html(proceduresHtml).animate({opacity: 1});
+        if (hasValue(contentHTML)) {
+            proceduresHtml = '<table  class="table-responsive" width="100%" id="eventListtnthproc" cellspacing="4" cellpadding="6">';
+            proceduresHtml += contentHTML;
+            proceduresHtml += '</table>';
+            $("#userProcedures").html(proceduresHtml);
+            $("#pastTreatmentsContainer").fadeIn();
 
-        var dataRows = $("#userProcedures tr[data-id]");
-        if (dataRows.length == $("#userProcedures tr[class='tnth-hide']").length) $(dataRows.get(0)).removeClass("tnth-hide");
+        } else {
+            $("#pastTreatmentsContainer").fadeOut();
+        }
 
         // If newEntry, then add icon to what we just added
         if (newEntry) {
@@ -707,6 +899,7 @@ var fillContent = {
             placement: 'top',
             html: true
         });
+        fillViews.procedure();
     },
     "timezone": function(data) {
         data.extension.forEach(function(item, index) {
@@ -718,10 +911,12 @@ var fillContent = {
                 });
             };
         });
+        fillViews.timezone();
+        fillViews.locale();
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -759,11 +954,11 @@ var assembleContent = {
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        $.each($("#userOrgs input"),function(i,v){
-            if ($(this).attr("data-parent-id")) {
-                if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
-            };
-        });
+        // $.each($("#userOrgs input"),function(i,v){
+        //     if ($(this).attr("data-parent-id")) {
+        //         if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
+        //     };
+        // });
 
         if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
@@ -774,13 +969,28 @@ var assembleContent = {
             if (orgIDs) {
                 if (orgIDs.length > 0) {
                     demoArray["careProvider"] = orgIDs;
-                } else {
-                    //don't update org to none if at the initial queries page
-                    if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
                 };
             };
 
         };
+
+        /**** dealing with the scenario where user can be affiliated with top level org e.g. CRV, IRONMAN, via direct database addition **/
+        var topLevelOrgs = $("#fillOrgs legend[data-checked]");
+        if (topLevelOrgs.length > 0)  {
+            topLevelOrgs.each(function() {
+                var tOrg = $(this).attr("orgid");
+                if (hasValue(tOrg)) {
+                    if (!demoArray["careProvider"]) demoArray["careProvider"] = [];
+                    demoArray["careProvider"].push({reference: "api/organization/" + tOrg});
+                };
+            });
+        };
+
+
+         //don't update org to none if there are top level org affiliation above
+         if (!demoArray["careProvider"] || (demoArray["careProvider"] && demoArray["careProvider"].length == 0)) {
+            if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
+         };
 
         if (hasValue($("#deathDate").val())) {
             demoArray["deceasedDateTime"] = $("#deathDate").val();
@@ -1169,10 +1379,15 @@ var OrgTool = function() {
     this.populateUI = function() {
         var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs");
         for (org in orgsList) {
-            if (orgsList[org].isTopLevel && (orgsList[org].children.length > 0)) {
-                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
-            }
+            if (orgsList[org].isTopLevel) {
+                if (orgsList[org].children.length > 0) {
+                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                    parentOrgsCt++;
+                } else {
+                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
+            };
             // Fill in each child clinic
             if (orgsList[org].children.length > 0) {
                 var childClinic = "";
@@ -1220,8 +1435,8 @@ var OrgTool = function() {
     this.handleEvent = function() {
         getSaveLoaderDiv("profileForm", "userOrgs");
         $("#userOrgs input[name='organization']").each(function() {
-            $(this).attr("save-container-id", "userOrgs");
-            $(this).on("click", function() {
+            $(this).attr("data-save-container-id", "userOrgs");
+            $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
 
@@ -1244,9 +1459,21 @@ var OrgTool = function() {
                         if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                     };
                 };
-                assembleContent.demo(userId,true, $(this), true);
-                if (typeof reloadConsentList != "undefined") reloadConsentList();
-                tnthAjax.handleConsent($(this));
+
+                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
+                    if (tnthAjax.hasConsent(userId, parentOrg)) {
+                        assembleContent.demo(userId,true, $(this), true);
+                    } else {
+                        var __modal = $("#" + parentOrg + "_consentModal");
+                        if (__modal.length > 0) $("#" + parentOrg + "_consentModal").modal("show");
+                        else assembleContent.demo(userId,true, $(this), true);
+                    };
+                }
+                else {
+                    assembleContent.demo(userId,true, $(this), true);
+                    if (typeof reloadConsentList != "undefined") reloadConsentList();
+                    tnthAjax.handleConsent($(this));
+                };
             });
         });
     };
@@ -1263,7 +1490,6 @@ var tnthAjax = {
             url: '/api/organization',
             async: sync? false : true
         }).done(function(data) {
-
             $("#fillOrgs").attr("userId", userId);
             $(".get-orgs-error").remove();
             OT.handlePreSelectedClinic();
@@ -1283,8 +1509,8 @@ var tnthAjax = {
        $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: (sync ? false : true),
-            cache: false
+            cache: false,
+            async: (sync ? false : true)
         }).done(function(data) {
             $(".get-consent-error").remove();
             if (data.consent_agreements) {
@@ -1343,8 +1569,8 @@ var tnthAjax = {
                         type: "DELETE",
                         url: '/api/user/' + userId + '/consent',
                         contentType: "application/json; charset=utf-8",
-                        cache: false,
                         async: false,
+                        cache: false,
                         dataType: 'json',
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
@@ -1370,15 +1596,15 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: false,
-            cache: false
+            cache: false,
+            async: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
                 if (d.length > 0) {
                     d.forEach(function(item) {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
-                        expired = tnthDates.getDateDiff(item.expires);
+                        expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
                             if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
@@ -1404,8 +1630,8 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/user/'+userId+"/consent",
-            async: false,
-            cache: false
+            cache: false,
+            async: false
         }).done(function(data) {
             if (data.consent_agreements) {
                 var d = data["consent_agreements"];
@@ -1414,7 +1640,7 @@ var tnthAjax = {
                         return new Date(b.signed) - new Date(a.signed); //latest comes first
                     });
                     item = d[0];
-                    expired = tnthDates.getDateDiff(item.expires);
+                    expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     if (item.deleted) found = true;
                     if (expired > 0) found = true;
                     if (item.staff_editable && item.include_in_reports && !item.send_reminders) suspended = true;
@@ -1508,7 +1734,8 @@ var tnthAjax = {
         $.ajax ({
             type: "GET",
             url: '/api/demographics/'+userId,
-            async: (sync ? false: true)
+            async: (sync ? false: true),
+            cache: false
         }).done(function(data) {
             if (!noOverride) {
                 fillContent.race(data);
@@ -1543,6 +1770,9 @@ var tnthAjax = {
             //console.log(data);
             $(".put-demo-error").remove();
             flo.showUpdate(targetField);
+            fillViews.demo();
+            fillViews.detail();
+            fillViews.org();
         }).fail(function() {
             if ($(".put-demo-error").length == 0) $(".error-message").append("<div class='put-demo-error'>Server error occurred setting demographics information.</div>");
             flo.showError(targetField);
@@ -1602,7 +1832,8 @@ var tnthAjax = {
         if (!userId) return false;
         $.ajax ({
             type: "GET",
-            url: '/api/patient/'+userId+'/procedure'
+            url: '/api/patient/'+userId+'/procedure',
+            cache: false
         }).done(function(data) {
             fillContent.treatment(data);
         }).fail(function() {
@@ -1662,8 +1893,10 @@ var tnthAjax = {
     "getProc": function(userId,newEntry) {
         $.ajax ({
             type: "GET",
-            url: '/api/patient/'+userId+'/procedure'
+            url: '/api/patient/'+userId+'/procedure',
+            cache: false
         }).done(function(data) {
+            $("#eventListLoad").hide();
             fillContent.proceduresContent(data,newEntry);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
@@ -1715,7 +1948,8 @@ var tnthAjax = {
         var self = this;
         $.ajax ({
             type: "GET",
-            url: '/api/user/'+userId+'/roles'
+            url: '/api/user/'+userId+'/roles',
+            cache: false
         }).done(function(data) {
             //self.getRoleList();
             $(".get-roles-error").remove();
@@ -1765,7 +1999,7 @@ var tnthAjax = {
            if ($(".get-clinical-error").length == 0) $(".error-message").append("<div class='get-clinical-error'>Server error occurred retrieving clinical data.</div>");
         });
     },
-    "putClinical": function(userId, toCall, toSend, targetField) {
+    "putClinical": function(userId, toCall, toSend, targetField, status) {
         flo.showLoader(targetField);
         $.ajax ({
             type: "POST",
@@ -1776,24 +2010,28 @@ var tnthAjax = {
         }).done(function() {
             $(".put-clinical-error").remove();
             flo.showUpdate(targetField);
+            fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
             if ($(".put-clinical-error").length == 0) $(".error-message").append("<div class='put-clinical-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
+            fillViews.clinical();
         });
     },
-    "getBiopsyId": function(userId) {
-        var obId = "", code="";
+    "getObservationId": function(userId, code) {
+        if (!hasValue(userId) && !hasValue(code)) return false;
+        var obId = "", _code="";
         $.ajax ({
             type: "GET",
             url: '/api/patient/'+userId+'/clinical',
+            cache: false,
             async: false
         }).done(function(data) {
             if (data && data.entry) {
                 (data.entry).forEach(function(item) {
                     if (!hasValue(obId)) {
-                        code = item.content.code.coding[0].code;
-                        if (code == "111") obId = item.content.id;
+                        _code = item.content.code.coding[0].code;
+                        if (_code == code) obId = item.content.id;
                     };
                 });
             }
@@ -1802,12 +2040,25 @@ var tnthAjax = {
         });
         return obId;
     },
-    "postBiopsy": function(userId, issuedDate, value, status, targetField, params) {
+    "postClinical": function(userId, toCall, toSend, status, targetField, params) {
         flo.showLoader(targetField);
         if (!userId) return false;
         if (!params) params = {};
-        var code = '111';
-        var display = "biopsy";
+        var code = "";
+        var display = "";
+        switch(toCall) {
+            case "biopsy":
+                code = "111";
+                display = "biopsy";
+                break;
+            case "pca_diag":
+                code = "121";
+                display = "PCa diagnosis";
+                break;
+            case "pca_localized":
+                code = "141";
+                display = "PCa localized diagnosis";
+        };
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -1815,11 +2066,11 @@ var tnthAjax = {
         var obsArray = {};
         obsArray["resourceType"] = "Observation";
         obsArray["code"] = {"coding": obsCode};
-        obsArray["issued"] = issuedDate ? issuedDate: "";
+        obsArray["issued"] = params.issuedDate ? params.issuedDate: "";
         obsArray["status"] = status ? status: "";
-        obsArray["valueQuantity"] = {"units":"boolean", "value":value};
+        obsArray["valueQuantity"] = {"units":"boolean", "value": toSend};
         if (params.performer) obsArray["performer"] = params.performer;
-        var obsId = tnthAjax.getBiopsyId(userId);
+        var obsId = tnthAjax.getObservationId(userId, code);
         if (hasValue(obsId)) {
             method = "PUT";
             url = url + "/" + obsId;
@@ -1829,14 +2080,17 @@ var tnthAjax = {
             url: url,
             contentType: "application/json; charset=utf-8",
             dataType: 'json',
+            cache: false,
             data: JSON.stringify(obsArray)
         }).done(function() {
             $(".post-biopsy-error").remove();
             flo.showUpdate(targetField);
+            fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
             if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
+            fillViews.clinical();
         });
     },
     "postTerms": function(toSend) {
@@ -1899,11 +2153,7 @@ funcWrapper = function(param) {
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
-        //dataFilter:data_filter,
-        //xhr: xhr_function,
-        crossDomain: true,
-        cache: false
-        //xhrFields: {withCredentials: true},
+        cache: (getIEVersion() ? false : true)
     }, 'html')
     .done(function(data) {
         embed_page(data);
@@ -1935,7 +2185,9 @@ $(document).ready(function() {
     } else loader();
 
     // Reveal footer after load to avoid any flashes will above content loads
-    $("#homeFooter").show();
+    setTimeout('$("#homeFooter").show();', 100);
+
+    //setTimeout('LRKeyEvent();', 1500);
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
@@ -1983,6 +2235,8 @@ $(document).ready(function() {
                 var addUserId = "";
                 if (typeof(patientId) !== "undefined") {
                     addUserId = "&user_id="+patientId;
+                } else if (hasValue($el.attr("data-user-id"))) {
+                    addUserId = "&user_id="+ $el.attr("data-user-id")
                 }
                 // If this is a valid address, then use unique_email to check whether it's already in use
                 if (emailReg.test(emailVal)) {
@@ -1993,8 +2247,8 @@ $(document).ready(function() {
                     }).done(function(data) {
                         if (data.unique) {
                             $("#erroremail").html('').parents(".form-group").removeClass('has-error');
-                            if ($el.attr("update-on-validated") == "true" && $el.attr("user-id")) {
-                                assembleContent.demo($el.attr("user-id"),true, $el);
+                            if ($el.attr("data-update-on-validated") == "true" && $el.attr("data-user-id")) {
+                                assembleContent.demo($el.attr("data-user-id"),true, $el);
                             };
                         } else {
                             $("#erroremail").html("This e-mail address is already in use. Please enter a different address.").parents(".form-group").addClass('has-error');
@@ -2426,37 +2680,77 @@ function convertGMTToLocalTime(dateString, format) {
 var FieldLoaderHelper = function () {
     this.showLoader = function(targetField) {
         if(targetField && targetField.length > 0) {
-           $("#" + targetField.attr("save-container-id") + "_load").css("opacity", 1);
+           $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
         };
     };
 
     this.showUpdate = function(targetField) {
         if(targetField && targetField.length > 0) {
-             $("#" + targetField.attr("save-container-id") + "_error").text("").css("opacity", 0);
-             $("#"+ targetField.attr("save-container-id") + "_success").text("success");
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("save-container-id") + '_success").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_success").css("opacity", 0);', 2000);
+             $("#" + targetField.attr("data-save-container-id") + "_error").text("").css("opacity", 0);
+             $("#"+ targetField.attr("data-save-container-id") + "_success").text("success");
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_success").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_success").css("opacity", 0);', 2000);
         };
     };
 
     this.showError = function(targetField) {
         if(targetField && targetField.length > 0) {
-            $("#" + targetField.attr("save-container-id") + "_error").html("Unable to update. System/Server Error.");
-            $("#" + targetField.attr("save-container-id") + "_success").text("").css("opacity", 0);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("save-container-id") + '_error").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("save-container-id") + '_error").css("opacity", 0);', 5000);
+            $("#" + targetField.attr("data-save-container-id") + "_error").html("Unable to update. System/Server Error.");
+            $("#" + targetField.attr("data-save-container-id") + "_success").text("").css("opacity", 0);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
+            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_error").css("opacity", 1);', 900);
+            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_error").css("opacity", 0);', 5000);
         };
     };
 
 };
 
 var flo = new FieldLoaderHelper();
+var LR_INVOKE_KEYCODE = 187; // "=" s=ign
+
+function LRKeyEvent() {
+    if ($(".button--LR").length > 0) {
+        $("html").on("keydown", function(e) {
+            if (e.keyCode == LR_INVOKE_KEYCODE) {
+               $(".button--LR").toggleClass("data-show");
+            };
+        });
+    };
+};
+
+function appendLREditContainer(target, url, show) {
+    if (!hasValue(url)) return false;
+    if (!target) target = $(document);
+    target.append('<div>' +
+                '<button class="btn btn-default button--LR"><a href="' + url + '" target="_blank">Edit in Liferay</a></button>' +
+                '</div>'
+                );
+    if (show) $(".button--LR").addClass("data-show");
+
+};
 
 function getSaveLoaderDiv(parentID, containerID) {
     var el = $("#" + containerID + "_load");
-    if (el.length == 0) $("#" + parentID + " #" + containerID).after('<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>');
+    if (el.length == 0) {
+        var c = $("#" + parentID + " #" + containerID);
+        if (c.length > 0) {
+            var snippet = '<div class="load-container">' + '<i id="' + containerID + '_load" class="fa fa-spinner fa-spin load-icon fa-lg save-info" style="margin-left:4px; margin-top:5px" aria-hidden="true"></i><i id="' + containerID + '_success" class="fa fa-check success-icon save-info" style="color: green" aria-hidden="true">Updated</i><i id="' + containerID + '_error" class="fa fa-times error-icon save-info" style="color:red" aria-hidden="true">Unable to Update.System error.</i></div>';
+            if (window.getComputedStyle) {
+                displayStyle = window.getComputedStyle(c.get(0), null).getPropertyValue('display');
+            } else {
+                displayStyle = (c.get(0)).currentStyle.display;
+            };
+            if (displayStyle == "block") {
+                c.append(snippet);
+            } else {
+                if (displayStyle == "none" || !hasValue(displayStyle)) {
+                    if (c.get(0).nodeName.toUpperCase() == "DIV" || c.get(0).nodeName.toUpperCase() == "P") c.append(snippet);
+                    else c.after(snippet);
+                } else c.after(snippet);
+            };
+        };
+    };
 };
 
 function _isTouchDevice(){

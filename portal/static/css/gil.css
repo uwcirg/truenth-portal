@@ -272,6 +272,20 @@ input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-decoration {
     -webkit-appearance: none;
 }
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color:    #999;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color:    #999;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color:    #999;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color:    #999;
+}
 fieldset {
     border: 1px solid #c0c0c0;
     margin: 0 2px;
@@ -4216,6 +4230,7 @@ only screen and (max-width: 899px) and (min-resolution: 2dppx) {
         background-size: 218px 95px;
         width: 218px;
         height: 95px;
+        color: #FFF;
     }
 }
 @media only screen and (min-width: 901px) and (-webkit-min-device-pixel-ratio: 2),
@@ -5475,6 +5490,9 @@ a:hover {
     height: 160px;
     z-index: 10;
 }
+.header.no-banner {
+    padding-top: 0;
+}
 @media (max-width: 899px) {
     .header {
         padding: 25px 80px;
@@ -6085,7 +6103,7 @@ figure.nav-overlay {
     color: #fff;
 }
 .page-intro--theme-brown-light {
-    background: #4D4E4C;
+    background: #797b77;
     color: #fff;
 }
 .page-intro__main {
@@ -6809,7 +6827,7 @@ figure.nav-overlay {
     top: 210px;
     background-color: rgba(95, 103, 110, 1);
 }
-.home--item-container, 
+.home--item-container,
 .home--item-container-full,
 .home--registration-container,
 .link-box {
@@ -6919,15 +6937,15 @@ figure.nav-overlay {
     font-size: 1.2em;
     padding: 1em 0;
 }
-nav.side-nav::-webkit-scrollbar, 
-div.home--item-container::-webkit-scrollbar, 
+nav.side-nav::-webkit-scrollbar,
+div.home--item-container::-webkit-scrollbar,
 div.modal.fade::-webkit-scrollbar {
     width: 0px;  /* remove scrollbar space */
     background: transparent;  /* optional: just make scrollbar invisible */
 }
 /* optional: show position indicator in red */
-nav.side-nav::-webkit-scrollbar-thumb, 
-div.home--item-container::-webkit-scrollbar-thumb, 
+nav.side-nav::-webkit-scrollbar-thumb,
+div.home--item-container::-webkit-scrollbar-thumb,
 div.modal.fade::-webkit-scrollbar-thumb {
     background: #FF0000;
 }
@@ -6994,7 +7012,7 @@ a.home--modal-link {
 }
 #fillOrgs input[type='checkbox'] {
     position: relative;
-    top: -1px;
+    right: 2px;
 }
 .tnth-hide {
     display: none;
@@ -7069,6 +7087,16 @@ a.home--modal-link {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.button--LR,
+.button--LR.show {
+   opacity: 0;
+   width: 180px;
+   text-align: center;
+   margin: 2em 0.5em;
+}
+.button--LR.show {
+    opacity: 1;
+}
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;
@@ -7077,8 +7105,8 @@ a.home--modal-link {
     }
 }
 @media (max-width: 1199px) {
-    .home--item-container, 
-    .home--registration-container, 
+    .home--item-container,
+    .home--registration-container,
     .home--item-container-full {
         width: 95%;
         max-width: 100%;
@@ -7089,7 +7117,7 @@ a.home--modal-link {
     }
 }
 @media (max-width: 990px) {
-    .home--item-container, 
+    .home--item-container,
     .home--registration-container,
     .home--item-container-full  {
         width: 90%;
@@ -7118,18 +7146,18 @@ a.home--modal-link {
     }
 }
 @media (max-width: 750px) {
-    .home--item-container, 
-    .home--registration-container, 
+    .home--item-container,
+    .home--registration-container,
     .home--item-container-full  {
         max-width: 100%;
         margin: 5%;
     }
-    #modal-org, 
+    #modal-org,
     #modal-org h4 {
         font-size: 14px !important;
     }
-    #fillOrgs *, 
-    .noOrg-container label span, 
+    #fillOrgs *,
+    .noOrg-container label span,
     #submit-orgs {
         font-size: 12px !important;
     }
@@ -7170,7 +7198,7 @@ a.home--modal-link {
         font-size: 1em !important;
         padding: 0.5em;
     }
-    #modal-register p, 
+    #modal-register p,
     #modal-register .button {
         font-size: 14px;
     }

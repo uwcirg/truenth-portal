@@ -6,8 +6,20 @@
   "repository": "https://github.com/uwcirg/true_nth_usa_portal",
   "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
   "success_url": "/about",
-  "env": {},
-  "image": "uwcirg-docker-true_nth.bintray.io/portal_web:latest",
+  "env": {
+    "LOG_FOLDER": {
+      "description": "Temporary log directory override; should write to stdout if unconfigured",
+      "value": "/tmp/logs"
+    },
+    "SERVER_NAME": {
+      "description": "Fully qualified domain name of system, excluding protocol (HTTP/S). See App Name",
+      "value": "HEROKU_APP_NAME.herokuapp.com"
+    },
+    "PERSISTENCE_FILE": {
+      "description": "Site-specific configuration file, defaults to TrueNTH",
+      "value": "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json"
+    }
+  },
   "addons": [
     "heroku-redis",
     {
@@ -17,4 +29,7 @@
       }
     }
   ],
+  "scripts": {
+    "postdeploy": "python manage.py initdb"
+  }
 }

@@ -18,6 +18,7 @@ Contents:
     configuration
     interventions
     organizations
+    user_experience
     sessions
     development
     code

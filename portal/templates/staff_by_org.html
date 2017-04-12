@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block main %}
+
+<div id="staffList" class="reduce-font-sizes">
+    <br/>
+    <h3 class="tnth-headline">{{ _("Staff Administration") }}</h3>
+    <br/>
+    <div id="staffListOptions">
+      <a href="{{ url_for('portal.staff_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a staff record") }}</a>
+      <div class="or">or</div>
+      <span class="profile-item-title">{{ _("Select a user below to view or update details.") }}</span>
+    </div>
+    <br/>
+    <div class="admin-table table-responsive smaller-text">
+        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <table id="adminTable"
+               class="table table-striped table-hover table-condensed"
+               data-toggle="table"
+               data-sort-name="id"
+               data-sort-order="desc"
+               data-search="true"
+               data-pagination="true"
+               data-page-size="50"
+               data-page-list="[25,50,100,ALL]"
+               data-toolbar="#adminTableToolbar"
+               data-show-toggle="true"
+               data-show-columns="true"
+               data-unique-id="id"
+               data-id-field="id">
+            <thead>
+            <tr>
+                <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
+                <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
+                <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
+                <th data-field="email" data-sortable="true" class="email-data-field">{{ _("Email") }}</th>
+                <th data-field="organization" data-sortable="true" class="org-data-field">{{ _("Site(s)") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for user in staff_list %}
+            <tr id="data_row_{{user.id}}">
+                <td>{{user.id}}</td>
+                <td><a href="{{ url_for('.profile', user_id=user.id) }}">{{ user.id }}</a></td>
+                <td>{{ user.first_name if user.first_name }}</td>
+                <td>{{ user.last_name if user.last_name }}</td>
+                <td class="email-data-field">{{ user.email if user.email }}</td>
+                <td class="org-data-field">{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}
+{% block document_ready %}
+$("#adminTable").bootstrapTable({
+    formatShowingRows: function (pageFrom, pageTo, totalRows) {
+        var rowInfo = "Showing "+pageFrom+" to "+pageTo+" of "+totalRows+" users";
+        $("#tableCount").html(rowInfo);
+        return rowInfo;
+    }
+});
+
+/** Example of how we could have a select to limit to a particular role. Needs more work
+because only looks at entire field
+$("#adminTableToolbar").on("click",function(){
+    $('#adminTable').bootstrapTable('filterBy', {roles: "patient"});
+});
+**/
+{% endblock %}

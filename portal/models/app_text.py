@@ -209,27 +209,28 @@ class VersionedResource(object):
             # In testing, mocking of test data includes not loading
             # app_text resources defining legit URLs.  punt if testing
             if current_app.config.get('TESTING'):
-                return ("[TESTING - fake response]", 'http://fake.org')
+                return {'error_msg': '[TESTING - fake response]', 'url': 'http://fake.org'}
             error_msg = "Could not retrieve remote content - Invalid URL"
             current_app.logger.error(error_msg + ": {}".format(url))
-            return (error_msg, url)
+            return {'error_msg': error_msg, 'url': url}
         except:
             error_msg =  "Could not retrieve remove content - Server could not be reached"
             current_app.logger.error(error_msg + ": {}".format(url))
-            return (error_msg, url)
+            return {'error_msg': error_msg, 'url': url}
         try:
-            return (
-                response.json()['asset'],
-                VersionedResource.permanent_url(
-                    version=response.json()['version'],
-                    generic_url=url))
+            return {
+                'asset': response.json()['asset'] if 'asset' in response.json() else None,
+                'url': VersionedResource.permanent_url(
+                        version=response.json()['version'] if 'version' in response.json() else None,
+                        generic_url=url),
+                'editorUrl': response.json()['editorUrl'] if 'editorUrl' in response.json() else None}
         except ValueError:  # thrown when no json is available in response
             if response.status_code == 200:
-                return (response.text, url)
+                return {'error_msg': response.text, 'url': url}
             error_msg = "Could not retrieve remote content - {} {}".format(
                 response.status_code, response.reason)
             current_app.logger.error(error_msg + ": {}".format(url))
-            return (error_msg, url)
+            return {'error_msg': error_msg, 'url': url}
 
 def app_text(name, *args):
     """Look up and return cusomized application text string

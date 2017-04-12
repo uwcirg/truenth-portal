@@ -15,11 +15,11 @@
                 {% set field = form.password %}
                 {{ render_field(form.password, label="Password", label_visible=false, tabindex=20) }}
                 {# Submit button #}
-                {{ render_submit_field(form.submit, tabindex=180, label="LOGIN", btnSize="btn-lg") }}
+                {{ render_submit_field(form.submit, tabindex=180, label="LOG IN", btnSize="btn-lg") }}
             </form>
             {% if user_manager.enable_forgot_password %}
                 <div class="divider">
-                    <a href="{{ url_for('user.forgot_password') }}"><small>{%trans%}Forgot your Password?{%endtrans%}</small></a>
+                    <a href="{{ url_for('user.forgot_password') }}"><small>{%trans%}Having trouble logging in?{%endtrans%}</small></a>
                 </div>
             {% endif %}
             <br/>

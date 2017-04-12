@@ -44,6 +44,13 @@ def organization_search():
             letter state code.
         required: false
         type: string
+      - name: search_filter
+        in: query
+        description:
+            Filter to apply to search, such as `leaves` to restrict results
+            to just the leaf nodes of the organization tree.
+        required: false
+        type: string
     produces:
       - application/json
     responses:
@@ -57,11 +64,12 @@ def organization_search():
           to view requested patient
 
     """
+    filter = None
     found_ids = []
     for k,v in request.args.items():
         if k == 'state':
             if not v or len(v) != 2:
-                abort(401, "state search requires two letter state code")
+                abort(400, "state search requires two letter state code")
             region = 'state:{}'.format(v.upper())
 
             query = OrganizationIdentifier.query.join(
@@ -72,10 +80,26 @@ def organization_search():
             found_ids = [oi.organization_id for oi in query]
             if not found_ids:
                 abort(404, "no organzations found for state {}".format(v))
+        elif k == 'filter':
+            filter = v
+            if not filter == 'leaves':
+                abort(
+                    400, "unknown filter request '{}' - expecting "
+                    "'leaves'".format(filter))
         else:
             abort(400, "can't search on '{}' at this time".format(k))
 
-    bundle = Organization.generate_bundle(found_ids)
+    # Apply search on org fields like inheritence - include any children
+    # of the matching nodes.  If filter is set, apply to results.
+    ot = OrgTree()
+    matching_orgs = set()
+    for org in found_ids:
+        if filter == 'leaves':
+            matching_orgs |= set(ot.all_leaves_below_id(org))
+        else:
+            matching_orgs |= set(ot.here_and_below_id(org))
+
+    bundle = Organization.generate_bundle(matching_orgs)
     return jsonify(bundle)
 
 

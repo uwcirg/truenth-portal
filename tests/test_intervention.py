@@ -454,6 +454,11 @@ class TestIntervention(TestCase):
             db.session.add(uw)
             db.session.commit()
         user, uw = map(db.session.merge, (user, uw))
+        uw_child = Organization(name='UW clinic', partOf_id=uw.id)
+        with SessionScope(db):
+            db.session.add(uw_child)
+            db.session.commit()
+        user, uw, uw_child = map(db.session.merge, (user, uw, uw_child))
 
         d = {'name': 'not in SR _and_ in clinc UW',
              'function': 'combine_strategies',
@@ -482,7 +487,9 @@ class TestIntervention(TestCase):
         # first strat true, second false.  therfore, should be False
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
-        user.organizations.append(uw)
+        # Add the child organization to the user, which should be included
+        # due to default behavior of limit_by_clinic
+        user.organizations.append(uw_child)
         with SessionScope(db):
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))

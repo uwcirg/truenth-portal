@@ -9,9 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
-    <meta http-equiv="Expires" content="Thu, 01 Jan 1970 00:00:00 GMT" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     {% set stylesheet = url_for('static', filename=config.PORTAL_STYLESHEET) %}
@@ -27,47 +24,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}"></script>
 </head>
-
 {# sets container to full-width #}
-{% set splashView = false %}
-{% if request.path=="/user/sign-in" or no_nav=="true" %}
-    {% set splashView = true %}
-{% endif %}
-
+{%- set splashView = false -%}
+{%- if request.path=="/user/sign-in" or no_nav=="true" -%}
+    {%- set splashView = true -%}
+{%- endif -%}
 {# sets columns of main container to col-xs-12 #}
-{% set wideContainer = false %}
-{% if wide_container and wide_container=="true" %}
-    {% set wideContainer = true %}
-{% endif %}
-
+{%- set wideContainer = false -%}
+{%- if wide_container and wide_container=="true" -%}
+    {%- set wideContainer = true -%}
+{%- endif -%}
 <body>
-    <div id="loadingIndicator" class="loading-indicator">
-        Loading... &nbsp;<!--<i class="fa fa-circle-o-notch fa-spin fa-4x"></i>-->
-    </div>
-    {# portal_wrapper loads in mainNav here. Hide completely on splashView pages #}
-    <div id="mainNav" {% if splashView %}class="hidden"{% endif %}>
-    </div>
-
+    <div id="loadingIndicator" class="loading-indicator">Loading...</div>
+    {#- portal_wrapper loads in mainNav here. Hide completely on splashView pages -#}
+    <div id="mainNav" {% if splashView %}class="hidden"{% endif %}></div>
     <div id="mainHolder" {% if splashView %}class="vertical-center"{% endif %}>
       <div id="mainDiv">
-
-        <div class="container{% if splashView %}-fluid{% endif %}">
+          <div class="container{% if splashView %}-fluid{% endif %}">
             <div class="row">
                 <div class="col-xs-12 {% if not wideContainer %}col-lg-12{% endif %}">
-                    {% block main %}
-                    {% endblock %}
+                    {% block main -%}
+                    {%- endblock %}
                 </div>
             </div>
-        </div>
-        {% block footer %}
-            {% from "flask_user/_macros.html" import footer %}
-            {% if splashView %}
+          </div>
+        {% block footer -%}
+            {%- from "flask_user/_macros.html" import footer -%}
+            {%- if splashView -%}
                 {{ footer(splash_style=true) }}
-            {% else %}
+            {%- else -%}
                 {{ footer() }}
-            {% endif %}
-        {% endblock %}
-
+            {%- endif -%}
+        {%- endblock -%}
       </div> {# <!-- <div id="mainDiv"> --> #}
     </div> {# <!-- <div id="mainHolder"> --> #}
 
@@ -75,15 +63,12 @@
     {% block flash_messages %}
         {%- with messages = get_flashed_messages(with_categories=true) -%}
             {% if messages %}
-
                 {# Hack to prevent modal if it's only successful login #}
                 {% set showMessages = true %}
                 {% if messages|first|last == "You have signed in successfully." %}
                     {% set showMessages = false %}
                 {% endif %}
-
                 {% if showMessages %}
-
                     {# Modal dialog for alerts #}
                     <div class="modal fade" tabindex="-1" role="dialog" id="alertModal">
                       <div class="modal-dialog">
@@ -93,14 +78,12 @@
                             <h2 class="modal-title">{{ _("TrueNTH") }}</h2>
                           </div>
                           <div class="modal-body">
-
-                            {% for category, message in messages %}
+                            {% for category, message in messages -%}
                                 {% if category=='error' %}
                                     {% set category='danger' %}
                                 {% endif %}
                                 <p class="text-{{category}}">{{ message|safe }}</p>
-                            {% endfor %}
-
+                            {%- endfor %}
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default btn-tnth-primary btn-lg" data-dismiss="modal">{{ _("Close") }}</button>
@@ -112,9 +95,7 @@
                     <script>
                       $('#alertModal').modal('show')
                     </script>
-
                 {% endif %}
-
             {% endif %}
         {%- endwith %}
     {% endblock %}
@@ -129,28 +110,23 @@ function _setHostName(url) {
     };
 };
 _setHostName(PORTAL_NAV_PAGE);
-
 var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
 if (LOGIN_AS_PATIENT) {
   if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
   window.addEventListener('popstate', function(event) {
     if (typeof history != 'undefined' && history.pushState) {
       history.pushState(null, null, location.href);
-      setTimeout('location.reload();', 0);
     } else {
       window.history.forward(1);
-      setTimeout('location.reload();', 0);
     };
   });
 };
-
-{% block document_ready %}
+{% block document_ready -%}
 $(document).ready(function(){
    $('[data-toggle="popover"]').popover();
    $(window).unload(function(){});
 });
-{% endblock %}
+{%- endblock %}
 </script>
-{% if config.metadata.version %}<!--Shared services version: {{config.metadata.version}}-->{% endif %}
 </body>
 </html>

@@ -706,10 +706,15 @@ module.exports = OrgTool = (function() {
     this.populateUI = function() {
         var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs();
         for (org in orgsList) {
-            if (orgsList[org].isTopLevel && (orgsList[org].children.length > 0)) {
-                $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
-            }
+            if (orgsList[org].isTopLevel) {
+                if (orgsList[org].children.length > 0) {
+                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                  parentOrgsCt++;
+                } else {
+                  $("#fillOrgs").append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
+            };
             // Fill in each child clinic
             if (orgsList[org].children.length > 0) {
                 var childClinic = "";
@@ -784,6 +789,13 @@ function checkBannerStatus() {
     };
   }
 };
+
+function adjustHeaderHeight() {
+  if ($(".watermark").length > 0) {
+    $("header.no-banner ").css("padding-top", "35px");
+  };
+};
+
 function goToLogin() {
     $('#modal-login-register').modal('hide');
     setTimeout("$('#modal-login').modal('show'); ", 400);
@@ -859,6 +871,27 @@ function updateOrgCallback(errorMessage) {
     };
 };
 
+var LR_INVOKE_KEYCODE = 187; // "=" sign
+
+function LRKeyEvent() {
+    if ($(".button--LR").length > 0) {
+        $("html").on("keydown", function(e) {
+            if (e.keyCode == LR_INVOKE_KEYCODE) {
+               $(".button--LR").toggleClass("show");
+            };
+        });
+    };
+};
+function appendLREditContainer(target, url, show) {
+    if (!hasValue(url)) return false;
+    if (!target) target = $(document);
+    target.append('<div>' +
+                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' +
+                '</div>'
+                );
+    if (show) $(".button--LR").addClass("show");
+
+};
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };

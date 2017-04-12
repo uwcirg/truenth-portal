@@ -108,14 +108,14 @@
   {% endblock %} <!-- end block nav-->
   {% block upperbanner %}
       {% if not user %}
-      <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Have a code from your doctor? Click here to join us
+      <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Click here to join us
           <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
   {% block main %}
       {% block header %}
-        <header class="header">
+        <header class="header {%if user%}no-banner{%endif%}">
           <div class="header__menu">
             <a class="menu button button--small button--white js-nav-menu-toggle">
                 <figure></figure><span>Menu</span>
@@ -157,7 +157,7 @@
           <li class="nav-list__item"><a href="{{PORTAL}}/what-is-prostate-cancer">Prostate Cancer Facts</a></li>
         </ul>
         <ul class="nav-list nav-list--lower">
-          <li class="nav-list__item"><a href="{{PORTAL}}/terms-and-conditions">Terms and Conditions</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}/terms">Terms</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/privacy">Privacy</a></li>
           <li class="nav-list__item"><a href="{{PORTAL}}/contact">Contact</a></li>
         </ul>
@@ -215,7 +215,7 @@
               <input name="password" type="password" placeholder="Password" required>
               <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
-              <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Forgot your password?</span></a>
+              <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">Having trouble logging in?</span></a>
             </form>
             <div class="or">or</div>
             <div class="box-modal-or__divider"></div>
@@ -514,6 +514,8 @@
 
             checkBannerStatus();
 
+            setTimeout("adjustHeaderHeight();", 500);
+
             (function() {
               var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
               if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
@@ -631,7 +633,10 @@
                         .on("click", "#stay-logged-in", sessMon.extendsess)
                         .on("click", "#log-out", sessMon.logout)
                         .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-             {% endif %}
+            {% endif %}
+
+            //uncomment if want to allow LR edit link to display on hot key
+            //setTimeout("LRKeyEvent();", 500);
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("loader(false);", 0);

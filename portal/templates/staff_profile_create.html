@@ -6,46 +6,29 @@
 <style>
 .pc-hr {
     border-top: 1px solid #ddd;
-}
-#clinicalGroupLabel {
-    margin-bottom: 1em;
-}
-.required {
-    color: #a09f9f ;
-}
-</style>
+}</style>
 <form id="createProfileForm" class="form tnth-form to-validate" role="form">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
     <div class="row">
         <div class="col-md-11">
             <div class="row">
-                <div class="col-md-push-1 col-md-11 col-xs-12">
-                    <hr>
-                    <h4 class="tnth-headline left-indent-top">{{ _("New User") }}</h4>
+                <div class="col-md-push-2 col-md-9 col-xs-12">
+                    <h4 class="tnth-headline left-indent-top">{{ _("New Staff") }}</h4>
                     <hr/>
                     <br/>
-
                     <div class="profile-item-container create-account-container">
                     <div class="row">
                         <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
-                            {{profileBirthDate(False)}}
                             <br/>
                         </div>
                     </div>
                     <div class="form-group float-input-label profile-section" id="emailGroup">
                         <label for="email">{{ _("Email Address") }}</label>
-                        <input type="text" class="form-control" id="email" name="email" error-field="erroremail" placeholder="{{ _('Your email') }}" value="" data-customemail="true" required />
-                        <div id="noEmailContainer">
-                            <input type="checkbox" id="noEmail" class="text-muted">&nbsp;<span class="text-muted">User does not have email address</span>
-                        </div>
+                        <input type="text" class="form-control" id="email" name="email" autocomplete="false" error-field="erroremail" placeholder="{{ _('Email Address') }}" value="" data-customemail="true" required />
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
                     {{profilePhone(False)}}
-                    <div id="studyIdContainer" class="form-group">
-                        <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
-                        <input type="text" class="form-control" id="studyId" name="studyId"/>
-                    </div>
                     <div class="divider"></div>
                     <hr/>
                     <div class="form-group profile-section" id="userOrgs">
@@ -55,7 +38,6 @@
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        //userId, noOverride, sync, noPopulate
                         var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
 
                         $.ajax ({
@@ -68,26 +50,31 @@
 
                             if (leafOrgs) {
                                 OT.filterOrgs(leafOrgs);
-                            }
+                            };
 
+                            var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                        
                             //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
                                     $("#userOrgs").find(".help-block").html("");
                                 });
                             });
+
+                            var visibleOrgs = $("#userOrgs input[name='organization']:visible");
+                            if (visibleOrgs.length == 1) visibleOrgs.prop("checked", true);
+
                         }).fail(function() {
                             console.log("Problem retrieving data from server.");
                         });
 
                     });</script>
                     <br/>
-                    <br/>
                     {{profileSaveBtn()}}
             </div>
             <br/>
             <div>
-                {{ back_btn('patients','patients list')}}
+                {{ back_btn('staff','Staff List')}}
                 <a href="javascript:void()" style="visibility:hidden" id="profileBackLink"></a>
             </div>
             </div>
@@ -113,7 +100,7 @@
 
 function _redirect(userId) {
     if (userId) {
-        $("#redirectLink").attr('href', '/patients/patient_profile/' + userId);
+        $("#redirectLink").attr('href', '/profile/' + userId);
         $("#redirectLink")[0].click();
     };
 };
@@ -129,27 +116,6 @@ $(document).ready(function(){
         $("#updateProfile").attr("disabled", false);
     });
 
-    $("#noEmail").on("click", function() {
-        if ($(this).is(":checked")) {
-            $("#email").val("");
-            $("#email").attr("disabled", true);
-            $("#email").removeAttr("required");
-            $("#email").removeAttr("data-customemail");
-            setTimeout('$("#erroremail").text("");', 500);
-        }
-        else {
-            $("#email").attr("disabled", false);
-            $("#email").attr("required", "required");
-            $("#email").attr("data-customemail", "true");
-        };
-    });
-
-    $("input[name='pca_localized']").each(function() {
-        $(this).on("click", function() {
-            $("#clinicalGroup").find(".help-block").html("");
-        });
-    });
-
     function getParentOrgId(obj) {
         var parentOrgId =  $(obj).attr("data-parent-id");
         if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
@@ -158,7 +124,7 @@ $(document).ready(function(){
 
     function getConsents() {
         var orgs = {}, consents = [];
-        $("#createProfileForm input[name='organization']:checkbox").each(function() {
+        $("#createProfileForm input[name='organization']").each(function() {
             if ($(this).prop("checked")) {
                 var consent_org_id;
                 {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}
@@ -190,29 +156,22 @@ $(document).ready(function(){
 
                 hasError = false;
 
-                if (!$("#noEmail").is(":checked")) {
-                    if ($("#emailGroup").hasClass("has-error")) {
-                        hasError = true;
-                    } else {
+                if ($("#emailGroup").hasClass("has-error")) {
+                    hasError = true;
+                } else {
 
-                        if ($("#current_user_email").val() === $("#email").val()) {
-                            setHelpText("emailGroup", "Email is already in use.", true);
-                        } else {
-                            setHelpText("emailGroup", "", false);
-                        };
+                    if ($("#current_user_email").val() === $("#email").val()) {
+                        setHelpText("emailGroup", "Email is already in use.", true);
+                    } else {
+                        setHelpText("emailGroup", "", false);
                     };
                 };
 
-                if ($("#userOrgs input:checkbox:checked").length == 0) {
+                if ($("#userOrgs input:checked").length == 0) {
                    setHelpText("userOrgs", "An organization must be selected.", true);
                 } else setHelpText("userOrgs", "", false);
 
-                if ($("#clinicalGroup input:radio:checked").length == 0) {
-                    setHelpText("clinicalGroup", "You must select Yes or No.", true);
-                } else setHelpText("clinicalGroup", "", false);
-
-
-
+              
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 });
@@ -233,12 +192,12 @@ $(document).ready(function(){
 
                 $("#updateProfile").attr("disabled", true);
 
-                var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                var orgIDs = $('#userOrgs input:checked').map(function(){
                     return { organization_id: $(this).val() };
                 }).get();
 
                 _accountArray['organizations'] = orgIDs;
-                _accountArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
+                _accountArray['roles'] =  [{'name': 'staff'}];
                 _accountArray['consents'] = getConsents();
                 //console.log(_demoArray)
 
@@ -252,34 +211,22 @@ $(document).ready(function(){
                         'given': $.trim($('input[name=firstname]').val()),
                         'family':$.trim($('input[name=lastname]').val())
                     };
-                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
+
+                    //_demoArray['birthDate'] = $('input[name=birthDate]').val();
 
                     _demoArray['telecom'] = [];
 
                     var emailVal = $.trim($('input[name=email]').val());
                     if (hasValue(emailVal)) {
                         _demoArray['telecom'].push({ 'system': 'email', 'value': emailVal });
-                    } else {
-                        _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
-                    };
+                    }
                     _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
 
-                     var orgIDs = $('#userOrgs input:checkbox:checked').map(function(){
+                     var orgIDs = $('#userOrgs input:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
 
                     _demoArray['careProvider'] = orgIDs;
-
-
-                    var studyId = $("#studyId").val();
-                    if (hasValue(studyId)) {
-                        var studyIdObj = {
-                            system: "http://us.truenth.org/identity-codes/external-study-id",
-                            use: "secondary",
-                            value: studyId
-                        };
-                        _demoArray["identifier"] = [studyIdObj];
-                    };
 
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
@@ -321,10 +268,10 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
-                console.log(requestData);
-                console.log(errorMessage);
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
+                //console.log(requestData);
+                //console.log(errorMessage);
+                //console.log("response Text: " + xhr.responseText);
+                //console.log("response status: " +  xhr.status);
                 reject(Error(errorMessage));
             });
 

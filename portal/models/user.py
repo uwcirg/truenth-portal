@@ -259,6 +259,24 @@ def user_extension_map(user, extension):
     raise ValueError("unknown extension: {}".format(extension.url))
 
 
+def default_email(context=None):
+    """Function to provide a unique, default email if none is provided
+
+    :param context: is populated by SQLAlchemy - see Context-Sensitive default
+        functions in http://docs.sqlalchemy.org/en/latest/core/defaults.html
+
+    :return: a unique email string to avoid unique constraints, if an email
+        isn't provided in the context
+
+    """
+    value = None
+    if context:
+        value = context.current_parameters.get('email')
+    if not value or value == NO_EMAIL_PREFIX:
+        value = NO_EMAIL_PREFIX + str(time.time())
+    return value
+
+
 class User(db.Model, UserMixin):
     ## PLEASE maintain merge_with() as user model changes ##
     __tablename__ = 'users'  # Override default 'user'
@@ -266,7 +284,9 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     registered = db.Column(db.DateTime, default=datetime.utcnow)
-    _email = db.Column('email', db.String(120), unique=True)
+    _email = db.Column(
+        'email', db.String(120), unique=True, nullable=False,
+        default=default_email)
     phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
@@ -421,13 +441,15 @@ class User(db.Model, UserMixin):
     @email.setter
     def email(self, email):
         if email == NO_EMAIL_PREFIX:
-            # Need a unique value to avoid unique constraint
-            if self.id:
-                self._email = NO_EMAIL_PREFIX + str(self.id)
-            else:
-                self._email = NO_EMAIL_PREFIX + str(time.time())
+            self._email = default_email()
+        elif self._email and self._email.startswith(
+            NO_EMAIL_PREFIX) and not email:
+            # already a unique email, for a user w/o email, don't
+            # set to an empty string if they didn't give a value.
+            pass
         else:
             self._email = email
+        assert(self._email and len(self._email))
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
@@ -438,6 +460,10 @@ class User(db.Model, UserMixin):
         collision.
 
         """
+        # Don't apply the invite mask to a user without email
+        if prefix == INVITE_PREFIX and self._email.startswith(NO_EMAIL_PREFIX):
+            return
+
         if self._email:
             if not self._email.startswith(prefix):
                 self._email = prefix + self._email
@@ -776,7 +802,8 @@ class User(db.Model, UserMixin):
 
             """
             if (not acting_user.has_role(ROLE.ADMIN)
-                and acting_user.has_role(ROLE.STAFF)
+                and (acting_user.has_role(ROLE.STAFF)
+                or acting_user.has_role(ROLE.STAFF_ADMIN))
                 and user.id == acting_user.id):
                 raise ValueError(
                     "staff can't change their own organization affiliations")

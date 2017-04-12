@@ -14,7 +14,7 @@ RUN \
 
 RUN printf '\n\
 Listen 0.0.0.0:${PORT}\n\
-ServerName ${APACHE_SERVER_NAME}\n\
+ServerName ${SERVER_NAME}\n\
 ErrorLog /dev/stdout\n\
 <VirtualHost *:${PORT}>\n\
   LogLevel info\n\
@@ -71,7 +71,7 @@ RUN \
 USER ${APACHE_RUN_USER}
 
 ENV \
-    APACHE_SERVER_NAME=${APACHE_SERVER_NAME:-localhost} \
+    SERVER_NAME=${SERVER_NAME:-localhost} \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}"
 

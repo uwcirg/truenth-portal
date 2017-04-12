@@ -9,6 +9,7 @@ from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
+from ..models.fhir import AssessmentStatus
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -85,15 +86,15 @@ def patients_root():
         wide_container="true")
 
 
-@patients.route('/profile_create')
+@patients.route('/patient-profile-create')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
-def profile_create():
+def patient_profile_create():
     consent_agreements = get_orgs_consent_agreements()
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
-        "profile_create.html", user = user,
+        "patient_profile_create.html", user = user,
         consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
 
 
@@ -126,22 +127,34 @@ def patient_profile(patient_id):
         display = intervention.display_for_user(patient)
         if display.access and display.link_url is not None and display.link_label is not None:
             user_interventions.append({"name": intervention.name})
+        if intervention.name == 'assessment_engine':
+            # Need to extend with subject_id as the staff user is driving
+            patient.assessment_link = '{url}&subject_id={id}'.format(
+                url=display.link_url, id=patient.id)
+            assessment_status = AssessmentStatus(user=patient)
+            patient.assessment_overall_status = assessment_status.overall_status if assessment_status else None
 
     return render_template(
         'profile.html', user=patient,
-        providerPerspective="true", consent_agreements=consent_agreements, user_interventions=user_interventions)
+        providerPerspective="true",
+        consent_agreements=consent_agreements,
+        user_interventions=user_interventions)
 
 
 def get_orgs_consent_agreements():
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
-        asset, url = VersionedResource.fetch_elements(
+        dict_consent_by_org = VersionedResource.fetch_elements(
             app_text(ConsentByOrg_ATMA.name_key(organization=org)))
+        asset = dict_consent_by_org.get('asset', None)
+        agreement_url = dict_consent_by_org.get('url', None)
+        editor_url = dict_consent_by_org.get('editorUrl', None)
 
         consent_agreements[org.id] = {
                 'organization_name': org.name,
                 'asset': asset,
-                'agreement_url': url}
+                'agreement_url': agreement_url,
+                'editor_url': editor_url}
 
     return consent_agreements

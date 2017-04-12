@@ -24,7 +24,7 @@ import sys
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .fhir import AssessmentStatus
-from .organization import Organization
+from .organization import Organization, OrgTree
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .procedure_codes import known_treatment_started
 from .role import Role
@@ -43,11 +43,15 @@ def _log(**kwargs):
         "{intervention}".format(**kwargs) + msg)
 
 
-def limit_by_clinic_list(org_list, combinator='all'):
+def limit_by_clinic_list(org_list, combinator='any', include_children=True):
     """Requires user is associated with {any,all} clinics in the list
 
-    Value of combinator determines if the user must be in 'any' or 'all' of the
-    clinics in the given list.
+    :param combinator: determines if the user must be in 'any' (default) or
+       'all' of the clinics in the given list.  NB combining 'all' with
+       include_children=True would mean all orgs in the list AND all chidren of
+       all orgs in list must be associated with the user for a true result.
+    :param include_children: include children in the organization tree if
+        set (default), otherwise, only include the organizations in the list
 
     """
     orgs = []
@@ -60,7 +64,12 @@ def limit_by_clinic_list(org_list, combinator='all'):
             raise ValueError("organization '{}' not found".format(org))
         except MultipleResultsFound:
             raise ValueError("multiple matches for org name {}".format(org))
-    required = set((o.id for o in orgs))
+
+    if include_children:
+        ot = OrgTree()
+        required = set([o for og in orgs for o in ot.here_and_below_id(og.id)])
+    else:
+        required = set((o.id for o in orgs))
     if combinator not in ('any', 'all'):
         raise ValueError("unknown value {} for combinator, must be any or all")
 
@@ -82,8 +91,13 @@ def limit_by_clinic_list(org_list, combinator='all'):
         user_registered_with_any_clinics
 
 
-def not_in_clinic_list(org_list):
-    """Requires user isn't associated with any clinic in the list"""
+def not_in_clinic_list(org_list, include_children=True):
+    """Requires user isn't associated with any clinic in the list
+
+    :param include_children: include children in the organization tree if
+        set (default), otherwise, only include the organizations in the list
+
+    """
     orgs = []
     for org in org_list:
         try:
@@ -95,7 +109,12 @@ def not_in_clinic_list(org_list):
         except MultipleResultsFound:
             raise ValueError("more than one organization named '{}'"
                              "found".format(org))
-    dont_want = set((o.id for o in orgs))
+
+    if include_children:
+        ot = OrgTree()
+        dont_want = set([o for og in orgs for o in ot.here_and_below_id(og.id)])
+    else:
+        dont_want = set((o.id for o in orgs))
 
     def user_not_registered_with_clinics(intervention, user):
         has = set((o.id for o in user.organizations))
@@ -214,8 +233,7 @@ def update_card_html_on_completion():
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
                 instrument_id=assessment_status.instruments_needing_full_assessment(),
-                resume_instrument_id=assessment_status.instruments_in_process(),
-                initial='true')
+                resume_instrument_id=assessment_status.instruments_in_process())
         elif assessment_status.overall_status == "Completed":
             if assessment_status.localized:
                 intro = """<p>
