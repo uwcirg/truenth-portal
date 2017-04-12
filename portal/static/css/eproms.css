@@ -1355,8 +1355,16 @@ div.noOrg-container span {
 #createProfileForm .title {
   margin-top: 5%;
 }
-#createProfileForm #phoneGroup {
-  margin-top: 1em;
+#createProfileForm #phoneGroup,
+#createProfileForm #userRole,
+#createProfileForm #userOrgs {
+  margin-top: 1.4em;
+}
+#createProfileForm #emailGroup {
+  margin-top: 0;
+}
+#createProfileForm #userRole .checkbox:first-of-type {
+  margin-top: 0;
 }
 #createProfileForm #studyIdContainer {
   margin-top: 1.8em;

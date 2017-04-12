@@ -499,10 +499,18 @@ def staff_profile_create():
         consent_agreements[org.id] = {
                 'asset': asset, 'agreement_url': url, 'organization_name': org.name}
     user = current_user()
-    leaf_organizations = user.leaf_organizations()
+    #compiling org list for staff
+    #org list should include all orgs under the current user's org(s), excluding the current user's org(s). 
+    OT = OrgTree()
+    org_list = set()
+    for org in user.organizations:
+        if org.id == 0:  # None of the above doesn't count
+            continue
+        org_list.update(OT.here_and_below_id(org.id))
+        org_list.remove(org.id)
     return render_template(
         "staff_profile_create.html", user=user,
-        consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
+        consent_agreements=consent_agreements, org_list=list(org_list))
 
 @portal.route('/staff')
 @roles_required(ROLE.STAFF_ADMIN)
@@ -525,16 +533,21 @@ def staff():
     staff_list = User.query.filter(User.id==-1)
 
     org_list = set()
+    user_orgs = []
 
     # Build list of all organization ids, and their decendents, the
-    # user belongs to
+    # user belongs to, however, need to exclude current user's orgs as user
+    # cannot edit record of staff from same org
     for org in user.organizations:
         if org.id == 0:  # None of the above doesn't count
             continue
         org_list.update(OT.here_and_below_id(org.id))
+        org_list.remove(org.id)
+        user_orgs.append(org.id)
 
     # Gather up all staff belonging to any of the orgs (and their children)
-    # this (staff) user belongs to.
+    # this (staff) user belongs to, excluding those from user's orgs
+    # staff_admin should not be able to edit other staff_admin or admin at their same org or above
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id==UserRoles.user_id,
              UserRoles.role_id==staff_role_id,
@@ -542,13 +555,12 @@ def staff():
              )
         ).join(UserOrganization).filter(
             and_(UserOrganization.user_id==User.id,
-                 UserOrganization.organization_id.in_(org_list)))
+                 UserOrganization.organization_id.in_(org_list),
+                 ~UserOrganization.organization_id.in_(user_orgs)))
     staff_list = staff_list.union(org_staff)
 
     return render_template(
-        'staff_by_org.html', staff_list=staff_list.all(),
-        user=user, org_list=org_list,
-        wide_container="true")
+        'staff_by_org.html', staff_list=staff_list.all(), user=user, wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))

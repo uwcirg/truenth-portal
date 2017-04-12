@@ -969,9 +969,6 @@ var assembleContent = {
             if (orgIDs) {
                 if (orgIDs.length > 0) {
                     demoArray["careProvider"] = orgIDs;
-                } else {
-                    //don't update org to none if at the initial queries page
-                    if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
                 };
             };
 
@@ -988,6 +985,12 @@ var assembleContent = {
                 };
             });
         };
+
+
+         //don't update org to none if at the initial queries page
+         if (!demoArray["careProvider"] || (demoArray["careProvider"] && demoArray["careProvider"].length == 0)) {
+            if ($("#aboutForm").length == 0) demoArray["careProvider"] = [{reference: "api/organization/" + 0}];
+         };
 
         if (hasValue($("#deathDate").val())) {
             demoArray["deceasedDateTime"] = $("#deathDate").val();
