@@ -226,15 +226,24 @@
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" required />
         <div class="help-block with-errors" id="erroremail"></div>
     </div>
-    <script>$(function() {
-        $("#email").on("keyup", function() {
-            if (hasValue($(this).val())) {
-                $("#btnPasswordResetEmail").attr("disabled", false);
-                $("#btnProfileSendEmail").attr("disabled", false);
-            } else {
+    <script>
+    function checkEmail(email) {
+        if (hasValue(email)) {
+            $("#btnPasswordResetEmail").attr("disabled", false);
+            $("#btnProfileSendEmail").attr("disabled", false);
+            $('#btnProfileSendEmail').removeClass('disabled');
+        } else {
+            if ($("#email").get(0).validity.valid) {
                 $("#btnPasswordResetEmail").attr("disabled", true);
                 $("#btnProfileSendEmail").attr("disabled", true);
+                $('#btnProfileSendEmail').addClass('disabled');
             };
+        };
+    };
+    $(function() {
+        checkEmail($("#email").val());
+        $("#email").on("keyup", function() {
+            checkEmail($(this).val());
         });
     });</script>
 {%- endmacro %}

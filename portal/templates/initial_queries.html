@@ -56,15 +56,17 @@
               </div>
             </div>
         {% endif %}
-        <div class="reg-complete-container">
-            <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
-            <p>{{ _("Click continue to start using TrueNTH") }}</p>
+        <div class="reg-buttons-msg-wrapper">
+          <div class="reg-complete-container">
+              <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
+              <p>{{ _("Click continue to start using TrueNTH") }}</p>
+          </div>
+          <div id="buttonsContainer" class="button-container">
+            <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
+            <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
+          </div>
+          <div id="iqErrorMessage" class="error-message text-danger"></div>
         </div>
-        <div id="buttonsContainer" class="button-container">
-          <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
-          <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
-        </div>
-        <div id="iqErrorMessage" class="error-message text-danger"></div>
     </form>
   </div>
 {% endblock %}
