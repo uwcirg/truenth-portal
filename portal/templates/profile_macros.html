@@ -1450,8 +1450,8 @@
                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
+                    <div id="enterManualInfoContainer" class="text-info small-text"></div>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" href="{{person.assessment_link}}">{{_("Enter manually")}}</a>
-
                 </div>
             </div>
         </div>
@@ -1475,6 +1475,9 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
+        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%} 
+            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
+        {%- endif -%}
     });</script>
 {%- endmacro %}
 {% macro profileInterventions(user_interventions) -%}
