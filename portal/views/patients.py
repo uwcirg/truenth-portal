@@ -9,6 +9,7 @@ from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
+from ..models.fhir import AssessmentStatus
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -130,6 +131,8 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
+            assessment_status = AssessmentStatus(user=patient)
+            patient.assessment_overall_status = assessment_status.overall_status if assessment_status else None
 
     return render_template(
         'profile.html', user=patient,
