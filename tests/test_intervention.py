@@ -8,13 +8,14 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
+from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import add_role
-from portal.system_uri import SNOMED
+from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 
 class TestIntervention(TestCase):
 
@@ -88,6 +89,51 @@ class TestIntervention(TestCase):
                 content_type='application/json',
                 data=json.dumps(data))
         self.assert400(rv)
+
+    def test_clinc_id(self):
+        # Create several orgs with identifier
+        org1 = Organization(name='org1')
+        org2 = Organization(name='org2')
+        org3 = Organization(name='org3')
+        identifier = Identifier(value='pick me', system=DECISION_SUPPORT_GROUP)
+        for org in (org1, org2, org3):
+            org.identifiers.append(identifier)
+
+        # Add access strategy to the care plan intervention
+        cp = INTERVENTION.CARE_PLAN
+        cp.public_access = False  # turn off public access to force strategy
+        cp_id = cp.id
+
+        with SessionScope(db):
+            map(db.session.add, (org1, org2, org3))
+            db.session.commit()
+
+        org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
+        d = {'function': 'limit_by_clinic_id',
+             'kwargs': [{'name': 'identifier_value',
+                         'value': 'pick me'}]
+            }
+        strat = AccessStrategy(
+            name="member of org with identifier",
+            intervention_id = cp_id,
+            function_details=json.dumps(d))
+
+        with SessionScope(db):
+            db.session.add(strat)
+            db.session.commit()
+
+        cp = INTERVENTION.CARE_PLAN
+        user = db.session.merge(self.test_user)
+
+        # Prior to associating user with any orgs, shouldn't have access
+        self.assertFalse(cp.display_for_user(user).access)
+
+        # Add association and test again
+        user.organizations.append(org3)
+        with SessionScope(db):
+            db.session.commit()
+        user, cp = map(db.session.merge, (user, cp))
+        self.assertTrue(cp.display_for_user(user).access)
 
     def test_multi_strategy(self):
         """Add strategy to limit users to any of several clinics"""
