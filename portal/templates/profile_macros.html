@@ -563,7 +563,9 @@
             if (leafOrgs) OT.filterOrgs(leafOrgs);
             if (!orgsEditable) disableOrgs();
 
-            {% if (person.has_role('patient') or current_user.has_role('patient')) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}
+            {%- if ((person.has_role('patient') or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
+                ((person.has_role('patient') and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
+             -%}
                 var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
                 if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                 var checkedOrgs = {};
@@ -576,7 +578,7 @@
                         $(this).prop("checked", true);
                     };
                 });
-            {% endif %}
+            {%- endif -%}
             {% if (current_user.has_role('patient') or current_user.has_role('write_only')) and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
                 var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
                 var checkedOrgs = [];
@@ -1688,7 +1690,7 @@
     {%- endif %}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF_ADMIN)) %}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) %}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
