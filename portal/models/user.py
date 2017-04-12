@@ -463,6 +463,10 @@ class User(db.Model, UserMixin):
         collision.
 
         """
+        # Don't apply the invite mask to a user without email
+        if prefix == INVITE_PREFIX and self._email.startswith(NO_EMAIL_PREFIX):
+            return
+
         if self._email:
             if not self._email.startswith(prefix):
                 self._email = prefix + self._email
