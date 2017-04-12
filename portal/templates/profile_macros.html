@@ -242,8 +242,10 @@
     };
     $(function() {
         checkEmail($("#email").val());
-        $("#email").on("keyup", function() {
+        $("#email").on("blur, keyup", function() {
             checkEmail($(this).val());
+            if ($(this).val() != "") $("#profileEmailSelect").attr("disabled", false);
+            else $("#profileEmailSelect").val("").attr("disabled", true);
         });
     });</script>
 {%- endmacro %}
@@ -268,11 +270,6 @@
         <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
     </div>
-    {%- endif -%}
-{%- endmacro %}
-{% macro profileSendEmail(person) -%}
-    {%- if person -%}
-    <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     <script>$(function () {
         function getAccessUrl() {
             var url = '';
@@ -291,10 +288,6 @@
             return url;
         };
         if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
-        $("#email").on("blur", function() {
-            if ($(this).val() != "") $("#profileEmailSelect").attr("disabled", false);
-            else $("#profileEmailSelect").val("").attr("disabled", true);
-        });
 
         $('#profileEmailSelect').on('change', function() {
             var message = '';
@@ -363,10 +356,15 @@
                 } else {
                     $('#profileEmailMessage').text('Unable to generate URL for email');
                 };
-            };
+            } else $('#profileEmailMessage').text('You must select a email type.');
         });
      });</script>
-     {% endif %}
+    {%- endif -%}
+{%- endmacro %}
+{% macro profileSendEmail(person) -%}
+    {%- if person -%}
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
+    {% endif %}
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
