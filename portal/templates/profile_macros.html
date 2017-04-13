@@ -267,7 +267,7 @@
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
             <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
         </select>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
     </div>
     <script>$(function () {
@@ -1437,6 +1437,7 @@
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
+                <input type="text" style="position: fixed; left: -10000000px;" autofocus="true"/>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
@@ -1447,7 +1448,7 @@
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
-                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn">{{_("Log in as patient")}}</button>
+                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
                 </div>
                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
@@ -1477,7 +1478,7 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%} 
+        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
             $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
         {%- endif -%}
     });</script>
@@ -1670,7 +1671,7 @@
             </div>
         </div>
     {%- endif %}
-    {%- if person and person.has_role(ROLE.PATIENT) %}
+    {%- if person and person.has_role(ROLE.PATIENT) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1687,7 +1688,21 @@
                 </div>
             </div>
         </div>
-    {%- endif %}
+    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div class="flex">
+                        <div id="resetPasswordContainer" class="flex-item">
+                            <p class="text-muted communication-prompt">Send reset password email to staff</p>
+                            {{resetPassword(person)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) %}editable{% endif %}" data-sections="org">
