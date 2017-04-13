@@ -1350,8 +1350,14 @@ div.noOrg-container span {
 #createProfileForm .title {
   margin-top: 5%;
 }
+#createProfileForm #userOrgs {
+  margin-top: 2em;
+}
 #createProfileForm #phoneGroup {
-  margin-top: 1em;
+  margin-top: 1.5em;
+}
+#createProfileForm #emailGroup {
+  margin-top: 0;
 }
 #createProfileForm #studyIdContainer {
   margin-top: 1.8em;

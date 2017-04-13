@@ -21,6 +21,8 @@
                         <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
                             <br/>
+                            {{profileBirthDate(False)}}
+                            <br/>
                         </div>
                     </div>
                     <div class="form-group float-input-label profile-section" id="emailGroup">
@@ -38,7 +40,7 @@
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+                        var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
 
                         $.ajax ({
                             type: "GET",
@@ -48,12 +50,12 @@
                             OT.populateOrgsList(data.entry);
                             OT.populateUI();
 
-                            if (leafOrgs) {
-                                OT.filterOrgs(leafOrgs);
+                            if (orgList) {
+                                OT.filterOrgs(orgList);
                             };
 
                             var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-                        
+
                             //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
@@ -115,7 +117,6 @@ $(document).ready(function(){
     $("#createProfileForm input, #createProfileForm select").on("change", function() {
         $("#updateProfile").attr("disabled", false);
     });
-
     function getParentOrgId(obj) {
         var parentOrgId =  $(obj).attr("data-parent-id");
         if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
@@ -171,7 +172,6 @@ $(document).ready(function(){
                    setHelpText("userOrgs", "An organization must be selected.", true);
                 } else setHelpText("userOrgs", "", false);
 
-              
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 });
@@ -212,7 +212,7 @@ $(document).ready(function(){
                         'family':$.trim($('input[name=lastname]').val())
                     };
 
-                    //_demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
 
                     _demoArray['telecom'] = [];
 

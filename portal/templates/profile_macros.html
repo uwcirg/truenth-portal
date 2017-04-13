@@ -1670,7 +1670,7 @@
             </div>
         </div>
     {%- endif %}
-    {%- if person and person.has_role(ROLE.PATIENT) %}
+    {%- if person and person.has_role(ROLE.PATIENT) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1687,7 +1687,21 @@
                 </div>
             </div>
         </div>
-    {%- endif %}
+    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div class="flex">
+                        <div id="resetPasswordContainer" class="flex-item">
+                            <p class="text-muted communication-prompt">Send reset password email to staff</p>
+                            {{resetPassword(person)}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) %}editable{% endif %}" data-sections="org">
