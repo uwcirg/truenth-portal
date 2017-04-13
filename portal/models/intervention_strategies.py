@@ -24,11 +24,12 @@ import sys
 from ..extensions import db
 from .fhir import CC, Coding, CodeableConcept
 from .fhir import AssessmentStatus
-from .organization import Organization, OrgTree
+from .identifier import Identifier
 from .intervention import Intervention, INTERVENTION, UserIntervention
+from .organization import Organization, OrgTree, OrganizationIdentifier
 from .procedure_codes import known_treatment_started
 from .role import Role
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
+from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
 
 
 ###
@@ -43,9 +44,14 @@ def _log(**kwargs):
         "{intervention}".format(**kwargs) + msg)
 
 
-def limit_by_clinic_list(org_list, combinator='any', include_children=True):
-    """Requires user is associated with {any,all} clinics in the list
+def limit_by_clinic_w_id(
+    identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
+    combinator='any', include_children=True):
+    """Requires user is associated with {any,all} clinics with identifier
 
+    :param identifier_value: value string for identifer associated with org(s)
+    :param identifier_system: system string for identifier, defaults to
+        DECISION_SUPPORT_GROUP
     :param combinator: determines if the user must be in 'any' (default) or
        'all' of the clinics in the given list.  NB combining 'all' with
        include_children=True would mean all orgs in the list AND all chidren of
@@ -54,16 +60,17 @@ def limit_by_clinic_list(org_list, combinator='any', include_children=True):
         set (default), otherwise, only include the organizations in the list
 
     """
-    orgs = []
-    for org in org_list:
-        try:
-            organization = Organization.query.filter_by(
-                name=org).one()
-            orgs.append(organization)
-        except NoResultFound:
-            raise ValueError("organization '{}' not found".format(org))
-        except MultipleResultsFound:
-            raise ValueError("multiple matches for org name {}".format(org))
+    try:
+        identifier = Identifier.query.filter_by(
+            _value=identifier_value, system=identifier_system).one()
+    except NoResultFound:
+        raise ValueError(
+            "strategy names non-existing Identifier({}, {})".format(
+                identifier_value, identifier_system))
+
+    orgs = Organization.query.join(OrganizationIdentifier).filter(and_(
+        Organization.id == OrganizationIdentifier.organization_id,
+        OrganizationIdentifier.identifier_id == identifier.id)).all()
 
     if include_children:
         ot = OrgTree()
@@ -91,24 +98,30 @@ def limit_by_clinic_list(org_list, combinator='any', include_children=True):
         user_registered_with_any_clinics
 
 
-def not_in_clinic_list(org_list, include_children=True):
+def not_in_clinic_w_id(
+    identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
+    include_children=True):
     """Requires user isn't associated with any clinic in the list
 
+    :param identifier_value: value string for identifer associated with org(s)
+    :param identifier_system: system string for identifier, defaults to
+        DECISION_SUPPORT_GROUP
     :param include_children: include children in the organization tree if
-        set (default), otherwise, only include the organizations in the list
+        set (default), otherwise, only include the organizations directly
+        associated with the identifier
 
     """
-    orgs = []
-    for org in org_list:
-        try:
-            organization = Organization.query.filter_by(
-                name=org).one()
-            orgs.append(organization)
-        except NoResultFound:
-            raise ValueError("organization '{}' not found".format(org))
-        except MultipleResultsFound:
-            raise ValueError("more than one organization named '{}'"
-                             "found".format(org))
+    try:
+        identifier = Identifier.query.filter_by(
+            _value=identifier_value, system=identifier_system).one()
+    except NoResultFound:
+        raise ValueError(
+            "strategy names non-existing Identifier({}, {})".format(
+                identifier_value, identifier_system))
+
+    orgs = Organization.query.join(OrganizationIdentifier).filter(and_(
+        Organization.id == OrganizationIdentifier.organization_id,
+        OrganizationIdentifier.identifier_id == identifier.id)).all()
 
     if include_children:
         ot = OrgTree()
