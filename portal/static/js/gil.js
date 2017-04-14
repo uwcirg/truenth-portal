@@ -292,6 +292,7 @@ module.exports = VisObj = (function() {
     };
     this.showMain = function() {
       if (!this.HAS_REDIRECT) {
+        adjustHeaderHeight();
         $("#mainHolder").css({
                   "visibility" : "visible",
                   "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
