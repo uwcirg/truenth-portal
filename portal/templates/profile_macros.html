@@ -1678,7 +1678,7 @@
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <div class="flex">
                         <div id="resetPasswordContainer" class="flex-item">
-                            <p class="text-muted communication-prompt">Send reset password email to patient</p>
+                            <p class="text-muted communication-prompt">{{_('Send reset password email to patient')}}</p>
                             {{resetPassword(person)}}
                         </div>
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
@@ -1695,7 +1695,7 @@
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <div class="flex">
                         <div id="resetPasswordContainer" class="flex-item">
-                            <p class="text-muted communication-prompt">Send reset password email to staff</p>
+                            <p class="text-muted communication-prompt">{{_('Send reset password email to staff')}}</p>
                             {{resetPassword(person)}}
                         </div>
                     </div>
