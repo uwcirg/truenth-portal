@@ -36,7 +36,7 @@
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
 @linkColor:       #4d4e50;
-@linkHover:       #2a4531;
+@linkHover:       #606a73;
 @btnColor:        #606a73;
 @inputBorderColor: #bdb9b9;
 @featureBtnColor: #333;
@@ -81,7 +81,10 @@ body {
   color: @baseColor;
   font-size: @baseFontSize;
 }
-
+.btn:focus,
+a:focus {
+  outline: none;
+}
 a {
   background-color: @linkColor;
   cursor: pointer;
@@ -841,6 +844,12 @@ h4.detail-title {
     border: solid #ccc 1px;
     text-decoration: none;
     letter-spacing: 1px;
+    &.link:hover {
+        color: #fff;
+        background-color: #2a4531;
+        border-color: #1c2f21;
+      }
+
     a {
       color: #FFF;
       text-decoration: none;
@@ -1289,7 +1298,7 @@ h4.detail-title {
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
   color: @featureBtnHoverColor;
-  background-color: @featureBtnHoverBgColor;
+  background-color: @linkHover;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
@@ -1318,7 +1327,7 @@ h4.detail-title {
   display: block;
 }
 #mainDiv.profile .profile-item-container .view-container td {
-  padding: 0.8em 1em;
+  padding: 0.6em 1em;
 }
 #mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
@@ -1360,6 +1369,12 @@ h4.detail-title {
   display: inline-block;
   width: 300px;
   max-width: 100%;
+  background: @featureBtnBgColor;
+  border-color: @featureBtnBgColor;
+  &:hover {
+    color: @linkHover;
+    background: #FFF;
+  }
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1556,7 +1571,7 @@ div.noOrg-container {
   padding: 0.4em;
 }
 #userSessionReportDetailHeader a[href]:hover {
-  color: #8c9094;
+  color: @linkHover;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1586,7 +1601,7 @@ div.noOrg-container {
 
 #userSessionListTable {
   TR:hover {
-    color: #6C7A72;
+    color: @linkHover;
     background-color: #ddd;
     cursor: pointer;
   }
@@ -1958,7 +1973,7 @@ sub.pointer {
   cursor:pointer;
 }
 sub.pointer:hover {
-  color: #79815D;
+  color: @linkHover;
 }
 .report-custom-header {
   padding: 0.3em 0.5em;
@@ -2298,8 +2313,8 @@ div.timezone-warning.text-warning {
   .checkbox input[type=checkbox] {
     top: -1px;
   }
-  #profile-gender-list input[type=radio] {
-    top: -2px;
+  #profile-gender-list {
+    margin-top: 0.2em;
   }
   #profile-gender-list input[type=radio] {
     top: -2px;
