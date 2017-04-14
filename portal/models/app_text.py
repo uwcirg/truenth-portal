@@ -206,9 +206,9 @@ class VersionedResource(object):
         try:
             response = requests.get(url)
         except MissingSchema:
-            # In testing, mocking of test data includes not loading
-            # app_text resources defining legit URLs.  punt if testing
-            if current_app.config.get('TESTING'):
+            # Development and staging systems shouldn't die on missing urls
+            if current_app.config.get(
+                'SYSTEM_TYPE') in ('development', 'staging'):
                 return {'error_msg': '[TESTING - fake response]', 'url': 'http://fake.org'}
             error_msg = "Could not retrieve remote content - Invalid URL"
             current_app.logger.error(error_msg + ": {}".format(url))
@@ -262,8 +262,9 @@ def app_text(name, *args):
     """
     item = AppText.query.filter_by(name=name).first()
     if not item:
-        if current_app.config.get('TESTING'):
-            return "[TESTING - ignore missing app_text '{}']".format(name)
+        # Development and staging systems shouldn't die on missing apt_text
+        if current_app.config.get('SYSTEM_TYPE') in ('development', 'staging'):
+            return "[missing app_text '{}']".format(name)
         raise ValueError("unknown customized app string '{}'".format(name))
 
     text = str(item)
