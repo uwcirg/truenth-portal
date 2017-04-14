@@ -197,7 +197,7 @@ $(document).ready(function(){
                 }).get();
 
                 _accountArray['organizations'] = orgIDs;
-                _accountArray['roles'] =  [{'name': 'staff'}, {'name': 'write_only'}];
+                _accountArray['roles'] =  [{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}];
                 _accountArray['consents'] = getConsents();
                 //console.log(_demoArray)
 

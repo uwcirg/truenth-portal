@@ -255,13 +255,13 @@
     <div id="sendEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
         <div class="registration-status-container">
-            <span class="text-muted">Registration status: </span>
-            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
+            <span class="text-muted">{{_('Registration status:')}}</span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
             {%- else -%}
-            <h4 class="text-success registration-label">registered</h4>
+            <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
-        <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ") }}{%- if person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
+        <label id="sendEmailLabel" class="text-muted">{{ _(gettext("Send email to %(name)", name='{%- if person and person.has_role(ROLE.PATIENT)-%}patient{%-else-%}user{%-endif-%}'))}}</label>
         <select  id="profileEmailSelect" class="form-control bd-element">
             <option value="">{{ _("Select Email...") }}</option>
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
@@ -373,10 +373,10 @@
     <div id="sendRegistrationEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
         <div class="registration-status-container">
-            <span class="text-muted">Registration status: </span>
+            <span class="text-muted">{{_('Registration status:')}}</span>
             {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
             {%- else -%}
-            <h4 class="text-success registration-label">registered</h4>
+            <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
         <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send registration email") }}</button>
@@ -1559,7 +1559,7 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%} 
+        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
             $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
         {%- endif -%}
     });</script>
