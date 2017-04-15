@@ -232,7 +232,8 @@ supress standard out (vital for debugging) and to stop on first error:
 Tox
 ~~~
 
-The test runner Tox is configured to run the portal test suite and test other parts of the build process, each configured as a separate Tox "environment". To run all available environments, execute the following command:
+The test runner `Tox
+<https://tox.readthedocs.io/en/latest/>`__ is configured to run the portal test suite and test other parts of the build process, each configured as a separate Tox "environment". To run all available environments, execute the following command:
 
 .. code:: bash
 
