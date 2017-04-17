@@ -8,13 +8,15 @@ from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
-import requests
 
 from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
+from ..database import db
+from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
+from ..models.app_text import AboutATMA, ConsentByOrg_ATMA
+from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -22,7 +24,6 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
-from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 

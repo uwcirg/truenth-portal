@@ -5,7 +5,8 @@ from flask import current_app
 from flask_mail import Message
 from flask_mail import email_dispatched
 
-from ..extensions import db, mail
+from ..database import db
+from ..extensions import mail
 
 
 def log_message(message, app):

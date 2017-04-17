@@ -4,7 +4,7 @@ from dateutil import parser
 from flask import current_app
 from enum import Enum
 
-from ..extensions import db
+from ..database import db
 from .fhir import FHIR_datetime
 from .reference import Reference
 

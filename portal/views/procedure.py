@@ -2,7 +2,8 @@ from flask import abort, jsonify, Blueprint, request
 from collections import defaultdict
 
 from ..audit import auditable_event
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
 from ..models.procedure import Procedure

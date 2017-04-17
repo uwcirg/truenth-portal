@@ -1,6 +1,6 @@
 """Identifier Model Module"""
 
-from ..extensions import db
+from ..database import db
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 

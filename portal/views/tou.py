@@ -1,7 +1,8 @@
 """Views for Initial Consent Terms"""
 from flask import abort, jsonify, Blueprint, request
 
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from ..models.audit import Audit
 from ..models.user import current_user, get_user

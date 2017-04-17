@@ -8,7 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask import url_for
 
 import address
-from ..extensions import db
+from ..database import db
 from .fhir import CodeableConcept, FHIR_datetime
 from .identifier import Identifier
 import reference
