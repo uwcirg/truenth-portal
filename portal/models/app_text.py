@@ -214,6 +214,9 @@ class VersionedResource(object):
             current_app.logger.error(error_msg + ": {}".format(url))
             return {'error_msg': error_msg, 'url': url}
         except:
+            if current_app.config.get(
+                'SYSTEM_TYPE') in ('development', 'staging'):
+                return {'error_msg': '[TESTING - fake response]', 'url': 'http://fake.org'}
             error_msg =  "Could not retrieve remove content - Server could not be reached"
             current_app.logger.error(error_msg + ": {}".format(url))
             return {'error_msg': error_msg, 'url': url}
