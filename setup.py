@@ -8,7 +8,7 @@ to install:
 
 """
 import datetime, os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 project = "portal"
 
@@ -43,7 +43,7 @@ setup_kwargs = dict(
 
     include_package_data=True,
     zip_safe=False,
-    packages=["portal"],
+    packages=find_packages(),
     scripts=["manage.py"],
     install_requires=[
         "Authomatic",

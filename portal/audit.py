@@ -13,8 +13,8 @@ import sys
 import logging
 from flask import current_app
 
-from extensions import db
-import portal.models.audit
+from .database  import db
+from .models.audit import Audit
 
 # special log level for auditable events
 # initial goal was to isolate all auditable events to one log handler
@@ -35,8 +35,9 @@ def auditable_event(message, user_id, subject_id, context="other"):
     current_app.logger.log(AUDIT, text)
 
     with db.session.no_autoflush:
-        db.session.add(portal.models.audit.Audit(
-            user_id=user_id, subject_id=subject_id, comment=message, context=context))
+        db.session.add(Audit(
+            user_id=user_id, subject_id=subject_id, comment=message,
+            context=context))
         db.session.commit()
 
 

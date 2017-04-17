@@ -10,11 +10,11 @@ import redis
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
+from .database import db
 from .extensions import authomatic
-from .extensions import babel, celery, db, mail, oauth, session, user_manager
+from .extensions import babel, celery, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
-from .models.i18n import get_locale
 from .models.role import ROLE
 from .views.assessment_engine import assessment_engine_api
 from .views.audit import audit_api

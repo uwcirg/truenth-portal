@@ -4,7 +4,7 @@ Address data lives in the 'addresses' table.  Several entities link
 to address via foreign keys.
 
 """
-from ..extensions import db
+from ..database import db
 from sqlalchemy.dialects.postgresql import ENUM
 
 

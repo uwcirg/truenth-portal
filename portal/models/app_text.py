@@ -15,7 +15,7 @@ from requests.exceptions import MissingSchema
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
-from ..extensions import db
+from ..database import db
 
 
 class AppText(db.Model):

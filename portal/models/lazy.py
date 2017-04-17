@@ -1,7 +1,7 @@
 import thread
 from sqlalchemy.orm.util import class_mapper
 
-from ..extensions import db
+from ..database import db
 
 def _is_sql_wrapper(instance):
     """Determines if instance is a SQLAlchemy wrapper (ORM instance)"""

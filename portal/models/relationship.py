@@ -7,7 +7,7 @@ To extend the list of roles, add name: description pairs to the
 STATIC_RELATIONSHIPS dict within, and rerun the seed command above.
 
 """
-from ..extensions import db
+from ..database import db
 from UserDict import IterableUserDict
 
 

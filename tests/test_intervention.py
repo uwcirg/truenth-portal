@@ -8,13 +8,14 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.group import Group
+from portal.models.identifier import Identifier
 from portal.models.intervention import INTERVENTION, UserIntervention
 from portal.models.intervention_strategies import AccessStrategy
 from portal.models.message import EmailMessage
 from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import add_role
-from portal.system_uri import SNOMED
+from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 
 class TestIntervention(TestCase):
 
@@ -89,14 +90,16 @@ class TestIntervention(TestCase):
                 data=json.dumps(data))
         self.assert400(rv)
 
-    def test_multi_strategy(self):
-        """Add strategy to limit users to any of several clinics"""
-        # Create several orgs - one of which the user is associated with
+    def test_clinc_id(self):
+        # Create several orgs with identifier
         org1 = Organization(name='org1')
         org2 = Organization(name='org2')
         org3 = Organization(name='org3')
+        identifier = Identifier(value='pick me', system=DECISION_SUPPORT_GROUP)
+        for org in (org1, org2, org3):
+            org.identifiers.append(identifier)
 
-        # Add access strategies to the care plan intervention
+        # Add access strategy to the care plan intervention
         cp = INTERVENTION.CARE_PLAN
         cp.public_access = False  # turn off public access to force strategy
         cp_id = cp.id
@@ -106,14 +109,12 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
-        d = {'function': 'limit_by_clinic_list',
-             'kwargs': [{'name': 'org_list',
-                         'value': [o.name for o in (org1, org2, org3)]},
-                        {'name': 'combinator',
-                         'value': 'any'}]
+        d = {'function': 'limit_by_clinic_w_id',
+             'kwargs': [{'name': 'identifier_value',
+                         'value': 'pick me'}]
             }
         strat = AccessStrategy(
-            name="member of org list",
+            name="member of org with identifier",
             intervention_id = cp_id,
             function_details=json.dumps(d))
 
@@ -448,7 +449,10 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
+        identifier = Identifier(
+            value='decision_support_p3p', system=DECISION_SUPPORT_GROUP)
         uw = Organization(name='UW Medicine (University of Washington)')
+        uw.identifiers.append(identifier)
         INTERVENTION.SEXUAL_RECOVERY.public_access = False
         with SessionScope(db):
             db.session.add(uw)
@@ -469,10 +473,10 @@ class TestIntervention(TestCase):
                   'value': [{'name': 'intervention_name',
                              'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
                  {'name': 'strategy_2',
-                  'value': 'limit_by_clinic_list'},
+                  'value': 'limit_by_clinic_w_id'},
                  {'name': 'strategy_2_kwargs',
-                  'value': [{'name': 'org_list',
-                             'value': [uw.name,]}]}
+                  'value': [{'name': 'identifier_value',
+                             'value': 'decision_support_p3p'}]}
                  ]
             }
         with SessionScope(db):
@@ -488,7 +492,7 @@ class TestIntervention(TestCase):
         self.assertFalse(ds_p3p.display_for_user(user).access)
 
         # Add the child organization to the user, which should be included
-        # due to default behavior of limit_by_clinic
+        # due to default behavior of limit_by_clinic_w_id
         user.organizations.append(uw_child)
         with SessionScope(db):
             db.session.commit()
@@ -513,9 +517,15 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
+        p3p_identifier = Identifier(
+            value='decision_support_p3p', system=DECISION_SUPPORT_GROUP)
+        wc_identifier = Identifier(
+            value='decision_support_wisercare', system=DECISION_SUPPORT_GROUP)
         ucsf = Organization(name='UCSF Medical Center')
         uw = Organization(
             name='UW Medicine (University of Washington)')
+        ucsf.identifiers.append(wc_identifier)
+        uw.identifiers.append(p3p_identifier)
         with SessionScope(db):
             db.session.add(ucsf)
             db.session.add(uw)
@@ -551,15 +561,15 @@ class TestIntervention(TestCase):
                       {'name': 'combinator',
                        'value': 'any'},  # makes this combination an 'OR'
                       {'name': 'strategy_1',
-                       'value': 'not_in_clinic_list'},
+                       'value': 'not_in_clinic_w_id'},
                       {'name': 'strategy_1_kwargs',
-                       'value': [{'name': 'org_list',
-                                  'value': [ucsf.name,],}]},
+                       'value': [{'name': 'identifier_value',
+                                  'value': 'decision_support_wisercare'}]},
                       {'name': 'strategy_2',
-                       'value': 'limit_by_clinic_list'},
+                       'value': 'limit_by_clinic_w_id'},
                       {'name': 'strategy_2_kwargs',
-                       'value': [{'name': 'org_list',
-                                  'value': [uw.name, ucsf.name]}]},
+                       'value': [{'name': 'identifier_value',
+                                  'value': 'decision_support_p3p'}]},
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',
@@ -615,9 +625,15 @@ class TestIntervention(TestCase):
         ds_p3p = INTERVENTION.DECISION_SUPPORT_P3P
         ds_p3p.public_access = False
         user = self.test_user
+        p3p_identifier = Identifier(
+            value='decision_support_p3p', system=DECISION_SUPPORT_GROUP)
+        wc_identifier = Identifier(
+            value='decision_support_wisercare', system=DECISION_SUPPORT_GROUP)
         ucsf = Organization(name='UCSF Medical Center')
         uw = Organization(
             name='UW Medicine (University of Washington)')
+        ucsf.identifiers.append(wc_identifier)
+        uw.identifiers.append(p3p_identifier)
         with SessionScope(db):
             db.session.add(ucsf)
             db.session.add(uw)
@@ -654,15 +670,25 @@ class TestIntervention(TestCase):
                       {'name': 'combinator',
                        'value': 'any'},  # makes this combination an 'OR'
                       {'name': 'strategy_1',
-                       'value': 'not_in_clinic_list'},
+                       'value': 'not_in_clinic_w_id'},
                       {'name': 'strategy_1_kwargs',
-                       'value': [{'name': 'org_list',
-                                  'value': [ucsf.name,],}]},
-                      {'name': 'strategy_2',
-                       'value': 'limit_by_clinic_list'},
-                      {'name': 'strategy_2_kwargs',
-                       'value': [{'name': 'org_list',
-                                  'value': [uw.name, ucsf.name]}]},
+                       'value': [{'name': 'identifier_value',
+                                  'value': 'decision_support_wisercare'}]},
+                     {'name': 'strategy_2',
+                      'value': 'combine_strategies'},
+                     {'name': 'strategy_2_kwargs',
+                      'value': [
+                          {'name': 'strategy_1',
+                           'value': 'limit_by_clinic_w_id'},
+                          {'name': 'strategy_1_kwargs',
+                           'value': [{'name': 'identifier_value',
+                                      'value': 'decision_support_wisercare'}]},
+                          {'name': 'strategy_2',
+                           'value': 'limit_by_clinic_w_id'},
+                          {'name': 'strategy_2_kwargs',
+                           'value': [{'name': 'identifier_value',
+                                      'value': 'decision_support_p3p'}]},
+                      ]},
                   ]},
                  # Not Started TX (strat 3)
                  {'name': 'strategy_3',

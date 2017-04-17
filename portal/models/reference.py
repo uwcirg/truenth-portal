@@ -1,9 +1,7 @@
 """Reference module - encapsulate FHIR Reference type"""
 import re
 
-from ..extensions import db
-import organization
-import user
+from ..database import db
 
 class MissingReference(Exception):
     """Raised when FHIR references cannot be found"""
@@ -42,6 +40,11 @@ class Reference(object):
         :raises :py:exc:`exceptions.ValueError`: if the text format can't be parsed
 
         """
+        ## Due to cyclic import problems, keep these local
+        from .organization import Organization
+        from .user import User
+
+
         if 'reference' in reference_dict:
             reference_text = reference_dict['reference']
         elif 'Reference' in reference_dict:
@@ -51,8 +54,8 @@ class Reference(object):
                     format(reference_dict))
 
         lookup = (
-            (re.compile('[Oo]rganization/(\d+)'), organization.Organization),
-            (re.compile('[Pp]atient/(\d+)'), user.User))
+            (re.compile('[Oo]rganization/(\d+)'), Organization),
+            (re.compile('[Pp]atient/(\d+)'), User))
 
         for pattern, obj in lookup:
             match = pattern.search(reference_text)

@@ -5,7 +5,8 @@ import json
 from sqlalchemy import exc, and_
 
 from ..audit import auditable_event
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.reference import MissingReference

@@ -3,11 +3,11 @@ from flask import abort, Blueprint, jsonify
 from flask import request
 
 from ..audit import auditable_event
+from ..database import db
+from ..extensions import oauth
 from ..models.audit import Audit
 from ..models.fhir import CC, ValueQuantity, Observation
 from ..models.user import current_user, get_user
-from ..extensions import oauth
-from ..extensions import db
 
 clinical_api = Blueprint('clinical_api', __name__, url_prefix='/api')
 

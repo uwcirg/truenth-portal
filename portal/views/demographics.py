@@ -4,10 +4,10 @@ from flask import current_app, request
 import json
 
 from ..audit import auditable_event
+from ..database import db
+from ..extensions import oauth
 from ..models.reference import MissingReference
 from ..models.user import current_user, get_user
-from ..extensions import oauth
-from ..extensions import db
 
 demographics_api = Blueprint('demographics_api', __name__, url_prefix='/api')
 

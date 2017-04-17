@@ -12,14 +12,15 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.site_persistence import SitePersistence
+from portal.models.app_text import app_text
 from portal.models.audit import Audit
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
-from portal.models.app_text import app_text
+from portal.models.role import ROLE
 
 known_good_persistence_file =\
-"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/b42b4f9fda85fd9484b3d68145813de190a0c9c8/site_persistence_file.json"
+"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7/site_persistence_file.json"
 
 
 class TestSitePersistence(TestCase):
@@ -67,6 +68,7 @@ class TestSitePersistence(TestCase):
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+        self.promote_user(user, role_name=ROLE.PATIENT)
         with SessionScope(db):
             db.session.commit()
         user = db.session.merge(user)
