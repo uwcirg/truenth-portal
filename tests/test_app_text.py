@@ -68,6 +68,7 @@ class TestAppText(TestCase):
         self.assertTrue('found!' in result)
 
     def test_fetch_elements_invalid_url(self):
+        self.app.config['SYSTEM_TYPE'] = 'production'
         sample_url = "https://notarealwebsitebeepboop.com"
         sample_error = "Could not retrieve remove content - Server could not be reached"
         result = VersionedResource.fetch_elements(sample_url)
