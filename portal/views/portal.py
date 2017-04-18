@@ -1,6 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
+from flask import render_template_string
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
@@ -810,3 +811,25 @@ def celery_result(task_id):
 def post_result(task_id):
     r = post_request.AsyncResult(task_id).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
+
+@portal.route("/legal/stock-org-consent/<org_name>")
+def stock_consent(org_name):
+    """Simple view to render default consent with named organization
+
+    We generally store the unique URL pointing to the content of the agreement
+    to which the user consents.  Special case for organizations without a
+    custom consent agreement on file.
+
+    :param org_name: the org_name to include in the agreement text
+
+    """
+    return render_template_string(
+        """<!doctype html>
+        <html>
+            <head>
+            </head>
+            <body>
+                <p>I consent to sharing information with the {{ org_name }}</p>
+            </body>
+        </html>""",
+        org_name=org_name)
