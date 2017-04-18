@@ -37,6 +37,10 @@ matrix:
     - env: TOXENV=build
       services:
         - docker
+    - env: TOXENV=ui
+      addons:
+        postgresql: "9.4"
+        sauce_connect: true
 
 before_install:
   # Set Github env vars
