@@ -7,14 +7,14 @@ from flask_script import Server
 def best_sql_url():
     """Return compliant sql url from available enviornment variables"""
     env = os.environ
-    if 'PGDATABASE' in env:
+    if 'SQLALCHEMY_DATABASE_URI' in env:
+        return env.get('SQLALCHEMY_DATABASE_URI')
+    elif 'PGDATABASE' in env:
         return (
             'postgresql://{PGUSER}:{PGPASSWORD}@{PGHOST}/{PGDATABASE}'.format(
                 PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
-    elif 'SQLALCHEMY_DATABASE_URI' in env:
-        return env.get('SQLALCHEMY_DATABASE_URI')
     else:
         return env.get(
             'DATABASE_URL',
