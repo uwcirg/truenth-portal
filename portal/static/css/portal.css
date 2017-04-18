@@ -37,6 +37,10 @@ body {
   color: #333;
   font-size: 16px;
 }
+.btn:focus,
+a:focus {
+  outline: none;
+}
 a {
   color: #4d4e50;
   cursor: pointer;
@@ -775,9 +779,15 @@ h4.detail-title {
 #indexNavBar span.link a {
   color: #FFF;
   text-decoration: none;
+  transition: background-color 300ms ease-in;
+}
+#indexNavBar span.link:hover {
+  color: #fff;
+  background-color: #2a4531;
+  border-color: #1c2f21;
 }
 #indexNavBar #indexNavBar span:hover {
-  color: #2a4531;
+  color: #606a73;
 }
 #indexNavBar #backLink {
   position: relative;
@@ -1169,6 +1179,7 @@ h4.detail-title {
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
+  background-color: #606a73;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
@@ -1197,7 +1208,10 @@ h4.detail-title {
   display: block;
 }
 #mainDiv.profile .profile-item-container .view-container td {
-  padding: 0.8em 1em;
+  padding: 0.6em 1em;
+}
+#mainDiv.profile .profile-item-container .view-container tr.study-id-view td {
+  padding: 0.6em 1em 0 1em;
 }
 #mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
@@ -1233,11 +1247,18 @@ h4.detail-title {
   margin-bottom: 1em;
 }
 #createUserLink {
-  border: 1px solid #bdb9b9;
-  height: 3.2em;
+  height: 3em;
   display: inline-block;
   width: 300px;
   max-width: 100%;
+  color: #FFF;
+  border: 1px solid #7C959E;
+  background: #7C959E;
+  padding: 0.7em 1em 1em 1em;
+}
+#createUserLink:hover {
+  color: #5f676e;
+  background: #FFF;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1430,7 +1451,7 @@ div.noOrg-container span {
   padding: 0.4em;
 }
 #userSessionReportDetailHeader a[href]:hover {
-  color: #8c9094;
+  color: #606a73;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1455,7 +1476,7 @@ table.profile-audit-log TH,
   font-size: 0.98em;
 }
 #userSessionListTable TR:hover {
-  color: #6C7A72;
+  color: #606a73;
   background-color: #ddd;
   cursor: pointer;
 }
@@ -1801,7 +1822,7 @@ sub.pointer {
   cursor: pointer;
 }
 sub.pointer:hover {
-  color: #79815D;
+  color: #606a73;
 }
 .report-custom-header {
   padding: 0.3em 0.5em;
@@ -1865,7 +1886,7 @@ sub.pointer:hover {
   font-size: 0.9em;
 }
 #consentContainer a:hover {
-  color: #2a4531;
+  color: #606a73;
 }
 .consent-checkbox {
   margin-left: -2px;
@@ -1882,7 +1903,7 @@ sub.pointer:hover {
   text-decoration: underline;
 }
 #profileConsentList a:hover {
-  color: #2a4531;
+  color: #606a73;
 }
 #profileConsentList .consentlist-header {
   background-color: #8a8e90;
@@ -2117,6 +2138,9 @@ div.timezone-warning.text-warning {
   }
   .checkbox input[type=checkbox] {
     top: -1px;
+  }
+  #profile-gender-list {
+    margin-top: 0.2em;
   }
   #profile-gender-list input[type=radio] {
     top: -2px;

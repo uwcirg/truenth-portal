@@ -8,13 +8,14 @@ from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
-import requests
 
 from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
+from ..database import db
+from ..extensions import oauth, user_manager
+from ..models.app_text import app_text, AboutATMA, VersionedResource
+from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -22,7 +23,6 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
-from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
@@ -394,21 +394,9 @@ def initial_queries():
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        dict_terms = VersionedResource.fetch_elements(
-            app_text(InitialConsent_ATMA.name_key()))
-        asset = dict_terms.get('asset', None)
-        url = dict_terms.get('url', None)
-        editorUrl = dict_terms.get('editorUrl', None)
-        terms = {'asset': asset, 'agreement_url': url, 'editorUrl': editorUrl}
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     if 'org' in still_needed:
-        for org_id in OrgTree().all_top_level_ids():
-            org = Organization.query.get(org_id)
-            dict_consent_by_org = VersionedResource.fetch_elements(
-                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org.get('asset', None)
-            url = dict_consent_by_org.get('url', None)
-            consent_agreements[org.id] = {
-                    'asset': asset, 'agreement_url': url, 'organization_name': org.name}
+        consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -455,23 +443,11 @@ def home():
     gil = current_app.config.get('GIL')
     consent_agreements = {}
     if gil:
-        for org_id in OrgTree().all_top_level_ids():
-            current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
-            org = Organization.query.get(org_id)
-            dict_consent_by_org = VersionedResource.fetch_elements(
-                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org.get('asset', None)
-            url = dict_consent_by_org.get('url', None)
-            if url:
-                current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
+        consent_agreements = Organization.consent_agreements()
 
-            consent_agreements[org.id] = {
-                    'organization_name': org.name,
-                    'asset': asset,
-                    'agreement_url': url}
-
-    return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
-                           interventions=interventions, consent_agreements=consent_agreements)
+    return render_template(
+        'portal.html' if not gil else 'gil/portal.html', user=user,
+        interventions=interventions, consent_agreements=consent_agreements)
 
 
 @portal.route('/admin')
@@ -489,6 +465,7 @@ def admin():
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
 def staff_profile_create():
+<<<<<<< HEAD
     consent_agreements = {}
     for org_id in OrgTree().all_top_level_ids():
         org = Organization.query.get(org_id)
@@ -499,6 +476,9 @@ def staff_profile_create():
         consent_agreements[org.id] = {
                 'asset': asset, 'agreement_url': url, 'organization_name': org.name}
 
+=======
+    consent_agreements = Organization.consent_agreements()
+>>>>>>> 27bf75cbc070649113ad78c1daf2ec6c43ce2a34
     user = current_user()
 
     #compiling org list for staff
@@ -512,7 +492,12 @@ def staff_profile_create():
 
     return render_template(
         "staff_profile_create.html", user=user,
+<<<<<<< HEAD
         consent_agreements=consent_agreements, org_list=list(org_list))
+=======
+        consent_agreements=consent_agreements,
+        leaf_organizations=leaf_organizations)
+>>>>>>> 27bf75cbc070649113ad78c1daf2ec6c43ce2a34
 
 @portal.route('/staff')
 @roles_required(ROLE.STAFF_ADMIN)
@@ -624,17 +609,7 @@ def profile(user_id):
     if user_id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        dict_consent_by_org = VersionedResource.fetch_elements(
-            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org.get('asset', None)
-        url = dict_consent_by_org.get('url', None)
-        consent_agreements[org.id] = {
-                'organization_name': org.name,
-                'asset': asset,
-                'agreement_url': url}
+    consent_agreements = Organization.consent_agreements()
     return render_template(
         'profile.html', user=user, consent_agreements=consent_agreements)
 
@@ -642,37 +617,36 @@ def profile(user_id):
 def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
-    dict_privacy = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))
-    content = dict_privacy.get('asset', None)
-    editorUrl = dict_privacy.get('editorUrl', None)
-    return render_template('privacy.html' if not gil else 'gil/privacy.html',
-        content=content, user=current_user(), editorUrl=editorUrl)
+    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    return render_template(
+        'privacy.html' if not gil else 'gil/privacy.html',
+        content=privacy_resource.asset, user=current_user(),
+        editorUrl=privacy_resource.editor_url)
 
 @portal.route('/terms')
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    dict_terms = VersionedResource.fetch_elements(
-            app_text(Terms_ATMA.name_key()))
-    content = dict_terms.get('asset', None)
-    editorUrl = dict_terms.get('editorUrl', None)
+    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
     return render_template('terms.html' if not gil else 'gil/terms.html',
-        content=content, editorUrl=editorUrl, user=user)
+        content=terms.asset, editorUrl=terms.editor_url, user=user)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    dict_about_tnth = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))
-    dict_about_mo = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))
+    about_tnth = VersionedResource(
+        app_text(AboutATMA.name_key(subject='TrueNTH')))
+    about_mo = VersionedResource(
+        app_text(AboutATMA.name_key(subject='Movember')))
     gil = current_app.config.get('GIL')
-    about_tnth_content = dict_about_tnth.get('asset', None)
-    about_mo_content = dict_about_mo.get('asset', None)
-    about_tnth_editorUrl = dict_about_tnth.get('editorUrl', None)
-    about_mo_editorUrl = dict_about_mo.get('editorUrl', None)
-    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_content,
-                           about_mo=about_mo_content, about_tnth_editorUrl=about_tnth_editorUrl,
-                           about_mo_editorUrl=about_mo_editorUrl, user=current_user())
+    return render_template(
+        'about.html' if not gil else 'gil/about.html',
+        about_tnth=about_tnth.asset,
+        about_mo=about_mo.asset,
+        about_tnth_editorUrl=about_tnth.editor_url,
+        about_mo_editorUrl=about_mo.editor_url,
+        user=current_user())
 
 @portal.route('/explore')
 def explore():

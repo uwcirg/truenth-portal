@@ -5,7 +5,7 @@ from uuid import uuid4
 from flask import current_app
 import os
 
-from ..extensions import db
+from ..database import db
 from .fhir import FHIR_datetime
 from .user import User
 

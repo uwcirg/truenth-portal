@@ -4,7 +4,8 @@ from flask import request
 from flask_user import roles_required
 
 from ..audit import auditable_event
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.group import Group
 from ..models.role import ROLE
 from ..models.user import current_user

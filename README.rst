@@ -229,15 +229,25 @@ supress standard out (vital for debugging) and to stop on first error:
 
     $ nosetests -sx tests.test_intervention
 
-The test suite can also be run on different python interpreters
-(currently Python 2.7, 3.5 and PyPy), if available, using the tox test
-automation framework:
+Tox
+~~~
+
+The test runner `Tox
+<https://tox.readthedocs.io/en/latest/>`__ is configured to run the portal test suite and test other parts of the build process, each configured as a separate Tox "environment". To run all available environments, execute the following command:
 
 .. code:: bash
 
     $ tox
 
-Tox will pass any options after -- to the test runner, nose, eg:
+To run a specific tox environment, "docs" or the docgen environment in this case, invoke tox with the ``-e`` option eg:
+
+.. code:: bash
+
+    $ tox -e docs
+
+Tox will also run the environment specified by the ``TOXENV`` environmental variable, as configured in the TravisCI integration.
+
+Tox will pass any options after -- to the test runner, nose. To run tests only from a certain module (analgous the above nosetests invocation):
 
 .. code:: bash
 

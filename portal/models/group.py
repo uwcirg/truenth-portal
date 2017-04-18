@@ -10,7 +10,7 @@ import re
 from sqlalchemy import UniqueConstraint
 from werkzeug.exceptions import BadRequest
 
-from ..extensions import db
+from ..database import db
 
 
 class Group(db.Model):

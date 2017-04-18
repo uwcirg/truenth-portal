@@ -8,7 +8,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from flask import url_for
 
 import address
-from ..extensions import db
+from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
+from .app_text import VersionedResource
+from ..database import db
 from .fhir import CodeableConcept, FHIR_datetime
 from .identifier import Identifier
 import reference
@@ -208,6 +210,31 @@ class Organization(db.Model):
             'entry':orgs,
         }
         return bundle
+
+    @staticmethod
+    def consent_agreements():
+        """Return consent agreements for all top level organizations
+
+        :return: dictionary keyed by top level organization id containing
+          a VersionedResource for each organization IFF the organization
+          has a custom consent agreement on file.  The `organization_name`
+          is also added to the versioned resource to simplify UI code.
+
+        """
+        agreements = {}
+        for org_id in OrgTree().all_top_level_ids():
+            org = Organization.query.get(org_id)
+            # Not all organizations maintain consent agreements
+            # include only those with such defined
+            try:
+                url = app_text(ConsentByOrg_ATMA.name_key(organization=org))
+            except UndefinedAppText:
+                # no consent found for this organization, continue
+                continue
+            resource = VersionedResource(url)
+            resource.organization_name = org.name
+            agreements[org.id] = resource
+        return agreements
 
 
 class UserOrganization(db.Model):

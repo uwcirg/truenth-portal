@@ -9,7 +9,7 @@ from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
-from ..extensions import db
+from ..database import db
 from .lazy import lazyprop
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036

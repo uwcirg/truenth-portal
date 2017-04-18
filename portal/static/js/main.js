@@ -90,9 +90,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        showMain();
+        setTimeout("showMain();", 500);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
+            setTimeout('$("#loadingIndicator").fadeOut();', 800);
         };
     };
 };
@@ -245,13 +245,13 @@ var fillViews = {
         var topLevelOrgs = $("#fillOrgs legend[data-checked]");
         if (topLevelOrgs.length > 0) {
             topLevelOrgs.each(function() {
-                content += "<p class='indent capitalize'>" + $(this).text() + "</p>";
+                content += "<p class='capitalize'>" + $(this).text() + "</p>";
             });
         };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
                 if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
-                else content += "<p class='indent'>" + $(this).closest("label").text() + "</p>";
+                else content += "<p>" + $(this).closest("label").text() + "</p>";
             };
         });
         if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
@@ -270,35 +270,36 @@ var fillViews = {
         if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
             var content = $("#firstname").val() + " " + $("#lastname").val();
             if (hasValue($.trim(content))) $("#name_view").text(content);
-            else $("#name_view").text("Not provided");
+            else $("#name_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "dob": function() {
         if (!$("#bdGroup").hasClass("has-error")) {
             if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
-                $("#dob_view").text($("#month option:selected").val() + "/" + $("#date").val() + "/" + $("#year").val());
-            } else $("#dob_view").text("Not provided");
+                var displayString = tnthDates.displayDateString($("#month option:selected").val(), $("#date").val(), $("#year").val());
+                $("#dob_view").text(displayString);
+            } else $("#dob_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "phone": function() {
         if (!$("#phoneGroup").hasClass("has-error")) {
             var content = $("#phone").val();
             if (hasValue(content)) $("#phone_view").text(content);
-            else $("#phone_view").text("Not provided");
+            else $("#phone_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "email": function() {
         if (!$("#emailGroup").hasClass("has-error")) {
             var content = $("#email").val();
             if (hasValue(content)) $("#email_view").text(content);
-            else $("#email_view").text("Not provided");
+            else $("#email_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "studyId": function() {
         if (!$("#profileStudyIDContainer").hasClass("has-error")) {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
-            else $("#study_id_view").text("Not provided");
+            else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "detail": function() {
@@ -311,8 +312,8 @@ var fillViews = {
         if ($("#genderGroup").length > 0) {
             if (!$("#genderGroup").hasClass("has-error")) {
                 var content = $("input[name=sex]:checked").val();
-                if (hasValue(content)) $("#gender_view").text(content);
-                else $("#gender_view").text("Not provided");
+                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + content + "</p>");
+                else $("#gender_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".gender-view").hide();
     },
@@ -324,7 +325,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#race_view").html(content);
-                else $("#race_view").text("Not provided");
+                else $("#race_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else {
             $(".race-view").hide();
@@ -338,7 +339,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#ethnicity_view").html(content);
-                else $("#ethnicity_view").text("Not provided");
+                else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".ethnicity-view").hide();
     },
@@ -350,7 +351,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#indigenous_view").html(content);
-                else $("#indigenous_view").text("Not provided");
+                else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
     },
@@ -360,21 +361,25 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
+                //note, biopsy date is formatted as mm/dd/yyyy
+                var cDate = new Date(biopsyDate);
+                displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-                content += "&nbsp;&nbsp;" + $("#biopsyDate").val();
+                content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
             if (hasValue(content)) $("#biopsy_view").html(content);
-            else $("#biopsy_view").html("No answer provided");
+            else $("#biopsy_view").html("<p class='text-muted'>No answer provided</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
         if (hasValue(content)) $("#pca_diag_view").text(content);
-        else $("#pca_diag_view").text("No answer provided");
+        else $("#pca_diag_view").html("<p class='text-muted'>No answer provided</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
             $("#boolDeath_view").text("Patient has deceased");
             if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
-                $("#deathDate_view").text($("#deathDay").val() + "/" + $("#deathMonth").val() + "/" + $("#deathYear").val());
+                var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
+                $("#deathDate_view").text(displayString);
             };
         } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
     },
@@ -399,7 +404,7 @@ var fillViews = {
             $("#userProcedures tr[data-id]").each(function() {
                 content += hasValue(content) ? "<br/>" : "";
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
@@ -708,6 +713,7 @@ var fillContent = {
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
+                    var isFake = (/fake/.test(item.agreement_url));
 
 
                     switch(consentStatus) {
@@ -765,12 +771,12 @@ var fillContent = {
                             content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
                         },
                         {
-                            content: sDisplay + (editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
+                            content: sDisplay + (editable && !isFake && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                            content: (isFake? "--" : "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : ""))
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -815,7 +821,7 @@ var fillContent = {
             };
 
         } else {
-            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger' style='font-size:0.9em'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
             if (parseInt(errorCode) == 401) {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
@@ -872,7 +878,7 @@ var fillContent = {
                 else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 };
@@ -1277,7 +1283,11 @@ var OrgTool = function() {
         $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) {
+                    var l = $(this).closest("label");
+                    l.hide();
+                    l.next(".divider").hide();
+                };
             };
         });
 
@@ -1304,7 +1314,9 @@ var OrgTool = function() {
 
                     });
 
-                    if (allSubOrgsHidden) $(this).children("label").hide();
+                    if (allSubOrgsHidden) {
+                        $(this).children("label").hide();
+                    };
 
                 } else {
                     var ip = $(this).find("input[name='organization']");
@@ -1439,7 +1451,6 @@ var OrgTool = function() {
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
-
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
@@ -2372,6 +2383,62 @@ var tnthDates = {
         var splitDate = currentDate.split('/');
         return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
     },
+    /**
+     * Convert month string to text
+     *
+     */
+     "convertMonthString": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+            var m = "";
+            switch(parseInt(month)) {
+                case 1:
+                    m = "Jan";
+                    break;
+                case 2:
+                    m = "Feb";
+                    break;
+                case 3:
+                    m = "Mar";
+                    break;
+                case 4:
+                    m = "Apr";
+                    break;
+                case 5:
+                    m = "May";
+                    break;
+                case 6:
+                    m = "Jun";
+                    break;
+                case 7:
+                    m = "Jul";
+                    break;
+                case 8:
+                    m = "Aug";
+                    break;
+                case 9:
+                    m = "Sep";
+                    break;
+                case 10:
+                    m = "Oct";
+                    break;
+                case 11:
+                    m = "Nov";
+                    break;
+                case 12:
+                    m = "Dec";
+                    break;
+            };
+            return m;
+        }
+     },
+     "displayDateString": function(m, d, y) {
+        var s = "";
+        if (hasValue(d)) s = parseInt(d);
+        if (hasValue(m)) s += (hasValue(s) ? " ": "") + this.convertMonthString(m);
+        if (hasValue(y)) s += (hasValue(s) ? " ": "") + y;
+        return s;
+     },
     /***
      * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
      * @param date - the date to be converted

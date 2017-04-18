@@ -1,16 +1,16 @@
 """SitePersistence Module"""
 from collections import defaultdict
+from dict_tools import dict_match
 from flask import current_app
 import json
 import os
 import requests
-from sqlalchemy import exc, and_
+from sqlalchemy import exc
 from StringIO import StringIO
 import tempfile
 
 from app import SITE_CFG
-from dict_tools import dict_match
-from extensions import db
+from database import db
 from models.app_text import AppText
 from models.fhir import FHIR_datetime
 from models.intervention import Intervention, INTERVENTION

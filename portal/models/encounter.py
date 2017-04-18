@@ -4,7 +4,7 @@ Designed around FHIR guidelines for representation of encounters.
 """
 from datetime import datetime
 
-from ..extensions import db
+from ..database import db
 from .fhir import as_fhir, FHIR_datetime
 from .reference import Reference
 from .role import ROLE

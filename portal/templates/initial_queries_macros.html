@@ -323,7 +323,7 @@
     {% if consent_agreements %}
         <div id="consentContainer" style="display:none">
           {% for org in consent_agreements %}
-            <div id="{{org}}_consentItem" class="well consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
+            <div id="{{org}}_consentItem" class="well consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /></div>
           {% endfor %}
         </div>
       {% endif %}
