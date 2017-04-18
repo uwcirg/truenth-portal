@@ -45,7 +45,7 @@ def organization_search():
             letter state code.
         required: false
         type: string
-      - name: search_filter
+      - name: filter
         in: query
         description:
             Filter to apply to search, such as `leaves` to restrict results
@@ -88,7 +88,8 @@ def organization_search():
                     400, "unknown filter request '{}' - expecting "
                     "'leaves'".format(filter))
         else:
-            abort(400, "can't search on '{}' at this time".format(k))
+            abort(400, "only search on `state` or `filter` are available "
+                  "at this time")
 
     # Apply search on org fields like inheritence - include any children
     # of the matching nodes.  If filter is set, apply to results.
