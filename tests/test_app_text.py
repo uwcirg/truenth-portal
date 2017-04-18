@@ -51,7 +51,7 @@ class TestAppText(TestCase):
         version = '1.3'
         expected = 'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=52668&version=1.3'
 
-        result = VersionedResource.permanent_url(
+        result = VersionedResource(sample)._permanent_url(
             generic_url=sample, version=version)
         self.assertTrue(Url(result) == Url(expected))
 
@@ -68,10 +68,10 @@ class TestAppText(TestCase):
         self.assertTrue('found!' in result)
 
     def test_fetch_elements_invalid_url(self):
-        self.app.config['SYSTEM_TYPE'] = 'production'
         sample_url = "https://notarealwebsitebeepboop.com"
         sample_error = "Could not retrieve remove content - Server could not be reached"
-        result = VersionedResource.fetch_elements(sample_url)
-        self.assertEquals(result['error_msg'],sample_error)
-        self.assertEquals(result['url'],sample_url)
-
+        result = VersionedResource(sample_url)
+        self.assertEquals(result.error_msg, sample_error)
+        self.assertEquals(result.url, sample_url)
+        # self.asset should still work (and equal the error text)
+        self.assertEquals(result.asset, sample_error)

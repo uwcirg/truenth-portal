@@ -1283,7 +1283,11 @@ var OrgTool = function() {
         $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) {
+                    var l = $(this).closest("label");
+                    l.hide();
+                    l.next(".divider").hide();
+                };
             };
         });
 
@@ -1310,7 +1314,9 @@ var OrgTool = function() {
 
                     });
 
-                    if (allSubOrgsHidden) $(this).children("label").hide();
+                    if (allSubOrgsHidden) {
+                        $(this).children("label").hide();
+                    };
 
                 } else {
                     var ip = $(this).find("input[name='organization']");
@@ -1445,7 +1451,6 @@ var OrgTool = function() {
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
-
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);

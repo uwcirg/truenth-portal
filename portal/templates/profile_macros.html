@@ -436,6 +436,19 @@
                 $(".clinic-prompt").show();
             };
         };
+        function hasChildrenOrgs(orgId, data) {
+            if (hasValue(orgId) && hasValue(data)) {
+                var parentId, hasChildren = false;
+                data.forEach(function(item) {
+                    if (!hasChildren) {
+                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                        hasChildren = (parentId == orgId);
+                    };
+
+                });
+                return hasChildren;
+            } else return false;
+        }
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
@@ -491,8 +504,14 @@
                                 if (parseInt(item.id) != 0) {
                                     var parentId;
                                     if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                                    else parentId = item.id;
-                                    $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
+                                    else {
+                                        //need to check if it is a parent org and whether it has child org or not
+                                        var c = hasChildrenOrgs(item.id, entry);
+                                        if (!c) parentId = item.id;
+                                    }
+                                    if (parentId) {
+                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
+                                    };
                                 };
                             };
                         });
@@ -613,8 +632,8 @@
     {%- if person and consent_agreements -%}
         <div id="consentContainer">
             {%- for org in consent_agreements -%}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
-              {% if consent_agreements[org].asset %}
+               {% if consent_agreements[org].url and consent_agreements[org].asset %}
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
                   <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
