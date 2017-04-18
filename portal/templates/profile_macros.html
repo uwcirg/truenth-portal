@@ -436,6 +436,19 @@
                 $(".clinic-prompt").show();
             };
         };
+        function hasChildrenOrgs(orgId, data) {
+            if (hasValue(orgId) && hasValue(data)) {
+                var parentId, hasChildren = false;
+                data.forEach(function(item) {
+                    if (!hasChildren) {
+                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                        hasChildren = (parentId == orgId);
+                    };
+
+                });
+                return hasChildren;
+            } else return false;
+        }
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
@@ -478,24 +491,30 @@
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
                   entry.forEach(function(item) {
-                    if (item.partOf) { //don't render parent org
-                        var __state = "";
-                        if (item.identifier) {
-                            (item.identifier).forEach(function(region) {
-                                if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
-                                    __state = (region.value).split(":")[1];
-                                    if (!states[__state]) {
-                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                        if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                        states[__state] = true;
-                                    };
-                                    if (parseInt(item.id) != 0) {
-                                        var parentId = (item.partOf.reference).split("/")[2];
+                    var __state = "";
+                    if (item.identifier) {
+                        (item.identifier).forEach(function(region) {
+                            if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
+                                __state = (region.value).split(":")[1];
+                                if (!states[__state]) {
+                                    $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                    if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                    states[__state] = true;
+                                };
+                                if (parseInt(item.id) != 0) {
+                                    var parentId;
+                                    if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                                    else {
+                                        //need to check if it is a parent org and whether it has child org or not
+                                        var c = hasChildrenOrgs(item.id, entry);
+                                        if (!c) parentId = item.id;
+                                    }
+                                    if (parentId) {
                                         $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
                                     };
                                 };
-                            });
-                        };
+                            };
+                        });
                     };
 
                   });
@@ -566,7 +585,7 @@
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var userOrgs = $("#userOrgs input[name='organization']");
                 if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                 var checkedOrgs = {};
                 userOrgs.each(function() {
@@ -613,39 +632,41 @@
     {%- if person and consent_agreements -%}
         <div id="consentContainer">
             {%- for org in consent_agreements -%}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
-              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
-                        </div>
-                        <div class="modal-body">
-                            <h4>Terms</h4>
-                            <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreements[org].asset|safe}}</div>
-                            <br/>
-                            <p>{{_("Do you consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreements[org].organization_name}}</span>?</p>
-                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                                  {{ _("Yes") }}
-                              </label>
-                              <br/>
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                                  {{ _("No") }}
-                              </label>
+               {% if consent_agreements[org].url and consent_agreements[org].asset %}
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
+                  <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                                <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
+                                </div>
+                                <div class="modal-body">
+                                <h4>Terms</h4>
+                                <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreements[org].asset|safe}}</div>
+                                <br/>
+                                <p>{{_("Do you consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreements[org].organization_name}}</span>?</p>
+                                <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                                  <label class="radio-inline">
+                                      <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                                      {{ _("Yes") }}
+                                  </label>
+                                  <br/>
+                                  <label class="radio-inline">
+                                      <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                                      {{ _("No") }}
+                                  </label>
+                                </div>
+                                <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                                 </div>
+                                 <br/>
+                                 <div class="modal-footer" >
+                                    <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                                 </div>
                             </div>
-                            <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
-                         </div>
-                         <br/>
-                         <div class="modal-footer" >
-                            <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
-                         </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endif %}
             {%- endfor -%}
         </div>
         <script>

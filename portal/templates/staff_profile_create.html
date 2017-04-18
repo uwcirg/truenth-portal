@@ -85,7 +85,7 @@
     {% if consent_agreements %}
         <div id="_consentContainer">
           {% for org in consent_agreements %}
-            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].agreement_url}}" />
+            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].url}}" />
           {% endfor %}
         </div>
     {% endif %}
@@ -132,9 +132,12 @@ $(document).ready(function(){
                 {% else %}
                     consent_org_id = $(this).val();
                 {% endif %}
-                if (!orgs[consent_org_id]) {
+                if (consent_org_id && !orgs[consent_org_id]) {
                     orgs[consent_org_id] = true;
-                    consents.push({"organization_id": consent_org_id, "agreement_url": $("#" + getParentOrgId(this) + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
+                    var agreement = $("#" + getParentOrgId(this) + "_consentItem").val();
+                    if (hasValue(agreement)) {
+                        consents.push({"organization_id": consent_org_id, "agreement_url": agreement, "staff_editable": true, "include_in_reports": true, "send_reminders": true});
+                    };
                 };
             };
         });

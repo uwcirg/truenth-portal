@@ -713,6 +713,7 @@ var fillContent = {
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
+                    var isFake = (/fake/.test(item.agreement_url));
 
 
                     switch(consentStatus) {
@@ -770,12 +771,12 @@ var fillContent = {
                             content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
                         },
                         {
-                            content: sDisplay + (editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
+                            content: sDisplay + (editable && !isFake && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                            content: (isFake? "--" : "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : ""))
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -1282,7 +1283,11 @@ var OrgTool = function() {
         $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) {
+                    var l = $(this).closest("label");
+                    l.hide();
+                    l.next(".divider").hide();
+                };
             };
         });
 
@@ -1309,7 +1314,9 @@ var OrgTool = function() {
 
                     });
 
-                    if (allSubOrgsHidden) $(this).children("label").hide();
+                    if (allSubOrgsHidden) {
+                        $(this).children("label").hide();
+                    };
 
                 } else {
                     var ip = $(this).find("input[name='organization']");
@@ -1444,7 +1451,6 @@ var OrgTool = function() {
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
                 var parentOrg = $(this).attr("data-parent-id");
-
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
