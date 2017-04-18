@@ -155,6 +155,19 @@ class TestOrganization(TestCase):
         self.assertTrue(bundle['resourceType'], 'Bundle')
         self.assertEquals(len(bundle['entry']), 2)
 
+    def test_organization_filter(self):
+        # Filter w/o a search term
+        self.deepen_org_tree()
+        count = Organization.query.count()
+        self.assertTrue(count > 6)
+
+        # Filter w/o search should give a short list of orgs
+        rv = self.client.get('/api/organization?filter=leaves')
+        self.assert200(rv)
+        bundle = rv.json
+        self.assertTrue(bundle['resourceType'], 'Bundle')
+        self.assertEquals(len(bundle['entry']), 3)
+
     def test_organization_put(self):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()

@@ -95,6 +95,11 @@ def organization_search():
     # of the matching nodes.  If filter is set, apply to results.
     ot = OrgTree()
     matching_orgs = set()
+
+    # Lookout for filter w/o a search term, use top level ids in this case
+    if filter and not found_ids:
+        found_ids = ot.all_top_level_ids()
+
     for org in found_ids:
         if filter == 'leaves':
             matching_orgs |= set(ot.all_leaves_below_id(org))
