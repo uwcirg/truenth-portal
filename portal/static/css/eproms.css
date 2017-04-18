@@ -1281,7 +1281,7 @@ div.right-panel {
   max-width: 100%;
 }
 #resetPasswordContainer {
-  flex-grow: 0.7;
+  flex-grow: 0.3;
 }
 #passwordResetMessage {
   width: 300px;
@@ -1299,6 +1299,10 @@ div.right-panel {
   color: #FFF;
   background: #79815d;
   border-color: #79815d;
+}
+#createUserLink:hover {
+  color: #FFF;
+  background: #333;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1373,8 +1377,14 @@ div.noOrg-container span {
 #createProfileForm .title {
   margin-top: 5%;
 }
+#createProfileForm #userOrgs {
+  margin-top: 2em;
+}
 #createProfileForm #phoneGroup {
-  margin-top: 1em;
+  margin-top: 1.5em;
+}
+#createProfileForm #emailGroup {
+  margin-top: 0;
 }
 #createProfileForm #studyIdContainer {
   margin-top: 1.8em;
@@ -1417,6 +1427,7 @@ div.noOrg-container span {
   background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
   max-width: 100%;
+  width: 400px;
 }
 #profileSendEmailContainer label {
   font-size: 0.95em;
@@ -1449,6 +1460,8 @@ div.noOrg-container span {
   font-size: 0.87em;
   margin-top: 1em;
   margin-left: 0.5em;
+  width: 250px;
+  max-width: 100%;
 }
 #profileStudyIDContainer input {
   width: 30%;
@@ -2007,6 +2020,9 @@ div.org-container input[type="checkbox"] {
 .registration-status-container {
   margin: 0 0 0.8em 0;
   font-size: 0.95em;
+}
+#sendRegistrationEmailForm label {
+  font-weight: normal;
 }
 .registration-label {
   display: inline-block;

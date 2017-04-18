@@ -350,8 +350,7 @@ def access_url(user_id):
     user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.STAFF])
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
