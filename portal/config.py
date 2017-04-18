@@ -153,4 +153,3 @@ class ConfigServer(Server):  # pragma: no cover
         host = self.host if host is None else host
         super(ConfigServer, self).__call__(app=app, host=host,
                 port=port, *args, **kwargs)
-
