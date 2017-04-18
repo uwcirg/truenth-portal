@@ -250,8 +250,7 @@ def access_via_token(token):
     user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.STAFF])
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
@@ -465,20 +464,7 @@ def admin():
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
 def staff_profile_create():
-<<<<<<< HEAD
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        dict_consent_by_org = VersionedResource.fetch_elements(
-            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org.get('asset', None)
-        url = dict_consent_by_org.get('url', None)
-        consent_agreements[org.id] = {
-                'asset': asset, 'agreement_url': url, 'organization_name': org.name}
-
-=======
     consent_agreements = Organization.consent_agreements()
->>>>>>> 27bf75cbc070649113ad78c1daf2ec6c43ce2a34
     user = current_user()
 
     #compiling org list for staff
@@ -492,12 +478,8 @@ def staff_profile_create():
 
     return render_template(
         "staff_profile_create.html", user=user,
-<<<<<<< HEAD
-        consent_agreements=consent_agreements, org_list=list(org_list))
-=======
         consent_agreements=consent_agreements,
-        leaf_organizations=leaf_organizations)
->>>>>>> 27bf75cbc070649113ad78c1daf2ec6c43ce2a34
+        org_list=list(org_list))
 
 @portal.route('/staff')
 @roles_required(ROLE.STAFF_ADMIN)
