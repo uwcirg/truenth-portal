@@ -12,7 +12,7 @@ env:
   matrix:
     - TOXENV=py27
   global:
-    - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
+    - SQLALCHEMY_DATABASE_TEST_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - LOG_FOLDER='/tmp/shared_service_log'
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}

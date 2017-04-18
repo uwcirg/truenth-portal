@@ -119,7 +119,9 @@ class TestConfig(BaseConfig):
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
-
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_TEST_URI',
+        "postgresql://test_user:4tests_only@localhost/portal_unit_tests")
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
