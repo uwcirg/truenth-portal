@@ -910,7 +910,7 @@
             });
         };
         $(function () {
-            setTimeout("tnthAjax.getConsent({{person.id}});", 500);
+            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 500);
         });
     </script>
     {% endif %}
@@ -1738,11 +1738,13 @@
             {{ profileCustomDetail(person) }}
         {%- endif -%}
     {%- endif -%}
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
+    {% if person and person.has_role(ROLE.PATIENT) -%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
+            </div>
         </div>
-    </div>
+    {%- endif %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1813,7 +1815,7 @@
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <div class="flex">
                         <div id="resetPasswordContainer" class="flex-item">
-                            <p class="text-muted communication-prompt">{{_('Send reset password email to staff')}}</p>
+                            <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
                             {{resetPassword(person)}}
                         </div>
                         {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
