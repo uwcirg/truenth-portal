@@ -712,9 +712,8 @@ var fillContent = {
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
-                    var isFake = (/fake/.test(item.agreement_url));
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    if (isFake || isDefault) editable = false;
+                    if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -777,8 +776,7 @@ var fillContent = {
                         {
                             content: function(item) {
                                 var s = "";
-                                if (isFake) s = "--";
-                                else if (isDefault) s = "TrueNTH USA Terms of Use";
+                                if (isDefault) s = "TrueNTH USA Terms of Use";
                                 else {
                                     s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
                                     ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")

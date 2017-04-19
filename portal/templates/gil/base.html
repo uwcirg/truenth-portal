@@ -260,12 +260,12 @@
             <div class="form-group profile-section" id="userOrgs">
                 <div class="indent">
                 <div id="fillOrgs"></div>
+                <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
                 <input type="hidden" name="__firstname" value="{{user.first_name if user and user.first_name}}"/>
                 <input type="hidden" name="__lastname"  value="{{user.last_name if user and user.last_name}}" />
                 <input type="hidden" name="__birthdate" value="{{user.birthdate if user and user.birthdate}}" />
-                <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
+                <div class="checkbox noOrg-container"><label><input id="noOrgs" class="clinic" type="radio" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
                 </div>
-                <!-- consent agreement -->
                 <button id="submit-orgs" class="button button--teal" type="button">Submit</button>
                 <br/>
                 <div id="modal-org-error" class="box-modal__copy text-danger"></div>
@@ -292,7 +292,7 @@
       <div id="consentContainer">
           {% for org in consent_agreements %}
             <div id="{{org}}_consentItem" class="consent">
-              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" />
+              <input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" />
               <input id="{{org}}_consent" class="consent-checkbox" type="checkbox"/>
             </div>
           {% endfor %}
@@ -554,6 +554,8 @@
                               params.org = parentOrg;
                               params.agreementUrl = agreementUrl;
                               setTimeout("OT.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
+                          } else {
+                            OT.setDefaultConsent($("#fillOrgs").attr("userId"), parentOrg);
                           };
                         };
 
