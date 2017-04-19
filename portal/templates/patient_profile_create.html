@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block main %}
 {%- from "flask_user/_macros.html" import back_btn -%}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn -%}
+{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn -%}
+{%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" class="form tnth-form to-validate">
     <input type="hidden" id="current_user_email" value="{{user.email}}" />
@@ -57,7 +58,7 @@
                                 OT.filterOrgs(leafOrgs);
                             };
 
-                             var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                             var userOrgs = $("#userOrgs input[name='organization']");
                              userOrgs.each(function() {
                                 $(this).attr("type", "radio");
                              });
@@ -90,13 +91,8 @@
             </div>
         </div>
     </div>
-    {% if consent_agreements -%}
-        <div id="_consentContainer">
-          {% for org in consent_agreements %}
-            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].url}}" />
-          {% endfor %}
-        </div>
-    {%- endif %}
+    {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
+    {%- endif -%}
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
 {% endblock %}
@@ -156,7 +152,7 @@ $(document).ready(function(){
                 {% endif %}
                 if (consent_org_id && !orgs[consent_org_id]) {
                     orgs[consent_org_id] = true;
-                    var agreement = $("#" + getParentOrgId(this) + "_consentItem").val();
+                    var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
                     if (hasValue(agreement)) {
                         consents.push({"organization_id": consent_org_id, "agreement_url": agreement, "staff_editable": true, "include_in_reports": true, "send_reminders": true});
                     };
@@ -260,7 +256,6 @@ $(document).ready(function(){
                     }).get();
 
                     _demoArray['careProvider'] = orgIDs;
-
 
                     var studyId = $("#studyId").val();
                     if (hasValue(studyId)) {

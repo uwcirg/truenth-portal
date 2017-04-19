@@ -616,7 +616,6 @@ $(document).ready(function(){
         if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
           //do nothing
         } else {
-          assembleContent.demo({{ user.id }},null, null, true);
           if (fc.allFieldsCompleted()) {
             continueToFinish();
           } else {
@@ -630,7 +629,6 @@ $(document).ready(function(){
     $("#consentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
-              assembleContent.demo({{ user.id }},null, null, true);
               if (fc.allFieldsCompleted()) {
                 continueToFinish();
               } else {

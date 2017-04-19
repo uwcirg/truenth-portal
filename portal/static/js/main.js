@@ -641,7 +641,7 @@ var fillContent = {
     "consentList" : function(data, userId, errorMessage, errorCode) {
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
             var dataArray = data["consent_agreements"].sort(function(a,b){
-                return new Date(b.signed) - new Date(a.signed);
+                 return new Date(b.signed) - new Date(a.signed);
             });
             var orgs = {};
             var existingOrgs = {};
@@ -689,9 +689,8 @@ var fillContent = {
                 };
             };
 
-            //console.log(orgs)
-
             dataArray.forEach(function(item, index) {
+                if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
                     var orgName = "";
@@ -713,8 +712,8 @@ var fillContent = {
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
-                    var isFake = (/fake/.test(item.agreement_url));
-
+                    var isDefault = /stock\-org\-consent/.test(item.agreement_url);
+                    if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -728,7 +727,7 @@ var fillContent = {
                                     sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Reports</span>";
+                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Report Historic Data</span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
                                     sDisplay = "<span class='text-danger small-text'>Purged/Removed</span>";
@@ -771,12 +770,19 @@ var fillContent = {
                             content: (orgName != "" && orgName != undefined? orgName : item.organization_id)
                         },
                         {
-                            content: sDisplay + (editable && !isFake && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
+                            content: sDisplay + (editable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consent' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + modalContent: ""),
                             "_class": "indent"
                         },
                         {
-                            content: (isFake? "--" : "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : ""))
+                            content: function(item) {
+                                var s = "";
+                                if (isDefault) s = "TrueNTH USA Terms of Use";
+                                else {
+                                    s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                                };
+                                return s;
+                            } (item)
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -1266,6 +1272,14 @@ var OrgTool = function() {
         };
         return false;
     };
+    this.getElementParentOrg = function(o) {
+        var parentOrg;
+        if (o) {
+           parentOrg = $(o).attr("data-parent-id");
+           if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        };
+        return parentOrg;
+    };
 
     this.getTopLevelOrgs = function() {
         return TOP_LEVEL_ORGS;
@@ -1450,7 +1464,7 @@ var OrgTool = function() {
             $(this).attr("data-save-container-id", "userOrgs");
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
-                var parentOrg = $(this).attr("data-parent-id");
+                var parentOrg = OT.getElementParentOrg(this);
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
@@ -1477,7 +1491,10 @@ var OrgTool = function() {
                     } else {
                         var __modal = $("#" + parentOrg + "_consentModal");
                         if (__modal.length > 0) $("#" + parentOrg + "_consentModal").modal("show");
-                        else assembleContent.demo(userId,true, $(this), true);
+                        else {
+                            tnthAjax.setDefaultConsent(userId, parentOrg);
+                            assembleContent.demo(userId,true, $(this), true);
+                        };
                     };
                 }
                 else {
@@ -1569,6 +1586,29 @@ var tnthAjax = {
             };
         };
     },
+    "setDefaultConsent": function(userId, orgId) {
+        if (!hasValue(userId) && !hasValue(orgId)) return false;
+        var stockConsentUrl = $("#stock_consent_url").val();
+        var agreementUrl = "";
+        if (hasValue(stockConsentUrl)) {
+            agreementUrl = stockConsentUrl.replace("placeholder", $("#" + orgId + "_org").attr("data-parent-name"));
+        };
+        if (hasValue(agreementUrl)) {
+            var params = CONSENT_ENUM["consented"];
+            params.org = orgId;
+            params.agreementUrl = encodeURIComponent(agreementUrl);
+            this.setConsent(userId, params, "default");
+            //need to remove all other consents associated un-selected org(s)
+            $("#userOrgs input[name='organization']").each(function() {
+                var po = OT.getElementParentOrg(this);
+                if (!$(this).is(":checked")) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": po}) + ");", 0);
+            });
+            if (typeof reloadConsentList != "undefined") reloadConsentList();
+            $("#consentContainer").find(".error-message").text("");
+        } else {
+            $("#consentContainer").find(".error-message").text("Unable to set default consent agreement");
+        }
+    },
     deleteConsent: function(userId, params) {
         if (userId && params) {
             var consented = this.getAllValidConsent(userId, params["org"]);
@@ -1576,6 +1616,16 @@ var tnthAjax = {
             if (consented) {
                 //delete all consents for the org
                 consented.forEach(function(orgId) {
+                    if (hasValue(params["exclude"])) {
+                        var arr = params["exclude"].split(",");
+                        var found = false;
+                        arr.forEach(function(o) {
+                            if (!found) {
+                                if (o == orgId) found = true;
+                            };
+                        });
+                        if (found) return true;
+                    };
                     $.ajax ({
                         type: "DELETE",
                         url: '/api/user/' + userId + '/consent',
@@ -1617,7 +1667,8 @@ var tnthAjax = {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
                         expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
-                            if (orgId == item.organization_id) consentedOrgIds.push(orgId);
+                            if (orgId == "all") consentedOrgIds.push(item.organization_id);
+                            else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
                     });
                 };
@@ -1635,6 +1686,7 @@ var tnthAjax = {
         //console.log("in hasConsent: userId: " + userId + " orgId: " + orgId)
         if (!userId) return false;
         if (!orgId) return false;
+        if (filterStatus == "default") return false;
 
         var consentedOrgIds = [], expired = 0, found = false, suspended = false;
         //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
@@ -1689,13 +1741,11 @@ var tnthAjax = {
     handleConsent: function(obj) {
         var self = this;
         $(obj).each(function() {
-            var parentOrg = $(this).attr("data-parent-id");
-            //var parentName = $(this).attr("data-parent-name");
+            var parentOrg = OT.getElementParentOrg(this);
             var orgId = $(this).val();
             var userId = $("#fillOrgs").attr("userId");
             if (!hasValue(userId)) userId = $("#userOrgs").attr("userId");
-            if (!hasValue(parentOrg)) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-            //if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+        
             var cto = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
@@ -1706,6 +1756,14 @@ var tnthAjax = {
                             params.org = cto ? parentOrg : orgId;
                             params.agreementUrl = agreementUrl;
                             setTimeout("tnthAjax.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
+                            $("#userOrgs input[name='organization']").each(function() {
+                                var po = OT.getElementParentOrg(this);
+                                if (!$(this).is(":checked")) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": po}) + ");", 0);
+                            });
+                        } else {
+                            if (cto) {
+                                tnthAjax.setDefaultConsent(userId, parentOrg); 
+                            };
                         };
                     };
 
@@ -1714,7 +1772,7 @@ var tnthAjax = {
                     if (cto) {
                         var topLevelOrgs = OT.getTopLevelOrgs();
                         topLevelOrgs.forEach(function(i) {
-                            setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": i}) + ");", 0);
+                            if (i != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": i}) + ");", 0);
                         });
 
                     } else {
@@ -1732,8 +1790,8 @@ var tnthAjax = {
                     childOrgs.each(function() {
                         if ($(this).prop("checked")) allUnchecked = false;
                     });
-                    if (allUnchecked) {
-                        setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": parentOrg}) + ");", 0);
+                    if (allUnchecked && childOrgs.length > 0) {
+                        if (parentOrg != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": parentOrg}) + ");", 0);
                     };
                 } else {
                     setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": orgId}) + ");", 0);

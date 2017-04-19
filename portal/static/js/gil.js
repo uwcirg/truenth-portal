@@ -408,6 +408,20 @@ module.exports = OrgTool = (function() {
     this.getOrgsList = function() {
         return orgsList;
     };
+    this.setDefaultConsent =  function(userId, orgId) {
+        if (!hasValue(userId) && !hasValue(orgId)) return false;
+        var stockConsentUrl = $("#stock_consent_url").val();
+        var agreementUrl = "";
+        if (hasValue(stockConsentUrl)) {
+            agreementUrl = stockConsentUrl.replace("placeholder", $("#" + orgId + "_org").attr("data-parent-name"));
+        };
+        if (hasValue(agreementUrl)) {
+            var params = CONSENT_ENUM["consented"];
+            params.org = orgId;
+            params.agreementUrl = encodeURIComponent(agreementUrl);
+            this.setConsent(userId, params, "default");
+        };
+    };
     this.setConsent = function(userId, params, status, sync) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
@@ -709,12 +723,13 @@ module.exports = OrgTool = (function() {
         for (org in orgsList) {
             if (orgsList[org].isTopLevel) {
                 if (orgsList[org].children.length > 0) {
-                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                  parentOrgsCt++;
+                  $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                  
                 } else {
-                  $("#fillOrgs").append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
-                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                  $("#fillOrgs").append('<div id="' + orgsList[org].id + '_container" data-parent-id="'+ orgsList[org].name +'"  data-parent-name="' + orgsList[org].name + '" class="org-container"><label id="org-label-' + orgsList[org].id + '" class="org-label"><input class="clinic" type="radio" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + orgsList[org].name + '</span></label></div>');
                 };
+                parentOrgsCt++;
             };
             // Fill in each child clinic
             if (orgsList[org].children.length > 0) {
@@ -727,14 +742,14 @@ module.exports = OrgTool = (function() {
 
                     if (orgsList[item.id].children.length > 0) {
                         childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                        '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
                         item.name +
                         '</span></label>';
 
                      } else {
                         childClinic += '<label class="org-label">' +
-                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                        '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
                         item.name +
                         '</span></label>';
