@@ -778,10 +778,7 @@
                             params.org = orgId;
                             params.agreementUrl = $("#" + orgId + "_agreement_url").val();
                             setTimeout("tnthAjax.setConsent({{person.id}}, " + JSON.stringify(params) + ");", 10);
-                            $("#userOrgs input[name='organization']").each(function() {
-                                var po = OT.getElementParentOrg(this);
-                                if (!$(this).is(":checked") && po != orgId && $(this).val() != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": po}) + ");", 200);
-                            });
+                            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
                         }
                         else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
                         if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
