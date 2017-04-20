@@ -613,9 +613,13 @@ $(document).ready(function(){
       if ($(this).prop("checked")) {
         var parentOrg = $(this).attr("data-parent-id");
         var m = $("#" + parentOrg + "_consentModal");
+        var dm = $("#" + parentOrg + "_defaultConsentModal");
         if ($("#fillOrgs").attr("patient_view") && m.length > 0 && $(this).val() != "0") {
           //do nothing
-        } else {
+        } else if ($("#fillOrgs").attr("patient_view") && dm.length > 0 ) {
+          //do nothing
+        }
+        else {
           if (fc.allFieldsCompleted()) {
             continueToFinish();
           } else {
@@ -637,6 +641,16 @@ $(document).ready(function(){
               };
             } else {
               $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
+            };
+            if ($("#consentContainer input[name='defaultToConsent']:checked").length > 0) {
+              if (fc.allFieldsCompleted()) {
+                continueToFinish();
+              } else {
+                if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
+                else stopContinue("orgsContainer");
+              };
+            } else {
+              $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
             };
         });
     });

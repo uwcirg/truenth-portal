@@ -261,7 +261,7 @@
             <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
-        <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label> 
+        <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
         <select  id="profileEmailSelect" class="form-control bd-element">
             <option value="">{{ _("Select Email...") }}</option>
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
@@ -613,6 +613,10 @@
                   setTimeout("handleCheckedItem();", 500);
 
                   OT.populateOrgsList(entry);
+                  $("#userOrgs input[name='organization']").each(function() {
+                    if ($(this).val() != 0) OT.getDefaultModal(this);
+                  });
+
                   {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
                   OT.handleEvent();
                 };
@@ -724,7 +728,7 @@
                     <h4>Terms</h4>
                     <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreement.asset|safe}}</div>
                     <br/>
-                    <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}</span></p>
+                    <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
                     <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
                       <label class="radio-inline">
                           <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
@@ -740,6 +744,7 @@
                      </div>
                      <br/>
                      <div class="modal-footer" >
+                        <div id="{{org}}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                         <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
                      </div>
                 </div>
@@ -765,12 +770,18 @@
                 $("#consentContainer input[name='toConsent']").each(function() {
                     $(this).on("click", function(e) {
                         e.stopPropagation();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true).hide();
                         var orgId = $(this).attr("data-org");
+                        $("#" + orgId + "_loader").show();
                         if ($(this).val() == "yes") {
                             var params = CONSENT_ENUM["consented"];
                             params.org = orgId;
                             params.agreementUrl = $("#" + orgId + "_agreement_url").val();
-                            tnthAjax.setConsent({{person.id}}, params);
+                            setTimeout("tnthAjax.setConsent({{person.id}}, " + JSON.stringify(params) + ");", 10);
+                            $("#userOrgs input[name='organization']").each(function() {
+                                var po = OT.getElementParentOrg(this);
+                                if (!$(this).is(":checked") && po != orgId && $(this).val() != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": po}) + ");", 200);
+                            });
                         }
                         else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
                         if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
@@ -790,6 +801,8 @@
                         };
                     });
                     $(this).on("shown.bs.modal", function() {
+                        $("#consentContainer .loading-message-indicator").hide();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });
