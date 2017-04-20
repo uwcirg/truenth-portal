@@ -7,7 +7,6 @@ usage() {
     echo -e "-s\n 'seed' the database" >&2
     echo -e "-v\n Be verbose" >&2
     echo -e "-f\n Force all conditional deployment processes" >&2
-    echo -e "-i\n Run initial deployment procedure" >&2
     exit 1
 }
 
@@ -47,9 +46,6 @@ while getopts ":b:p:ivsf" option; do
             ;;
         v)
             VERBOSE=true
-            ;;
-        i)
-            INIT=true
             ;;
         s)
             SEED=true
@@ -107,8 +103,7 @@ fi
 
 # DB Changes
 if [[
-    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/migrations) && $? -eq 0 )) &&
-    -z $INIT
+    ($FORCE || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/migrations) && $? -eq 0 ))
 ]]; then
     activate_once
 
@@ -121,14 +116,8 @@ fi
 # New seed data
 if [[ $FORCE || $SEED || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
-
-    if [[ $INIT ]]; then
-        echo "Initializing database"
-        python "${GIT_WORK_TREE}/manage.py" initdb
-    else
-        echo "Seeding database"
-        python "${GIT_WORK_TREE}/manage.py" seed
-    fi
+    echo "Running database maintenance"
+    python "${GIT_WORK_TREE}/manage.py" sync
 fi
 
 
