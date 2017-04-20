@@ -38,15 +38,13 @@ def stamp_db():
     if db.engine.dialect.has_table(db.engine.connect(), 'alembic_version'):
         return
 
-    alembic_args = [
-        '--raiseerr',
-        'stamp',
-        'head']
     # Alembic looks for the alembic.ini file in CWD
     # hop over there and then return to CWD
     cwd = os.getcwd()
     os.chdir(MIGRATIONS_DIR)
-    alembic.config.main(argv=alembic_args)
+
+    alembic.config.main(argv=['--raiseerr', 'stamp', 'head'])
+
     os.chdir(cwd)
 
 
