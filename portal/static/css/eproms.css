@@ -184,8 +184,12 @@ select:not([multiple]) {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show='true'] {
     opacity: 1;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show='false'] {
+    opacity: 0;
 }
 #fullSizeBox a[href*="register"] {
   display: none;

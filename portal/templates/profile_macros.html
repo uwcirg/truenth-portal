@@ -755,7 +755,7 @@
 {% macro consent(person, consent_agreements, current_user, includeModal) -%}
     {%- if person and consent_agreements -%}
         <div id="consentContainer">
-            {{consent_fields(consent_agreements)}}
+            {{consent_fields(consent_agreements, current_user)}}
             {%- if includeModal-%}
                 {%- for org in consent_agreements -%}
                    {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
@@ -898,13 +898,14 @@
      });</script>
 {%- endmacro %}
 
-{% macro profileConsent(person, current_user) -%}
+{% macro profileConsent(person, current_user, terms) -%}
     {% if person %}
     <div id="profileConsentList"></div>
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
+        var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-endif-%};
 
         /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
@@ -1630,7 +1631,7 @@
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions, terms) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1698,7 +1699,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
-                    {{profileConsent(person, current_user)}}
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>
@@ -1741,7 +1742,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions, terms) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
@@ -1849,7 +1850,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>

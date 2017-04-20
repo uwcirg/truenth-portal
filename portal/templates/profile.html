@@ -64,9 +64,9 @@
         <div id="indexContainer">{{ _("Index List") }}</div>
         <br/>
         {%- if user.id == current_user.id -%}
-          {{user_profile(user, current_user, consent_agreements, user_interventions)}}
+          {{user_profile(user, current_user, consent_agreements, user_interventions, terms)}}
         {%- else -%}
-          {{profile(user, current_user, consent_agreements, user_interventions)}}
+          {{profile(user, current_user, consent_agreements, user_interventions, terms)}}
         {%- endif -%}
           <br/><br/>
       </div>
