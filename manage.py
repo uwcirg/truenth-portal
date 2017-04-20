@@ -5,6 +5,7 @@ python manage.py --help
 """
 import os
 
+import alembic.config
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
@@ -24,20 +25,42 @@ from portal.site_persistence import SitePersistence
 app = create_app()
 manager = Manager(app)
 
-migrate = Migrate(
-    app,
-    db,
-    directory=os.path.join(app.root_path, 'migrations')
-)
+MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
+migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
 manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
 
+def stamp_db():
+    """Run the alembic command to stamp the db with the current head"""
+    # if the alembic_version table exists, this db has been stamped,
+    # don't update to head, as it would potentially skip steps.
+    if db.engine.dialect.has_table(db.engine.connect(), 'alembic_version'):
+        return
+
+    alembic_args = [
+        '--raiseerr',
+        'stamp',
+        'head']
+    # Alembic looks for the alembic.ini file in CWD
+    # hop over there and then return to CWD
+    cwd = os.getcwd()
+    os.chdir(MIGRATIONS_DIR)
+    alembic.config.main(argv=alembic_args)
+    os.chdir(cwd)
+
+
 @manager.command
 def initdb():
-    """Init/reset database."""
-    db.drop_all()
+    """Init database.
+
+    To re/create the database, [delete and] create within the DBMS itself,
+    then invoke this function.
+    """
     db.create_all()
+    # Stamp the current alembic version, so subesquent upgrades know
+    # the correct starting point
+    stamp_db()
     seed(include_interventions=True)
 
 
