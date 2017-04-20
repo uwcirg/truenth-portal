@@ -31,6 +31,18 @@ manager.add_command('db', MigrateCommand)
 manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
 
+def _run_alembic_command(args):
+    """Helper to manage working directory and run given alembic commands"""
+    # Alembic looks for the alembic.ini file in CWD
+    # hop over there and then return to CWD
+    cwd = os.getcwd()
+    os.chdir(MIGRATIONS_DIR)
+
+    alembic.config.main(argv=args)
+
+    os.chdir(cwd)  # restore cwd
+
+
 def stamp_db():
     """Run the alembic command to stamp the db with the current head"""
     # if the alembic_version table exists, this db has been stamped,
@@ -38,27 +50,27 @@ def stamp_db():
     if db.engine.dialect.has_table(db.engine.connect(), 'alembic_version'):
         return
 
-    # Alembic looks for the alembic.ini file in CWD
-    # hop over there and then return to CWD
-    cwd = os.getcwd()
-    os.chdir(MIGRATIONS_DIR)
+    _run_alembic_command(['--raiseerr', 'stamp', 'head'])
 
-    alembic.config.main(argv=['--raiseerr', 'stamp', 'head'])
 
-    os.chdir(cwd)
+def upgrade_db():
+    """Run any outstanding migration scripts"""
+    _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
 
 
 @manager.command
-def initdb():
-    """Init database.
+def sync():
+    """Synchronize database with latest schema and persistence data.
+
+    Idempotent function takes necessary steps to build tables, migrate
+    schema and run `seed`.  Safe to run on existing or brand new databases.
 
     To re/create the database, [delete and] create within the DBMS itself,
     then invoke this function.
     """
     db.create_all()
-    # Stamp the current alembic version, so subesquent upgrades know
-    # the correct starting point
     stamp_db()
+    upgrade_db()
     seed(include_interventions=True)
 
 
