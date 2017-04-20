@@ -318,7 +318,7 @@
       });
     </script>
   {%- endmacro %}
-  {% macro consent_fields(consent_agreements) -%}
+  {% macro consent_fields(consent_agreements, current_user) -%}
     {%-if consent_agreements -%}
         {%- for org in consent_agreements -%}
            {%- if consent_agreements[org].url and consent_agreements[org].asset -%}

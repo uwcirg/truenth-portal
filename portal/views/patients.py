@@ -9,6 +9,7 @@ from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.fhir import AssessmentStatus
+from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -132,9 +133,11 @@ def patient_profile(patient_id):
                 url=display.link_url, id=patient.id)
             assessment_status = AssessmentStatus(user=patient)
             patient.assessment_overall_status = assessment_status.overall_status if assessment_status else None
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     return render_template(
         'profile.html', user=patient,
         providerPerspective="true",
         consent_agreements=consent_agreements,
-        user_interventions=user_interventions)
+        user_interventions=user_interventions,
+        terms=terms)

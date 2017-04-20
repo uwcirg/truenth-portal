@@ -395,8 +395,8 @@ def initial_queries():
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    if 'org' in still_needed:
-        consent_agreements = Organization.consent_agreements()
+    #need this at all time now for ui
+    consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -593,8 +593,9 @@ def profile(user_id):
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key())) 
     return render_template(
-        'profile.html', user=user, consent_agreements=consent_agreements)
+        'profile.html', user=user, consent_agreements=consent_agreements, terms=terms)
 
 @portal.route('/privacy')
 def privacy():
