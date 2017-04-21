@@ -705,7 +705,7 @@ var fillContent = {
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    if (isDefault) editable = false;
+                    //if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -716,7 +716,8 @@ var fillContent = {
                             break;
                         case "active":
                             if (se && sr && ir) {
-                                    sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                    if (isDefault) sDisplay = "<span class='text-success small-text'>Consented</span>";
+                                    else sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
                                     sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Report Historic Data</span>";
@@ -755,6 +756,13 @@ var fillContent = {
                             + '</div></div></div>';
 
                     };
+
+                    if (ctop) {
+                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                        content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
+                    };
+
                     content += "<tr>";
 
                     [
@@ -768,7 +776,7 @@ var fillContent = {
                         {
                             content: function(item) {
                                 var s = "";
-                                if (isDefault) s = "Sharing data with the clinic <span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>View</em></a></span>";
+                                if (isDefault) s = "Sharing information with clinics <span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>View</em></a></span>";
                                 else {
                                     s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
                                     ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
@@ -784,11 +792,6 @@ var fillContent = {
                     });
                     content += "</tr>";
                     existingOrgs[item.organization_id] = true;
-                    if (existingOrgs[item.organization_id] && ctop) {
-                        content += "<tr><td>" + orgName + "</td><td><span class='text-success small-text'>Consented / Enrolled</span></td>";
-                        content += "<td>TrueNTH USA terms of use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
-                    };
                 };
 
             });
