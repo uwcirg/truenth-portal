@@ -1,4 +1,4 @@
-{% from "initial_queries_macros.html" import patientQGroup %}
+{% from "initial_queries_macros.html" import patientQGroup, consent_fields %}
 
 {% macro profileImage(person) -%}
     {% if person and person.image_url %}
@@ -255,20 +255,21 @@
     <div id="sendEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
         <div class="registration-status-container">
-            <span class="text-muted">Registration Status: </span>
-            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">not yet registered</h4>
+            <span class="text-muted">{{_('Registration status:')}}</span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_('not yet registered')}}</h4>
             {%- else -%}
-            <h4 class="text-success registration-label">registered</h4>
+            <h4 class="text-success registration-label">{{_('registered')}}</h4>
             {%- endif -%}
         </div>
-        <label id="sendEmailLabel" class="text-muted">{{ _("Send Email to Patient") }}</label>
+        <label id="sendEmailLabel" class="text-muted">{{ _("Send email to ")}}{%- if person and person.has_role(ROLE.PATIENT)-%}{{_('patient')}}{%-else-%}{{_('user')}}{%-endif-%}</label>
         <select  id="profileEmailSelect" class="form-control bd-element">
             <option value="">{{ _("Select Email...") }}</option>
             {%- if person.has_role('write_only') %}<option value="invite">{{ app_text('profileSendEmail option invite') }}</option>{%- endif %}
             <option value="reminder">{{ app_text('profileSendEmail option reminder') }}</option>
         </select>
-        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send email") }}</button>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled" type="button">{{ _("Send email") }}</button>
         <div id="profileEmailMessage" class="text-info"></div>
+        <div id="profileEmailErrorMessage" class="text-danger"></div>
     </div>
     <script>$(function () {
         function getAccessUrl() {
@@ -281,9 +282,10 @@
                 async: false
             }).done(function(data) {
                 url = data['access_url'];
+                $("#profileEmailErrorMessage").text("");
                 console.log(url);
             }).fail(function() {
-                console.log('failed request');
+                $("#profileEmailErrorMessage").text("failed request to get email invite url");
             });
             return url;
         };
@@ -328,13 +330,15 @@
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
-                    {# javascript variables are not available at template
-                       rendering time.  insert a placeholder and then
-                       replace once the variable is available. #}
-                    body = '{{ app_text('profileSendEmail invite email_body',
-                            'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
-                    body = body.replace(/url_placeholder/g, return_url);
-                    subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
+                    if (hasValue(return_url)) {
+                        {#- javascript variables are not available at template
+                           rendering time.  insert a placeholder and then
+                           replace once the variable is available. -#}
+                        body = '{{ app_text('profileSendEmail invite email_body',
+                                'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
+                        body = body.replace(/url_placeholder/g, return_url);
+                        subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
+                    };
                 }
                 else { // reminder
                     body = '{{ app_text('profileSendEmail reminder email_body', url_for('user.login', _external=True, email=person.email)) | safe }}'.replace(/\(clinic name\)/g, clinicName);
@@ -353,8 +357,6 @@
                         console.log('failed request');
                         $('#profileEmailMessage').text('Unable to send email.');
                     });
-                } else {
-                    $('#profileEmailMessage').text('Unable to generate URL for email');
                 };
             } else $('#profileEmailMessage').text('You must select a email type.');
         });
@@ -365,6 +367,86 @@
     {%- if person -%}
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     {% endif %}
+{%- endmacro %}
+{% macro profileRegistrationEmail(person) -%}
+    {%- if person -%}
+    <div id="sendRegistrationEmailForm">
+        <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
+        <div class="registration-status-container">
+            <span class="text-muted">{{_('Registration status:')}}</span>
+            {% if person and person.has_role("write_only") %}<h4 class="text-warning registration-label">{{_("not yet registered")}}</h4>
+            {%- else -%}
+            <h4 class="text-success registration-label">{{_('registered')}}</h4>
+            {%- endif -%}
+        </div>
+        <button id="btnProfileSendEmail" class="btn btn-tnth-primary disabled">{{ _("Send registration email") }}</button>
+        <div id="profileEmailMessage" class="text-info"></div>
+        <div id="profileEmailErrorMessage" class="text-danger"></div>
+    </div>
+    <script>$(function () {
+        function getAccessUrl() {
+            var url = '';
+            $.ajax ({
+                type: 'GET',
+                url: '/api/user/' + $("#_userId").val() + '/access_url',
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                async: false
+            }).done(function(data) {
+                url = data['access_url'];
+                $("#profileEmailErrorMessage").text("");
+                console.log(url);
+            }).fail(function() {
+                $("#profileEmailErrorMessage").text("failed request to get email invite url");
+            });
+            return url;
+        };
+        if (!hasValue($("#email").val())) $("#profileEmailSelect").attr("disabled", true);
+
+        $('#btnProfileSendEmail').on('click', function(event) {
+            event.preventDefault();
+            var email = $('#email').val();
+            var subject = '';
+            var body = '';
+            var return_url = '';
+            var clinicName = (function() {
+                var orgs = $("#userOrgs input[name='organization']:checked");
+                var parentName = "";
+                if (orgs.length > 0 ) {
+                    orgs.each(function() {
+                        if (!parentName) {
+                            parentName = $(this).attr("data-parent-name");
+                            if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                        };
+                    });
+                };
+                var cn = parentName ? parentName: "your clinic";
+                return cn;
+            })();
+            return_url = getAccessUrl();
+            if (hasValue(return_url)) {
+                body = "<p>Hello,</p>";
+                body += "<p>This email was sent to you from " + clinicName + ". This is an invitation to complete your registration.</p>";
+                body += "Verify your account now by clicking on the link below to visit TrueNTH:";
+                body += "<br/><br/>";
+                body += "<a href='" + return_url + "'>Complete Registration</a>";
+                subject = "Registration invite from " + clinicName;
+            };
+            if (body != '') {
+                $.ajax ({
+                    type: 'POST',
+                    url: "{{url_for('portal.invite')}}",
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: {'subject': subject, 'recipients': email, 'body': body}
+                }).done(function(data) {
+                    $('#profileEmailMessage').text('invite email sent to ' + email);
+                }).fail(function() {
+                    $('#profileEmailMessage').text('Unable to send email.');
+                });
+            };
+        });
+     });</script>
+    {%- endif -%}
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
@@ -410,6 +492,7 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div id="userOrgs" class="customized">
+           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
            <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
            <div class="state-selector-container"><select id="stateSelector" class="form-control"></select></div>
            <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
@@ -424,7 +507,7 @@
                </div>
            </div>
            <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
-           {% if consent_agreements %}{{consent(person, consent_agreements, current_user)}}{% endif %}
+           {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
     </div>
     <script>
@@ -436,6 +519,19 @@
                 $(".clinic-prompt").show();
             };
         };
+        function hasChildrenOrgs(orgId, data) {
+            if (hasValue(orgId) && hasValue(data)) {
+                var parentId, hasChildren = false;
+                data.forEach(function(item) {
+                    if (!hasChildren) {
+                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                        hasChildren = (parentId == orgId);
+                    };
+
+                });
+                return hasChildren;
+            } else return false;
+        }
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
@@ -478,24 +574,30 @@
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
                   entry.forEach(function(item) {
-                    if (item.partOf) { //don't render parent org
-                        var __state = "";
-                        if (item.identifier) {
-                            (item.identifier).forEach(function(region) {
-                                if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
-                                    __state = (region.value).split(":")[1];
-                                    if (!states[__state]) {
-                                        $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                        if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                        states[__state] = true;
-                                    };
-                                    if (parseInt(item.id) != 0) {
-                                        var parentId = (item.partOf.reference).split("/")[2];
-                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
+                    var __state = "";
+                    if (item.identifier) {
+                        (item.identifier).forEach(function(region) {
+                            if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
+                                __state = (region.value).split(":")[1];
+                                if (!states[__state]) {
+                                    $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
+                                    if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                    states[__state] = true;
+                                };
+                                if (parseInt(item.id) != 0) {
+                                    var parentId;
+                                    if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                                    else {
+                                        //need to check if it is a parent org and whether it has child org or not
+                                        var c = hasChildrenOrgs(item.id, entry);
+                                        if (!c) parentId = item.id;
+                                    }
+                                    if (parentId) {
+                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
                                     };
                                 };
-                            });
-                        };
+                            };
+                        });
                     };
 
                   });
@@ -511,6 +613,10 @@
                   setTimeout("handleCheckedItem();", 500);
 
                   OT.populateOrgsList(entry);
+                  $("#userOrgs input[name='organization']").each(function() {
+                    if ($(this).val() != 0) OT.getDefaultModal(this);
+                  });
+
                   {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
                   OT.handleEvent();
                 };
@@ -530,6 +636,7 @@
             {% if 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES %}<label>{{ _("Main clinic for prostate cancer care") }}</label>{%else%}
             <label>{{_("Clinics ")}}<span class="text-muted smaller-text">({{ _("Optional") }})</span></label>{% endif %}
             <div class="indent">
+            <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
             <div id="fillOrgs" {% if person and person.has_role(ROLE.PATIENT) and (person.id == current_user.id) %}patient_view="true"{%endif%}></div>
             <div class="noOrg-container" style="{{'display:none' if removeNone == 'true'}}"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("None of the Above") }}</span></label></div>
             </div>
@@ -540,7 +647,7 @@
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
+        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}true{% else %}false{% endif %};
         //STAFF CANNOT EDIT THEIR OWN ORGS
         {% if not(current_user.has_role(ROLE.ADMIN)) and current_user.has_role(ROLE.STAFF) and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
 
@@ -566,7 +673,7 @@
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
+                var userOrgs = $("#userOrgs input[name='organization']");
                 if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                 var checkedOrgs = {};
                 userOrgs.each(function() {
@@ -608,56 +715,70 @@
         };
     </script>
 {%- endmacro %}
-
-{% macro consent(person, consent_agreements, current_user) -%}
-    {%- if person and consent_agreements -%}
-        <div id="consentContainer">
-            {%- for org in consent_agreements -%}
-              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
-              <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
-                        </div>
-                        <div class="modal-body">
-                            <h4>Terms</h4>
-                            <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreements[org].asset|safe}}</div>
-                            <br/>
-                            <p>{{_("Do you consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreements[org].organization_name}}</span>?</p>
-                            <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                                  {{ _("Yes") }}
-                              </label>
-                              <br/>
-                              <label class="radio-inline">
-                                  <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                                  {{ _("No") }}
-                              </label>
-                            </div>
-                            <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
-                         </div>
-                         <br/>
-                         <div class="modal-footer" >
-                            <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
-                         </div>
+{% macro consent_modal(person, consent_agreement, org) -%}
+    {%- if person and consent_agreement and org -%}
+        <div class="modal fade" id="{{org}}_consentModal" tabindex="-1" role="dialog" aria-labelledby="{{org}}_consentModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
+                    <div class="modal-body">
+                    <h4>Terms</h4>
+                    <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreement.asset|safe}}</div>
+                    <br/>
+                    <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
+                    <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                      <label class="radio-inline">
+                          <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                          {{ _("Yes") }}
+                      </label>
+                      <br/>
+                      <label class="radio-inline">
+                          <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                          {{ _("No") }}
+                      </label>
+                    </div>
+                    <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                     </div>
+                     <br/>
+                     <div class="modal-footer" >
+                        <div id="{{org}}_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                        <button type="button" class="btn btn-default btn-consent-close" data-org="{{org}}" data-dismiss="modal" aria-label="Close">{{ _("Close") }}</button>
+                     </div>
                 </div>
             </div>
-            {%- endfor -%}
+        </div>
+    {%- endif -%}
+{%- endmacro %}
+{% macro consent(person, consent_agreements, current_user, includeModal) -%}
+    {%- if person and consent_agreements -%}
+        <div id="consentContainer">
+            {{consent_fields(consent_agreements, current_user)}}
+            {%- if includeModal-%}
+                {%- for org in consent_agreements -%}
+                   {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
+                   {{consent_modal(person, consent_agreements[org], org)}}
+                   {%- endif -%}
+                {%- endfor -%}
+            {%- endif -%}
+            <div class="error-message"></div>
         </div>
         <script>
             $(function() {
                 $("#consentContainer input[name='toConsent']").each(function() {
-                    $(this).on("click", function() {
+                    $(this).on("click", function(e) {
+                        e.stopPropagation();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true).hide();
                         var orgId = $(this).attr("data-org");
+                        $("#" + orgId + "_loader").show();
                         if ($(this).val() == "yes") {
                             var params = CONSENT_ENUM["consented"];
                             params.org = orgId;
                             params.agreementUrl = $("#" + orgId + "_agreement_url").val();
-                            tnthAjax.setConsent({{person.id}}, params);
+                            setTimeout("tnthAjax.setConsent({{person.id}}, " + JSON.stringify(params) + ");", 10);
+                            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
                         }
                         else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
                         if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
@@ -675,6 +796,13 @@
                             var userId = $("#fillOrgs").attr("userId");
                             assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                         };
+                    });
+                    $(this).on("shown.bs.modal", function() {
+                        $("#consentContainer .loading-message-indicator").hide();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
+                        $("#consentContainer input[name='toConsent']").each(function(){
+                            $(this).prop("checked", false);
+                        });
                     });
                 });
             });
@@ -770,7 +898,7 @@
      });</script>
 {%- endmacro %}
 
-{% macro profileConsent(person, current_user) -%}
+{% macro profileConsent(person, current_user, terms) -%}
     {% if person %}
     <div id="profileConsentList"></div>
     <script>
@@ -786,8 +914,8 @@
                     // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
                     // more obvious when the updated list loads
                     setTimeout(function(){
-                        tnthAjax.getConsent({{person.id}});
-                    },1000);
+                        tnthAjax.getConsent({{person.id}}, true);
+                    },1500);
 
             });
         };
@@ -1437,6 +1565,7 @@
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
+                <input type="text" style="position: fixed; left: -10000000px;" autofocus="true"/>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
@@ -1447,7 +1576,7 @@
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
-                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn">{{_("Log in as patient")}}</button>
+                    <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
                 </div>
                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
@@ -1477,7 +1606,7 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%} 
+        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
             $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
         {%- endif -%}
     });</script>
@@ -1501,7 +1630,7 @@
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions, terms) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1568,8 +1697,8 @@
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Clinic Agreement")}}</h4>
-                    {{profileConsent(person, current_user)}}
+                    <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>
@@ -1612,18 +1741,20 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions, terms) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
             {{ profileCustomDetail(person) }}
         {%- endif -%}
     {%- endif -%}
-    <div class="row">
-        <div class="col-md-12 col-xs-12">
-            <h4 class="profile-item-title detail-title">Patient Details</h4>
+    {% if person and person.has_role(ROLE.PATIENT) -%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <h4 class="profile-item-title detail-title">{{_("Patient Details")}}</h4>
+            </div>
         </div>
-    </div>
+    {%- endif %}
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1670,27 +1801,44 @@
             </div>
         </div>
     {%- endif %}
-    {%- if person and person.has_role(ROLE.PATIENT) %}
+    {%- if person and person.has_role(ROLE.PATIENT) -%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
                     <div class="flex">
                         <div id="resetPasswordContainer" class="flex-item">
-                            <p class="text-muted communication-prompt">Send reset password email to patient</p>
+                            <p class="text-muted communication-prompt">{{_("Send reset password email to patient")}}</p>
                             {{resetPassword(person)}}
                         </div>
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                        <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">Send registration email to patient</p>{{profileSendEmail(person)}}</div>
+                        <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to patient")}}</p>{{profileSendEmail(person)}}</div>
                         {%- endif %}
                     </div>
                 </div>
             </div>
         </div>
-    {%- endif %}
+    {%- elif person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN)-%}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="communicationsLoc" class="profile-item-title index-item">{{ _("Communications") }}</h4>
+                    <div class="flex">
+                        <div id="resetPasswordContainer" class="flex-item">
+                            <p class="text-muted communication-prompt">{{_("Send reset password email to staff")}}</p>
+                            {{resetPassword(person)}}
+                        </div>
+                        {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
+                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileRegistrationEmail(person)}}</div>
+                        {%- endif -%}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) %}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
@@ -1701,7 +1849,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>

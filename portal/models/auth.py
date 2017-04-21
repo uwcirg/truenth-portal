@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 from sqlalchemy.dialects.postgresql import ENUM
 from urlparse import urlparse
 
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from .relationship import RELATIONSHIP
 from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request

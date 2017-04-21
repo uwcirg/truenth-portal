@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block main %}
 {% from "flask_user/_macros.html" import back_btn %}
-{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileOrg, profileSaveBtn %}
+{% from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn %}
+{% from "initial_queries_macros.html" import consent_fields %}
 <br/>
 <style>
 .pc-hr {
@@ -21,6 +22,8 @@
                         <div class="col-md-11 col-xs-12">
                             {{profileName(False)}}
                             <br/>
+                            {{profileBirthDate(False)}}
+                            <br/>
                         </div>
                     </div>
                     <div class="form-group float-input-label profile-section" id="emailGroup">
@@ -38,7 +41,7 @@
                     </div>
                     <script>$(function () {
                         /*** need to run this instead of the one function from main.js because we don't want to pre-check any org here ***/
-                        var leafOrgs = {% if leaf_organizations %} {{leaf_organizations | safe}} {% else %} false {% endif %};
+                        var orgList = {% if org_list %} {{org_list | safe}} {% else %} false {% endif %};
 
                         $.ajax ({
                             type: "GET",
@@ -48,12 +51,12 @@
                             OT.populateOrgsList(data.entry);
                             OT.populateUI();
 
-                            if (leafOrgs) {
-                                OT.filterOrgs(leafOrgs);
+                            if (orgList) {
+                                OT.filterOrgs(orgList);
                             };
 
                             var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-                        
+
                             //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
@@ -81,15 +84,9 @@
             </div>
         </div>
     </div>
-
-    {% if consent_agreements %}
-        <div id="_consentContainer">
-          {% for org in consent_agreements %}
-            <input type="hidden" id="{{org}}_consentItem" value="{{consent_agreements[org].agreement_url}}" />
-          {% endfor %}
-        </div>
-    {% endif %}
-
+    {%- if consent_agreements -%}
+        <div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
+    {%- endif -%}
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
 
@@ -115,7 +112,6 @@ $(document).ready(function(){
     $("#createProfileForm input, #createProfileForm select").on("change", function() {
         $("#updateProfile").attr("disabled", false);
     });
-
     function getParentOrgId(obj) {
         var parentOrgId =  $(obj).attr("data-parent-id");
         if (!hasValue(parentOrgId)) parentOrgId = $(obj).closest(".org-container[data-parent-id]").attr("data-parent-id");
@@ -132,9 +128,12 @@ $(document).ready(function(){
                 {% else %}
                     consent_org_id = $(this).val();
                 {% endif %}
-                if (!orgs[consent_org_id]) {
+                if (consent_org_id && !orgs[consent_org_id]) {
                     orgs[consent_org_id] = true;
-                    consents.push({"organization_id": consent_org_id, "agreement_url": $("#" + getParentOrgId(this) + "_consentItem").val(), "staff_editable": true, "include_in_reports": true, "send_reminders": true})
+                    var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
+                    if (hasValue(agreement)) {
+                        consents.push({"organization_id": consent_org_id, "agreement_url": agreement, "staff_editable": true, "include_in_reports": true, "send_reminders": true});
+                    };
                 };
             };
         });
@@ -171,7 +170,6 @@ $(document).ready(function(){
                    setHelpText("userOrgs", "An organization must be selected.", true);
                 } else setHelpText("userOrgs", "", false);
 
-              
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 });
@@ -197,7 +195,7 @@ $(document).ready(function(){
                 }).get();
 
                 _accountArray['organizations'] = orgIDs;
-                _accountArray['roles'] =  [{'name': 'staff'}];
+                _accountArray['roles'] =  [{'name': '{{ROLE.STAFF}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}];
                 _accountArray['consents'] = getConsents();
                 //console.log(_demoArray)
 
@@ -212,7 +210,7 @@ $(document).ready(function(){
                         'family':$.trim($('input[name=lastname]').val())
                     };
 
-                    //_demoArray['birthDate'] = $('input[name=birthDate]').val();
+                    _demoArray['birthDate'] = $('input[name=birthDate]').val();
 
                     _demoArray['telecom'] = [];
 

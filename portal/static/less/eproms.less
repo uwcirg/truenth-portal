@@ -37,7 +37,7 @@
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
 @linkColor:       #57675B;
-@linkHover:       #2a4531;
+@linkHover:       #60654f;
 @btnColor:        #79815D;
 @featureBtnColor: #333;
 @featureBtnHoverColor: #FFF;
@@ -82,7 +82,10 @@ body {
 .capitalize {
   text-transform: capitalize;
 }
-
+.btn:focus,
+a:focus {
+  outline: none;
+}
 .btn {
   cursor: pointer;
   border-radius: 0;
@@ -164,8 +167,11 @@ a.btn {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show = 'true'] {
     opacity: 1;
+}
+#profileConsentList .button--LR[data-show = 'false'] {
+    opacity: 0;
 }
 #profileConsentList {
   .button--LR,
@@ -379,7 +385,7 @@ select:not([multiple]) {
     cursor:pointer;
   }
   li:hover {
-    color: @menuTextHoverColor;
+    color: @linkHover;
     transform: scale(1.05);
   }
 }
@@ -672,7 +678,7 @@ div.right-panel {
   }
   tr[data-uniqueid]:hover {
    background-color: #ececea;
-   color: #606a73;
+   color: @linkHover;
   }
   TH {
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
@@ -892,7 +898,7 @@ div.right-panel {
 #patientList {
   div.or {
     display: inline-block;
-    background-color: #888a8c;
+    background-color: #9fa294;
     margin: 1.5em 1em 1em 1.2em;
   }
   #_downloadLink {
@@ -910,7 +916,7 @@ div.right-panel {
 #staffList {
   div.or {
     display: inline-block;
-    background-color: #888a8c;
+    background-color: #9fa294;
     margin: 1.5em 1em 1em 1.2em;
   }
   .firstname-field, .lastname-field {
@@ -1303,10 +1309,9 @@ div.right-panel {
   height: 2.5em;
   width: 70px;
   padding: 0 0.7em;
-  /*background: linear-gradient(to bottom, #FFF, #e4e4e4);
-  border: solid 1px #dad8d8;*/
   color: #FFF;
-  background: #79815d;
+  background: @btnColor;
+  border-color: @btnColor;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.9em;
@@ -1315,7 +1320,7 @@ div.right-panel {
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
-  background-color: #5f676e;
+  background-color: @linkHover;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
@@ -1348,7 +1353,10 @@ div.right-panel {
   vertical-align: top;
 }
 #mainDiv.profile .profile-item-container .view-container td {
-  padding: 0.8em 1em;
+  padding: 0.6em 1em;
+}
+#mainDiv.profile .profile-item-container .view-container tr.study-id-view td {
+  padding: 0.6em 1em 0 1em;
 }
 #aboutForm .view-container {
   display: none;
@@ -1369,7 +1377,7 @@ div.right-panel {
   max-width: 100%;
 }
 #resetPasswordContainer {
-  flex-grow: 0.7;
+  flex-grow: 0.3;
 }
 #passwordResetMessage {
   width: 300px;
@@ -1390,6 +1398,12 @@ div.right-panel {
   height: 3.2em;
   display: inline-block;
   width: 300px;
+  background: @btnColor;
+  border-color: @btnColor;
+   &:hover {
+    color: @featureBtnHoverColor;
+    background: @featureBtnColor;
+  }
 }
 
 .profile-create-item-container {
@@ -1466,12 +1480,12 @@ input.clinic {
 }
 div.noOrg-container {
   input[type="radio"] {
-  font-size:0.95em;
   top: 2px;
   }
   span {
   margin-left:5px;
   position: relative;
+  left: 2px;
   top: 1px;
   }
 }
@@ -1480,8 +1494,14 @@ div.noOrg-container {
   .title {
     margin-top: 5%;
   }
+  #userOrgs {
+  margin-top: 2em;
+  }
   #phoneGroup {
-    margin-top: 1em;
+    margin-top: 1.5em;
+  }
+  #emailGroup {
+    margin-top: 0;
   }
   #studyIdContainer {
    margin-top: 1.8em;
@@ -1524,6 +1544,7 @@ div.noOrg-container {
   background-color: #f9f9f9;
   background-color: rgba(204, 204, 204, 0.3);
   border-radius: 6px;
+  width: 400px;
   max-width: 100%;
   label{
     font-size:0.95em;
@@ -1561,6 +1582,11 @@ div.noOrg-container {
   font-size: 0.87em;
   margin-top: 1em;
   margin-left:0.5em;
+  width: 250px;
+  max-width: 100%;
+}
+#sendRegistrationEmailForm label {
+  font-weight: normal;
 }
 
  #profileStudyIDContainer {
@@ -1590,7 +1616,7 @@ div.noOrg-container {
   margin-top: 0.5em;
 }
 #userSessionReportDetailHeader a[href]:hover {
-  color: #8c9094;
+  color: @linkHover;
 }
 #userSessionReportDetailTable caption {
   padding: 0;
@@ -1967,7 +1993,7 @@ sub.pointer {
   cursor:pointer;
 }
 sub.pointer:hover {
-  color: #79815D;
+  color: @linkHover;
 }
 
 .report-custom-header {
@@ -2285,6 +2311,9 @@ div.timezone-warning.text-warning {
   .checkbox input[type=checkbox] {
     top: -1px;
   }
+  #profile-gender-list {
+    margin-top: 0.2em;
+  }
   #profile-gender-list input[type=radio] {
     top: -2px;
    }
@@ -2554,10 +2583,10 @@ div.timezone-warning.text-warning {
 
   .form-group {
     input[type=checkbox] {
-      margin-top: 4px;
+      margin-top: 5px;
     }
     input[type=radio] {
-      margin-top: 4px;
+      margin-top: 3px;
     }
   }
 

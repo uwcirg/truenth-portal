@@ -4,7 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from validators import url as url_validation
 
 from .audit import Audit
-from ..extensions import db
+from ..database import db
 from .fhir import FHIR_datetime
 from .organization import Organization
 from .user import User

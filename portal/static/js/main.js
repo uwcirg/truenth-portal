@@ -90,9 +90,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        showMain();
+        setTimeout("showMain();", 500);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
+            setTimeout('$("#loadingIndicator").fadeOut();', 800);
         };
     };
 };
@@ -245,13 +245,13 @@ var fillViews = {
         var topLevelOrgs = $("#fillOrgs legend[data-checked]");
         if (topLevelOrgs.length > 0) {
             topLevelOrgs.each(function() {
-                content += "<p class='indent capitalize'>" + $(this).text() + "</p>";
+                content += "<p class='capitalize'>" + $(this).text() + "</p>";
             });
         };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
                 if ($(this).val() == "0") content += "<p>No affiliated clinic</p>";
-                else content += "<p class='indent'>" + $(this).closest("label").text() + "</p>";
+                else content += "<p>" + $(this).closest("label").text() + "</p>";
             };
         });
         if (!hasValue(content)) content = "<p class='text-muted'>No clinic selected</p>";
@@ -270,35 +270,36 @@ var fillViews = {
         if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
             var content = $("#firstname").val() + " " + $("#lastname").val();
             if (hasValue($.trim(content))) $("#name_view").text(content);
-            else $("#name_view").text("Not provided");
+            else $("#name_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "dob": function() {
         if (!$("#bdGroup").hasClass("has-error")) {
             if (hasValue($.trim($("#month option:selected").val()+$("#year").val()+$("#date").val()))) {
-                $("#dob_view").text($("#month option:selected").val() + "/" + $("#date").val() + "/" + $("#year").val());
-            } else $("#dob_view").text("Not provided");
+                var displayString = tnthDates.displayDateString($("#month option:selected").val(), $("#date").val(), $("#year").val());
+                $("#dob_view").text(displayString);
+            } else $("#dob_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "phone": function() {
         if (!$("#phoneGroup").hasClass("has-error")) {
             var content = $("#phone").val();
             if (hasValue(content)) $("#phone_view").text(content);
-            else $("#phone_view").text("Not provided");
+            else $("#phone_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "email": function() {
         if (!$("#emailGroup").hasClass("has-error")) {
             var content = $("#email").val();
             if (hasValue(content)) $("#email_view").text(content);
-            else $("#email_view").text("Not provided");
+            else $("#email_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "studyId": function() {
         if (!$("#profileStudyIDContainer").hasClass("has-error")) {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
-            else $("#study_id_view").text("Not provided");
+            else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "detail": function() {
@@ -311,8 +312,8 @@ var fillViews = {
         if ($("#genderGroup").length > 0) {
             if (!$("#genderGroup").hasClass("has-error")) {
                 var content = $("input[name=sex]:checked").val();
-                if (hasValue(content)) $("#gender_view").text(content);
-                else $("#gender_view").text("Not provided");
+                if (hasValue(content)) $("#gender_view").html("<p class='capitalize'>" + content + "</p>");
+                else $("#gender_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".gender-view").hide();
     },
@@ -324,7 +325,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#race_view").html(content);
-                else $("#race_view").text("Not provided");
+                else $("#race_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else {
             $(".race-view").hide();
@@ -338,7 +339,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#ethnicity_view").html(content);
-                else $("#ethnicity_view").text("Not provided");
+                else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".ethnicity-view").hide();
     },
@@ -350,7 +351,7 @@ var fillViews = {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
                 if (hasValue(content)) $("#indigenous_view").html(content);
-                else $("#indigenous_view").text("Not provided");
+                else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
     },
@@ -360,21 +361,25 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
+                //note, biopsy date is formatted as mm/dd/yyyy
+                var cDate = new Date(biopsyDate);
+                displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-                content += "&nbsp;&nbsp;" + $("#biopsyDate").val();
+                content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
             if (hasValue(content)) $("#biopsy_view").html(content);
-            else $("#biopsy_view").html("No answer provided");
+            else $("#biopsy_view").html("<p class='text-muted'>No answer provided</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
         if (hasValue(content)) $("#pca_diag_view").text(content);
-        else $("#pca_diag_view").text("No answer provided");
+        else $("#pca_diag_view").html("<p class='text-muted'>No answer provided</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
             $("#boolDeath_view").text("Patient has deceased");
             if (hasValue($("#deathDate").val()) && !$("#deathDayContainer").hasClass("has-error") && !$("#deathMonthContainer").hasClass("has-error") && !$("#deathYearContainer").hasClass("has-error")) {
-                $("#deathDate_view").text($("#deathDay").val() + "/" + $("#deathMonth").val() + "/" + $("#deathYear").val());
+                var displayString = tnthDates.displayDateString($("#deathMonth").val(), $("#deathDay").val(),$("#deathYear").val());
+                $("#deathDate_view").text(displayString);
             };
         } else $("#boolDeath_view").html("<p class='text-muted'>No information provided.</p>");
     },
@@ -399,7 +404,7 @@ var fillViews = {
             $("#userProcedures tr[data-id]").each(function() {
                 content += hasValue(content) ? "<br/>" : "";
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
@@ -613,14 +618,6 @@ var fillContent = {
                 };
             };
         });
-
-        // If there's a pre-selected clinic set in session, then fill it in here (for initial_queries)
-        if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            var o = $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]");
-            o.prop('checked', true);
-            //clinicNames.push(o.closest("label").text());
-
-        };
         fillViews.org();
     },
     "subjectId": function(data) {
@@ -634,9 +631,11 @@ var fillContent = {
         fillViews.studyId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
+        var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
+        var content = "";
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
             var dataArray = data["consent_agreements"].sort(function(a,b){
-                return new Date(b.signed) - new Date(a.signed);
+                 return new Date(b.signed) - new Date(a.signed);
             });
             var orgs = {};
             var existingOrgs = {};
@@ -644,8 +643,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
-            var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-
+        
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -667,7 +665,7 @@ var fillContent = {
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-            var content = "<table class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
@@ -684,9 +682,8 @@ var fillContent = {
                 };
             };
 
-            //console.log(orgs)
-
             dataArray.forEach(function(item, index) {
+                if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
                     var orgName = "";
@@ -708,7 +705,8 @@ var fillContent = {
                     var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
                     var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
-
+                    var isDefault = /stock\-org\-consent/.test(item.agreement_url);
+                    //if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -719,10 +717,11 @@ var fillContent = {
                             break;
                         case "active":
                             if (se && sr && ir) {
-                                    sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                    if (isDefault) sDisplay = "<span class='text-success small-text'>Consented</span>";
+                                    else sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Reports</span>";
+                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Report Historic Data</span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
                                     sDisplay = "<span class='text-danger small-text'>Purged/Removed</span>";
@@ -758,6 +757,13 @@ var fillContent = {
                             + '</div></div></div>';
 
                     };
+
+                    if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
+                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                        content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
+                    };
+
                     content += "<tr>";
 
                     [
@@ -769,8 +775,15 @@ var fillContent = {
                             "_class": "indent"
                         },
                         {
-                            content: "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
-                            ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                            content: function(item) {
+                                var s = "";
+                                if (isDefault) s = "Sharing information with clinics <span class='agreement'>&nbsp;<a href='" + decodeURIComponent(item.agreement_url) + "' target='_blank'><em>View</em></a></span>";
+                                else {
+                                    s = "<span class='agreement'><a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span>" +
+                                    ((editorUrlEl.length > 0 && hasValue(editorUrlEl.val())) ? ("<div class='button--LR' " + (editorUrlEl.attr("data-show") == "true" ?"data-show='true'": "data-show='false'") + "><a href='" + editorUrlEl.val() + "' target='_blank'>Edit in Liferay</a></div>") : "")
+                                };
+                                return s;
+                            } (item)
                         },
                         {
                             content: (signedDate).replace("T", " ")
@@ -796,7 +809,18 @@ var fillContent = {
                  $("#profileConsentList .button--LR").each(function() {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
                  });
-            } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+            } else {
+                if (ctop) {
+                        if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                            content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
+                            content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                            content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                            content += "</tr>";
+                            $("#profileConsentList").html(content);
+                        } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+            };
 
             if (editable) {
                 $("input[class='radio_consent_input']").each(function() {
@@ -815,10 +839,19 @@ var fillContent = {
             };
 
         } else {
-            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger' style='font-size:0.9em'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
-            if (parseInt(errorCode) == 401) {
+            if (hasValue(errorMessage)) {
+                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+            } else if (parseInt(errorCode) == 401) {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
+            } else {
+                if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
+                    content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                    content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                    content += "</tr>";
+                } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
         };
         $("#profileConsentList").animate({opacity: 1});
@@ -872,7 +905,7 @@ var fillContent = {
                 else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 };
@@ -1260,6 +1293,14 @@ var OrgTool = function() {
         };
         return false;
     };
+    this.getElementParentOrg = function(o) {
+        var parentOrg;
+        if (o) {
+           parentOrg = $(o).attr("data-parent-id");
+           if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+        };
+        return parentOrg;
+    };
 
     this.getTopLevelOrgs = function() {
         return TOP_LEVEL_ORGS;
@@ -1277,7 +1318,11 @@ var OrgTool = function() {
         $("input[name='organization']").each(function() {
             if (! self.inArray($(this).val(), leafOrgs)) {
                 $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) $(this).closest("label").hide();
+                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) {
+                    var l = $(this).closest("label");
+                    l.hide();
+                    l.next(".divider").hide();
+                };
             };
         });
 
@@ -1304,7 +1349,9 @@ var OrgTool = function() {
 
                     });
 
-                    if (allSubOrgsHidden) $(this).children("label").hide();
+                    if (allSubOrgsHidden) {
+                        $(this).children("label").hide();
+                    };
 
                 } else {
                     var ip = $(this).find("input[name='organization']");
@@ -1423,12 +1470,86 @@ var OrgTool = function() {
             if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
         };
     };
+    this.getDefaultModal = function(o) {
+        if (!o) return false;
+        var orgId = $(o).val(), orgName = $(o).attr("data-parent-name");
+        if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
+            var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_consentModal">'
+                + '<div class="modal-dialog" role="document">' +
+                '<div class="modal-content">' +
+                '<div class="modal-header">' +
+                '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+                '<h4 class="modal-title">Consent to share information</h4>' +
+                '</div>' +
+                '<div class="modal-body">' +
+                '<h4>Terms</h4>' +
+                '<p>I consent to sharing information with the <span class="consent-clinic-name">' + orgName + '.</span></p>' +
+                '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
+                '<label class="radio-inline">' +
+                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
+                '<br/>' +
+                '<label class="radio-inline">' +
+                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
+                '</div>' +
+                '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
+                '</div>' +
+                '<br/>' +
+                '<div class="modal-footer" >' +
+                '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
+                '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="Close">Close</button>' +
+                '</div></div></div></div>';
+            $("#consentContainer").append(s);
+            $("#" + orgId + "_defaultConsentModal input[name='defaultToConsent']").each(function() {
+                $(this).on("click", function(e) {
+                    e.stopPropagation();
+                    var orgId = $(this).attr("data-org");
+                    var userId = $("#fillOrgs").attr("userId");
+                    $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true).hide();
+                    $("#" + orgId + "_loader").show();
+                    if ($(this).val() == "yes") {
+                        setTimeout("tnthAjax.setDefaultConsent(" + userId + "," +  orgId + ");", 100);
+                    } else tnthAjax.deleteConsent(userId, {"org":orgId});
+                    if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
+                    setTimeout('$(".modal").modal("hide");', 250);
+                });
+             });
+             $(document).delegate("#" + orgId + "_defaultConsentModal button[data-dismiss]", "click", function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                setTimeout("location.reload();", 10);
+             });
+             $("#" + orgId + "_defaultConsentModal").on("hidden.bs.modal", function() {
+                if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                    $("#userOrgs input[name='organization']").each(function() {
+                        $(this).removeAttr("data-require-validate");
+                    });
+                    var userId = $("#fillOrgs").attr("userId");
+                    assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
+                };
+             }).on("shown.bs.modal", function() {
+                $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
+                $(this).find(".loading-message-indicator").hide();
+                $(this).find("input[name='defaultToConsent']").each(function(){
+                    $(this).prop("checked", false);
+                });
+             });
+        };
+        return $("#" + orgId + "_defaultConsentModal");
+    }
     this.handlePreSelectedClinic = function() {
         if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            var ob = $("body").find("#userOrgs input.clinic[value="+preselectClinic+"]");
+            var ob = $("body").find("#userOrgs input[value="+preselectClinic+"]");
             if (ob.length > 0) {
                 ob.prop('checked', true);
-                tnthAjax.handleConsent(ob);
+                ob.attr('data-require-validate', 'true');
+                var stateContainer = ob.closest(".state-container");
+                if (stateContainer.length > 0) {
+                    var st = stateContainer.attr("state");
+                    if (hasValue(st)) {
+                        $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
+                        stateContainer.show();
+                    };
+                };
             };
         };
     };
@@ -1438,8 +1559,7 @@ var OrgTool = function() {
             $(this).attr("data-save-container-id", "userOrgs");
             $(this).on("click", function(e) {
                 var userId = $("#fillOrgs").attr("userId");
-                var parentOrg = $(this).attr("data-parent-id");
-
+                var parentOrg = OT.getElementParentOrg(this);
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
@@ -1466,7 +1586,15 @@ var OrgTool = function() {
                     } else {
                         var __modal = $("#" + parentOrg + "_consentModal");
                         if (__modal.length > 0) $("#" + parentOrg + "_consentModal").modal("show");
-                        else assembleContent.demo(userId,true, $(this), true);
+                        else {
+                            //open default modal
+                            var __defaultModal = OT.getDefaultModal(this);
+                            if (__defaultModal) __defaultModal.modal("show");
+                            else {
+                              tnthAjax.setDefaultConsent(userId, parentOrg);
+                              assembleContent.demo(userId,true, $(this), true);
+                            };
+                        };
                     };
                 }
                 else {
@@ -1558,6 +1686,26 @@ var tnthAjax = {
             };
         };
     },
+    "setDefaultConsent": function(userId, orgId) {
+        if (!hasValue(userId) && !hasValue(orgId)) return false;
+        var stockConsentUrl = $("#stock_consent_url").val();
+        var agreementUrl = "";
+        if (hasValue(stockConsentUrl)) {
+            agreementUrl = stockConsentUrl.replace("placeholder", encodeURIComponent($("#" + orgId + "_org").attr("data-parent-name")));
+        };
+        if (hasValue(agreementUrl)) {
+            var params = CONSENT_ENUM["consented"];
+            params.org = orgId;
+            params.agreementUrl = agreementUrl;
+            this.setConsent(userId, params, "default");
+            //need to remove all other consents associated w un-selected org(s)
+            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
+            if (typeof reloadConsentList != "undefined") reloadConsentList();
+            $("#consentContainer").find(".error-message").text("");
+        } else {
+            $("#consentContainer").find(".error-message").text("Unable to set default consent agreement");
+        }
+    },
     deleteConsent: function(userId, params) {
         if (userId && params) {
             var consented = this.getAllValidConsent(userId, params["org"]);
@@ -1565,6 +1713,16 @@ var tnthAjax = {
             if (consented) {
                 //delete all consents for the org
                 consented.forEach(function(orgId) {
+                    if (hasValue(params["exclude"])) {
+                        var arr = params["exclude"].split(",");
+                        var found = false;
+                        arr.forEach(function(o) {
+                            if (!found) {
+                                if (o == orgId) found = true;
+                            };
+                        });
+                        if (found) return true;
+                    };
                     $.ajax ({
                         type: "DELETE",
                         url: '/api/user/' + userId + '/consent',
@@ -1606,7 +1764,8 @@ var tnthAjax = {
                         //console.log("expired: " + item.expires + " dateDiff: " + tnthDates.getDateDiff(item.expires))
                         expired = item.expires ? tnthDates.getDateDiff(String(item.expires)) : 0;
                         if (!(item.deleted) && !(expired > 0)) {
-                            if (orgId == item.organization_id) consentedOrgIds.push(orgId);
+                            if (orgId == "all") consentedOrgIds.push(item.organization_id);
+                            else if (orgId == item.organization_id) consentedOrgIds.push(orgId);
                         };
                     });
                 };
@@ -1624,6 +1783,7 @@ var tnthAjax = {
         //console.log("in hasConsent: userId: " + userId + " orgId: " + orgId)
         if (!userId) return false;
         if (!orgId) return false;
+        if (filterStatus == "default") return false;
 
         var consentedOrgIds = [], expired = 0, found = false, suspended = false;
         //console.log("in hasConsent: userId: " + userId + " parentOrg: " + parentOrg)
@@ -1675,16 +1835,36 @@ var tnthAjax = {
         //console.log(consentedOrgIds)
         return consentedOrgIds.length > 0 ? consentedOrgIds : null;
     },
+    removeObsoleteConsent: function() {
+        var userId = $("#fillOrgs").attr("userId");
+        var co = [];
+        function inCurrent(o) {
+            var found = false;
+            co.forEach(function(org) {
+                if (!found) {
+                    if (org == o) found = true;
+                };
+            });
+            return found;
+        };
+        $("#userOrgs input[name='organization']").each(function() {
+            if ($(this).is(":checked")) {
+                var po = OT.getElementParentOrg(this);
+                co.push($(this).val());
+                if (hasValue(po)) co.push(po);
+            };
+        });
+        //exclude currently selected orgs
+        tnthAjax.deleteConsent(userId, {org: "all", exclude: co.join(",")});
+    },
     handleConsent: function(obj) {
         var self = this;
         $(obj).each(function() {
-            var parentOrg = $(this).attr("data-parent-id");
-            //var parentName = $(this).attr("data-parent-name");
+            var parentOrg = OT.getElementParentOrg(this);
             var orgId = $(this).val();
             var userId = $("#fillOrgs").attr("userId");
             if (!hasValue(userId)) userId = $("#userOrgs").attr("userId");
-            if (!hasValue(parentOrg)) parentOrg = $(this).closest(".org-container[data-parent-id]").attr("data-parent-id");
-            //if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
+        
             var cto = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
@@ -1695,6 +1875,11 @@ var tnthAjax = {
                             params.org = cto ? parentOrg : orgId;
                             params.agreementUrl = agreementUrl;
                             setTimeout("tnthAjax.setConsent($('#fillOrgs').attr('userId')," + JSON.stringify(params) + ", 'all', true);", 0);
+                            setTimeout("tnthAjax.removeObsoleteConsent();", 200);
+                        } else {
+                            if (cto) {
+                                tnthAjax.setDefaultConsent(userId, parentOrg); 
+                            };
                         };
                     };
 
@@ -1703,7 +1888,7 @@ var tnthAjax = {
                     if (cto) {
                         var topLevelOrgs = OT.getTopLevelOrgs();
                         topLevelOrgs.forEach(function(i) {
-                            setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": i}) + ");", 0);
+                            if (i != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": i}) + ");", 0);
                         });
 
                     } else {
@@ -1721,8 +1906,8 @@ var tnthAjax = {
                     childOrgs.each(function() {
                         if ($(this).prop("checked")) allUnchecked = false;
                     });
-                    if (allUnchecked) {
-                        setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": parentOrg}) + ");", 0);
+                    if (allUnchecked && childOrgs.length > 0) {
+                        if (parentOrg != orgId) setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": parentOrg}) + ");", 0);
                     };
                 } else {
                     setTimeout("tnthAjax.deleteConsent($('#fillOrgs').attr('userId')," + JSON.stringify({"org": orgId}) + ");", 0);
@@ -2372,6 +2557,62 @@ var tnthDates = {
         var splitDate = currentDate.split('/');
         return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
     },
+    /**
+     * Convert month string to text
+     *
+     */
+     "convertMonthString": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+            var m = "";
+            switch(parseInt(month)) {
+                case 1:
+                    m = "Jan";
+                    break;
+                case 2:
+                    m = "Feb";
+                    break;
+                case 3:
+                    m = "Mar";
+                    break;
+                case 4:
+                    m = "Apr";
+                    break;
+                case 5:
+                    m = "May";
+                    break;
+                case 6:
+                    m = "Jun";
+                    break;
+                case 7:
+                    m = "Jul";
+                    break;
+                case 8:
+                    m = "Aug";
+                    break;
+                case 9:
+                    m = "Sep";
+                    break;
+                case 10:
+                    m = "Oct";
+                    break;
+                case 11:
+                    m = "Nov";
+                    break;
+                case 12:
+                    m = "Dec";
+                    break;
+            };
+            return m;
+        }
+     },
+     "displayDateString": function(m, d, y) {
+        var s = "";
+        if (hasValue(d)) s = parseInt(d);
+        if (hasValue(m)) s += (hasValue(s) ? " ": "") + this.convertMonthString(m);
+        if (hasValue(y)) s += (hasValue(s) ? " ": "") + y;
+        return s;
+     },
     /***
      * parseDate - Fancier function for changing javascript date yyyy-mm-dd (with optional time) to a dd/mm/yyyy (optional time) format. Used with mPOWEr
      * @param date - the date to be converted

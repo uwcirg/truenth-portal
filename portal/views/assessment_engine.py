@@ -4,17 +4,16 @@ from flask import session
 from sqlalchemy.orm.exc import NoResultFound
 from flask_swagger import swagger
 import jsonschema
-import json
 import requests
 
 from ..audit import auditable_event
+from ..database import db
+from ..extensions import oauth
 from ..models.auth import validate_client_origin
-from ..models.fhir import AssessmentStatus
-from ..models.fhir import FHIR_datetime, QuestionnaireResponse, aggregate_responses, generate_qnr_csv
+from ..models.fhir import AssessmentStatus, FHIR_datetime, QuestionnaireResponse
+from ..models.fhir import aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User
-from ..extensions import oauth
-from ..extensions import db
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')

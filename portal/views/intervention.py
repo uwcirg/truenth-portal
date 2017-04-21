@@ -7,16 +7,16 @@ from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..database import db
+from ..extensions import oauth
 from ..models.auth import validate_client_origin
 from ..models.group import Group, UserGroup
 from ..models.intervention import access_types, INTERVENTION, UserIntervention
+from ..models.intervention_strategies import AccessStrategy
 from ..models.message import EmailMessage
-from ..models.user import current_user, User
 from ..models.relationship import RELATIONSHIP
 from ..models.role import ROLE
-from ..extensions import oauth
-from ..extensions import db
-from ..models.intervention_strategies import AccessStrategy
+from ..models.user import current_user, User
 
 
 intervention_api = Blueprint('intervention_api', __name__, url_prefix='/api')

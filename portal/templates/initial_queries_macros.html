@@ -241,10 +241,11 @@
 
               if (errorMsg == "") {
                   $("#biopsyDateError").text("");
-                  setTimeout('$("#biopsy_yes").trigger("click");', 500);
+                  $("#biopsy_yes").trigger("click");
                   return true;
               } else {
                   $("#biopsyDateError").text(errorMsg);
+                  $("#biopsyDate").datepicker("hide");
                   return false;
               };
            } else {
@@ -265,6 +266,7 @@
           	$(this).on("click", function() {
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
+                $("#biopsyDate").focus();
           		} else {
           			$("#biopsyDate").val("");
                 $("#biopsyDateError").text("");
@@ -295,7 +297,7 @@
           <div class="noOrg-container"><label><input id="noOrgs" class="clinic" type="checkbox" name="organization" value="0"><span>{{ _("I'm not receiving care at any of the above clinics") }}</span></label></div>
         </div>
       </div>
-      {{consent(consent_agreements)}}
+      {{consent_fields(consent_agreements)}}
     </div>
     <script>
     function _orgsCallback() {
@@ -317,16 +319,15 @@
         tnthAjax.getOrgs($("#iq_userId").val(), false,true, _orgsCallback);
       });
     </script>
-
   {%- endmacro %}
-  {% macro consent(consent_agreements) -%}
-    {% if consent_agreements %}
-        <div id="consentContainer" style="display:none">
-          {% for org in consent_agreements %}
-            <div id="{{org}}_consentItem" class="well consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].agreement_url}}" /></div>
-          {% endfor %}
-        </div>
-      {% endif %}
+  {% macro consent_fields(consent_agreements, current_user) -%}
+    {%-if consent_agreements -%}
+        {%- for org in consent_agreements -%}
+           {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
+              <div id="{{org}}_consentItem" class="consent"><input type="hidden" id="{{org}}_agreement_url" value="{{consent_agreements[org].url}}" /><input type="hidden" id="{{org}}_editor_url" value="{{consent_agreements[org].editor_url}}" data-show="{%if current_user and current_user.has_role(ROLE.CONTENT_MANAGER) %}true{%else%}false{%endif%}"/><input type="hidden" id="{{org}}_agreement_organization_name" value="{{consent_agreements[org].organization_name}}"/></div>
+            {%- endif -%}
+        {%- endfor -%}
+    {%-endif-%}
   {%- endmacro %}
 
 

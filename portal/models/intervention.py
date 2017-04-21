@@ -3,7 +3,7 @@ from UserDict import IterableUserDict
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import ENUM
 
-from ..extensions import db
+from ..database import db
 from .lazy import query_by_name
 
 class DisplayDetails(object):

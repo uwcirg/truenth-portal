@@ -20,6 +20,8 @@ from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
+from ..database import db
+from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
 from ..models.coredata import Coredata
@@ -29,7 +31,6 @@ from ..models.login import login_user
 from ..models.role import ROLE
 from ..models.user import add_authomatic_user
 from ..models.user import current_user, get_user, User
-from ..extensions import authomatic, db, oauth
 
 auth = Blueprint('auth', __name__)
 

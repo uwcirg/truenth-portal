@@ -15,7 +15,7 @@ from requests.exceptions import MissingSchema
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
-from ..extensions import db
+from ..database import db
 
 
 class AppText(db.Model):
@@ -163,8 +163,62 @@ class PrivacyATMA(AppTextModelAdapter):
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    @staticmethod
-    def permanent_url(generic_url, version):
+    def __init__(self, url):
+        """Initialize based on requested URL
+
+        Attempts to fetch the asset, permanent version of URL and link
+        for content editing.
+
+        In the event of an error, details are logged, and self.error_msg
+        will be defined, and returned in a request for the asset attribute.
+
+        :param url: the URL to pull details and asset from
+
+        :attribute asset: will contain the html asset downloaed, found in the
+            cache, or the error message if that fails.
+        :attribute editor_url: defined if such was available, else None
+        :attribute url: the `permanent url` for the resource if available,
+            otherwise the original url.
+
+        """
+        self._asset, self.error_msg, self.editor_url = None, None, None
+        self.url = url
+        try:
+            response = requests.get(url)
+            self._asset = response.json().get('asset')
+            self.url =  self._permanent_url(
+                generic_url=url, version=response.json().get('version'))
+            self.editor_url = response.json().get('editorUrl')
+        except MissingSchema:
+            if current_app.config.get('TESTING'):
+                self._asset = '[TESTING - fake response]'
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - Invalid URL")
+        except ValueError:  # raised when no json is available in response
+            if response.status_code == 200:
+                self._asset = response.text
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - " "{} {}".format(
+                        response.status_code, response.reason))
+        except:
+            self.error_msg = (
+                "Could not retrieve remove content - Server could not be "
+                "reached")
+
+        if self.error_msg:
+            current_app.logger.error(self.error_msg + ": {}".format(url))
+
+
+    @property
+    def asset(self):
+        """Return asset if available else error message"""
+        if self._asset:
+            return self._asset
+        return self.error_msg
+
+    def _permanent_url(self, generic_url, version):
         """Produce a permanent url from the metadata provided
 
         Resources are versioned - but the link maintained in the app_text
@@ -177,7 +231,8 @@ class VersionedResource(object):
         """
         parsed = urlparse(generic_url)
         qs = dict(parse_qsl(parsed.query))
-        qs['version'] = version
+        if version:
+            qs['version'] = version
 
         path = parsed.path
         if path.endswith('/detailed'):
@@ -191,46 +246,10 @@ class VersionedResource(object):
         return url
 
 
-    @staticmethod
-    def fetch_elements(url):
-        """Given a URL, fetch the asset and permanent version of URL
+class UndefinedAppText(Exception):
+    """Exception raised when requested AppText isn't defined"""
+    pass
 
-        Pulls and returns the 'asset' (i.e. response.text) from the given URL.
-        If version info is provided in the `detailed` response, a permanent
-        version of the URL is also returned.
-
-        :param url: the URL to pull details and asset from
-        :returns: (asset, url)
-
-        """
-        try:
-            response = requests.get(url)
-        except MissingSchema:
-            # In testing, mocking of test data includes not loading
-            # app_text resources defining legit URLs.  punt if testing
-            if current_app.config.get('TESTING'):
-                return {'error_msg': '[TESTING - fake response]', 'url': 'http://fake.org'}
-            error_msg = "Could not retrieve remote content - Invalid URL"
-            current_app.logger.error(error_msg + ": {}".format(url))
-            return {'error_msg': error_msg, 'url': url}
-        except:
-            error_msg =  "Could not retrieve remove content - Server could not be reached"
-            current_app.logger.error(error_msg + ": {}".format(url))
-            return {'error_msg': error_msg, 'url': url}
-        try:
-            return {
-                'asset': response.json()['asset'] if 'asset' in response.json() else None,
-                'url': VersionedResource.permanent_url(
-                        version=response.json()['version'] if 'version' in response.json() else None,
-                        generic_url=url),
-                'editorUrl': response.json()['editorUrl'] if 'editorUrl' in response.json() else None}
-        except ValueError:  # thrown when no json is available in response
-            if response.status_code == 200:
-                return {'error_msg': response.text, 'url': url}
-            error_msg = "Could not retrieve remote content - {} {}".format(
-                response.status_code, response.reason)
-            current_app.logger.error(error_msg + ": {}".format(url))
-            return {'error_msg': error_msg, 'url': url}
 
 def app_text(name, *args):
     """Look up and return cusomized application text string
@@ -259,12 +278,15 @@ def app_text(name, *args):
     the page, therefore any javascript variables will not be available in time
     for app_text() to use them.
 
+    :raises UndefinedAppText: if the `name` isn't found.
+
     """
     item = AppText.query.filter_by(name=name).first()
     if not item:
         if current_app.config.get('TESTING'):
             return "[TESTING - ignore missing app_text '{}']".format(name)
-        raise ValueError("unknown customized app string '{}'".format(name))
+        raise UndefinedAppText(
+            "unknown customized app string '{}'".format(name))
 
     text = str(item)
     try:

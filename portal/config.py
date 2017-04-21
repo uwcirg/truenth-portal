@@ -103,8 +103,8 @@ class BaseConfig(object):
 
     DEFAULT_LOCALE = 'en_US'
     FILE_UPLOAD_DIR = 'uploads'
-    LR_ORIGIN = 'https://stg-cms.us.truenth.org'
-    LR_GROUP = 20142
+    LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
+    LR_GROUP = 20147
 
     SYSTEM_TYPE = 'development'
 
@@ -119,7 +119,9 @@ class TestConfig(BaseConfig):
     SERVER_NAME = 'localhost:5005'
     LIVESERVER_PORT = 5005
     SQLALCHEMY_ECHO = False
-
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_TEST_URI',
+        "postgresql://test_user:4tests_only@localhost/portal_unit_tests")
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
@@ -153,4 +155,3 @@ class ConfigServer(Server):  # pragma: no cover
         host = self.host if host is None else host
         super(ConfigServer, self).__call__(app=app, host=host,
                 port=port, *args, **kwargs)
-

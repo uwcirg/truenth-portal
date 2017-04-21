@@ -1,6 +1,7 @@
 """Portal view functions (i.e. not part of the API or auth)"""
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
+from flask import render_template_string
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
@@ -8,13 +9,14 @@ from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
 from datetime import datetime
-import requests
 
 from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
-from ..models.app_text import app_text, VersionedResource
-from ..models.app_text import AboutATMA, ConsentByOrg_ATMA, PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
+from ..database import db
+from ..extensions import oauth, user_manager
+from ..models.app_text import app_text, AboutATMA, VersionedResource
+from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -22,7 +24,6 @@ from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
-from ..extensions import db, oauth, user_manager
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
 
@@ -250,8 +251,7 @@ def access_via_token(token):
     user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.STAFF])
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not allowed for privileged accounts")
@@ -394,21 +394,9 @@ def initial_queries():
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
     if 'tou' in still_needed:
-        dict_terms = VersionedResource.fetch_elements(
-            app_text(InitialConsent_ATMA.name_key()))
-        asset = dict_terms.get('asset', None)
-        url = dict_terms.get('url', None)
-        editorUrl = dict_terms.get('editorUrl', None)
-        terms = {'asset': asset, 'agreement_url': url, 'editorUrl': editorUrl}
-    if 'org' in still_needed:
-        for org_id in OrgTree().all_top_level_ids():
-            org = Organization.query.get(org_id)
-            dict_consent_by_org = VersionedResource.fetch_elements(
-                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org.get('asset', None)
-            url = dict_consent_by_org.get('url', None)
-            consent_agreements[org.id] = {
-                    'asset': asset, 'agreement_url': url, 'organization_name': org.name}
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    #need this at all time now for ui
+    consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
@@ -455,23 +443,11 @@ def home():
     gil = current_app.config.get('GIL')
     consent_agreements = {}
     if gil:
-        for org_id in OrgTree().all_top_level_ids():
-            current_app.logger.debug("GET CONSENT AGREEMENT FOR ORG: %s", org_id)
-            org = Organization.query.get(org_id)
-            dict_consent_by_org = VersionedResource.fetch_elements(
-                app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-            asset = dict_consent_by_org.get('asset', None)
-            url = dict_consent_by_org.get('url', None)
-            if url:
-                current_app.logger.debug("DEBUG CONSENT AGREEMENT URL: %s for %s", url, org_id)
+        consent_agreements = Organization.consent_agreements()
 
-            consent_agreements[org.id] = {
-                    'organization_name': org.name,
-                    'asset': asset,
-                    'agreement_url': url}
-
-    return render_template('portal.html' if not gil else 'gil/portal.html', user=user,
-                           interventions=interventions, consent_agreements=consent_agreements)
+    return render_template(
+        'portal.html' if not gil else 'gil/portal.html', user=user,
+        interventions=interventions, consent_agreements=consent_agreements)
 
 
 @portal.route('/admin')
@@ -489,20 +465,22 @@ def admin():
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
 def staff_profile_create():
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        dict_consent_by_org = VersionedResource.fetch_elements(
-            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org.get('asset', None)
-        url = dict_consent_by_org.get('url', None)
-        consent_agreements[org.id] = {
-                'asset': asset, 'agreement_url': url, 'organization_name': org.name}
+    consent_agreements = Organization.consent_agreements()
     user = current_user()
-    leaf_organizations = user.leaf_organizations()
+
+    #compiling org list for staff
+    #org list should include all orgs under the current user's org(s)
+    OT = OrgTree()
+    org_list = set()
+    for org in user.organizations:
+        if org.id == 0:  # None of the above doesn't count
+            continue
+        org_list.update(OT.here_and_below_id(org.id))
+
     return render_template(
         "staff_profile_create.html", user=user,
-        consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
+        consent_agreements=consent_agreements,
+        org_list=list(org_list))
 
 @portal.route('/staff')
 @roles_required(ROLE.STAFF_ADMIN)
@@ -520,11 +498,17 @@ def staff():
 
     staff_role_id = Role.query.filter(
         Role.name==ROLE.STAFF).with_entities(Role.id).first()
+    admin_role_id = Role.query.filter(
+        Role.name==ROLE.ADMIN).with_entities(Role.id).first()
+    staff_admin_role_id = Role.query.filter(
+        Role.name==ROLE.STAFF_ADMIN).with_entities(Role.id).first()
 
     # empty patient query list to start, unionize with other relevant lists
     staff_list = User.query.filter(User.id==-1)
 
     org_list = set()
+
+    user_orgs = set()
 
     # Build list of all organization ids, and their decendents, the
     # user belongs to
@@ -532,11 +516,26 @@ def staff():
         if org.id == 0:  # None of the above doesn't count
             continue
         org_list.update(OT.here_and_below_id(org.id))
+        user_orgs.add(org.id)
+
+    #Gather up all staff admin and admin that belongs to user's org(s)
+    admin_staff = User.query.join(UserRoles).filter(
+        and_(User.id==UserRoles.user_id,
+             UserRoles.role_id.in_([admin_role_id, staff_admin_role_id]),
+             User.deleted_id==None
+             )
+        ).join(UserOrganization).filter(
+            and_(UserOrganization.user_id==User.id,
+                 UserOrganization.organization_id.in_(user_orgs)))
+    admin_list = [u.id for u in admin_staff]
+
 
     # Gather up all staff belonging to any of the orgs (and their children)
-    # this (staff) user belongs to.
+    # NOTE, need to exclude staff_admin or admin user at the same org(s) as the user
+    # as the user should NOT be able to edit their record
     org_staff = User.query.join(UserRoles).filter(
         and_(User.id==UserRoles.user_id,
+            ~User.id.in_(admin_list),
              UserRoles.role_id==staff_role_id,
              User.deleted_id==None
              )
@@ -547,8 +546,7 @@ def staff():
 
     return render_template(
         'staff_by_org.html', staff_list=staff_list.all(),
-        user=user, org_list=org_list,
-        wide_container="true")
+        user=user, wide_container="true")
 
 
 @portal.route('/invite', methods=('GET', 'POST'))
@@ -594,55 +592,45 @@ def profile(user_id):
     if user_id:
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        dict_consent_by_org = VersionedResource.fetch_elements(
-            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org.get('asset', None)
-        url = dict_consent_by_org.get('url', None)
-        consent_agreements[org.id] = {
-                'organization_name': org.name,
-                'asset': asset,
-                'agreement_url': url}
+    consent_agreements = Organization.consent_agreements()
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key())) 
     return render_template(
-        'profile.html', user=user, consent_agreements=consent_agreements)
+        'profile.html', user=user, consent_agreements=consent_agreements, terms=terms)
 
 @portal.route('/privacy')
 def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
-    dict_privacy = VersionedResource.fetch_elements(app_text(PrivacyATMA.name_key()))
-    content = dict_privacy.get('asset', None)
-    editorUrl = dict_privacy.get('editorUrl', None)
-    return render_template('privacy.html' if not gil else 'gil/privacy.html',
-        content=content, user=current_user(), editorUrl=editorUrl)
+    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    return render_template(
+        'privacy.html' if not gil else 'gil/privacy.html',
+        content=privacy_resource.asset, user=current_user(),
+        editorUrl=privacy_resource.editor_url)
 
 @portal.route('/terms')
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    dict_terms = VersionedResource.fetch_elements(
-            app_text(Terms_ATMA.name_key()))
-    content = dict_terms.get('asset', None)
-    editorUrl = dict_terms.get('editorUrl', None)
+    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
     return render_template('terms.html' if not gil else 'gil/terms.html',
-        content=content, editorUrl=editorUrl, user=user)
+        content=terms.asset, editorUrl=terms.editor_url, user=user)
 
 @portal.route('/about')
 def about():
     """main TrueNTH about page"""
-    dict_about_tnth = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='TrueNTH')))
-    dict_about_mo = VersionedResource.fetch_elements(app_text(AboutATMA.name_key(subject='Movember')))
+    about_tnth = VersionedResource(
+        app_text(AboutATMA.name_key(subject='TrueNTH')))
+    about_mo = VersionedResource(
+        app_text(AboutATMA.name_key(subject='Movember')))
     gil = current_app.config.get('GIL')
-    about_tnth_content = dict_about_tnth.get('asset', None)
-    about_mo_content = dict_about_mo.get('asset', None)
-    about_tnth_editorUrl = dict_about_tnth.get('editorUrl', None)
-    about_mo_editorUrl = dict_about_mo.get('editorUrl', None)
-    return render_template('about.html' if not gil else 'gil/about.html', about_tnth=about_tnth_content,
-                           about_mo=about_mo_content, about_tnth_editorUrl=about_tnth_editorUrl,
-                           about_mo_editorUrl=about_mo_editorUrl, user=current_user())
+    return render_template(
+        'about.html' if not gil else 'gil/about.html',
+        about_tnth=about_tnth.asset,
+        about_mo=about_mo.asset,
+        about_tnth_editorUrl=about_tnth.editor_url,
+        about_mo_editorUrl=about_mo.editor_url,
+        user=current_user())
 
 @portal.route('/explore')
 def explore():
@@ -824,3 +812,25 @@ def celery_result(task_id):
 def post_result(task_id):
     r = post_request.AsyncResult(task_id).get(timeout=1.0)
     return jsonify(status_code=r.status_code, url=r.url, text=r.text)
+
+@portal.route("/legal/stock-org-consent/<org_name>")
+def stock_consent(org_name):
+    """Simple view to render default consent with named organization
+
+    We generally store the unique URL pointing to the content of the agreement
+    to which the user consents.  Special case for organizations without a
+    custom consent agreement on file.
+
+    :param org_name: the org_name to include in the agreement text
+
+    """
+    return render_template_string(
+        """<!doctype html>
+        <html>
+            <head>
+            </head>
+            <body>
+                <p>I consent to sharing information with the {{ org_name }}</p>
+            </body>
+        </html>""",
+        org_name=org_name)

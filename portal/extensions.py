@@ -8,12 +8,7 @@ Defined here to break the circular dependencies.  See `app.py` for
 additional configuration of most objects defined herein.
 
 """
-
-
-# SQLAlchemy provides the database object relational mapping (ORM)
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from database import db
 
 # Flask-User
 from flask_user import UserManager, SQLAlchemyAdapter

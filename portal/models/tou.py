@@ -1,5 +1,5 @@
 """ToU (Terms of Use)  module"""
-from ..extensions import db
+from ..database import db
 
 
 class ToU(db.Model):

@@ -4,12 +4,12 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
-from ..models.app_text import app_text, ConsentByOrg_ATMA, VersionedResource
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.fhir import AssessmentStatus
+from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -90,7 +90,7 @@ def patients_root():
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def patient_profile_create():
-    consent_agreements = get_orgs_consent_agreements()
+    consent_agreements = Organization.consent_agreements()
     user = current_user()
     leaf_organizations = user.leaf_organizations()
     return render_template(
@@ -118,7 +118,7 @@ def patient_profile(patient_id):
     patient = get_user(patient_id)
     if not patient:
         abort(404, "Patient {} Not Found".format(patient_id))
-    consent_agreements = get_orgs_consent_agreements()
+    consent_agreements = Organization.consent_agreements()
 
     user_interventions = []
     interventions =\
@@ -133,28 +133,11 @@ def patient_profile(patient_id):
                 url=display.link_url, id=patient.id)
             assessment_status = AssessmentStatus(user=patient)
             patient.assessment_overall_status = assessment_status.overall_status if assessment_status else None
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     return render_template(
         'profile.html', user=patient,
         providerPerspective="true",
         consent_agreements=consent_agreements,
-        user_interventions=user_interventions)
-
-
-def get_orgs_consent_agreements():
-    consent_agreements = {}
-    for org_id in OrgTree().all_top_level_ids():
-        org = Organization.query.get(org_id)
-        dict_consent_by_org = VersionedResource.fetch_elements(
-            app_text(ConsentByOrg_ATMA.name_key(organization=org)))
-        asset = dict_consent_by_org.get('asset', None)
-        agreement_url = dict_consent_by_org.get('url', None)
-        editor_url = dict_consent_by_org.get('editorUrl', None)
-
-        consent_agreements[org.id] = {
-                'organization_name': org.name,
-                'asset': asset,
-                'agreement_url': agreement_url,
-                'editor_url': editor_url}
-
-    return consent_agreements
+        user_interventions=user_interventions,
+        terms=terms)

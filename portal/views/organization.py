@@ -5,7 +5,8 @@ import json
 from sqlalchemy import exc, and_
 
 from ..audit import auditable_event
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.identifier import Identifier
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree
 from ..models.reference import MissingReference
@@ -44,7 +45,7 @@ def organization_search():
             letter state code.
         required: false
         type: string
-      - name: search_filter
+      - name: filter
         in: query
         description:
             Filter to apply to search, such as `leaves` to restrict results
@@ -87,12 +88,18 @@ def organization_search():
                     400, "unknown filter request '{}' - expecting "
                     "'leaves'".format(filter))
         else:
-            abort(400, "can't search on '{}' at this time".format(k))
+            abort(400, "only search on `state` or `filter` are available "
+                  "at this time")
 
     # Apply search on org fields like inheritence - include any children
     # of the matching nodes.  If filter is set, apply to results.
     ot = OrgTree()
     matching_orgs = set()
+
+    # Lookout for filter w/o a search term, use top level ids in this case
+    if filter and not found_ids:
+        found_ids = ot.all_top_level_ids()
+
     for org in found_ids:
         if filter == 'leaves':
             matching_orgs |= set(ot.all_leaves_below_id(org))

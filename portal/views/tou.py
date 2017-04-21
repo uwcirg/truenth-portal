@@ -1,7 +1,8 @@
-"""Views for Initial Consent Terms"""
+"""Views for Terms Of Use"""
 from flask import abort, jsonify, Blueprint, request
 
-from ..extensions import db, oauth
+from ..database import db
+from ..extensions import oauth
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
@@ -17,30 +18,30 @@ def get_current_tou_url():
 
     ---
     tags:
-      - Initial Consent Terms
+      - Terms Of Use
     operationId: getCurrentToU
     produces:
       - application/json
     responses:
       200:
         description:
-          Returns URL for current Initial Consent Terms, with respect to current
+          Returns URL for current Terms Of Use, with respect to current
           system configuration in simple json {url:"http..."}
 
     """
-    dict_terms = VersionedResource.fetch_elements(app_text(InitialConsent_ATMA.name_key()))
-    return jsonify(url=dict_terms.get('url', None))
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    return jsonify(url=terms.url)
 
 
 @tou_api.route('/user/<int:user_id>/tou')
 @oauth.require_oauth()
 def get_tou(user_id):
-    """Access Initial Consent Terms info for given user
+    """Access Terms Of Use info for given user
 
     Returns ToU{'accepted': true|false} for requested user.
     ---
     tags:
-      - Initial Consent Terms
+      - Terms Of Use
     operationId: getToU
     produces:
       - application/json
@@ -74,7 +75,7 @@ def get_tou(user_id):
 @tou_api.route('/user/<user_id>/tou/accepted', methods=('POST',))
 @oauth.require_oauth()
 def post_user_accepted_tou(user_id):
-    """Accept Initial Consent Terms on behalf of user
+    """Accept Terms Of Use on behalf of user
 
     POST simple JSON describing ToU the user accepted for persistence.  This
     endpoint enables service or other users to set accepted ToU on behalf of
@@ -82,7 +83,7 @@ def post_user_accepted_tou(user_id):
 
     ---
     tags:
-      - Initial Consent Terms
+      - Terms Of Use
     operationId: userAcceptToU
     produces:
       - application/json
@@ -102,7 +103,7 @@ def post_user_accepted_tou(user_id):
             - agreement_url
           properties:
             agreement_url:
-              description: URL for Initial Consent Terms text
+              description: URL for Terms Of Use text
               type: string
     responses:
       200:
@@ -127,13 +128,13 @@ def post_user_accepted_tou(user_id):
 @tou_api.route('/tou/accepted', methods=('POST',))
 @oauth.require_oauth()
 def accept_tou(user_id=None):
-    """Accept Initial Consent Terms info for authenticated user
+    """Accept Terms Of Use info for authenticated user
 
     POST simple JSON describing ToU the user accepted for persistence.
 
     ---
     tags:
-      - Initial Consent Terms
+      - Terms Of Use
     operationId: acceptToU
     produces:
       - application/json
@@ -147,7 +148,7 @@ def accept_tou(user_id=None):
             - agreement_url
           properties:
             agreement_url:
-              description: URL for Initial Consent Terms text
+              description: URL for Terms Of Use text
               type: string
     responses:
       200:

@@ -19,7 +19,7 @@ import time
 from .audit import Audit
 from ..dict_tools import dict_match
 from .encounter import Encounter
-from ..extensions import db
+from ..database import db
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .identifier import Identifier

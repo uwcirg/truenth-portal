@@ -6,7 +6,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
-from ..extensions import db, oauth, user_manager
+from ..database import db
+from ..extensions import oauth, user_manager
 from ..models.audit import Audit
 from ..models.group import Group
 from ..models.organization import Organization
@@ -349,8 +350,7 @@ def access_url(user_id):
     user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE,
-                      ROLE.STAFF])
+    not_allowed = set([ROLE.ADMIN, ROLE.APPLICATION_DEVELOPER, ROLE.SERVICE])
     has = set([role.name for role in user.roles])
     if not has.isdisjoint(not_allowed):
         abort(400, "Access URL not provided for privileged accounts")
