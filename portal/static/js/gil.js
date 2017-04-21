@@ -524,7 +524,7 @@ module.exports = OrgTool = (function() {
         }).done(function(data) {
           if (callback) callback(data);
         }).fail(function() {
-          if (callback) callback();
+          if (callback) callback({error: "failed request"});
         });
 
     };
