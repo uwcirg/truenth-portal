@@ -1370,7 +1370,7 @@ input.clinic {
   top: -1px !important;
 }
 div.noOrg-container input[type="radio"] {
-  font-size: 0.95em;
+  left: 2px;
   top: 2px;
 }
 div.noOrg-container span {
