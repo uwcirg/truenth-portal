@@ -353,11 +353,6 @@ function getNext() {
             if (hasValue(parentOrg)) {
               var cModal = $("#" + parentOrg + "_consentModal");
               if (cModal.length > 0) cModal.modal("show");
-              else {
-                var dModal = $("#" + parentOrg + "_defaultConsentModal");
-                if (dModal.length > 0) dModal.modal("show");
-                else if (!found) continueToFinish();
-              }
             } else {
               if (!found) continueToFinish();
             };
