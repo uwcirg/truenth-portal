@@ -553,9 +553,10 @@ $(document).ready(function(){
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
+                  $("#biopsyDate").datepicker("hide").blur();
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
-            };
+            }
 
             thisItem.parents(".pat-q").next().fadeIn();
 
