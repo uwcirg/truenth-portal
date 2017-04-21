@@ -631,6 +631,8 @@ var fillContent = {
         fillViews.studyId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
+        var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
+        var content = "";
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
             var dataArray = data["consent_agreements"].sort(function(a,b){
                  return new Date(b.signed) - new Date(a.signed);
@@ -641,8 +643,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
-            var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
-
+        
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -664,7 +665,7 @@ var fillContent = {
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
-            var content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
+            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
@@ -757,7 +758,7 @@ var fillContent = {
 
                     };
 
-                    if (ctop) {
+                    if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
                         content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
                         content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
                         content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
@@ -808,7 +809,18 @@ var fillContent = {
                  $("#profileConsentList .button--LR").each(function() {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
                  });
-            } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+            } else {
+                if (ctop) {
+                        if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                            content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
+                            content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                            content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                            content += "</tr>";
+                            $("#profileConsentList").html(content);
+                        } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+            };
 
             if (editable) {
                 $("input[class='radio_consent_input']").each(function() {
@@ -827,10 +839,19 @@ var fillContent = {
             };
 
         } else {
-            $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
-            if (parseInt(errorCode) == 401) {
+            if (hasValue(errorMessage)) {
+                $("#profileConsentList").html(errorMessage ? ("<p class='text-danger'>" + errorMessage + "</p>") : "<p class='text-muted'>No consent found for this user.</p>");
+            } else if (parseInt(errorCode) == 401) {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
+            } else {
+                if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                    content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                    content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
+                    content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                    content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                    content += "</tr>";
+                } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
         };
         $("#profileConsentList").animate({opacity: 1});
