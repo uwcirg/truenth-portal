@@ -21,7 +21,7 @@ ErrorLog /dev/stdout\n\
   ErrorLog /dev/stdout\n\
   CustomLog /dev/stdout combined\n\
   WSGIPassAuthorization On\n\
-  WSGIDaemonProcess stg_cs user=${APACHE_RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
+  WSGIDaemonProcess stg_cs user=${RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
   WSGIScriptAlias / /var/www/portal.wsgi\n\
   <Directory /var/www/>\n\
     WSGIProcessGroup stg_cs\n\
@@ -54,21 +54,21 @@ RUN \
 COPY portal.wsgi /var/www/
 
 ENV \
-    APACHE_RUN_USER="${APACHE_RUN_USER:-www-data}" \
+    RUN_USER="${RUN_USER:-www-data}" \
     LOG_FOLDER="/tmp/shared_service_log" \
     PORT="${PORT:-8008}" \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
     mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
-    chown $APACHE_RUN_USER:$APACHE_RUN_USER \
+    chown $RUN_USER:$RUN_USER \
         /var/run/apache2/ \
         ${LOG_FOLDER} \
         ${PROJECT_DIR}/var/portal-instance/ && \
     sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf && \
     a2ensite portal && a2dissite 000-default && a2disconf other-vhosts-access-log
 
-USER ${APACHE_RUN_USER}
+USER ${RUN_USER}
 
 ENV \
     SERVER_NAME=${SERVER_NAME:-localhost} \
