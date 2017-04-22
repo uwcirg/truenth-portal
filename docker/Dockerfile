@@ -32,7 +32,6 @@ RUN \
 ENV \
     RUN_USER="${RUN_USER:-www-data}" \
     LOG_FOLDER="/tmp/shared_service_log" \
-    PORT="${PORT:-8008}" \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
@@ -43,6 +42,7 @@ USER ${RUN_USER}
 
 ENV \
     SERVER_NAME=${SERVER_NAME:-localhost} \
+    PORT="${PORT:-8008}" \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}"
 
