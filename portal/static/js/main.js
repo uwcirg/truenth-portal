@@ -643,7 +643,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
-        
+
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -845,12 +845,13 @@ var fillContent = {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
             } else {
-                if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                if (ctop && typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
                     content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
                     content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
                     content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
                     content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
                     content += "</tr>";
+                    $("#profileConsentList").html(content);
                 } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
         };
@@ -1472,7 +1473,7 @@ var OrgTool = function() {
     };
     this.getDefaultModal = function(o) {
         if (!o) return false;
-        var orgId = $(o).val(), orgName = $(o).attr("data-parent-name");
+        var orgId = this.getElementParentOrg(o), orgName = $(o).attr("data-parent-name");
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
             var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_consentModal">'
                 + '<div class="modal-dialog" role="document">' +
@@ -1498,7 +1499,7 @@ var OrgTool = function() {
                 '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
                 '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="Close">Close</button>' +
                 '</div></div></div></div>';
-            $("#consentContainer").append(s);
+            $("#defaultConsentContainer").append(s);
             $("#" + orgId + "_defaultConsentModal input[name='defaultToConsent']").each(function() {
                 $(this).on("click", function(e) {
                     e.stopPropagation();
@@ -1508,7 +1509,10 @@ var OrgTool = function() {
                     $("#" + orgId + "_loader").show();
                     if ($(this).val() == "yes") {
                         setTimeout("tnthAjax.setDefaultConsent(" + userId + "," +  orgId + ");", 100);
-                    } else tnthAjax.deleteConsent(userId, {"org":orgId});
+                    } else {
+                        tnthAjax.deleteConsent(userId, {"org":orgId});
+                        setTimeout("tnthAjax.removeObsoleteConsent();", 100);
+                    }
                     if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
                     setTimeout('$(".modal").modal("hide");', 250);
                 });
@@ -1864,7 +1868,7 @@ var tnthAjax = {
             var orgId = $(this).val();
             var userId = $("#fillOrgs").attr("userId");
             if (!hasValue(userId)) userId = $("#userOrgs").attr("userId");
-        
+
             var cto = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
@@ -1878,7 +1882,7 @@ var tnthAjax = {
                             setTimeout("tnthAjax.removeObsoleteConsent();", 200);
                         } else {
                             if (cto) {
-                                tnthAjax.setDefaultConsent(userId, parentOrg); 
+                                tnthAjax.setDefaultConsent(userId, parentOrg);
                             };
                         };
                     };
