@@ -35,7 +35,7 @@ ENV \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
-    mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
+    mkdir --parents ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
     chown $RUN_USER:$RUN_USER ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
 
 USER ${RUN_USER}
