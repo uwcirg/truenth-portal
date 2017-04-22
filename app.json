@@ -7,10 +7,6 @@
   "logo": "https://github.com/uwcirg/true_nth_usa_portal/raw/develop/portal/static/img/logo.png",
   "success_url": "/about",
   "env": {
-    "LOG_FOLDER": {
-      "description": "Temporary log directory override; should write to stdout if unconfigured",
-      "value": "/tmp/logs"
-    },
     "SERVER_NAME": {
       "description": "Fully qualified domain name of system, excluding protocol (HTTP/S). See App Name",
       "value": "HEROKU_APP_NAME.herokuapp.com"
