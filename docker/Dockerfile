@@ -55,15 +55,13 @@ COPY portal.wsgi /var/www/
 
 ENV \
     APACHE_RUN_USER="${APACHE_RUN_USER:-www-data}" \
-    LOG_FOLDER="/tmp/shared_service_log" \
     PORT="${PORT:-8008}" \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
-    mkdir -p ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
+    mkdir -p ${PROJECT_DIR}/var/portal-instance/ && \
     chown $APACHE_RUN_USER:$APACHE_RUN_USER \
         /var/run/apache2/ \
-        ${LOG_FOLDER} \
         ${PROJECT_DIR}/var/portal-instance/ && \
     sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf && \
     a2ensite portal && a2dissite 000-default && a2disconf other-vhosts-access-log
