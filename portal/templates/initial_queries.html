@@ -353,6 +353,8 @@ function getNext() {
             if (hasValue(parentOrg)) {
               var cModal = $("#" + parentOrg + "_consentModal");
               if (cModal.length > 0) cModal.modal("show");
+              var dModal = $("#" + parentOrg + "_defaultConsentModal");
+              if (dModal.length > 0) dModal.modal("show");
             } else {
               if (!found) continueToFinish();
             };
@@ -647,6 +649,21 @@ $(document).ready(function(){
       };
     };
 
+    $("#defaultConsentContainer .modal").each(function() {
+        $(this).on("hidden.bs.modal", function() {
+          if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+            if (fc.allFieldsCompleted()) {
+              continueToFinish();
+            } else {
+              if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
+              else stopContinue("orgsContainer");
+            };
+          } else {
+            $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
+          };
+        });
+    });
+
     $("#consentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
@@ -661,16 +678,6 @@ $(document).ready(function(){
               };
             } else {
               $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
-            };
-            if ($("#consentContainer input[name='defaultToConsent']:checked").length > 0) {
-              if (fc.allFieldsCompleted()) {
-                continueToFinish();
-              } else {
-                if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
-                else stopContinue("orgsContainer");
-              };
-            } else {
-              $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
             };
         });
     });
