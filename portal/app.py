@@ -161,7 +161,7 @@ def configure_logging(app):  # pragma: no cover
         sql_log.setLevel(logging.INFO)
         sql_log.addHandler(sql_file_handler)
 
-    if app.testing:
+    if app.testing or not app.config.get('LOG_FOLDER', None):
         # Skip test mode. Just check standard output.
         return
 
