@@ -81,9 +81,5 @@ CMD \
     . /etc/apache2/envvars && \
     . ${PROJECT_DIR}/bin/activate && \
     env && \
-    if [ -n "$(flask db current)" ]; then \
-        flask db migrate; \
-    else \
-        python ${FLASK_APP} initdb; \
-    fi && \
+    python ${FLASK_APP} sync && \
     /usr/sbin/apache2 -D FOREGROUND
