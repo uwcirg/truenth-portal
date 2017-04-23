@@ -129,10 +129,13 @@ a.btn {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show='true'] {
     opacity: 1;
 }
-
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show='false'] {
+    opacity: 0;
+}
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    #999;
 }
@@ -1358,7 +1361,6 @@ div.main-state-container .noOrg-container {
   margin-left: 0.5em;
 }
 div.noOrg-container {
-  font-size: 0.95em;
   margin-top: 0.2em;
 }
 div.noOrg-container input[type="radio"] {
@@ -1369,6 +1371,7 @@ div.noOrg-container span {
   margin-left: 2px;
   position: relative;
   top: 1px;
+  left: 2px;
   font-weight: normal;
 }
 #createProfileForm .title {

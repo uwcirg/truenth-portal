@@ -167,8 +167,11 @@ a.btn {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show = 'true'] {
     opacity: 1;
+}
+#profileConsentList .button--LR[data-show = 'false'] {
+    opacity: 0;
 }
 #profileConsentList {
   .button--LR,
@@ -1477,12 +1480,12 @@ input.clinic {
 }
 div.noOrg-container {
   input[type="radio"] {
-  font-size:0.95em;
   top: 2px;
   }
   span {
   margin-left:5px;
   position: relative;
+  left: 2px;
   top: 1px;
   }
 }

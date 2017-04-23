@@ -39,8 +39,9 @@ Flask-WTF==0.14.2
 functools32==3.2.3.post2
 future==0.16.0
 fuzzywuzzy==0.15.0
+gunicorn==19.7.1
 imagesize==0.7.1
-ipdb==0.10.2
+ipdb==0.10.3
 ipython==5.3.0
 ipython-genutils==0.2.0
 itsdangerous==0.24
@@ -78,7 +79,7 @@ redis==2.10.5
 requests==2.13.0
 requests-cache==0.4.13
 requests-oauthlib==0.8.0
-selenium==3.3.3
+selenium==3.4.0
 simplegeneric==0.8.1
 six==1.10.0
 snowballstemmer==1.2.1

@@ -184,8 +184,12 @@ select:not([multiple]) {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show='true'] {
     opacity: 1;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show='false'] {
+    opacity: 0;
 }
 #fullSizeBox a[href*="register"] {
   display: none;
@@ -1366,7 +1370,7 @@ input.clinic {
   top: -1px !important;
 }
 div.noOrg-container input[type="radio"] {
-  font-size: 0.95em;
+  left: 2px;
   top: 2px;
 }
 div.noOrg-container span {

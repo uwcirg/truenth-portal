@@ -174,8 +174,11 @@ a.btn {
   display: inline-block;
 }
 .button--LR.data-show,
-#profileConsentList .button--LR[data-show] {
+#profileConsentList .button--LR[data-show = 'true'] {
     opacity: 1;
+}
+#profileConsentList .button--LR[data-show = 'false'] {
+    opacity: 0;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
@@ -1492,6 +1495,7 @@ div.noOrg-container {
   margin-left:2px;
   position: relative;
   top: 1px;
+  left: 2px;
   font-weight: normal;
   }
 }

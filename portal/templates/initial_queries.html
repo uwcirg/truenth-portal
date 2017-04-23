@@ -40,13 +40,13 @@
               </div>
             </div>
         {% endif %}
-        {% if 'org' in still_needed %}
+        {% if 'org' in still_needed or session.get('associate_clinic_id', '') %}
             <div id="orgsContainer" class="iq-container" parent-section="true">
               <div class="content">
                 <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
                 <div class="content-body">
-                 {% if not session.get('associate_clinic_id', '') and ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                     <div id="clinics" parent-section="true">
+                 {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                     <div id="clinics">
                         {{profileOrgsSelector(user, user, consent_agreements)}}
                      </div>
                  {% else %}
@@ -95,6 +95,7 @@
 var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
+var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-endif-%};
 
 var fc, mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
@@ -252,31 +253,31 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
       if (fields) {
           fields.forEach(function(field) {
             if (field.length > 0 && (field.attr("skipped") != "true")) {
-              var type = field.attr('type');
-              switch(String(type).toLowerCase()) {
-              case 'checkbox':
-                    _isChecked = false;
-                    field.each(function() {
-                        if ($(this).is(":checked")) {
-                          _isChecked = true;
-                        };
-                    });
-                    if (!(_isChecked)) isComplete = false;
+                var type = field.attr('type');
+                switch(String(type).toLowerCase()) {
+                case 'checkbox':
+                case 'radio':
+                      _isChecked = false;
+                      field.each(function() {
+                          if ($(this).is(":checked")) {
+                            _isChecked = true;
+                          };
+                          if (hasValue($(this).attr("data-require-validate"))) isComplete = false;
+                      });
+                      if (!(_isChecked)) isComplete = false;
+                      break;
+                case 'select':
+                    if (field.val() == '') isComplete = false;
                     break;
-              case 'radio':
-                  if (!field.is(":checked")) isComplete = false;
-                  break;
-              case 'select':
-                  if (field.val() == '') isComplete = false;
-                  break;
-              case 'text':
-                  if (field.val() == '') isComplete = false;
-                  else if (!(field.get(0).validity.valid)) isComplete = false;
-                  break;
-              case 'terms':
-                  if (!(field.attr("data-agree") == "true")) isComplete = false;
-                  break;
-              };
+                case 'text':
+                    if (field.val() == '') isComplete = false;
+                    else if (!(field.get(0).validity.valid)) isComplete = false;
+                    break;
+                case 'terms':
+                    if (!(field.attr("data-agree") == "true")) isComplete = false;
+                    break;
+                };
+                if (hasValue(field.attr("data-require-validate"))) isComplete = false;
             };
         });
       };
@@ -344,6 +345,23 @@ function getNext() {
     if (!found && !fc.sectionCompleted(section)) {
       $("#" + section).fadeIn(500).addClass("open");
       found = true;
+       if (section == "orgsContainer") {
+          if (hasValue(preselectClinic)) {
+            OT.handlePreSelectedClinic();
+            var o = $("#userOrgs input[name='organization']:checked");
+            var parentOrg = OT.getElementParentOrg(o);
+            if (hasValue(parentOrg)) {
+              var cModal = $("#" + parentOrg + "_consentModal");
+              if (cModal.length > 0) cModal.modal("show");
+              var dModal = $("#" + parentOrg + "_defaultConsentModal");
+              if (dModal.length > 0) dModal.modal("show");
+            } else {
+              if (!found) continueToFinish();
+            };
+          } else {
+            if (!found) continueToFinish();
+          };
+       };
     };
   };
   if (!found) continueToFinish();
@@ -538,6 +556,7 @@ $(document).ready(function(){
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
+                  $("#biopsyDate").datepicker("hide").blur();
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
             };
@@ -630,9 +649,27 @@ $(document).ready(function(){
       };
     };
 
+    $("#defaultConsentContainer .modal").each(function() {
+        $(this).on("hidden.bs.modal", function() {
+          if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+            if (fc.allFieldsCompleted()) {
+              continueToFinish();
+            } else {
+              if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
+              else stopContinue("orgsContainer");
+            };
+          } else {
+            $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
+          };
+        });
+    });
+
     $("#consentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
+              $("#userOrgs input[name='organization']").each(function() {
+                $(this).removeAttr("data-require-validate");
+              });
               if (fc.allFieldsCompleted()) {
                 continueToFinish();
               } else {
@@ -641,16 +678,6 @@ $(document).ready(function(){
               };
             } else {
               $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
-            };
-            if ($("#consentContainer input[name='defaultToConsent']:checked").length > 0) {
-              if (fc.allFieldsCompleted()) {
-                continueToFinish();
-              } else {
-                if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
-                else stopContinue("orgsContainer");
-              };
-            } else {
-              $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
             };
         });
     });

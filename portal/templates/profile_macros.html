@@ -507,6 +507,7 @@
                </div>
            </div>
            <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+           <div id="defaultConsentContainer"></div>
            {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
     </div>
@@ -647,7 +648,7 @@
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
+        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}true{% else %}false{% endif %};
         //STAFF CANNOT EDIT THEIR OWN ORGS
         {% if not(current_user.has_role(ROLE.ADMIN)) and current_user.has_role(ROLE.STAFF) and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
 
@@ -755,7 +756,7 @@
 {% macro consent(person, consent_agreements, current_user, includeModal) -%}
     {%- if person and consent_agreements -%}
         <div id="consentContainer">
-            {{consent_fields(consent_agreements)}}
+            {{consent_fields(consent_agreements, current_user)}}
             {%- if includeModal-%}
                 {%- for org in consent_agreements -%}
                    {%- if consent_agreements[org].url and consent_agreements[org].asset -%}
@@ -780,7 +781,10 @@
                             setTimeout("tnthAjax.setConsent({{person.id}}, " + JSON.stringify(params) + ");", 10);
                             setTimeout("tnthAjax.removeObsoleteConsent();", 100);
                         }
-                        else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
+                        else {
+                            tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
+                            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
+                        };
                         if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
                         setTimeout('$(".modal").modal("hide");', 250);
                     });
@@ -898,7 +902,7 @@
      });</script>
 {%- endmacro %}
 
-{% macro profileConsent(person, current_user) -%}
+{% macro profileConsent(person, current_user, terms) -%}
     {% if person %}
     <div id="profileConsentList"></div>
     <script>
@@ -1630,7 +1634,7 @@
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions, terms) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1698,7 +1702,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
-                    {{profileConsent(person, current_user)}}
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>
@@ -1741,7 +1745,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions, terms) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
@@ -1838,7 +1842,7 @@
     {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) %}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
@@ -1849,7 +1853,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user)}}
+                    {{profileConsent(person, current_user, terms)}}
                 </div>
             </div>
         </div>
