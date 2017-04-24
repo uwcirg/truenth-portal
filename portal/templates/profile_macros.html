@@ -609,7 +609,7 @@
                   .prepend("<option value='' selected>Select</option>")
                   .val("");
                   $(".state-container, .clinic-prompt").hide();
-                  OT.handlePreSelectedClinic();
+                  setTimeout("OT.handlePreSelectedClinic();", 200);
                   //case of pre-selected clinic, need to check if any clinic has prechecked
                   setTimeout("handleCheckedItem();", 500);
 
