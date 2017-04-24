@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import current_app, abort, Blueprint, render_template, request
+from flask import abort, Blueprint, render_template, request
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -8,10 +8,8 @@ from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
-from ..models.user_consent import UserConsent
 from ..models.fhir import AssessmentStatus
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
-from datetime import datetime
 
 
 patients = Blueprint('patients', __name__, url_prefix='/patients')
@@ -35,24 +33,6 @@ def patients_root():
     patients = User.query.filter(User.id==-1)
 
     org_list = set()
-
-    consent_with_top_level_org = current_app.config.get('CONSENT_WITH_TOP_LEVEL_ORG', False)
-    now = datetime.utcnow()
-    consented_users = []
-    #gather all consented users from user's organizations
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-          continue
-        #get respective consented user for each user org
-        consent_org_id = org.id
-        if consent_with_top_level_org:
-            consent_org_id = OrgTree().find(org.id).top_level()
-        if consent_org_id:
-            consent_query = UserConsent.query.filter(and_(
-                        UserConsent.organization_id == consent_org_id,
-                        UserConsent.deleted_id == None,
-                        UserConsent.expires > now)).with_entities(UserConsent.user_id)
-            consented_users.extend([u[0] for u in consent_query])
 
     if user.has_role(ROLE.STAFF):
         request_org_list = request.args.get('org_list', None)
@@ -78,8 +58,7 @@ def patients_root():
         org_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
-                 User.id.in_(consented_users)
+                 User.deleted_id==None
                  )
             ).join(UserOrganization).filter(
                 and_(UserOrganization.user_id==User.id,
@@ -95,8 +74,7 @@ def patients_root():
         ui_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
-                 User.deleted_id==None,
-                 User.id.in_(consented_users))
+                 User.deleted_id==None)
                  ).join(UserIntervention).filter(
                  and_(UserIntervention.user_id==User.id,
                      UserIntervention.intervention_id.in_(ui_list)))
