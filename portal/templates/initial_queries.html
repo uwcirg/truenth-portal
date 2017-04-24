@@ -343,24 +343,21 @@ function getNext() {
   var found = false;
   for (var section in fc.mainSections) {
     if (!found && !fc.sectionCompleted(section)) {
-      $("#" + section).fadeIn(500).addClass("open");
-      found = true;
        if (section == "orgsContainer") {
           if (hasValue(preselectClinic)) {
-            OT.handlePreSelectedClinic();
-            var o = $("#userOrgs input[name='organization']:checked");
-            var parentOrg = OT.getElementParentOrg(o);
-            if (hasValue(parentOrg)) {
-              var cModal = $("#" + parentOrg + "_consentModal");
-              if (cModal.length > 0) cModal.modal("show");
-              var dModal = $("#" + parentOrg + "_defaultConsentModal");
-              if (dModal.length > 0) dModal.modal("show");
-            } else {
-              if (!found) continueToFinish();
-            };
+              var __modal = OT.getConsentModal();
+              if (__modal) {
+                __modal.modal("show");
+              };
+              $("#" + section).fadeIn(500).addClass("open");
+              found = true;
           } else {
-            if (!found) continueToFinish();
+            $("#" + section).fadeIn(500).addClass("open");
+            found = true;
           };
+       } else {
+          $("#" + section).fadeIn(500).addClass("open");
+          found = true;
        };
     };
   };
@@ -652,21 +649,22 @@ $(document).ready(function(){
     $("#defaultConsentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
           if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+            $("#userOrgs input[name='organization']").each(function() {
+                $(this).removeAttr("data-require-validate");
+            });
             if (fc.allFieldsCompleted()) {
               continueToFinish();
             } else {
               if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
               else stopContinue("orgsContainer");
             };
-          } else {
-            $("#consentContainer input[name='defaultToConsent']:checked").prop("checked", false);
           };
         });
     });
 
     $("#consentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
-            if ($("#consentContainer input[name='toConsent']:checked").length > 0) {
+            if ($(this).find("input[name='toConsent']:checked").length > 0) {
               $("#userOrgs input[name='organization']").each(function() {
                 $(this).removeAttr("data-require-validate");
               });
@@ -676,8 +674,6 @@ $(document).ready(function(){
                 if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
                 else stopContinue("orgsContainer");
               };
-            } else {
-              $("#consentContainer input[name='toConsent']:checked").prop("checked", false);
             };
         });
     });
