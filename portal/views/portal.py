@@ -115,6 +115,7 @@ def gil_shortcut_alias_validation(clinic_alias):
         OT = OrgTree()
         orgs = OT.here_and_below_id(results.organization_id)
         for childOrg in orgs:
+            # the org tree contains an org other than the alias org itself
             if childOrg != results.organization_id:
                 return jsonify({"error": "alias points to top-level organization"})
 
@@ -206,6 +207,7 @@ def specific_clinic_landing(clinic_alias):
         OT = OrgTree()
         orgs = OT.here_and_below_id(results.organization_id)
         for childOrg in orgs:
+            # the org tree contains an org other than the alias org itself
             if childOrg != results.organization_id:
                 abort(400, "alias points to top-level organization")
 
