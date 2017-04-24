@@ -109,10 +109,14 @@ def gil_shortcut_alias_validation(clinic_alias):
     # Expecting exactly one organization for this alias, save ID in session
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
-    # Top-level orgs won't work, as the UI only lists the clinic level
+    # Top-level orgs with child orgs won't work, as the UI only lists the clinic level
     org = Organization.query.get(results.organization_id)
     if org.partOf_id is None:
-        return jsonify({"error": "alias points to top-level organization"})
+        OT = OrgTree()
+        orgs = OT.here_and_below_id(results.organization_id)
+        for childOrg in orgs:
+            if childOrg != results.organization_id:
+                return jsonify({"error": "alias points to top-level organization"})
 
     identifier = {"name": org.name}
 
@@ -196,10 +200,14 @@ def specific_clinic_landing(clinic_alias):
     results = OrganizationIdentifier.query.filter_by(
         identifier_id=identifier.id).one()
 
-    # Top-level orgs won't work, as the UI only lists the clinic level
+    # Top-level orgs with child orgs won't work, as the UI only lists the clinic level
     org = Organization.query.get(results.organization_id)
     if org.partOf_id is None:
-        abort(400, "alias points to top-level organization")
+        OT = OrgTree()
+        orgs = OT.here_and_below_id(results.organization_id)
+        for childOrg in orgs:
+            if childOrg != results.organization_id:
+                abort(400, "alias points to top-level organization")
 
     session['associate_clinic_id'] = results.organization_id
     current_app.logger.debug(
@@ -593,7 +601,7 @@ def profile(user_id):
         user.check_role("edit", other_id=user_id)
         user = get_user(user_id)
     consent_agreements = Organization.consent_agreements()
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key())) 
+    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     return render_template(
         'profile.html', user=user, consent_agreements=consent_agreements, terms=terms)
 
