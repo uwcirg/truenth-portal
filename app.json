@@ -30,6 +30,6 @@
     }
   ],
   "scripts": {
-    "postdeploy": "python manage.py initdb"
+    "postdeploy": "python manage.py sync"
   }
 }
