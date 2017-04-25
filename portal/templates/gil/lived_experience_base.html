@@ -1,0 +1,16 @@
+{% extends "gil/base.html" %}
+{% block footnote %}
+<aside>
+     <div class="module-wrap module-wrap--background" style="background-image: url({{ url_for('static', filename='img/LE_Share_Story.jpg') }})">
+        <div class="module">
+          <div class="accent-heading accent-heading--white">Objective N<em>o</em>1: TrueNTH Community</div>
+          <h3 class="module__head">Everyone has a part to play in improving the prostate cancer journey.</h3>
+          <div class="module--flex">
+            <div class="button-callout"><a href="{{PORTAL}}{{url_for('portal.contact')}}" class="button button--large button--teal" id="lnShareYourStory">Share Your Story</a></div>
+            <div class="button-callout"><a href="{{PORTAL}}{{url_for('portal.lived_experience')}}" class="button button--large button--teal" id="lnReadMoreStory">Read More Stories</a></div>
+          </div>
+        </div>
+        </div>
+      </div>
+ </aside>
+{% endblock %}

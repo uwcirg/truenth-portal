@@ -822,6 +822,7 @@ function setSelectedNavItem(obj) {
 
     $(obj).on("click", function(event) {
           event.preventDefault();
+          loader(false);
           $(".side-nav__close").trigger("click");
           return;
      });
