@@ -50,10 +50,7 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
-    LOG_FOLDER = os.environ.get(
-        'LOG_FOLDER',
-        os.path.join('/var/log', __package__)
-    )
+    LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
     LOG_LEVEL = 'DEBUG'
 
     MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
