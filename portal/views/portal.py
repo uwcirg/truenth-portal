@@ -144,6 +144,18 @@ def exercise_and_diet():
 def lived_experience():
     return render_template('gil/lived-experience.html', user=current_user())
 
+@portal.route('/david-andrew-story')
+def david_andrew_story():
+    return render_template('gil/david_andrew_story.html', user=current_user())
+
+@portal.route('/alonzo-mccann-story')
+def alonzo_mccann_story():
+    return render_template('gil/alonzo_mccann_story.html', user=current_user())
+
+@portal.route('/hirsch-brothers-story')
+def hirsch_brothers_story():
+    return render_template('gil/hirsch_brothers_story.html', user=current_user())
+
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
 
