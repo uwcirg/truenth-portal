@@ -408,8 +408,8 @@ var fillViews = {
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
-            else $("#procedure_view").html("<p class='text-muted'>No information provided</p>");
-        } else $("#procedure_view").html("<p class='text-muted'>No information available</p>");
+            else $("#procedure_view").html("<p class='text-muted'>No information provided.</p>");
+        } else $("#procedure_view").html("<p class='text-muted'>No information available.</p>");
     }
 };
 
