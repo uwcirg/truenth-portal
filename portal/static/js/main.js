@@ -408,8 +408,8 @@ var fillViews = {
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
-            else $("#procedure_view").html("<p class='text-muted'>No information provided</p>");
-        } else $("#procedure_view").html("<p class='text-muted'>No information available</p>");
+            else $("#procedure_view").html("<p class='text-muted'>No information provided.</p>");
+        } else $("#procedure_view").html("<p class='text-muted'>No information available.</p>");
     }
 };
 
@@ -608,6 +608,7 @@ var fillContent = {
                         ckOrg.prop("checked", true);
                         $("#stateSelector").find("option[value='" + state + "']").prop("selected", true).val(state);
                     });
+                    $(".noOrg-container").show();
                 } else {
                     var ckOrg = $("body").find("#userOrgs input.clinic[value="+orgID+"]");
                     if (ckOrg.length > 0) ckOrg.prop('checked', true);
@@ -811,14 +812,14 @@ var fillContent = {
                  });
             } else {
                 if (ctop) {
-                        if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
-                            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                            content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                            content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                            content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                            content += "</tr>";
-                            $("#profileConsentList").html(content);
-                        } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                    if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                        content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
+                        content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
+                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
+                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
+                        content += "</tr>";
+                        $("#profileConsentList").html(content);
+                    } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
 
@@ -1475,7 +1476,7 @@ var OrgTool = function() {
         if (!o) return false;
         var orgId = this.getElementParentOrg(o), orgName = $(o).attr("data-parent-name");
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
-            var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_consentModal">'
+            var s = '<div class="modal fade" id="' + orgId + '_defaultConsentModal" tabindex="-1" role="dialog" aria-labelledby="' + orgId + '_defaultConsentModal">'
                 + '<div class="modal-dialog" role="document">' +
                 '<div class="modal-content">' +
                 '<div class="modal-header">' +
@@ -1542,10 +1543,27 @@ var OrgTool = function() {
     }
     this.handlePreSelectedClinic = function() {
         if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            var ob = $("body").find("#userOrgs input[value="+preselectClinic+"]");
+            var ob = $("#userOrgs input[value='"+preselectClinic+"']");
             if (ob.length > 0) {
-                ob.prop('checked', true);
-                ob.attr('data-require-validate', 'true');
+                ob.prop("checked", true);
+                var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
+                var userId = $("#fillOrgs").attr("userId");
+                if (!tnthAjax.hasConsent(userId, parentOrg)) {
+                    var __modal = OT.getConsentModal();
+                    if (__modal) {
+                        ob.attr("data-require-validate", "true");
+                         __modal.on("hidden.bs.modal", function() {
+                            if ($(this).find("input[name='toConsent']:checked").length > 0 ||
+                                $(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                                  $("#userOrgs input[name='organization']").each(function() {
+                                    $(this).removeAttr("data-require-validate");
+                                  });
+                            };
+                        });
+                    } else {
+                        tnthAjax.setDefaultConsent(userId, parentOrg);
+                    };
+                };
                 var stateContainer = ob.closest(".state-container");
                 if (stateContainer.length > 0) {
                     var st = stateContainer.attr("state");
@@ -1556,6 +1574,23 @@ var OrgTool = function() {
                 };
             };
         };
+    };
+    this.getSelectedOrg = function() {
+        return $("#userOrgs input[name='organization']:checked");
+    };
+    this.getConsentModal = function(parentOrg) {
+        if (!hasValue(parentOrg)) {
+            parentOrg = this.getElementParentOrg(this.getSelectedOrg());
+        };
+        if (hasValue(parentOrg)) {
+            var __modal = $("#" + parentOrg + "_consentModal");
+            if (__modal.length > 0) return __modal;
+            else {
+                var __defaultModal = this.getDefaultModal(this.getSelectedOrg());
+                if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
+                else return false;
+            };
+        } else return false;
     };
     this.handleEvent = function() {
         getSaveLoaderDiv("profileForm", "userOrgs");
@@ -1588,16 +1623,11 @@ var OrgTool = function() {
                     if (tnthAjax.hasConsent(userId, parentOrg)) {
                         assembleContent.demo(userId,true, $(this), true);
                     } else {
-                        var __modal = $("#" + parentOrg + "_consentModal");
-                        if (__modal.length > 0) $("#" + parentOrg + "_consentModal").modal("show");
+                        var __modal = OT.getConsentModal();
+                        if (__modal.length > 0) __modal.modal("show");
                         else {
-                            //open default modal
-                            var __defaultModal = OT.getDefaultModal(this);
-                            if (__defaultModal) __defaultModal.modal("show");
-                            else {
-                              tnthAjax.setDefaultConsent(userId, parentOrg);
-                              assembleContent.demo(userId,true, $(this), true);
-                            };
+                            tnthAjax.setDefaultConsent(userId, parentOrg);
+                            assembleContent.demo(userId,true, $(this), true);
                         };
                     };
                 }
@@ -1842,15 +1872,6 @@ var tnthAjax = {
     removeObsoleteConsent: function() {
         var userId = $("#fillOrgs").attr("userId");
         var co = [];
-        function inCurrent(o) {
-            var found = false;
-            co.forEach(function(org) {
-                if (!found) {
-                    if (org == o) found = true;
-                };
-            });
-            return found;
-        };
         $("#userOrgs input[name='organization']").each(function() {
             if ($(this).is(":checked")) {
                 var po = OT.getElementParentOrg(this);

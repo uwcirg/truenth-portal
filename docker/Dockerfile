@@ -6,31 +6,9 @@ RUN \
     apt-get update && \
     apt-get dist-upgrade --yes && \
     apt-get install --yes --force-yes --no-install-recommends \
-        apache2 \
-        libapache2-mod-wsgi \
         libpq5 \
         python2.7 && \
     apt-get clean
-
-RUN printf '\n\
-Listen 0.0.0.0:${PORT}\n\
-ServerName ${SERVER_NAME}\n\
-ErrorLog /dev/stdout\n\
-<VirtualHost *:${PORT}>\n\
-  LogLevel info\n\
-  ErrorLog /dev/stdout\n\
-  CustomLog /dev/stdout combined\n\
-  WSGIPassAuthorization On\n\
-  WSGIDaemonProcess stg_cs user=${APACHE_RUN_USER} group=${APACHE_RUN_GROUP} threads=5\n\
-  WSGIScriptAlias / /var/www/portal.wsgi\n\
-  <Directory /var/www/>\n\
-    WSGIProcessGroup stg_cs\n\
-    WSGIApplicationGroup %%{GLOBAL}\n\
-    Require all granted\n\
-  </Directory>\n\
-</VirtualHost>\n\
-\n'\
-> /etc/apache2/sites-available/portal.conf
 
 ARG debian_repo="http://dl.bintray.com/v1/content/uwcirg/truenth"
 
@@ -51,32 +29,25 @@ RUN \
     apt-get clean && \
     rm --force --recursive --verbose /tmp/artifacts
 
-COPY portal.wsgi /var/www/
-
 ENV \
-    APACHE_RUN_USER="${APACHE_RUN_USER:-www-data}" \
-    PORT="${PORT:-8008}" \
+    RUN_USER="${RUN_USER:-www-data}" \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
-    mkdir -p ${PROJECT_DIR}/var/portal-instance/ && \
-    chown $APACHE_RUN_USER:$APACHE_RUN_USER \
-        /var/run/apache2/ \
-        ${PROJECT_DIR}/var/portal-instance/ && \
-    sed -i 's|Listen [[:digit:]]\+|Listen ${PORT}|g' /etc/apache2/ports.conf && \
-    a2ensite portal && a2dissite 000-default && a2disconf other-vhosts-access-log
+    mkdir --parents ${PROJECT_DIR}/var/portal-instance/ && \
+    chown $RUN_USER:$RUN_USER ${PROJECT_DIR}/var/portal-instance/
 
-USER ${APACHE_RUN_USER}
+USER ${RUN_USER}
 
 ENV \
     SERVER_NAME=${SERVER_NAME:-localhost} \
+    PORT="${PORT:-8008}" \
     FLASK_APP="${PROJECT_DIR}/bin/manage.py" \
     PERSISTENCE_FILE="${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}"
 
 EXPOSE ${PORT}
 
 CMD \
-    . /etc/apache2/envvars && \
     . ${PROJECT_DIR}/bin/activate && \
     env && \
     if [ -n "$(flask db current)" ]; then \
@@ -84,4 +55,6 @@ CMD \
     else \
         python ${FLASK_APP} initdb; \
     fi && \
-    /usr/sbin/apache2 -D FOREGROUND
+    gunicorn \
+        --bind "0.0.0.0:${PORT}" \
+    manage:app
