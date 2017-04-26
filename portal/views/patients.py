@@ -36,46 +36,40 @@ def patients_root():
 
     org_list = set()
 
-    OT = OrgTree()
-
-    consent_with_top_level_org = current_app.config.get('CONSENT_WITH_TOP_LEVEL_ORG', False)
-
     now = datetime.utcnow()
-
     consented_users = []
 
-
-    request_org_list = request.args.get('org_list', None)
-
-    # Build list of all organization ids, and their decendents, the
-    # user belongs to
-    if request_org_list:
-        #for selected filtered orgs, we also need to get the children of each, if any
-        request_org_list = set(request_org_list.split(","))
-        for orgId in request_org_list:
-            if orgId == 0:  # None of the above doesn't count
-                continue
-            consent_org_id = orgId
-            if consent_with_top_level_org:
-                consent_org_id = OT.find(orgId).top_level()
-            org_list.update(OT.here_and_below_id(consent_org_id))
-    else:
-        for org in user.organizations:
-            if org.id == 0:  # None of the above doesn't count
-                continue
-            consent_org_id = org.id
-            if consent_with_top_level_org:
-                consent_org_id = OT.find(org.id).top_level()
-            org_list.update(OT.here_and_below_id(consent_org_id))
-
-    #gather all consented users from user's organizations
     consent_query = UserConsent.query.filter(and_(
-                UserConsent.organization_id.in_(org_list),
-                UserConsent.deleted_id == None,
-                UserConsent.expires > now)).with_entities(UserConsent.user_id)
-    consented_users.extend([u[0] for u in consent_query])
+                         UserConsent.deleted_id == None,
+                         UserConsent.expires > now)).with_entities(UserConsent.user_id)
+    consented_users = [u.user_id for u in consent_query]
 
+
+    for c in consented_users:
+        print ("consented user {}".format(c))
     if user.has_role(ROLE.STAFF):
+        request_org_list = request.args.get('org_list', None)
+        # Build list of all organization ids, and their decendents, the
+        # user belongs to
+        OT = OrgTree()
+
+        if request_org_list:
+            #for selected filtered orgs, we also need to get the children of each, if any
+            request_org_list = set(request_org_list.split(","))
+            for orgId in request_org_list:
+                if orgId == 0:  # None of the above doesn't count
+                    continue
+                org_list.update(OT.here_and_below_id(orgId))
+        else:
+            for org in user.organizations:
+                if org.id == 0:  # None of the above doesn't count
+                    continue
+                org_list.update(OT.here_and_below_id(org.id))
+
+        for org in list(org_list):
+            print("org {}".format(org))
+        print("org list length {}".format(len(list(org_list))))
+
         # Gather up all patients belonging to any of the orgs (and their children)
         # this (staff) user belongs to.
         org_patients = User.query.join(UserRoles).filter(
@@ -84,11 +78,12 @@ def patients_root():
                  User.deleted_id==None,
                  User.id.in_(consented_users)
                  )
-            )
+            ).join(UserOrganization).filter(
+                and_(UserOrganization.user_id==User.id,
+                     UserOrganization.organization_id.in_(org_list)))
         patients = patients.union(org_patients)
 
     if user.has_role(ROLE.INTERVENTION_STAFF):
-
         uis = UserIntervention.query.filter(UserIntervention.user_id == user.id)
         ui_list = [ui.intervention_id for ui in uis]
 
@@ -108,7 +103,6 @@ def patients_root():
         'patients_by_org.html', patients_list=patients.all(),
         user=user, org_list=org_list,
         wide_container="true")
-
 
 @patients.route('/patient-profile-create')
 @roles_required(ROLE.STAFF)
