@@ -55,7 +55,6 @@ setup_kwargs = dict(
         "Flask-Migrate",
         "Flask-OAuthlib",
         "Flask-SQLAlchemy",
-        "Flask-Script",
         "Flask-Session",
         "Flask-Swagger",
         "Flask-Testing",
