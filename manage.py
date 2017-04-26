@@ -7,7 +7,6 @@ import os
 import click
 
 import alembic.config
-from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
@@ -24,12 +23,9 @@ from portal.models.user_consent import db_maintenance
 from portal.site_persistence import SitePersistence
 
 app = create_app()
-manager = Manager(app)
 
 MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
 migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
-manager.add_command('db', MigrateCommand)
-manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
 
 def _run_alembic_command(args):
@@ -129,5 +125,3 @@ def translations():
     upsert_to_template_file()
 
 
-if __name__ == '__main__':
-    manager.run()
