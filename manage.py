@@ -116,7 +116,8 @@ def export_site():
     SitePersistence().export()
 
 
-@manager.option('-u', '--username', dest='username')
+@click.option('--username', '-u', help='Username of user to purge.')
+@app.cli.command()
 def purge_user(username):
     """Purge the given user from the system"""
     permanently_delete_user(username)
