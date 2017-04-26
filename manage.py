@@ -113,13 +113,13 @@ def purge_user(username):
     permanently_delete_user(username)
 
 
-@manager.command
+@app.cli.command()
 def mark_test():
     """Designate all current users as test users"""
     flag_test()
 
 
-@manager.command
+@app.cli.command()
 def translations():
     """Add extracted DB strings to existing PO template file"""
     upsert_to_template_file()
