@@ -57,7 +57,7 @@ def patients_root():
                 continue
             consent_org_id = orgId
             if consent_with_top_level_org:
-                consent_org_id = OrgTree().find(orgId).top_level()
+                consent_org_id = OT.find(orgId).top_level()
             org_list.update(OT.here_and_below_id(consent_org_id))
     else:
         for org in user.organizations:
@@ -65,7 +65,7 @@ def patients_root():
                 continue
             consent_org_id = org.id
             if consent_with_top_level_org:
-                consent_org_id = OrgTree().find(org.id).top_level()
+                consent_org_id = OT.find(org.id).top_level()
             org_list.update(OT.here_and_below_id(consent_org_id))
 
     #gather all consented users from user's organizations
