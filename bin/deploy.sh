@@ -66,6 +66,7 @@ if [ ! -d "$repo_path/.git" ]; then
 fi
 
 export GIT_WORK_TREE="$repo_path"
+export FLASK_APP="${GIT_WORK_TREE}/manage.py"
 export GIT_DIR="${GIT_WORK_TREE}/.git"
 
 if [[ -z $BRANCH ]]; then
@@ -110,14 +111,14 @@ if [[
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
-    python "${GIT_WORK_TREE}/manage.py" db upgrade
+    flask sync
 fi
 
 # New seed data
 if [[ $FORCE || $SEED || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
     echo "Running database seeding"
-    python "${GIT_WORK_TREE}/manage.py" seed
+    flask seed
 fi
 
 
