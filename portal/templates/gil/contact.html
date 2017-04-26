@@ -69,7 +69,6 @@
 {% block document_ready %}
   <script>
       $(document).ready(function(){
-        $("header").addClass("header--white");
         $("#first-name, #last-name").each(function() {
             $(this).on("blur", function() {
                 var name = $("#first-name").val();
