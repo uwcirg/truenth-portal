@@ -81,7 +81,11 @@ def sync():
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 def seed(include_interventions=False, keep_unmentioned=False):
     """Seed database with required data"""
-    add_static_concepts()
+
+    # Request context necessary for generating data from own HTTP APIs
+    with app.test_request_context():
+        add_static_concepts()
+
     add_static_interventions()
     add_static_organization()
     add_static_relationships()
