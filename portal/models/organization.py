@@ -184,7 +184,7 @@ class Organization(db.Model):
         return d
 
     @classmethod
-    def generate_bundle(cls, limit_to_ids=None):
+    def generate_bundle(cls, limit_to_ids):
         """Generate a FHIR bundle of existing orgs ordered by ID
 
         If limit_to_ids is defined, only return the matching set, otherwise

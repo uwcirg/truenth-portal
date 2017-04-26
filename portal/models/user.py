@@ -159,7 +159,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
-    # todo: move to click prompt
+
     if not acting_user:
         actor = raw_input(
             "\n\nWARNING!!!\n\n"
