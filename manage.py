@@ -4,6 +4,7 @@ python manage.py --help
 
 """
 import os
+import click
 
 import alembic.config
 from flask_script import Manager
@@ -58,7 +59,7 @@ def upgrade_db():
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
 
 
-@manager.command
+@app.cli.command()
 def sync():
     """Synchronize database with latest schema and persistence data.
 
@@ -74,7 +75,9 @@ def sync():
     seed(include_interventions=True)
 
 
-@manager.command
+@app.cli.command()
+@click.option('--include_interventions', '-i', default=False, help='Include (overwrite) intervention data')
+@click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 def seed(include_interventions=False, keep_unmentioned=False):
     """Seed database with required data"""
     add_static_concepts()
