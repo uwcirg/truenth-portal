@@ -44,9 +44,6 @@ def patients_root():
                          UserConsent.expires > now)).with_entities(UserConsent.user_id)
     consented_users = [u.user_id for u in consent_query]
 
-
-    for c in consented_users:
-        print ("consented user {}".format(c))
     if user.has_role(ROLE.STAFF):
         request_org_list = request.args.get('org_list', None)
         # Build list of all organization ids, and their decendents, the
@@ -65,10 +62,6 @@ def patients_root():
                 if org.id == 0:  # None of the above doesn't count
                     continue
                 org_list.update(OT.here_and_below_id(org.id))
-
-        for org in list(org_list):
-            print("org {}".format(org))
-        print("org list length {}".format(len(list(org_list))))
 
         # Gather up all patients belonging to any of the orgs (and their children)
         # this (staff) user belongs to.
