@@ -1,5 +1,6 @@
 """Extension model"""
 from abc import ABCMeta, abstractmethod, abstractproperty
+from sqlalchemy.orm.exc import NoResultFound
 from .fhir import Coding
 
 class Extension:
@@ -41,7 +42,7 @@ class CCExtension(Extension):
                 concept = Coding.query.filter_by(
                     system=coding['system'], code=coding['code']).one()
             except NoResultFound:
-                raise ValueError("Unknown code: {} for system{}".format(
+                raise ValueError("Unknown code: {} for system {}".format(
                                      coding['code'], coding['system']))
             if concept.code in remove_if_not_requested:
                 # The concept existed before and is to be retained

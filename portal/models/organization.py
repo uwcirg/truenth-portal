@@ -150,8 +150,8 @@ class Organization(db.Model):
                     'ethnicity_codings','indigenous_codings'):
             if attr in data:
                 setattr(self, attr, data.get(attr))
-        if 'extension' in fhir:
-            for e in fhir['extension']:
+        if 'extension' in data:
+            for e in data['extension']:
                 instance = org_extension_map(self, e)
                 instance.apply_fhir()
         if 'identifier' in data:
@@ -267,8 +267,7 @@ class LocaleExtension(CCExtension):
     def __init__(self, organization, extension):
         self.organization, self.extension = organization, extension
 
-    extension_url =\
-       "http://hl7.org/fhir/StructureDefinition/us-core-race"
+    extension_url = "http://hl7.org/fhir/valueset/languages"
 
     @property
     def children(self):

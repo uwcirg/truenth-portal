@@ -8,7 +8,6 @@ import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym
 from sqlalchemy import and_, or_, UniqueConstraint
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from StringIO import StringIO
