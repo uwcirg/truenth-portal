@@ -101,7 +101,7 @@ def seed(include_interventions=False, keep_unmentioned=False):
     SitePersistence().import_(include_interventions, keep_unmentioned)
 
 
-@manager.command
+@app.cli.command()
 def export_site():
     """Generate JSON file containing dynamic site config
 
