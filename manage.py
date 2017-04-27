@@ -75,9 +75,12 @@ def sync():
     seed(include_interventions=True)
 
 
-@app.cli.command()
 @click.option('--include_interventions', '-i', default=False, help='Include (overwrite) intervention data')
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
+@app.cli.command()
+def seed_command(include_interventions, keep_unmentioned):
+    seed(include_interventions, keep_unmentioned)
+
 def seed(include_interventions=False, keep_unmentioned=False):
     """Seed database with required data"""
 
