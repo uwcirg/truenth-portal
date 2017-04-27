@@ -1,7 +1,7 @@
 """Role module
 
 Role data lives in the `roles` table, populated via:
-    `python manage.py seed`
+    `flask seed`
 
 To restrict access to a given role, use the ROLE object:
     @roles_required(ROLE.ADMIN)

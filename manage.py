@@ -1,16 +1,15 @@
 """ Defines a series of scripts for running server and maintenance
 
-python manage.py --help
+FLASK_APP=manage.py flask --help
 
 """
 import os
+import click
 
 import alembic.config
-from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
-from portal.config import ConfigServer
 from portal.extensions import db
 from portal.models.i18n import upsert_to_template_file
 from portal.models.fhir import add_static_concepts
@@ -23,13 +22,15 @@ from portal.models.user_consent import db_maintenance
 from portal.site_persistence import SitePersistence
 
 app = create_app()
-manager = Manager(app)
 
 MIGRATIONS_DIR = os.path.join(app.root_path, 'migrations')
 migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
-manager.add_command('db', MigrateCommand)
-manager.add_command('runserver', ConfigServer(host='0.0.0.0', threaded=True))
 
+@app.cli.command()
+def runserver():
+    # Todo: figure out how to override default host in `flask run`
+    # http://click.pocoo.org/5/commands/#overriding-defaults
+    app.run(host='0.0.0.0')
 
 def _run_alembic_command(args):
     """Helper to manage working directory and run given alembic commands"""
@@ -58,7 +59,7 @@ def upgrade_db():
     _run_alembic_command(['--raiseerr', 'upgrade', 'head'])
 
 
-@manager.command
+@app.cli.command()
 def sync():
     """Synchronize database with latest schema and persistence data.
 
@@ -74,10 +75,19 @@ def sync():
     seed(include_interventions=True)
 
 
-@manager.command
+@click.option('--include_interventions', '-i', default=False, help='Include (overwrite) intervention data')
+@click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
+@app.cli.command()
+def seed_command(include_interventions, keep_unmentioned):
+    seed(include_interventions, keep_unmentioned)
+
 def seed(include_interventions=False, keep_unmentioned=False):
     """Seed database with required data"""
-    add_static_concepts()
+
+    # Request context necessary for generating data from own HTTP APIs
+    with app.test_request_context():
+        add_static_concepts()
+
     add_static_interventions()
     add_static_organization()
     add_static_relationships()
@@ -93,7 +103,7 @@ def seed(include_interventions=False, keep_unmentioned=False):
     SitePersistence().import_(include_interventions, keep_unmentioned)
 
 
-@manager.command
+@app.cli.command()
 def export_site():
     """Generate JSON file containing dynamic site config
 
@@ -108,23 +118,20 @@ def export_site():
     SitePersistence().export()
 
 
-@manager.option('-u', '--username', dest='username')
+@click.option('--username', '-u', help='Username of user to purge.')
+@app.cli.command()
 def purge_user(username):
     """Purge the given user from the system"""
     permanently_delete_user(username)
 
 
-@manager.command
+@app.cli.command()
 def mark_test():
     """Designate all current users as test users"""
     flag_test()
 
 
-@manager.command
+@app.cli.command()
 def translations():
     """Add extracted DB strings to existing PO template file"""
     upsert_to_template_file()
-
-
-if __name__ == '__main__':
-    manager.run()

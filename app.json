@@ -26,6 +26,6 @@
     }
   ],
   "scripts": {
-    "postdeploy": "python manage.py sync"
+    "postdeploy": "FLASK_APP=manage.py flask sync"
   }
 }

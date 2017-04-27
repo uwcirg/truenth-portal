@@ -50,7 +50,7 @@ EXPOSE ${PORT}
 CMD \
     . ${PROJECT_DIR}/bin/activate && \
     env && \
-    python ${FLASK_APP} sync && \
+    flask sync && \
     gunicorn \
         --bind "0.0.0.0:${PORT}" \
     manage:app
