@@ -10,7 +10,6 @@ import alembic.config
 from flask_migrate import Migrate, MigrateCommand
 
 from portal.app import create_app
-from portal.config import ConfigServer
 from portal.extensions import db
 from portal.models.i18n import upsert_to_template_file
 from portal.models.fhir import add_static_concepts
