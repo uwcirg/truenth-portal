@@ -483,6 +483,17 @@ class User(db.Model, UserMixin):
         return options
 
 
+    @property
+    def locale_display_options(self):
+        """Collates all the locale options from the user's orgs
+        to establish which should be visible to the user"""
+        locale_options = set()
+        for org in self.organizations:
+            for locale in org.locales:
+                locale_options.add(locale.code)
+        return locale_options
+
+
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
         org = Organization.query.filter_by(name=organization_name).one()
