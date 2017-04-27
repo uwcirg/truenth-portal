@@ -31,12 +31,11 @@ RUN \
 
 ENV \
     RUN_USER="${RUN_USER:-www-data}" \
-    LOG_FOLDER="/tmp/shared_service_log" \
     PROJECT_DIR="/opt/venvs/portal"
 
 RUN \
-    mkdir --parents ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/ && \
-    chown $RUN_USER:$RUN_USER ${LOG_FOLDER} ${PROJECT_DIR}/var/portal-instance/
+    mkdir --parents ${PROJECT_DIR}/var/portal-instance/ && \
+    chown $RUN_USER:$RUN_USER ${PROJECT_DIR}/var/portal-instance/
 
 USER ${RUN_USER}
 
@@ -51,11 +50,7 @@ EXPOSE ${PORT}
 CMD \
     . ${PROJECT_DIR}/bin/activate && \
     env && \
-    if [ -n "$(flask db current)" ]; then \
-        flask db migrate; \
-    else \
-        python ${FLASK_APP} initdb; \
-    fi && \
+    python ${FLASK_APP} sync && \
     gunicorn \
         --bind "0.0.0.0:${PORT}" \
     manage:app
