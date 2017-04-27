@@ -1,6 +1,6 @@
 """ Defines a series of scripts for running server and maintenance
 
-python manage.py --help
+FLASK_APP=manage.py flask --help
 
 """
 import os
