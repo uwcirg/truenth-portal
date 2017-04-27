@@ -6671,6 +6671,22 @@ figure.nav-overlay {
     letter-spacing: 1.5px;
     text-transform: uppercase;
     margin: 0 20px;
+    & i {
+        color: #FFF;
+        text-align: center;
+        font-size: 1.8em;
+        display: block;
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+    }
+    & i:hover {
+        text-decoration: none;
+    }
+}
+@media (min-width: 768px) {
+    .nav-list__item i {
+        margin-top: 0;
+    }
 }
 @media (max-width: 767px) {
     .nav-list__item {
