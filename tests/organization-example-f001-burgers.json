@@ -106,5 +106,15 @@
   "use_specific_codings":true,
   "race_codings": true,
   "ethnicity_codings": false,
-  "indigenous_codings": true
+  "indigenous_codings": true,
+  "extension": [
+    {"url": "http://hl7.org/fhir/valueset/languages",
+      "valueCodeableConcept": {
+        "coding": [
+          {"system": "urn:ietf:bcp:47",
+           "code": "en_AU"
+          }
+        ]
+      }}
+  ]
 }
