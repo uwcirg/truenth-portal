@@ -163,6 +163,9 @@ a:active,
 a:hover {
     outline: 0;
 }
+a.disabled {
+    opacity: 0.6;
+}
 abbr[title] {
     border-bottom: 1px dotted;
 }
@@ -1725,7 +1728,7 @@ pre code {
 .module:after {
     clear: both;
 }
-@media (min-width: 768px) {
+@media (min-width: 820px) {
     .container,
     .outer-container,
     .photo-grid-container,
@@ -4181,6 +4184,11 @@ a:not(.button):not(.box-modal form button):not(.side-nav-items__button a):active
     width: 218px;
     height: 95px;
 }
+@media (min-width: 900px) {
+    .header--white .logo {
+        background-image: url(../img/logo-white@2x.png);
+    }
+}
 @media only screen and (-webkit-min-device-pixel-ratio: 2),
 only screen and (-moz-min-device-pixel-ratio: 2),
 only screen and (min-device-pixel-ratio: 2),
@@ -4309,7 +4317,7 @@ only screen and (min-resolution: 2dppx) {
     color: #4C5E6E;
 }
 .button--large {
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1;
     letter-spacing: 5px;
     min-width: 218px;
@@ -4332,6 +4340,15 @@ only screen and (min-resolution: 2dppx) {
 .box-modal form button:hover {
     background: #576e76;
     color: white;
+}
+@media (max-width: 767px) {
+    .button--teal {
+        font-size: 0.9em;
+        padding-left: 12px;
+        padding-right: 12px;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
+    }
 }
 .button--white,
 .side-nav-items__button a {
@@ -4439,6 +4456,9 @@ only screen and (min-resolution: 2dppx) {
     display: inline-block;
     width: 100%;
     clear: both;
+}
+.accent-heading--white {
+    color: #FFF;
 }
 .accent-heading:after,
 .side-nav h3:after {
@@ -4837,10 +4857,11 @@ only screen and (min-resolution: 2dppx) {
 }
 @media (max-width: 767px) {
     .icon-box__button {
-        font-size: 20px;
-        line-height: 24px;
-        padding-right: 15px;
-        padding-left: 15px;
+        font-size: 0.9em;
+        padding-left: 12px;
+        padding-right: 12px;
+        margin-left: 0.5em;
+        margin-right: 0.5em;
     }
 }
 .icon-box__button span {
@@ -4866,6 +4887,11 @@ only screen and (min-resolution: 2dppx) {
 }
 .page-intro .icon-box__button--main {
     min-width: 250px;
+}
+@media (max-width: 767px) {
+    .page-intro .icon-box__button--main {
+        font-size: 0.7em;
+    }
 }
 .icon-box__button--main:hover {
     background: #576e76;
@@ -5090,6 +5116,11 @@ a.profile-toggle figure {
     font-size: 28px;
     line-height: 35px;
     margin: 20px 0;
+}
+@media (max-width: 767px) {
+    .list-module__item {
+        font-size: 24px;
+    }
 }
 .checkbox-item {
     padding-left: 80px;
@@ -6132,7 +6163,12 @@ figure.nav-overlay {
     margin: 0 auto;
     max-width: 780px;
     margin: 0 auto;
-    padding-top: 210px;
+    padding-top: 40px;
+}
+@media (min-width: 900px) {
+    .page-intro__content {
+        padding-top: 210px;
+    }
 }
 @media (max-width: 767px) {
     .page-intro__content {
@@ -6148,8 +6184,8 @@ figure.nav-overlay {
 }
 @media (max-width: 767px) {
     .module {
-        padding-left: 45px;
-        padding-right: 45px;
+        padding-left: 10px;
+        padding-right: 10px;
     }
 }
 .module__copy {
@@ -6172,12 +6208,7 @@ figure.nav-overlay {
     margin: 0 0 40px;
     padding: 0 1em;
 }
-@media (max-width: 767px) {
-    .module__head {
-        font-size: 28px;
-        line-height: 40px;
-    }
-}
+
 .module__heading {
     font-size: 33px;
     line-height: 38px;
@@ -6185,7 +6216,6 @@ figure.nav-overlay {
     margin: 0 0 20px;
     text-align: center;
 }
-<<<<<<< HEAD
 @media (min-height: 900px) {
     .module__heading {
         font-size: 35px;
@@ -6207,8 +6237,6 @@ figure.nav-overlay {
         line-height: 40px;
     }
 }
-=======
->>>>>>> origin
 [class*='theme-brown'] .module__heading--accent {
     color: #BCC2A6;
 }
@@ -6232,6 +6260,9 @@ figure.nav-overlay {
     text-align: left;
 }
 @media (max-width: 767px) {
+    .module__head {
+        font-size: 26px;
+    }
     .module__body {
         font-size: 22px;
         line-height: 28px;
@@ -6406,7 +6437,6 @@ figure.nav-overlay {
     color: #D2D1C5;
     opacity: 0.5;
 }
-<<<<<<< HEAD
 .button--brown {
     color: #FFF;
     background: #89847b;
@@ -6437,8 +6467,6 @@ figure.nav-overlay {
         padding-right: 8px;
     }
 }
-=======
->>>>>>> origin
 .module-wrap--has-border {
     padding-top: 30px;
     border-top: 2px solid;
@@ -6458,8 +6486,8 @@ figure.nav-overlay {
     position: relative;
 }
 .module-wrap--watch img {
-    left: 30px;
-    width: calc(100% - 60px);
+    left: 20px;
+    width: calc(100% - 40px);
     position: relative;
 }
 @media (max-width: 767px) {
@@ -6476,7 +6504,6 @@ figure.nav-overlay {
     height: 100%;
     top: 0;
 }
-<<<<<<< HEAD
 .main--story .header .logo {
     background-image: url(../img/logo-base.png)
 }
@@ -6569,14 +6596,11 @@ figure.nav-overlay {
 .story-text--left {
     text-align: left;
 }
-=======
->>>>>>> origin
 @media (max-width: 767px) {
     .module-wrap--watch iframe {
         left: 20px;
         width: calc(100% - 40px);
     }
-<<<<<<< HEAD
 
 }
 .page-intro--lived-experience {
@@ -6722,8 +6746,6 @@ aside .module--flex {
     max-width: 100%;
     margin:0 auto;
     flex-wrap: wrap
-=======
->>>>>>> origin
 }
 .module-wrap--watch .module-wrap--inner {
     position: absolute;
@@ -6731,6 +6753,18 @@ aside .module--flex {
     left: 50%;
     margin-left: -109px;
     margin-top: -36px;
+}
+.module-wrap--watch .module-wrap--inner--content {
+    top: 2.5em;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    color: #FFF;
+}
+.module-wrap--inner--content .button-callout {
+    margin-top: 4em;
 }
 @media (max-width: 767px) {
     .module-wrap--watch .module-wrap--inner .button-callout {
@@ -6755,7 +6789,6 @@ aside .module--flex {
         min-height: none;
     }
 }
-<<<<<<< HEAD
 
 .sprout-video-container {
     margin-top: 2em;
@@ -6819,8 +6852,6 @@ aside .module--flex {
     opacity: 0.4;
     z-index: 1;
 }
-=======
->>>>>>> origin
 .footer {
     background: #000;
     text-align: center;
@@ -7573,6 +7604,7 @@ a.home--modal-link {
     }
     #portalMain .icon-box__button--main {
         height: 66px;
+        line-height: 1.5em;
     }
     .side-nav-items__item, .side-nav-items__item a {
         font-size: 1em !important;
