@@ -77,7 +77,7 @@ def sync():
 
 @click.option('--include_interventions', '-i', default=False, help='Include (overwrite) intervention data')
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
-@app.cli.command()
+@app.cli.command(name="seed")
 def seed_command(include_interventions, keep_unmentioned):
     seed(include_interventions, keep_unmentioned)
 
