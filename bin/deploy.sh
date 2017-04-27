@@ -117,7 +117,7 @@ fi
 # New seed data
 if [[ $FORCE || $SEED || ( -n $(git diff $old_head $new_head -- ${GIT_WORK_TREE}/portal/models) && $? -eq 0 ) ]]; then
     activate_once
-    echo "Running database seeding"
+    echo "Seeding database"
     flask seed
 fi
 
