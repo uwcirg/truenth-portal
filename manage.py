@@ -69,7 +69,8 @@ def sync():
     To re/create the database, [delete and] create within the DBMS itself,
     then invoke this function.
     """
-    db.create_all()
+    if not db.engine.dialect.has_table(db.engine.connect(), 'alembic_version'):
+        db.create_all()
     stamp_db()
     upgrade_db()
     seed(include_interventions=True)
