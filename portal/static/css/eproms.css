@@ -877,6 +877,10 @@ div.right-panel {
 #_downloadMessage {
   color: #a94442;
 }
+#patientAssessmentDownload {
+  display: inline-block;
+  min-height: 1.2em;
+}
 #patientsInstrumentListWrapper {
   position: relative;
   padding: 0.6em 0 0.3em 0;
@@ -890,6 +894,11 @@ div.right-panel {
 }
 #patientsInstrumentList.ready + #instrumentListLoad {
   opacity: 0;
+}
+.instrument-container label {
+  min-width: 100px;
+  max-width: 100%;
+  display: inline-block;
 }
 #instrumentListLoad {
   position: absolute;
