@@ -6248,9 +6248,6 @@ figure.nav-overlay {
     text-align: center;
     padding: 0 1em;
 }
-.module__body + .button-callout {
-    margin-top: 2em;
-}
 @media (min-width:900px) {
     .module__body {
         line-height: 33px;
@@ -6606,107 +6603,139 @@ figure.nav-overlay {
 .page-intro--lived-experience {
     padding-top: 140px;
     margin-top: -140px;
+    background-position: 75% top;
+    transition: background-position 150ms ease-out;
 }
-.module-wrap--background {
+.module-wrap--background,
+.module-wrap--background__center,
+.module-wrap--background__left {
     text-align: center;
-    background-size: 100% 100%;
+    background-size: cover;
     background-attachment: scroll;
-    background-position: center center;
+    background-position: top center;
     background-repeat: no-repeat;
     position: relative;
     min-width: 100%;
     width: 100%;
-    padding-bottom: calc(30% - 350px);
-    transition: background-image 250ms ease-out;
+    /*height: 39.6%;*/
+    transition: height 200ms ease-in-out, background-position 200ms ease-in-out;
+}
+.module-wrap--background__center {
+    background-position: 0 0;
+}
+@media (min-width: 1200px) {
+    .module-wrap--background__center {
+        background-position: 5% 0;
+    }
+}
+.module-wrap--background__alonzo {
+    background-image: url("../img/LE_Alonzo_McCann_Tablet.jpg");
+    background-position: 95%;
+    transition: background-position 200ms ease-in-out;
+}
+@media (min-width: 992px) {
+    .module-wrap--background__alonzo {
+        background-image: url("../img/LE_Alonzo_McCann.jpg");
+    }
+}
+.module-wrap--background__andrew {
+    background-image: url("../img/LE_David_Andrew_Perez_Tablet.jpg");
+    background-position: 0;
+    transition: background-position 200ms ease-in-out;
+}
+@media (min-width: 992px) {
+    .module-wrap--background__andrew {
+        background-image: url("../img/LE_David_Andrew_Perez.jpg");
+    }
+}
+.module-wrap--background__twins {
+    background-image: url("../img/LE_Hirsch_Brothers_Tablet.jpg");
+    background-position: 58%;
+    transition: background-position 200ms ease-in-out;
+}
+@media (min-width: 1300px) {
+    .module-wrap--background__twins {
+        background-position: 60%;
+        background-image: url("../img/LE_Hirsch_Brothers.jpg");
+    }
 }
 .module-wrap--background .module__head {
     font-size: 33px;
 }
-main .module-wrap--background {
-    height: 300px;
-    padding-bottom: calc(30% - 300px);
-    transition: height 150ms ease-in;
-}
-@media (min-width: 991px) {
-    main .module-wrap--background {
-        padding-bottom: calc(30% - 300px);
-        height: 300px;
-    }
-}
-@media (min-width: 1199px) {
-    main .module-wrap--background {
-        padding-bottom: calc(30% - 400px);
-        height: 400px;
-    }
-}
-@media (min-width: 1299px) {
+
+@media (min-width: 1600px) {
     .module-wrap--background {
-        padding-bottom: calc(30% - 500px);
-    }
-    main .module-wrap--background {
-        height: 500px;
+        max-height: 508px;
     }
 }
-
-@media (min-width: 992px) {
+@media (min-width: 1399px) {
     main .module-wrap--background .button-callout{
-        margin-top: -2.5em;
+        margin-top: 1%;
     }
 }
-
-@media (min-width: 1199px) {
-    main .module-wrap--background .button-callout{
-        margin-top: -1em;
-    }
+.module-wrap--background .button-callout {
+    padding: 1%;
+    transition: all 250ms ease-out;
 }
-@media (min-width: 1299px) {
-    main .module-wrap--background .button-callout{
-        margin-top: 5em;
+@media (min-width: 1200px) {
+    .module-wrap--background .button-callout {
+        padding: 4% 1% 1% 1%;
     }
 }
 .module-wrap--background .module__body {
-    padding: 0 1em;
+    padding: 2% 5%;
     min-height: 100px;
+    transition: padding 150ms ease-out;
 }
-@media (min-width: 728px) {
+@media (min-width: 851px) {
     .module-wrap--background .module__body {
-        padding: 0 2em;
+        padding: 3% 18%;
     }
 }
 @media (min-width: 992px) {
     .module-wrap--background .module__body {
-        padding: 0 3em;
+        font-size: 1.8em;
+        line-height: 1.4em;
     }
 }
+@media (min-width: 1100px) {
+    .module-wrap--background .module__body {
+        padding: 2% 15%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .module-wrap--background .module__body {
+        padding: 1% 11%;
+    }
+}
+
 .module-wrap--background img {
     display: none;
     transition: all 250ms ease-in;
 }
-.module-wrap--background .module {
+.module-wrap--background .module,
+.module-wrap--background .module--shift__right,
+.module-wrap--background .module--shift__left {
     z-index: 2;
-    padding: 20px 0;
+    padding: 3% 1%;
+    transition: padding 150ms ease-in;
 }
-@media (min-width: 900px) {
-    .module-wrap--background .module {
-        padding: 30px 0;
+
+@media (max-width: 1199px) {
+    .module-wrap--background .module--shift__right {
+        padding: 5% 0 5% 20%;
+    }
+    .module-wrap--background .module--shift__left {
+        padding: 5% 22% 5% 0;
     }
 }
-@media (min-width: 1200px) {
-    .module-wrap--background .module {
-        padding: 70px 0;
-    }
-}
-@media (min-width: 1299px) {
-    .module-wrap--background .module {
-        padding: 90px 0;
-    }
-}
-@media (max-width: 819px) {
+@media (max-width: 851px) {
     .module-wrap--background .module {
         margin: 0 0.5em;
     }
 }
-@media (max-width: 990px) {
+@media (max-width: 851px) {
     main .module-wrap--background {
         background: #5d5a55;
         background-image: none !important;
@@ -6717,35 +6746,42 @@ main .module-wrap--background {
     }
     img.mobile {
         display: block;
-        width: 350px;
+        width: 300px;
         max-width: 100%;
         margin: 0 auto 1.5em auto;
+        padding: 1em 0;
     }
     .module-wrap--background .module {
-        padding: 90px 20px 60px 20px;
+        padding: 8% 2%;
+        margin: 0 auto;
     }
 
     .module-wrap--background .module__heading {
         font-size: 24px;
         padding-left: 10px;
         padding-right: 10px;
-        margin: 2em 0 1em 0;
     }
     .module-wrap--background .button--brown {
         margin: 0 20px;
     }
 }
 aside .module-wrap--background {
-    padding-top: 4em;
+    padding-top: 8%;
     padding-bottom: 0;
-    background-size: cover;
+    background-position: center;
+    transition: background-position 150ms ease-in;
+}
+@media (min-width: 992px) {
+    aside .module-wrap--background {
+        padding-top: 6%;
+    }
 }
 aside .module--flex {
     display:flex;
     justify-content: space-around;
     max-width: 100%;
     margin:0 auto;
-    flex-wrap: wrap
+    flex-wrap: wrap;
 }
 .module-wrap--watch .module-wrap--inner {
     position: absolute;
