@@ -724,7 +724,7 @@ module.exports = OrgTool = (function() {
             if (orgsList[org].isTopLevel) {
                 if (orgsList[org].children.length > 0) {
                   $("#fillOrgs").append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='radio' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                  
+
                 } else {
                   $("#fillOrgs").append('<div id="' + orgsList[org].id + '_container" data-parent-id="'+ orgsList[org].name +'"  data-parent-name="' + orgsList[org].name + '" class="org-container"><label id="org-label-' + orgsList[org].id + '" class="org-label"><input class="clinic" type="radio" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
                         orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/><span>' + orgsList[org].name + '</span></label></div>');
@@ -822,6 +822,7 @@ function setSelectedNavItem(obj) {
 
     $(obj).on("click", function(event) {
           event.preventDefault();
+          loader(false);
           $(".side-nav__close").trigger("click");
           return;
      });
@@ -941,5 +942,4 @@ var CONSENT_ENUM = {
         "send_reminders": false
     }
 };
-
 
