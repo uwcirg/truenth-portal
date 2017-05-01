@@ -5,6 +5,7 @@ import os
 
 from portal.extensions import db
 from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
+from portal.models.fhir import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
@@ -21,6 +22,9 @@ class TestOrganization(TestCase):
             'organization-example-f001-burgers.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
+        #prepopuate database with matching locale
+        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
+                  'system': "urn:ietf:bcp:47"})
         org = Organization.from_fhir(data)
         self.assertEquals(org.addresses[0].line1,
                           data['address'][0]['line'][0])
@@ -186,6 +190,10 @@ class TestOrganization(TestCase):
             db.session.commit()
         org = db.session.merge(org)
         org_id = org.id
+
+        #prepopuate database with matching locale
+        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
+                  'system': "urn:ietf:bcp:47"})
 
         rv = self.client.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',

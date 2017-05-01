@@ -8,7 +8,6 @@ import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym
 from sqlalchemy import and_, or_, UniqueConstraint
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from StringIO import StringIO
@@ -20,6 +19,7 @@ from .audit import Audit
 from ..dict_tools import dict_match
 from .encounter import Encounter
 from ..database import db
+from .extension import CCExtension
 from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .identifier import Identifier
@@ -44,52 +44,12 @@ internal_identifier_systems = (
     TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS
 
 
-class Extension:
-    """Abstract base class for common user extension FHIR objects"""
-    __metaclass__ = ABCMeta
-
+class UserIndigenousStatusExtension(CCExtension):
+    # Used in place of us-core-race and us-core-ethnicity for
+    # Australian configurations.
     def __init__(self, user, extension):
         self.user, self.extension = user, extension
 
-    @abstractproperty
-    def children(self):  # pragma: no cover
-        pass
-
-    def as_fhir(self):
-        if self.children.count():
-            return {
-                'url': self.extension_url,
-                'valueCodeableConcept': {
-                    'coding': [c.as_fhir() for c in self.children]}
-            }
-
-    def apply_fhir(self):
-        assert self.extension['url'] == self.extension_url
-        # track current concepts - must remove any not requested
-        remove_if_not_requested = {e.code: e for e in self.children}
-
-        for coding in self.extension['valueCodeableConcept']['coding']:
-            try:
-                concept = Coding.query.filter_by(
-                    system=coding['system'], code=coding['code']).one()
-            except NoResultFound:
-                raise ValueError("Unknown code: {} for system{}".format(
-                                     coding['code'], coding['system']))
-            if concept.code in remove_if_not_requested:
-                # The concept existed before and is to be retained
-                remove_if_not_requested.pop(concept.code)
-            else:
-                # Otherwise, it's new; add it
-                self.children.append(concept)
-
-        # Remove the stale concepts that weren't requested again
-        for concept in remove_if_not_requested.values():
-            self.children.remove(concept)
-
-
-class UserIndigenousStatusExtension(Extension):
-    # Used in place of us-core-race and us-core-ethnicity for
-    # Australian configurations.
     extension_url = TRUENTH_EXTENSTION_NHHD_291036
 
     @property
@@ -97,7 +57,10 @@ class UserIndigenousStatusExtension(Extension):
         return self.user.indigenous
 
 
-class UserEthnicityExtension(Extension):
+class UserEthnicityExtension(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
 
@@ -106,7 +69,10 @@ class UserEthnicityExtension(Extension):
         return self.user.ethnicities
 
 
-class UserRaceExtension(Extension):
+class UserRaceExtension(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/us-core-race"
 
@@ -115,7 +81,10 @@ class UserRaceExtension(Extension):
         return self.user.races
 
 
-class UserTimezone(Extension):
+class UserTimezone(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/user-timezone"
 
@@ -159,7 +128,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
-
+    # todo: move to click prompt
     if not acting_user:
         actor = raw_input(
             "\n\nWARNING!!!\n\n"

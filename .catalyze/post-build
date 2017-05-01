@@ -2,4 +2,4 @@
 # Datica post-build hook script
 # https://resources.datica.com/compliant-cloud/articles/buildpacks-custom/#pre-and-post-build-hooks
 
-python manage.py sync
+FLASK_APP=manage.py flask sync
