@@ -1602,6 +1602,7 @@ var OrgTool = function() {
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
+                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
                     } else {
                         $("#userOrgs input[name='organization']").each(function() {
                             //console.log("in id: " + $(this).attr("id"))
@@ -1611,6 +1612,7 @@ var OrgTool = function() {
                                 if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                            };
                         });
+                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                     };
                 } else {
                     var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;

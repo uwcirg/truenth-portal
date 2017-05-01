@@ -331,8 +331,25 @@
                     return pName;
                 })();
                 var greeting = (function() {
-                    var fname = $("#firstname").val();
-                    var lname = $("#lastname").val();
+                    var fname = "";
+                    var lname = "";
+                    if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+                        fname = $("#firstname").val();
+                        lname = $("#lastname").val();
+                    } else {
+                        $.ajax ({
+                            type: "GET",
+                            url: '/api/demographics/{{person.id}}',
+                            async: false,
+                            cache: false
+                        }).done(function(data) {
+                            if (data && data.name) {
+                                fname = data.name.given; 
+                                lname = data.name.family; 
+                            };
+                        }).fail(function() {
+                        });
+                    };
                     var txt = "Hello";
                     if (hasValue(fname)) txt += " " + fname;
                     if (hasValue(lname)) txt += " " + lname;
@@ -344,11 +361,10 @@
                         {#- javascript variables are not available at template
                            rendering time.  insert a placeholder and then
                            replace once the variable is available. -#}
-                        body = '{{ app_text('profileSendEmail invite email_body',
-                                'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
+                        body = '{{ app_text('profileSendEmail invite email_body', 'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
                         body = body.replace(/\(greeting\)/g, greeting);
                         body = body.replace(/\(parent org\)/g, parentName);
-                        body = body.replace(/url_placeholder/g, return_url);
+                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
                         subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                     };
                 }
