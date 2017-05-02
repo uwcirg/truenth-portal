@@ -148,18 +148,6 @@ def lived_experience():
 def stories(page_name):
     return render_template('gil/%s.html' % page_name.replace('-', '_'))
 
-# @portal.route('/stories/david-andrew-story')
-# def david_andrew_story():
-#     return render_template('gil/david_andrew_story.html', user=current_user())
-
-# @portal.route('/stories/alonzo-mccann-story')
-# def alonzo_mccann_story():
-#     return render_template('gil/alonzo_mccann_story.html', user=current_user())
-
-# @portal.route('/stories/hirsch-brothers-story')
-# def hirsch_brothers_story():
-#     return render_template('gil/hirsch_brothers_story.html', user=current_user())
-
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
 
