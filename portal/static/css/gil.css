@@ -6481,6 +6481,22 @@ figure.nav-overlay {
     text-transform: uppercase;
     margin: 0 20px;
 }
+.nav-list__item i {
+    color: #FFF;
+    text-align: center;
+    font-size: 1.8em;
+    display: block;
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+}
+@media (min-width: 768px) {
+    .nav-list__item i {
+        margin-top: 0;
+    }
+}
+.nav-list__item i:hover {
+    text-decoration: none;
+}
 @media (max-width: 767px) {
     .nav-list__item {
         font-size: 14px;
