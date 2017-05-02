@@ -1,11 +1,37 @@
-{% extends "gil/base.html" %}
+{% extends "gil/lived_experience_base.html" %}
 {% block main %}
     <main class="main">
       {{super()}}
-      <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
+      <div class="page-intro page-intro--dark page-intro--lived-experience" style="background-image: url({{ url_for('static', filename='img/LE_Main.jpg') }})">
         <div class="page-intro__content">
-          <h1 class="page-intro__main">Lived Experience</h1>
-          <p class="page-intro__sub">Coming in 2017.</p>
+          <div class="accent-heading accent-heading--white">Objective N<em>o</em>1: LIVED EXPERIENCE</div>
+          <p class="page-intro__sub">TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey.</p>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--background module-wrap--background__alonzo">
+           <div class="module">
+            <p class="module__heading">ALONZO McCANN</p>
+            <img src="{{ url_for('static', filename='img/LE_Alonzo_McCann_Mobile.jpg') }}" class="mobile">
+            <p class="module__body">Alonzo McCann is a Detroit football coach, preacher, husband and father. After one of the darkest periods of his life, he now reflects on the route he took through recovery.</p>
+            <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories',page_name='alonzo-mccann-story')}}">Watch Alonzo's Film</a></div>
+           </div>
+      </div>
+      <div class="module-wrap module-wrap--background module-wrap--background__andrew blue-theme">
+        <div class="module">
+          <p class="module__heading">DAVID AND ANDREW PEREZ</p>
+          <img src="{{ url_for('static', filename='img/LE_David_Andrew_Perez_Mobile.jpg') }}" class="mobile">
+          <p class="module__body">Andrew proved he would be there for his father as he began his Prostate Cancer journey.</p>
+          <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories',page_name='david-andrew-story')}}">READ DAVID AND ANDREW'S STORY</a></div>
+           </div>
+        </div>
+      </div>
+      <div class="module-wrap module-wrap--background module-wrap--background__twins">
+        <div class="module">
+          <p class="module__heading">THE HIRSCH BROTHERS</p>
+          <img src="{{ url_for('static', filename='img/LE_Hirsch_Brothers_Mobile.jpg') }}" class="mobile">
+          <p class="module__body">Twin brothers Mark and Jon Hirsch learned how family history and early detection would play a role in their shared Prostate Cancer journey.</p>
+          <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories', page_name='hirsch-brothers-story')}}">Watch Mark and Jon's Film</a></div>
+           </div>
         </div>
       </div>
     </main>
@@ -13,6 +39,11 @@
 {% block document_ready %}
   <script>
       $(document).ready(function(){
+        $("header").addClass("header--white");
+        $("#lnReadMoreStory").addClass("disabled").on("click", function(e) {
+          e.preventDefault();
+          return false;
+        });
         setSelectedNavItem($(".side-nav-items__item--livedexperience"));
       });
   </script>

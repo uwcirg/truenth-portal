@@ -144,6 +144,10 @@ def exercise_and_diet():
 def lived_experience():
     return render_template('gil/lived-experience.html', user=current_user())
 
+@portal.route('/stories/<string:page_name>')
+def stories(page_name):
+    return render_template('gil/%s.html' % page_name.replace('-', '_'))
+
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
 
