@@ -159,7 +159,7 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
-
+    # todo: move to click prompt
     if not acting_user:
         actor = raw_input(
             "\n\nWARNING!!!\n\n"
@@ -1171,7 +1171,8 @@ class User(db.Model, UserMixin):
         # birthdate is trickier - raw delta doesn't make sense.  treat
         # it like a string, mismatch always results in a 0 score
         dob = self.birthdate or datetime.utcnow()
-        if (dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
+        if (birthdate.year < 1900 or
+            dob.strftime('%d%m%Y') != birthdate.strftime('%d%m%Y')):
             return 0
         return sum(scores) / len(scores)
 

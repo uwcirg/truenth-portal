@@ -50,10 +50,7 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
-    LOG_FOLDER = os.environ.get(
-        'LOG_FOLDER',
-        os.path.join('/var/log', __package__)
-    )
+    LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
     LOG_LEVEL = 'DEBUG'
 
     MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
@@ -125,33 +122,3 @@ class TestConfig(BaseConfig):
 
     WTF_CSRF_ENABLED = False
     FILE_UPLOAD_DIR = 'test_uploads'
-
-
-class ConfigServer(Server):  # pragma: no cover
-    """Correctly read Flask configuration values when running Flask
-
-    Flask-Script 2.0.5 does not read host and port specified in
-    SERVER_NAME.  This subclass fixes that.
-
-    Bug: https://github.com/smurfix/flask-script/blob/7dfaf2898d648761632dc5b3ba6654edff67ec57/flask_script/commands.py#L343
-
-    Values passed in when instance is called as a function override
-    those passed during initialization which override configured values
-
-    See https://github.com/smurfix/flask-script/issues/108
-    """
-    def __init__(self, port=None, host=None, **kwargs):
-        """Override default port and host
-
-        Allow fallback to configured values
-
-        """
-        super(ConfigServer, self).__init__(port=port, host=host, **kwargs)
-
-    def __call__(self, app=None, host=None, port=None, *args, **kwargs):
-        """Call app.run() with highest precedent configuration values"""
-        # Fallback to initialized value if None is passed
-        port = self.port if port is None else port
-        host = self.host if host is None else host
-        super(ConfigServer, self).__call__(app=app, host=host,
-                port=port, *args, **kwargs)

@@ -24,7 +24,7 @@
                     <div id="patientsInstrumentListWrapper">
                       <div id="patientsInstrumentList" class="profile-radio-list">
                         {% for instrument_code in config["INSTRUMENTS"] | sort() %}
-                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
+                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label style="min-width: 100px; max-width: 100%"><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
                         </div>
                         {% endfor %}
                       </div>

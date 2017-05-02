@@ -507,6 +507,7 @@
                </div>
            </div>
            <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+           <div id="defaultConsentContainer"></div>
            {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
     </div>
@@ -608,7 +609,7 @@
                   .prepend("<option value='' selected>Select</option>")
                   .val("");
                   $(".state-container, .clinic-prompt").hide();
-                  OT.handlePreSelectedClinic();
+                  setTimeout("OT.handlePreSelectedClinic();", 200);
                   //case of pre-selected clinic, need to check if any clinic has prechecked
                   setTimeout("handleCheckedItem();", 500);
 
@@ -780,7 +781,10 @@
                             setTimeout("tnthAjax.setConsent({{person.id}}, " + JSON.stringify(params) + ");", 10);
                             setTimeout("tnthAjax.removeObsoleteConsent();", 100);
                         }
-                        else tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
+                        else {
+                            tnthAjax.deleteConsent({{person.id}}, {"org":orgId});
+                            setTimeout("tnthAjax.removeObsoleteConsent();", 100);
+                        };
                         if (typeof reloadConsentList != "undefined") setTimeout("reloadConsentList();", 500);
                         setTimeout('$(".modal").modal("hide");', 250);
                     });
@@ -1119,7 +1123,7 @@
 
                 } else {
                     $("#userSessionListTable").hide();
-                    $("#userSessionsListContainer").prepend("<span class='text-muted'>No Questionnaire Data Found.</span>");
+                    $("#userSessionsListContainer").prepend("<span class='text-muted'>No questionnaire data found.</span>");
                 };
 
             }).fail(function() {
@@ -1375,12 +1379,12 @@
     <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
-                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Reports") }}</h4>
+                    <h4 id="interventionReportsLoc" class="profile-item-title index-item">{{ _("Intervention Reports") }}</h4>
                     <div>
                         {%- if person and person.staff_html() -%}
                             {{person.staff_html() | safe}}
                         {%- else -%}
-                            <div class="text-muted">{{ _("No Reports Available") }}</div>
+                            <div class="text-muted">{{ _("No reports available.") }}</div>
                         {%- endif -%}
                     </div>
                 </div>

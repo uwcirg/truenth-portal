@@ -55,9 +55,13 @@ def configure_audit_log(app):  # pragma: no cover
         return
 
     logging.addLevelName('AUDIT', AUDIT)
-    audit_log = os.path.join(app.config['LOG_FOLDER'], 'audit.log')
-    audit_file_handler = logging.FileHandler(audit_log, delay=True)
-    audit_file_handler.setLevel(AUDIT)
-    audit_file_handler.setFormatter(
+
+    audit_log_handler = logging.StreamHandler(sys.stdout)
+    if app.config.get('LOG_FOLDER', None):
+        audit_log = os.path.join(app.config['LOG_FOLDER'], 'audit.log')
+        audit_log_handler = logging.FileHandler(audit_log, delay=True)
+
+    audit_log_handler.setLevel(AUDIT)
+    audit_log_handler.setFormatter(
         logging.Formatter('%(asctime)s: %(message)s'))
-    app.logger.addHandler(audit_file_handler)
+    app.logger.addHandler(audit_log_handler)

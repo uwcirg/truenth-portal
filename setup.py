@@ -55,13 +55,13 @@ setup_kwargs = dict(
         "Flask-Migrate",
         "Flask-OAuthlib",
         "Flask-SQLAlchemy",
-        "Flask-Script",
         "Flask-Session",
         "Flask-Swagger",
         "Flask-Testing",
         "Flask-User",
         "Flask-WebTest",
         "fuzzywuzzy",
+        "gunicorn",
         "jsonschema",
         "oauthlib",
         "pkginfo",
@@ -103,8 +103,6 @@ else:
         build_version = BUILD_DIR.split("-")[-1]
         version_kwargs = {"version": "0+ng"+build_version}
 
-        # Install gunicorn WSGI server
-        setup_kwargs["install_requires"].append("gunicorn")
     else:
         version_kwargs = dict(version='0+d'+datetime.date.today().strftime('%Y%m%d'))
 
