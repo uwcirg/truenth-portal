@@ -644,7 +644,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
-
+            
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -666,6 +666,7 @@ var fillContent = {
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
+            var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
             content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
@@ -734,7 +735,7 @@ var fillContent = {
                             };
                             break;
                     };
-                    var modalContent = "";
+                    var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
@@ -745,17 +746,36 @@ var fillContent = {
                             + '<h5 class="modal-title">Consent Status Editor</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em"><em>Modify</em> the consent status for this user to: </h4>'
+                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
+                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
+                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
                             + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
+                        consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
+                            + '<div class="modal-dialog" role="document">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                            + '<h5 class="modal-title">Consent Date Editor</h5>'
+                            + '</div>'
+                            + '<div class="modal-body" style="padding: 0 2em">'
+                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent date for this agreement to: </h4>'
+                            + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
+                            + '<div id="consentDateContainer_' + index + '" style="font-size:0.95em; margin-left:1em">'
+                            + '<input type="text" style="width:150px; max-width: 100%; display:inline-block" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11"/><span class="text-muted">&nbsp; example: 1 Jan, 2017</span>'
+                            + '</div><div id="consentDateError_' + index + '" class="error-message"></div><br/><br/>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
+                            + '</div>'
+                            + '</div></div></div>';
+
 
                     };
 
@@ -787,7 +807,7 @@ var fillContent = {
                             } (item)
                         },
                         {
-                            content: (signedDate).replace("T", " ")
+                            content: (signedDate).replace("T", " ") + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
                         }
                     ].forEach(function(cell) {
                         if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
@@ -828,13 +848,67 @@ var fillContent = {
                     $(this).on("click", function() {
                         var o = CONSENT_ENUM[$(this).val()];
                         if (o) {
-                            o.org = $(this).attr("orgId");
-                            o.agreementUrl = $(this).attr("agreementUrl");
+                            o.org = $(this).attr("data-orgId");
+                            o.agreementUrl = $(this).attr("data-agreementUrl");
                         };
-                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("userId"), {org: $(this).attr("orgId")});
-                        else  tnthAjax.setConsent(userId, o, $(this).val());
+                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                        else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
                         $("#" + $(this).attr("modalId")).modal('hide');
                         if (typeof reloadConsentList != "undefined") reloadConsentList();
+                    });
+                });
+            };
+            if (consentDateEditable) {
+                var today = new Date();
+                $(".consent-date-modal").each(function() {
+                    $(this).on("shown.bs.modal", function() {
+                        $(this).find(".consent-date").focus();
+                    });
+                });
+                $(".consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $(".consent-date").each(function() {
+                    $(this).on("change", function() {
+                        var self = this;
+                        if (!hasValue($(this).val())) return false;
+                        var dArray = $.trim($(this).val()).split(" ");
+                        if (dArray.length < 3) return false;
+                        var day = dArray[0], month = dArray[1], year = dArray[2];
+                        if (day.length < 1) return false;
+                        if (month.length < 1) return false;
+                        if (year.length < 4) return false;
+
+                        var dt = new Date($(this).val());
+                        if (!tnthDates.isDate(dt)) return false;
+                        else {
+                              var today = new Date(), errorMsg = "";
+                              if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
+                              // Only allow if date is before today
+                              if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+                                  errorMsg = "The date must not be in the future.";
+                              };
+                              if (hasValue(errorMsg)) {
+                                $("#consentDateError_" + $(this).attr("data-index")).text(errorMsg);
+                                $(this).datepicker("hide");
+                              } else {
+                                    $("#consentDateError_" + $(this).attr("data-index")).text("");
+                                    $(this).datepicker("hide");
+                                    var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                                    var o = CONSENT_ENUM[$(this).attr("data-status")];
+                                    if (o) {
+                                        o.org = $(this).attr("data-orgId");
+                                        o.agreementUrl = $(this).attr("data-agreementUrl");
+                                        o.acceptance_date = cDate;
+                                        o.testPatient = true;
+                                        setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
+                                        setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
+                                        $("#consentListTable button[data-dismiss]").attr("disabled", true);
+                                        setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
+                                        if (typeof reloadConsentList != "undefined") reloadConsentList();
+                                        else setTimeout("location.reload();", 2000);
+                                        $("#consentListTable .modal").modal("hide");
+                                    };
+                              };
+                        };
                     });
                 });
             };
@@ -1702,7 +1776,13 @@ var tnthAjax = {
     "setConsent": function(userId, params, status, sync) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
-            if (!consented) {
+            if (!consented || params["testPatient"]) {
+                params["user_id"] = userId;
+                params["organization_id"] = params["org"];
+                params["agreement_url"] =  params["agreementUrl"]
+                params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
+                params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
+                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false)
                 $.ajax ({
                     type: "POST",
                     url: '/api/user/' + userId + '/consent',
@@ -1710,7 +1790,7 @@ var tnthAjax = {
                     cache: false,
                     dataType: 'json',
                     async: (sync? false: true),
-                    data: JSON.stringify({"user_id": userId, "organization_id": params["org"], "agreement_url": params["agreementUrl"], "staff_editable": (hasValue(params["staff_editable"])? params["staff_editable"] : false), "include_in_reports": (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false), "send_reminders": (hasValue(params["send_reminders"]) ? params["send_reminders"] : false) })
+                    data: JSON.stringify(params)
                 }).done(function(data) {
                     //console.log("consent updated successfully.");
                     $(".set-consent-error").remove();
@@ -2816,6 +2896,9 @@ var tnthDates = {
             toReturn = "Today";
         }
         return toReturn
+    },
+    "isDate": function(d) {
+        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime() );
     }
 };
 
