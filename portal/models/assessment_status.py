@@ -146,7 +146,7 @@ class AssessmentStatus(object):
 
         for q in questionnaires:
             self.__status_per_instrument(
-                q.title, q.days_till_due, q.days_till_overdue)
+                q.name, q.days_till_due, q.days_till_overdue)
 
         status_strings = [details['status'] for details in
                           self.instrument_status.values()]

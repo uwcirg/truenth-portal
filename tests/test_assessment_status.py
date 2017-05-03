@@ -51,13 +51,13 @@ def mock_questionnairebanks():
     m_qb = QuestionnaireBank(
         name='metastatic', organization_id=metastatic_org.id)
     for rank, instrument in enumerate(localized_instruments):
-        q = Questionnaire(title=instrument)
+        q = Questionnaire(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=7, days_till_overdue=90,
             rank=rank)
         l_qb.questionnaires.append(qbq)
     for rank, instrument in enumerate(metastatic_instruments):
-        q = Questionnaire(title=instrument)
+        q = Questionnaire(name=instrument)
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=30,
             rank=rank)
