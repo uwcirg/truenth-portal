@@ -196,17 +196,17 @@ class SitePersistence(object):
 
         def update_questionnaire(data):
             q = Questionnaire.from_fhir(data)
-            existing = Questionnaire.query.filter_by(title=q.title).first()
+            existing = Questionnaire.query.filter_by(name=q.name).first()
             if existing:
                 details = StringIO()
                 if not dict_match(data, existing.as_fhir(), details):
-                    self._log("Questionnaire {title} collision on "
+                    self._log("Questionnaire {name} collision on "
                               "import.  {details}".format(
-                                  title=q.title, details=details.getvalue()))
+                                  name=q.name, details=details.getvalue()))
                     existing.update_from_fhir(data)
             else:
                 self._log("Questionnaire {} not found - importing".format(
-                    q.title))
+                    q.name))
                 db.session.add(q)
 
         def update_qb(qb_json):
@@ -290,12 +290,12 @@ class SitePersistence(object):
         qs_seen = []
         for o in objs_by_type['Questionnaire']:
             update_questionnaire(o)
-            qs_seen.append(o['title'])
+            qs_seen.append(o['name'])
 
         # Delete any Questionnaires not named
         if not keep_unmentioned:
             query = Questionnaire.query.filter(
-                ~Questionnaire.title.in_(qs_seen))
+                ~Questionnaire.name.in_(qs_seen))
             for q in query:
                 current_app.logger.info(
                     "Deleting Questionnaire not mentioned in "
