@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import current_app, abort, Blueprint, render_template, request
+from flask import abort, Blueprint, render_template, request
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -36,23 +36,14 @@ def patients_root():
 
     org_list = set()
 
-    consent_with_top_level_org = current_app.config.get('CONSENT_WITH_TOP_LEVEL_ORG', False)
     now = datetime.utcnow()
     consented_users = []
-    #gather all consented users from user's organizations
-    for org in user.organizations:
-        if org.id == 0:  # None of the above doesn't count
-          continue
-        #get respective consented user for each user org
-        consent_org_id = org.id
-        if consent_with_top_level_org:
-            consent_org_id = OrgTree().find(org.id).top_level()
-        if consent_org_id:
-            consent_query = UserConsent.query.filter(and_(
-                        UserConsent.organization_id == consent_org_id,
-                        UserConsent.deleted_id == None,
-                        UserConsent.expires > now)).with_entities(UserConsent.user_id)
-            consented_users.extend([u[0] for u in consent_query])
+
+    consent_query = UserConsent.query.filter(and_(
+                         UserConsent.deleted_id == None,
+                         UserConsent.expires > now)).with_entities(
+                             UserConsent.user_id)
+    consented_users = [u.user_id for u in consent_query]
 
     if user.has_role(ROLE.STAFF):
         request_org_list = request.args.get('org_list', None)
@@ -61,7 +52,8 @@ def patients_root():
         OT = OrgTree()
 
         if request_org_list:
-            #for selected filtered orgs, we also need to get the children of each, if any
+            # for selected filtered orgs, we also need to get the children
+            # of each, if any
             request_org_list = set(request_org_list.split(","))
             for orgId in request_org_list:
                 if orgId == 0:  # None of the above doesn't count
@@ -73,8 +65,8 @@ def patients_root():
                     continue
                 org_list.update(OT.here_and_below_id(org.id))
 
-        # Gather up all patients belonging to any of the orgs (and their children)
-        # this (staff) user belongs to.
+        # Gather up all patients belonging to any of the orgs (and their
+        # children) this (staff) user belongs to.
         org_patients = User.query.join(UserRoles).filter(
             and_(User.id==UserRoles.user_id,
                  UserRoles.role_id==patient_role_id,
@@ -107,7 +99,6 @@ def patients_root():
         user=user, org_list=org_list,
         wide_container="true")
 
-
 @patients.route('/patient-profile-create')
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
@@ -117,7 +108,8 @@ def patient_profile_create():
     leaf_organizations = user.leaf_organizations()
     return render_template(
         "patient_profile_create.html", user = user,
-        consent_agreements=consent_agreements, leaf_organizations=leaf_organizations)
+        consent_agreements=consent_agreements,
+        leaf_organizations=leaf_organizations)
 
 
 @patients.route('/sessionReport/<int:user_id>/<instrument_id>/<authored_date>')
@@ -147,14 +139,17 @@ def patient_profile(patient_id):
             Intervention.query.order_by(Intervention.display_rank).all()
     for intervention in interventions:
         display = intervention.display_for_user(patient)
-        if display.access and display.link_url is not None and display.link_label is not None:
+        if (display.access and display.link_url is not None and
+            display.link_label is not None):
             user_interventions.append({"name": intervention.name})
         if intervention.name == 'assessment_engine':
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
             assessment_status = AssessmentStatus(user=patient)
-            patient.assessment_overall_status = assessment_status.overall_status if assessment_status else None
+            patient.assessment_overall_status = (
+                assessment_status.overall_status if assessment_status else
+                None)
     terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     return render_template(
