@@ -4,12 +4,12 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
+from ..models.assessment_status import AssessmentStatus
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
 from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
-from ..models.fhir import AssessmentStatus
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from datetime import datetime
 

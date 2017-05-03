@@ -2,7 +2,7 @@
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
-from tests.test_assessment_status import mock_qr
+from tests.test_assessment_status import mock_qr, mock_questionnairebanks
 
 from portal.extensions import db
 from portal.models.audit import Audit
@@ -347,6 +347,12 @@ class TestIntervention(TestCase):
         ae  = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
         self.bless_with_basics()
+
+        # generate questionnaire banks and associate user with
+        # metastatic organization
+        mock_questionnairebanks()
+        metastatic_org = Organization.query.filter_by(name='metastatic').one()
+        self.test_user.organizations.append(metastatic_org)
 
         with SessionScope(db):
             d = {'function': 'update_card_html_on_completion',

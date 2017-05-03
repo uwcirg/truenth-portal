@@ -16,6 +16,8 @@ from models.fhir import FHIR_datetime
 from models.intervention import Intervention, INTERVENTION
 from models.intervention_strategies import AccessStrategy
 from models.organization import Organization
+from models.questionnaire import Questionnaire
+from models.questionnaire_bank import QuestionnaireBank
 
 
 class SitePersistence(object):
@@ -134,6 +136,14 @@ class SitePersistence(object):
             if rules:
                 d['entry'] += rules
 
+        # Add Questionnaires
+        for q in Questionnaire.query.all():
+            d['entry'].append(q.as_json())
+
+        # Add QuestionnaireBanks
+        for qb in QuestionnaireBank.query.all():
+            d['entry'].append(qb.as_json())
+
         # Add customized app strings
         app_strings = AppText.query.all()
         for app_string in app_strings:
@@ -183,6 +193,28 @@ class SitePersistence(object):
             else:
                 self._log("org {} not found - importing".format(org.id))
                 db.session.add(org)
+
+        def update_questionnaire(data):
+            q = Questionnaire.from_fhir(data)
+            existing = Questionnaire.query.filter_by(name=q.name).first()
+            if existing:
+                details = StringIO()
+                if not dict_match(data, existing.as_fhir(), details):
+                    self._log("Questionnaire {name} collision on "
+                              "import.  {details}".format(
+                                  name=q.name, details=details.getvalue()))
+                    existing.update_from_fhir(data)
+            else:
+                self._log("Questionnaire {} not found - importing".format(
+                    q.name))
+                db.session.add(q)
+
+        def update_qb(qb_json):
+            # NB - due to dependent structure of questionnaire
+            # banks on association table data, the objects are
+            # added to the db on the fly.  Therefore, we fail to
+            # log differences with existing persisted data.
+            QuestionnaireBank.from_json(qb_json)
 
         def update_strat(strat_json):
             strat = AccessStrategy.from_json(strat_json)
@@ -252,6 +284,40 @@ class SitePersistence(object):
                 current_app.logger.info(
                     "Deleting organization not mentioned in "
                     "site_persistence: {}".format(org))
+            query.delete(synchronize_session=False)
+
+        # Questionnaires:
+        qs_seen = []
+        for o in objs_by_type['Questionnaire']:
+            update_questionnaire(o)
+            qs_seen.append(o['name'])
+
+        # Delete any Questionnaires not named
+        if not keep_unmentioned:
+            query = Questionnaire.query.filter(
+                ~Questionnaire.name.in_(qs_seen))
+            for q in query:
+                current_app.logger.info(
+                    "Deleting Questionnaire not mentioned in "
+                    "site_persistence: {}".format(q))
+            query.delete(synchronize_session=False)
+        # commit Questionnaires as referenced by QuestionnaireBanks
+        db.session.commit()
+
+        # QuestionnaireBanks:
+        qbs_seen = []
+        for o in objs_by_type['QuestionnaireBank']:
+            update_qb(o)
+            qbs_seen.append(o['name'])
+
+        # Delete any QuestionnaireBanks not named
+        if not keep_unmentioned:
+            query = QuestionnaireBank.query.filter(
+                ~QuestionnaireBank.name.in_(qbs_seen))
+            for qb in query:
+                current_app.logger.info(
+                    "Deleting QuestionnaireBank not mentioned in "
+                    "site_persistence: {}".format(qb))
             query.delete(synchronize_session=False)
 
         # Intervention details

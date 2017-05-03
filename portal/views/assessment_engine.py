@@ -9,8 +9,9 @@ import requests
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
+from ..models.assessment_status import AssessmentStatus
 from ..models.auth import validate_client_origin
-from ..models.fhir import AssessmentStatus, FHIR_datetime, QuestionnaireResponse
+from ..models.fhir import FHIR_datetime, QuestionnaireResponse
 from ..models.fhir import aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User

@@ -14,7 +14,7 @@ from ..database import db
 from .extension import CCExtension
 from .fhir import Coding, CodeableConcept, FHIR_datetime
 from .identifier import Identifier
-import reference
+from .reference import Reference
 from .telecom import Telecom
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
@@ -152,7 +152,7 @@ class Organization(db.Model):
         if 'type' in data:
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:
-            self.partOf_id = reference.Reference.parse(data['partOf']).id
+            self.partOf_id = Reference.parse(data['partOf']).id
         for attr in ('use_specific_codings','race_codings',
                     'ethnicity_codings','indigenous_codings'):
             if attr in data:
@@ -182,7 +182,7 @@ class Organization(db.Model):
         if self.type:
             d['type'] = self.type.as_fhir()
         if self.partOf_id:
-            d['partOf'] = reference.Reference.organization(
+            d['partOf'] = Reference.organization(
                 self.partOf_id).as_fhir()
         if self.coding_options:
             for attr in ('use_specific_codings','race_codings',
