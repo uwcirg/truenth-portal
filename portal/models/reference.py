@@ -4,7 +4,6 @@ from sqlalchemy import and_
 
 from ..database import db
 from .identifier import Identifier
-from .organization import Organization, OrganizationIdentifier
 
 class MissingReference(Exception):
     """Raised when FHIR references cannot be found"""
@@ -57,7 +56,7 @@ class Reference(object):
 
         """
         ## Due to cyclic import problems, keep these local
-        from .organization import Organization
+        from .organization import Organization, OrganizationIdentifier
         from .questionnaire import Questionnaire
         from .user import User
 
