@@ -73,8 +73,12 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
-          <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
-          <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
+          {%- if (person and ("en_US" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_US" -%}
+           <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
+          {%- endif -%}
+          {%- if (person and ("en_AU" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_AU" -%}
+           <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
+          {%- endif -%}
         </select>
      </div>
      <script>$(function () {
