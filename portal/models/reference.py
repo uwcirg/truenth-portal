@@ -11,6 +11,11 @@ class MissingReference(Exception):
     pass
 
 
+class MultipleReference(Exception):
+    """Raised when FHIR references retrieve multiple results"""
+    pass
+
+
 class Reference(object):
 
     @classmethod
@@ -40,6 +45,7 @@ class Reference(object):
         :returns: the referenced object - instantiated from the db
 
         :raises :py:exc:`portal.models.reference.MissingReference`: if the referenced object can not be found
+        :raises :py:exc:`portal.models.reference.MultipleReference`: if the referenced object retrieves multiple results
         :raises :py:exc:`exceptions.ValueError`: if the text format can't be parsed
 
         """
@@ -94,7 +100,7 @@ class Reference(object):
                 raise MissingReference("Reference not found: {}".format(
                     reference_text))
             elif result.count() > 1:
-                raise ValueError('Constraint error - multiple organizations ' \
+                raise MultipleReference('Multiple organizations ' \
                     'found for reference {}'.format(reference_text))
             return result.first()
 

@@ -90,6 +90,26 @@ class TestOrganization(TestCase):
         rv = self.client.get('/api/organization/{}'.format(org.id))
         self.assert200(rv)
 
+    def test_organization_get_by_identifier(self):
+        org_id_system = "testsystem"
+        org_id_value = "testval"
+        self.login()
+        org = Organization(name='test',id=999)
+        ident = Identifier(id=99,system=org_id_system,value=org_id_value)
+        org_ident = OrganizationIdentifier(organization_id=999,
+                                            identifier_id=99)
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.add(ident)
+            db.session.commit()
+            db.session.add(org_ident)
+            db.session.commit()
+
+        # use api to obtain FHIR
+        rv = self.client.get('/api/organization/{}/{}'.format(org_id_system,
+                                            org_id_value))
+        self.assert200(rv)
+
     def test_organization_list(self):
         count = Organization.query.count()
 
