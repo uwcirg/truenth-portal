@@ -25,6 +25,13 @@ class Reference(object):
         return instance
 
     @classmethod
+    def questionnaire(cls, questionnaire_title):
+        """Create a reference object from a known questionnaire title"""
+        instance = cls()
+        instance.questionnaire_title = questionnaire_title
+        return instance
+
+    @classmethod
     def parse(cls, reference_dict):
         """Parse an organization from a FHIR Reference resource
 
@@ -42,6 +49,7 @@ class Reference(object):
         """
         ## Due to cyclic import problems, keep these local
         from .organization import Organization
+        from .questionnaire import Questionnaire
         from .user import User
 
 
@@ -54,19 +62,23 @@ class Reference(object):
                     format(reference_dict))
 
         lookup = (
-            (re.compile('[Oo]rganization/(\d+)'), Organization),
-            (re.compile('[Pp]atient/(\d+)'), User))
+            (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
+            (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'title'),
+            (re.compile('[Pp]atient/(\d+)'), User, 'id'))
 
-        for pattern, obj in lookup:
+        for pattern, obj, attribute in lookup:
             match = pattern.search(reference_text)
             if match:
-                try:
-                    id = int(match.groups()[0])
-                except:
-                    raise ValueError('ID not found in reference {}'.format(
-                        reference_text))
+                value = match.groups()[0]
+                if attribute == 'id':
+                    try:
+                        value = int(value)
+                    except:
+                        raise ValueError('ID not found in reference {}'.format(
+                            reference_text))
                 with db.session.no_autoflush:
-                    result = obj.query.get(id)
+                    search_attr = {attribute: value}
+                    result = obj.query.filter_by(**search_attr).first()
                 if not result:
                     raise MissingReference("Reference not found: {}".format(
                         reference_text))
@@ -88,5 +100,7 @@ class Reference(object):
             ref = "api/patient/{}".format(self.patient_id)
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
+        if hasattr(self, 'questionnaire_title'):
+            ref = "api/questionnaire/{}".format(self.questionnaire_title)
 
         return {"reference": ref}
