@@ -48,7 +48,7 @@ class Organization(db.Model):
             secondary="organization_addresses")
     identifiers = db.relationship('Identifier', lazy='dynamic',
             secondary="organization_identifiers")
-    locales = db.relationship(Coding, lazy='dynamic',
+    _locales = db.relationship(Coding, lazy='dynamic',
             secondary="organization_locales")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
@@ -124,6 +124,13 @@ class Organization(db.Model):
             self.coding_options = self.coding_options | INDIGENOUS_CODINGS_MASK
         else:
             self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
+
+    @hybrid_property
+    def locales(self):
+        if self.partOf_id:
+            parent = Organization.query.get(self.partOf_id)
+            return self._locales.union(parent.locales)
+        return self._locales
 
     @classmethod
     def from_fhir(cls, data):
