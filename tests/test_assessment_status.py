@@ -3,9 +3,12 @@ from datetime import datetime
 from flask_webtest import SessionScope
 
 from portal.extensions import db
-from portal.models.audit import Audit
-from portal.models.fhir import CC, QuestionnaireResponse, AssessmentStatus
-from portal.models.fhir import localized_PCa
+from portal.models.assessment_status import AssessmentStatus
+from portal.models.organization import Organization
+from portal.models.questionnaire import Questionnaire
+from portal.models.questionnaire_bank import QuestionnaireBank
+from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.fhir import QuestionnaireResponse
 from tests import TestCase, TEST_USER_ID
 
 
@@ -30,24 +33,62 @@ def mock_qr(user_id, instrument_id, status='completed'):
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
-metastaic_instruments = set(['eortc', 'hpfs', 'prems', 'irondemog'])
+metastatic_instruments = set(['eortc', 'hpfs', 'prems', 'irondemog'])
 
+def mock_questionnairebanks():
+    # Define test Orgs and QuestionnaireBanks for each group
+    localized_org = Organization(name='localized')
+    metastatic_org = Organization(name='metastatic')
+    with SessionScope(db):
+        db.session.add(localized_org)
+        db.session.add(metastatic_org)
+        db.session.commit()
+    localized_org, metastatic_org = map(
+        db.session.merge, (localized_org, metastatic_org))
+
+    l_qb = QuestionnaireBank(
+        name='localized', organization_id=localized_org.id)
+    m_qb = QuestionnaireBank(
+        name='metastatic', organization_id=metastatic_org.id)
+    for rank, instrument in enumerate(localized_instruments):
+        q = Questionnaire(title=instrument)
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire=q, days_till_due=7, days_till_overdue=90,
+            rank=rank)
+        l_qb.questionnaires.append(qbq)
+    for rank, instrument in enumerate(metastatic_instruments):
+        q = Questionnaire(title=instrument)
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire=q, days_till_due=1, days_till_overdue=30,
+            rank=rank)
+        m_qb.questionnaires.append(qbq)
+    with SessionScope(db):
+        db.session.add(l_qb)
+        db.session.add(m_qb)
+        db.session.commit()
 
 class TestAssessment(TestCase):
 
+    def setUp(self):
+        super(TestAssessment, self).setUp()
+        mock_questionnairebanks()
+        self.localized_org_id = Organization.query.filter_by(
+            name='localized').one().id
+        self.metastatic_org_id = Organization.query.filter_by(
+            name='metastatic').one().id
+
     def mark_localized(self):
-        self.test_user.save_constrained_observation(
-            codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
-            audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
+        self.test_user.organizations.append(Organization.query.get(
+            self.localized_org_id))
+
+    def mark_metastatic(self):
+        self.test_user.organizations.append(Organization.query.get(
+            self.metastatic_org_id))
 
     def test_localized_using_org(self):
         self.bless_with_basics()
+        self.mark_localized()
         self.test_user = db.session.merge(self.test_user)
-        org_name = self.test_user.valid_consents[0].organization.name
-        self.app.config['LOCALIZED_AFFILIATE_ORG'] = org_name
-
-        # with that consent in place, test user should be 'localized'
-        self.assertTrue(localized_PCa(self.test_user))
 
         # confirm appropriate instruments
         a_s = AssessmentStatus(user=self.test_user)
@@ -117,6 +158,7 @@ class TestAssessment(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
+        self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Completed")
@@ -128,13 +170,14 @@ class TestAssessment(TestCase):
     def test_metastatic_due(self):
         # hasn't taken, but still in "Due" period
         self.bless_with_basics()  # pick up a consent, etc.
+        self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Due")
 
         # confirm list of expected intruments needing attention
         self.assertEquals(
-            metastaic_instruments,
+            metastatic_instruments,
             set(a_s.instruments_needing_full_assessment()))
         self.assertFalse(a_s.instruments_in_process())
 
@@ -146,4 +189,5 @@ class TestAssessment(TestCase):
         self.assert200(rv)
         self.assertEquals(len(rv.json['status']), 1)
         self.assertEquals(
-            rv.json['status'][0]['consents'][0]['assessment_status'], 'Due')
+            rv.json['status'][0]['consents'][0]['assessment_status'],
+            'Not Enrolled')

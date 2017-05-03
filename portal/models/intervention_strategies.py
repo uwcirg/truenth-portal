@@ -21,9 +21,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
 
+from .assessment_status import AssessmentStatus
 from ..database import db
 from .fhir import CC, Coding, CodeableConcept
-from .fhir import AssessmentStatus
 from .identifier import Identifier
 from .intervention import Intervention, INTERVENTION, UserIntervention
 from .organization import Organization, OrgTree, OrganizationIdentifier

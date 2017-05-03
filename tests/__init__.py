@@ -180,6 +180,10 @@ class TestCase(Base):
             db.session.add(consent)
             db.session.commit()
 
+        # Invalidate org tree cache, in case orgs are added by other
+        # tests.  W/o doing so, the new orgs aren't in the orgtree
+        OrgTree.invalidate_cache()
+
     def shallow_org_tree(self):
         """Create shallow org tree for common test needs"""
         org_101 = Organization(id=101, name='101')
