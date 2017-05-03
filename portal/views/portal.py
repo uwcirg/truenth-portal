@@ -26,6 +26,7 @@ from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
+from jinja2 import TemplateNotFound
 
 
 portal = Blueprint('portal', __name__)
@@ -146,7 +147,10 @@ def lived_experience():
 
 @portal.route('/stories/<string:page_name>')
 def stories(page_name):
-    return render_template('gil/%s.html' % page_name.replace('-', '_'))
+    try:
+        return render_template('gil/%s.html' % page_name.replace('-', '_'))
+    except TemplateNotFound as err:
+        return page_not_found(err)
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
