@@ -644,7 +644,6 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var userTimeZone = getUserTimeZone(userId);
             var userLocale = getUserLocale(userId);
-            
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
