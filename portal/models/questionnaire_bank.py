@@ -121,9 +121,9 @@ class QuestionnaireBankQuestionnaire(db.Model):
                 "{0.questionnaire_bank_id}:{0.questionnaire_id}".format(self))
 
     @property
-    def title(self):
-        """Easy access to linked questionnaire `title`"""
-        return self.questionnaire.title
+    def name(self):
+        """Easy access to linked questionnaire `name`"""
+        return self.questionnaire.name
 
     @classmethod
     def from_fhir(cls, data):
@@ -142,7 +142,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
 
     def as_fhir(self):
         d = {}
-        d['questionnaire'] = Reference.questionnaire(self.title).as_fhir()
+        d['questionnaire'] = Reference.questionnaire(self.name).as_fhir()
         for k in ('rank', 'days_till_due', 'days_till_overdue'):
             if getattr(self, k, None):
                 d[k] = getattr(self, k)
