@@ -1,10 +1,18 @@
 """Reference module - encapsulate FHIR Reference type"""
 import re
+from sqlalchemy import and_
 
 from ..database import db
+from .identifier import Identifier
+from .organization import Organization, OrganizationIdentifier
 
 class MissingReference(Exception):
     """Raised when FHIR references cannot be found"""
+    pass
+
+
+class MultipleReference(Exception):
+    """Raised when FHIR references retrieve multiple results"""
     pass
 
 
@@ -37,6 +45,7 @@ class Reference(object):
         :returns: the referenced object - instantiated from the db
 
         :raises :py:exc:`portal.models.reference.MissingReference`: if the referenced object can not be found
+        :raises :py:exc:`portal.models.reference.MultipleReference`: if the referenced object retrieves multiple results
         :raises :py:exc:`exceptions.ValueError`: if the text format can't be parsed
 
         """
@@ -71,6 +80,29 @@ class Reference(object):
                     raise MissingReference("Reference not found: {}".format(
                         reference_text))
                 return result
+
+        match = re.compile('[Oo]rganization/(.+)/(.+)').search(reference_text)
+        if match:
+            try:
+                id_system = match.groups()[0]
+                id_value = match.groups()[1]
+            except:
+                raise ValueError('Identifier values not found in ' \
+                    'reference {}'.format(reference_text))
+            with db.session.no_autoflush:
+                result = Organization.query.join(
+                      OrganizationIdentifier).join(Identifier).filter(and_(
+                          Organization.id==OrganizationIdentifier.organization_id,
+                          OrganizationIdentifier.identifier_id==Identifier.id,
+                          Identifier.system==id_system,
+                          Identifier._value==id_value))
+            if not result.count():
+                raise MissingReference("Reference not found: {}".format(
+                    reference_text))
+            elif result.count() > 1:
+                raise MultipleReference('Multiple organizations ' \
+                    'found for reference {}'.format(reference_text))
+            return result.first()
 
         raise ValueError('Reference not found: {}'.format(reference_text))
 
