@@ -6,6 +6,8 @@ import json
 from portal.extensions import db
 from portal.models.auth import AuthProvider
 from portal.models.organization import Organization, OrgTree
+from portal.models.organization import OrganizationIdentifier
+from portal.models.identifier import Identifier
 from portal.models.role import ROLE
 from portal.models.user import User
 
@@ -236,6 +238,41 @@ class TestDemographics(TestCase):
         # confirm only the one sent via API is intact.
         self.assertEquals(user.organizations.count(), 1)
         self.assertEquals(user.organizations[0].name, 'test org')
+
+    def test_demographics_org_identifier_ref(self):
+        # referencing careProvider by (unique) external Identifier
+
+        self.shallow_org_tree()
+        org = Organization.query.filter(Organization.id > 0).first()
+        org_id, org_name = org.id, org.name
+
+        # create OrganizationIdentifier and add to org
+        org_id_system = "testsystem"
+        org_id_value = "testval"
+        ident = Identifier(id=99,system=org_id_system,value=org_id_value)
+        org_ident = OrganizationIdentifier(organization_id=org_id,
+                                            identifier_id=99)
+
+        with SessionScope(db):
+            db.session.add(ident)
+            db.session.commit()
+            db.session.add(org_ident)
+            db.session.commit()
+
+        data = {"careProvider": [{"reference": "Organization/{}/{}".format(
+                org_id_system, org_id_value)}],
+                "resourceType": "Patient",
+               }
+
+        self.login()
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert200(rv)
+        user = db.session.merge(self.test_user)
+        self.assertEquals(user.organizations.count(), 1)
+        self.assertEquals(user.organizations[0].name, org_name)
 
     def test_non_admin_org_change(self):
         """non-admin staff can't change their top-level orgs"""
