@@ -12,18 +12,18 @@ from tests import TestCase
 class TestQuestionnaireBank(TestCase):
 
     def test_questionnaire_serialize(self):
-        q1 = Questionnaire(title='q1')
+        q1 = Questionnaire(name='q1')
         with SessionScope(db):
             db.session.add(q1)
             db.session.commit()
         q1 = db.session.merge(q1)
         data = q1.as_fhir()
         self.assertEquals(data['resourceType'], "Questionnaire")
-        self.assertEquals(data['title'], 'q1')
+        self.assertEquals(data['name'], 'q1')
 
     def test_serialize(self):
-        q1 = Questionnaire(title='q1')
-        q2 = Questionnaire(title='q2')
+        q1 = Questionnaire(name='q1')
+        q2 = Questionnaire(name='q2')
         org = Organization(name='org')
         with SessionScope(db):
             db.session.add(q1)
@@ -51,8 +51,8 @@ class TestQuestionnaireBank(TestCase):
 
     def test_import(self):
         org = Organization(name='org')
-        q1 = Questionnaire(title='q1')
-        q2 = Questionnaire(title='q2')
+        q1 = Questionnaire(name='q1')
+        q2 = Questionnaire(name='q2')
         with SessionScope(db):
             db.session.add(org)
             db.session.add(q1)
@@ -72,7 +72,7 @@ class TestQuestionnaireBank(TestCase):
                     'rank': 2,
                     'questionnaire': {
                         'reference': 'api/questionnaire/{}'.format(
-                            q1.title)}
+                            q1.name)}
                 },
                 {
                     'days_till_overdue': 30,
@@ -80,7 +80,7 @@ class TestQuestionnaireBank(TestCase):
                     'rank': 1,
                     'questionnaire': {
                         'reference': 'api/questionnaire/{}'.format(
-                            q2.title)}
+                            q2.name)}
                 }
             ],
             'id': 1,
@@ -91,9 +91,9 @@ class TestQuestionnaireBank(TestCase):
 
     def test_lookup_for_user(self):
         crv = Organization(name='CRV')
-        epic26 = Questionnaire(title='epic26')
-        eproms_add = Questionnaire(title='eproms_add')
-        comorb = Questionnaire(title='comorb')
+        epic26 = Questionnaire(name='epic26')
+        eproms_add = Questionnaire(name='eproms_add')
+        comorb = Questionnaire(name='comorb')
         with SessionScope(db):
             db.session.add(crv)
             db.session.add(epic26)
@@ -123,5 +123,5 @@ class TestQuestionnaireBank(TestCase):
         results = QuestionnaireBank.q_for_user(self.test_user)
         self.assertTrue(3, len(results))
         # confirm rank sticks
-        self.assertEquals(results[0].title, 'epic26')
-        self.assertEquals(results[2].title, 'comorb')
+        self.assertEquals(results[0].name, 'epic26')
+        self.assertEquals(results[2].name, 'comorb')

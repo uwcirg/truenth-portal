@@ -33,10 +33,10 @@ class Reference(object):
         return instance
 
     @classmethod
-    def questionnaire(cls, questionnaire_title):
-        """Create a reference object from a known questionnaire title"""
+    def questionnaire(cls, questionnaire_name):
+        """Create a reference object from a known questionnaire name"""
         instance = cls()
-        instance.questionnaire_title = questionnaire_title
+        instance.questionnaire_name = questionnaire_name
         return instance
 
     @classmethod
@@ -72,7 +72,7 @@ class Reference(object):
 
         lookup = (
             (re.compile('[Oo]rganization/(\d+)'), Organization, 'id'),
-            (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'title'),
+            (re.compile('[Qq]uestionnaire/(\w+)'), Questionnaire, 'name'),
             (re.compile('[Pp]atient/(\d+)'), User, 'id'))
 
         for pattern, obj, attribute in lookup:
@@ -132,7 +132,7 @@ class Reference(object):
             ref = "api/patient/{}".format(self.patient_id)
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
-        if hasattr(self, 'questionnaire_title'):
-            ref = "api/questionnaire/{}".format(self.questionnaire_title)
+        if hasattr(self, 'questionnaire_name'):
+            ref = "api/questionnaire/{}".format(self.questionnaire_name)
 
         return {"reference": ref}
