@@ -469,16 +469,16 @@ class User(db.Model, UserMixin):
 
     @property
     def external_study_id(self):
-        """Return the value of the user's external study identifier
+        """Return the value of the user's external study identifier(s)
 
-        External study identifiers are assumed to be <= 1 per person;
-        as such, only the first external study identifier's value is returned
+        If more than one external study identifiers are found for the user,
+        values will be joined by ', '
 
         """
-        ext_id = self._identifiers.filter_by(system='http://us.truenth.org/' \
-                                    'identity-codes/external-study-id').first()
-        if ext_id:
-            return ext_id.value
+        ext_ids = self._identifiers.filter_by(system='http://us.truenth.org/' \
+                                    'identity-codes/external-study-id')
+        if ext_ids.count():
+            return ', '.join([ext_id.value for ext_id in ext_ids])
 
     @property
     def org_coding_display_options(self):
