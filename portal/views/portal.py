@@ -18,6 +18,7 @@ from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, AboutATMA, VersionedResource
 from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
+from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
