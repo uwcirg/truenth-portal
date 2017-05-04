@@ -555,7 +555,6 @@ $(document).ready(function(){
                 else {
                   $("#biopsyDate").datepicker("hide").blur();
                   var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
-                  console.log(biopsyDate);
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": biopsyDate});
                 };
             };

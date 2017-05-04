@@ -799,7 +799,7 @@ var fillContent = {
                             } (item)
                         },
                         {
-                            content: (signedDate).replace("T", " ") + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
+                            content: signedDate + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
 
                         }
                     ].forEach(function(cell) {
@@ -877,7 +877,7 @@ var fillContent = {
                                 setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
                                 if (typeof reloadConsentList != "undefined") reloadConsentList();
                                 else setTimeout("location.reload();", 2000);
-                                setTimeout((function() { $("#consentListTable .modal").modal("hide"); })(), 1000);
+                                $("#consentListTable .modal").modal("hide");
                             };
                         };
                     });
@@ -2635,6 +2635,55 @@ var tnthDates = {
         var splitDate = currentDate.split('/');
         return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
     },
+     /**
+     * Convert month string to numeric
+     *
+     */
+     "convertMonthNumeric": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+            var m = "";
+            switch((month).toLowerCase()) {
+                case "jan":
+                    m = 1;
+                    break;
+                case "feb":
+                    m = 2;
+                    break;
+                case "mar":
+                    m = 3;
+                    break;
+                case "apr":
+                    m = 4;
+                    break;
+                case "may":
+                    m = 5;
+                    break;
+                case "jun":
+                    m = 6;
+                    break;
+                case "jul":
+                    m = 7;
+                    break;
+                case "aug":
+                    m = 8;
+                    break;
+                case "sep":
+                    m = 9;
+                    break;
+                case "oct":
+                    m = 10;
+                    break;
+                case "nov":
+                    m = 11;
+                    break;
+                case "dec":
+                    m = 12;
+                    break;
+            };
+            return m;
+        }
+     },
     /**
      * Convert month string to text
      *
@@ -2877,15 +2926,18 @@ var tnthDates = {
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) return false;
         var day = dArray[0], month = dArray[1], year = dArray[2];
+        //console.log("day: " + day + " month: " + month + " year: " + year)
         if (day.length < 1) return false;
         if (month.length < 3) return false;
         if (year.length < 4) return false;
         if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
         if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
-        if (!/(0)?[1-9]|1\d|2\d/.test(month)) return false;
+        if (!/(19|20)\d{2}/.test(year)) return false;
         var dt = new Date(date);
-        if (!tnthDates.isDate(dt)) return false;
-        else {
+        if (!this.isDateObj(dt)) return false;
+        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
+            return false;
+        } else {
           var today = new Date(), errorMsg = "";
           if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
           // Only allow if date is before today
@@ -2901,8 +2953,14 @@ var tnthDates = {
           }
         };
     },
-    "isDate": function(d) {
-        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime() );
+    "isDateObj": function(d) {
+        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
+    },
+    "isValidDate": function(y, m, d) {
+        var date = new Date(y,parseInt(m)-1,d);
+        var convertedDate = ""+date.getFullYear() + (date.getMonth()+1) + date.getDate();
+        var givenDate = "" + y + m + d;
+        return ( givenDate == convertedDate);
     },
     /*
      * NB
@@ -2914,13 +2972,13 @@ var tnthDates = {
                var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
                var d = new Date(dateString);
                var ap, day, month, year, hours, minutes, seconds, nd;
-               if (!this.isDate(d)) return "";
+               if (!this.isDateObj(d)) return "";
                if (iosDateTest.test(dateString)) {
                    //IOS date, no need to convert again to date object, just parse it as is
                    //issue when passing it into Date object, the output date is inconsistent across from browsers
-                   var dArray = $.trim(dateString).replace(/[\.TZ:\-]/gi, " ").split(" ");
+                   var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
                    year = dArray[0];
-                   month = parseInt(dArray[1]);
+                   month = dArray[1];
                    day = dArray[2];
                    hours = dArray[3];
                    minutes = dArray[4];

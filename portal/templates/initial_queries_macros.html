@@ -228,13 +228,14 @@
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
           var today = new Date();
-          $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true, clearBtn: true});
-          $("#biopsyDate").on("keydown, blur", function() {
+          $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+          $("#biopsyDate").on("keydown", function() {
             $("#biopsyDateError").text("");
             $(this).datepicker("hide");
           });
           $("input[name='biopsy']").each(function() {
-          	$(this).on("click", function() {
+          	$(this).on("click", function(e) {
+              e.stopPropagation();
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
                 $("#biopsyDate").focus();
