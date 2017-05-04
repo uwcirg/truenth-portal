@@ -257,6 +257,7 @@ class User(db.Model, UserMixin):
         'email', db.String(120), unique=True, nullable=False,
         default=default_email)
     phone = db.Column(db.String(40))
+    alt_phone = db.Column(db.String(40))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
@@ -723,7 +724,8 @@ class User(db.Model, UserMixin):
         d['status'] = 'registered' if self.registered else 'unknown'
         if self._locale:
             d['communication'] = [{"language": self._locale.as_fhir()}]
-        telecom = Telecom(email=self.email, phone=self.phone)
+        telecom = Telecom(email=self.email, phone=self.phone,
+                            alt_phone=self.alt_phone)
         d['telecom'] = telecom.as_fhir()
         d['photo'] = []
         if self.image_url:
@@ -957,6 +959,7 @@ class User(db.Model, UserMixin):
             telecom = Telecom.from_fhir(fhir['telecom'])
             self.email = telecom.email
             self.phone = telecom.phone
+            self.alt_phone = telecom.alt_phone
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
