@@ -90,9 +90,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 500);
+        setTimeout("showMain();", 1000);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 800);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1500);
         };
     };
 };
@@ -636,8 +636,6 @@ var fillContent = {
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            //var userTimeZone = getUserTimeZone(userId);
-            //var userLocale = getUserLocale(userId);
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -2639,50 +2637,27 @@ var tnthDates = {
      * Convert month string to numeric
      *
      */
+
      "convertMonthNumeric": function(month) {
         if (!hasValue(month)) return "";
         else {
-            var m = "";
-            switch((month).toLowerCase()) {
-                case "jan":
-                    m = 1;
-                    break;
-                case "feb":
-                    m = 2;
-                    break;
-                case "mar":
-                    m = 3;
-                    break;
-                case "apr":
-                    m = 4;
-                    break;
-                case "may":
-                    m = 5;
-                    break;
-                case "jun":
-                    m = 6;
-                    break;
-                case "jul":
-                    m = 7;
-                    break;
-                case "aug":
-                    m = 8;
-                    break;
-                case "sep":
-                    m = 9;
-                    break;
-                case "oct":
-                    m = 10;
-                    break;
-                case "nov":
-                    m = 11;
-                    break;
-                case "dec":
-                    m = 12;
-                    break;
+             month_map = {
+                "jan":1,
+                "feb":2,
+                "mar":3,
+                "apr":4,
+                "may":5,
+                "jun":6,
+                "jul":7,
+                "aug":8,
+                "sep":9,
+                "oct":10,
+                "nov":11,
+                "dec":12,
             };
-            return m;
-        }
+            var m = month_map[month.toLowerCase()];
+            return hasValue(m) ? m : "";
+        };
      },
     /**
      * Convert month string to text
@@ -2691,47 +2666,23 @@ var tnthDates = {
      "convertMonthString": function(month) {
         if (!hasValue(month)) return "";
         else {
-            var m = "";
-            switch(parseInt(month)) {
-                case 1:
-                    m = "Jan";
-                    break;
-                case 2:
-                    m = "Feb";
-                    break;
-                case 3:
-                    m = "Mar";
-                    break;
-                case 4:
-                    m = "Apr";
-                    break;
-                case 5:
-                    m = "May";
-                    break;
-                case 6:
-                    m = "Jun";
-                    break;
-                case 7:
-                    m = "Jul";
-                    break;
-                case 8:
-                    m = "Aug";
-                    break;
-                case 9:
-                    m = "Sep";
-                    break;
-                case 10:
-                    m = "Oct";
-                    break;
-                case 11:
-                    m = "Nov";
-                    break;
-                case 12:
-                    m = "Dec";
-                    break;
+            numeric_month_map = {
+                1:"Jan",
+                2:"Feb",
+                3:"Mar",
+                4:"Apr",
+                5:"May",
+                6:"Jun",
+                7:"Jul",
+                8:"Aug",
+                9:"Sep",
+                10:"Oct",
+                11:"Nov",
+                12:"Dec"
             };
-            return m;
-        }
+            var m = numeric_month_map[parseInt(month)];
+            return hasValue(m)? m : "";
+        };
      },
      "isDate": function(obj) {
         return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
@@ -2957,10 +2908,20 @@ var tnthDates = {
         return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
     },
     "isValidDate": function(y, m, d) {
-        var date = new Date(y,parseInt(m)-1,d);
-        var convertedDate = ""+date.getFullYear() + (date.getMonth()+1) + date.getDate();
-        var givenDate = "" + y + m + d;
+        var date = this.getDateObj(y, m, d);
+        var convertedDate = this.getConvertedDate(date);
+        var givenDate = this.getGivenDate(y, m, d);
         return ( givenDate == convertedDate);
+    },
+    "getDateObj": function(y, m, d) {
+        return new Date(y,parseInt(m)-1,d);
+    },
+    "getConvertedDate": function(dateObj) {
+        if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
+        else return "";
+    },
+    "getGivenDate":function(y, m, d) {
+        return ""+y+m+d;
     },
     /*
      * NB

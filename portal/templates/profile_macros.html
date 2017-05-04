@@ -1035,7 +1035,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: "Date/Time <span class='gmt'> (GMT), Y-M-D</span>",
+                                title: "{%trans%}Date/Time <span class='gmt'> (GMT), Y-M-D</span>{%endtrans%}",
                                 sortable: true,
                                 searchable: true,
                                 /******
@@ -1446,11 +1446,6 @@
             $(".timezone-error").html("");
             $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
-            // if ($.trim($(".timezone-error").text()) == "") {
-            //     setTimeout(function(){
-            //         window.location.reload(true);
-            //     },1000);
-            // };
         });
     });
     {% endif %}
