@@ -866,7 +866,7 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
-                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"]);
+                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
                 });
