@@ -42,7 +42,7 @@ AdminTool.prototype.getData = function(userString) {
                       || (String(prevItem.consent_signed).substring(0, 10) != String(item.consent.signed).substring(0, 10)))) {
                       if (!(/null/.test(item.consent.agreement_url))) {
                         var cl = "";
-                        var sd = item.consent.signed? (item.consent.signed).substring(0, 10) : "";
+                        var sd = tnthDates.formatDateString(item.consent.signed);
                         var status = item.assessment_status;
                         if (!item.consent.send_reminders) status = "withdrawn";
                         switch(String(status).toLowerCase()) {
@@ -60,7 +60,7 @@ AdminTool.prototype.getData = function(userString) {
                               break;
                         };
                         a += (a != "" ? "<br/>" : "") + "<span class='" + cl  + " small-text' style='text-transform: capitalize'>" + status + "</span>";
-                        s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + (sd ? (sd.substr(5).replace(/\-/g, "/") + "/" + sd.substring(0, 4)) : "") + "</span>";
+                        s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + sd + "</span>";
                         prevItem.assessment_status = item.assessment_status;
                         prevItem.consent_signed = item.consent.signed;
                       };

@@ -325,7 +325,7 @@
                     if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
                     if (!hasValue(cn)) cn = "your clinic";
                     return cn;
-                })(); 
+                })();
                 var parentName = (function() {
                     var pName = "";
                     if (selectedOrg.length > 0) {
@@ -348,8 +348,8 @@
                             cache: false
                         }).done(function(data) {
                             if (data && data.name) {
-                                fname = data.name.given; 
-                                lname = data.name.family; 
+                                fname = data.name.given;
+                                lname = data.name.family;
                             };
                         }).fail(function() {
                         });
@@ -856,8 +856,6 @@
     $(function () {
          var ww = $(window).width();
          var prUserId = $("#pr_user_id").val();
-         var userTimeZone = getUserTimeZone(prUserId);
-         var userLocale = getUserLocale(prUserId);
 
         $.ajax ({
             type: "GET",
@@ -868,8 +866,7 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
-                    if (String(userTimeZone).toUpperCase() != "UTC") item["uploaded_at"] = convertUserDateTimeByLocaleTimeZone(String(item["uploaded_at"]), userTimeZone, userLocale);
-                    else item["uploaded_at"] = String(item["uploaded_at"]).replace(/[tz]/gi, " ");
+                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
                 });
@@ -941,7 +938,7 @@
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
-        var isTestPatient = {%-if person and person.has_role(ROLE.TEST)-%}true{%-else-%}false{%-endif-%};
+        var isTestPatient = {%-if person and person.has_role(ROLE.TEST) and person.id != current_user.id-%}true{%-else-%}false{%-endif-%};
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
 
         /**** this function is used when this section becomes editable ****/
@@ -981,9 +978,6 @@
         $(function () {
              var ww = $(window).width();
              var auditUserId = $("#audit_user_id").val();
-             var userTimeZone = getUserTimeZone(auditUserId);
-             var userLocale = getUserLocale(auditUserId);
-
             $.ajax ({
                 type: "GET",
                 url: '/api/user/' + $("#audit_user_id").val() + '/audit',
@@ -1001,9 +995,7 @@
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
                         //console.log(r.exec(String(item["by"])));
-
-                        if (String(userTimeZone).toUpperCase() != "UTC") item["lastUpdated"] = convertUserDateTimeByLocaleTimeZone(String(item["lastUpdated"]), userTimeZone, userLocale);
-                        else item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
+                        item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -1043,7 +1035,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Date/Time' + (userTimeZone == "UTC" ? "<span class='gmt'> (GMT)</span>" : ($(".timezone-error").text() == "" ? "" : ("<span class='gmt'> (GMT)</span>"))),
+                                title: "{%trans%}Date/Time <span class='gmt'> (GMT), Y-M-D</span>{%endtrans%}",
                                 sortable: true,
                                 searchable: true,
                                 /******
@@ -1106,7 +1098,7 @@
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT Time Zone") }} )</small></th></tr>
+            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT, Y-M-D") }} )</small></th></tr>
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
@@ -1114,8 +1106,6 @@
         $(function () {
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
-        var userTimeZone = getUserTimeZone(sessionUserId);
-        var userLocale = getUserLocale(sessionUserId);
 
         $.ajax ({
                 type: "GET",
@@ -1132,21 +1122,14 @@
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         var authoredDate = String(entry['authored']);
-                        var originalAuthoredDate = authoredDate;
-                        if (userTimeZone != "UTC") {
-                            authoredDate = convertUserDateTimeByLocaleTimeZone(authoredDate, userTimeZone, userLocale);
-                            if($(".timezone-error").text() == "") $("#gmtText").hide();
-                        }
-                        else {
-                            $("#gmtText").show();
-                        }
+                        $("#gmtText").show();
                         if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + originalAuthoredDate;
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
                                                  entry['status'],
-                                                 authoredDate.replace(/[tz]/gi, " ")].map(function(o) {
+                                                 tnthDates.formatDateString(entry['authored'], "iso")].map(function(o) {
                                                     return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
                                                  }).join('') +
                                                  '</tr>';
@@ -1182,9 +1165,6 @@
             var sessionListHTML = "";
             var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
-            var userTimeZone = getUserTimeZone(sessionUserId);
-            var userLocale = getUserLocale(sessionUserId);
-            var convertedAuthoredDate = convertUserDateTimeByLocaleTimeZone(sessionAuthoredDate, userTimeZone, userLocale);
 
             $.ajax ({
                     type: "GET",
@@ -1206,9 +1186,8 @@
                         var reportHTML = '<caption><hr/><span class="profile-item-title">' +
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
-                                        String(entry['authored']).replace(/[tz]/gi, " ") +
-                                        convertedAuthoredDate.replace(/[tz]/gi, " ") +
-                                        (String(userTimeZone).toLowerCase() == "utc" ? " <span class='gmt'>GMT</span>": "") + '</span><hr/></caption>';
+                                        tnthDates.formatDateString(sessionAuthoredDate, "iso") +
+                                         " <span class='gmt'>(GMT), Y-M-D</span>" + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '', a = '';
@@ -1348,7 +1327,7 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
+                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
@@ -1467,11 +1446,6 @@
             $(".timezone-error").html("");
             $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
-            if ($.trim($(".timezone-error").text()) == "") {
-                setTimeout(function(){
-                    window.location.reload(true);
-                },1000);
-            };
         });
     });
     {% endif %}

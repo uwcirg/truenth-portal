@@ -191,6 +191,11 @@ select:not([multiple]) {
 #profileConsentList .button--LR[data-show='false'] {
     opacity: 0;
 }
+.consent-date-modal.fade {
+    -webkit-transition: opacity .7s ease-out !important;
+    -o-transition: opacity .7s ease-out !important;
+    transition: opacity .7s ease-out !important;
+}
 #fullSizeBox a[href*="register"] {
   display: none;
 }

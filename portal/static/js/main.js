@@ -90,9 +90,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 500);
+        setTimeout("showMain();", 1000);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 800);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1500);
         };
     };
 };
@@ -106,7 +106,12 @@ function convertToLocalTime(dateString) {
         var offset = d.getTimezoneOffset() / 60;
         var hours = d.getHours();
         newDate.setHours(hours - offset);
-        convertedDate = newDate.toLocaleString();
+        var options = {
+            year: 'numeric', day: 'numeric', month: 'short',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+        };
+        convertedDate = newDate.toLocaleString(options);
     };
     return convertedDate;
 };
@@ -126,7 +131,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
         var options = {
-            year: 'numeric', day: 'numeric', month: 'numeric',
+            year: 'numeric', day: 'numeric', month: 'short',
             hour: 'numeric', minute: 'numeric', second: 'numeric',
             hour12: false
         };
@@ -402,9 +407,8 @@ var fillViews = {
         if ($("#userProcedures").length > 0) {
             var content = "";
             $("#userProcedures tr[data-id]").each(function() {
-                content += hasValue(content) ? "<br/>" : "";
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + $(this).text() + "</div>";
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
@@ -445,18 +449,8 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                //convert date string to a valid date format for conversion into Date object
-                                var d = (val.content.issued).replace(/-/g,"/");
-                                if (d.indexOf("T") != -1) d = d.substring(0, (d).indexOf("T"));
-                                issuedDate = new Date(d);
-                                //mm/dd/yyyy format, NOTE, use native date object methods here
-                                //as toLocaleString is not supported in some browsers e.g. firefox
-                                var month = issuedDate.getMonth()+1;
-                                var day = issuedDate.getDate();
-                                var year = issuedDate.getFullYear();
-                                var cDate = (month < 10?("0"+month): month)+"/"+(day < 10?("0"+day):day)+"/"+year;
-                                //in MM/DD/YYYY format
-                                $("#biopsyDate").val(cDate);
+                                //d M y format
+                                $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
                                 $("#biopsyDateContainer").show();
                             };
                         } else {
@@ -642,8 +636,6 @@ var fillContent = {
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            var userTimeZone = getUserTimeZone(userId);
-            var userLocale = getUserLocale(userId);
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -703,8 +695,7 @@ var fillContent = {
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
-                    var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
-                    var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
+                    var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
                     //if (isDefault) editable = false;
@@ -781,7 +772,7 @@ var fillContent = {
                     if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
                         content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
                         content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
+                        content += "<td>" + signedDate + "</td></tr>";
                     };
 
                     content += "<tr>";
@@ -806,7 +797,8 @@ var fillContent = {
                             } (item)
                         },
                         {
-                            content: (signedDate).replace("T", " ") + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
+                            content: signedDate + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
+
                         }
                     ].forEach(function(cell) {
                         if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
@@ -822,9 +814,6 @@ var fillContent = {
                 $("#profileConsentList").html(content);
                 if (!ctop) $("#profileConsentList .agreement").each(function() {
                     $(this).parent().hide();
-                });
-                if ($(".timezone-error").text() == "" && (userTimeZone.toUpperCase() != "UTC")) $("#profileConsentList .gmt").each(function() {
-                    $(this).hide();
                 });
                  $("#profileConsentList .button--LR").each(function() {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
@@ -867,46 +856,27 @@ var fillContent = {
                 $(".consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
                 $(".consent-date").each(function() {
                     $(this).on("change", function() {
-                        var self = this;
-                        if (!hasValue($(this).val())) return false;
-                        var dArray = $.trim($(this).val()).split(" ");
-                        if (dArray.length < 3) return false;
-                        var day = dArray[0], month = dArray[1], year = dArray[2];
-                        if (day.length < 1) return false;
-                        if (month.length < 1) return false;
-                        if (year.length < 4) return false;
-
-                        var dt = new Date($(this).val());
-                        if (!tnthDates.isDate(dt)) return false;
-                        else {
-                              var today = new Date(), errorMsg = "";
-                              if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
-                              // Only allow if date is before today
-                              if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                                  errorMsg = "The date must not be in the future.";
-                              };
-                              if (hasValue(errorMsg)) {
-                                $("#consentDateError_" + $(this).attr("data-index")).text(errorMsg);
-                                $(this).datepicker("hide");
-                              } else {
-                                    $("#consentDateError_" + $(this).attr("data-index")).text("");
-                                    $(this).datepicker("hide");
-                                    var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
-                                    var o = CONSENT_ENUM[$(this).attr("data-status")];
-                                    if (o) {
-                                        o.org = $(this).attr("data-orgId");
-                                        o.agreementUrl = $(this).attr("data-agreementUrl");
-                                        o.acceptance_date = cDate;
-                                        o.testPatient = true;
-                                        setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
-                                        setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
-                                        $("#consentListTable button[data-dismiss]").attr("disabled", true);
-                                        setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
-                                        if (typeof reloadConsentList != "undefined") reloadConsentList();
-                                        else setTimeout("location.reload();", 2000);
-                                        $("#consentListTable .modal").modal("hide");
-                                    };
-                              };
+                        var isValid = tnthDates.isValidDefaultDateFormat($(this).val(), $("#consentDateError_" + $(this).attr("data-index")));
+                        if (!isValid) {
+                            $(this).datepicker("hide");
+                        } else {
+                            $(this).datepicker("hide");
+                            var dt = new Date($(this).val());
+                            var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                            var o = CONSENT_ENUM[$(this).attr("data-status")];
+                            if (o) {
+                                o.org = $(this).attr("data-orgId");
+                                o.agreementUrl = $(this).attr("data-agreementUrl");
+                                o.acceptance_date = cDate;
+                                o.testPatient = true;
+                                setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
+                                setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
+                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
+                                setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
+                                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                                else setTimeout("location.reload();", 2000);
+                                $("#consentListTable .modal").modal("hide");
+                            };
                         };
                     });
                 });
@@ -2663,6 +2633,32 @@ var tnthDates = {
         var splitDate = currentDate.split('/');
         return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
     },
+     /**
+     * Convert month string to numeric
+     *
+     */
+
+     "convertMonthNumeric": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+             month_map = {
+                "jan":1,
+                "feb":2,
+                "mar":3,
+                "apr":4,
+                "may":5,
+                "jun":6,
+                "jul":7,
+                "aug":8,
+                "sep":9,
+                "oct":10,
+                "nov":11,
+                "dec":12,
+            };
+            var m = month_map[month.toLowerCase()];
+            return hasValue(m) ? m : "";
+        };
+     },
     /**
      * Convert month string to text
      *
@@ -2670,47 +2666,26 @@ var tnthDates = {
      "convertMonthString": function(month) {
         if (!hasValue(month)) return "";
         else {
-            var m = "";
-            switch(parseInt(month)) {
-                case 1:
-                    m = "Jan";
-                    break;
-                case 2:
-                    m = "Feb";
-                    break;
-                case 3:
-                    m = "Mar";
-                    break;
-                case 4:
-                    m = "Apr";
-                    break;
-                case 5:
-                    m = "May";
-                    break;
-                case 6:
-                    m = "Jun";
-                    break;
-                case 7:
-                    m = "Jul";
-                    break;
-                case 8:
-                    m = "Aug";
-                    break;
-                case 9:
-                    m = "Sep";
-                    break;
-                case 10:
-                    m = "Oct";
-                    break;
-                case 11:
-                    m = "Nov";
-                    break;
-                case 12:
-                    m = "Dec";
-                    break;
+            numeric_month_map = {
+                1:"Jan",
+                2:"Feb",
+                3:"Mar",
+                4:"Apr",
+                5:"May",
+                6:"Jun",
+                7:"Jul",
+                8:"Aug",
+                9:"Sep",
+                10:"Oct",
+                11:"Nov",
+                12:"Dec"
             };
-            return m;
-        }
+            var m = numeric_month_map[parseInt(month)];
+            return hasValue(m)? m : "";
+        };
+     },
+     "isDate": function(obj) {
+        return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
      },
      "displayDateString": function(m, d, y) {
         var s = "";
@@ -2896,8 +2871,140 @@ var tnthDates = {
         }
         return toReturn
     },
-    "isDate": function(d) {
-        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime() );
+    "isValidDefaultDateFormat": function(date, errorField) {
+        if (!hasValue(date)) return false;
+        if (date.length < 10) return false;
+        var dArray = $.trim(date).split(" ");
+        if (dArray.length < 3) return false;
+        var day = dArray[0], month = dArray[1], year = dArray[2];
+        //console.log("day: " + day + " month: " + month + " year: " + year)
+        if (day.length < 1) return false;
+        if (month.length < 3) return false;
+        if (year.length < 4) return false;
+        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
+        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
+        if (!/(19|20)\d{2}/.test(year)) return false;
+        var dt = new Date(date);
+        if (!this.isDateObj(dt)) return false;
+        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
+            return false;
+        } else {
+          var today = new Date(), errorMsg = "";
+          if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
+          // Only allow if date is before today
+          if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+              errorMsg = "The date must not be in the future.";
+          };
+          if (hasValue(errorMsg)) {
+            if (errorField) $(errorField).text(errorMsg);
+            return false;
+          } else {
+            if (errorField) $(errorField).text("");
+            return true;
+          }
+        };
+    },
+    "isDateObj": function(d) {
+        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
+    },
+    "isValidDate": function(y, m, d) {
+        var date = this.getDateObj(y, m, d);
+        var convertedDate = this.getConvertedDate(date);
+        var givenDate = this.getGivenDate(y, m, d);
+        return ( givenDate == convertedDate);
+    },
+    "getDateObj": function(y, m, d) {
+        return new Date(y,parseInt(m)-1,d);
+    },
+    "getConvertedDate": function(dateObj) {
+        if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
+        else return "";
+    },
+    "getGivenDate":function(y, m, d) {
+        return ""+y+m+d;
+    },
+    /*
+     * NB
+     * For dateString in ISO-8601 format date as returned from server
+     * e.g. '2011-06-29T16:52:48'*/
+
+    "formatDateString": function(dateString, format) {
+        if (dateString) {
+               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
+               var d = new Date(dateString);
+               var ap, day, month, year, hours, minutes, seconds, nd;
+               if (!this.isDateObj(d)) return "";
+               if (iosDateTest.test(dateString)) {
+                   //IOS date, no need to convert again to date object, just parse it as is
+                   //issue when passing it into Date object, the output date is inconsistent across from browsers
+                   var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
+                   year = dArray[0];
+                   month = dArray[1];
+                   day = dArray[2];
+                   hours = dArray[3];
+                   minutes = dArray[4];
+                   seconds = dArray[5];
+                }
+                else {
+                   day = d.getDate();
+                   month = d.getMonth() + 1;
+                   year = d.getFullYear();
+                   hours = d.getHours();
+                   minutes = d.getMinutes();
+                   seconds = d.getSeconds();
+                   nd = "";
+                };
+
+               day = pad(day);
+               month = pad(month);
+               hours = pad(hours);
+               minutes = pad(minutes);
+               seconds = pad(seconds);
+
+               function pad(n) {
+                    n = parseInt(n);
+                    return (n < 10) ? '0' + n : n;
+               };
+
+               switch(format) {
+                    case "mm/dd/yyyy":
+                        nd = month + "/" + day + "/" + year;
+                        break;
+                    case "mm-dd-yyyy":
+                        nd = month + "-" + day + "-" + year;
+                        break;
+                    case "mm-dd-yyyy hh:mm:ss":
+                        nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd/mm/yyyy":
+                        nd = day + "/" + month + "/" + year;
+                        break;
+                    case "dd/mm/yyyy hh:mm:ss":
+                        nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd-mm-yyyy":
+                        nd = day + "-" + month + "-" + year;
+                        break;
+                    case "dd-mm-yyyy hh:mm:ss":
+                        nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "iso-short":
+                    case "yyyy-mm-dd":
+                        nd = year + "-" + month + "-" + day;
+                        break;
+                    case "iso":
+                    case "yyyy-mm-dd hh:mm:ss":
+                        nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                     case "d M y":
+                     default:
+                        //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
+                        nd = this.displayDateString(month, day, year);
+                        break;
+               };
+
+           return nd;
+        } else return "";
     }
 };
 
@@ -2924,61 +3031,6 @@ var tnthTables = {
     }
 };
 
-/*assume dateString is ISO-8601 formatted date returned from server: e.g. '2011-06-29T16:52:48.000Z'*/
-function convertGMTToLocalTime(dateString, format) {
-    if (dateString) {
-           //console.log('unformated date: ' + dateString);
-           var d = new Date(String(dateString));
-            //console.log("new date: " + d)
-           // console.log((new Date(d)).toString().replace(/GMT.*/g,""));
-           var ap = "AM";
-           var day = d.getDate();
-           var month = (d.getMonth() + 1);
-           var year = d.getFullYear();
-           var hours = d.getHours();
-           var minutes = d.getMinutes();
-           var seconds = d.getSeconds();
-           var nd = "";
-
-
-           if (hours   > 11) { ap = "PM";             };
-           if (hours   > 12) { hours = hours - 12;      };
-           if (hours   === 0) { hours = 12;};
-
-           day = pad(day);
-           month = pad(month);
-           hours = pad(hours);
-           minutes = pad(minutes);
-           seconds = pad(seconds);
-
-           function pad(n) {
-                n = parseInt(n);
-                return (n < 10) ? '0' + n : n;
-           };
-
-           switch(format) {
-                case "dd/mm/yyyy":
-                    nd = day + "/" + month + "/" + year;
-                    break;
-                case "dd/mm/yyyy hh:mm:ss":
-                    nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-                    break;
-                case "dd-mm-yyyy":
-                    nd = day + "-" + month + "-" + year;
-                    break;
-                case "dd-mm-yyyy hh:mm:ss":
-                    nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-                    break;
-                default:
-                    //yyyy-mm-dd hh:mm:ss;
-                    nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-           }
-
-           return nd;
-    } else return "";
-
-
-};
 
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
