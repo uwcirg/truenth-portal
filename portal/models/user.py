@@ -468,6 +468,19 @@ class User(db.Model, UserMixin):
         return self._identifiers
 
     @property
+    def external_study_id(self):
+        """Return the value of the user's external study identifier(s)
+
+        If more than one external study identifiers are found for the user,
+        values will be joined by ', '
+
+        """
+        ext_ids = self._identifiers.filter_by(system='http://us.truenth.org/' \
+                                    'identity-codes/external-study-id')
+        if ext_ids.count():
+            return ', '.join([ext_id.value for ext_id in ext_ids])
+
+    @property
     def org_coding_display_options(self):
         """Collates all race/ethnicity/indigenous display options
         from the user's orgs to establish which options to display"""
