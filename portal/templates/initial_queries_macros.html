@@ -136,7 +136,7 @@
             </div>
             <div id="biopsyDateContainer" class="indent form-group">
             	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
-            	<input id="biopsyDate" type="text" class="form-control" placeholder="MM/DD/YYYY" maxlength="10">
+            	<input id="biopsyDate" type="text" class="form-control" placeholder="d M yyyy" maxlength="11">
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
             </div>
             <div class="radio biopsy-option">
@@ -215,41 +215,12 @@
       </div>
       <script>
         function checkBiopsyDate(val) {
-           if (!hasValue(val)) return false;
-           var m = val.match(/(\/)/);
-           if (!m || !m.length) return false;
-           if (m && m.length < 2) return false;
-           var initArray = val.split("/");
-           if (initArray.length < 3) return false;
-           //make sure at least all date items are there
-           if (initArray[0].length == 0 || initArray[1].length == 0 || initArray[2].length < 4) return false;
-           if (/((0)?[1-9]|1\d|2\d)\/((0)?[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}/.test(val)) {
-              var today = new Date();
-              // Check to see if this is a real date
-              var dArray = (val).split("/");
-              var iy = parseInt(dArray[2]), im = parseInt(dArray[0]), iid=parseInt(dArray[1]);
-              var date = new Date(iy,im-1,iid);
-              var errorMsg = "";
-
-              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                  if (iy < 1900) errorMsg = "Year must be after 1900";
-                  // Only allow if date is before today
-                  if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                      errorMsg = "The date must not be in the future.";
-                  };
-              } else errorMsg = "Invalid Date. Please enter a valid date.";
-
-              if (errorMsg == "") {
-                  $("#biopsyDateError").text("");
-                  $("#biopsy_yes").trigger("click");
-                  return true;
-              } else {
-                  $("#biopsyDateError").text(errorMsg);
-                  $("#biopsyDate").datepicker("hide");
-                  return false;
-              };
+           var isValid = tnthDates.isValidDefaultDateFormat(val, $("#biopsyDateError"));
+           if (isValid) {
+              $("#biopsy_yes").trigger("click");
+              return true;
            } else {
-              $("#biopsyDateError").text("Invalid date. Please enter the date in correct format (mm/dd/yyyy).");
+              $("#biopsyDate").datepicker("hide");
               return false;
            };
         };
@@ -257,8 +228,8 @@
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
           var today = new Date();
-          $("#biopsyDate").datepicker({"format": "mm/dd/yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-          $("#biopsyDate").on("keydown", function() {
+          $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true, clearBtn: true});
+          $("#biopsyDate").on("keydown, blur", function() {
             $("#biopsyDateError").text("");
             $(this).datepicker("hide");
           });
