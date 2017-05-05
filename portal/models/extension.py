@@ -1,7 +1,6 @@
 """Extension model"""
 from abc import ABCMeta, abstractmethod, abstractproperty
 from sqlalchemy.orm.exc import NoResultFound
-from .fhir import Coding
 
 class Extension:
     """Abstract base class for extension FHIR objects"""
@@ -33,6 +32,8 @@ class CCExtension(Extension):
             }
 
     def apply_fhir(self):
+        from .fhir import Coding  # local due to cycle
+
         assert self.extension['url'] == self.extension_url
         # track current concepts - must remove any not requested
         remove_if_not_requested = {e.code: e for e in self.children}

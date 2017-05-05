@@ -5,7 +5,7 @@ Designed around FHIR guidelines for representation of encounters.
 from datetime import datetime
 
 from ..database import db
-from .fhir import as_fhir, FHIR_datetime
+from ..date_tools import as_fhir, FHIR_datetime
 from .reference import Reference
 from .role import ROLE
 from sqlalchemy.dialects.postgresql import ENUM

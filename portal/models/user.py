@@ -1,5 +1,4 @@
 """User model """
-from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
@@ -19,8 +18,9 @@ from .audit import Audit
 from ..dict_tools import dict_match
 from .encounter import Encounter
 from ..database import db
+from ..date_tools import as_fhir, FHIR_datetime
 from .extension import CCExtension
-from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
+from .fhir import Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention

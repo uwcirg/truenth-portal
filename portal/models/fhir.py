@@ -1,82 +1,17 @@
 """Model classes for retaining FHIR data"""
-from datetime import date, datetime
-from dateutil import parser
-from flask import abort, current_app
+from datetime import datetime
 import json
-import pytz
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
 from ..database import db
+from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
+from .organization import OrgTree
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
-
-
-def as_fhir(obj):
-    """For builtin types needing FHIR formatting help
-
-    Returns obj as JSON FHIR formatted string
-
-    """
-    if hasattr(obj, 'as_fhir'):
-        return obj.as_fhir()
-    if isinstance(obj, datetime):
-        # Make SURE we only communicate unaware or UTC timezones
-        tz = getattr(obj, 'tzinfo', None)
-        if tz and tz != pytz.utc:
-            current_app.logger.error("Datetime export of NON-UTC timezone")
-        return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
-    if isinstance(obj, date):
-        return obj.strftime('%Y-%m-%d')
-
-
-class FHIR_datetime(object):
-    """Utility class/namespace for working with FHIR datetimes"""
-
-    @staticmethod
-    def as_fhir(obj):
-        return as_fhir(obj)
-
-    @staticmethod
-    def parse(data, error_subject=None):
-        """Parse input string to generate a UTC datetime instance
-
-        NB - date must be more recent than year 1900 or a ValueError
-        will be raised.
-
-        :param data: the datetime string to parse
-        :param error_subject: Subject string to use in error message
-
-        :return: UTC datetime instance from given data
-
-        """
-        # As we use datetime.strftime for display, and it can't handle dates
-        # older than 1900, treat all such dates as an error
-        epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')
-        try:
-            dt = parser.parse(data)
-        except ValueError:
-            msg = "Unable to parse {}: {}".format(error_subject, data)
-            current_app.logger.warn(msg)
-            abort(400, msg)
-        if dt.tzinfo:
-            epoch = pytz.utc.localize(epoch)
-            # Convert to UTC if necessary
-            if dt.tzinfo != pytz.utc:
-                dt = dt.astimezone(pytz.utc)
-        # As we use datetime.strftime for display, and it can't handle dates
-        # older than 1900, treat all such dates as an error
-        if dt < epoch:
-            raise ValueError("Dates prior to year 1900 not supported")
-        return dt
-
-    @staticmethod
-    def now():
-        """Generates a FHIR compliant datetime string for current moment"""
-        return datetime.utcnow().isoformat()+'Z'
 
 
 class CodeableConceptCoding(db.Model):
@@ -503,14 +438,21 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
-def aggregate_responses(instrument_ids):
+def aggregate_responses(instrument_ids, current_user):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
+    :param current_user: user making request, necessary to restrict results
+        to list of patients the current_user has permission to see
 
     """
+    # Gather up the patient IDs for whom current user has 'view' permission
+    user_ids = OrgTree().visible_patients(current_user)
+
     annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter(
+        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
+            QuestionnaireResponse.authored.desc())
 
     if instrument_ids:
         instrument_filters = (
