@@ -66,7 +66,7 @@
     $(".button-container").each(function() {
         $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
     });
-
+    $("#footerLockup").attr("src", "{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}").css({"height":86, "width": 86});
     $(".btn-tnth-primary").on("click", function() {
         var link = $(this).attr("href");
         if (hasValue(link)) {

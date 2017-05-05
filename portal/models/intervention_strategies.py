@@ -229,19 +229,14 @@ def update_card_html_on_completion():
         def get_due_date(assessment_status):
             instrument_due_date = None
             # prefer due_date for first instrument needing full assessment
-            needing = assessment_status.instruments_needing_full_assessment()
-            if needing:
-                instrument_due_date = assessment_status.instrument_status[
-                    needing[0]].get('by_date')
-            else:
-                # nothing needing full assessment, try date of next partial
-                partial = assessment_status.instruments_in_process()
-                if partial:
-                    instrument_due_date = assessment_status.instrument_status[
-                        partial[0]].get('by_date')
-            if not instrument_due_date:
-                return datetime.utcnow()
-            return instrument_due_date
+            instruments = (
+                assessment_status.instruments_needing_full_assessment() or
+                assessment_status.instruments_in_process()
+            )
+            if instruments:
+                return assessment_status.instrument_status[instruments[0]].get('by_date')
+            return datetime.utcnow()
+
         due_date = get_due_date(assessment_status)
 
         if assessment_status.overall_status in (
