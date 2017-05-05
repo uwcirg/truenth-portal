@@ -3,9 +3,11 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
+from datetime import datetime
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import url_for
+from werkzeug.exceptions import Unauthorized
 
 import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
@@ -15,6 +17,7 @@ from ..date_tools import FHIR_datetime
 from .extension import CCExtension
 from .identifier import Identifier
 from .reference import Reference
+from .role import Role, ROLE
 from .telecom import Telecom
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
@@ -531,6 +534,40 @@ class OrgTree(object):
             children = self.here_and_below_id(organization_id)
             if other_organization_id in children:
                 return True
+
+    def visible_patients(self, staff_user):
+        """Returns patient IDs for whom the current staff_user can view
+
+        Staff users can view all patients at or below their own org
+        level.
+
+        """
+        from .user import User, UserRoles  # local to avoid cycle
+        from .user_consent import UserConsent
+
+        if not (
+            staff_user.has_role(ROLE.STAFF) or
+            staff_user.has_role(ROLE.STAFF_ADMIN)):
+            raise Unauthorized("visible_patients() exclusive to staff use")
+
+        staff_user_orgs = set()
+        for org in staff_user.organizations:
+            staff_user_orgs.update(self.here_and_below_id(org.id))
+
+        if not staff_user_orgs:
+            return []
+
+        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT).one().id
+        now = datetime.utcnow()
+        query = db.session.query(User.id).join(
+            UserRoles).join(UserConsent).join(UserOrganization).filter(
+                User.deleted_id == None,
+                UserRoles.role_id == patient_role_id,
+                UserConsent.deleted_id == None,
+                UserConsent.expires > now,
+                UserOrganization.organization_id.in_(staff_user_orgs))
+
+        return [u[0] for u in query]  # flaten return tuples to list of ids
 
 
 def add_static_organization():

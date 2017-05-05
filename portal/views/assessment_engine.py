@@ -2,6 +2,7 @@
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session
 from flask_swagger import swagger
+from flask_user import roles_required
 import jsonschema
 import requests
 from sqlalchemy.orm.exc import NoResultFound
@@ -15,6 +16,7 @@ from ..models.auth import validate_client_origin
 from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
+from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
@@ -592,11 +594,16 @@ def assessment(patient_id, instrument_id):
 
     return jsonify(bundle)
 
+
 @assessment_engine_api.route('/patient/assessment')
+@roles_required([ROLE.STAFF_ADMIN, ROLE.STAFF])
 @oauth.require_oauth()
 def get_assessments():
     """
     Return multiple patient's responses to all questionnaires
+
+    NB list of patient's returned is limited by current_users implicit
+    permissions, typically controlled through organization affiliation.
 
     ---
     operationId: getQuestionnaireResponses
@@ -676,8 +683,11 @@ def get_assessments():
           to view requested patient
 
     """
+    # Rather than call current_user.check_role() for every patient
+    # in the bundle, deligate that responsibility to aggregate_responses()
     bundle = aggregate_responses(
         instrument_ids=request.args.getlist('instrument_id'),
+        current_user=current_user()
     )
     bundle.update({
         'link': {

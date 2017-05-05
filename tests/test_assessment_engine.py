@@ -1,8 +1,9 @@
 """Unit test module for Assessment Engine API"""
 import json
 from flask_swagger import swagger
-from tests import TestCase, TEST_USER_ID
 
+from tests import TestCase, TEST_USER_ID
+from portal.models.role import ROLE
 
 class TestAssessmentEngine(TestCase):
 
@@ -29,7 +30,7 @@ class TestAssessmentEngine(TestCase):
         swagger_spec = swagger(self.app)
         completed_qnr = swagger_spec['definitions']['QuestionnaireResponse']['example']
         instrument_id = completed_qnr['questionnaire']['reference'].split('/')[-1]
-        
+
         questions = completed_qnr['group']['question']
         incomplete_questions = []
 
@@ -46,13 +47,17 @@ class TestAssessmentEngine(TestCase):
         })
 
         self.login()
-        
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.PATIENT)
+
         # Upload incomplete QNR
         in_progress_response = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(in_progress_qnr),
         )
+        self.assert200(in_progress_response)
 
         # Update incomplete QNR
         update_qnr_response = self.client.put(
@@ -68,8 +73,9 @@ class TestAssessmentEngine(TestCase):
             '/api/patient/assessment?instrument_id={}'.format(instrument_id),
             content_type='application/json',
         )
-        # import ipdb; ipdb.set_trace()
-        self.assertEquals(updated_qnr_response.json['entry'][0]['group'], completed_qnr['group'])
+        self.assert200(updated_qnr_response)
+        self.assertEquals(updated_qnr_response.json['entry'][0]['group'],
+                          completed_qnr['group'])
 
     def test_no_update_assessment(self):
         swagger_spec = swagger(self.app)
@@ -83,6 +89,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(qnr),
         )
+        self.assert200(qnr_response)
 
         qnr['identifier']['system'] = 'foo'
 
@@ -100,11 +107,16 @@ class TestAssessmentEngine(TestCase):
         instrument_id = example_data['questionnaire']['reference'].split('/')[-1]
 
         self.login()
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.STAFF)
+        self.promote_user(role_name=ROLE.PATIENT)
+
         upload = self.client.post(
             '/api/patient/{}/assessment'.format(TEST_USER_ID),
             content_type='application/json',
             data=json.dumps(example_data),
         )
+        self.assert200(upload)
 
         rv = self.client.get(
             '/api/patient/assessment?instrument_id={}'.format(instrument_id),
@@ -126,6 +138,7 @@ class TestAssessmentEngine(TestCase):
             content_type='application/json',
             data=json.dumps(example_data),
         )
+        self.assert200(upload_response)
 
         download_response = self.client.get(
             '/api/patient/assessment?format=csv&instrument_id={}'.format(instrument_id),

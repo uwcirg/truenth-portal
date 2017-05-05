@@ -14,7 +14,6 @@ from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
 
-
 class CodeableConceptCoding(db.Model):
     """Link table joining CodeableConcept with n Codings"""
 
@@ -439,14 +438,21 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
-def aggregate_responses(instrument_ids):
+def aggregate_responses(instrument_ids, current_user):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
+    :param current_user: user making request, necessary to restrict results
+        to list of patients the current_user has permission to see
 
     """
+    # Gather up the patient IDs for whom current user has 'view' permission
+    user_ids = OrgTree().visible_patients(current_user)
+
     annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter(
+        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
+            QuestionnaireResponse.authored.desc())
 
     if instrument_ids:
         instrument_filters = (
