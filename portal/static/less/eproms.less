@@ -36,22 +36,22 @@
  **/
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
-@linkColor:       #57675B;
-@linkHover:       #60654f;
-@btnColor:        #79815D;
-@featureBtnColor: #333;
+@linkColor:       #333;
+@linkHover:       #5f676e;
+@btnColor:        #7C959E;
+@featureBtnColor: #7C959E;
 @featureBtnHoverColor: #FFF;
 @featureBtnHoverBgColor: #000;
 @legendColor:    #595F57;
 @sectionTitleColor: #526960;
 @sectionBorderColor: #E0E6E3;
-@rowBackgroundColor: #7d826e;
+@rowBackgroundColor: #8a8e90;
 @navBarBgColor: #607D8B;
 @toolTipColor: #575a4d;
 @menuTextColor: #494e37;
 @menuTextHoverColor: #337ab7;
 @menuTitleColor: #5b5e61;
-@leftPanelBgColor: #e2e4d9;
+@leftPanelBgColor: #bac1ca;
 @errorMessageColor: #a94442;
 @placeHolderColor: #999;
 
@@ -93,7 +93,7 @@ a:focus {
   letter-spacing: 1px;
   padding: 0.8em;
   letter-spacing: 2px;
-  color: #333f4b;
+  color: @btnColor;
   background-color: #FFF;
   border: 1px solid #bdb9b9;
   text-transform: uppercase;
@@ -298,7 +298,7 @@ select:not([multiple]) {
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
-  background: #858681;
+  background: background: rgba(95, 103, 110, 1);
   z-index: -2;
  .detail-title {
     color: #ebefeb;
@@ -434,6 +434,7 @@ body.open-nav .left-panel {
 div.right-panel {
   position:relative;
   transition:margin-left ease .5s;
+  border: 2px solid rgba(121, 121, 121, 1);
   max-width: 991px;
 }
 #topTerms ~ #aboutForm {
@@ -1260,8 +1261,8 @@ div.right-panel {
   padding-bottom: 1em;
 }
 .portal-description {
-  background: #676961;
-  border: 2px solid #7d7d7b;
+  background: #43484d;
+  border: 1px solid rgba(121, 121, 121, 1);
   color: #FFF;
   padding: 2em 2em 4em 2em;
   position: relative;
@@ -3041,7 +3042,7 @@ div.timezone-warning.text-warning {
 
 #regForm input[type="submit"],
 #loginForm input[type="submit"] {
-   background-color: #79815d;
+   background-color: @btnColor;
    text-align: center;
    padding: 1.2em 2em 1em 2em;
 }

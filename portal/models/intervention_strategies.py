@@ -20,7 +20,6 @@ from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
-import datetime
 
 from .assessment_status import AssessmentStatus
 from ..database import db
@@ -228,22 +227,16 @@ def update_card_html_on_completion():
             return top_level_org_name
 
         def get_due_date(assessment_status):
-            #FOR TESTING!!
-            # parent_org = get_top_level_org_name()
-            # thresholds = (
-            #     (90, "CRV"),
-            #     (30, "IRONMAN")
-            # )
-            # for days_allowed, org in thresholds:
-            #     if org == parent_org:
-            #         return assessment_status.consent_date + timedelta(days=days_allowed)
             instrument_due_date = None
-            for instrument, details in assessment_status.instrument_status.items():
-                if not instrument_due_date:
-                    instrument_due_date = details.get('by_date')
-            if not instrument_due_date:
-                return datetime.datetime.utcnow()
-            return instrument_due_date
+            # prefer due_date for first instrument needing full assessment
+            instruments = (
+                assessment_status.instruments_needing_full_assessment() or
+                assessment_status.instruments_in_process()
+            )
+            if instruments:
+                return assessment_status.instrument_status[instruments[0]].get('by_date')
+            return datetime.utcnow()
+
         due_date = get_due_date(assessment_status)
 
         if assessment_status.overall_status in (
@@ -263,7 +256,7 @@ def update_card_html_on_completion():
                     <h4 class="portal-intro-text">Please complete your {parent_org} registry study questionnaire by {due_date}.</h4>
                     <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
                 </div>
-            """.format(user.display_name, due_date=due_date.strftime('%d, %b %Y'), parent_org=get_top_level_org_name())
+            """.format(user.display_name, due_date=due_date.strftime('%-d %b %Y'), parent_org=get_top_level_org_name())
 
             card_html = """
             {intro}
@@ -288,7 +281,7 @@ def update_card_html_on_completion():
             link_label = 'View previous questionnaire'
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
             next_survey_date = assessment_status.completed_date + timedelta(days=365)
-            most_recent_survey_date = assessment_status.completed_date.strftime('%d, %b %Y')
+            most_recent_survey_date = assessment_status.completed_date.strftime('%-d %b %Y')
             intro = """
                     <div class="portal-header-container">
                         <h2 class="portal-header">Thank you, {}.</h2>
@@ -296,7 +289,7 @@ def update_card_html_on_completion():
                         <p>You will be notified when the next questionnaire is ready to complete ( {next_survey_date} ).</p>
                         <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
                     </div>
-                    """.format(user.display_name, parent_org=get_top_level_org_name(), next_survey_date=next_survey_date.strftime('%d, %b %Y'))
+                    """.format(user.display_name, parent_org=get_top_level_org_name(), next_survey_date=next_survey_date.strftime('%-d %b %Y'))
             card_html = """
             <div class="container">
                 {intro}

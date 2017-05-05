@@ -68,8 +68,8 @@ a:focus {
 }
 .btn-tnth-primary {
   color: #fff;
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
   padding-right: 1em;
@@ -84,8 +84,8 @@ a:focus {
 .btn-tnth-primary.active,
 .open > .dropdown-toggle.btn-tnth-primary {
   color: #fff;
-  background-color: #2a4531;
-  border-color: #1c2f21;
+  background-color: #5f676e;
+  border-color: #5f676e;
 }
 .btn-tnth-primary .glyphicon {
   color: #FFF;
@@ -241,7 +241,7 @@ select:not([multiple]) {
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
-  background: #858681;
+  background: rgba(95, 103, 110, 1);
   z-index: -2;
 }
 #mainDiv.profile .detail-title {
@@ -369,7 +369,7 @@ div.left-panel {
   left: 0;
   height: 100%;
   min-width: 50px;
-  background: #e2e4d9;
+  background: #bac1ca;
   transition: width ease .5s;
   z-index: 10;
   display: none;
@@ -842,7 +842,7 @@ div.right-panel {
 #patientList div.or,
 #staffList div.or {
   display: inline-block;
-  background-color: #9fa294;
+  background-color: #888a8c;
   margin: 1.5em 1em 1em;
 }
 #patientList #_downloadLink {
@@ -1085,7 +1085,7 @@ div.right-panel {
   border-radius: 45px;
 }
 #mainDiv.portal {
-  background: #82827c;
+  background: rgba(95, 103, 110, 1);
   height: 100vh;
   overflow: hidden;
 }
@@ -1108,7 +1108,7 @@ div.right-panel {
   width: 100% !important;
   font-size: 1.2em;
   max-width: 100%;
-  border: 2px solid #7d7d7b;
+  border: 2px solid rgba(121, 121, 121, 1);
 }
 .portal-header-container {
   color: #FFF;
@@ -1178,8 +1178,8 @@ div.right-panel {
   padding-bottom: 1em;
 }
 .portal-description {
-  background: #676961;
-  border: 2px solid #7d7d7b;
+  background: #43484d;
+  border: 1px solid rgba(121, 121, 121, 1);
   color: #FFF;
   padding: 2em 2em 4em 2em;
   position: relative;
@@ -1377,8 +1377,8 @@ div.right-panel {
   width: 70px;
   padding: 0 0.7em;
   color: #FFF;
-  background: #79815d;
-  border-color: #79815d;
+  background: #7C959E;
+  border-color: #7C959E;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.9em;
@@ -1387,7 +1387,7 @@ div.right-panel {
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
-  background-color: #60654f;
+  background-color: #5f676e;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
@@ -1460,12 +1460,12 @@ div.right-panel {
   display: inline-block;
   width: 300px;
   color: #FFF;
-  background: #79815d;
-  border-color: #79815d;
+  background: #7C959E;
+  border-color: #7C959E;
 }
 #createUserLink:hover {
   color: #FFF;
-  background: #333;
+  background: #5f676e;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1666,7 +1666,7 @@ div.noOrg-container span {
 #userSessionListTable TH,
 table.profile-audit-log TH,
 .thead {
-  background-color: #7d826e;
+  background-color: #8a8e90;
   color: #FFF;
   padding: 0.25em 0.5em;
   font-size: 1em;
@@ -1918,34 +1918,34 @@ table.profile-audit-log TH,
   font-size: 0.93em;
 }
 .pagination > .active > a {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > .active > a:focus {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > .active > a:hover {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > .active > span {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > .active > span:focus {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > .active > span:hover {
-  background-color: #79815D;
-  border-color: #79815D;
+  background-color: #7C959E;
+  border-color: #7C959E;
 }
 .pagination > li > a {
-  color: #79815D;
+  color: #333;
 }
 .pagination > li > span {
-  color: #79815D;
+  color: #7C959E;
 }
 /**override bootstrap style**/
 .checkbox input[type=checkbox],
@@ -2098,7 +2098,7 @@ sub.pointer:hover {
   color: #60654f;
 }
 #profileConsentList .consentlist-header {
-  background-color: #7d826e;
+  background-color: #8a8e90;
   color: #FFF;
   font-weight: normal;
   padding-left: 0.6em;
@@ -3031,7 +3031,7 @@ fieldset[disabled] .btn-google.active {
 }
 #regForm input[type="submit"],
 #loginForm input[type="submit"] {
-  background-color: #79815d;
+  background-color: #7C959E;
   text-align: center;
   padding: 1.2em 2em 1em 2em;
 }
