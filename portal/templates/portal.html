@@ -23,6 +23,8 @@
             {%- if intervention.description and intervention.description != "" -%}<h2 class="tnth-subhead">{{ intervention.description }}</h2>{% endif %}
             {%- if display.card_html -%}
                     {{ display.card_html | safe }}
+                    <input type="hidden" class="link-label" value="{{display.link_label}}" />
+                    <input type="hidden" class="link-url" value="{{display.link_url}}" />
             {%- else -%}
                 <div class="portal-description portal-description-incomplete portal-no-description-container">
                     {%- if not display.link_url -%}
