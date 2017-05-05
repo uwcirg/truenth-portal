@@ -5,7 +5,6 @@ from flask import current_app
 from enum import Enum
 
 from ..database import db
-from .fhir import FHIR_datetime
 from .reference import Reference
 
 
@@ -51,7 +50,9 @@ class Audit(db.Model):
 
     def as_fhir(self):
         """Typically included as *meta* data in containing FHIR resource"""
-        from .user import get_user  # avoid ciclic import
+        from .user import get_user
+        from .fhir import FHIR_datetime
+
         d = {}
         d['version'] = self.version
         d['lastUpdated'] = FHIR_datetime.as_fhir(self.timestamp)

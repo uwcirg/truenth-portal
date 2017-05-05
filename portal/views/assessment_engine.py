@@ -1,17 +1,18 @@
 """Assessment Engine API view functions"""
 from flask import abort, Blueprint, current_app, jsonify, request, redirect, Response
 from flask import session
-from sqlalchemy.orm.exc import NoResultFound
 from flask_swagger import swagger
 import jsonschema
 import requests
+from sqlalchemy.orm.exc import NoResultFound
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
 from ..models.auth import validate_client_origin
-from ..models.fhir import FHIR_datetime, QuestionnaireResponse
+from ..models.fhir import QuestionnaireResponse
 from ..models.fhir import aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.user import current_user, get_user, User
@@ -597,7 +598,6 @@ def get_assessments():
     """
     Return multiple patient's responses to all questionnaires
 
-
     ---
     operationId: getQuestionnaireResponses
     tags:
@@ -676,7 +676,6 @@ def get_assessments():
           to view requested patient
 
     """
-
     bundle = aggregate_responses(
         instrument_ids=request.args.getlist('instrument_id'),
     )

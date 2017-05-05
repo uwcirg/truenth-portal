@@ -11,8 +11,8 @@ import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource
 from ..database import db
+from ..date_tools import FHIR_datetime
 from .extension import CCExtension
-from .fhir import Coding, CodeableConcept, FHIR_datetime
 from .identifier import Identifier
 from .reference import Reference
 from .telecom import Telecom
@@ -48,7 +48,7 @@ class Organization(db.Model):
             secondary="organization_addresses")
     identifiers = db.relationship('Identifier', lazy='dynamic',
             secondary="organization_identifiers")
-    _locales = db.relationship(Coding, lazy='dynamic',
+    _locales = db.relationship('Coding', lazy='dynamic',
             secondary="organization_locales")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
@@ -138,6 +138,8 @@ class Organization(db.Model):
         return org.update_from_fhir(data)
 
     def update_from_fhir(self, data):
+        from .fhir import CodeableConcept  # local to avoid cycle
+
         if 'id' in data:
             self.id = data['id']
         if 'name' in data:
