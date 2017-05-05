@@ -15,12 +15,11 @@ the parameters given to the closures.
 """
 from flask import current_app, url_for
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sys
-import datetime
 
 from .assessment_status import AssessmentStatus
 from ..database import db
@@ -228,21 +227,18 @@ def update_card_html_on_completion():
             return top_level_org_name
 
         def get_due_date(assessment_status):
-            #FOR TESTING!!
-            # parent_org = get_top_level_org_name()
-            # thresholds = (
-            #     (90, "CRV"),
-            #     (30, "IRONMAN")
-            # )
-            # for days_allowed, org in thresholds:
-            #     if org == parent_org:
-            #         return assessment_status.consent_date + timedelta(days=days_allowed)
             instrument_due_date = None
-            for instrument, details in assessment_status.instrument_status.items():
-                if not instrument_due_date:
-                    instrument_due_date = details.get('by_date')
-            if not instrument_due_date:
-                return datetime.datetime.utcnow()
+            # prefer due_date for first instrument needing full assessment
+            needing = assessment_status.instruments_needing_full_assessment()
+            if needing:
+                instrument_due_date = assessment_status.instrument_status[
+                    needing[0]].get('by_date')
+            else:
+                # nothing needing full assessment, try date of next partial
+                partial = assessment_status.instruments_in_process()
+                if partial:
+                    instrument_due_date = assessment_status.instrument_status[
+                        partial[0]].get('by_date')
             return instrument_due_date
         due_date = get_due_date(assessment_status)
 
