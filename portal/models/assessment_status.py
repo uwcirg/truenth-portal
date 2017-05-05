@@ -172,21 +172,32 @@ class AssessmentStatus(object):
 
         """
         def status_from_recents(recents):
+            """Returns tuple ('status string', by_date) from recents
+
+            NB - by_date only makes sense for some states, None otherwise
+
+            """
             if 'completed' in recents:
-                return "Completed"
+                return ("Completed", None)
+            status = None
             if 'in-progress' in recents:
-                return "In Progress"
+                status = "In Progress"
             today = datetime.utcnow()
             delta = today - self.consent_date
             if delta < timedelta(days=days_till_due+1):
-                return "Due"
+                status = status or "Due"
+                return (status,
+                        self.consent_date + timedelta(days=days_till_due))
             if delta < timedelta(days=days_till_overdue+1):
-                return "Overdue"
-            return "Expired"
+                status = status or "Overdue"
+                return (status,
+                        self.consent_date + timedelta(days=days_till_overdue))
+            return ("Expired", None)
 
         if not instrument_id in self.instrument_status:
             self.instrument_status[instrument_id] = most_recent_survey(
                 self.user, instrument_id)
         if not 'status' in self.instrument_status[instrument_id]:
-            self.instrument_status[instrument_id]['status'] =\
+            (self.instrument_status[instrument_id]['status'],
+             self.instrument_status[instrument_id]['by_date']) =\
                     status_from_recents(self.instrument_status[instrument_id])
