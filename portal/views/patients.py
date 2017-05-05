@@ -75,6 +75,7 @@ def patients_root():
                  )
             ).join(UserOrganization).filter(
                 and_(UserOrganization.user_id==User.id,
+                     UserOrganization.organization_id != 0,
                      UserOrganization.organization_id.in_(org_list)))
         patients = patients.union(org_patients)
 
