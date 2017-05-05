@@ -141,8 +141,10 @@ def demographics_set(patient_id):
     patient = get_user(patient_id)
     if patient.deleted:
         abort(400, "deleted user - operation not permitted")
-    if not request.json or 'resourceType' not in request.json or\
-            request.json['resourceType'] != 'Patient':
+    if not request.json:
+        abort(400, "Requires JSON with submission including "
+              "HEADER 'Content-Type: application/json'")
+    if request.json.get('resourceType') != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
     try:
         patient.update_from_fhir(request.json, acting_user=current_user())
