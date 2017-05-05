@@ -95,6 +95,11 @@ class TestAssessment(TestCase):
         self.assertEquals(
             set(a_s.instruments_needing_full_assessment()),
             localized_instruments)
+
+        # check due date access
+        for instrument, details in a_s.instrument_status.items():
+            self.assertTrue(details.get('by_date') > datetime.utcnow())
+
         self.assertFalse(a_s.instruments_in_process())
 
     def test_localized_on_time(self):
