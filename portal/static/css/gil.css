@@ -6210,7 +6210,7 @@ figure.nav-overlay {
 }
 
 .module__heading {
-    font-size: 33px;
+    font-size: 30px;
     line-height: 38px;
     font-weight: bold;
     margin: 0 0 20px;
@@ -6258,10 +6258,10 @@ figure.nav-overlay {
 }
 @media (max-width: 767px) {
     .module__head {
-        font-size: 26px;
+        font-size: 24px;
     }
     .module__body {
-        font-size: 22px;
+        font-size: 20px;
         line-height: 28px;
     }
 }
@@ -6629,28 +6629,33 @@ figure.nav-overlay {
     }
 }
 .module-wrap--background__alonzo {
-    background-image: url("../img/LE_Alonzo_McCann_Tablet.jpg");
-    background-position: 95%;
+    background-image: url("../img/LE_Alonzo_McCann.jpg");
+    background-position: 65%;
     transition: background-position 200ms ease-in-out;
 }
-@media (min-width: 992px) {
+@media (min-width: 1100px) {
+    .module-wrap--background__alonzo {
+        background-position: center center;
+    }
+}
+/*@media (min-width: 992px) {
     .module-wrap--background__alonzo {
         background-image: url("../img/LE_Alonzo_McCann.jpg");
     }
-}
+}*/
 .module-wrap--background__andrew {
-    background-image: url("../img/LE_David_Andrew_Perez_Tablet.jpg");
+    background-image: url("../img/LE_David_Andrew_Perez.jpg");
     background-position: 0;
     transition: background-position 200ms ease-in-out;
 }
-@media (min-width: 992px) {
+/*@media (min-width: 992px) {
     .module-wrap--background__andrew {
         background-image: url("../img/LE_David_Andrew_Perez.jpg");
     }
-}
+}*/
 .module-wrap--background__twins {
     background-image: url("../img/LE_Hirsch_Brothers_Tablet.jpg");
-    background-position: 58%;
+    background-position: 75%;
     transition: background-position 200ms ease-in-out;
 }
 @media (min-width: 1300px) {
@@ -6660,7 +6665,7 @@ figure.nav-overlay {
     }
 }
 .module-wrap--background .module__head {
-    font-size: 33px;
+    font-size: 2.3em;
 }
 
 @media (min-width: 1600px) {
@@ -6694,7 +6699,6 @@ figure.nav-overlay {
 }
 @media (min-width: 992px) {
     .module-wrap--background .module__body {
-        font-size: 1.8em;
         line-height: 1.4em;
     }
 }
@@ -6746,7 +6750,7 @@ figure.nav-overlay {
     }
     img.mobile {
         display: block;
-        width: 300px;
+        width: 350px;
         max-width: 100%;
         margin: 0 auto 1.5em auto;
         padding: 1em 0;
@@ -6757,7 +6761,6 @@ figure.nav-overlay {
     }
 
     .module-wrap--background .module__heading {
-        font-size: 24px;
         padding-left: 10px;
         padding-right: 10px;
     }
@@ -6766,10 +6769,15 @@ figure.nav-overlay {
     }
 }
 aside .module-wrap--background {
-    padding-top: 8%;
+    padding-top: 14%;
     padding-bottom: 0;
     background-position: center;
     transition: background-position 150ms ease-in;
+}
+@media (min-width: 550px) {
+    aside .module-wrap--background {
+        padding-top: 8%;
+    }
 }
 @media (min-width: 992px) {
     aside .module-wrap--background {
