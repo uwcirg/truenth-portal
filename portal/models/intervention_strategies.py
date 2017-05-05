@@ -15,7 +15,7 @@ the parameters given to the closures.
 """
 from flask import current_app, url_for
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -239,6 +239,8 @@ def update_card_html_on_completion():
                 if partial:
                     instrument_due_date = assessment_status.instrument_status[
                         partial[0]].get('by_date')
+            if not instrument_due_date:
+                return datetime.utcnow()
             return instrument_due_date
         due_date = get_due_date(assessment_status)
 
