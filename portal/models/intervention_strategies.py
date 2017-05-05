@@ -259,7 +259,7 @@ def update_card_html_on_completion():
                     <h4 class="portal-intro-text">Please complete your {parent_org} registry study questionnaire by {due_date}.</h4>
                     <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
                 </div>
-            """.format(user.display_name, due_date=due_date.strftime('%d, %b %Y'), parent_org=get_top_level_org_name())
+            """.format(user.display_name, due_date=due_date.strftime('%-d %b %Y'), parent_org=get_top_level_org_name())
 
             card_html = """
             {intro}
@@ -284,7 +284,7 @@ def update_card_html_on_completion():
             link_label = 'View previous questionnaire'
             link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
             next_survey_date = assessment_status.completed_date + timedelta(days=365)
-            most_recent_survey_date = assessment_status.completed_date.strftime('%d, %b %Y')
+            most_recent_survey_date = assessment_status.completed_date.strftime('%-d %b %Y')
             intro = """
                     <div class="portal-header-container">
                         <h2 class="portal-header">Thank you, {}.</h2>
@@ -292,7 +292,7 @@ def update_card_html_on_completion():
                         <p>You will be notified when the next questionnaire is ready to complete ( {next_survey_date} ).</p>
                         <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
                     </div>
-                    """.format(user.display_name, parent_org=get_top_level_org_name(), next_survey_date=next_survey_date.strftime('%d, %b %Y'))
+                    """.format(user.display_name, parent_org=get_top_level_org_name(), next_survey_date=next_survey_date.strftime('%-d %b %Y'))
             card_html = """
             <div class="container">
                 {intro}
