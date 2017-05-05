@@ -13,7 +13,7 @@ NB - several functions are closures returning access_strategy functions with
 the parameters given to the closures.
 
 """
-from flask import current_app, url_for, request
+from flask import current_app, url_for
 import json
 from datetime import timedelta
 from sqlalchemy import and_, UniqueConstraint
@@ -227,7 +227,8 @@ def update_card_html_on_completion():
                 return "current"
             return top_level_org_name
 
-        #temporary placeholder function, should get this as a property of assessment_status object
+        #NOTE: this is only a temporary placeholder function
+        #Should get this information from a property of assessment_status object
         def get_due_date(assessment_status):
             parent_org = get_top_level_org_name()
             thresholds = (
@@ -240,9 +241,7 @@ def update_card_html_on_completion():
             return datetime.utcnow()
         due_date = get_due_date(assessment_status)
 
-        test_status = request.args.get('test_status', 'Nope')
-
-        if test_status == 'Due' or assessment_status.overall_status in (
+        if assessment_status.overall_status in (
             'Due', 'Overdue', 'In Progress'):
 
             link_label = 'Go to questionnaire'
@@ -287,7 +286,7 @@ def update_card_html_on_completion():
             most_recent_survey_date = assessment_status.completed_date.strftime('%d, %b %Y')
             intro = """
                     <div class="portal-header-container">
-                        <h2 class="portal-header">Thank you, {}</h2>
+                        <h2 class="portal-header">Thank you, {}.</h2>
                         <p>You have completed the {parent_org} Registry questionnaire.</p>
                         <p>You will be notified when the next questionnaire is ready to complete ( {next_survey_date} ).</p>
                         <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
