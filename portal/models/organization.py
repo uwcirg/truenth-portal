@@ -130,9 +130,9 @@ class Organization(db.Model):
 
     @hybrid_property
     def locales(self):
-        if self.partOf_id:
-            parent = Organization.query.get(self.partOf_id)
-            return self._locales.union(parent.locales)
+        # if self.partOf_id:
+            # parent = Organization.query.get(self.partOf_id)
+            # return self._locales.union(parent.locales)
         return self._locales
 
     @classmethod
