@@ -234,8 +234,12 @@ def update_card_html_on_completion():
                 assessment_status.instruments_in_process()
             )
             if instruments:
-                return assessment_status.instrument_status[instruments[0]].get('by_date')
-            return datetime.utcnow()
+                instrument_due_date = assessment_status.instrument_status[instruments[0]].get('by_date')
+
+            if instrument_due_date:
+                return instrument_due_date
+            else:
+                return datetime.utcnow()
 
         due_date = get_due_date(assessment_status)
 
