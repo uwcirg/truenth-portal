@@ -666,7 +666,7 @@ def share_story():
 
 @portal.route('/robots.txt')
 def robots():
-    if current_app.config["SYSTEM_TYPE"].lower() in ("production", "demo"):
+    if current_app.config["SYSTEM_TYPE"].lower() == "production":
         return "User-agent: * \nAllow: /"
     return "User-agent: * \nDisallow: /"
 
