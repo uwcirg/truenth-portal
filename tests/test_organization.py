@@ -36,6 +36,7 @@ class TestOrganization(TestCase):
         self.assertTrue(org.use_specific_codings)
         self.assertTrue(org.race_codings)
         self.assertFalse(org.ethnicity_codings)
+        self.assertEquals(org.locales.count(),1)
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
@@ -360,34 +361,3 @@ class TestOrganization(TestCase):
         self.assertEquals(len(nodes), 4)
         for i in (102, 1002, 10031, 10032):
             self.assertTrue(i in nodes)
-
-    def test_org_extension_inheritance(self):
-        # prepopuate database with matching locale
-        cd = Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
-                  'system': "urn:ietf:bcp:47"})
-        # create parent with specific coding options and locale
-        parent_id = 101
-        parent = Organization(id=parent_id, name='test parent')
-        parent.use_specific_codings = True
-        parent.race_codings = True
-        parent.ethnicity_codings = False
-        parent.indigenous_codings = False
-        ol = OrganizationLocale(organization_id=parent_id, coding_id=cd.id)
-        # create child org with no coding options or locales
-        org = Organization(id=102, name='test', partOf_id=parent_id)
-        org.use_specific_codings = False
-        with SessionScope(db):
-            db.session.add(parent)
-            db.session.commit()
-            db.session.add(ol)
-            db.session.add(org)
-            db.session.commit()
-        org = db.session.merge(org)
-        # test inheritance
-        self.assertTrue(org.id)
-        self.assertEquals(org.partOf_id, parent_id)
-        self.assertFalse(org.use_specific_codings)
-        self.assertTrue(org.race_codings)
-        self.assertFalse(org.ethnicity_codings)
-        self.assertFalse(org.indigenous_codings)
-        self.assertEquals(org.locales.first().code,'en_AU')
