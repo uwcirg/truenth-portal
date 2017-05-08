@@ -1,7 +1,20 @@
 {% extends "gil/lived_experience_base.html" %}
 {% block main %}
-    <main class="main">
+    <main class="main main--white">
       {{super()}}
+      {% block header %}
+        <header class="header header--white {%if user%}no-banner{%endif%}">
+          <div class="header__menu">
+            <a class="menu button button--small button--white js-nav-menu-toggle">
+                <figure></figure><span>{{_("Menu")}}</span>
+            </a>
+          </div>
+          <a class="logo" href="{{PORTAL}}/"></a>
+          {% if not user %}
+            <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
+          {% endif %}
+        </header>
+      {% endblock %}
       <div class="page-intro page-intro--dark page-intro--lived-experience" style="background-image: url({{ url_for('static', filename='img/LE_Main.jpg') }})">
         <div class="page-intro__content">
           <div class="accent-heading accent-heading--white">Objective N<em>o</em>1: LIVED EXPERIENCE</div>
@@ -39,7 +52,6 @@
 {% block document_ready %}
   <script>
       $(document).ready(function(){
-        $("header").addClass("header--white");
         $("#lnReadMoreStory").addClass("disabled").on("click", function(e) {
           e.preventDefault();
           return false;

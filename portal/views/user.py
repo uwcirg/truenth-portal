@@ -1585,7 +1585,8 @@ def upload_user_document(user_id):
         :return: the posted file
         """
         if not request.files or len(request.files) != 1:
-            abort(400, "no file found - POST single file")
+            abort(400, "no file found - please POST a single file using " \
+                  "standard multipart/form-data parameters")
         key = request.files.keys()[0]  # either 'file' or actual filename
         filedata = request.files[key]
         return filedata
