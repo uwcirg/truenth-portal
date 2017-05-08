@@ -2,6 +2,19 @@
 {% block main %}
     <main class="main">
       {{super()}}
+       {% block header %}
+        <header class="header header--white {%if user%}no-banner{%endif%}">
+          <div class="header__menu">
+            <a class="menu button button--small button--white js-nav-menu-toggle">
+                <figure></figure><span>{{_("Menu")}}</span>
+            </a>
+          </div>
+          <a class="logo" href="{{PORTAL}}/"></a>
+          {% if not user %}
+            <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
+          {% endif %}
+        </header>
+      {% endblock %}
       <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
         <div class="page-intro__content">
           <h1 class="page-intro__main">Contact Us</h1>
@@ -69,7 +82,6 @@
 {% block document_ready %}
   <script>
       $(document).ready(function(){
-        $("header").addClass("header--white");
         $("#first-name, #last-name").each(function() {
             $(this).on("blur", function() {
                 var name = $("#first-name").val();
