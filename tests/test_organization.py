@@ -9,7 +9,6 @@ from portal.models.fhir import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
-from portal.models.organization import OrganizationLocale
 from portal.models.role import ROLE
 from tests import TestCase
 

@@ -226,26 +226,10 @@ def update_card_html_on_completion():
                 return "current"
             return top_level_org_name
 
-        def get_due_date(assessment_status):
-            instrument_due_date = None
-            # prefer due_date for first instrument needing full assessment
-            instruments = (
-                assessment_status.instruments_needing_full_assessment() or
-                assessment_status.instruments_in_process()
-            )
-            if instruments:
-                instrument_due_date = assessment_status.instrument_status[instruments[0]].get('by_date')
-
-            if instrument_due_date:
-                return instrument_due_date
-            else:
-                return datetime.utcnow()
-
-        due_date = get_due_date(assessment_status)
-
         if assessment_status.overall_status in (
             'Due', 'Overdue', 'In Progress'):
-
+            due_date = assessment_status.next_available_due_date()
+            assert(due_date)  # given the status condition, should be defined
             link_label = 'Go to questionnaire'
             if assessment_status.overall_status == 'In Progress':
                 link_label = 'Continue questionnaire'
