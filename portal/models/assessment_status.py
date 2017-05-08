@@ -127,6 +127,30 @@ class AssessmentStatus(object):
                 results.append(instrument_id)
         return results
 
+    def next_available_due_date(self):
+        """Lookup due_date from next available assessment
+
+        Prefer due_date for first instrument needing full assessment,
+        also consider those in process in case others don't qualify.
+
+        :returns: due date of next available assessment, or None
+
+        """
+        result = None
+        instruments = (
+            self.instruments_needing_full_assessment() or
+            self.instruments_in_process()
+        )
+        due_dates = [self.instrument_status[i].get(
+            'by_date') for i in instruments]
+
+        # return first non-none
+        try:
+            result = next(dd for dd in due_dates if dd is not None)
+        except StopIteration:
+            pass  # happens if every item in due_dates is None
+        return result
+
     def __obtain_status_details(self):
         # expensive process - do once
         if hasattr(self, '_details_obtained'):
