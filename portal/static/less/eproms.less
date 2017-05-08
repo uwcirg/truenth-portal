@@ -37,11 +37,11 @@
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
 @linkColor:       #333;
-@linkHover:       #5f676e;
+@linkHover:       #909698;
 @btnColor:        #7C959E;
 @featureBtnColor: #7C959E;
 @featureBtnHoverColor: #FFF;
-@featureBtnHoverBgColor: #000;
+@featureBtnHoverBgColor: #909698;
 @legendColor:    #595F57;
 @sectionTitleColor: #526960;
 @sectionBorderColor: #E0E6E3;
@@ -128,8 +128,9 @@ a:focus {
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
+    background-color: @linkHover;
+    border-color: @linkHover;
+    text-decoration: none;
   }
   .glyphicon {
     color: #FFF;
@@ -307,12 +308,6 @@ select:not([multiple]) {
   #profileHeader * {
     color: #FFF;
     letter-spacing: 1px;
-  }
-  #bdGroup {
-    margin-bottom: 0.2em;
-  }
-  #profileStudyIDContainer {
-    margin-bottom: 2em;
   }
   .copyright-container *,
   .logo-container * {
@@ -767,8 +762,8 @@ div.right-panel {
 
 .access-button:hover {
     color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
+    background-color: @linkHover;
+    border-color: @linkHover;
 }
 
 #accessCodeWrapper {
@@ -1170,8 +1165,8 @@ div.right-panel {
 }
 #mainDiv.portal {
   background: #929291;
-  height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 #mainDiv.portal .container {
   max-width: 1100px;
@@ -1180,9 +1175,7 @@ div.right-panel {
   color: #FFF;
 }
 .portal-item {
- /* margin: 5em 0;
-  padding: 1em 3em 3em 3em;*/
- margin: 4em auto 2em auto;
+ margin: 3em auto 2em auto;
  min-height: 60vh;
 }
 .portal-no-description-container {
@@ -1230,8 +1223,13 @@ div.right-panel {
   letter-spacing: 0.5px;
 }
 .portal-header {
-  font-size: 1.4em;
+  font-size: 1.2em;
   letter-spacing: 1px;
+}
+@media (min-width: 726px) {
+  .portal-header {
+    font-size: 1.4em;
+  }
 }
 .portal-intro-text {
   font-size: 1.1em;
@@ -1242,7 +1240,7 @@ div.right-panel {
   }
 }
 .portal-header-logout-container {
-  width: 300px;
+  width: 100%;
   max-width: 100%;
   margin: 2em auto;
   text-align: center;
@@ -1266,7 +1264,7 @@ div.right-panel {
   color: #FFF;
   padding: 2em 2em 4em 2em;
   position: relative;
-  width: 450px;
+  width: 430px;
   max-width: 100%;
   margin: 1em;
   min-height: 230px;
@@ -1464,7 +1462,7 @@ div.right-panel {
   top: 2em;
   right: 2em;
   margin-right: 1em;
-  z-index: 200;
+  z-index: 20;
   height: 2.5em;
   width: 70px;
   padding: 0 0.7em;
@@ -2002,6 +2000,9 @@ div.noOrg-container {
   margin-bottom: 2em;
   border-bottom: 1px solid #E0E6E3;
   padding: 0.1em 0 1.5em 0;
+  .profile-item-container {
+    padding: 1.5em 2em 2em 2em;
+  }
   h4 {
     margin-bottom: 1em;
   }
@@ -2223,7 +2224,7 @@ color: #777
   font-size: 0.9em
   }
   a:hover {
-  color: #979a8d;
+  color: @linkHover;
   }
 }
 .consent-checkbox {
@@ -2241,7 +2242,7 @@ color: #777
     text-decoration:underline;
   }
   a:hover {
-    color: #3c763d;
+    color: @linkHover;
   }
   .consentlist-header {
     background-color: @rowBackgroundColor;
@@ -2366,9 +2367,6 @@ div.timezone-warning.text-warning {
       margin-bottom: 0;
     }
   }
-  #profileStudyIDContainer {
-    margin-top: -2.5em !important;
-  }
   #profileForm {
     #bdGroup .flex {
       flex-wrap: nowrap !important;
@@ -2402,10 +2400,12 @@ div.timezone-warning.text-warning {
   label,
   legend,
   .tnth-form .form-group > label {
-    font-size: 13px;
+    font-size: 14px;
   }
-  #createUserLink {
-    font-size: @mediumText;
+  #createUserLink,
+  .btn,
+  .btn-tnth-primary {
+    font-size: 0.95em;
   }
   div.right-panel {
     margin-left: 0 !important;
@@ -2434,7 +2434,7 @@ div.timezone-warning.text-warning {
     padding: 0;
   }
   .profile-item-container {
-    padding: 2em;
+    padding: 1em;
     max-width: 100%;
   }
   .fixed-table-pagination {
