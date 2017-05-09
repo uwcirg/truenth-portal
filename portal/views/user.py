@@ -199,8 +199,9 @@ def account():
             user.update_orgs(org_list, acting_user=acting_user,
                             excuse_top_check=True)
         except NoResultFound:
-            abort (400, "ill formed organizations "
-                   "{}".format(request.json['organizations']))
+            abort (400, "Organization in {} not found, check "
+                   "/api/organization for existance.".format(
+                       request.json['organizations']))
 
     if request.json and 'consents' in request.json:
         try:
