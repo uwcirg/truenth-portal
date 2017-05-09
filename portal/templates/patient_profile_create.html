@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 {%- from "flask_user/_macros.html" import back_btn -%}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn -%}
+{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" class="form tnth-form to-validate">
@@ -30,6 +30,7 @@
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
                     {{profilePhone(False)}}
+                    {{profileAltPhone(False)}}
                     <div id="studyIdContainer" class="form-group">
                         <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
                         <input type="text" class="form-control" id="studyId" name="studyId"/>
@@ -249,7 +250,8 @@ $(document).ready(function(){
                     } else {
                         _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
                     };
-                    _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
+                    _demoArray['telecom'].push({ 'system': 'phone', 'use': 'mobile', 'value': $.trim($('input[name=phone]').val())});
+                    _demoArray['telecom'].push({ 'system': 'phone', 'use': 'home', 'value': $.trim($('input[name=altPhone]').val())});
 
                      var orgIDs = $('#userOrgs input:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
@@ -319,7 +321,7 @@ $(document).ready(function(){
     };
 
     function clear() {
-        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
+        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone', 'altPhone'].forEach(function(fieldName) {
             var currentElement = $('#' + fieldName);
             var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
             switch(_tagName.toLowerCase()) {

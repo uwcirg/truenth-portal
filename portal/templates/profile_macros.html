@@ -489,6 +489,13 @@
     </div>
 {%- endmacro %}
 
+{% macro profileAltPhone(person) -%}
+    <div id="altPhoneGroup" class="form-group float-input-label profile-section">
+        <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.alt_phone if person and person.alt_phone }}" />
+    </div>
+{%- endmacro %}
+
 {% macro resetPassword(person) %}
     <div id="resetPasswordGroup" class="form-group profile-section flex-item">
         <button id="btnPasswordResetEmail" class="btn btn-tnth-primary">{{ _("Send email") }}</button>
@@ -1654,6 +1661,7 @@
                         {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">
@@ -1662,6 +1670,7 @@
                     {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(person)}}{% endif -%}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
                 </div>
             </div>
         </div>
@@ -1789,6 +1798,7 @@
                         {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">
@@ -1797,6 +1807,7 @@
                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
                 </div>
             </div>
         </div>

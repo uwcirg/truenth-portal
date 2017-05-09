@@ -12,13 +12,14 @@ class Telecom(object):
     class wraps common functions.
 
     """
-    def __init__(self, phone=None, email=None, fax=None):
+    def __init__(self, phone=None, email=None, fax=None, alt_phone=None):
         self.phone = phone
         self.email = email
         self.fax = fax
+        self.alt_phone = alt_phone
 
     def __str__(self):
-        return "Telecom: {0.phone} {0.email}".format(self)
+        return "Telecom: {0.phone} {0.alt_phone} {0.email}".format(self)
 
     @classmethod
     def from_fhir(cls, data):
@@ -26,23 +27,38 @@ class Telecom(object):
         for item in data:
             attr = item.get('system')
             value = item.get('value')
+            use = item.get('use')
             if not hasattr(telecom, attr):
                 current_app.logger.warn(
                     "FHIR contains unexpected telecom system {system}"\
                     " ignoring {value}".format(**item))
-            elif getattr(telecom, attr, None):
+            elif getattr(telecom, attr, None) and not use:
                 current_app.logger.warn(
                     "FHIR contains multiple telecom entries for "\
                     "{system} ignoring {value}".format(**item))
+            elif use and use not in ['home','mobile']:
+                current_app.logger.warn(
+                    "FHIR contains unexpected telecom use {use}"\
+                    " ignoring {value}".format(**item))
+            elif use == 'home':
+                setattr(telecom, 'alt_phone', value)
             else:
                 setattr(telecom, attr, value)
         return telecom
 
     def as_fhir(self):
         telecom = []
-        for attr in ('phone', 'email', 'fax'):
+        for attr in ('email', 'fax'):
             value = getattr(self, attr, None)
             if value:
                 telecom.append({'system': attr,
                                 'value': value})
+        if self.phone:
+            telecom.append({'system':'phone',
+                            'value':self.phone,
+                            'use':'mobile'})
+        if self.alt_phone:
+            telecom.append({'system':'phone',
+                            'value':self.alt_phone,
+                            'use':'home'})
         return telecom
