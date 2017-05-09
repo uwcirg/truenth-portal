@@ -571,6 +571,9 @@ def set_user_consents(user_id):
         user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
+    if not request.json:
+        abort(400, "Requires JSON with submission including "
+              "HEADER 'Content-Type: application/json'")
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
