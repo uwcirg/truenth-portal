@@ -155,12 +155,12 @@ class SitePersistence(object):
 
         self.__write__(d)
 
-    def import_(self, include_interventions, keep_unmentioned):
+    def import_(self, exclude_interventions, keep_unmentioned):
         """If persistence file is found, import the data
 
-        :param include_interventions: if True, intervention data in the
+        :param exclude_interventions: if False, intervention data in the
             persistence file will be included (and potentially replace
-            existing intervention state).  if False, intervention data
+            existing intervention state).  if True, intervention data
             will be ignored.
 
         :param keep_unmentioned: if True, unmentioned data, such as
@@ -240,7 +240,7 @@ class SitePersistence(object):
             if existing:
                 details = StringIO()
                 if not dict_match(intervention_json, existing_json, details):
-                    if include_interventions:
+                    if not exclude_interventions:
                         self._log("Intervention {id} collision on "
                                   "import.  {details}".format(
                                       id=intervention.id,
@@ -248,18 +248,18 @@ class SitePersistence(object):
                         db.session.delete(existing)
                         db.session.add(intervention)
                     else:
-                        print ("WARNING: include_interventions not set and "
+                        print ("WARNING: exclude_intervention set and "
                                "'{}' differs with persistence".format(
                                    intervention.description))
                         print "{}".format(details.getvalue())
                         db.session.expunge(intervention)
             else:
-                if include_interventions:
+                if not exclude_interventions:
                     self._log("Intervention {} not found, "
                               "importing".format(intervention.id))
                     db.session.add(intervention)
                 else:
-                    print ("WARNING: include_interventions not set and "
+                    print ("WARNING: exclude_intervention set and "
                            "'{}' not present".format(
                                intervention_json))
                     if intervention in db.session:
@@ -332,13 +332,13 @@ class SitePersistence(object):
         if not keep_unmentioned:
             for intervention in Intervention.query.filter(
                 ~Intervention.name.in_(interventions_seen)):
-                if include_interventions:
+                if not exclude_interventions:
                     current_app.logger.info(
                         "Deleting Intervention not mentioned in "
                         "site_persistence: {}".format(intervention))
                     db.session.delete(intervention)
                 else:
-                    print ("WARNING: include_interventions not set and "
+                    print ("WARNING: exclude_interventions set and "
                            "'{}' in db but not in persistence".format(
                                intervention))
 
