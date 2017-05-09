@@ -32,7 +32,7 @@ class Telecom(object):
                 current_app.logger.warn(
                     "FHIR contains unexpected telecom system {system}"\
                     " ignoring {value}".format(**item))
-            elif getattr(telecom, attr, None) and attr != 'phone':
+            elif getattr(telecom, attr, None) and not use:
                 current_app.logger.warn(
                     "FHIR contains multiple telecom entries for "\
                     "{system} ignoring {value}".format(**item))
