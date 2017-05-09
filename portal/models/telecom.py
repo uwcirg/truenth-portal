@@ -36,6 +36,10 @@ class Telecom(object):
                 current_app.logger.warn(
                     "FHIR contains multiple telecom entries for "\
                     "{system} ignoring {value}".format(**item))
+            elif use and use not in ['home','mobile']:
+                current_app.logger.warn(
+                    "FHIR contains unexpected telecom use {use}"\
+                    " ignoring {value}".format(**item))
             elif use == 'home':
                 setattr(telecom, 'alt_phone', value)
             else:
