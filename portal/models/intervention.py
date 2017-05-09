@@ -92,6 +92,14 @@ class Intervention(db.Model):
             else:
                 setattr(instance, attr, None)
 
+        # static_link_url is special - generally we don't pull links
+        # from persisted format as each instance is configured to
+        # communicate with distinct interventions.  'static_link_url'
+        # is an exception - if present, set link_url to match - but
+        # don't include in exports
+        if 'static_link_url' in data:
+            instance.link_url = data['static_link_url']
+
         return instance
 
     def fetch_strategies(self):
