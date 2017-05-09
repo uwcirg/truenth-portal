@@ -4322,6 +4322,7 @@ only screen and (min-resolution: 2dppx) {
     letter-spacing: 5px;
     min-width: 218px;
     padding: 25px 30px;
+    margin: 0.5em auto;
 }
 .button--small,
 .box-modal form button,
@@ -6517,14 +6518,23 @@ figure.nav-overlay {
     text-align: right;
     position: absolute;
     left: 0;
-    bottom: -2.5em;
-    margin-top: 1em;
     opacity: 0.6;
-    right: 0;
+    right: 1em;
+    line-height: 1.8em;
 }
-@media (min-width: 435px) {
+@media (min-width: 768px) {
     .main--story .module figcaption {
-        right: 6em;
+        right: 4em;
+    }
+}
+@media (min-width: 496px) {
+    .main--story .module figcaption {
+        bottom: -2.5em;
+    }
+}
+@media (min-width: 992px) {
+    .main--story .module figcaption {
+        right: 8em;
     }
 }
 .module-wrap--story {
@@ -6533,17 +6543,22 @@ figure.nav-overlay {
 }
 @media (min-width: 770px) {
     .module-wrap--story {
-        padding-top: 20%;
+        padding-top: 22%;
     }
 }
 @media (min-width: 900px) {
     .module-wrap--story {
-        padding-top: 12%;
+        padding-top: 13%;
     }
 }
 @media (min-width: 1200px) {
     .module-wrap--story {
-        padding-top: 8%;
+        padding-top: 7%;
+    }
+}
+@media (min-width: 1658px) {
+    .module-wrap--story {
+        padding-top: 6.5%;
     }
 }
 .module-wrap--story .module {
@@ -6562,15 +6577,14 @@ figure.nav-overlay {
         padding: 0;
     }
 }
-
-@media (min-width: 992px) {
-    .module-wrap--story .module {
-        padding: 30px 0;
-    }
-}
 @media (min-width: 900px) {
     .module-wrap--story .module:first-of-type {
-        padding-top: 240px;
+        padding-top: 220px;
+    }
+}
+@media (min-width: 1200px) {
+    .module-wrap--story .module:first-of-type {
+        padding-top: 250px;
     }
 }
 .module-wrap--story .accent-heading {
@@ -6619,11 +6633,14 @@ figure.nav-overlay {
         padding-top: 18%;
         min-height: 380px;
 }
+.page-intro--lived-experience .page-intro__sub {
+    margin-top: 0.5em;
+}
 
 @media (min-width: 900px) {
     .page-intro--lived-experience .page-intro__content {
     	min-height: 420px;
-        padding-top: 220px;
+        padding-top: 210px;
     }
 }
 .module-wrap--background,
@@ -6691,11 +6708,6 @@ figure.nav-overlay {
 .module-wrap--background .module__head {
     font-size: 2em;
 }
-@media (min-width: 1600px) {
-    .module-wrap--background {
-        max-height: 508px;
-    }
-}
 @media (min-width: 1399px) {
     main .module-wrap--background .button-callout{
         margin-top: 1%;
@@ -6749,7 +6761,7 @@ figure.nav-overlay {
 .module-wrap--background .module--shift__right,
 .module-wrap--background .module--shift__left {
     z-index: 2;
-    padding: 4.5% 1%;
+    padding: 4.5% 1% 3.5% 1%;;
 }
 
 @media (max-width: 1199px) {
@@ -6799,19 +6811,34 @@ figure.nav-overlay {
     }
 }
 aside .module-wrap--background {
-    padding-top: 5%;
+    padding-top: 7%;
     padding-bottom: 0;
     background-position: 55%;
     transition: all 150ms ease-in;
 }
+@media (min-width: 450px) {
+    aside .module-wrap--background {
+        padding-top: 5%;
+    }
+}
+@media (min-width: 992px) {
+    aside .module-wrap--background {
+        padding-top: 4%;
+    }
+}
+@media (min-width: 1400px) {
+    aside .module-wrap--background {
+        padding-top: 2%;
+    }
+}
+@media (min-width: 1600px) {
+    aside .module-wrap--background {
+        padding-top: 1.5%;
+    }
+}
 @media (min-width: 1400px) {
 	aside .module-wrap--background {
 		background-position: 53%;
-	}
-}
-@media (min-width: 1300px) {
-	aside .module-wrap--background {
-		padding-top: 3%;
 	}
 }
 aside .module-wrap--background .module__head {
@@ -6875,24 +6902,14 @@ aside .module--flex {
     margin-top: 2em;
     margin-bottom: 2em;
     position: relative;
-    padding-top: 0px;
-    padding-bottom: 56.9%;
-    height: 0;
+    padding: 0 0 56.9% 0;
+    height: 100%;
     overflow: hidden;
     max-width: 100%;
     transition: all 500ms ease-in;
     display: block;
+    background-color: #f1efec;
 }
-@media (min-width: 750px) {
-    .sprout-video-container {
-        padding-bottom: 56%;
-    }
-}
-.sprout-video-container.inline {
-    display: inline-block;
-    padding-bottom: 40%;
-}
-
 .sprout-video-container .embed-video {
     position: absolute;
     top: 0;
@@ -6902,6 +6919,12 @@ aside .module--flex {
     height: 100%;
     margin-left: -1px;
     transition: all 250ms ease-in;
+    background-color: #f1efec;
+}
+@media (min-width: 992px) {
+    .sprout-video-container .embed-video {
+        height: 99%;
+    }
 }
 .button--video {
     position: absolute;
@@ -6950,8 +6973,18 @@ aside .module--flex {
         width: 250px;
         padding: 0.5em;
         font-size: 0.85em;
-        top: 42%;
+        top: 38%;
         height: 3.5em;
+    }
+}
+@media (min-width: 768px) {
+    .button--video {
+        top: 40%;
+    }
+}
+@media (min-width: 992px) {
+    .button--video {
+        top: 41%;
     }
 }
 .button--video__overlay {
