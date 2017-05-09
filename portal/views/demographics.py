@@ -146,6 +146,9 @@ def demographics_set(patient_id):
               "HEADER 'Content-Type: application/json'")
     if request.json.get('resourceType') != 'Patient':
         abort(400, "Requires FHIR resourceType of 'Patient'")
+    if request.json.get('organizations'):
+        abort(400, "FHIR Patient Resource uses 'careProvider' "
+              "for organizations")
     try:
         patient.update_from_fhir(request.json, acting_user=current_user())
     except MissingReference, e:
