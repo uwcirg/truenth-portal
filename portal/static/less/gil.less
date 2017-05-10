@@ -7730,29 +7730,49 @@ aside .module-wrap--background .module__head {
 }
 .home--items-wrapper {
     .link-container {
-        margin: 0 1em 2em 1.1em;
+        max-width: 800px;
         display: flex;
-        justify-content: center;
-        flex-flow: row wrap;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin: 0 1em 0 1.2em;
     }
     .link-box {
         padding: 1em;
         height: 5em;
         min-height: 4em;
         max-width: 100%;
-        margin: 0.5em 0.2em;
+        margin: 1em auto;
         text-align: center;
-        color: #BCC2A6;
+        color: #FFF;
         text-transform: uppercase;
         letter-spacing: 2px;
-        background-color: rgba(57, 56, 51, 0.8);
+        background-color: #7C959E;
+        border: 1px #7C959E solid;
         cursor: pointer;
-        a {
-            color: #BCC2A6;
-        }
-        a:hover {
+        & a {
             color: #FFF;
         }
+        &:hover {
+            background: #576e76;
+            border: #576e76;
+        }
+    }
+}
+@media (min-width: 901px) {
+    .home--items-wrapper .link-box {
+        margin: 0.5em auto;
+        width: 330px;
+        max-width: 100%;
+    }
+}
+@media (min-width: 681px) {
+    .home--items-wrapper .link-container {
+        margin: 0 auto;
+    }
+}
+@media (min-width: 901px) {
+    .home--items-wrapper .link-container {
+        margin: 0 auto 4em auto;
     }
 }
 .home--registration-container p {
