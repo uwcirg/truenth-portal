@@ -964,8 +964,10 @@ div.right-panel {
   transition: opacity 250ms ease-in;
   &.ready {
     opacity: 1;
+    z-index: 1;
     & + #instrumentListLoad {
       opacity: 0;
+      z-index: -1;
     }
   }
 }
