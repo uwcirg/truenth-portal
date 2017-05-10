@@ -79,7 +79,7 @@ def sync():
         db.create_all()
     stamp_db()
     upgrade_db()
-    seed(include_interventions=True)
+    seed()
 
 
 @click.option('--exclude_interventions', '-e', default=False,
