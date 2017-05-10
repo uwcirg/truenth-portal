@@ -897,6 +897,7 @@ div.right-panel {
 }
 #patientsInstrumentList.ready + #instrumentListLoad {
   opacity: 0;
+  z-index: -1;
 }
 .instrument-container label {
   min-width: 100px;
@@ -910,6 +911,7 @@ div.right-panel {
   margin: 1.5em;
   opacity: 1;
   transition: opacity 250ms ease-out;
+  z-index: 1;
 }
 #patientsDownloadTypeList {
   margin-top: 0.5em;
