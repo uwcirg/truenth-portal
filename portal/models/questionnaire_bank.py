@@ -48,12 +48,19 @@ class QuestionnaireBank(db.Model):
             self.classification = data['classification']
         self.organization_id = Reference.parse(
             data['organization']).id
-        self.add_if_not_found(commit_immediately=True)
+        self = self.add_if_not_found(commit_immediately=True)
+        qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_fhir(
                 q)
             questionnaire.questionnaire_bank_id = self.id
             questionnaire = questionnaire.add_if_not_found(True)
+            qs_named.add(questionnaire)
+
+        # remove any stale
+        for unwanted in set(self.questionnaires) - qs_named:
+            self.questionnaires.remove(unwanted)
+            db.session.delete(unwanted)
 
     def as_json(self):
         d = {}
