@@ -11,7 +11,7 @@ from .reference import Reference
 
 classification_types = ('baseline', 'recurring', 'indefinite')
 classification_types_enum = ENUM(
-    *classification_types, name='classification', create_type=False)
+    *classification_types, name='classification_enum', create_type=False)
 
 
 class QuestionnaireBank(db.Model):
@@ -19,7 +19,8 @@ class QuestionnaireBank(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
     classification = db.Column(
-        'classification', classification_types_enum, default='baseline')
+        'classification', classification_types_enum,
+        server_default='baseline', nullable=False)
     questionnaires = db.relationship(
         'QuestionnaireBankQuestionnaire',
         back_populates='questionnaire_bank',
@@ -32,7 +33,8 @@ class QuestionnaireBank(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "QuestionnaireBank {0.id} {0.name}".format(self)
+        return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
+            self)
 
     @classmethod
     def from_json(cls, data):
