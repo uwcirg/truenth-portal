@@ -132,7 +132,7 @@ def export_site():
     help='Email of user to act as.',
     prompt= \
         "\n\nWARNING!!!\n\n"
-        " This will permanently the target user and all their related data.\n"
+        " This will permanently delete the target user and all their related data.\n"
         " If you want to contiue,"
         " enter a valid user email as the acting party for our records"
 )
