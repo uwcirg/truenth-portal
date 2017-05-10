@@ -127,10 +127,20 @@ def export_site():
 
 
 @click.option('--email', '-e', help='Email of user to purge.')
+@click.option(
+    '--actor', '-a',
+    help='Email of user to act as.',
+    prompt= \
+        "\n\nWARNING!!!\n\n"
+        " This will permanently the target user and all their related data.\n"
+        " If you want to contiue,"
+        " enter a valid user email as the acting party for our records"
+)
 @app.cli.command()
-def purge_user(username):
+def purge_user(email, actor):
     """Purge the given user from the system"""
-    permanently_delete_user(username)
+    # import ipdb; ipdb.set_trace()
+    permanently_delete_user(email, actor=actor)
 
 
 @app.cli.command()
