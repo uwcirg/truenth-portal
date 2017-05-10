@@ -1276,9 +1276,10 @@
                      <table>
                         <tr><td class="text-muted">{{_("Have you had a prostate cancer biopsy?")}}</td><td><div id="biopsy_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Have you been diagnosed with prostate cancer?")}}</td><td><div id="pca_diag_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Is the prostate cancer only within the prostate?")}}</td><td><div id="pca_localized_view"></div></td></tr>
                    </table>
                 </div>
-                <div id="patientQContainer" class="edit-container well">
+                <div id="patientQContainer" class="edit-container">
                     {{patientQGroup(current_user)}}
                 </div>
             </div>
@@ -1303,9 +1304,8 @@
         };
         $(function () {
             $("#patientQ").show();
-            //don't show treatment & pca localized questions
+            //don't show treatment
             $("#patTx").remove();
-            $("#patMeta").remove();
 
             $("#patientQ hr").hide();
             {% if person and current_user and person.id != current_user.id %}
@@ -1327,6 +1327,7 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
+                              $("#biopsyDate").datepicker("hide").blur();
                               tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
                             };
                         };

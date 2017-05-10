@@ -372,12 +372,15 @@ var fillViews = {
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-            if (hasValue(content)) $("#biopsy_view").html(content);
+            if (hasValue(content)) $("#biopsy_view").html("<div>" + content + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>No answer provided</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_diag_view").text(content);
+        if (hasValue(content)) $("#pca_diag_view").html("<div>" + content + "</div>");
         else $("#pca_diag_view").html("<p class='text-muted'>No answer provided</p>");
+        content = $("#patMeta input[name='pca_localized']:checked").closest("label").text();
+        if (hasValue(content)) $("#pca_localized_view").html("<div>" + content + "</div>");
+        else $("#pca_localized_view").html("<p class='text-muted'>No answer provided</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
