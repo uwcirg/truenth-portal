@@ -54,16 +54,3 @@
      </div>
     </main>
 {% endblock %}
-{% block document_ready %}
-<script>
-    $(document).ready(function() {
-        $(".button--video").on("click", function(e) {
-            e.stopPropagation();
-            var videoSrc = $(this).next("iframe.embed-video").attr("src");
-            $(this).next("iframe.embed-video").attr("src", videoSrc + "?autoplay=true");
-            $(".button--video__overlay").hide();
-            $(this).fadeOut();
-        });
-    });
-</script>
-{% endblock %}
