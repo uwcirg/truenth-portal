@@ -1,5 +1,7 @@
 """Questionnaire Bank module"""
+from collections import defaultdict
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from .organization import OrgTree
@@ -7,10 +9,17 @@ from .questionnaire import Questionnaire
 from .reference import Reference
 
 
+classification_types = ('baseline', 'recurring', 'indefinite')
+classification_types_enum = ENUM(
+    *classification_types, name='classification', create_type=False)
+
+
 class QuestionnaireBank(db.Model):
     __tablename__ = 'questionnaire_banks'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
+    classification = db.Column(
+        'classification', classification_types_enum, default='baseline')
     questionnaires = db.relationship(
         'QuestionnaireBankQuestionnaire',
         back_populates='questionnaire_bank',
@@ -33,6 +42,8 @@ class QuestionnaireBank(db.Model):
 
     def update_from_json(self, data):
         self.name = data['name']
+        if 'classification' in data:
+            self.classification = data['classification']
         self.organization_id = Reference.parse(
             data['organization']).id
         self.add_if_not_found(commit_immediately=True)
@@ -46,6 +57,7 @@ class QuestionnaireBank(db.Model):
         d = {}
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
+        d['classification'] = self.classification
         d['organization'] = Reference.organization(
             self.organization_id).as_fhir()
         d['questionnaires'] = [q.as_fhir() for q in self.questionnaires]
@@ -77,18 +89,21 @@ class QuestionnaireBank(db.Model):
         QuestionnaireBanks are associated with a user through the top
         level organization affiliation.
 
-        :return: list of QuestionnaireBankQuestionnaire objects for given user
+        :return: dictionary keyed by QuestionnaireBank.classification
+            with list of QuestionnaireBankQuestionnaire objects for
+            said classification for given user
 
         """
-        qs = []
+        results = defaultdict(list)
         OT = OrgTree()
         for org in user.organizations:
             # Only top level orgs named in associations w/ QuestionnairBanks
             top = OT.find(org.id).top_level()
-            qb = QuestionnaireBank.query.filter_by(organization_id=top).first()
-            if qb:
-                qs += [q for q in qb.questionnaires]
-        return qs
+            qbs = QuestionnaireBank.query.filter_by(organization_id=top)
+            for qb in qbs:
+                results[qb.classification].extend(
+                    [q for q in qb.questionnaires])
+        return results
 
 
 class QuestionnaireBankQuestionnaire(db.Model):

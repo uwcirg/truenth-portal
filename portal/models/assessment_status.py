@@ -162,13 +162,14 @@ class AssessmentStatus(object):
 
         # instrument/questionnaire list comes from the QuestionnaireBank
         # associated with this user
-        questionnaires = QuestionnaireBank.q_for_user(self.user)
-        if not questionnaires:
+        questionnaires_by_classification = QuestionnaireBank.q_for_user(
+            self.user)
+        if not questionnaires_by_classification.get('baseline'):
             self._overall_status = 'Not Enrolled'
             self._details_obtained = True
             return
 
-        for q in questionnaires:
+        for q in questionnaires_by_classification['baseline']:
             self.__status_per_instrument(
                 q.name, q.days_till_due, q.days_till_overdue)
 
