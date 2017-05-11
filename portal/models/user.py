@@ -113,7 +113,7 @@ class UserTimezone(CCExtension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username, user_id=None, acting_user=None):
+def permanently_delete_user(username, user_id=None, acting_user=None, actor=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
@@ -128,15 +128,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
-    # todo: move to click prompt
+
     if not acting_user:
-        actor = raw_input(
-            "\n\nWARNING!!!\n\n"
-            " This will permanently destroy user: {}\n"
-            " and all their related data.\n\n"
-            " If you want to contiue, enter a valid user\n"
-            " email as the acting party for our records: ".
-            format(username))
         acting_user = User.query.filter_by(username=actor).first()
     if not acting_user:
         raise ValueError("Acting user not found -- can't continue")
