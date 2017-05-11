@@ -18,6 +18,7 @@ from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, AboutATMA, VersionedResource
 from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
+from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -26,6 +27,7 @@ from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
 from ..tasks import add, post_request
+from jinja2 import TemplateNotFound
 
 
 portal = Blueprint('portal', __name__)
@@ -143,6 +145,13 @@ def exercise_and_diet():
 @portal.route('/lived-experience')
 def lived_experience():
     return render_template('gil/lived-experience.html', user=current_user())
+
+@portal.route('/stories/<string:page_name>')
+def stories(page_name):
+    try:
+        return render_template('gil/%s.html' % page_name.replace('-', '_'))
+    except TemplateNotFound as err:
+        return page_not_found(err)
 
 class ShortcutAliasForm(FlaskForm):
     shortcut_alias = StringField('Code', validators=[validators.Required()])
@@ -654,6 +663,12 @@ def explore():
 @portal.route('/shareYourStory')
 def share_story():
     return redirect(url_for('static', filename='files/LivedExperienceVideo.pdf'))
+
+@portal.route('/robots.txt')
+def robots():
+    if current_app.config["SYSTEM_TYPE"].lower() == "production":
+        return "User-agent: * \nAllow: /"
+    return "User-agent: * \nDisallow: /"
 
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():

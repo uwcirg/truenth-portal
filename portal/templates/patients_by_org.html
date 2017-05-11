@@ -24,7 +24,7 @@
                     <div id="patientsInstrumentListWrapper">
                       <div id="patientsInstrumentList" class="profile-radio-list">
                         {% for instrument_code in config["INSTRUMENTS"] | sort() %}
-                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label style="min-width: 100px; max-width: 100%"><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
+                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
                         </div>
                         {% endfor %}
                       </div>
@@ -101,6 +101,7 @@
                    <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -120,6 +121,9 @@
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
+                      {% endif %}
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
+                        <td>{{ patient.external_study_id }}</td>
                       {% endif %}
                       <td><!--consent datefield--></td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>

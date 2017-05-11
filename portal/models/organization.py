@@ -3,17 +3,21 @@
 Designed around FHIR guidelines for representation of organizations, locations
 and healthcare services which are used to describe hospitals and clinics.
 """
+from datetime import datetime
 from sqlalchemy import UniqueConstraint, and_
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask import url_for
+from werkzeug.exceptions import Unauthorized
 
 import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
 from .app_text import VersionedResource
 from ..database import db
-from .fhir import CodeableConcept, FHIR_datetime
+from ..date_tools import FHIR_datetime
+from .extension import CCExtension
 from .identifier import Identifier
-import reference
+from .reference import Reference
+from .role import Role, ROLE
 from .telecom import Telecom
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
@@ -47,6 +51,8 @@ class Organization(db.Model):
             secondary="organization_addresses")
     identifiers = db.relationship('Identifier', lazy='dynamic',
             secondary="organization_identifiers")
+    locales = db.relationship('Coding', lazy='dynamic',
+            secondary="organization_locales")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __init__(self, **kwargs):
@@ -128,6 +134,8 @@ class Organization(db.Model):
         return org.update_from_fhir(data)
 
     def update_from_fhir(self, data):
+        from .fhir import CodeableConcept  # local to avoid cycle
+
         if 'id' in data:
             self.id = data['id']
         if 'name' in data:
@@ -142,11 +150,15 @@ class Organization(db.Model):
         if 'type' in data:
             self.type = CodeableConcept.from_fhir(data['type'])
         if 'partOf' in data:
-            self.partOf_id = reference.Reference.parse(data['partOf']).id
+            self.partOf_id = Reference.parse(data['partOf']).id
         for attr in ('use_specific_codings','race_codings',
                     'ethnicity_codings','indigenous_codings'):
             if attr in data:
                 setattr(self, attr, data.get(attr))
+        if 'extension' in data:
+            for e in data['extension']:
+                instance = org_extension_map(self, e)
+                instance.apply_fhir()
         if 'identifier' in data:
             for id in data['identifier']:
                 identifier = Identifier.from_fhir(id).add_if_not_found()
@@ -168,7 +180,7 @@ class Organization(db.Model):
         if self.type:
             d['type'] = self.type.as_fhir()
         if self.partOf_id:
-            d['partOf'] = reference.Reference.organization(
+            d['partOf'] = Reference.organization(
                 self.partOf_id).as_fhir()
         if self.coding_options:
             for attr in ('use_specific_codings','race_codings',
@@ -177,6 +189,14 @@ class Organization(db.Model):
                     d[attr] = True
                 else:
                     d[attr] = False
+        extensions = []
+        for kls in org_extension_classes:
+            instance = org_extension_map(self, {'url': kls.extension_url})
+            data = instance.as_fhir()
+            if data:
+                extensions.append(data)
+        if extensions:
+            d['extension'] = extensions
         if self.identifiers:
             d['identifier'] = []
         for id in self.identifiers:
@@ -235,6 +255,53 @@ class Organization(db.Model):
             resource.organization_name = org.name
             agreements[org.id] = resource
         return agreements
+
+
+class OrganizationLocale(db.Model):
+    __tablename__ = 'organization_locales'
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.ForeignKey('organizations.id', ondelete='CASCADE'),
+                        nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('organization_id', 'coding_id',
+        name='_organization_locale_coding'),)
+
+
+class LocaleExtension(CCExtension):
+    def __init__(self, organization, extension):
+        self.organization, self.extension = organization, extension
+
+    extension_url = "http://hl7.org/fhir/valueset/languages"
+
+    @property
+    def children(self):
+        return self.organization.locales
+
+
+org_extension_classes = (LocaleExtension,)
+
+
+def org_extension_map(organization, extension):
+    """Map the given extension to the Organization
+
+    FHIR uses extensions for elements beyond base set defined.  Lookup
+    an adapter to handle the given extension for the organization.
+
+    :param organization: the org to apply to or read the extension from
+    :param extension: a dictionary with at least a 'url' key defining
+        the extension.
+
+    :returns: adapter implementing apply_fhir and as_fhir methods
+
+    :raises :py:exc:`exceptions.ValueError`: if the extension isn't recognized
+
+    """
+    for kls in org_extension_classes:
+        if extension['url'] == kls.extension_url:
+            return kls(organization, extension)
+    # still here implies an extension we don't know how to handle
+    raise ValueError("unknown extension: {}".format(extension.url))
 
 
 class UserOrganization(db.Model):
@@ -460,6 +527,40 @@ class OrgTree(object):
             children = self.here_and_below_id(organization_id)
             if other_organization_id in children:
                 return True
+
+    def visible_patients(self, staff_user):
+        """Returns patient IDs for whom the current staff_user can view
+
+        Staff users can view all patients at or below their own org
+        level.
+
+        """
+        from .user import User, UserRoles  # local to avoid cycle
+        from .user_consent import UserConsent
+
+        if not (
+            staff_user.has_role(ROLE.STAFF) or
+            staff_user.has_role(ROLE.STAFF_ADMIN)):
+            raise Unauthorized("visible_patients() exclusive to staff use")
+
+        staff_user_orgs = set()
+        for org in staff_user.organizations:
+            staff_user_orgs.update(self.here_and_below_id(org.id))
+
+        if not staff_user_orgs:
+            return []
+
+        patient_role_id = Role.query.filter_by(name=ROLE.PATIENT).one().id
+        now = datetime.utcnow()
+        query = db.session.query(User.id).join(
+            UserRoles).join(UserConsent).join(UserOrganization).filter(
+                User.deleted_id == None,
+                UserRoles.role_id == patient_role_id,
+                UserConsent.deleted_id == None,
+                UserConsent.expires > now,
+                UserOrganization.organization_id.in_(staff_user_orgs))
+
+        return [u[0] for u in query]  # flaten return tuples to list of ids
 
 
 def add_static_organization():

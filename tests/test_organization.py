@@ -5,6 +5,7 @@ import os
 
 from portal.extensions import db
 from portal.system_uri import PRACTICE_REGION, SHORTCUT_ALIAS
+from portal.models.fhir import Coding
 from portal.models.identifier import Identifier
 from portal.models.organization import Organization, OrgTree
 from portal.models.organization import OrganizationIdentifier
@@ -21,6 +22,9 @@ class TestOrganization(TestCase):
             'organization-example-f001-burgers.json'), 'r') as fhir_data:
             data = json.load(fhir_data)
 
+        #prepopuate database with matching locale
+        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
+                  'system': "urn:ietf:bcp:47"})
         org = Organization.from_fhir(data)
         self.assertEquals(org.addresses[0].line1,
                           data['address'][0]['line'][0])
@@ -31,6 +35,7 @@ class TestOrganization(TestCase):
         self.assertTrue(org.use_specific_codings)
         self.assertTrue(org.race_codings)
         self.assertFalse(org.ethnicity_codings)
+        self.assertEquals(org.locales.count(),1)
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
@@ -83,6 +88,26 @@ class TestOrganization(TestCase):
 
         # use api to obtain FHIR
         rv = self.client.get('/api/organization/{}'.format(org.id))
+        self.assert200(rv)
+
+    def test_organization_get_by_identifier(self):
+        org_id_system = "testsystem"
+        org_id_value = "testval"
+        self.login()
+        org = Organization(name='test',id=999)
+        ident = Identifier(id=99,system=org_id_system,value=org_id_value)
+        org_ident = OrganizationIdentifier(organization_id=999,
+                                            identifier_id=99)
+        with SessionScope(db):
+            db.session.add(org)
+            db.session.add(ident)
+            db.session.commit()
+            db.session.add(org_ident)
+            db.session.commit()
+
+        # use api to obtain FHIR
+        rv = self.client.get('/api/organization/{}/{}'.format(org_id_system,
+                                            org_id_value))
         self.assert200(rv)
 
     def test_organization_list(self):
@@ -186,6 +211,10 @@ class TestOrganization(TestCase):
             db.session.commit()
         org = db.session.merge(org)
         org_id = org.id
+
+        #prepopuate database with matching locale
+        Coding.from_fhir({'code': 'en_AU', 'display': 'Australian English',
+                  'system': "urn:ietf:bcp:47"})
 
         rv = self.client.put('/api/organization/{}'.format(org_id),
                           content_type='application/json',
@@ -331,29 +360,3 @@ class TestOrganization(TestCase):
         self.assertEquals(len(nodes), 4)
         for i in (102, 1002, 10031, 10032):
             self.assertTrue(i in nodes)
-
-    def test_coding_option_inheritance(self):
-        # create parent with specific coding options
-        parent = Organization(id=101, name='test parent')
-        parent.use_specific_codings = True
-        parent.race_codings = True
-        parent.ethnicity_codings = False
-        parent.indigenous_codings = False
-        with SessionScope(db):
-            db.session.add(parent)
-            db.session.commit()
-        parent = db.session.merge(parent)
-        parent_id = parent.id
-        # create child org, test inheritance of coding options
-        org = Organization(name='test', partOf_id=101)
-        org.use_specific_codings = False
-        with SessionScope(db):
-            db.session.add(org)
-            db.session.commit()
-        org = db.session.merge(org)
-        self.assertTrue(org.id)
-        self.assertEquals(org.partOf_id, parent_id)
-        self.assertFalse(org.use_specific_codings)
-        self.assertTrue(org.race_codings)
-        self.assertFalse(org.ethnicity_codings)
-        self.assertFalse(org.indigenous_codings)

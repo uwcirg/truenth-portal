@@ -1,5 +1,4 @@
 """User model """
-from abc import ABCMeta, abstractproperty
 from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
@@ -8,7 +7,6 @@ import pytz
 from sqlalchemy import text
 from sqlalchemy.orm import synonym
 from sqlalchemy import and_, or_, UniqueConstraint
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
 from StringIO import StringIO
@@ -20,7 +18,9 @@ from .audit import Audit
 from ..dict_tools import dict_match
 from .encounter import Encounter
 from ..database import db
-from .fhir import as_fhir, FHIR_datetime, Observation, UserObservation
+from ..date_tools import as_fhir, FHIR_datetime
+from .extension import CCExtension
+from .fhir import Observation, UserObservation
 from .fhir import Coding, CodeableConcept, ValueQuantity
 from .identifier import Identifier
 from .intervention import UserIntervention
@@ -44,52 +44,12 @@ internal_identifier_systems = (
     TRUENTH_ID, TRUENTH_USERNAME) + TRUENTH_PROVIDER_SYSTEMS
 
 
-class Extension:
-    """Abstract base class for common user extension FHIR objects"""
-    __metaclass__ = ABCMeta
-
+class UserIndigenousStatusExtension(CCExtension):
+    # Used in place of us-core-race and us-core-ethnicity for
+    # Australian configurations.
     def __init__(self, user, extension):
         self.user, self.extension = user, extension
 
-    @abstractproperty
-    def children(self):  # pragma: no cover
-        pass
-
-    def as_fhir(self):
-        if self.children.count():
-            return {
-                'url': self.extension_url,
-                'valueCodeableConcept': {
-                    'coding': [c.as_fhir() for c in self.children]}
-            }
-
-    def apply_fhir(self):
-        assert self.extension['url'] == self.extension_url
-        # track current concepts - must remove any not requested
-        remove_if_not_requested = {e.code: e for e in self.children}
-
-        for coding in self.extension['valueCodeableConcept']['coding']:
-            try:
-                concept = Coding.query.filter_by(
-                    system=coding['system'], code=coding['code']).one()
-            except NoResultFound:
-                raise ValueError("Unknown code: {} for system{}".format(
-                                     coding['code'], coding['system']))
-            if concept.code in remove_if_not_requested:
-                # The concept existed before and is to be retained
-                remove_if_not_requested.pop(concept.code)
-            else:
-                # Otherwise, it's new; add it
-                self.children.append(concept)
-
-        # Remove the stale concepts that weren't requested again
-        for concept in remove_if_not_requested.values():
-            self.children.remove(concept)
-
-
-class UserIndigenousStatusExtension(Extension):
-    # Used in place of us-core-race and us-core-ethnicity for
-    # Australian configurations.
     extension_url = TRUENTH_EXTENSTION_NHHD_291036
 
     @property
@@ -97,7 +57,10 @@ class UserIndigenousStatusExtension(Extension):
         return self.user.indigenous
 
 
-class UserEthnicityExtension(Extension):
+class UserEthnicityExtension(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/us-core-ethnicity"
 
@@ -106,7 +69,10 @@ class UserEthnicityExtension(Extension):
         return self.user.ethnicities
 
 
-class UserRaceExtension(Extension):
+class UserRaceExtension(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/us-core-race"
 
@@ -115,7 +81,10 @@ class UserRaceExtension(Extension):
         return self.user.races
 
 
-class UserTimezone(Extension):
+class UserTimezone(CCExtension):
+    def __init__(self, user, extension):
+        self.user, self.extension = user, extension
+
     extension_url =\
        "http://hl7.org/fhir/StructureDefinition/user-timezone"
 
@@ -499,6 +468,19 @@ class User(db.Model, UserMixin):
         return self._identifiers
 
     @property
+    def external_study_id(self):
+        """Return the value of the user's external study identifier(s)
+
+        If more than one external study identifiers are found for the user,
+        values will be joined by ', '
+
+        """
+        ext_ids = self._identifiers.filter_by(system='http://us.truenth.org/' \
+                                    'identity-codes/external-study-id')
+        if ext_ids.count():
+            return ', '.join([ext_id.value for ext_id in ext_ids])
+
+    @property
     def org_coding_display_options(self):
         """Collates all race/ethnicity/indigenous display options
         from the user's orgs to establish which options to display"""
@@ -512,6 +494,21 @@ class User(db.Model, UserMixin):
             attrs = ('race','ethnicity','indigenous')
             options = dict.fromkeys(attrs,True)
         return options
+
+
+    @property
+    def locale_display_options(self):
+        """Collates all the locale options from the user's orgs
+        to establish which should be visible to the user"""
+        locale_options = set()
+        for org in self.organizations:
+            for locale in org.locales:
+                locale_options.add(locale.code)
+            while org.partOf_id:
+                org = Organization.query.get(org.partOf_id)
+                for locale in org.locales:
+                    locale_options.add(locale.code)
+        return locale_options
 
 
     def add_organization(self, organization_name):

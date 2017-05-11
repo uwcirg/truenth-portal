@@ -14,10 +14,10 @@
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="Birthday must be valid and in required format." data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
             <div class="flex-item" id="bdMonthContainer">
-                <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="Birthday must be valid and in required format." data-error-field="errorbirthday" required>
+                <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
                     <option value="02">{{ _("February") }}</option>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="Birthday must be valid and in required format." data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -73,8 +73,12 @@
     <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
+          {%- if (person and ("en_US" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_US" -%}
           <option value="en_US" {{ "selected" if ((person and person.locale_code == "en_US") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_US")) }}>{{ _("American English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_US" }}</option>
+          {%- endif -%}
+          {%- if (person and ("en_AU" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_AU" -%}
           <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
+          {%- endif -%}
         </select>
      </div>
      <script>$(function () {
@@ -279,6 +283,7 @@
                 url: '/api/user/' + $("#_userId").val() + '/access_url',
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json',
+                cache: false,
                 async: false
             }).done(function(data) {
                 url = data['access_url'];
@@ -313,20 +318,46 @@
                 var subject = '';
                 var body = '';
                 var return_url = '';
+                var parentName = "";
+                var selectedOrg = $("#userOrgs input[name='organization']:checked");
                 var clinicName = (function() {
-                    var orgs = $("#userOrgs input[name='organization']:checked").not('[parent_org]');
-                    var parentName = "";
-                    if (orgs.length > 0 ) {
-                        orgs.each(function() {
-                            if (!parentName) {
-                                parentName = $(this).attr("data-parent-name");
-                                if (!hasValue(parentName)) parentName = $(this).closest(".org-container[data-parent-id]").attr("data-parent-name");
-                                //console.log("pn: " + parentName)
+                    var cn = "";
+                    if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
+                    if (!hasValue(cn)) cn = "your clinic";
+                    return cn;
+                })();
+                var parentName = (function() {
+                    var pName = "";
+                    if (selectedOrg.length > 0) {
+                        pName = $(selectedOrg).attr("data-parent-name");
+                        if (!hasValue(pName)) pName = $(selectedOrg).closest(".org-container[data-parent-id]").attr("data-parent-name");
+                    };
+                    return pName;
+                })();
+                var greeting = (function() {
+                    var fname = "";
+                    var lname = "";
+                    if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+                        fname = $("#firstname").val();
+                        lname = $("#lastname").val();
+                    } else {
+                        $.ajax ({
+                            type: "GET",
+                            url: '/api/demographics/{{person.id}}',
+                            async: false,
+                            cache: false
+                        }).done(function(data) {
+                            if (data && data.name) {
+                                fname = data.name.given;
+                                lname = data.name.family;
                             };
+                        }).fail(function() {
                         });
                     };
-                    var cn = parentName ? parentName: "your clinic";
-                    return cn;
+                    var txt = "Hello";
+                    if (hasValue(fname)) txt += " " + fname;
+                    if (hasValue(lname)) txt += " " + lname;
+                    return txt;
                 })();
                 if (selectedOption.val() == 'invite'){
                     return_url = getAccessUrl();
@@ -334,9 +365,10 @@
                         {#- javascript variables are not available at template
                            rendering time.  insert a placeholder and then
                            replace once the variable is available. -#}
-                        body = '{{ app_text('profileSendEmail invite email_body',
-                                'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
-                        body = body.replace(/url_placeholder/g, return_url);
+                        body = '{{ app_text('profileSendEmail invite email_body', 'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
+                        body = body.replace(/\(greeting\)/g, greeting);
+                        body = body.replace(/\(parent org\)/g, parentName);
+                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
                         subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
                     };
                 }
@@ -348,6 +380,7 @@
                     $.ajax ({
                         type: 'POST',
                         url: '/invite',
+                        cache: false,
                         contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                         data: {'subject': subject, 'recipients': email, 'body': body}
                     }).done(function(data) {
@@ -823,8 +856,6 @@
     $(function () {
          var ww = $(window).width();
          var prUserId = $("#pr_user_id").val();
-         var userTimeZone = getUserTimeZone(prUserId);
-         var userLocale = getUserLocale(prUserId);
 
         $.ajax ({
             type: "GET",
@@ -835,8 +866,7 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
-                    if (String(userTimeZone).toUpperCase() != "UTC") item["uploaded_at"] = convertUserDateTimeByLocaleTimeZone(String(item["uploaded_at"]), userTimeZone, userLocale);
-                    else item["uploaded_at"] = String(item["uploaded_at"]).replace(/[tz]/gi, " ");
+                    item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
                 });
@@ -908,6 +938,7 @@
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
+        var isTestPatient = {%-if person and person.has_role(ROLE.TEST) and person.id != current_user.id-%}true{%-else-%}false{%-endif-%};
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
 
         /**** this function is used when this section becomes editable ****/
@@ -947,9 +978,6 @@
         $(function () {
              var ww = $(window).width();
              var auditUserId = $("#audit_user_id").val();
-             var userTimeZone = getUserTimeZone(auditUserId);
-             var userLocale = getUserLocale(auditUserId);
-
             $.ajax ({
                 type: "GET",
                 url: '/api/user/' + $("#audit_user_id").val() + '/audit',
@@ -967,9 +995,7 @@
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
                         //console.log(r.exec(String(item["by"])));
-
-                        if (String(userTimeZone).toUpperCase() != "UTC") item["lastUpdated"] = convertUserDateTimeByLocaleTimeZone(String(item["lastUpdated"]), userTimeZone, userLocale);
-                        else item["lastUpdated"] = String(item["lastUpdated"]).replace(/[tz]/gi, " ");
+                        item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -1009,7 +1035,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: 'Date/Time' + (userTimeZone == "UTC" ? "<span class='gmt'> (GMT)</span>" : ($(".timezone-error").text() == "" ? "" : ("<span class='gmt'> (GMT)</span>"))),
+                                title: "{%trans%}Date/Time <span class='gmt'> (GMT), Y-M-D</span>{%endtrans%}",
                                 sortable: true,
                                 searchable: true,
                                 /******
@@ -1072,7 +1098,7 @@
         <input type="hidden" id="_session_user_id" value="{{person.id if person}}"/>
         <table id="userSessionListTable" class="tnth-admin-table table table-hover table-condensed table-striped table-bordered table-responsive small-text">
             <caption>{{ _("Session History") }} <span class="text-muted smaller-text">({{ _("click each row to review report") }})</span></caption>
-            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT Time Zone") }} )</small></th></tr>
+            <tr><th>{{ _("Questionnaire Name") }}</th><th>{{ _("Status") }}</th><th>{{ _("Last Updated") }} <small id="gmtText" class="gmt">( {{ _("GMT, Y-M-D") }} )</small></th></tr>
         </table>
         <div id="profileSessionListError" class="error-message"></div>
     </div>
@@ -1080,8 +1106,6 @@
         $(function () {
         var sessionListHTML = "";
         var sessionUserId = $("#_session_user_id").val();
-        var userTimeZone = getUserTimeZone(sessionUserId);
-        var userLocale = getUserLocale(sessionUserId);
 
         $.ajax ({
                 type: "GET",
@@ -1098,21 +1122,14 @@
                         var arrRefs = String(reference).split('/');
                         var instrumentId = arrRefs.length > 0 ? arrRefs[arrRefs.length - 1] : "";
                         var authoredDate = String(entry['authored']);
-                        var originalAuthoredDate = authoredDate;
-                        if (userTimeZone != "UTC") {
-                            authoredDate = convertUserDateTimeByLocaleTimeZone(authoredDate, userTimeZone, userLocale);
-                            if($(".timezone-error").text() == "") $("#gmtText").hide();
-                        }
-                        else {
-                            $("#gmtText").show();
-                        }
+                        $("#gmtText").show();
                         if (instrumentId) {
-                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + originalAuthoredDate;
+                            var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
                             sessionListHTML += '<tr title="Click to view report"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
                                                  entry['status'],
-                                                 authoredDate.replace(/[tz]/gi, " ")].map(function(o) {
+                                                 tnthDates.formatDateString(entry['authored'], "iso")].map(function(o) {
                                                     return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
                                                  }).join('') +
                                                  '</tr>';
@@ -1148,9 +1165,6 @@
             var sessionListHTML = "";
             var sessionUserId = $("#_report_user_id").val();
             var sessionAuthoredDate = $("#_report_authored_date").val();
-            var userTimeZone = getUserTimeZone(sessionUserId);
-            var userLocale = getUserLocale(sessionUserId);
-            var convertedAuthoredDate = convertUserDateTimeByLocaleTimeZone(sessionAuthoredDate, userTimeZone, userLocale);
 
             $.ajax ({
                     type: "GET",
@@ -1172,9 +1186,8 @@
                         var reportHTML = '<caption><hr/><span class="profile-item-title">' +
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
-                                        String(entry['authored']).replace(/[tz]/gi, " ") +
-                                        convertedAuthoredDate.replace(/[tz]/gi, " ") +
-                                        (String(userTimeZone).toLowerCase() == "utc" ? " <span class='gmt'>GMT</span>": "") + '</span><hr/></caption>';
+                                        tnthDates.formatDateString(sessionAuthoredDate, "iso") +
+                                         " <span class='gmt'>(GMT), Y-M-D</span>" + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '', a = '';
@@ -1314,7 +1327,7 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
+                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
@@ -1433,11 +1446,6 @@
             $(".timezone-error").html("");
             $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
-            if ($.trim($(".timezone-error").text()) == "") {
-                setTimeout(function(){
-                    window.location.reload(true);
-                },1000);
-            };
         });
     });
     {% endif %}
@@ -1645,7 +1653,7 @@
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Phone")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">
@@ -1690,14 +1698,25 @@
         </div>
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
         {{profileProcedures(person, current_user) | show_macro('procedures')}}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container {% if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES%}editable{% endif %}" data-sections="org">
-                    <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
-                     {{profileOrgsSelector(person, current_user, consent_agreements)}}
+       {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container editable" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                         {{profileOrgsSelector(person, current_user, consent_agreements)}}
+                    </div>
                 </div>
             </div>
-        </div>
+        {%-else-%}
+             <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container {% if person and person.has_role(ROLE.ADMIN) %}editable{% endif %}" data-sections="org">
+                        <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("My Clinic") }}</h4>
+                        {{profileOrg(person,None,consent_agreements, current_user)}}
+                    </div>
+                </div>
+            </div>
+        {%-endif-%}
         <div class="row">
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
@@ -1769,7 +1788,7 @@
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        <tr><td class="text-muted">{{_("Phone")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">

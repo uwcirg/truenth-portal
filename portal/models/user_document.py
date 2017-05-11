@@ -6,7 +6,7 @@ from flask import current_app
 import os
 
 from ..database import db
-from .fhir import FHIR_datetime
+from ..date_tools import FHIR_datetime
 from .user import User
 
 class UserDocument(db.Model):

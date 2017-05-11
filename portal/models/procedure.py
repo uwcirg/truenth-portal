@@ -1,7 +1,8 @@
 """Procedure Model"""
 
 from ..database import db
-from .fhir import as_fhir, CodeableConcept, FHIR_datetime
+from ..date_tools import as_fhir, FHIR_datetime
+from .fhir import CodeableConcept
 from .reference import Reference
 
 

@@ -7,7 +7,7 @@ import os
 import click
 
 import alembic.config
-from flask_migrate import Migrate, MigrateCommand
+from flask_migrate import Migrate
 
 from portal.app import create_app
 from portal.extensions import db
@@ -30,7 +30,13 @@ migrate = Migrate(app, db, directory=MIGRATIONS_DIR)
 def runserver():
     # Todo: figure out how to override default host in `flask run`
     # http://click.pocoo.org/5/commands/#overriding-defaults
-    app.run(host='0.0.0.0')
+    app.run(
+        host='0.0.0.0',
+        threaded=True,
+        use_debugger=True,
+        use_reloader=True,
+    )
+
 
 def _run_alembic_command(args):
     """Helper to manage working directory and run given alembic commands"""
@@ -73,16 +79,17 @@ def sync():
         db.create_all()
     stamp_db()
     upgrade_db()
-    seed(include_interventions=True)
+    seed()
 
 
-@click.option('--include_interventions', '-i', default=False, help='Include (overwrite) intervention data')
+@click.option('--exclude_interventions', '-e', default=False,
+              help="Exclude (don't overwrite) intervention data")
 @click.option('--keep_unmentioned', '-k', default=False, help='Keep orgs and interventions not mentioned in persistence file')
 @app.cli.command(name="seed")
-def seed_command(include_interventions, keep_unmentioned):
-    seed(include_interventions, keep_unmentioned)
+def seed_command(exclude_interventions, keep_unmentioned):
+    seed(exclude_interventions, keep_unmentioned)
 
-def seed(include_interventions=False, keep_unmentioned=False):
+def seed(exclude_interventions=False, keep_unmentioned=False):
     """Seed database with required data"""
 
     # Request context necessary for generating data from own HTTP APIs
@@ -98,10 +105,10 @@ def seed(include_interventions=False, keep_unmentioned=False):
 
     # Always update interventions on development systems
     if app.config["SYSTEM_TYPE"].lower() == 'development':
-        include_interventions = True
+        exclude_interventions = False
 
     # import site export file if found
-    SitePersistence().import_(include_interventions, keep_unmentioned)
+    SitePersistence().import_(exclude_interventions, keep_unmentioned)
 
 
 @app.cli.command()

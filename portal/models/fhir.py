@@ -1,83 +1,17 @@
 """Model classes for retaining FHIR data"""
-from collections import OrderedDict
-from datetime import date, datetime, timedelta
-from dateutil import parser
-from flask import abort, current_app
+from datetime import datetime
 import json
-import pytz
 from sqlalchemy import UniqueConstraint, or_
 from sqlalchemy.dialects.postgresql import JSONB, ENUM
 import requests
 
 from ..database import db
+from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
+from .organization import OrgTree
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
-
-
-def as_fhir(obj):
-    """For builtin types needing FHIR formatting help
-
-    Returns obj as JSON FHIR formatted string
-
-    """
-    if hasattr(obj, 'as_fhir'):
-        return obj.as_fhir()
-    if isinstance(obj, datetime):
-        # Make SURE we only communicate unaware or UTC timezones
-        tz = getattr(obj, 'tzinfo', None)
-        if tz and tz != pytz.utc:
-            current_app.logger.error("Datetime export of NON-UTC timezone")
-        return obj.strftime("%Y-%m-%dT%H:%M:%S%z")
-    if isinstance(obj, date):
-        return obj.strftime('%Y-%m-%d')
-
-
-class FHIR_datetime(object):
-    """Utility class/namespace for working with FHIR datetimes"""
-
-    @staticmethod
-    def as_fhir(obj):
-        return as_fhir(obj)
-
-    @staticmethod
-    def parse(data, error_subject=None):
-        """Parse input string to generate a UTC datetime instance
-
-        NB - date must be more recent than year 1900 or a ValueError
-        will be raised.
-
-        :param data: the datetime string to parse
-        :param error_subject: Subject string to use in error message
-
-        :return: UTC datetime instance from given data
-
-        """
-        # As we use datetime.strftime for display, and it can't handle dates
-        # older than 1900, treat all such dates as an error
-        epoch = datetime.strptime('1900-01-01', '%Y-%m-%d')
-        try:
-            dt = parser.parse(data)
-        except ValueError:
-            msg = "Unable to parse {}: {}".format(error_subject, data)
-            current_app.logger.warn(msg)
-            abort(400, msg)
-        if dt.tzinfo:
-            epoch = pytz.utc.localize(epoch)
-            # Convert to UTC if necessary
-            if dt.tzinfo != pytz.utc:
-                dt = dt.astimezone(pytz.utc)
-        # As we use datetime.strftime for display, and it can't handle dates
-        # older than 1900, treat all such dates as an error
-        if dt < epoch:
-            raise ValueError("Dates prior to year 1900 not supported")
-        return dt
-
-    @staticmethod
-    def now():
-        """Generates a FHIR compliant datetime string for current moment"""
-        return datetime.utcnow().isoformat()+'Z'
 
 
 class CodeableConceptCoding(db.Model):
@@ -504,14 +438,21 @@ class QuestionnaireResponse(db.Model):
         return "QuestionnaireResponse {0.id} for user {0.subject_id} "\
                 "{0.status} {0.authored}".format(self)
 
-def aggregate_responses(instrument_ids):
+def aggregate_responses(instrument_ids, current_user):
     """Build a bundle of QuestionnaireResponses
 
     :param instrument_ids: list of instrument_ids to restrict results to
+    :param current_user: user making request, necessary to restrict results
+        to list of patients the current_user has permission to see
 
     """
+    # Gather up the patient IDs for whom current user has 'view' permission
+    user_ids = OrgTree().visible_patients(current_user)
+
     annotated_questionnaire_responses = []
-    questionnaire_responses = QuestionnaireResponse.query.order_by(QuestionnaireResponse.authored.desc())
+    questionnaire_responses = QuestionnaireResponse.query.filter(
+        QuestionnaireResponse.subject_id.in_(user_ids)).order_by(
+            QuestionnaireResponse.authored.desc())
 
     if instrument_ids:
         instrument_filters = (
@@ -711,210 +652,3 @@ def add_static_concepts(only_quick=False):
 
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate
-
-
-def localized_PCa(user):
-    """Look up user's value for localized PCa"""
-    from .organization import Organization, OrgTree
-
-    # Some systems use organization affiliation to note
-    # if a user has what we call a 'localized diagnosis'
-    if current_app.config.get('LOCALIZED_AFFILIATE_ORG', None):
-        localized_org = Organization.query.filter_by(
-            name=current_app.config.get('LOCALIZED_AFFILIATE_ORG')).one()
-        ot = OrgTree()
-        consented_orgs = [c.organization_id for c in user.valid_consents]
-        if ot.at_or_below_ids(localized_org.id, consented_orgs):
-            return True
-        return False
-    else:
-        codeable_concept = CC.PCaLocalized
-        value_quantities = user.fetch_values_for_concept(codeable_concept)
-        if value_quantities:
-            assert len(value_quantities) == 1
-            return value_quantities[0].value == 'true'
-        return False
-
-
-def most_recent_survey(user, instrument_id=None):
-    """Look up timestamp for recent QuestionnaireResponse for user
-
-    :param user: Patient to whom completed QuestionnaireResponses belong
-    :param instrument_id: Optional parameter to limit type of
-        QuestionnaireResponse in lookup.
-    :return: dictionary with authored (timestamp) of the most recent
-        QuestionnaireResponse keyed by status found
-
-    """
-    query = QuestionnaireResponse.query.distinct(
-        QuestionnaireResponse.status).filter(
-        QuestionnaireResponse.subject_id == user.id)
-    if instrument_id:
-        query = query.filter(
-            QuestionnaireResponse.document[
-                ("questionnaire", "reference")
-            ].astext.endswith(instrument_id))
-
-    query = query.order_by(
-        QuestionnaireResponse.status,
-        QuestionnaireResponse.authored).limit(
-            5).with_entities(QuestionnaireResponse.status,
-                            QuestionnaireResponse.authored)
-    results = {}
-    for qr in query:
-        if qr[1] not in results:
-            results[qr[0]] = qr[1]
-    return results
-
-
-
-class AssessmentStatus(object):
-    """Lookup and hold assessment status detail for a user
-
-    Complicated task due to nature of multiple instruments which differ
-    depending on user state such as localized or metastatic.
-
-    """
-
-    def __init__(self, user, consent=None):
-        """Initialize assessment status object for given user/consent
-
-        :param user: The user in question - patient on whom to check status
-        :param consent: Consent agreement defining dates and which organization
-            to consider in the status check.  If not provided, use the first
-            valid consent found for the user.  Users w/o consents have
-            overall_status of `Expired`
-
-        """
-        self.user = user
-        self._consent = consent
-        self._overall_status, self._consent_date = None, None
-        self._localized = localized_PCa(user)
-        self.instrument_status = OrderedDict()
-
-    @property
-    def consent_date(self):
-        """Return timestamp of signed consent, if available, else None"""
-
-        if self._consent_date:
-            return self._consent_date
-
-        # If we aren't given a consent, use the first valid consent found
-        # for the user.
-        if not self._consent:
-            if self.user.valid_consents and len(list(self.user.valid_consents)) > 0:
-                self._consent = self.user.valid_consents[0]
-
-        if self._consent:
-            self._consent_date = self._consent.audit.timestamp
-        else:
-            # Tempting to call this invalid state, but it's possible
-            # the consent has been revoked, treat as expired.
-            self._consent_date = None
-        return self._consent_date
-
-    @property
-    def completed_date(self):
-        """Returns timestamp from completed assessment, if available"""
-        self.__obtain_status_details()
-        best_date = None
-        for instrument, details in self.instrument_status.items():
-            if 'completed' in details:
-                # TODO: in event of multiple completed instruments,
-                # not sure *which* date is best??
-                best_date = details['completed']
-        return best_date
-
-    @property
-    def localized(self):
-        return self._localized
-
-    @property
-    def overall_status(self):
-        """Returns display quality string for user's overall status"""
-        self.__obtain_status_details()
-        return self._overall_status
-
-    def instruments_needing_full_assessment(self):
-        self.__obtain_status_details()
-        results = []
-        for instrument_id, details in self.instrument_status.items():
-            if 'completed' in details or 'in-progress' in details:
-                continue
-            results.append(instrument_id)
-        return results
-
-    def instruments_in_process(self):
-        self.__obtain_status_details()
-        results = []
-        for instrument_id, details in self.instrument_status.items():
-            if 'in-progress' in details:
-                results.append(instrument_id)
-        return results
-
-    def __obtain_status_details(self):
-        # expensive process - do once
-        if hasattr(self, '_details_obtained'):
-            return
-        if not self.consent_date:
-            self._overall_status = 'Expired'
-            self._details_obtained = True
-            return
-        if self.localized:
-            thresholds = (
-                (7, "Due"),
-                (90, "Overdue"),
-            )
-            for instrument in ('epic26', 'eproms_add', 'comorb'):
-                self.__status_per_instrument(instrument, thresholds)
-        else:
-            # assuming metastaic - although it's possible the user just didn't
-            # answer the localized question
-            thresholds = (
-                (1, "Due"),
-                (30, "Overdue")
-            )
-            for instrument in ('eortc', 'hpfs', 'prems', 'irondemog'):
-                self.__status_per_instrument(instrument, thresholds)
-
-        status_strings = [details['status'] for details in
-                          self.instrument_status.values()]
-
-        if all(status_strings[0] == status for status in status_strings):
-            # All intruments in the same state - use the common value
-            self._overall_status = status_strings[0]
-        else:
-            if any("Expired" == status for status in status_strings):
-                # At least one expired, but not all
-                self._overall_status = "Partially Completed"
-            self._overall_status = "In Progress"
-        self._details_obtained = True
-
-    def __status_per_instrument(self, instrument_id, thresholds):
-        """Returns status for one instrument
-
-        :param instrument_id: the instument in question
-        :param thresholds: series of day counts and status strings.
-            NB - these must be ordered with increasing values.
-
-        :return: matching status string from constraints
-
-        """
-        def status_from_recents(recents):
-            if 'completed' in recents:
-                return "Completed"
-            if 'in-progress' in recents:
-                return "In Progress"
-            today = datetime.utcnow()
-            delta = today - self.consent_date
-            for days_allowed, message in thresholds:
-                if delta < timedelta(days=days_allowed+1):
-                    return message
-            return "Expired"
-
-        if not instrument_id in self.instrument_status:
-            self.instrument_status[instrument_id] = most_recent_survey(
-                self.user, instrument_id)
-        if not 'status' in self.instrument_status[instrument_id]:
-            self.instrument_status[instrument_id]['status'] =\
-                    status_from_recents(self.instrument_status[instrument_id])

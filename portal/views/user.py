@@ -199,8 +199,9 @@ def account():
             user.update_orgs(org_list, acting_user=acting_user,
                             excuse_top_check=True)
         except NoResultFound:
-            abort (400, "ill formed organizations "
-                   "{}".format(request.json['organizations']))
+            abort (400, "Organization in {} not found, check "
+                   "/api/organization for existance.".format(
+                       request.json['organizations']))
 
     if request.json and 'consents' in request.json:
         try:
@@ -570,6 +571,9 @@ def set_user_consents(user_id):
         user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
+    if not request.json:
+        abort(400, "Requires JSON with submission including "
+              "HEADER 'Content-Type: application/json'")
     request.json['user_id'] = user_id
     try:
         consent = UserConsent.from_json(request.json)
@@ -1585,7 +1589,8 @@ def upload_user_document(user_id):
         :return: the posted file
         """
         if not request.files or len(request.files) != 1:
-            abort(400, "no file found - POST single file")
+            abort(400, "no file found - please POST a single file using " \
+                  "standard multipart/form-data parameters")
         key = request.files.keys()[0]  # either 'file' or actual filename
         filedata = request.files[key]
         return filedata

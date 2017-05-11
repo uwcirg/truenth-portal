@@ -31,7 +31,7 @@ class TestSitePersistence(TestCase):
             self.fail("unset environment var PERSISTENCE_FILE for test")
         self.app.config['PERSISTENCE_FILE'] = known_good_persistence_file
         SitePersistence().import_(
-            include_interventions=True, keep_unmentioned=False)
+            exclude_interventions=False, keep_unmentioned=False)
 
     def testOrgs(self):
         """Confirm persisted organizations came into being"""
@@ -51,7 +51,7 @@ class TestSitePersistence(TestCase):
         # with deep (test) org tree in place, perform a delete by
         # repeating import w/o keep_unmentioned set
         SitePersistence().import_(
-            include_interventions=True, keep_unmentioned=False)
+            exclude_interventions=False, keep_unmentioned=False)
 
     def testP3Pstrategy(self):
         # Prior to meeting conditions in strategy, user shouldn't have access

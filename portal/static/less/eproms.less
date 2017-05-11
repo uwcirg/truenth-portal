@@ -36,22 +36,22 @@
  **/
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
-@linkColor:       #57675B;
-@linkHover:       #60654f;
-@btnColor:        #79815D;
-@featureBtnColor: #333;
+@linkColor:       #333;
+@linkHover:       #909698;
+@btnColor:        #7C959E;
+@featureBtnColor: #7C959E;
 @featureBtnHoverColor: #FFF;
-@featureBtnHoverBgColor: #000;
+@featureBtnHoverBgColor: #909698;
 @legendColor:    #595F57;
 @sectionTitleColor: #526960;
 @sectionBorderColor: #E0E6E3;
-@rowBackgroundColor: #7d826e;
+@rowBackgroundColor: #8a8e90;
 @navBarBgColor: #607D8B;
 @toolTipColor: #575a4d;
 @menuTextColor: #494e37;
 @menuTextHoverColor: #337ab7;
 @menuTitleColor: #5b5e61;
-@leftPanelBgColor: #e2e4d9;
+@leftPanelBgColor: #bac1ca;
 @errorMessageColor: #a94442;
 @placeHolderColor: #999;
 
@@ -93,7 +93,7 @@ a:focus {
   letter-spacing: 1px;
   padding: 0.8em;
   letter-spacing: 2px;
-  color: #333f4b;
+  color: @btnColor;
   background-color: #FFF;
   border: 1px solid #bdb9b9;
   text-transform: uppercase;
@@ -120,13 +120,17 @@ a:focus {
   -webkit-transition: all 0.3s ease-in-out 0s;
   border-radius: 0;
   letter-spacing: 2px;
+  min-width: 100px;
+  display: inline-block;
+  text-transform: uppercase;
   &:hover,
   &:focus,
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
+    background-color: @linkHover;
+    border-color: @linkHover;
+    text-decoration: none;
   }
   .glyphicon {
     color: #FFF;
@@ -179,6 +183,11 @@ a.btn {
     margin: 0 0.5em;
     display: inline-block !important;
   }
+}
+.consent-date-modal.fade {
+    -webkit-transition: opacity .7s ease-out !important;
+    -o-transition: opacity .7s ease-out !important;
+    transition: opacity .7s ease-out !important;
 }
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    @placeHolderColor;
@@ -290,7 +299,7 @@ select:not([multiple]) {
 #mainDiv.profile {
   min-height: 110vh;
   overflow: hidden;
-  background: #858681;
+  background: background: rgba(95, 103, 110, 1);
   z-index: -2;
  .detail-title {
     color: #ebefeb;
@@ -299,12 +308,6 @@ select:not([multiple]) {
   #profileHeader * {
     color: #FFF;
     letter-spacing: 1px;
-  }
-  #bdGroup {
-    margin-bottom: 0.2em;
-  }
-  #profileStudyIDContainer {
-    margin-bottom: 2em;
   }
   .copyright-container *,
   .logo-container * {
@@ -426,6 +429,7 @@ body.open-nav .left-panel {
 div.right-panel {
   position:relative;
   transition:margin-left ease .5s;
+  border: 2px solid rgba(121, 121, 121, 1);
   max-width: 991px;
 }
 #topTerms ~ #aboutForm {
@@ -758,8 +762,8 @@ div.right-panel {
 
 .access-button:hover {
     color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
+    background-color: @linkHover;
+    border-color: @linkHover;
 }
 
 #accessCodeWrapper {
@@ -947,6 +951,10 @@ div.right-panel {
     left: -1px;
   }
 }
+#patientAssessmentDownload {
+  display: inline-block;
+  min-height: 1.2em;
+}
 #patientsInstrumentListWrapper {
   position: relative;
   padding: 0.6em 0 0.3em 0;
@@ -968,6 +976,11 @@ div.right-panel {
   margin: 1.5em;
   opacity: 1;
   transition: opacity 250ms ease-out;
+}
+.instrument-container label {
+  min-width: 100px;
+  max-width: 100%;
+  display: inline-block;
 }
 #patientsDownloadTypeList {
   margin-top: 0.5em;
@@ -1150,11 +1163,155 @@ div.right-panel {
     border-radius: 45px;
   }
 }
+#mainDiv.portal {
+  background: #929291;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+#mainDiv.portal .container {
+  max-width: 1100px;
+}
+#mainDiv.portal .copyright-container * {
+  color: #FFF;
+}
 .portal-item {
-  margin: 2em 0 3em;
+ margin: 3em auto 2em auto;
+ min-height: 60vh;
+}
+.portal-no-description-container {
+  min-height: 400px;
+  position: relative;
+  margin-top: 10%;
+  width: 100% !important;
+  font-size: 1.2em;
+  max-width: 100%;
+  border: 2px solid #7d7d7b;
+}
+.portal-header-container {
+  color: #FFF;
+  width: 85%;
+  margin: 1em auto 6em auto;
+  font-size: 1.2em;
+  max-width: 100%;
+  text-align: center;
+}
+.button-callout {
+  position: relative;
+}
+.button-callout figure {
+  display: inline-block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2.5em;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50px;
+  cursor: pointer;
+}
+.button-callout figure::after {
+  content: "\EA03";
+  display: inline-block;
+  font-family: "symbols";
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1;
+}
+.portal-header-container * {
+  line-height: 27px;
+  letter-spacing: 0.5px;
+}
+.portal-header {
+  font-size: 1.2em;
+  letter-spacing: 1px;
+}
+@media (min-width: 726px) {
+  .portal-header {
+    font-size: 1.4em;
+  }
+}
+.portal-intro-text {
+  font-size: 1.1em;
+}
+@media (min-width: 423px) {
+  .portal-header {
+    line-height: 50px;
+  }
+}
+.portal-header-logout-container {
+  width: 100%;
+  max-width: 100%;
+  margin: 2em auto;
+  text-align: center;
+  & a {
+  width: 150px;
+  max-width: 100%;
+  margin: 1em auto;
+  text-transform: uppercase;
+  }
+}
+.portal-flex-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  position: relative;
+  padding-bottom: 1em;
 }
 .portal-description {
+  background: #43484d;
+  border: 1px solid rgba(121, 121, 121, 1);
+  color: #FFF;
+  padding: 2em 2em 4em 2em;
+  position: relative;
+  width: 430px;
+  max-width: 100%;
+  margin: 1em;
+  min-height: 230px;
+  &.disabled {
+    opacity: 0.6;
+  }
+  & a {
+  color: #FFF;
+  }
+}
+.portal-description-body {
+  margin-top: 1.5em;
+  text-align: center;
+  font-size: 1.1em;
+}
+.portal-flex-container .button-container,
+.portal-description .button-container {
+  position: absolute;
+  bottom: 0;
   margin-bottom: 1em;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  text-align: center;
+}
+.button-container a {
+  width: 300px;
+  max-width: 100%;
+  font-size: 1em;
+}
+.portal-description-incomplete .button-container {
+  top: 50%;
+}
+.portal-description-title {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.portal-registration-container, .portal-full-width-container {
+  width: 93.5%;
+  max-width: 100%;
+}
+.portal-full-width-container {
+  font-size: 1.2em;
+  padding: 2em;
 }
 .loading-message-indicator {
   z-index: 10;
@@ -1305,7 +1462,7 @@ div.right-panel {
   top: 2em;
   right: 2em;
   margin-right: 1em;
-  z-index: 200;
+  z-index: 20;
   height: 2.5em;
   width: 70px;
   padding: 0 0.7em;
@@ -1843,6 +2000,9 @@ div.noOrg-container {
   margin-bottom: 2em;
   border-bottom: 1px solid #E0E6E3;
   padding: 0.1em 0 1.5em 0;
+  .profile-item-container {
+    padding: 1.5em 2em 2em 2em;
+  }
   h4 {
     margin-bottom: 1em;
   }
@@ -2064,7 +2224,7 @@ color: #777
   font-size: 0.9em
   }
   a:hover {
-  color: #979a8d;
+  color: @linkHover;
   }
 }
 .consent-checkbox {
@@ -2082,7 +2242,7 @@ color: #777
     text-decoration:underline;
   }
   a:hover {
-    color: #3c763d;
+    color: @linkHover;
   }
   .consentlist-header {
     background-color: @rowBackgroundColor;
@@ -2207,9 +2367,6 @@ div.timezone-warning.text-warning {
       margin-bottom: 0;
     }
   }
-  #profileStudyIDContainer {
-    margin-top: -2.5em !important;
-  }
   #profileForm {
     #bdGroup .flex {
       flex-wrap: nowrap !important;
@@ -2243,10 +2400,12 @@ div.timezone-warning.text-warning {
   label,
   legend,
   .tnth-form .form-group > label {
-    font-size: 13px;
+    font-size: 14px;
   }
-  #createUserLink {
-    font-size: @mediumText;
+  #createUserLink,
+  .btn,
+  .btn-tnth-primary {
+    font-size: 0.95em;
   }
   div.right-panel {
     margin-left: 0 !important;
@@ -2275,7 +2434,7 @@ div.timezone-warning.text-warning {
     padding: 0;
   }
   .profile-item-container {
-    padding: 2em;
+    padding: 1em;
     max-width: 100%;
   }
   .fixed-table-pagination {
@@ -2883,7 +3042,7 @@ div.timezone-warning.text-warning {
 
 #regForm input[type="submit"],
 #loginForm input[type="submit"] {
-   background-color: #79815d;
+   background-color: @btnColor;
    text-align: center;
    padding: 1.2em 2em 1em 2em;
 }

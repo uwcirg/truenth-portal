@@ -90,9 +90,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 500);
+        setTimeout("showMain();", 1000);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 800);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1500);
         };
     };
 };
@@ -106,7 +106,12 @@ function convertToLocalTime(dateString) {
         var offset = d.getTimezoneOffset() / 60;
         var hours = d.getHours();
         newDate.setHours(hours - offset);
-        convertedDate = newDate.toLocaleString();
+        var options = {
+            year: 'numeric', day: 'numeric', month: 'short',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+        };
+        convertedDate = newDate.toLocaleString(options);
     };
     return convertedDate;
 };
@@ -126,7 +131,7 @@ function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
         //month: 'numeric', day: 'numeric',
         locale = locale.replace("_", "-").toLowerCase();
         var options = {
-            year: 'numeric', day: 'numeric', month: 'numeric',
+            year: 'numeric', day: 'numeric', month: 'short',
             hour: 'numeric', minute: 'numeric', second: 'numeric',
             hour12: false
         };
@@ -402,9 +407,8 @@ var fillViews = {
         if ($("#userProcedures").length > 0) {
             var content = "";
             $("#userProcedures tr[data-id]").each(function() {
-                content += hasValue(content) ? "<br/>" : "";
                 $(this).find("td").each(function() {
-                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "&nbsp;" + $(this).text();
+                    if (!$(this).hasClass("list-cell") && !$(this).hasClass("lastCell")) content += "<div style='line-height:1.5em'>" + $(this).text() + "</div>";
                 });
             });
             if (hasValue(content)) $("#procedure_view").html(content);
@@ -445,18 +449,8 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                //convert date string to a valid date format for conversion into Date object
-                                var d = (val.content.issued).replace(/-/g,"/");
-                                if (d.indexOf("T") != -1) d = d.substring(0, (d).indexOf("T"));
-                                issuedDate = new Date(d);
-                                //mm/dd/yyyy format, NOTE, use native date object methods here
-                                //as toLocaleString is not supported in some browsers e.g. firefox
-                                var month = issuedDate.getMonth()+1;
-                                var day = issuedDate.getDate();
-                                var year = issuedDate.getFullYear();
-                                var cDate = (month < 10?("0"+month): month)+"/"+(day < 10?("0"+day):day)+"/"+year;
-                                //in MM/DD/YYYY format
-                                $("#biopsyDate").val(cDate);
+                                //d M y format
+                                $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
                                 $("#biopsyDateContainer").show();
                             };
                         } else {
@@ -642,9 +636,6 @@ var fillContent = {
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            var userTimeZone = getUserTimeZone(userId);
-            var userLocale = getUserLocale(userId);
-
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -666,6 +657,7 @@ var fillContent = {
             });
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
+            var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
             content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
             ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
@@ -703,8 +695,7 @@ var fillContent = {
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
-                    var signedDate = convertUserDateTimeByLocaleTimeZone(item.signed, userTimeZone, userLocale);
-                    var expiresDate = convertUserDateTimeByLocaleTimeZone(item.expires, userTimeZone, userLocale);
+                    var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
                     //if (isDefault) editable = false;
@@ -734,7 +725,7 @@ var fillContent = {
                             };
                             break;
                     };
-                    var modalContent = "";
+                    var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
@@ -745,24 +736,43 @@ var fillContent = {
                             + '<h5 class="modal-title">Consent Status Editor</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em"><em>Modify</em> the consent status for this user to: </h4>'
+                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" orgId="' + item.organization_id + '" agreementUrl="' + String(item.agreement_url).trim() + '" userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
+                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
+                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
                             + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
+                        consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
+                            + '<div class="modal-dialog" role="document">'
+                            + '<div class="modal-content">'
+                            + '<div class="modal-header">'
+                            + '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>'
+                            + '<h5 class="modal-title">Consent Date Editor</h5>'
+                            + '</div>'
+                            + '<div class="modal-body" style="padding: 0 2em">'
+                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent date for this agreement to: </h4>'
+                            + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
+                            + '<div id="consentDateContainer_' + index + '" style="font-size:0.95em; margin-left:1em">'
+                            + '<input type="text" style="width:150px; max-width: 100%; display:inline-block" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11"/><span class="text-muted">&nbsp; example: 1 Jan, 2017</span>'
+                            + '</div><div id="consentDateError_' + index + '" class="error-message"></div><br/><br/>'
+                            + '</div>'
+                            + '<div class="modal-footer">'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
+                            + '</div>'
+                            + '</div></div></div>';
+
 
                     };
 
                     if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
                         content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
                         content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + (signedDate).replace("T", " ") + "</td></tr>";
+                        content += "<td>" + signedDate + "</td></tr>";
                     };
 
                     content += "<tr>";
@@ -787,7 +797,8 @@ var fillContent = {
                             } (item)
                         },
                         {
-                            content: (signedDate).replace("T", " ")
+                            content: signedDate + (consentDateEditable && consentStatus == "active"? '&nbsp;&nbsp;<a data-toggle="modal" data-target="#consentDate' + index + 'Modal" ><span class="glyphicon glyphicon-pencil" aria-hidden="true" style="cursor:pointer; color: #000"></span></a>' + consentDateModalContent: "")
+
                         }
                     ].forEach(function(cell) {
                         if (cell.content != "n/a") content += "<td class='consentlist-cell" + (cell._class? (" " + cell._class): "") + "' >" + cell.content + "</td>";
@@ -803,9 +814,6 @@ var fillContent = {
                 $("#profileConsentList").html(content);
                 if (!ctop) $("#profileConsentList .agreement").each(function() {
                     $(this).parent().hide();
-                });
-                if ($(".timezone-error").text() == "" && (userTimeZone.toUpperCase() != "UTC")) $("#profileConsentList .gmt").each(function() {
-                    $(this).hide();
                 });
                  $("#profileConsentList .button--LR").each(function() {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
@@ -828,13 +836,48 @@ var fillContent = {
                     $(this).on("click", function() {
                         var o = CONSENT_ENUM[$(this).val()];
                         if (o) {
-                            o.org = $(this).attr("orgId");
-                            o.agreementUrl = $(this).attr("agreementUrl");
+                            o.org = $(this).attr("data-orgId");
+                            o.agreementUrl = $(this).attr("data-agreementUrl");
                         };
-                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("userId"), {org: $(this).attr("orgId")});
-                        else  tnthAjax.setConsent(userId, o, $(this).val());
+                        if ($(this).val() == "purged") tnthAjax.deleteConsent($(this).attr("data-userId"), {org: $(this).attr("data-orgId")});
+                        else  tnthAjax.setConsent($(this).attr("data-userId"), o, $(this).val());
                         $("#" + $(this).attr("modalId")).modal('hide');
                         if (typeof reloadConsentList != "undefined") reloadConsentList();
+                    });
+                });
+            };
+            if (consentDateEditable) {
+                var today = new Date();
+                $(".consent-date-modal").each(function() {
+                    $(this).on("shown.bs.modal", function() {
+                        $(this).find(".consent-date").focus();
+                    });
+                });
+                $(".consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $(".consent-date").each(function() {
+                    $(this).on("change", function() {
+                        var isValid = tnthDates.isValidDefaultDateFormat($(this).val(), $("#consentDateError_" + $(this).attr("data-index")));
+                        if (!isValid) {
+                            $(this).datepicker("hide");
+                        } else {
+                            $(this).datepicker("hide");
+                            var dt = new Date($(this).val());
+                            var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+                            var o = CONSENT_ENUM[$(this).attr("data-status")];
+                            if (o) {
+                                o.org = $(this).attr("data-orgId");
+                                o.agreementUrl = $(this).attr("data-agreementUrl");
+                                o.acceptance_date = cDate;
+                                o.testPatient = true;
+                                setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
+                                setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
+                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
+                                setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
+                                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                                else setTimeout("location.reload();", 2000);
+                                $("#consentListTable .modal").modal("hide");
+                            };
+                        };
                     });
                 });
             };
@@ -1602,6 +1645,7 @@ var OrgTool = function() {
                 if ($(this).prop("checked")){
                     if ($(this).attr("id") !== "noOrgs") {
                         $("#noOrgs").prop('checked',false);
+                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
                     } else {
                         $("#userOrgs input[name='organization']").each(function() {
                             //console.log("in id: " + $(this).attr("id"))
@@ -1611,6 +1655,7 @@ var OrgTool = function() {
                                 if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                            };
                         });
+                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                     };
                 } else {
                     var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
@@ -1700,7 +1745,13 @@ var tnthAjax = {
     "setConsent": function(userId, params, status, sync) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
-            if (!consented) {
+            if (!consented || params["testPatient"]) {
+                params["user_id"] = userId;
+                params["organization_id"] = params["org"];
+                params["agreement_url"] =  params["agreementUrl"]
+                params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
+                params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
+                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false)
                 $.ajax ({
                     type: "POST",
                     url: '/api/user/' + userId + '/consent',
@@ -1708,7 +1759,7 @@ var tnthAjax = {
                     cache: false,
                     dataType: 'json',
                     async: (sync? false: true),
-                    data: JSON.stringify({"user_id": userId, "organization_id": params["org"], "agreement_url": params["agreementUrl"], "staff_editable": (hasValue(params["staff_editable"])? params["staff_editable"] : false), "include_in_reports": (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false), "send_reminders": (hasValue(params["send_reminders"]) ? params["send_reminders"] : false) })
+                    data: JSON.stringify(params)
                 }).done(function(data) {
                     //console.log("consent updated successfully.");
                     $(".set-consent-error").remove();
@@ -2582,6 +2633,32 @@ var tnthDates = {
         var splitDate = currentDate.split('/');
         return splitDate[1] + '/' + splitDate[0] + '/' + splitDate[2];
     },
+     /**
+     * Convert month string to numeric
+     *
+     */
+
+     "convertMonthNumeric": function(month) {
+        if (!hasValue(month)) return "";
+        else {
+             month_map = {
+                "jan":1,
+                "feb":2,
+                "mar":3,
+                "apr":4,
+                "may":5,
+                "jun":6,
+                "jul":7,
+                "aug":8,
+                "sep":9,
+                "oct":10,
+                "nov":11,
+                "dec":12,
+            };
+            var m = month_map[month.toLowerCase()];
+            return hasValue(m) ? m : "";
+        };
+     },
     /**
      * Convert month string to text
      *
@@ -2589,47 +2666,26 @@ var tnthDates = {
      "convertMonthString": function(month) {
         if (!hasValue(month)) return "";
         else {
-            var m = "";
-            switch(parseInt(month)) {
-                case 1:
-                    m = "Jan";
-                    break;
-                case 2:
-                    m = "Feb";
-                    break;
-                case 3:
-                    m = "Mar";
-                    break;
-                case 4:
-                    m = "Apr";
-                    break;
-                case 5:
-                    m = "May";
-                    break;
-                case 6:
-                    m = "Jun";
-                    break;
-                case 7:
-                    m = "Jul";
-                    break;
-                case 8:
-                    m = "Aug";
-                    break;
-                case 9:
-                    m = "Sep";
-                    break;
-                case 10:
-                    m = "Oct";
-                    break;
-                case 11:
-                    m = "Nov";
-                    break;
-                case 12:
-                    m = "Dec";
-                    break;
+            numeric_month_map = {
+                1:"Jan",
+                2:"Feb",
+                3:"Mar",
+                4:"Apr",
+                5:"May",
+                6:"Jun",
+                7:"Jul",
+                8:"Aug",
+                9:"Sep",
+                10:"Oct",
+                11:"Nov",
+                12:"Dec"
             };
-            return m;
-        }
+            var m = numeric_month_map[parseInt(month)];
+            return hasValue(m)? m : "";
+        };
+     },
+     "isDate": function(obj) {
+        return  Object.prototype.toString.call(obj) === '[object Date]' && !isNaN(obj.getTime());
      },
      "displayDateString": function(m, d, y) {
         var s = "";
@@ -2814,6 +2870,141 @@ var tnthDates = {
             toReturn = "Today";
         }
         return toReturn
+    },
+    "isValidDefaultDateFormat": function(date, errorField) {
+        if (!hasValue(date)) return false;
+        if (date.length < 10) return false;
+        var dArray = $.trim(date).split(" ");
+        if (dArray.length < 3) return false;
+        var day = dArray[0], month = dArray[1], year = dArray[2];
+        //console.log("day: " + day + " month: " + month + " year: " + year)
+        if (day.length < 1) return false;
+        if (month.length < 3) return false;
+        if (year.length < 4) return false;
+        if (!/(0)?[1-9]|1\d|2\d|3[01]/.test(day)) return false;
+        if (!/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i.test(month)) return false;
+        if (!/(19|20)\d{2}/.test(year)) return false;
+        var dt = new Date(date);
+        if (!this.isDateObj(dt)) return false;
+        else if (!this.isValidDate(year, this.convertMonthNumeric(month), day)) {
+            return false;
+        } else {
+          var today = new Date(), errorMsg = "";
+          if (dt.getFullYear() < 1900) errorMsg = "Year must be after 1900";
+          // Only allow if date is before today
+          if (dt.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
+              errorMsg = "The date must not be in the future.";
+          };
+          if (hasValue(errorMsg)) {
+            if (errorField) $(errorField).text(errorMsg);
+            return false;
+          } else {
+            if (errorField) $(errorField).text("");
+            return true;
+          }
+        };
+    },
+    "isDateObj": function(d) {
+        return Object.prototype.toString.call(d) === "[object Date]" && !isNaN( d.getTime());
+    },
+    "isValidDate": function(y, m, d) {
+        var date = this.getDateObj(y, m, d);
+        var convertedDate = this.getConvertedDate(date);
+        var givenDate = this.getGivenDate(y, m, d);
+        return ( givenDate == convertedDate);
+    },
+    "getDateObj": function(y, m, d) {
+        return new Date(y,parseInt(m)-1,d);
+    },
+    "getConvertedDate": function(dateObj) {
+        if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
+        else return "";
+    },
+    "getGivenDate":function(y, m, d) {
+        return ""+y+m+d;
+    },
+    /*
+     * NB
+     * For dateString in ISO-8601 format date as returned from server
+     * e.g. '2011-06-29T16:52:48'*/
+
+    "formatDateString": function(dateString, format) {
+        if (dateString) {
+               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
+               var d = new Date(dateString);
+               var ap, day, month, year, hours, minutes, seconds, nd;
+               if (!this.isDateObj(d)) return "";
+               if (iosDateTest.test(dateString)) {
+                   //IOS date, no need to convert again to date object, just parse it as is
+                   //issue when passing it into Date object, the output date is inconsistent across from browsers
+                   var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
+                   year = dArray[0];
+                   month = dArray[1];
+                   day = dArray[2];
+                   hours = dArray[3];
+                   minutes = dArray[4];
+                   seconds = dArray[5];
+                }
+                else {
+                   day = d.getDate();
+                   month = d.getMonth() + 1;
+                   year = d.getFullYear();
+                   hours = d.getHours();
+                   minutes = d.getMinutes();
+                   seconds = d.getSeconds();
+                   nd = "";
+                };
+
+               day = pad(day);
+               month = pad(month);
+               hours = pad(hours);
+               minutes = pad(minutes);
+               seconds = pad(seconds);
+
+               function pad(n) {
+                    n = parseInt(n);
+                    return (n < 10) ? '0' + n : n;
+               };
+
+               switch(format) {
+                    case "mm/dd/yyyy":
+                        nd = month + "/" + day + "/" + year;
+                        break;
+                    case "mm-dd-yyyy":
+                        nd = month + "-" + day + "-" + year;
+                        break;
+                    case "mm-dd-yyyy hh:mm:ss":
+                        nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd/mm/yyyy":
+                        nd = day + "/" + month + "/" + year;
+                        break;
+                    case "dd/mm/yyyy hh:mm:ss":
+                        nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "dd-mm-yyyy":
+                        nd = day + "-" + month + "-" + year;
+                        break;
+                    case "dd-mm-yyyy hh:mm:ss":
+                        nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "iso-short":
+                    case "yyyy-mm-dd":
+                        nd = year + "-" + month + "-" + day;
+                        break;
+                    case "iso":
+                    case "yyyy-mm-dd hh:mm:ss":
+                        nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                     case "d M y":
+                     default:
+                        //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
+                        nd = this.displayDateString(month, day, year);
+                        break;
+               };
+
+           return nd;
+        } else return "";
     }
 };
 
@@ -2840,61 +3031,6 @@ var tnthTables = {
     }
 };
 
-/*assume dateString is ISO-8601 formatted date returned from server: e.g. '2011-06-29T16:52:48.000Z'*/
-function convertGMTToLocalTime(dateString, format) {
-    if (dateString) {
-           //console.log('unformated date: ' + dateString);
-           var d = new Date(String(dateString));
-            //console.log("new date: " + d)
-           // console.log((new Date(d)).toString().replace(/GMT.*/g,""));
-           var ap = "AM";
-           var day = d.getDate();
-           var month = (d.getMonth() + 1);
-           var year = d.getFullYear();
-           var hours = d.getHours();
-           var minutes = d.getMinutes();
-           var seconds = d.getSeconds();
-           var nd = "";
-
-
-           if (hours   > 11) { ap = "PM";             };
-           if (hours   > 12) { hours = hours - 12;      };
-           if (hours   === 0) { hours = 12;};
-
-           day = pad(day);
-           month = pad(month);
-           hours = pad(hours);
-           minutes = pad(minutes);
-           seconds = pad(seconds);
-
-           function pad(n) {
-                n = parseInt(n);
-                return (n < 10) ? '0' + n : n;
-           };
-
-           switch(format) {
-                case "dd/mm/yyyy":
-                    nd = day + "/" + month + "/" + year;
-                    break;
-                case "dd/mm/yyyy hh:mm:ss":
-                    nd = day + "/" + month + "/" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-                    break;
-                case "dd-mm-yyyy":
-                    nd = day + "-" + month + "-" + year;
-                    break;
-                case "dd-mm-yyyy hh:mm:ss":
-                    nd = day + "-" + month + "-" + year + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-                    break;
-                default:
-                    //yyyy-mm-dd hh:mm:ss;
-                    nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds + " " + ap;
-           }
-
-           return nd;
-    } else return "";
-
-
-};
 
 /**
  * Protect window.console method calls, e.g. console is not defined on IE
