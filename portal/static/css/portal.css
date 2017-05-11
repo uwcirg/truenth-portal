@@ -1405,6 +1405,7 @@ div.noOrg-container span {
   height: 40px !important;
 }
 #createProfileForm #phone,
+#createProfileForm #altPhone,
 #createProfileForm #email {
   width: 350px;
   max-width: 100%;
@@ -1720,7 +1721,8 @@ table.profile-audit-log TH,
   max-width: 100%;
 }
 #phone,
-#email {
+#email,
+#altPhone {
   width: 300px;
   max-width: 100%;
 }

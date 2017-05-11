@@ -18,7 +18,7 @@ from .extension import CCExtension
 from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
-from .telecom import Telecom
+from .telecom import ContactPoint, Telecom
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
@@ -41,7 +41,8 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(120))
-    phone = db.Column(db.String(40))
+    phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
     type_id = db.Column(db.ForeignKey('codeable_concepts.id',
                                       ondelete='cascade'))
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
@@ -53,6 +54,8 @@ class Organization(db.Model):
             secondary="organization_identifiers")
     locales = db.relationship('Coding', lazy='dynamic',
             secondary="organization_locales")
+    _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
+            cascade="save-update")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __init__(self, **kwargs):
@@ -128,6 +131,18 @@ class Organization(db.Model):
         else:
             self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
 
+    @property
+    def phone(self):
+        if self._phone:
+            return self._phone.value
+
+    @phone.setter
+    def phone(self, val):
+        if self._phone:
+            self._phone.value = val
+        else:
+            self._phone = ContactPoint(system='phone',use='work',value=val)
+
     @classmethod
     def from_fhir(cls, data):
         org = cls()
@@ -142,8 +157,10 @@ class Organization(db.Model):
             self.name = data['name']
         if 'telecom' in data:
             telecom = Telecom.from_fhir(data['telecom'])
-            self.phone = telecom.phone
             self.email = telecom.email
+            telecom_cps = telecom.cp_dict()
+            self.phone = telecom_cps.get(('phone','work')) \
+                or telecom_cps.get(('phone',None))
         if 'address' in data:
             for addr in data['address']:
                 self.addresses.append(address.Address.from_fhir(addr))
@@ -171,7 +188,7 @@ class Organization(db.Model):
         d['resourceType'] = 'Organization'
         d['id'] = self.id
         d['name'] = self.name
-        telecom = Telecom(email=self.email, phone=self.phone)
+        telecom = Telecom(email=self.email, contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
         if self.addresses:
             d['address'] = []

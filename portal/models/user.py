@@ -31,7 +31,7 @@ from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
-from .telecom import Telecom
+from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
@@ -249,7 +249,10 @@ class User(db.Model, UserMixin):
     _email = db.Column(
         'email', db.String(120), unique=True, nullable=False,
         default=default_email)
-    phone = db.Column(db.String(40))
+    phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
+    alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
@@ -305,6 +308,11 @@ class User(db.Model, UserMixin):
     documents = db.relationship('UserDocument', lazy='dynamic')
     _identifiers = db.relationship(
         'Identifier', lazy='dynamic', secondary='user_identifiers')
+
+    _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
+            cascade="save-update")
+    _alt_phone = db.relationship('ContactPoint', foreign_keys=alt_phone_id,
+            cascade="save-update")
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
@@ -412,6 +420,31 @@ class User(db.Model, UserMixin):
         else:
             self._email = email
         assert(self._email and len(self._email))
+
+    @property
+    def phone(self):
+        if self._phone:
+            return self._phone.value
+
+    @phone.setter
+    def phone(self, val):
+        if self._phone:
+            self._phone.value = val
+        else:
+            self._phone = ContactPoint(system='phone',use='mobile',value=val)
+
+    @property
+    def alt_phone(self):
+        if self._alt_phone:
+            return self._alt_phone.value
+
+    @alt_phone.setter
+    def alt_phone(self, val):
+        if self._alt_phone:
+            self._alt_phone.value = val
+        else:
+            self._alt_phone = ContactPoint(system='phone',use='home',value=val)
+
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
@@ -716,7 +749,8 @@ class User(db.Model, UserMixin):
         d['status'] = 'registered' if self.registered else 'unknown'
         if self._locale:
             d['communication'] = [{"language": self._locale.as_fhir()}]
-        telecom = Telecom(email=self.email, phone=self.phone)
+        telecom = Telecom(email=self.email,
+                        contact_points=[self._phone, self._alt_phone])
         d['telecom'] = telecom.as_fhir()
         d['photo'] = []
         if self.image_url:
@@ -949,7 +983,10 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             self.email = telecom.email
-            self.phone = telecom.phone
+            telecom_cps = telecom.cp_dict()
+            self.phone = telecom_cps.get(('phone','mobile')) \
+                or telecom_cps.get(('phone',None))
+            self.alt_phone = telecom_cps.get(('phone','home'))
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:

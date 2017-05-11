@@ -267,6 +267,7 @@ var fillViews = {
         this.dob();
         this.studyId();
         this.phone();
+        this.altPhone();
         this.email();
         this.deceased();
         this.detail();
@@ -291,6 +292,13 @@ var fillViews = {
             var content = $("#phone").val();
             if (hasValue(content)) $("#phone_view").text(content);
             else $("#phone_view").html("<p class='text-muted'>Not provided</p>");
+        };
+    },
+    "altPhone": function() {
+        if (!$("#altPhoneGroup").hasClass("has-error")) {
+            var content = $("#altPhone").val();
+            if (hasValue(content)) $("#alt_phone_view").text(content);
+            else $("#alt_phone_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "email": function() {
@@ -1229,7 +1237,8 @@ var assembleContent = {
             if ($.trim(emailVal) != "") {
                 demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
             };
-            demoArray["telecom"].push({ "system": "phone", "value": $.trim($("input[name=phone]").val()) });
+            demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
+            demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
            //console.log("demoArray", demoArray);
         };
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
