@@ -113,7 +113,7 @@
                       <td>{{patient.id}}</td>
                       <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                      <td style="width: 10%; word-wrap:break-word;">{{ patient.first_name if patient.first_name }}</td>
+                      <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
@@ -125,7 +125,7 @@
                         <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
                       {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{{ patient.external_study_id }}</td>
+                        <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td><!--consent datefield--></td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
