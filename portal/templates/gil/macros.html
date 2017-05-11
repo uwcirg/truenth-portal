@@ -4,8 +4,8 @@
           <figure class="footer__logo--truenth"></figure>
         </div>
         <ul class="nav-list">
-          <li class="nav-list__item"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/about">{{_("About")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.landing')}}">{{_("Home")}}</a></li>
+          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.about')}}">{{_("About")}}</a></li>
           <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('portal.decision_support')}}">{{_("Decision Support")}}</a></li>
           <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('portal.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>
         </ul>
