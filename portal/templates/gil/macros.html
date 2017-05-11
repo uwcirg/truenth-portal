@@ -1,5 +1,5 @@
 {% macro footerHTML(custom_class) -%}
-     <footer class="footer {{custom_class}}">
+     <footer class="footer{%if custom_class%} {{custom_class}}{%endif%}">
         <div class="footer__logo-area">
           <figure class="footer__logo--truenth"></figure>
         </div>
