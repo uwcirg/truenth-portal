@@ -334,11 +334,12 @@ class TestDemographics(TestCase):
 
         self.assert200(rv)
         fhir = json.loads(rv.data)
-        self.assertEquals(len(fhir['telecom']),1)
         for item in fhir['telecom']:
             if item['system'] == 'phone':
                 if item['use'] == 'mobile':
-                    self.assertEquals('867-5309', item['value'])
+                    self.assertEquals(item['value'], '867-5309')
+                elif item['use'] == 'home':
+                    self.assertEquals(item['value'], None)
                 else:
                     self.fail(
                         'unexpected telecom use: {}'.format(item['use']))
