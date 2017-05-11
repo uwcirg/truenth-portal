@@ -1,3 +1,4 @@
+{%- from "gil/macros.html" import footerHTML -%}
 <!DOCTYPE html>
 <html class="no-js" lang="">
   <head>
@@ -144,33 +145,7 @@
     </aside>
   {% endblock %}
   {% block footer %}
-    <footer class="footer">
-        <div class="footer__logo-area">
-          <figure class="footer__logo--truenth"></figure>
-        </div>
-        <ul class="nav-list">
-          <li class="nav-list__item"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}/about">{{_("About")}}</a></li>
-          <li class="nav-list__item"><a class="decision-support-link" href="{{PORTAL}}{{url_for('portal.decision_support')}}">{{_("Decision Support")}}</a></li>
-          <li class="nav-list__item"><a class="symptom-tracker-link" href="{{PORTAL}}{{url_for('portal.symptom_tracker')}}">{{_("Symptom Tracker")}}</a></li>
-        </ul>
-        <ul class="nav-list nav-list--lower">
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-        </ul>
-        <ul class="nav-list nav-list--lower">
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.terms_and_conditions')}}">{{_("Terms")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.privacy')}}">{{_("Privacy")}}</a></li>
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.contact')}}">{{_("Contact")}}</a></li>
-        </ul>
-        <ul class="nav-list nav-list--lower">
-          <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.contact')}}" ><i class="fa fa-envelope fa-2x" aria-hidden="true"></i>{{_("Contact Us")}}</a></li>
-          <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank"><i class="fa fa-facebook-square fa-2x" aria-hidden="true"></i>{{_("Facebook")}}</a></li>
-          <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i>{{_("Twitter")}}</a></li>
-        </ul>
-        <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
-            <figure class="footer__logo--movember"></figure></a></div>
-        <div class="footer__logo-area copyright">&copy;{{_("2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization.")}}</div>
-      </footer>
+    {{footerHTML()}}
   {% endblock %}
   {% block version %}
     {% if config.metadata.version %}
