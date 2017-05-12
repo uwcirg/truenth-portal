@@ -89,21 +89,26 @@
 
 </div>
 {%- endmacro %}
-
-{% macro footer(splash_style=false) -%}
+{% macro footer(splash_style=false, white_theme=False) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
         <div class="col-xs-6 col-lg-8 footer-container">
             <div class="copyright-container">
-                <p><small><a href="{{PORTAL}}{{url_for('portal.about')}}">{{ _("About") }}</a> | <a href="{{PORTAL}}{{url_for('portal.contact')}}">{{ _("Contact") }}</a> | <a href="{{PORTAL}}{{url_for('portal.privacy')}}">{{ _("Privacy") }}</a></small></p>
-                <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p>
+                {{linksHTML()}}
             </div>
         </div>
         <div class="col-xs-6 col-lg-4 footer-container logo-container">
             <div class="pull-right">
-                <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" alt="Movember logo" /></a>
+                {{logo(white_theme)}}
             </div>
         </div>
     </div>
 </div>
+{%- endmacro %}  
+{% macro linksHTML()-%}
+    <p><small><a href="{{PORTAL}}{{url_for('portal.about')}}">{{ _("About") }}</a> | <a href="{{PORTAL}}{{url_for('portal.contact')}}">{{ _("Contact") }}</a> | <a href="{{PORTAL}}{{url_for('portal.privacy')}}">{{ _("Privacy") }}</a></small></p>
+    <p><small class="text-muted">&copy;{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small></p>
+{%- endmacro %}
+{% macro logo(white_theme=False) -%}
+    <a href="http://us.movember.com" title="{{ _('Movember') }}">{%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="Movember Logo"/>{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" alt="Movember logo" />{%-endif-%}</a>
 {%- endmacro %}

@@ -1,7 +1,7 @@
 {%- extends "layout.html" -%}
-{%- block main -%}
-{%- from "flask_user/_macros.html" import back_btn, back_link -%}
+{%- from "flask_user/_macros.html" import back_btn, back_link, linksHTML, logo -%}
 {%- from "profile_macros.html" import profile, user_profile, profileSaveBtn, profileImage -%}
+{%- block main -%}
 <script>$("#mainDiv").addClass("profile");</script>
 <div id="stickyMenu"></div>
 <form id="profileForm" class="form tnth-form to-validate" data-toggle="validator">
@@ -74,7 +74,7 @@
   </div>
 </form>
 {% endblock %}
-{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container"><p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }}</a></small></p><p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p></div><div class="logo-container"><a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="Movember Logo"/></a></div></div></div>{% endblock %}
+{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{{linksHTML()}}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
 {% block document_ready %}
 {% if user.has_role(ROLE.PATIENT) and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-endif-%};
