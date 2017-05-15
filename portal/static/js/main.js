@@ -1386,7 +1386,6 @@ OrgTool.prototype.getOrgsList = function() {
     return this.orgsList;
 };
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
-    //console.log(leafOrgs)
     if (!leafOrgs) return false;
     var self = this;
 
@@ -1539,10 +1538,8 @@ OrgTool.prototype.getHereBelowOrgs = function() {
       var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
       if (cOrgs && cOrgs.length > 0) {
         here_below_orgs = here_below_orgs.concat(cOrgs);
-        //console.log(here_below_orgs)
-      }
+      };
   });
-  //console.log(here_below_orgs)
   return here_below_orgs;
 };
 
@@ -1575,7 +1572,6 @@ OrgTool.prototype.populateOrgsList = function(items) {
             if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
         };
     });
-    //console.log(orgsList)
     return orgsList;
 };
 OrgTool.prototype.populateUI = function() {
@@ -2250,7 +2246,6 @@ var tnthAjax = {
                         $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
                         $("#locale").val(locale);
                         fillViews.locale();
-                        console.log("locale: " + locale)
                     };
                 });
             };
