@@ -47,6 +47,7 @@ class Organization(db.Model):
                                       ondelete='cascade'))
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
     coding_options = db.Column(db.Integer, nullable=False, default=0)
+    default_locale_id = db.Column(db.ForeignKey('codings.id'))
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
@@ -143,6 +144,23 @@ class Organization(db.Model):
         else:
             self._phone = ContactPoint(system='phone',use='work',value=val)
 
+    @property
+    def default_locale(self):
+        from .fhir import Coding  # local due to cycle
+        if self.default_locale_id:
+            coding = Coding.query.get(self.default_locale_id)
+            if coding:
+                return coding.code
+
+
+    @default_locale.setter
+    def default_locale(self, value):
+        from .fhir import Coding  # local due to cycle
+        coding = Coding.query.filter_by(
+                system='urn:ietf:bcp:47', code=value).first()
+        if coding:
+            self.default_locale_id = coding.id
+
     @classmethod
     def from_fhir(cls, data):
         org = cls()
@@ -181,6 +199,8 @@ class Organization(db.Model):
                 identifier = Identifier.from_fhir(id).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
+        if 'language' in data:
+            self.default_locale = data['language']
         return self
 
     def as_fhir(self):
@@ -218,6 +238,8 @@ class Organization(db.Model):
             d['identifier'] = []
         for id in self.identifiers:
             d['identifier'].append(id.as_fhir())
+        if self.default_locale:
+            d['language'] = self.default_locale
         return d
 
     @classmethod

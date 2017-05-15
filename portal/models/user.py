@@ -530,10 +530,14 @@ class User(db.Model, UserMixin):
         for org in self.organizations:
             for locale in org.locales:
                 locale_options.add(locale.code)
+            if org.default_locale:
+                locale_options.add(org.default_locale)
             while org.partOf_id:
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
                     locale_options.add(locale.code)
+                if org.default_locale:
+                    locale_options.add(org.default_locale)
         return locale_options
 
 

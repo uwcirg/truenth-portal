@@ -36,6 +36,7 @@ class TestOrganization(TestCase):
         self.assertTrue(org.race_codings)
         self.assertFalse(org.ethnicity_codings)
         self.assertEquals(org.locales.count(),1)
+        self.assertEquals(org.default_locale, "en_AU")
 
     def test_from_fhir_partOf(self):
         # prepopulate database with parent organization
