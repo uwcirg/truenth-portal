@@ -1602,6 +1602,8 @@ def upload_user_document(user_id):
         doc = UserDocument.from_post(file, data)
     except ValueError as e:
         abort(400, str(e))
+    except OSError as e:
+        abort(500, str(e))
 
     db.session.add(doc)
     db.session.commit()
