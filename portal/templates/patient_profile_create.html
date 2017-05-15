@@ -200,7 +200,6 @@ $(document).ready(function(){
                 } else setHelpText("clinicalGroup", "", false);
 
 
-
                 $("#createProfileForm .help-block.with-errors").each(function() {
                     if (!hasError) { if ($(this).text() != "") hasError = true };
                 });
@@ -259,6 +258,11 @@ $(document).ready(function(){
 
                     _demoArray['careProvider'] = orgIDs;
 
+                    var arrCommunication = OT.getCommunicationArray();
+                    if (arrCommunication.length > 0) {
+                        _demoArray['communication'] = arrCommunication;
+                    };
+
                     var studyId = $("#studyId").val();
                     if (hasValue(studyId)) {
                         var studyIdObj = {
@@ -268,7 +272,6 @@ $(document).ready(function(){
                         };
                         _demoArray["identifier"] = [studyIdObj];
                     };
-
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {
