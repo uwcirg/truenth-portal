@@ -228,6 +228,11 @@ $(document).ready(function(){
 
                     _demoArray['careProvider'] = orgIDs;
 
+                    var arrCommunication = OT.getCommunicationArray();
+                    if (arrCommunication.length > 0) {
+                        _demoArray['communication'] = arrCommunication;
+                    };
+
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {

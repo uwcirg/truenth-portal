@@ -80,6 +80,7 @@
           <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
           {%- endif -%}
         </select>
+        <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
      </div>
      <script>$(function () {
         $('#locale').on('change', function() {
@@ -688,17 +689,8 @@
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}true{% else %}false{% endif %};
-        //STAFF CANNOT EDIT THEIR OWN ORGS
-        {% if not(current_user.has_role(ROLE.ADMIN)) and current_user.has_role(ROLE.STAFF) and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
-
-        function disableOrgs() {
-            $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
-                    $(this).attr("disabled", true);
-            });
-        };
         var leafOrgs = false;
-        {% if current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
+        {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
@@ -709,13 +701,11 @@
         function _handleOrgs() {
 
             if (leafOrgs) OT.filterOrgs(leafOrgs);
-            if (!orgsEditable) disableOrgs();
 
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
                 var userOrgs = $("#userOrgs input[name='organization']");
-                if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                 var checkedOrgs = {};
                 userOrgs.each(function() {
                     if ($(this).prop("checked")) {
@@ -727,32 +717,6 @@
                     };
                 });
             {%- endif -%}
-            {% if (current_user.has_role('patient') or current_user.has_role('write_only')) and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-                var checkedOrgs = [];
-                userOrgs.each(function() {
-                    if ($(this).prop("checked") && parseInt($(this).val()) != 0) {
-                        checkedOrgs.push({
-                            "id": $(this).val(),
-                            "name": $("#org-label-" + $(this).val()).text()
-                        });
-                    };
-                });
-                if (checkedOrgs.length > 0) {
-                    var html = "";
-                    checkedOrgs.forEach(function(item) {
-                        html += '<div id="' + item.id + '_container" class="org-container"><label id="org-label-' + item.id + '" class="org-label"><input class="clinic" type="checkbox" name="organization" id="' + item.id + '_org" value="' + item.id + '" disabled="disabled" checked>' + item.name + "</label></div>";
-                    });
-                    $("#fillOrgs").html(html);
-                    $("div.noOrg-container").hide();
-                } else {
-                    if ($("#noOrgs").is(":checked")) {
-                        $("#fillOrgs").html("<span class='text-muted'>No organization/affiliation</span>");
-                        $("div.noOrg-container").hide();
-                    };
-                }
-
-            {% endif %}
         };
     </script>
 {%- endmacro %}
