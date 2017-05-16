@@ -147,10 +147,16 @@ class Organization(db.Model):
     @property
     def default_locale(self):
         from .fhir import Coding  # local due to cycle
-        if self.default_locale_id:
-            coding = Coding.query.get(self.default_locale_id)
-            if coding:
-                return coding.code
+        coding = None
+        org = self
+        if org.default_locale_id:
+            coding = Coding.query.get(org.default_locale_id)
+        while org.partOf_id and not coding:
+            org = Organization.query.get(org.partOf_id)
+            if org.default_locale_id:
+                coding = Coding.query.get(org.default_locale_id)
+        if coding:
+            return coding.code
 
 
     @default_locale.setter

@@ -1064,12 +1064,6 @@ var assembleContent = {
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
-        // $.each($("#userOrgs input"),function(i,v){
-        //     if ($(this).attr("data-parent-id")) {
-        //         if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
-        //     };
-        // });
-
         if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
             orgIDs = $("#userOrgs input[name='organization']").map(function(){
@@ -1169,36 +1163,18 @@ var assembleContent = {
                     )
                 };
             };
-            if (targetField && $(targetField).attr("id") == "locale") {
+            
+            if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
-                        {"language": {
-                            "coding": [
-                                {   "code": $("#locale").find("option:selected").val(),
-                                    "display": $("#locale").find("option:selected").text(),
-                                    "system": "urn:ietf:bcp:47"
-                                }
-                            ]
-                        }}
-                    ];
-            } else {
-                var arrCommunication = OT.getCommunicationArray();
-                if (arrCommunication.length > 0) {
-                    demoArray['communication'] = arrCommunication;
-                } else {
-
-                    if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
-                        demoArray["communication"] = [
-                            {"language": {
-                                "coding": [
-                                    {   "code": $("#locale").find("option:selected").val(),
-                                        "display": $("#locale").find("option:selected").text(),
-                                        "system": "urn:ietf:bcp:47"
-                                    }
-                                ]
-                            }}
-                        ];
-                    };
-                };
+                    {"language": {
+                        "coding": [
+                            {   "code": $("#locale").find("option:selected").val(),
+                                "display": $("#locale").find("option:selected").text(),
+                                "system": "urn:ietf:bcp:47"
+                            }
+                        ]
+                    }}
+                ];
             };
 
             if (tz.length > 0) {
@@ -1382,6 +1358,30 @@ var OrgTool = function() {
     this.TOP_LEVEL_ORGS = [];
     this.orgsList = {};
 };
+OrgTool.prototype.inArray = function( n, array) {
+  if (n && array && Array.isArray(array)) {
+    var found = false;
+    for (var index = 0; !found && index < array.length; index++) {
+        if (array[index] == n) found = true;
+    };
+    return found;
+  } else return false;
+};
+OrgTool.prototype.getElementParentOrg = function(o) {
+    var parentOrg;
+    if (o) {
+       parentOrg = $(o).attr("data-parent-id");
+       if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+    };
+    return parentOrg;
+};
+OrgTool.prototype.getTopLevelOrgs = function() {
+  var ml = this.getOrgsList(), orgList = [];
+  for (var org in ml) {
+    if (ml[org].isTopLevel) orgList.push(org);
+  };
+  return orgList;
+};
 OrgTool.prototype.getOrgsList = function() {
     return this.orgsList;
 };
@@ -1453,96 +1453,6 @@ OrgTool.prototype.findOrg = function(entry, orgId) {
     };
     return org;
 };
-OrgTool.prototype.inArray = function( n, array) {
-  if (n && array && Array.isArray(array)) {
-    var found = false;
-    for (var index = 0; !found && index < array.length; index++) {
-        if (array[index] == n) found = true;
-    };
-    return found;
-  } else return false;
-};
-OrgTool.prototype.getTopLevelOrgs = function() {
-  var ml = this.getOrgsList(), orgList = [];
-  for (var org in ml) {
-    if (ml[org].isTopLevel) orgList.push(org);
-  };
-  return orgList;
-};
-OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
-  var parentList = [], self = this;
-  if (uo) {
-    uo.forEach(function(o) {
-      var p = self.getTopLevelParentOrg(o);
-      if (p && !self.inArray(p, parentList))  {
-        parentList.push(p);
-      };
-    });
-    return parentList;
-  } else return false;
-};
-OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
-  if (!currentOrg) return false;
-  var ml = this.getOrgsList(), self = this;
-  if (ml && ml[currentOrg]) {
-    if (ml[currentOrg].isTopLevel) {
-      return currentOrg;
-    } else {
-      if (ml[currentOrg].parentOrgId) return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
-      else return currentOrg;
-    };
-  } else return false;
-};
-OrgTool.prototype.getAllParentOrgs = function(orgId, orgList) {
-    if (!orgId) return false;
-    var ml = this.getOrgsList(), self = this;
-    if (ml && ml[orgId]) {
-        if (!orgList) orgList = [];
-        if (!ml[orgId].parentOrgId) {
-          if (!self.inArray(orgId, orgList)) orgList.push(orgId);
-          return orgList;
-        } else {
-          if (!self.inArray(ml[orgId].parentOrgId, orgList)) orgList.push(ml[orgId].parentOrgId)
-          return self.getAllParentOrgs(ml[orgId].parentOrgId, orgList);
-        };
-    } else return false;
-};
-OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
-    if (!orgs || (orgs.length == 0)) {
-      return orgList;
-    } else {
-      if (!orgList) orgList = [];
-      var mainOrgsList = this.getOrgsList();
-      var childOrgs = [];
-      orgs.forEach(function(org) {
-          var o = mainOrgsList[org.id];
-          if (o) {
-            orgList.push(org.id);
-            var c  = o.children ? o.children : null;
-            if (c && c.length > 0) {
-                c.forEach(function(i) {
-                  childOrgs.push(i);
-                });
-            };
-          };
-      });
-      return this.getChildOrgs(childOrgs, orgList);
-    };
-};
-OrgTool.prototype.getHereBelowOrgs = function() {
-  var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
-  var here_below_orgs = [];
-  userOrgs.forEach(function(orgId) {
-      here_below_orgs.push(orgId);
-      var co = mainOrgsList[orgId];
-      var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
-      if (cOrgs && cOrgs.length > 0) {
-        here_below_orgs = here_below_orgs.concat(cOrgs);
-      };
-  });
-  return here_below_orgs;
-};
-
 OrgTool.prototype.populateOrgsList = function(items) {
     if (!items) return false;
     var entry = items, self = this, parentId, orgsList = self.orgsList;
@@ -1620,63 +1530,6 @@ OrgTool.prototype.populateUI = function() {
 
         if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
     };
-};
-OrgTool.prototype.getElementParentOrg = function(o) {
-    var parentOrg;
-    if (o) {
-       parentOrg = $(o).attr("data-parent-id");
-       if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
-    };
-    return parentOrg;
-};
-OrgTool.prototype.getCommunicationArray = function() {
-    var arrCommunication = [];
-    $('#userOrgs input:checked').each(function() {
-        if ($(this).val() == 0) return true; //don't count none
-        var oList = OT.getOrgsList();
-        var oi = oList[$(this).val()];
-        if (!oi) return true;
-        if (oi.language) {
-            arrCommunication.push({"language": {"coding":[{
-            "code": oi.language,
-            "system": "urn:ietf:bcp:47"
-            }]}});
-        }
-        else if (oi.extension && oi.extension.length > 0) {
-            (oi.extension).forEach(function(ex) {
-                if (ex.url == "http://hl7.org/fhir/valueset/languages" && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
-            });
-        } else {
-            var p = OT.getAllParentOrgs($(this).val());
-            if (p) {
-                p.forEach(function(orgId) {
-                    var o = oList[orgId];
-                    if (o) {
-                        if (o.language) {
-                            arrCommunication.push({"language": {"coding":[{
-                            "code": o.language,
-                            "system": "urn:ietf:bcp:47"
-                            }]}});
-                        } else if (o.extension) {
-                            (o.extension).forEach(function(ex) {
-                                if (ex.url == "http://hl7.org/fhir/valueset/languages" && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
-                            });
-                        };
-                    };
-                });
-            };
-        };
-    });
-    if (arrCommunication.length == 0) {
-        var defaultLocale = $("#sys_default_locale").val();
-        if (hasValue(defaultLocale)) arrCommunication.push({"language": {"coding":[{
-            "code": defaultLocale,
-            "display":$("#locale").find("option[value='" + defaultLocale + "']").text(),
-            "system": "urn:ietf:bcp:47"
-        }]}});
-
-    };
-    return arrCommunication;
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
@@ -1851,7 +1704,95 @@ OrgTool.prototype.handleEvent = function() {
         });
     });
 };
+OrgTool.prototype.getCommunicationArray = function() {
+    var arrCommunication = [];
+    $('#userOrgs input:checked').each(function() {
+        if ($(this).val() == 0) return true; //don't count none
+        var oList = OT.getOrgsList();
+        var oi = oList[$(this).val()];
+        if (!oi) return true;
+        if (oi.language) {
+            arrCommunication.push({"language": {"coding":[{
+            "code": oi.language,
+            "system": "urn:ietf:bcp:47"
+            }]}});
+        }
+        else if (oi.extension && oi.extension.length > 0) {
+            (oi.extension).forEach(function(ex) {
+                if (ex.url == "http://hl7.org/fhir/valueset/languages" && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
+            });
+        };
+    });
+    if (arrCommunication.length == 0) {
+        var defaultLocale = $("#sys_default_locale").val();
+        if (hasValue(defaultLocale)) arrCommunication.push({"language": {"coding":[{
+            "code": defaultLocale,
+            "display":$("#locale").find("option[value='" + defaultLocale + "']").text(),
+            "system": "urn:ietf:bcp:47"
+        }]}});
 
+    };
+    return arrCommunication;
+};
+OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
+  var parentList = [], self = this;
+  if (uo) {
+    uo.forEach(function(o) {
+      var p = self.getTopLevelParentOrg(o);
+      if (p && !self.inArray(p, parentList))  {
+        parentList.push(p);
+      };
+    });
+    return parentList;
+  } else return false;
+};
+OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
+  if (!currentOrg) return false;
+  var ml = this.getOrgsList(), self = this;
+  if (ml && ml[currentOrg]) {
+    if (ml[currentOrg].isTopLevel) {
+      return currentOrg;
+    } else {
+      if (ml[currentOrg].parentOrgId) return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
+      else return currentOrg;
+    };
+  } else return false;
+};
+OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
+    if (!orgs || (orgs.length == 0)) {
+      return orgList;
+    } else {
+      if (!orgList) orgList = [];
+      var mainOrgsList = this.getOrgsList();
+      var childOrgs = [];
+      orgs.forEach(function(org) {
+          var o = mainOrgsList[org.id];
+          if (o) {
+            orgList.push(org.id);
+            var c  = o.children ? o.children : null;
+            if (c && c.length > 0) {
+                c.forEach(function(i) {
+                  childOrgs.push(i);
+                });
+            };
+          };
+      });
+      return this.getChildOrgs(childOrgs, orgList);
+    };
+};
+OrgTool.prototype.getHereBelowOrgs = function() {
+  var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
+  var here_below_orgs = [];
+  userOrgs.forEach(function(orgId) {
+      here_below_orgs.push(orgId);
+      var co = mainOrgsList[orgId];
+      var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+      if (cOrgs && cOrgs.length > 0) {
+        here_below_orgs = here_below_orgs.concat(cOrgs);
+      };
+  });
+  return here_below_orgs;
+};
 var OT = new OrgTool();
 
 var tnthAjax = {

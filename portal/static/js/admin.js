@@ -192,8 +192,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
         self.populateOrgsList(data.entry);
         self.populateUI();
         if (!noPatientData) {
-          var hbOrgs = self.getHereBelowOrgs();
-          self.filterOrgs(hbOrgs);
+            var hbOrgs = self.getHereBelowOrgs();
+	          self.filterOrgs(hbOrgs);
         };
         $("#dataDownloadModal").on('shown.bs.modal', function () {
               var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
