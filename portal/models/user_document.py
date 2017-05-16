@@ -58,7 +58,7 @@ class UserDocument(db.Model):
                 os.makedirs(upload_dir)
             upload_file.save(os.path.join(upload_dir,str(file_uuid)))
         except:
-            raise ValueError("could not save file")
+            raise OSError("could not save file")
 
         return cls(user_id=data['user_id'],document_type=data['document_type'],filename=filename,
                     filetype=filetype,uuid=file_uuid,uploaded_at=datetime.utcnow())
