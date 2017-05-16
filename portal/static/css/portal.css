@@ -1480,6 +1480,7 @@ div.noOrg-container span {
 }
 #userSessionListTable TH,
 table.profile-audit-log TH,
+#profilePatientReportTable TH,
 .thead {
   background-color: #8a8e90;
   color: #FFF;
