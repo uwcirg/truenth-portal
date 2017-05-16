@@ -1,12 +1,34 @@
-<style type="text/css">.no-fouc {display: none;}
+<style type="text/css">
+.no-fouc {display: none;}
+#tnthBottomNavWrapper { background: #000; text-align: center; display: block;font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;font-size: 14px;line-height: 1.42857;color: #4A4A4A;width:100%;}
+#tnthBottomNavWrapper::before {content: " ";display: table;}
+#tnthBottomNavWrapper .footer__logo-area {padding: 25px 0;width: 100%;}
+#tnthBottomNavWrapper .footer__logo-area.footer__logo-area--movember {padding: 12px 0 32px 0;}
+#tnthBottomNavWrapper .footer figure {margin: 0;display: inline-block;}
+#tnthBottomNavWrapper .logo-footer-truenth, .footer__logo--truenth {background-image: url({{PORTAL}}{{ url_for('static', filename='img/TrueNTH-Footer-Logo.png') }});background-size:79px 91px;width: 79px;height: 91px;margin: 0 auto;}
+#tnthBottomNavWrapper .footer__logo--movember {background-image: url({{PORTAL}}{{ url_for('static', filename='img/Movember-Footer-Logo.png') }});background-size: 86px 86px;width: 86px;height: 86px;margin: 0 auto;}
+#tnthBottomNavWrapper .nav-list {position: relative;min-height: 1px;padding-left: 7.5px;padding-right: 7.5px;width: 100%;margin: 0 0 20px;}
+#tnthBottomNavWrapper .nav-list__item {font-size: 16px;line-height: 1;display: inline-block;letter-spacing: 1.5px;text-transform: uppercase;margin: 0 20px;}
+#tnthBottomNavWrapper .nav-list__item a {color: #FFF;text-decoration: none;line-height: 2em;}
+#tnthBottomNavWrapper .nav-list__item a:hover {color: #8F9385;}
+@media (min-width: 687px) {
+    #tnthBottomNavWrapper .nav-list__item a {line-height: 1em;}
+}
+#tnthBottomNavWrapper .nav-list--lower .nav-list__item a {color: #8F9385;}
+#tnthBottomNavWrapper .nav-list--lower .nav-list__item a:hover {color: #FFF;}
+#tnthBottomNavWrapper .copyright {margin-top: -2em;padding-left: 2em;padding-right: 2em;max-width: 100%;color: #8F9385;opacity: 0.9;}
+@media (min-width: 768px) {
+    #tnthBottomNavWrapper .nav-list__item i {margin-top: 0;}
+}
+#tnthBottomNavWrapper .nav-list__item i {color: #FFF;text-align: center;font-size: 1.8em;display: block;margin-top: 0.3em;margin-bottom: 0.3em;}
+#tnthBottomNavWrapper .nav-list__item img {-webkit-font-smoothing: antialiased;color: #FFF;text-align: center;display: block;margin: -0.3em auto 0 auto;}
+@media (min-width: 687px) {
+  #tnthBottomNavWrapper .nav-list__item img {margin-bottom: 0.3em;}
+}
 </style>
 <script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
-<link rel="stylesheet" href="{{PORTAL}}{{ url_for('static', filename='css/bottomnav.css') }}">
-<script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
 <footer id="tnthBottomNavWrapper">
-    <div class="footer__logo-area">
-          <figure class="footer__logo--truenth"></figure>
-    </div>
+    <div class="footer__logo-area"><figure class="footer__logo--truenth"></figure></div>
     <ul class="nav-list">
       <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.landing')}}">{{_("Home")}}</a></li>
       <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.about')}}">{{_("About")}}</a></li>
@@ -22,18 +44,59 @@
       <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.contact')}}">{{_("Contact")}}</a></li>
     </ul>
     <ul class="nav-list nav-list--lower">
-      <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.contact')}}" ><i class="fa fa-envelope fa-2x" aria-hidden="true"></i>{{_("Contact Us")}}</a></li>
-      <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank"><i class="fa fa-facebook-square fa-2x" aria-hidden="true"></i>{{_("Facebook")}}</a></li>
-      <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank"><i class="fa fa-twitter-square fa-2x" aria-hidden="true"></i>{{_("Twitter")}}</a></li>
+      <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.contact')}}" ><img src="{{PORTAL}}{{url_for('static', filename='img/letter.png') }}">{{_("Contact Us")}}</a></li>
+      <li class="nav-list__item"><a href="https://www.facebook.com/TrueNTH.ProstateCancer/" target="_blank"><img src="{{PORTAL}}{{url_for('static', filename='img/facebook.png') }}">{{_("Facebook")}}</a></li>
+      <li class="nav-list__item"><a href="https://twitter.com/TrueNTH_US" target="_blank"><img src="{{PORTAL}}{{url_for('static', filename='img/twitter.png') }}">{{_("Twitter")}}</a></li>
     </ul>
-    <div class="footer__logo-area"><a href="http://www.movember.com" target="_blank">
+    <div class="footer__logo-area footer__logo-area--movember"><a href="http://www.movember.com" target="_blank">
         <figure class="footer__logo--movember"></figure></a></div>
     <div class="footer__logo-area copyright">&copy;{{_("2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization.")}}</div>
 </footer>
 <script>
 $(document).ready(function(){
-  // Configure and start the session timeout monitor
-  {% if user %}
+   {% if user %}
+      $.ajax({
+        url: "{{PORTAL}}/gil-interventions-items",
+        context: document.body,
+        cache: false
+      }).done(function(data) {
+          if (data.interventions) {
+            (data.interventions).forEach(function(item) {
+              var d = item.description;
+              var b = item.link_url;
+              var n = item.name.replace(/\_/g, " ")
+              var disabled = item.link_url == "disabled";
+              var dm = /decision\s?support/gi;
+              var sm = /symptom\s?tracker/gi;
+              var sm2 = /self[_\s]?management/gi;
+              if (dm.test(d) || dm.test(n)) {
+                  if (!disabled) {
+                      $("#tnthBottomNavWrapper .decision-support-link").each(function() {
+                        $(this).attr("href", b);
+                        $(this).removeClass("disabled");
+                      });
+                  } else {
+                    $("#tnthBottomNavWrapper .decision-support-link").each(function() {
+                        $(this).removeAttr("href");
+                        $(this).addClass("disabled");
+                    });
+                  };
+              } else if (sm.test(d) || sm2.test(n)) {
+                if (!disabled) {
+                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
+                      $(this).attr("href", b)
+                      $(this).removeClass("disabed");
+                  });
+                } else {
+                  $("#tnthBottomNavWrapper .symptom-tracker-link").each(function() {
+                      $(this).removeAttr("href");
+                      $(this).addClass("disabled");
+                  });
+                };
+              };
+            });
+          };
+      }).fail(function() {});
    {% endif %}
 });
 </script>

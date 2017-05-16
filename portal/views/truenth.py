@@ -188,6 +188,43 @@ def portal_wrapper_html():
     )
     return make_response(html)
 
+@truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
+@crossdomain()
+def portal_footer_html():
+    """Returns portal footer for insertion at end of interventions
+
+    Get html for the portal site UI footer
+
+    CORS headers will only be included when the request includes well defined
+    Origin header.
+
+    To assist in logic decisions on client pages, the javascript variable
+    `truenth_authenticated` of type boolean included in the response will
+    accurately describe the user's athenticated status.
+
+    ---
+    tags:
+      - TrueNTH
+    operationId: getPortalFooterHTML
+    produces:
+      - text/html
+    """
+    # Unlike all other oauth protected resources, we manually check
+    # if it's a valid oauth request as this resource is also available prior
+    # to logging in.
+    valid, req = oauth.verify_request(['email'])
+    if valid:
+      user = req.user
+    else:
+      user = current_user()
+
+    html = render_template(
+        'portal_footer.html',
+        PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
+        user=user
+    )
+    return make_response(html)
+
 ### Depricated rewrites follow
 @truenth_api.route('/portal-wrapper-html/<username>',
                    methods=('GET', 'OPTIONS'))
