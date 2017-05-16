@@ -17,7 +17,7 @@ blinker==1.4
 celery==4.0.2
 cffi==1.10.0
 click==6.7
-coverage==4.4
+coverage==4.4.1
 decorator==4.0.11
 docopt==0.6.2
 docutils==0.13.1
@@ -97,7 +97,7 @@ waitress==1.0.2
 wcwidth==0.1.7
 WebOb==1.7.2
 WebTest==2.0.27
-Werkzeug==0.12.1
+Werkzeug==0.12.2
 WTForms==2.1
 xvfbwrapper==0.2.9
 -e .
