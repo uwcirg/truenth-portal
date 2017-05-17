@@ -84,8 +84,8 @@ a:focus {
 .btn-tnth-primary.active,
 .open > .dropdown-toggle.btn-tnth-primary {
   color: #fff;
-  background-color: #909698;
-  border-color: #909698;
+  background-color: #576e76;
+  border-color: #576e76;
   text-decoration: none;
 }
 .btn-tnth-primary .glyphicon {
@@ -97,7 +97,7 @@ a {
 }
 a:hover,
 a:active {
-  color: #909698;
+  color: #576e76;
 }
 a.disabled {
   opacity: 0.6;
@@ -174,7 +174,7 @@ select:not([multiple]) {
 .feature-btn-primary:hover,
 .feature-btn-primary:active {
   color: #FFF;
-  background-color: #909698;
+  background-color: #576e76;
 }
 .button--LR,
 .button--LR.data-show,
@@ -343,7 +343,7 @@ select:not([multiple]) {
   cursor: pointer;
 }
 #stickyMenu li:hover {
-  color: #909698;
+  color: #576e76;
   transform: scale(1.05);
 }
 a.open,
@@ -362,7 +362,7 @@ a.open {
   color: #2a4531;
 }*/
 a.back:hover {
-  color: #909698;
+  color: #576e76;
 }
 a.open .glyphicon, a.back .glyphicon {
   font-size: 1.2em;
@@ -651,7 +651,7 @@ div.right-panel {
   display: inline-block;
 }
 #adminTableToolbar div.orglist-selector div.dropdown-menu #userOrgs {
-  width: 300px;
+  width: 350px;
   max-width: 100%;
   padding: 0 0.5em 0 1em;
   margin: 0 auto;
@@ -664,9 +664,8 @@ div.right-panel {
   margin: -0.4em 0;
 }
 #adminTableToolbar div.orglist-selector div.org-container label.org-label {
-  margin: -5em 0;
   font-size: 1em;
-  display: inline;
+  display: inline-block;
 }
 #adminTableToolbar div.orglist-selector #orglist-footer-container {
   padding: 0 0.5em;
@@ -717,8 +716,8 @@ div.right-panel {
 }
 .access-button:hover {
   color: #fff;
-  background-color: #909698;
-  border-color: #909698;
+  background-color: #576e76;
+  border-color: #576e76;
 }
 #accessCodeWrapper {
   margin: 0 auto;
@@ -832,7 +831,7 @@ div.right-panel {
   top: 2px;
 }
 #indexNavBar span:hover {
-  color: #909698;
+  color: #576e76;
   cursor: pointer;
 }
 #indexNavBar #backLink {
@@ -1397,7 +1396,7 @@ div.right-panel {
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
   color: #FFF;
-  background-color: #909698;
+  background-color: #576e76;
 }
 #mainDiv.profile .profile-item-edit-btn::before {
   content: "EDIT";
@@ -1472,7 +1471,7 @@ div.right-panel {
 }
 #createUserLink:hover {
   color: #FFF;
-  background: #909698;
+  background: #576e76;
 }
 .profile-create-item-container {
   border-radius: 8px;
@@ -1616,7 +1615,7 @@ div.noOrg-container span {
 .create-account-container #bdGroup {
   margin-bottom: 0.1em;
   padding-bottom: 0;
-  min-height: 120px;
+  min-height: 124px;
 }
 .left-indent-bottom {
   margin-left: 3.2em;
@@ -1938,8 +1937,8 @@ table.profile-audit-log TH,
   border-color: #7C959E;
 }
 .pagination > .active > a:hover {
-  background-color: #909698;
-  border-color: #909698;
+  background-color: #576e76;
+  border-color: #576e76;
 }
 .pagination > .active > span {
   background-color: #7C959E;
@@ -1950,8 +1949,8 @@ table.profile-audit-log TH,
   border-color: #7C959E;
 }
 .pagination > .active > span:hover {
-  background-color: #909698;
-  border-color: #909698;
+  background-color: #576e76;
+  border-color: #576e76;
 }
 .pagination > li > a {
   color: #333;
@@ -2027,7 +2026,7 @@ sub.pointer {
   cursor: pointer;
 }
 sub.pointer:hover {
-  color: #909698;
+  color: #576e76;
 }
 .report-custom-header {
   padding: 0.3em 0.5em;
@@ -2090,7 +2089,7 @@ sub.pointer:hover {
   font-size: 0.9em;
 }
 #consentContainer a:hover {
-  color: #909698;
+  color: #576e76;
 }
 .consent-checkbox {
   margin-left: -2px;
@@ -2107,7 +2106,7 @@ sub.pointer:hover {
   text-decoration: underline;
 }
 #profileConsentList a:hover {
-  color: #909698;
+  color: #576e76;
 }
 #profileConsentList .consentlist-header {
   background-color: #8a8e90;
