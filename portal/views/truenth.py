@@ -213,10 +213,6 @@ def portal_footer_html():
         description:
           if missing valid OAuth token or logged-in user lacks permission
           to view requested patient
-      403:
-        description:
-          if a login_url is provided with an origin other than one
-          registered as a client app or intervention
 
     """
     # Unlike all other oauth protected resources, we manually check
@@ -227,6 +223,11 @@ def portal_footer_html():
       user = req.user
     else:
       user = current_user()
+
+    if not user:
+        current_app.logger.warning(
+            "unauthorized access from referer `%s`", request.headers.get('Referer'))
+        return make_response("Unauthorized Access"), 401
 
     html = render_template(
         'portal_footer.html',
