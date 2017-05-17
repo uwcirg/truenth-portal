@@ -115,10 +115,6 @@ def portal_wrapper_html():
         description:
           html for direct insertion near the top of the intervention's
           page.
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
       403:
         description:
           if a login_url is provided with an origin other than one
@@ -209,10 +205,6 @@ def portal_footer_html():
         description:
           html for direct insertion near the bottom of the intervention's
           page.
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
 
     """
     # Unlike all other oauth protected resources, we manually check
@@ -223,11 +215,6 @@ def portal_footer_html():
       user = req.user
     else:
       user = current_user()
-
-    if not user:
-        current_app.logger.warning(
-            "unauthorized access from referer `%s`", request.headers.get('Referer'))
-        return make_response("Unauthorized Access"), 401
 
     html = render_template(
         'portal_footer.html',
