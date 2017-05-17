@@ -105,6 +105,9 @@ class BaseConfig(object):
 
     SYSTEM_TYPE = 'development'
 
+    SMARTLING_LANGUAGES = ['en_AU', 'es_MX', 'fr_CA']
+    SMARTLING_PROJECT_ID = '13f8e2dcf'
+
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True

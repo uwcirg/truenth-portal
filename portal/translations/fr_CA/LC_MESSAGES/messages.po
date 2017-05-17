@@ -1,17 +1,18 @@
-# Translations template for PROJECT.
+# French (Canada) translations for PROJECT.
 # Copyright (C) 2017 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-05-17 10:49-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-05-16 15:51-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: fr_CA\n"
+"Language-Team: fr_CA <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -59,9 +60,7 @@ msgid "Internal Server Error"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/500.html:34
-msgid ""
-"Your request is not processed due to server error(s). If you are still "
-"experiencing problem.  Please use the link below."
+msgid "Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/about.html:5
@@ -148,9 +147,7 @@ msgid "Identity Verification"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:18
-msgid ""
-"To ensure your personal details are not shared with others, please enter "
-"the following data for account confirmation."
+msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:27
@@ -309,10 +306,7 @@ msgid "Obtain OAuth 2.0 Credentials from TrueNTH"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/client_add.html:9
-msgid ""
-"To add an application to TrueNTH, one must first register the application"
-" origin or URL.  Multiple origins may be entered, separated by white "
-"space."
+msgid "To add an application to TrueNTH, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/client_add.html:18
@@ -451,9 +445,7 @@ msgid "More About You"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:8
-msgid ""
-"The TrueNTH system asks these questions in order to give you information "
-"that best fits"
+msgid "The TrueNTH system asks these questions in order to give you information that best fits"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:8
@@ -525,9 +517,9 @@ msgstr ""
 msgid "Continue"
 msgstr ""
 
+# apptext: landing title
 #: /home/adam/truenth_ss/portal/templates/explore.html:12
 #: /home/adam/truenth_ss/portal/templates/portal.html:15
-# apptext: landing title
 msgid "Welcome to TrueNTH"
 msgstr ""
 
@@ -536,15 +528,11 @@ msgid "Explore How TrueNTH Works"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:20
-msgid ""
-"A program aimed at improving the lives of men diagnosed and living with "
-"prostate cancer, and their partners, loved ones, and caregivers."
+msgid "A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:21
-msgid ""
-"Coming soon … discover tools designed to help those affected by prostate "
-"cancer."
+msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:29
@@ -618,9 +606,7 @@ msgid "Terms of Use"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:6
-msgid ""
-"Thanks for signing up for TrueNTH. First, please review the terms of use "
-"to access the TrueNTH tools"
+msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:14
@@ -636,9 +622,7 @@ msgid "To Continue"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:33
-msgid ""
-"You must agree to the terms and conditions by checking the provided "
-"checkbox."
+msgid "You must agree to the terms and conditions by checking the provided checkbox."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:37
@@ -651,9 +635,7 @@ msgid "I'm a man who is concerned about prostate cancer for myself"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:82
-msgid ""
-"I'm a caregiver, spouse or partner who wants to learn more about prostate"
-" cancer"
+msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:95
@@ -747,9 +729,9 @@ msgstr ""
 msgid "Body"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/invite.html:17
 # apptext: profileSendEmail invite email_subject
 # apptext: profileSendEmail option invite
+#: /home/adam/truenth_ss/portal/templates/invite.html:17
 msgid "TrueNTH Invitation"
 msgstr ""
 
@@ -784,9 +766,7 @@ msgid "Log in"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/landing.html:40
-msgid ""
-"You have been logged out due to inactivity. Please log in again to "
-"continue."
+msgid "You have been logged out due to inactivity. Please log in again to continue."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:104
@@ -890,8 +870,8 @@ msgstr ""
 msgid "Site(s)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/portal.html:16
 # apptext: landing sub-title
+#: /home/adam/truenth_ss/portal/templates/portal.html:16
 msgid "Tools for navigating the prostate cancer journey"
 msgstr ""
 
@@ -902,9 +882,7 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/portal.html:57
 #: /home/adam/truenth_ss/portal/templates/portal.html:51
-msgid ""
-"Completing your registration will allow you to return here in the future "
-"to see the information you've previously entered."
+msgid "Completing your registration will allow you to return here in the future to see the information you've previously entered."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/portal.html:59
@@ -1004,11 +982,7 @@ msgid "Log in as this patient"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile.html:52
-msgid ""
-"This is intended for \"kiosk\" style administration of an assessment, "
-"wherein the staff person \"logs in as the patient\", which logs the staff"
-" person out of their session, and automatically logs in this patient "
-"without their needing to enter login credentials. Proceed?"
+msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile.html:57
@@ -1246,10 +1220,7 @@ msgid "Log in as patient"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1562
-msgid ""
-"This logs you out, and logs in the patient without their needing to enter"
-" credentials. This is so the patient can complete their questionnaire on "
-"this device. Ideal for tablet and kiosk computers."
+msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1566
@@ -1258,9 +1229,7 @@ msgid "Enter manually"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1567
-msgid ""
-"Enter questionnaire responses on patient's behalf. Helpful if responses "
-"have been completed on paper."
+msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1621
@@ -1396,16 +1365,12 @@ msgid "Clinical Data"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1944
-msgid ""
-"Which of the following prostate cancer management options has the patient"
-" had, if any? If you don&#39;t remember the exact date, please make your "
-"best guess."
+msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:1944
 msgid ""
-"Which of the following prostate cancer management options have you had, "
-"if any? If you don&#39;t remember the exact\n"
+"Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
 "                            date, please make your best guess."
 msgstr ""
 
@@ -1475,9 +1440,7 @@ msgid "Management(s)"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:2029
-msgid ""
-"You have updated your profile. Click the Save button to submit your "
-"changes."
+msgid "You have updated your profile. Click the Save button to submit your changes."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:2029
@@ -1569,9 +1532,7 @@ msgid "Movember.com"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:110
-msgid ""
-"2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-"
-"profit organization."
+msgid "2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/change_password.html:6
@@ -1653,31 +1614,19 @@ msgid "About Using Google or Facebook for TrueNTH"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:96
-msgid ""
-"We offer users the ability to create a unique account for TrueNTH or the "
-"option to use their Facebook or Google logins. Choosing to use Google of "
-"Facebook provide a few additional benefits to you:"
+msgid "We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Google of Facebook provide a few additional benefits to you:"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:98
-msgid ""
-"A single login - you don't need to remember multiple user names or "
-"passwords. Assuming you have an active login with Facebook or Google, "
-"logging into TrueNTH is as simple as clicking a single button."
+msgid "A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:99
-msgid ""
-"TrueNTH can automatically import basic profile information from those "
-"services, simplifying the amount of information you need to enter. This "
-"includes name, email address, birthdate and profile image."
+msgid "TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:100
-msgid ""
-"Information is a one-way street - TrueNTH can pull basic profile "
-"information from Facebook and Google, but never share anything with them."
-" And we NEVER post or share anything to your accounts."
+msgid "Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
@@ -1751,9 +1700,7 @@ msgid "Twitter"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:27
-msgid ""
-"2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-"
-"profit organization."
+msgid "2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/portal.html:44
@@ -1855,7 +1802,7 @@ msgid "<p>Organization and support for the many details of life as a prostate ca
 msgstr ""
 
 # apptext: profileSendEmail reminder email_body
-msgid "<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align="center" width="300" bgcolor="#0088cc" style="background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;"><a href="{0}" style="color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href="{0}">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
+msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#0088cc\" style=\"background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
 msgstr ""
 
 # apptext: UCSF Medical Center organization consent URL

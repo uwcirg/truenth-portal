@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 
 from portal.app import create_app
 from portal.extensions import db
-from portal.models.i18n import upsert_to_template_file
+from portal.models.i18n import update_smartling
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
@@ -149,7 +149,18 @@ def mark_test():
     flag_test()
 
 
+@click.option('--language', '-l', help='language code (e.g. en_US).')
 @app.cli.command()
-def translations():
-    """Add extracted DB strings to existing PO template file"""
-    upsert_to_template_file()
+def translation_upload(language):
+    """Update .po file(s) on Smartling
+
+    Creates a new .pot file, updates the file with relevant DB entries, then
+    uses said .pot file to update the .po file for the specified language (or
+    for all languages, if no language is specified).
+    The updated .po file(s) are then uploaded to Smartling via API POST
+    """
+    update_languages = app.config["SMARTLING_LANGUAGES"]
+    if not language:
+        update_smartling(update_languages)
+    elif language in update_languages:
+        update_smartling([language])
