@@ -76,6 +76,7 @@ def smartling_authenticate():
 def update_smartling():
     # authenticate smartling
     auth = smartling_authenticate()
+    current_app.logger.debug("authenticated in smartling successfully")
     # get relevant filepaths
     translation_fpath = os.path.join(current_app.root_path, "translations")
     pot_fpath = os.path.join(translation_fpath, 'messages.pot')
@@ -83,19 +84,23 @@ def update_smartling():
     # create new .pot file from code
     check_call(['pybabel', 'extract', '-F', config_fpath, '-o', pot_fpath,
                 current_app.root_path])
+    current_app.logger.debug("messages.pot file generated")
     # update .pot file with db values
     upsert_to_template_file()
+    current_app.logger.debug("messages.pot file updated with db strings")
     # upload .pot file to smartling
-    headers = {'Authorization': 'Bearer {}'.format(auth)}
-    files = {'file': ('messages.pot', open(pot_fpath, 'rb'))}
-    data = {
-        'fileUri': 'portal/translations/messages.pot',
-        'fileType': 'gettext'
-    }
-    resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
-            'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
-            data=data, files=files, headers=headers)
-    resp.raise_for_status()
+    with open(pot_fpath, 'rb') as potfile:
+        headers = {'Authorization': 'Bearer {}'.format(auth)}
+        files = {'file': ('messages.pot', potfile)}
+        data = {
+            'fileUri': 'portal/translations/messages.pot',
+            'fileType': 'gettext'
+        }
+        resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
+                'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
+                data=data, files=files, headers=headers)
+        resp.raise_for_status()
+    current_app.logger.debug("messages.pot uploaded to smartling successfully")
 
 
 @babel.localeselector
