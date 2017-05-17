@@ -1,7 +1,9 @@
 """Unit test module for questionnaire_bank"""
+from datetime import datetime
 from flask_webtest import SessionScope
 
 from portal.extensions import db
+from portal.models.assessment_status import QuestionnaireDetails
 from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
@@ -31,8 +33,8 @@ class TestQuestionnaireBank(TestCase):
             db.session.add(org)
             db.session.commit()
         q1, q2, org = map(db.session.merge, (q1, q2, org))
-        qb = QuestionnaireBank(name='qb', organization_id=org.id)
-        qb.name = 'bank'
+        qb = QuestionnaireBank(
+            name='qb', organization_id=org.id, classification='baseline')
         for rank, q in enumerate((q1, q2)):
             qbq = QuestionnaireBankQuestionnaire(
                 days_till_due=5,
@@ -84,7 +86,8 @@ class TestQuestionnaireBank(TestCase):
                 }
             ],
             'id': 1,
-            'name': u'bank'
+            'name': u'bank',
+            'classification': 'baseline'
         }
         qb = QuestionnaireBank.from_json(data)
         self.assertEquals(2, len(qb.questionnaires))
@@ -120,8 +123,9 @@ class TestQuestionnaireBank(TestCase):
         # User associated with CRV org should generate appropriate
         # questionnaires
         self.test_user = db.session.merge(self.test_user)
-        results = QuestionnaireBank.q_for_user(self.test_user)
+        qd = QuestionnaireDetails(self.test_user, datetime.utcnow())
+        results = list(qd.baseline())
         self.assertTrue(3, len(results))
         # confirm rank sticks
-        self.assertEquals(results[0].name, 'epic26')
-        self.assertEquals(results[2].name, 'comorb')
+        self.assertEquals(results[0]['name'], 'epic26')
+        self.assertEquals(results[2]['name'], 'comorb')
