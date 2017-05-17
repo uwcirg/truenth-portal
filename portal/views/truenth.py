@@ -191,16 +191,12 @@ def portal_wrapper_html():
 @truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
 @crossdomain()
 def portal_footer_html():
-    """Returns portal footer for insertion at end of interventions
+    """Returns portal footer for insertion at bottom of interventions
 
     Get html for the portal site UI footer
 
     CORS headers will only be included when the request includes well defined
     Origin header.
-
-    To assist in logic decisions on client pages, the javascript variable
-    `truenth_authenticated` of type boolean included in the response will
-    accurately describe the user's athenticated status.
 
     ---
     tags:
@@ -208,6 +204,20 @@ def portal_footer_html():
     operationId: getPortalFooterHTML
     produces:
       - text/html
+    responses:
+      200:
+        description:
+          html for direct insertion near the bottom of the intervention's
+          page.
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+      403:
+        description:
+          if a login_url is provided with an origin other than one
+          registered as a client app or intervention
+
     """
     # Unlike all other oauth protected resources, we manually check
     # if it's a valid oauth request as this resource is also available prior
