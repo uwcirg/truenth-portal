@@ -1,5 +1,6 @@
 """Questionnaire Bank module"""
 from collections import defaultdict
+from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -90,29 +91,6 @@ class QuestionnaireBank(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
-
-    @staticmethod
-    def q_for_user(user):
-        """Lookup and return all questionnaires for the given user
-
-        QuestionnaireBanks are associated with a user through the top
-        level organization affiliation.
-
-        :return: dictionary keyed by QuestionnaireBank.classification
-            with list of QuestionnaireBankQuestionnaire objects for
-            said classification for given user
-
-        """
-        results = defaultdict(list)
-        OT = OrgTree()
-        for org in user.organizations:
-            # Only top level orgs named in associations w/ QuestionnairBanks
-            top = OT.find(org.id).top_level()
-            qbs = QuestionnaireBank.query.filter_by(organization_id=top)
-            for qb in qbs:
-                results[qb.classification].extend(
-                    [q for q in qb.questionnaires])
-        return results
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
