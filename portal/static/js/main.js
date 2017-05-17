@@ -271,6 +271,7 @@ var fillViews = {
         this.email();
         this.deceased();
         this.locale();
+        this.timezone();
         this.detail();
     },
     "name": function() {
@@ -410,7 +411,7 @@ var fillViews = {
     },
     "timezone": function() {
         if ($("#profileTimeZone").length > 0) {
-            var content = $("#profileTimeZone option:selected").val();
+            var content = $("#profileTimeZone").find("option:selected").val();
             if (hasValue(content)) $("#timezone_view").text(content);
             else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
         } else $(".timezone-view").hide();
@@ -542,21 +543,27 @@ var fillContent = {
         if (data.communication) {
             data.communication.forEach(function(item) {
                 if (item.language && item.language.coding) {
-                    $("#locale").find("option").each(function() {
-                        $(this).removeAttr("selected");
-                    });
                     var selected = false;
+                    if (item.language.coding.length > 0) {
+                        $("#locale").find("option").each(function() {
+                             $(this).removeAttr("selected");
+                        });
+                    };
                     item.language.coding.forEach(function(l) {
                         //select the first available language
                         if (!selected) {
-                            $("#locale").find("option[value='" + l.code + "']").attr("selected", "selected");
-                            $("#locale").val(l.code);
-                            selected = true;
+                            var option = $("#locale").find("option[value='" + l.code + "']");
+                            if (option.length > 0) {
+                                $("#locale").find("option[value='" + l.code + "']").attr("selected", "selected");
+                                $("#locale").val(l.code);
+                                selected = true;
+                            };
                         };
                     });
                 };
             });
         };
+        fillViews.locale();
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
@@ -1022,7 +1029,6 @@ var fillContent = {
             };
         });
         fillViews.timezone();
-        fillViews.locale();
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
