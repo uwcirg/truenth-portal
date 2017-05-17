@@ -115,10 +115,6 @@ def portal_wrapper_html():
         description:
           html for direct insertion near the top of the intervention's
           page.
-      401:
-        description:
-          if missing valid OAuth token or logged-in user lacks permission
-          to view requested patient
       403:
         description:
           if a login_url is provided with an origin other than one
@@ -185,6 +181,45 @@ def portal_wrapper_html():
         branded_logos=branded_logos(),
         enable_links = not disable_links,
         expires_in = cookie_timeout if cookie_timeout else expires_in()
+    )
+    return make_response(html)
+
+@truenth_api.route('/portal-footer-html/', methods=('GET', 'OPTIONS'))
+@crossdomain()
+def portal_footer_html():
+    """Returns portal footer for insertion at bottom of interventions
+
+    Get html for the portal site UI footer
+
+    CORS headers will only be included when the request includes well defined
+    Origin header.
+
+    ---
+    tags:
+      - TrueNTH
+    operationId: getPortalFooterHTML
+    produces:
+      - text/html
+    responses:
+      200:
+        description:
+          html for direct insertion near the bottom of the intervention's
+          page.
+
+    """
+    # Unlike all other oauth protected resources, we manually check
+    # if it's a valid oauth request as this resource is also available prior
+    # to logging in.
+    valid, req = oauth.verify_request(['email'])
+    if valid:
+      user = req.user
+    else:
+      user = current_user()
+
+    html = render_template(
+        'portal_footer.html',
+        PORTAL=''.join(('//', current_app.config['SERVER_NAME'])),
+        user=user
     )
     return make_response(html)
 
