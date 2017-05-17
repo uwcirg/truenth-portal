@@ -653,6 +653,7 @@ var fillContent = {
             };
         });
         fillViews.org();
+        OT.handleIronmanSections($("#userOrgs input[name='organization']:checked").val());
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -1680,12 +1681,15 @@ OrgTool.prototype.handleEvent = function() {
                     });
                     if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                 };
+
             } else {
                 var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
                 if (!isChecked) {
                     if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                 };
             };
+
+            OT.handleIronmanSections($(this).val());
 
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
@@ -1709,6 +1713,47 @@ OrgTool.prototype.handleEvent = function() {
             }
         });
     });
+};
+OrgTool.prototype.handleIronmanSections = function(orgId) {
+    //for IROMAN patient, race/ethinicity/race sections will need to be hidden
+    //IROMAN org ID = 20000
+    var topLevelOrg = OT.getTopLevelParentOrg(orgId);
+    var sections = [
+        {
+            id: "userEthnicity"
+        },
+        {
+            id: "userRace"
+        },
+        {
+            id: "userIndigenousStatus"
+        },
+        {
+            class: "ethnicity-view"
+        },
+        {
+            class: "race-view"
+        },
+        {
+            class: "indigenous-view"
+        }
+    ];
+    if (hasValue(orgId)  && parseInt(orgId) != 0) {
+        sections.forEach(function(item) {
+            if (topLevelOrg == "20000") {
+                if (item.id) $("#" + item.id).hide();
+                else if (item.class) $("." + item.class).hide();
+            } else {
+                if (item.id) $("#" + item.id).show();
+                else if (item.class) $("." + item.class).show();
+            }
+        });
+    } else {
+        sections.forEach(function(item) {
+            if (item.id) $("#" + item.id).show();
+            else if (item.class) $("." + item.class).show();
+        });
+    };
 };
 OrgTool.prototype.getCommunicationArray = function() {
     var arrCommunication = [];

@@ -141,7 +141,7 @@
                     url: '/fhir/valueset/AU-NHHD-METeOR-id-291036'
                 }).done(function(data) {
                     var as = data["codeSystem"]["concept"];
-                    var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
+                    var html = '<div class="form-group" id="userIndigenousStatus">' +
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' + '<label>' +
