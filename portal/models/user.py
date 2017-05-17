@@ -527,6 +527,8 @@ class User(db.Model, UserMixin):
         """Collates all the locale options from the user's orgs
         to establish which should be visible to the user"""
         locale_options = set()
+        if self.locale_code:
+            locale_options.add(self.locale_code)
         for org in self.organizations:
             for locale in org.locales:
                 locale_options.add(locale.code)
