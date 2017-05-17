@@ -1,6 +1,6 @@
 <style type="text/css">
 .no-fouc {display: none;}
-#tnthBottomNavWrapper { background: #000; text-align: center; display: block;font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;font-size: 14px;line-height: 1.42857;color: #4A4A4A;width:100%;}
+#tnthBottomNavWrapper { background: #000; text-align: center; display: block;font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;font-size: 14px;line-height: 1.42857;color: #4A4A4A;width:100%; overflow: hidden;}
 #tnthBottomNavWrapper::before {content: " ";display: table;}
 #tnthBottomNavWrapper .footer__logo-area {padding: 25px 0;width: 100%;}
 #tnthBottomNavWrapper .footer__logo-area.footer__logo-area--movember {padding: 12px 0 32px 0;}
@@ -16,18 +16,15 @@
 }
 #tnthBottomNavWrapper .nav-list--lower .nav-list__item a {color: #8F9385;}
 #tnthBottomNavWrapper .nav-list--lower .nav-list__item a:hover {color: #FFF;}
-#tnthBottomNavWrapper .copyright {margin-top: -2em;padding-left: 2em;padding-right: 2em;max-width: 100%;color: #8F9385;opacity: 0.9;}
-@media (min-width: 768px) {
-    #tnthBottomNavWrapper .nav-list__item i {margin-top: 0;}
-}
-#tnthBottomNavWrapper .nav-list__item i {color: #FFF;text-align: center;font-size: 1.8em;display: block;margin-top: 0.3em;margin-bottom: 0.3em;}
+#tnthBottomNavWrapper .copyright {margin-top: -2em; margin: auto;max-width: 100%;color: #8F9385;opacity: 0.9;}
+@media (max-width: 699px) { #tnthBottomNavWrapper .nav-list__item, #tnthBottomNavWrapper .nav-list--lower .nav-list__item a, .copyright {font-size: 0.95em;} }
 #tnthBottomNavWrapper .nav-list__item img {-webkit-font-smoothing: antialiased;color: #FFF;text-align: center;display: block;margin: -0.3em auto 0 auto;}
 @media (min-width: 687px) {
   #tnthBottomNavWrapper .nav-list__item img {margin-bottom: 0.3em;}
 }
 </style>
 <script>$("#tnthBottomNavWrapper").addClass('no-fouc');</script>
-<footer id="tnthBottomNavWrapper">
+<div id="tnthBottomNavWrapper">
     <div class="footer__logo-area"><figure class="footer__logo--truenth"></figure></div>
     <ul class="nav-list">
       <li class="nav-list__item"><a href="{{PORTAL}}{{url_for('portal.landing')}}">{{_("Home")}}</a></li>
@@ -51,7 +48,7 @@
     <div class="footer__logo-area footer__logo-area--movember"><a href="http://www.movember.com" target="_blank">
         <figure class="footer__logo--movember"></figure></a></div>
     <div class="footer__logo-area copyright">&copy;{{_("2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization.")}}</div>
-</footer>
+</div>
 <script>
 $(document).ready(function(){
    {% if user %}
