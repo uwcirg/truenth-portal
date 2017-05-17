@@ -73,7 +73,7 @@ def smartling_authenticate():
     return token
 
 
-def update_smartling(languages):
+def update_smartling():
     # authenticate smartling
     auth = smartling_authenticate()
     # get relevant filepaths
@@ -83,34 +83,19 @@ def update_smartling(languages):
     # create new .pot file from code
     check_call(['pybabel', 'extract', '-F', config_fpath, '-o', pot_fpath,
                 current_app.root_path])
-    # update pot file with db values
+    # update .pot file with db values
     upsert_to_template_file()
-
-    # create .po files from .pot file, upload to smartling
-    for language in languages:
-        po_fpath = os.path.join(translation_fpath, language,
-                    "LC_MESSAGES/messages.po")
-        if not os.path.exists(po_fpath):
-            os.makedirs(os.path.join(translation_fpath,language,"LC_MESSAGES"))
-        if os.path.isfile(po_fpath):
-            cmd = ['pybabel', 'update', '-i', pot_fpath, '-d',
-                    translation_fpath, '-l', language, '--no-wrap']
-        else:
-            cmd = ['pybabel', 'init', '-i', pot_fpath, '-d',
-                    translation_fpath, '-l', language, '--no-wrap']
-        check_call(cmd)
-
-        filename = '{}_messages.po'.format(language)
-        headers = {'Authorization': 'Bearer {}'.format(auth)}
-        files = {'file': (filename, open(po_fpath, 'rb'))}
-        data = {
-            'fileUri': filename,
-            'fileType': 'gettext'
-        }
-        resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
-                'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
-                data=data, files=files, headers=headers)
-        resp.raise_for_status()
+    # upload .pot file to smartling
+    headers = {'Authorization': 'Bearer {}'.format(auth)}
+    files = {'file': ('messages.pot', open(pot_fpath, 'rb'))}
+    data = {
+        'fileUri': 'portal/translations/messages.pot',
+        'fileType': 'gettext'
+    }
+    resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
+            'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
+            data=data, files=files, headers=headers)
+    resp.raise_for_status()
 
 
 @babel.localeselector

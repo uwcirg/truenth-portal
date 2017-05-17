@@ -149,18 +149,11 @@ def mark_test():
     flag_test()
 
 
-@click.option('--language', '-l', help='language code (e.g. en_US).')
 @app.cli.command()
-def translation_upload(language):
+def translation_upload():
     """Update .po file(s) on Smartling
 
     Creates a new .pot file, updates the file with relevant DB entries, then
-    uses said .pot file to update the .po file for the specified language (or
-    for all languages, if no language is specified).
-    The updated .po file(s) are then uploaded to Smartling via API POST
+    POSTs said .pot file to Smartling via their API
     """
-    update_languages = app.config["SMARTLING_LANGUAGES"]
-    if not language:
-        update_smartling(update_languages)
-    elif language in update_languages:
-        update_smartling([language])
+    update_smartling()
