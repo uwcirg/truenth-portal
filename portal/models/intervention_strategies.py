@@ -229,6 +229,7 @@ def update_card_html_on_completion():
                 'Due', 'Overdue', 'In Progress'):
                 due_date = assessment_status.next_available_due_date(
                     classification='baseline')
+                assert due_date
                 return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">Hi {user_name},</h2>
@@ -256,7 +257,6 @@ def update_card_html_on_completion():
                       </div>
                     </div>""".format(
                         user_name=user.display_name,
-                        due_date=due_date.strftime('%-d %b %Y'),
                         parent_org=assessment_status.organization.name)
             if assessment_status.overall_status == "Completed":
                 return """
