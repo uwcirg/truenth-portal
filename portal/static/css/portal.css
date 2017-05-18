@@ -2816,6 +2816,9 @@ fieldset[disabled] .btn-google.active {
   max-width: 100%;
   margin: 0 auto;
 }
+#createAcctTxt {
+  margin: 2em 0 0.5em 0;
+}
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #socialMediaLoginContainer .btn-social,
