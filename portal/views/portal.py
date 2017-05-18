@@ -78,26 +78,38 @@ def landing():
     return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
 
 #from GIL
-@portal.route('/gil-interventions-items')
-@oauth.require_oauth()
-def gil_interventions_items():
+@portal.route('/gil-interventions-items/<int:user_id>')
+@crossdomain()
+def gil_interventions_items(user_id):
     """ this is needed to filter the GIL menu based on user's intervention(s)
-        trying to do this so code is more easily managed from front end side """
-    user = current_user()
+        trying to do this so code is more easily managed from front end side
+        Currently it is also accessed via ajax call from portal footer
+        see: api/portal-footer-html/
+    """
+    user = None
+
+    if user_id:
+        user = get_user(user_id)
+    else:
+        user = current_user()
+
     user_interventions = []
-    interventions =\
-            Intervention.query.order_by(Intervention.display_rank).all()
-    for intervention in interventions:
-        display = intervention.display_for_user(user)
-        if display.access:
-            user_interventions.append({
-                "name": intervention.name,
-                "description": intervention.description if intervention.description else "",
-                "link_url": display.link_url if display.link_url is not None else "disabled",
-                "link_label": display.link_label if display.link_label is not None else ""
-            })
+
+    if user:
+        interventions =\
+                Intervention.query.order_by(Intervention.display_rank).all()
+        for intervention in interventions:
+            display = intervention.display_for_user(user)
+            if display.access:
+                user_interventions.append({
+                    "name": intervention.name,
+                    "description": intervention.description if intervention.description else "",
+                    "link_url": display.link_url if display.link_url is not None else "disabled",
+                    "link_label": display.link_label if display.link_label is not None else ""
+                })
 
     return jsonify(interventions=user_interventions)
+
 @portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
 def gil_shortcut_alias_validation(clinic_alias):
     # Shortcut aliases are registered with the organization as identifiers.

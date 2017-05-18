@@ -6,7 +6,8 @@ from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
 from ..models.auth import validate_client_origin
-from ..models.user import current_user
+from ..models.coredata import Coredata
+from ..models.user import current_user, get_user
 
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
@@ -16,6 +17,20 @@ OPTIONS = ('ethnicity', 'procedure', 'race')
 @coredata_api.route('/options', methods=('GET',))
 def options():
     return jsonify(require_options=OPTIONS)
+
+
+@coredata_api.route('/user/<int:user_id>/still_needed', methods=('GET',))
+@oauth.require_oauth()
+def still_needed(user_id):
+    """Looks up missing coredata elements for given user
+
+    :returns: simple JSON struct with a list (potentially empty) of the
+        coredata elements still needed
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    still_needed = Coredata().still_needed(user)
+    return jsonify(still_needed=still_needed)
 
 
 @coredata_api.route('/acquire', methods=('GET',))

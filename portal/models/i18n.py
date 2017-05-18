@@ -3,10 +3,13 @@ import sys
 import os
 from collections import defaultdict
 from flask import current_app
-from ..extensions import babel
-from .user import current_user
+from requests import post
+from subprocess import check_call
+
 from .app_text import AppText
+from ..extensions import babel
 from .intervention import Intervention
+from .user import current_user
 
 
 def get_db_strings():
@@ -50,6 +53,54 @@ def upsert_to_template_file():
         except:
             exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
             sys.exit("Could not write to translation file!\n ->%s" % (exceptionValue))
+
+
+def smartling_authenticate():
+    url = 'https://api.smartling.com/auth-api/v2/authenticate'
+    headers = {'Content-type': 'application/json'}
+    data = {
+        "userIdentifier": current_app.config.get("SMARTLING_USER_ID"),
+        "userSecret": current_app.config.get("SMARTLING_USER_SECRET")
+    }
+    resp = post(url, json=data, headers=headers)
+    if resp.status_code != 200:
+        sys.exit("Could not connect to smartling!")
+    resp_json = resp.json()
+    if ('response' in resp_json) and ('data' in resp_json['response']):
+        token = resp_json['response']['data'].get('accessToken')
+    if not token:
+        sys.exit("No access token found!")
+    return token
+
+
+def update_smartling():
+    # authenticate smartling
+    auth = smartling_authenticate()
+    current_app.logger.debug("authenticated in smartling successfully")
+    # get relevant filepaths
+    translation_fpath = os.path.join(current_app.root_path, "translations")
+    pot_fpath = os.path.join(translation_fpath, 'messages.pot')
+    config_fpath = os.path.join(current_app.root_path, "../instance/babel.cfg")
+    # create new .pot file from code
+    check_call(['pybabel', 'extract', '-F', config_fpath, '-o', pot_fpath,
+                current_app.root_path])
+    current_app.logger.debug("messages.pot file generated")
+    # update .pot file with db values
+    upsert_to_template_file()
+    current_app.logger.debug("messages.pot file updated with db strings")
+    # upload .pot file to smartling
+    with open(pot_fpath, 'rb') as potfile:
+        headers = {'Authorization': 'Bearer {}'.format(auth)}
+        files = {'file': ('messages.pot', potfile)}
+        data = {
+            'fileUri': 'portal/translations/messages.pot',
+            'fileType': 'gettext'
+        }
+        resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
+                'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
+                data=data, files=files, headers=headers)
+        resp.raise_for_status()
+    current_app.logger.debug("messages.pot uploaded to smartling successfully")
 
 
 @babel.localeselector
