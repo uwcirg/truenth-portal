@@ -11,6 +11,8 @@
 #tnthBottomNavWrapper .nav-list__item {font-size: 16px;line-height: 1;display: inline-block;letter-spacing: 1.5px;text-transform: uppercase;margin: 0 20px;}
 #tnthBottomNavWrapper .nav-list__item a {color: #FFF;text-decoration: none;line-height: 2em;}
 #tnthBottomNavWrapper .nav-list__item a:hover {color: #8F9385;}
+#tnthBottomNavWrapper .nav-list__item a.disabled {opacity: 0.6;}
+
 @media (min-width: 687px) {
     #tnthBottomNavWrapper .nav-list__item a {line-height: 1em;}
 }
@@ -53,7 +55,8 @@
 $(document).ready(function(){
    {% if user %}
       $.ajax({
-        url: "{{PORTAL}}/gil-interventions-items",
+        url: "{{PORTAL}}/gil-interventions-items/{{user.id}}",
+        crossDomain: true,
         context: document.body,
         cache: false
       }).done(function(data) {
