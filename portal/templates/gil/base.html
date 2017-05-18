@@ -344,7 +344,7 @@
               if (show) {
                   VO.showLoader();
               } else {
-                  {% if user and (not user.has_role(ROLE.STAFF)) and (not user.has_role(ROLE.ADMIN)) %} filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
+                  {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %} filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
                   VO.showMain();
               };
           };
