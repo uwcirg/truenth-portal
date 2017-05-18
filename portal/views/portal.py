@@ -79,25 +79,26 @@ def landing():
 
 #from GIL
 @portal.route('/gil-interventions-items')
-@oauth.require_oauth()
 def gil_interventions_items():
     """ this is needed to filter the GIL menu based on user's intervention(s)
         trying to do this so code is more easily managed from front end side """
     user = current_user()
     user_interventions = []
-    interventions =\
-            Intervention.query.order_by(Intervention.display_rank).all()
-    for intervention in interventions:
-        display = intervention.display_for_user(user)
-        if display.access:
-            user_interventions.append({
-                "name": intervention.name,
-                "description": intervention.description if intervention.description else "",
-                "link_url": display.link_url if display.link_url is not None else "disabled",
-                "link_label": display.link_label if display.link_label is not None else ""
-            })
+    if user:
+        interventions =\
+                Intervention.query.order_by(Intervention.display_rank).all()
+        for intervention in interventions:
+            display = intervention.display_for_user(user)
+            if display.access:
+                user_interventions.append({
+                    "name": intervention.name,
+                    "description": intervention.description if intervention.description else "",
+                    "link_url": display.link_url if display.link_url is not None else "disabled",
+                    "link_label": display.link_label if display.link_label is not None else ""
+                })
 
     return jsonify(interventions=user_interventions)
+    
 @portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
 def gil_shortcut_alias_validation(clinic_alias):
     # Shortcut aliases are registered with the organization as identifiers.
