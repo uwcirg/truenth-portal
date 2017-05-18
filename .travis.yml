@@ -12,7 +12,7 @@ env:
   matrix:
     - TOXENV=py27
   global:
-    - FLASK_APP=$(readlink -f manage.py)
+    - FLASK_APP="$(readlink -f manage.py)"
     - SQLALCHEMY_DATABASE_TEST_URI='postgresql://postgres:@localhost/portal_unit_tests'
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}
@@ -22,6 +22,7 @@ env:
 
 matrix:
   include:
+    - env: TOXENV=translations
     - env: TOXENV=docs
       services: []
       addons: {}
