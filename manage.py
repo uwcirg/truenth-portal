@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 
 from portal.app import create_app
 from portal.extensions import db
-from portal.models.i18n import update_smartling
+from portal.models.i18n import smartling_upload, smartling_download
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
@@ -151,9 +151,21 @@ def mark_test():
 
 @app.cli.command()
 def translation_upload():
-    """Update .po file(s) on Smartling
+    """Update .pot file on Smartling
 
     Creates a new .pot file, updates the file with relevant DB entries, then
     POSTs said .pot file to Smartling via their API
     """
-    update_smartling()
+    smartling_upload()
+
+
+@click.option('--language', '-l', help='language code (e.g. en_US).')
+@app.cli.command()
+def translation_download(language):
+    """Download .po file(s) from Smartling
+
+    GETs the .po file for the specified language from Smartling via their API.
+    If no language is specified, all available translations will be downloaded.
+    After download, .po file(s) are compiled into .mo file(s) using pybabel
+    """
+    smartling_download(language)
