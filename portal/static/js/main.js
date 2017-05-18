@@ -1739,14 +1739,15 @@ OrgTool.prototype.handleIronmanSections = function(orgId) {
         }
     ];
     if (hasValue(orgId)  && parseInt(orgId) != 0) {
+        var orgsList = this.getOrgsList();
         sections.forEach(function(item) {
-            if (topLevelOrg == "20000") {
+            if (orgsList[topLevelOrg] && orgsList[topLevelOrg].name.toUpperCase() == "IRONMAN") {
                 if (item.id) $("#" + item.id).hide();
                 else if (item.class) $("." + item.class).hide();
             } else {
                 if (item.id) $("#" + item.id).show();
                 else if (item.class) $("." + item.class).show();
-            }
+            };
         });
     } else {
         sections.forEach(function(item) {
