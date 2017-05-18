@@ -1563,11 +1563,41 @@
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
                     <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
                 </div>
-                <div class="profile-item-container custom-container-item">
+                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
-                    <div id="enterManualInfoContainer" class="text-info small-text"></div>
-                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" href="{{person.assessment_link}}">{{_("Enter manually")}}</a>
+                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
+                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="manualEntryModalLabel">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                              </div>
+                              <div class="modal-body">
+                                <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>
+                                 <div class="form-group">
+                                    <div class="profile-radio-list">
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                          <span>{{ _("Interview assisted") }}</span>
+                                      </label>
+                                      <br/>
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                          <span>{{ _("Paper") }}</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div id="manualEntryMessageContainer" class="error-message"></div>
+                              </div>
+                              <div class="modal-footer">
+                                <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1591,6 +1621,33 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
+
+        $(document).delegate("#meSubmit", "click", function(event){
+            var method = "";
+            $("input[name='entryMethod'").each(function() {
+                if ($(this).is(":checked")) {
+                    method = $(this).val();
+                };
+            });
+            if (method != "") {
+                $("#manualEntryMessageContainer").text("");
+                var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+                if (hasValue(assessment_url)) {
+                    if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
+                    else assessment_url += "?entry_method=" + method;
+                } else {
+                    $("#manualEntryMessageContainer").html("The user does not have a valid assessment link.");
+                }
+                window.location = assessment_url;
+            } else {
+                $("#manualEntryMessageContainer").html("You must select a method.");
+            };
+          });
+
+          $("input[name='entryMethod']").on("click", function() {
+              if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
+          });
+
         {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
             $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
         {%- endif -%}
