@@ -79,7 +79,7 @@ redis==2.10.5
 requests==2.14.2
 requests-cache==0.4.13
 requests-oauthlib==0.8.0
-selenium==3.4.1
+selenium==3.4.2
 simplegeneric==0.8.1
 six==1.10.0
 snowballstemmer==1.2.1
