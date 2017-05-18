@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 
 from portal.app import create_app
 from portal.extensions import db
-from portal.models.i18n import upsert_to_template_file
+from portal.models.i18n import update_smartling
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions
 from portal.models.organization import add_static_organization
@@ -150,6 +150,10 @@ def mark_test():
 
 
 @app.cli.command()
-def translations():
-    """Add extracted DB strings to existing PO template file"""
-    upsert_to_template_file()
+def translation_upload():
+    """Update .po file(s) on Smartling
+
+    Creates a new .pot file, updates the file with relevant DB entries, then
+    POSTs said .pot file to Smartling via their API
+    """
+    update_smartling()
