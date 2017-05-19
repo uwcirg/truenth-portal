@@ -22,7 +22,7 @@ env:
 
 matrix:
   include:
-    - env: TOXENV=translations
+    - env: TOXENV=translations SQLALCHEMY_DATABASE_URI="$SQLALCHEMY_DATABASE_TEST_URI"
     - env: TOXENV=docs
       services: []
       addons: {}
