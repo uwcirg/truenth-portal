@@ -275,7 +275,7 @@ AdminTool.prototype.getInstrumentList = function() {
     //CRV
     '10000': ['epic26', 'eproms_add', 'comorb'],
     //IRONMAN
-    '20000': ['eortc', 'hpfs', 'prems', 'irondemog']
+    '20000': ['eortc', 'ironmisc', 'prems', 'irondemog']
   };
 };
 __setOrgsMenuHeight = function(padding) {
