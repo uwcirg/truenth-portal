@@ -170,7 +170,7 @@ class RaceData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.hasrole(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT):
             return True
         return False
 
@@ -185,7 +185,7 @@ class EthnicityData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.hasrole(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT):
             return True
         return False
 
@@ -200,7 +200,7 @@ class IndigenousData(CoredataPoint):
             return False
         if IRONMAN_user(user):
             return False
-        if user.hasrole(ROLE.PATIENT):
+        if user.has_role(ROLE.PATIENT):
             return True
         return False
 
