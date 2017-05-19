@@ -103,7 +103,7 @@
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
@@ -127,7 +127,12 @@
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
-                      <td><!--consent datefield--></td>
+                      <td>{%- if patient.valid_consents -%}
+                        {%-for consent in patient.valid_consents -%}
+                          <span class="raw-consent-date tnth-hide">{{consent.audit.timestamp}}</span><br/>
+                        {%-endfor-%}
+                      {%-endif-%}
+                      </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
                   </tr>
                {% endfor %}
@@ -151,14 +156,22 @@ var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
-  $("#adminTable").on("sort.bs.table reset-view.bs.table toggle.bs.table", function() {
+  $("#adminTable").on("sort.bs.table reset-view.bs.table", function() {
       AT.updateData();
    });
   $("#adminTable").on("page-change.bs.table", function() {
-      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},800);
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
+      if ($(this).find(".card-view").length > 0) {
+        AT.updateData();
+      }
+  });
+  $("#adminTable").on("toggle.bs.table", function() {
+      if ($(this).find(".card-view").length > 0) {
+        AT.updateData();
+      }
   });
   setTimeout("AT.updateData();", 0);
-
+  
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");
