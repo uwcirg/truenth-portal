@@ -33,6 +33,23 @@ def still_needed(user_id):
     return jsonify(still_needed=still_needed)
 
 
+@coredata_api.route('/user/<int:user_id>/required', methods=('GET',))
+@oauth.require_oauth()
+def requried(user_id):
+    """Looks up required core data elements for user
+
+    :returns: simple JSON struct with a list of the coredata elements
+        required for the given user.  The list is dependent on the application
+        configuration and details such as user's role, organizations and
+        intervention affiliations.
+
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    required = Coredata().required(user)
+    return jsonify(required=required)
+
+
 @coredata_api.route('/acquire', methods=('GET',))
 @oauth.require_oauth()
 def acquire():
