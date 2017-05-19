@@ -1,10 +1,13 @@
 """Module for i18n methods and functionality"""
 import sys
 import os
+import re
+import requests
 from collections import defaultdict
+from cStringIO import StringIO
 from flask import current_app
-from requests import post
 from subprocess import check_call
+from zipfile import ZipFile
 
 from .app_text import AppText
 from ..extensions import babel
@@ -62,21 +65,21 @@ def smartling_authenticate():
         "userIdentifier": current_app.config.get("SMARTLING_USER_ID"),
         "userSecret": current_app.config.get("SMARTLING_USER_SECRET")
     }
-    resp = post(url, json=data, headers=headers)
+    resp = requests.post(url, json=data, headers=headers)
     if resp.status_code != 200:
-        sys.exit("Could not connect to smartling!")
+        sys.exit("could not connect to smartling")
     resp_json = resp.json()
     if ('response' in resp_json) and ('data' in resp_json['response']):
         token = resp_json['response']['data'].get('accessToken')
     if not token:
-        sys.exit("No access token found!")
+        sys.exit("no smartling access token found")
     return token
 
 
-def update_smartling():
+def smartling_upload():
     # authenticate smartling
     auth = smartling_authenticate()
-    current_app.logger.debug("authenticated in smartling successfully")
+    current_app.logger.debug("authenticated in smartling")
     # get relevant filepaths
     translation_fpath = os.path.join(current_app.root_path, "translations")
     pot_fpath = os.path.join(translation_fpath, 'messages.pot')
@@ -96,11 +99,63 @@ def update_smartling():
             'fileUri': 'portal/translations/messages.pot',
             'fileType': 'gettext'
         }
-        resp = post('https://api.smartling.com/files-api/v2/projects/{}/' \
+        resp = requests.post('https://api.smartling.com' \
+                '/files-api/v2/projects/{}/' \
                 'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
                 data=data, files=files, headers=headers)
         resp.raise_for_status()
-    current_app.logger.debug("messages.pot uploaded to smartling successfully")
+    current_app.logger.debug("messages.pot uploaded to smartling")
+
+
+def smartling_download(language=None):
+    translation_fpath = os.path.join(current_app.root_path, "translations")
+    # authenticate smartling
+    auth = smartling_authenticate()
+    current_app.logger.debug("authenticated in smartling")
+    # GET file(s) from smartling
+    headers = {'Authorization': 'Bearer {}'.format(auth)}
+    if language:
+        if not re.match(r'[a-z]{2}_[A-Z]{2}',language):
+            sys.exit('invalid language code; expected format xx_XX')
+        language_id = re.sub('_','-',language)
+        url = 'https://api.smartling.com/files-api/v2/projects/' \
+            '{}/locales/{}/file?fileUri={}'.format(
+                current_app.config.get("SMARTLING_PROJECT_ID"), language_id,
+                'portal/translations/messages.pot')
+        resp = requests.get(url, headers=headers)
+        if not resp.content:
+            sys.exit('no file returned')
+        current_app.logger.debug("{} po file downloaded " \
+                                "from smartling".format(language))
+        po_path = os.path.join(translation_fpath, language,
+                                'LC_MESSAGES', 'messages.po')
+        with open(po_path,"wb") as fout:
+            fout.write(resp.content)
+        current_app.logger.debug("{} po file saved".format(language))
+    else:
+        url = 'https://api.smartling.com/files-api/v2/projects/' \
+            '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
+            'published'.format(current_app.config.get("SMARTLING_PROJECT_ID"),
+                'portal/translations/messages.pot')
+        resp = requests.get(url, headers=headers)
+        if not resp.content:
+            sys.exit('no file returned')
+        current_app.logger.debug("zip file downloaded from smartling")
+        fp = StringIO(resp.content)
+        zfp = ZipFile(fp, "r")
+        for langfile in zfp.namelist():
+            langcode = re.sub('-','_',langfile.split('/')[0])
+            po_path = os.path.join(translation_fpath, langcode,
+                                'LC_MESSAGES', 'messages.po')
+            data = zfp.read(langfile)
+            if not data or not langcode:
+                sys.exit('invalid po file for {}'.format(langcode))
+            with open(po_path,"wb") as fout:
+                fout.write(data)
+            current_app.logger.debug("{} po file saved".format(langcode))
+    # compile .mo file(s) from .po file(s)
+    check_call(['pybabel','compile','-f','-d',translation_fpath])
+    current_app.logger.debug("babel mo files compiled and updated")
 
 
 @babel.localeselector
