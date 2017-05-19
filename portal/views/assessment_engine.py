@@ -1393,6 +1393,7 @@ def present_assessment(instruments=None):
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
         "subject_id": request.args.get('subject_id'),
+        "entry_method": request.args.get('entry_method')
     }
     # Clear empty querystring params
     assessment_params = {k:v for k,v in assessment_params.items() if v}

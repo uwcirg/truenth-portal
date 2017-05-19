@@ -1971,7 +1971,7 @@ table.profile-audit-log TH,
   margin-right: 7px;
 }
 .radio-inline input[type=radio] {
-  margin-left: -18px;
+  margin-left: -20px;
 }
 div.biopsy-option:last-of-type{
   margin-top: 1px;
@@ -2018,6 +2018,13 @@ div.biopsy-option:last-of-type{
 .modal button,
 .modal a.btn {
   font-size: 0.85em;
+}
+#manualEntryModal input[type='radio'] {
+  margin-top: 4px;
+  margin-left: -20px;
+}
+#manualEntryModal .modal-title {
+  margin: 0.5em;
 }
 .hide {
   display: none;
