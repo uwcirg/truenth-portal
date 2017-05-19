@@ -175,7 +175,7 @@ class RaceData(CoredataPoint):
         return False
 
     def hasdata(self, user):
-        return len(user.races) > 0
+        return user.races.count() > 0
 
 
 class EthnicityData(CoredataPoint):
@@ -190,7 +190,7 @@ class EthnicityData(CoredataPoint):
         return False
 
     def hasdata(self, user):
-        return len(user.ethnicities) > 0
+        return user.ethnicities.count() > 0
 
 
 class IndigenousData(CoredataPoint):
@@ -205,7 +205,7 @@ class IndigenousData(CoredataPoint):
         return False
 
     def hasdata(self, user):
-        return len(user.indigenous) > 0
+        return user.indigenous.count() > 0
 
 
 class RoleData(CoredataPoint):
