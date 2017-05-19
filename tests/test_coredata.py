@@ -31,7 +31,11 @@ class TestCoredata(TestCase):
         with SessionScope(db):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        self.assertTrue(Coredata().initial_obtained(self.test_user))
+        # should leave only indigenous, race and ethnicity
+        self.assertFalse(Coredata().initial_obtained(self.test_user))
+        expect = set(('race', 'ethnicity', 'indigenous'))
+        found = set(Coredata().still_needed(self.test_user))
+        self.assertEquals(found, expect)
 
     def test_still_needed(self):
         """Query for list of missing datapoints in legible format"""
@@ -44,3 +48,7 @@ class TestCoredata(TestCase):
         self.assertTrue('tou' in needed)
         self.assertTrue('clinical' in needed)
         self.assertTrue('org' in needed)
+
+        # needed should match required (minus 'name', 'role')
+        required = Coredata().required(self.test_user)
+        self.assertEquals(set(required) - set(needed), set(('name', 'role')))
