@@ -1683,9 +1683,21 @@ OrgTool.prototype.handleEvent = function() {
             } else {
                 var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
                 if (!isChecked) {
+                    //do not attempt to update if all orgs are unchecked for staff/staff admin
+                    var isStaff = false;
+                     $("#rolesGroup input[name='user_type']").each(function() {
+                        if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
+                            $("#userOrgs .help-block").addClass("error-message").text("Cannot ununcheck.  A staff member must be associated with an organization");
+                            isStaff = true;
+                        };
+                     });
+                     if (!isStaff) $("#userOrgs .help-block").removeClass("error-message").text("");
+                     else return false;
                     if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                 };
             };
+
+            $("#userOrgs .help-block").removeClass("error-message").text("");
 
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
