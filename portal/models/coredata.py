@@ -45,6 +45,15 @@ class Coredata(object):
                     items.append(instance.id)
             return items
 
+        def optional(self, user):
+            # Returns list of optional datapoints for user
+            items = []
+            for cls in self._registered:
+                instance = cls()
+                if instance.optional(user):
+                    items.append(instance.id)
+            return items
+
         def initial_obtained(self, user):
             # Check if all registered methods have data
             for cls in self._registered:
@@ -105,6 +114,29 @@ class CoredataPoint(object):
         belonging to an intervention or organization may imply the datapoint
         should never be an available option for the user to set.
 
+        Optional and required are mutually exclusive - an item may not be in
+        either for a user, but it shouldn't be in both.
+
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def optional(self, user):
+        """Returns true if optional for user, false otherwise
+
+        Applications are configured to request a set of core data points.
+        This method returns True if the active configuration includes the
+        datapoint for the user, regardless of whether or not a value has
+        been acquired.  i.e., should the user ever be asked for this point,
+        or should the control be hidden regardless of the presence of data.
+
+        NB - the user's state is frequently considered.  For example,
+        belonging to an intervention or organization may imply the datapoint
+        should never be an available option for the user to set.
+
+        Optional and required are mutually exclusive - an item may not be in
+        either for a user, but it shouldn't be in both.
+
         """
         raise NotImplemented
 
@@ -159,6 +191,10 @@ class DobData(CoredataPoint):
             return True
         return False
 
+    def optional(self, user):
+        # Optional for anyone, for whom it isn't required
+        return not self.required(user)
+
     def hasdata(self, user):
         return user.birthdate is not None
 
@@ -166,6 +202,9 @@ class DobData(CoredataPoint):
 class RaceData(CoredataPoint):
 
     def required(self, user):
+        return False
+
+    def optional(self, user):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -181,6 +220,9 @@ class RaceData(CoredataPoint):
 class EthnicityData(CoredataPoint):
 
     def required(self, user):
+        return False
+
+    def optional(self, user):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -196,6 +238,9 @@ class EthnicityData(CoredataPoint):
 class IndigenousData(CoredataPoint):
 
     def required(self, user):
+        return False
+
+    def optional(self, user):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -213,6 +258,9 @@ class RoleData(CoredataPoint):
     def required(self, user):
         return not SR_user(user)
 
+    def optional(self, user):
+        return False
+
     def hasdata(self, user):
         if len(user.roles) > 0:
             return True
@@ -228,6 +276,9 @@ class OrgData(CoredataPoint):
             return True
         return False
 
+    def optional(self, user):
+        return False
+
     def hasdata(self, user):
         return user.organizations.count() > 0
 
@@ -238,6 +289,9 @@ class ClinicalData(CoredataPoint):
         if SR_user(user):
             return False
         return user.has_role(ROLE.PATIENT)
+
+    def optional(self, user):
+        return False
 
     def hasdata(self, user):
         required = {item: False for item in (
@@ -261,6 +315,9 @@ class LocalizedData(CoredataPoint):
             return False
         return user.has_role(ROLE.PATIENT)
 
+    def optional(self, user):
+        return False
+
     def hasdata(self, user):
         for obs in user.observations:
             if obs.codeable_concept == CC.PCaLocalized:
@@ -273,6 +330,9 @@ class NameData(CoredataPoint):
     def required(self, user):
         return not SR_user(user)
 
+    def optional(self, user):
+        return not self.required(user)
+
     def hasdata(self, user):
         return user.first_name and user.last_name
 
@@ -281,6 +341,9 @@ class TouData(CoredataPoint):
 
     def required(self, user):
         return not SR_user(user)
+
+    def optional(self, user):
+        return False
 
     def hasdata(self, user):
         return ToU.query.join(Audit).filter(
