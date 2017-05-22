@@ -12,7 +12,8 @@ from .user import User
 class UserDocument(db.Model):
     """ORM class for user document upload data
 
-    Capture and store uploaded user documents (e.g. WiserCare Patient Report, user avatar image, etc).
+    Capture and store uploaded user documents
+    (e.g. patient reports, user avatar images, etc).
 
     """
     __tablename__ = 'user_documents'
