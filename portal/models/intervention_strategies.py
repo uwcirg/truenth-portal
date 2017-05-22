@@ -265,7 +265,7 @@ def update_card_html_on_completion():
                 p1 = _("You have completed the {} Registry questionnaire" \
                         ".").format(assessment_status.organization.name)
                 p2 = _("You will be notified when the next questionnaire " \
-                        "is ready to complete ({next_survey_date}).").format(
+                        "is ready to complete ({}).").format(
                         (assessment_status.completed_date +
                             timedelta(days=365)).strftime('%-d %b %Y'))
                 return """
@@ -294,10 +294,6 @@ def update_card_html_on_completion():
                   </div>
                 </div>""".format(h4=h4, p1=p1)
 
-            h4 = _("Completed Questionnaires")
-            p1 = _("View questionnaire completed on {}").format(
-                        assessment_status.completed_date.strftime(
-                        '%-d %b %Y'))
             completed_html = """
                 <div class="portal-description">
                   <h4 class="portal-description-title">
@@ -313,6 +309,10 @@ def update_card_html_on_completion():
                  </div>"""
 
             if assessment_status.overall_status == "Completed":
+                h4 = _("Completed Questionnaires")
+                p1 = _("View questionnaire completed on {}").format(
+                            assessment_status.completed_date.strftime(
+                            '%-d %b %Y'))
                 return completed_html.format(h4=h4, p1=p1,
                     recent_survey_link= url_for(
                         "portal.profile", _anchor="proAssessmentsLoc"))
