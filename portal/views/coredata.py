@@ -50,6 +50,23 @@ def requried(user_id):
     return jsonify(required=required)
 
 
+@coredata_api.route('/user/<int:user_id>/optional', methods=('GET',))
+@oauth.require_oauth()
+def optional(user_id):
+    """Looks up optional core data elements for user
+
+    :returns: simple JSON struct with a list of the coredata elements
+        optional for the given user.  The list is dependent on the application
+        configuration and details such as user's role, organizations and
+        intervention affiliations.
+
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    optional = Coredata().optional(user)
+    return jsonify(optional=optional)
+
+
 @coredata_api.route('/acquire', methods=('GET',))
 @oauth.require_oauth()
 def acquire():
