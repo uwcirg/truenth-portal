@@ -579,6 +579,10 @@ class OrgTree(object):
         Staff users can view all patients at or below their own org
         level.
 
+        NB - no patients should ever have a consent on file with the special
+        organization 'none of the above' - said organization is ignored in the
+        search.
+
         """
         from .user import User, UserRoles  # local to avoid cycle
         from .user_consent import UserConsent
@@ -589,7 +593,7 @@ class OrgTree(object):
             raise Unauthorized("visible_patients() exclusive to staff use")
 
         staff_user_orgs = set()
-        for org in staff_user.organizations:
+        for org in (o for o in staff_user.organizations if o.id != 0):
             staff_user_orgs.update(self.here_and_below_id(org.id))
 
         if not staff_user_orgs:
