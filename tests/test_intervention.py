@@ -372,6 +372,7 @@ class TestIntervention(TestCase):
         # Add a fake assessments and see a change
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
         mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 

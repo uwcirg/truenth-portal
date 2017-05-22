@@ -33,7 +33,7 @@ def mock_qr(user_id, instrument_id, status='completed'):
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
-metastatic_baseline_instruments = set(['eortc', 'ironmisc', 'prems'])
+metastatic_baseline_instruments = set(['eortc', 'ironmisc', 'factfpsi', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
 
 def mock_questionnairebanks():
@@ -177,6 +177,7 @@ class TestAssessment(TestCase):
         self.bless_with_basics()  # pick up a consent, etc.
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
         mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
