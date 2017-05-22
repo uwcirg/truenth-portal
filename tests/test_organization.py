@@ -361,3 +361,12 @@ class TestOrganization(TestCase):
         self.assertEquals(len(nodes), 4)
         for i in (102, 1002, 10031, 10032):
             self.assertTrue(i in nodes)
+
+    def test_visible_patients_on_none(self):
+        # Add none of the above to users orgs
+        self.test_user.organizations.append(Organization.query.get(0))
+        self.promote_user(role_name=ROLE.STAFF)
+        self.test_user = db.session.merge(self.test_user)
+
+        patients_list = OrgTree().visible_patients(self.test_user)
+        self.assertEquals(len(patients_list), 0)
