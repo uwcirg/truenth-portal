@@ -1415,11 +1415,11 @@ def user_documents(user_id):
                     type: integer
                     format: int64
                     description:
-                      User identifier defining with whom the document belongs to
+                      User identifier defining to whom the document belongs
                   document_type:
                     type: string
                     description:
-                      Type of document uploaded (e.g. WiserCare Patient Report,
+                      Type of document uploaded (e.g. patient report pdf,
                       user avatar image, etc)
                   uploaded_at:
                     type: string
@@ -1527,11 +1527,12 @@ def download_user_document(user_id,doc_id):
 @user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
 @oauth.require_oauth()
 def upload_user_document(user_id):
-    """Add a WiserCare Patient Report for the user
+    """Add a Patient Report for the user
+    (e.g. from WiserCare, P3P, Symptom Tracker, etc)
 
     File must be included in the POST call, and must be a valid PDF file.
-    File will be stored on server using uuid as filename; file metadata (including
-    reference uuid) will be stored in the db.
+    File will be stored on server using uuid as filename; file metadata
+    (including reference uuid) will be stored in the db.
 
     ---
     tags:
