@@ -31,10 +31,11 @@ class TestCoredata(TestCase):
         with SessionScope(db):
             db.session.commit()
         self.test_user = db.session.merge(self.test_user)
-        # should leave only indigenous, race and ethnicity
-        self.assertFalse(Coredata().initial_obtained(self.test_user))
+        # should leave only indigenous, race and ethnicity as options
+        # and nothing required
+        self.assertTrue(Coredata().initial_obtained(self.test_user))
         expect = set(('race', 'ethnicity', 'indigenous'))
-        found = set(Coredata().still_needed(self.test_user))
+        found = set(Coredata().optional(self.test_user))
         self.assertEquals(found, expect)
 
     def test_still_needed(self):
