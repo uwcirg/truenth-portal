@@ -373,6 +373,7 @@ class TestIntervention(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='eortc')
         mock_qr(user_id=TEST_USER_ID, instrument_id='ironmisc')
         mock_qr(user_id=TEST_USER_ID, instrument_id='factfpsi')
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26')
         mock_qr(user_id=TEST_USER_ID, instrument_id='prems')
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
