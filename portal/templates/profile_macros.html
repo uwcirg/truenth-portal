@@ -1158,7 +1158,7 @@
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         tnthDates.formatDateString(sessionAuthoredDate, "iso") +
-                                         " <span class='gmt'>(GMT), Y-M-D</span>" + '</span><hr/></caption>';
+                                         " <span class='gmt'>(GMT, Y-M-D)</span>" + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '', a = '';
