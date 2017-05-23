@@ -9,7 +9,7 @@ from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .organization import OrgTree
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
@@ -198,6 +198,35 @@ class ClinicalConstants(object):
         return value_quantity
 
 CC = ClinicalConstants()
+
+class EncounterConstants(object):
+    """ TrueNTH Encounter type Codes
+    See http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.type
+    """
+
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
+    @lazyprop
+    def paper(self):
+        coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='paper').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def phone(self):
+        coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='phone').one()
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+EC = EncounterConstants()
+
+
 
 
 class ValueQuantity(db.Model):
@@ -636,7 +665,18 @@ def add_static_concepts(only_quick=False):
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
 
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
+    paper = Coding(
+        system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+        code='paper',
+        display='Information collected on paper',
+    )
+    phone = Coding(
+        system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+        code='phone',
+        display='Information collected over telephone system',
+    )
+
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized, paper, phone]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
@@ -649,6 +689,10 @@ def add_static_concepts(only_quick=False):
     for clinical_concepts in CC:
         if not clinical_concepts in db.session():
             db.session.add(clinical_concepts)
+
+    for encounter_type in EC:
+        if not encounter_type in db.session():
+            db.session.add(encounter_type)
 
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate

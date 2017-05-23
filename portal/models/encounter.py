@@ -6,10 +6,19 @@ from datetime import datetime
 
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
+from .fhir import Coding
 from .reference import Reference
 from .role import ROLE
 from sqlalchemy.dialects.postgresql import ENUM
 
+
+class EncounterEncounterTypes(db.Model):
+    """Link table joining Encounter with n Encounter types"""
+
+    __tablename__ = 'encounter_encounter_types'
+    id = db.Column(db.Integer, primary_key=True)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
 # http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.status
 status_types = ENUM(
