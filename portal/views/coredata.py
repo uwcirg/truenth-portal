@@ -6,7 +6,8 @@ from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
 from ..models.auth import validate_client_origin
-from ..models.user import current_user
+from ..models.coredata import Coredata
+from ..models.user import current_user, get_user
 
 
 coredata_api = Blueprint('coredata_api', __name__, url_prefix='/api/coredata')
@@ -16,6 +17,54 @@ OPTIONS = ('ethnicity', 'procedure', 'race')
 @coredata_api.route('/options', methods=('GET',))
 def options():
     return jsonify(require_options=OPTIONS)
+
+
+@coredata_api.route('/user/<int:user_id>/still_needed', methods=('GET',))
+@oauth.require_oauth()
+def still_needed(user_id):
+    """Looks up missing coredata elements for given user
+
+    :returns: simple JSON struct with a list (potentially empty) of the
+        coredata elements still needed
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    still_needed = Coredata().still_needed(user)
+    return jsonify(still_needed=still_needed)
+
+
+@coredata_api.route('/user/<int:user_id>/required', methods=('GET',))
+@oauth.require_oauth()
+def requried(user_id):
+    """Looks up required core data elements for user
+
+    :returns: simple JSON struct with a list of the coredata elements
+        required for the given user.  The list is dependent on the application
+        configuration and details such as user's role, organizations and
+        intervention affiliations.
+
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    required = Coredata().required(user)
+    return jsonify(required=required)
+
+
+@coredata_api.route('/user/<int:user_id>/optional', methods=('GET',))
+@oauth.require_oauth()
+def optional(user_id):
+    """Looks up optional core data elements for user
+
+    :returns: simple JSON struct with a list of the coredata elements
+        optional for the given user.  The list is dependent on the application
+        configuration and details such as user's role, organizations and
+        intervention affiliations.
+
+    """
+    current_user().check_role(permission='view', other_id=user_id)
+    user = get_user(user_id)
+    optional = Coredata().optional(user)
+    return jsonify(optional=optional)
 
 
 @coredata_api.route('/acquire', methods=('GET',))
