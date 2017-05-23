@@ -339,7 +339,7 @@ var fillViews = {
                 $("#userRace input:checkbox").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#race_view").html(content);
+                if (hasValue(content)) $("#race_view").html($.trim(content));
                 else $("#race_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else {
@@ -353,7 +353,7 @@ var fillViews = {
                 $("#userEthnicity input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#ethnicity_view").html(content);
+                if (hasValue(content)) $("#ethnicity_view").html($.trim(content));
                 else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".ethnicity-view").hide();
@@ -363,9 +363,9 @@ var fillViews = {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#indigenous_view").html(content);
+                if (hasValue($.trim(content))) $("#indigenous_view").html($.trim(content));
                 else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
@@ -653,6 +653,7 @@ var fillContent = {
             };
         });
         fillViews.org();
+        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -1169,7 +1170,7 @@ var assembleContent = {
                     )
                 };
             };
-            
+
             if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
@@ -1680,6 +1681,7 @@ OrgTool.prototype.handleEvent = function() {
                     });
                     if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
                 };
+
             } else {
                 var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
                 if (!isChecked) {
@@ -1696,6 +1698,7 @@ OrgTool.prototype.handleEvent = function() {
                     if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                 };
             };
+            setTimeout("tnthAjax.getOptionalCoreData(" + userId + ", false, $(\".profile-item-container[data-sections='detail']\"));", 150);
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
@@ -1814,6 +1817,41 @@ OrgTool.prototype.getHereBelowOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "getOptionalCoreData": function(userId, sync, target, callback) {
+        if (target) {
+            target.find(".profile-item-loader").show();
+        };
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/optional",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.optional) {
+                var self = this;
+                var sections = $("#profileForm .optional");
+                sections.each(function() {
+                    var section = $(this).attr("data-section-id");
+                    if (hasValue(section)) {
+                        if (OT.inArray(section, data.optional)) {
+                            $(this).show();
+                        } else $(this).hide();
+                    };
+                });
+                if (callback) callback(data);
+            } else {
+                if (callback) callback({});
+            };
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        });
+    },
     "getOrgs": function(userId, noOverride, sync, callback, noPopulate) {
         loader(true);
         var self = this;

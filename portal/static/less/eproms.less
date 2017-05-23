@@ -1524,6 +1524,7 @@ div.right-panel {
 }
 #mainDiv.profile .profile-item-container .view-container {
   display: block;
+  position: relative;
 }
 #mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
@@ -1541,6 +1542,19 @@ div.right-panel {
 #mainDiv.profile .profile-item-container.edit .view-container {
   display: none;
 }
+#mainDiv.profile .profile-item-loader {
+  position: absolute;
+  top: 1%;
+  left: 1%;
+  width: 98%;
+  height: 98%;
+  padding: 8%;
+  background-color: #FFF;
+  opacity: 0.3;
+  z-index: 21;
+  display: none;
+}
+
 .profile-item-title {
   color: #5b5e61;
   margin-bottom: 2em;
@@ -1628,6 +1642,9 @@ div.right-panel {
   }
   .radio label{
     margin-bottom: 4px;
+  }
+  input, label {
+    margin-left: 6px;
   }
 }
 

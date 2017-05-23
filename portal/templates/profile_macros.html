@@ -132,7 +132,7 @@
 
 {% macro profileIndigenous(person) -%}
     {%- if person and person.org_coding_display_options.indigenous -%}
-        <div id="userIndigenousStatusContainer" class="flex-item"></div>
+        <div id="userIndigenousStatusContainer" data-section-id="indigenous" class="flex-item optional"></div>
         <script>
         $(function () {
             (function() {
@@ -144,8 +144,8 @@
                     var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
-                        html += '<div>' + '<label>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
+                        html += '<div>' +
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -167,7 +167,7 @@
 
 {% macro profileRace(person) -%}
     {%- if person and person.org_coding_display_options.race -%}
-        <div class="form-group profile-section flex-item" id="userRace">
+        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace">
             <label>{{ _("Race") }}</label>
             <div class="profile-radio-list">
                 <div class="checkbox">
@@ -207,7 +207,7 @@
 
 {% macro profileEthnicity(person) -%}
     {%- if person and person.org_coding_display_options.ethnicity -%}
-        <div class="form-group profile-section flex-item" id="userEthnicity">
+        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" id="userEthnicity">
             <label>{{ _("Ethnicity") }}</label>
             <div class="profile-radio-list">
                 <div class="radio">
@@ -1709,9 +1709,9 @@
                     <div class="view-container">
                         <table>
                             <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr class="ethnicity-view"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr class="race-view"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                            <tr id="ethnicityViewRow" data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                            <tr id="raceViewRow" data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                            <tr id="indigenousViewRow" data-section-id="indigenous" class="indigenous-view optional"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
                        </table>
                     </div>
                     <div class="flex edit-container">
@@ -1846,9 +1846,9 @@
                     <div class="view-container">
                          <table>
                             <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr class="ethnicity-view"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr class="race-view"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                            <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                            <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                            <tr data-section-id="indigenous" class="indigenous-view optional"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
                        </table>
                     </div>
                     <div class="flex edit-container">
