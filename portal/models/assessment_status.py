@@ -48,7 +48,7 @@ def qbs_for_user(user, classification):
 
     """
     results = []
-    for org in user.organizations:
+    for org in (o for o in user.organizations if o.id):
         top = OrgTree().find(org.id).top_level()
         qbs = QuestionnaireBank.query.filter(
             QuestionnaireBank.organization_id == top,

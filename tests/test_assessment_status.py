@@ -33,7 +33,8 @@ def mock_qr(user_id, instrument_id, status='completed'):
 
 
 localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
-metastatic_baseline_instruments = set(['eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
+metastatic_baseline_instruments = set([
+    'eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
 
 def mock_questionnairebanks():
@@ -41,6 +42,10 @@ def mock_questionnairebanks():
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
     with SessionScope(db):
+        for name in (localized_instruments.union(*(
+            metastatic_baseline_instruments,
+            metastatic_indefinite_instruments))):
+            db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
         db.session.commit()
@@ -60,19 +65,19 @@ def mock_questionnairebanks():
         classification='indefinite',
         organization_id=metastatic_org.id)
     for rank, instrument in enumerate(localized_instruments):
-        q = Questionnaire(name=instrument)
+        q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=7, days_till_overdue=90,
             rank=rank)
         l_qb.questionnaires.append(qbq)
     for rank, instrument in enumerate(metastatic_baseline_instruments):
-        q = Questionnaire(name=instrument)
+        q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=30,
             rank=rank)
         mb_qb.questionnaires.append(qbq)
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
-        q = Questionnaire(name=instrument)
+        q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=30,
             rank=rank)
@@ -222,3 +227,13 @@ class TestAssessment(TestCase):
         self.assertEquals(
             rv.json['status'][0]['consents'][0]['assessment_status'],
             'Not Enrolled')
+
+    def test_none_org(self):
+        # check users w/ none of the above org
+        self.test_user.organizations.append(Organization.query.get(0))
+        self.login()
+        self.bless_with_basics()
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Due")
