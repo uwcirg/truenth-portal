@@ -59,7 +59,7 @@ AdminTool.prototype.getData = function(userString) {
                               break;
                         };
                         a += (a != "" ? "<br/>" : "") + "<span class='" + cl  + " small-text' style='text-transform: capitalize'>" + status + "</span>";
-                        s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + sd + "</span>";
+                        s += (s != "" ? "<br/>" : "") + sd;
                         prevItem.assessment_status = item.assessment_status;
                         prevItem.consent_signed = item.consent.signed;
                       };
@@ -86,14 +86,22 @@ AdminTool.prototype.getData = function(userString) {
                   var cdField = row.children(".consentdate-field");
                  //console.log("status: " + statusField.length + " cdField: " + cdField.length);
                  if (d.data.status) statusField.html(d.data.status);
-                 if (d.data.consentdate) cdField.html(d.data.consentdate);
+                  var cdField = row.children(".consentdate-field");
+                  if (hasValue(d.data.consentdate)) {
+                    if (cdField.find(".formatted-consent-date").length == 0) cdField.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
+                    else cdField.find(".formatted-consent-date").text(d.data.consentdate);
+                  };
 
                  //card view
                  var cvf = row.find(".card-view");
                  cvf.each(function() {
                     var ctf = $(this).find(".title");
+                    var ctv = $(this).find(".value");
                     if ((/consent date/gi).test(ctf.text())) {
-                      ctf.next().html(d.data.consentdate);
+                       if (hasValue(d.data.consentdate)) {
+                          if (ctv.find(".formatted-consent-date").length == 0) ctv.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
+                          else ctv.find(".formatted-consent-date").text(d.data.consentdate);
+                       };
                     };
                  });
 
