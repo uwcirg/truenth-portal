@@ -363,9 +363,9 @@ var fillViews = {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#indigenous_view").html($.trim(content));
+                if (hasValue($.trim(content))) $("#indigenous_view").html($.trim(content));
                 else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
