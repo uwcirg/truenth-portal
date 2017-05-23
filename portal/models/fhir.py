@@ -676,6 +676,7 @@ def add_static_concepts(only_quick=False):
         display='Information collected over telephone system',
     )
 
+    # Todo: Shouldn't need to specify these again here...
     concepts = [BIOPSY, PCaDIAG, PCaLocalized, PAPER, PHONE]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
