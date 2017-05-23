@@ -227,3 +227,13 @@ class TestAssessment(TestCase):
         self.assertEquals(
             rv.json['status'][0]['consents'][0]['assessment_status'],
             'Not Enrolled')
+
+    def test_none_org(self):
+        # check users w/ none of the above org
+        self.test_user.organizations.append(Organization.query.get(0))
+        self.login()
+        self.bless_with_basics()
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Due")
