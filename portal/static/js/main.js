@@ -344,7 +344,7 @@ var fillViews = {
             };
         } else {
             $(".race-view").hide();
-        }
+        };
     },
     "ethnicity": function() {
         if ($("#userEthnicity").length > 0) {
@@ -361,7 +361,7 @@ var fillViews = {
     "indigenous": function() {
         if ($("#userIndigenousStatus").length > 0) {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
-                var content = "";
+                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
                 })
@@ -1832,10 +1832,19 @@ var tnthAjax = {
                 var sections = $("#profileForm .optional");
                 sections.each(function() {
                     var section = $(this).attr("data-section-id");
+                    var parent = $(this).closest(".profile-item-container");
+                    var noDataContainer = parent.find(".no-data-container");
+                    var btn = parent.find(".profile-item-edit-btn").hide();
                     if (hasValue(section)) {
                         if (OT.inArray(section, data.optional)) {
                             $(this).show();
-                        } else $(this).hide();
+                            noDataContainer.html("");
+                            btn.show();
+                        } else {
+                            $(this).hide();
+                            noDataContainer.html("<p class='text-muted'>No information available</p>");
+                            btn.hide();
+                        };
                     };
                 });
                 if (callback) callback(data);
