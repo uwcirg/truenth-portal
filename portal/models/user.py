@@ -1192,7 +1192,6 @@ class User(db.Model, UserMixin):
             return '<div>' + '</div><div>'.join(
                 [ui.staff_html for ui in uis]) + '</div>'
 
-
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""
         # remove case issues as it confuses the match
