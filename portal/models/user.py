@@ -1192,20 +1192,6 @@ class User(db.Model, UserMixin):
             return '<div>' + '</div><div>'.join(
                 [ui.staff_html for ui in uis]) + '</div>'
 
-    def report_html(self):
-        """Helper used from templates to display all patient report information
-
-        Combines the intervention links from staff_html() with the patient's
-        list of UserDocuments of type PatientReport (including download links)
-
-        """
-        html = self.staff_html()
-        for doc in self.documents.filter_by(document_type='PatientReport'):
-            dllink = '<div><a title="Download" href="/api/user/{}/' \
-                        'user_documents/{}">{}</a></div>'.format(self.id,
-                        doc.id, doc.filename)
-            html += dllink
-        return html
 
     def fuzzy_match(self, first_name, last_name, birthdate):
         """Returns probability score [0-100] of it being the same user"""
