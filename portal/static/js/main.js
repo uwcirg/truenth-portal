@@ -361,7 +361,7 @@ var fillViews = {
     "indigenous": function() {
         if ($("#userIndigenousStatus").length > 0) {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
-                 var content = "";
+                var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
                 })
