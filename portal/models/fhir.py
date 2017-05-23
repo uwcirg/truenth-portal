@@ -211,14 +211,14 @@ class EncounterConstants(object):
             yield getattr(self, attr)
 
     @lazyprop
-    def paper(self):
+    def PAPER(self):
         coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='paper').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
-    def phone(self):
+    def PHONE(self):
         coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='phone').one()
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
@@ -665,18 +665,18 @@ def add_static_concepts(only_quick=False):
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
 
-    paper = Coding(
+    PAPER = Coding(
         system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
         code='paper',
         display='Information collected on paper',
     )
-    phone = Coding(
+    PHONE = Coding(
         system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
         code='phone',
         display='Information collected over telephone system',
     )
 
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized, paper, phone]
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized, PAPER, PHONE]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
