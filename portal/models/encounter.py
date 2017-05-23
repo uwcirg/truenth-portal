@@ -12,10 +12,10 @@ from .role import ROLE
 from sqlalchemy.dialects.postgresql import ENUM
 
 
-class EncounterEncounterTypes(db.Model):
+class EncounterCodings(db.Model):
     """Link table joining Encounter with n Encounter types"""
 
-    __tablename__ = 'encounter_encounter_types'
+    __tablename__ = 'encounter_codings'
     id = db.Column(db.Integer, primary_key=True)
     encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
     coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
