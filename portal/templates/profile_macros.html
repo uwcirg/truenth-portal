@@ -717,6 +717,9 @@
                     };
                 });
             {%- endif -%}
+            {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
+                $("#userOrgs .noOrg-container").hide();
+            {%- endif -%}
         };
     </script>
 {%- endmacro %}
