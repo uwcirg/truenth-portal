@@ -1283,11 +1283,13 @@ def assessment_add(patient_id):
         'valid': True,
     })
 
+    encounter = current_user().current_encounter
+
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
         status=request.json["status"],
         document=request.json,
-        encounter=current_user().current_encounter
+        encounter=encounter,
     )
 
     db.session.add(questionnaire_response)
