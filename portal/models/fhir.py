@@ -212,14 +212,22 @@ class EncounterConstants(object):
 
     @lazyprop
     def PAPER(self):
-        coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='paper').one()
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='paper',
+            display='Information collected on paper',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
     def PHONE(self):
-        coding = Coding.query.filter_by(system=TRUENTH_ENCOUNTER_CODE_SYSTEM, code='phone').one()
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='phone',
+            display='Information collected over telephone system',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -665,19 +673,8 @@ def add_static_concepts(only_quick=False):
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
 
-    PAPER = Coding(
-        system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
-        code='paper',
-        display='Information collected on paper',
-    )
-    PHONE = Coding(
-        system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
-        code='phone',
-        display='Information collected over telephone system',
-    )
-
     # Todo: Shouldn't need to specify these again here...
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized, PAPER, PHONE]
+    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
