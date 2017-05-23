@@ -339,7 +339,7 @@ var fillViews = {
                 $("#userRace input:checkbox").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#race_view").html(content);
+                if (hasValue(content)) $("#race_view").html($.trim(content));
                 else $("#race_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else {
@@ -353,7 +353,7 @@ var fillViews = {
                 $("#userEthnicity input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#ethnicity_view").html(content);
+                if (hasValue(content)) $("#ethnicity_view").html($.trim(content));
                 else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".ethnicity-view").hide();
@@ -365,7 +365,7 @@ var fillViews = {
                 $("#userIndigenousStatus input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#indigenous_view").html(content);
+                if (hasValue(content)) $("#indigenous_view").html($.trim(content));
                 else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
@@ -653,7 +653,7 @@ var fillContent = {
             };
         });
         fillViews.org();
-        OT.handleIronmanSections($("#userOrgs input[name='organization']:checked").val());
+        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -1170,7 +1170,7 @@ var assembleContent = {
                     )
                 };
             };
-            
+
             if ($("#locale").length > 0 && $("#locale").find("option:selected").length > 0) {
                 demoArray["communication"] = [
                     {"language": {
@@ -1688,8 +1688,7 @@ OrgTool.prototype.handleEvent = function() {
                     if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
                 };
             };
-
-            OT.handleIronmanSections($(this).val());
+            setTimeout("tnthAjax.getOptionalCoreData(" + userId + ", false, $(\".profile-item-container[data-sections='detail']\"));", 150);
 
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
@@ -1713,48 +1712,6 @@ OrgTool.prototype.handleEvent = function() {
             }
         });
     });
-};
-OrgTool.prototype.handleIronmanSections = function(orgId) {
-    //for IROMAN patient, race/ethinicity/race sections will need to be hidden
-    //IROMAN org ID = 20000
-    var topLevelOrg = OT.getTopLevelParentOrg(orgId);
-    var sections = [
-        {
-            id: "userEthnicity"
-        },
-        {
-            id: "userRace"
-        },
-        {
-            id: "userIndigenousStatus"
-        },
-        {
-            class: "ethnicity-view"
-        },
-        {
-            class: "race-view"
-        },
-        {
-            class: "indigenous-view"
-        }
-    ];
-    if (hasValue(orgId)  && parseInt(orgId) != 0) {
-        var orgsList = this.getOrgsList();
-        sections.forEach(function(item) {
-            if (orgsList[topLevelOrg] && orgsList[topLevelOrg].name.toUpperCase() == "IRONMAN") {
-                if (item.id) $("#" + item.id).hide();
-                else if (item.class) $("." + item.class).hide();
-            } else {
-                if (item.id) $("#" + item.id).show();
-                else if (item.class) $("." + item.class).show();
-            };
-        });
-    } else {
-        sections.forEach(function(item) {
-            if (item.id) $("#" + item.id).show();
-            else if (item.class) $("." + item.class).show();
-        });
-    };
 };
 OrgTool.prototype.getCommunicationArray = function() {
     var arrCommunication = [];
@@ -1848,6 +1805,41 @@ OrgTool.prototype.getHereBelowOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "getOptionalCoreData": function(userId, sync, target, callback) {
+        if (target) {
+            target.find(".profile-item-loader").show();
+        };
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/optional",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.optional) {
+                var self = this;
+                var sections = $("#profileForm .optional");
+                sections.each(function() {
+                    var section = $(this).attr("data-section-id");
+                    if (hasValue(section)) {
+                        if (OT.inArray(section, data.optional)) {
+                            $(this).show();
+                        } else $(this).hide();
+                    };
+                });
+                if (callback) callback(data);
+            } else {
+                if (callback) callback({});
+            };
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        });
+    },
     "getOrgs": function(userId, noOverride, sync, callback, noPopulate) {
         loader(true);
         var self = this;
