@@ -13,8 +13,7 @@ from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
 from ..models.auth import validate_client_origin
-from ..models.fhir import QuestionnaireResponse
-from ..models.fhir import aggregate_responses, generate_qnr_csv
+from ..models.fhir import QuestionnaireResponse, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
