@@ -211,6 +211,7 @@ def update_card_html_on_completion():
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
         assessment_status = AssessmentStatus(user=user)
+        current_app.logger.debug("{}".format(assessment_status))
         indefinite_questionnaires = (
             assessment_status.instruments_needing_full_assessment(
                 classification='indefinite'),
