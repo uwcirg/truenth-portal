@@ -504,6 +504,10 @@ def aggregate_responses(instrument_ids, current_user):
 
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
+        encounter = questionnaire_response.encounter
+        encounter_fhir = encounter.as_fhir()
+        questionnaire_response.document["encounter"] = encounter_fhir
+
         questionnaire_response.document["subject"] = {
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
