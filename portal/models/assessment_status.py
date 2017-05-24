@@ -189,6 +189,16 @@ class AssessmentStatus(object):
         self._consent = consent
         self.questionnaire_data = QuestionnaireDetails(user, self.consent_date)
 
+    def __str__(self):
+        """Present friendly format for logging, etc."""
+        results = (
+            "{0.user} has overall status '{0.overall_status}' for "
+            "baseline questionnaires:".format(self))
+
+        return results + str(
+            ['{}:{}'.format(unicode(q['name']), unicode(q['status']))
+             for q in self.questionnaire_data.baseline()])
+
     @property
     def consent_date(self):
         """Return timestamp of signed consent, if available, else None"""
@@ -324,7 +334,7 @@ class AssessmentStatus(object):
                 self.questionnaire_data.baseline()]
             if all((status_strings[0] == status for status in status_strings)):
                 if not status_strings[0] in (
-                    'Completed', 'Due', 'In Progress', 'Overdue'):
+                    'Completed', 'Due', 'In Progress', 'Overdue', 'Expired'):
                     raise ValueError('Unexpected common status {}'.format(
                         status_strings[0]))
                 self._overall_status = status_strings[0]
