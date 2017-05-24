@@ -96,9 +96,9 @@ def patients_root():
         patients = patients.union(ui_patients)
 
     #get assessment status only if it is needed as specified by config
-    patient_list_addl_fields = current_app.config.get('PATIENT_LIST_ADDL_FIELDS')
-    if 'status' in patient_list_addl_fields:
-        patient_list = []
+    patients_list = None
+    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
+        patients_list = []
         for patient in patients:
             assessment_status = AssessmentStatus(user=patient)
             try:
@@ -109,11 +109,10 @@ def patients_root():
                 patient.assessment_status = None
                 current_app.logger.debug("Error retrieving assessment status for patient {}".format(str(patient.id)))
 
-            patient_list.append(patient)
-        patients = patient_list
+            patients_list.append(patient)
 
     return render_template(
-        'patients_by_org.html', patients_list=patients,
+        'patients_by_org.html', patients_list=patients_list if patients_list else patients.all(),
         user=user, org_list=org_list,
         wide_container="true")
 

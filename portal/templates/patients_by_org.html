@@ -160,21 +160,21 @@ $(document).ready(function() {
   /*****************
   //client side update of data
   //keep this here, in case we need to bring this back
-  $("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
-      AT.updateData();
-   });
-  $("#adminTable").on("page-change.bs.table", function() {
-      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
-      if ($(this).find(".card-view").length > 0) {
-        AT.updateData();
-      }
-  });
-  $("#adminTable").on("toggle.bs.table", function() {
-      if ($(this).find(".card-view").length > 0) {
-        AT.updateData();
-      }
-  });
-  setTimeout("AT.updateData();", 0);
+  //$("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
+  //    AT.updateData();
+  // });
+  //$("#adminTable").on("page-change.bs.table", function() {
+  //    if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
+  //    if ($(this).find(".card-view").length > 0) {
+  //      AT.updateData();
+  //    }
+  //});
+  //$("#adminTable").on("toggle.bs.table", function() {
+  //    if ($(this).find(".card-view").length > 0) {
+  //      AT.updateData();
+  //    }
+  //});
+  //setTimeout("AT.updateData();", 0);
   ******************/
 
    AT.fadeLoader();
