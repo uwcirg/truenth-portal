@@ -614,8 +614,8 @@ def generate_qnr_csv(qnr_bundle):
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
         row_data.update({
-            'entry_method': entry_method(row_data, qnr_data),
-            'author_role': author_role(row_data, qnr_data),
+            'entry_method': entry_method(row_data, qnr),
+            'author_role': author_role(row_data, qnr),
         })
         for question in qnr['group']['question']:
             row_data.update({'question_code': question['linkId']})
