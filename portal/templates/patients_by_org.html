@@ -129,6 +129,7 @@
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
+                          <span class="tnth-hide">{{consent.audit.timestamp}}</span>
                           {{consent.audit.timestamp.strftime('%-d %b %Y')}}<br/>
                         {%-endfor-%}
                       {%-endif-%}
