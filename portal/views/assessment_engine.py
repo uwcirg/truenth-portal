@@ -13,7 +13,7 @@ from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
 from ..models.auth import validate_client_origin
-from ..models.fhir import QuestionnaireResponse, aggregate_responses, generate_qnr_csv
+from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
@@ -1284,6 +1284,9 @@ def assessment_add(patient_id):
     })
 
     encounter = current_user().current_encounter
+    if 'entry_method' in session:
+        encounter_type = getattr(EC, session['entry_method'].upper())
+        encounter.type.append(encounter_type)
 
     questionnaire_response = QuestionnaireResponse(
         subject_id=patient_id,
@@ -1394,7 +1397,6 @@ def present_assessment(instruments=None):
         "project": ",".join(common_instruments),
         "resume_instrument_id": ",".join(resume_instruments),
         "subject_id": request.args.get('subject_id'),
-        "entry_method": request.args.get('entry_method')
     }
     # Clear empty querystring params
     assessment_params = {k:v for k,v in assessment_params.items() if v}
@@ -1404,6 +1406,17 @@ def present_assessment(instruments=None):
         "/surveys/new_session?",
         requests.compat.urlencode(assessment_params),
     ))
+
+    # Temporarily persist entry method until QNR POSTed
+    entry_methods = {'paper'}
+    if (
+        'entry_method' in request.args and
+        request.args.get('entry_method') in entry_methods
+    ):
+        session['entry_method'] = request.args.get('entry_method')
+        current_app.logger.debug(
+            'storing session[entry_method]: %s', request.args.get('entry_method')
+        )
 
     if 'next' in request.args:
         next_url = request.args.get('next')
