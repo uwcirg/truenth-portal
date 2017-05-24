@@ -33,7 +33,6 @@ from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import ContactPoint, Telecom
 
-
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
 
@@ -542,6 +541,7 @@ class User(db.Model, UserMixin):
                 if org.default_locale:
                     locale_options.add(org.default_locale)
         return locale_options
+        
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
