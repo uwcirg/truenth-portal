@@ -234,9 +234,6 @@ class EncounterConstants(object):
 
 EC = EncounterConstants()
 
-
-
-
 class ValueQuantity(db.Model):
     __tablename__ = 'value_quantities'
     id = db.Column(db.Integer, primary_key=True)
