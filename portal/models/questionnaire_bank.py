@@ -1,11 +1,8 @@
 """Questionnaire Bank module"""
-from collections import defaultdict
-from flask import current_app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
-from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .reference import Reference
 
@@ -113,7 +110,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
             questionnaire_bank_id, questionnaire_id,
             name='_questionnaire_bank_questionnaire'),
         UniqueConstraint(
-            questionnaire_id, rank,
+            questionnaire_bank_id, rank,
             name='_questionnaire_bank_questionnaire_rank')
     )
 
