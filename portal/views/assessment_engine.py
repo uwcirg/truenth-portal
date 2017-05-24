@@ -1470,6 +1470,9 @@ def complete_assessment():
     """
 
     next_url = session.pop("assessment_return", "home")
+    entry_method = session.pop("entry_method", None)
+    if entry_method:
+        current_app.logger.debug("assessment complete via %s", entry_method)
 
     current_app.logger.debug("assessment complete, redirect to: %s", next_url)
     return redirect(next_url, code=303)
