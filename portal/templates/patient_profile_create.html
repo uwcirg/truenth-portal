@@ -84,7 +84,7 @@
                     {{profileSaveBtn()}}
             </div>
             <br/>
-            <div>
+            <div class="back-button-container">
                 {{ back_btn('patients','patients list')}}
                 <a href="#" style="visibility:hidden" id="profileBackLink"></a>
             </div>
@@ -111,6 +111,14 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _accountArray = {};
     var hasError = false;
     var errorMessage = '';
+
+    $("#createProfileForm .back-button-container").prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    $("#createProfileForm .btn-tnth-back").on("click", function(e) {
+        e.preventDefault();
+        $(this).prev(".loading-message-indicator").show();
+        $(this).hide();
+        window.location = $(this).attr("href");
+    });
 
     $("#updateProfile").attr("disabled", true);
     $("#createProfileForm input, #createProfileForm select").on("change", function() {
