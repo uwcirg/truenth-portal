@@ -101,9 +101,14 @@ def patients_root():
         patient_list = []
         for patient in patients:
             assessment_status = AssessmentStatus(user=patient)
-            patient.assessment_status = (
+            try:
+                patient.assessment_status = (
                     assessment_status.overall_status if assessment_status else
                     None)
+            except ValueError:
+                patient.assessment_status = None
+                current_app.logger.debug("Error retrieving assessment status for patient {}".format(str(patient.id)))
+
             patient_list.append(patient)
         patients = patient_list
 
