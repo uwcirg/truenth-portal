@@ -9,7 +9,7 @@ from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .organization import OrgTree
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
@@ -199,6 +199,40 @@ class ClinicalConstants(object):
 
 CC = ClinicalConstants()
 
+class EncounterConstants(object):
+    """ TrueNTH Encounter type Codes
+    See http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.type
+    """
+
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
+    @lazyprop
+    def PAPER(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='paper',
+            display='Information collected on paper',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def PHONE(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='phone',
+            display='Information collected over telephone system',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+EC = EncounterConstants()
 
 class ValueQuantity(db.Model):
     __tablename__ = 'value_quantities'
@@ -467,6 +501,10 @@ def aggregate_responses(instrument_ids, current_user):
 
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
+        encounter = questionnaire_response.encounter
+        encounter_fhir = encounter.as_fhir()
+        questionnaire_response.document["encounter"] = encounter_fhir
+
         questionnaire_response.document["subject"] = {
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
@@ -526,11 +564,31 @@ def generate_qnr_csv(qnr_bundle):
 
         return filtered_answers
 
+    def entry_method(row_data, qnr_data):
+        # Todo: replace with EC.PAPER CodeableConcept
+        if 'paper' in (c.get('code') for c in qnr_data['encounter']['type']):
+            return 'enter manually - paper'
+        if row_data.get('subject_id') == row_data.get('author_id'):
+            return 'online'
+        else:
+            return 'enter manually - interview assisted'
+
+    def author_role(row_data, qnr_data):
+        if (
+            row_data.get('subject_id') == row_data.get('author_id') or
+            'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+        ):
+            return 'Subject'
+        else:
+            return 'Site Resource'
+
     columns = (
         'identifier',
         'study_id',
         'subject_id',
         'author_id',
+        'author_role',
+        'entry_method',
         'authored',
         'instrument',
         'question_code',
@@ -555,6 +613,10 @@ def generate_qnr_csv(qnr_bundle):
             'authored': qnr['authored'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
+        row_data.update({
+            'entry_method': entry_method(row_data, qnr_data),
+            'author_role': author_role(row_data, qnr_data),
+        })
         for question in qnr['group']['question']:
             row_data.update({'question_code': question['linkId']})
 
@@ -636,6 +698,7 @@ def add_static_concepts(only_quick=False):
     PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
                               display='PCa localized diagnosis')
 
+    # Todo: Shouldn't need to specify these again here...
     concepts = [BIOPSY, PCaDIAG, PCaLocalized]
     concepts += fetch_local_valueset(NHHD_291036)
     if not only_quick:
@@ -649,6 +712,10 @@ def add_static_concepts(only_quick=False):
     for clinical_concepts in CC:
         if not clinical_concepts in db.session():
             db.session.add(clinical_concepts)
+
+    for encounter_type in EC:
+        if not encounter_type in db.session():
+            db.session.add(encounter_type)
 
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate

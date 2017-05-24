@@ -6,10 +6,19 @@ from datetime import datetime
 
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
+from .fhir import Coding
 from .reference import Reference
 from .role import ROLE
 from sqlalchemy.dialects.postgresql import ENUM
 
+
+class EncounterCodings(db.Model):
+    """Link table joining Encounter with n Encounter types"""
+
+    __tablename__ = 'encounter_codings'
+    id = db.Column(db.Integer, primary_key=True)
+    encounter_id = db.Column(db.ForeignKey('encounters.id'), nullable=False)
+    coding_id = db.Column(db.ForeignKey('codings.id'), nullable=False)
 
 # http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.status
 status_types = ENUM(
@@ -43,7 +52,7 @@ class Encounter(db.Model):
     """when not defined, Period is assumed to be ongoing
     """
     auth_method = db.Column('auth_method', auth_method_types, nullable=False)
-
+    type = db.relationship("Coding", secondary='encounter_codings')
     def __str__(self):
         """Log friendly string format"""
         def period():
@@ -66,6 +75,8 @@ class Encounter(db.Model):
         d['period'] = {'start': as_fhir(self.start_time)}
         if self.end_time:
             d['period']['end'] = as_fhir(self.end_time)
+        if self.type:
+            d['type'] = [coding.as_fhir() for coding in self.type]
         d['auth_method'] = self.auth_method
         return d
 
