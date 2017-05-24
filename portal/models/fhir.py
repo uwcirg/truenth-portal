@@ -509,6 +509,17 @@ def aggregate_responses(instrument_ids, current_user):
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
 
+        # Override default FHIR to include org name
+        care_provider = questionnaire_response.document["subject"].get("careProvider")
+        if care_provider:
+            care_provider = []
+            for org in subject.organizations:
+                care_provider.append({
+                    "reference": "api/organization/%d" % org.id,
+                    "name": org.name,
+                })
+            questionnaire_response.document["subject"]["careProvider"] = care_provider
+
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
     bundle = {
