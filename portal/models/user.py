@@ -541,7 +541,7 @@ class User(db.Model, UserMixin):
                 if org.default_locale:
                     locale_options.add(org.default_locale)
         return locale_options
-
+    
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""

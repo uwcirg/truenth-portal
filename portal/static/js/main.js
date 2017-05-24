@@ -48,6 +48,14 @@ function embed_page(data){
                 //console.log("in firefox")
             } else setTimeout("loader();", 0);
 
+            $("#tnthTopLinks li a, #tnthNavbarXs li a").each(function() {
+                $(this).on("click", function(e) {
+                    e.preventDefault();
+                    loader(true);
+                    window.location = $(this).attr("href");
+                });
+            });
+
         });
 }
 
