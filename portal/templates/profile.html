@@ -94,6 +94,14 @@ var __stickyMenu, __navBar, __stickyMenu_topPos, __homeFooter, __indexContainer,
 $(document).ready(function(){
     $('#loginAsPatient a').tooltip();
 
+    $("#profileForm .back").prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    $("#profileForm .back").on("click", function(e) {
+        e.preventDefault();
+        $(this).find(".loading-message-indicator").show();
+        $(this).find(".glyphicon-home").hide();
+        window.location = $(this).attr("href");
+    });
+
     $("a.open").on("click", function(e) {
       // stop default browser behavior
       e.preventDefault();
