@@ -509,6 +509,17 @@ def aggregate_responses(instrument_ids, current_user):
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
 
+        # Override default FHIR to include org name
+        care_provider = questionnaire_response.document["subject"].get("careProvider")
+        if care_provider:
+            care_provider = []
+            for org in subject.organizations:
+                care_provider.append({
+                    "reference": "api/organization/%d" % org.id,
+                    "name": org.name,
+                })
+            questionnaire_response.document["subject"]["careProvider"] = care_provider
+
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
     bundle = {
@@ -532,6 +543,12 @@ def generate_qnr_csv(qnr_bundle):
             else:
                 return identifier['value']
         return None
+    def get_site(qnr_data):
+        """Return name of first organization, else None"""
+        try:
+            return qnr_data['subject']['careProvider'][0]['name']
+        except (KeyError, IndexError):
+            return None
 
     def consolidate_answer_pairs(answers):
         """
@@ -590,7 +607,9 @@ def generate_qnr_csv(qnr_bundle):
 
     columns = (
         'identifier',
+        'status',
         'study_id',
+        'site_name',
         'subject_id',
         'author_id',
         'author_role',
@@ -606,11 +625,13 @@ def generate_qnr_csv(qnr_bundle):
     for qnr in qnr_bundle['entry']:
         row_data = {
             'identifier': qnr['identifier']['value'],
+            'status': qnr['status'],
             'subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
             ),
             'author_id': qnr['author']['reference'].split('/')[-1],
+            'site_name': get_site(qnr),
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
