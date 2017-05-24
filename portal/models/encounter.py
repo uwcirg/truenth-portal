@@ -52,7 +52,7 @@ class Encounter(db.Model):
     """when not defined, Period is assumed to be ongoing
     """
     auth_method = db.Column('auth_method', auth_method_types, nullable=False)
-
+    type = db.relationship("Coding", secondary='encounter_codings')
     def __str__(self):
         """Log friendly string format"""
         def period():
