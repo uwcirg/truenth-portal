@@ -590,6 +590,7 @@ def generate_qnr_csv(qnr_bundle):
 
     columns = (
         'identifier',
+        'status',
         'study_id',
         'subject_id',
         'author_id',
@@ -606,6 +607,7 @@ def generate_qnr_csv(qnr_bundle):
     for qnr in qnr_bundle['entry']:
         row_data = {
             'identifier': qnr['identifier']['value'],
+            'status': qnr['status'],
             'subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
