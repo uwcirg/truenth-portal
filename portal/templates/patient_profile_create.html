@@ -92,7 +92,7 @@
             </div>
         </div>
     </div>
-    <input type="hidden" id="stock_consent_url" value="http://eproms-dev.cirg.washington.edu:5000/legal/stock-org-consent/placeholder" />
+    <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
     {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
     {%- endif -%}
 </form>
