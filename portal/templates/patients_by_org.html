@@ -119,7 +119,7 @@
                       <td>{{ patient.phone if patient.phone}}</td>
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip">{{ patient.staff_html() | safe }}{% for doc in patient.documents.filter_by(document_type='PatientReport') | sort(attribute='id') %}<div><a title="Download" href="{{ url_for('user_api.download_user_document', user_id=patient.id, doc_id=doc.id) }}">{{ doc.filename }}</a></div>{% endfor %}</td>
+                        <td class="rowlink-skip">{{ patient.staff_html() | safe }}{% for doc in patient.documents.filter_by(document_type='PatientReport') | sort(attribute='id') %}<div><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{{ doc.filename }}</a></div>{% endfor %}</td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
