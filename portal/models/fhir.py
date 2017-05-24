@@ -543,6 +543,12 @@ def generate_qnr_csv(qnr_bundle):
             else:
                 return identifier['value']
         return None
+    def get_site(qnr_data):
+        """Return name of first organization, else None"""
+        try:
+            return qnr_data['subject']['careProvider'][0]['name']
+        except (KeyError, IndexError):
+            return None
 
     def consolidate_answer_pairs(answers):
         """
@@ -603,6 +609,7 @@ def generate_qnr_csv(qnr_bundle):
         'identifier',
         'status',
         'study_id',
+        'site_name',
         'subject_id',
         'author_id',
         'author_role',
@@ -624,6 +631,7 @@ def generate_qnr_csv(qnr_bundle):
                 use='official'
             ),
             'author_id': qnr['author']['reference'].split('/')[-1],
+            'site_name': get_site(qnr),
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
