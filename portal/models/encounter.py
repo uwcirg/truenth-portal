@@ -75,6 +75,8 @@ class Encounter(db.Model):
         d['period'] = {'start': as_fhir(self.start_time)}
         if self.end_time:
             d['period']['end'] = as_fhir(self.end_time)
+        if self.type:
+            d['type'] = [coding.as_fhir() for coding in self.type]
         d['auth_method'] = self.auth_method
         return d
 
