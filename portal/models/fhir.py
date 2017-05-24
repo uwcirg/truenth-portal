@@ -9,6 +9,7 @@ from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .organization import OrgTree
+from .reference import Reference
 from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
@@ -509,16 +510,11 @@ def aggregate_responses(instrument_ids, current_user):
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
 
-        # Override default FHIR to include org name
-        care_provider = questionnaire_response.document["subject"].get("careProvider")
-        if care_provider:
-            care_provider = []
-            for org in subject.organizations:
-                care_provider.append({
-                    "reference": "api/organization/%d" % org.id,
-                    "name": org.name,
-                })
-            questionnaire_response.document["subject"]["careProvider"] = care_provider
+        if subject.organizations:
+            questionnaire_response.document["subject"]["careProvider"] = [
+                Reference.organization(org.id).as_fhir()
+                for org in subject.organizations
+            ]
 
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
@@ -546,7 +542,7 @@ def generate_qnr_csv(qnr_bundle):
     def get_site(qnr_data):
         """Return name of first organization, else None"""
         try:
-            return qnr_data['subject']['careProvider'][0]['name']
+            return qnr_data['subject']['careProvider'][0]['display']
         except (KeyError, IndexError):
             return None
 
