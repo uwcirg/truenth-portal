@@ -35,7 +35,8 @@ class Procedure(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     encounter_id = db.Column(db.ForeignKey('encounters.id',
-                                           name='procedures_encounter_fk'))
+                                           name='procedures_encounter_fk'),
+                                           nullable=False)
 
     audit = db.relationship('Audit', cascade="save-update", lazy='joined')
     """tracks when and by whom the `procedure` was retained, included

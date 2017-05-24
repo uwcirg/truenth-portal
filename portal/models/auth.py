@@ -44,7 +44,7 @@ class Client(db.Model):
     client_id = db.Column(db.String(40), primary_key=True)
     client_secret = db.Column(db.String(55), nullable=False)
 
-    user_id = db.Column(db.ForeignKey('users.id'))
+    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     user = db.relationship('User')
 
     _redirect_uris = db.Column(db.Text)
@@ -189,7 +189,8 @@ class Grant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')
+        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False
     )
     user = db.relationship('User')
 
@@ -242,7 +243,8 @@ class Token(db.Model):
     client = db.relationship('Client')
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE')
+        db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False
     )
     user = db.relationship('User')
 
