@@ -92,6 +92,7 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
     {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
     {%- endif -%}
 </form>
@@ -162,6 +163,10 @@ $(document).ready(function(){
                 if (consent_org_id && !orgs[consent_org_id]) {
                     orgs[consent_org_id] = true;
                     var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
+                    if (!hasValue(agreement)) {
+                        var stockConsentUrl = $("#stock_consent_url").val();
+                        agreement = stockConsentUrl.replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
+                    };
                     if (hasValue(agreement)) {
                         consents.push({"organization_id": consent_org_id, "agreement_url": agreement, "staff_editable": true, "include_in_reports": true, "send_reminders": true});
                     };
