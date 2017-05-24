@@ -226,7 +226,7 @@ class TestAssessment(TestCase):
         self.assertEquals(len(rv.json['status']), 1)
         self.assertEquals(
             rv.json['status'][0]['consents'][0]['assessment_status'],
-            'Not Enrolled')
+            'Expired')
 
     def test_none_org(self):
         # check users w/ none of the above org

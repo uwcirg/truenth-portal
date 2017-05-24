@@ -292,24 +292,45 @@ class AssessmentStatus(object):
 
     @property
     def overall_status(self):
-        """Returns display quality string for user's overall status"""
+        """Returns display quality string for user's overall status
+
+        returns:
+            'Completed': if all questionnaires in the bank were completed.
+            'Due': if all questionnares are unstarted and the days since
+                consenting hasn't exceeded the 'days_till_due' for all
+                questionnaires.
+            'Expired': if we don't have a consent date for the user, or
+                if there are no questionnaires assigned to the user, or
+                if all questionnaires in the bank have expired.
+            'Overdue': if all questionnares are unstarted and the days since
+                consenting hasn't exceeded the 'days_till_overdue' for all
+                questionnaires.  (NB - check for 'due' runs first)
+            'Partially Completed': if one or more questionnares were at least
+                started and at least one questionnaire is expired.
+            'In Progress': if one or more questionnares were at least
+                started and the remaining unfininshed questionnaires are not
+                expired.
+
+        """
         if hasattr(self, '_overall_status'):
             return self._overall_status
         else:
-            if not self.consent_date:
-                self._overall_status = 'Expired'
-                return self._overall_status
             first_baseline = next(self.questionnaire_data.baseline(), None)
-            if not first_baseline:
-                self._overall_status = 'Not Enrolled'
+            if not self.consent_date or not first_baseline:
+                self._overall_status = 'Expired'
                 return self._overall_status
             status_strings = [
                 details['status'] for details in
                 self.questionnaire_data.baseline()]
             if all((status_strings[0] == status for status in status_strings)):
+                if not status_strings[0] in (
+                    'Completed', 'Due', 'In Progress', 'Overdue'):
+                    raise ValueError('Unexpected common status {}'.format(
+                        status_strings[0]))
                 self._overall_status = status_strings[0]
             else:
                 if any(('Expired' == status for status in status_strings)):
                     self._overall_status = 'Partially Completed'
-                self._overall_status = 'In Progress'
+                else:
+                    self._overall_status = 'In Progress'
             return self._overall_status
