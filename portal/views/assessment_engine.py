@@ -1285,7 +1285,7 @@ def assessment_add(patient_id):
 
     encounter = current_user().current_encounter
     if 'entry_method' in session:
-        encounter_type = getattr(EC, session['entry_method'].upper())
+        encounter_type = getattr(EC, session['entry_method'].upper()).codings[0]
         encounter.type.append(encounter_type)
 
     questionnaire_response = QuestionnaireResponse(
