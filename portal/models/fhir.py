@@ -566,7 +566,10 @@ def generate_qnr_csv(qnr_bundle):
 
     def entry_method(row_data, qnr_data):
         # Todo: replace with EC.PAPER CodeableConcept
-        if 'paper' in (c.get('code') for c in qnr_data['encounter']['type']):
+        if (
+            'type' in qnr_data['encounter'] and
+            'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+        ):
             return 'enter manually - paper'
         if row_data.get('subject_id') == row_data.get('author_id'):
             return 'online'
@@ -614,8 +617,8 @@ def generate_qnr_csv(qnr_bundle):
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
         row_data.update({
-            'entry_method': entry_method(row_data, qnr_data),
-            'author_role': author_role(row_data, qnr_data),
+            'entry_method': entry_method(row_data, qnr),
+            'author_role': author_role(row_data, qnr),
         })
         for question in qnr['group']['question']:
             row_data.update({'question_code': question['linkId']})
