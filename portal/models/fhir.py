@@ -164,24 +164,33 @@ class ClinicalConstants(object):
 
     @lazyprop
     def BIOPSY(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='111',
+            display='biopsy',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
     def PCaDIAG(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='121',
+            display='PCa diagnosis',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
     def PCaLocalized(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='141',
+            display='PCa localized diagnosis',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -714,16 +723,7 @@ def add_static_concepts(only_quick=False):
     """
     from .procedure_codes import TxStartedConstants, TxNotStartedConstants
 
-    BIOPSY = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111',
-                             display='biopsy')
-    PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
-                              display='PCa diagnosis')
-    PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
-                              display='PCa localized diagnosis')
-
-    # Todo: Shouldn't need to specify these again here...
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
-    concepts += fetch_local_valueset(NHHD_291036)
+    concepts = fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')
