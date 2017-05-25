@@ -107,7 +107,7 @@ class BaseConfig(object):
 
     SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID', None)
     SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET', None)
-    SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', '13f8e2dcf')
+    SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', None)
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
