@@ -67,7 +67,7 @@ class TestSitePersistence(TestCase):
 
         # Fulfill conditions
         enc = Encounter(status='in-progress', auth_method='url_authenticated',
-                    user_id=TEST_USER_ID, start_time=datetime.utcnow())
+                        user_id=TEST_USER_ID, start_time=datetime.utcnow())
         with SessionScope(db):
             db.session.add(enc)
             db.session.commit()

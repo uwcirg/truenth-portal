@@ -34,11 +34,12 @@ class TestClinical(TestCase):
             observation.performers.append(performer)
             db.session.add(observation)
             enc = Encounter(status='planned', auth_method='url_authenticated',
-                    user_id=TEST_USER_ID, start_time=datetime.utcnow())
+                            user_id=TEST_USER_ID, start_time=datetime.utcnow())
             db.session.add(enc)
             db.session.flush()
             db.session.add(UserObservation(user_id=int(TEST_USER_ID),
-                observation_id=observation.id, encounter_id=enc.id))
+                            observation_id=observation.id,
+                            encounter_id=enc.id))
             db.session.commit()
 
     def test_clinicalGET(self):
