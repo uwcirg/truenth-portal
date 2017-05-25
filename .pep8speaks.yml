@@ -1,0 +1,13 @@
+# pep8speaks - A GitHub integration to automatically review Python code style over Pull Requests
+# https://pep8speaks.com/
+
+pycodestyle:
+  # Default is 79 in PEP8
+  max-line-length: 100
+
+scanner:
+  # Errors caused by only the patch are shown, not the whole file
+  diff_only: True
+
+# If True, no comment is made when the bot does not find any pep8 errors
+no_blank_comment: True
