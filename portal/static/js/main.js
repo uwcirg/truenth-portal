@@ -473,12 +473,23 @@ var fillContent = {
                                 //d M y format
                                 $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
                                 $("#biopsyDateContainer").show();
+                                $("#biopsyDate").removeAttr("skipped");
                             };
                         } else {
                             $("#biopsyDate").val("");
                             $("#biopsyDateContainer").hide();
+                            $("#biopsyDate").attr("skipped", "true");
                         };
                     };
+                    if (clinicalItem == "pca_diag") {
+                        if ($("#pca_diag_no").is(":checked")) {
+                            $("#tx_yes").attr("skipped", "true");
+                            $("#tx_no").attr("skipped", "true");
+                        } else {
+                            $("#tx_yes").removeAttr("skipped");
+                            $("#tx_no").removeAttr("skipped");
+                        };
+                    }
                 };
             };
         });
@@ -1825,7 +1836,42 @@ OrgTool.prototype.getHereBelowOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "getStillNeededCoreData": function(userId, sync, callback) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/still_needed",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.still_needed && data.still_needed.length > 0) {
+                if (callback) callback(data.still_needed);
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get needed core data"});
+        });
+    },
+    "getRequiredCoreData": function(userId, sync, callback) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/required",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.required) {
+                if (callback) callback(data.still_needed);
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+        });
+    },
     "getOptionalCoreData": function(userId, sync, target, callback) {
+        if (!hasValue(userId)) return false;
         if (target) {
             target.find(".profile-item-loader").show();
         };
