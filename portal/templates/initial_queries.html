@@ -329,7 +329,6 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
   var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
-  //if (completed) this.showAll();
   return completed;
 };
 
@@ -555,8 +554,6 @@ $(document).ready(function(){
             $("#month").removeAttr("required").attr("skipped", "true");
             $("#year").removeAttr("required").attr("skipped", "true");
             $(".bd-optional").show();
-           //fc.continueToFinish();
-           // return true;
           };
         };
 

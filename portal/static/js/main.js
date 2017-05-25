@@ -481,6 +481,15 @@ var fillContent = {
                             $("#biopsyDate").attr("skipped", "true");
                         };
                     };
+                    if (clinicalItem == "pca_diag") {
+                        if ($("#pca_diag_no").is(":checked")) {
+                            $("#tx_yes").attr("skipped", "true");
+                            $("#tx_no").attr("skipped", "true");
+                        } else {
+                            $("#tx_yes").removeAttr("skipped");
+                            $("#tx_no").removeAttr("skipped");
+                        };
+                    }
                 };
             };
         });
@@ -1835,7 +1844,7 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-            if (data && data.still_needed) {
+            if (data && data.still_needed && data.still_needed.length > 0) {
                 if (callback) callback(data.still_needed);
             } else {
                 if (callback) callback({"error": "no data returned"});
