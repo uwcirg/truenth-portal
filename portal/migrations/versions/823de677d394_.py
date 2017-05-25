@@ -44,11 +44,11 @@ def remove_generated_encounters(table_name):
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    for obj_id, enc_id in session.execute("SELECT {table_name}.id, " \
-                        "encounters.id FROM {table_name} JOIN encounters ON " \
-                        "{table_name}.encounter_id = encounters.id WHERE " \
-                        "encounters.status = 'finished' AND "\
-                        "encounters.auth_method = 'staff_authenticated' AND " \
+    for obj_id, enc_id in session.execute("SELECT {table_name}.id, "
+                        "encounters.id FROM {table_name} JOIN encounters ON "
+                        "{table_name}.encounter_id = encounters.id WHERE "
+                        "encounters.status = 'finished' AND "
+                        "encounters.auth_method = 'staff_authenticated' AND "
                         "encounters.start_time = '2000-01-01 01:01:01'".format(
                               table_name=table_name)):
         session.execute('UPDATE {} SET encounter_id = NULL WHERE id = {}' \

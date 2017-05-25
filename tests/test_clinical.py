@@ -38,8 +38,8 @@ class TestClinical(TestCase):
             db.session.add(enc)
             db.session.flush()
             db.session.add(UserObservation(user_id=int(TEST_USER_ID),
-                            observation_id=observation.id,
-                            encounter_id=enc.id))
+                                            observation_id=observation.id,
+                                            encounter_id=enc.id))
             db.session.commit()
 
     def test_clinicalGET(self):
