@@ -27,6 +27,7 @@ class TestCoredata(TestCase):
         # Prior to adding clinical data, should return false
         self.assertFalse(Coredata().initial_obtained(self.test_user))
 
+        self.login()
         self.add_required_clinical_data()
         with SessionScope(db):
             db.session.commit()

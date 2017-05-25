@@ -160,6 +160,7 @@ class TestIntervention(TestCase):
         self.assertFalse(cp.display_for_user(user).access)
 
         # Bless the test user with PCa diagnosis
+        self.login()
         user.save_constrained_observation(
             codeable_concept=CC.PCaDIAG, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
@@ -609,6 +610,8 @@ class TestIntervention(TestCase):
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
+        user = db.session.merge(user)
+        self.login()
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
@@ -734,6 +737,8 @@ class TestIntervention(TestCase):
 
         self.add_procedure(
             code='424313000', display='Started active surveillance')
+        user = db.session.merge(user)
+        self.login()
         user.save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))

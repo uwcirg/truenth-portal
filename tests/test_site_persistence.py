@@ -63,6 +63,7 @@ class TestSitePersistence(TestCase):
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
 
         # Fulfill conditions
+        self.login()
         self.add_procedure(
             code='424313000', display='Started active surveillance')
         user.save_constrained_observation(
