@@ -473,10 +473,12 @@ var fillContent = {
                                 //d M y format
                                 $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
                                 $("#biopsyDateContainer").show();
+                                $("#biopsyDate").removeAttr("skipped");
                             };
                         } else {
                             $("#biopsyDate").val("");
                             $("#biopsyDateContainer").hide();
+                            $("#biopsyDate").attr("skipped", "true");
                         };
                     };
                 };
@@ -1825,7 +1827,42 @@ OrgTool.prototype.getHereBelowOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "getStillNeededCoreData": function(userId, sync, callback) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/still_needed",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.still_needed) {
+                if (callback) callback(data.still_needed);
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get needed core data"});
+        });
+    },
+    "getRequiredCoreData": function(userId, sync, callback) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/required",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.required) {
+                if (callback) callback(data.still_needed);
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+        });
+    },
     "getOptionalCoreData": function(userId, sync, target, callback) {
+        if (!hasValue(userId)) return false;
         if (target) {
             target.find(".profile-item-loader").show();
         };
