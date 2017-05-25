@@ -2,6 +2,7 @@
 
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
+from .encounter import Encounter
 from .fhir import CodeableConcept
 from .reference import Reference
 from .user import get_user
@@ -65,13 +66,17 @@ class Procedure(db.Model):
                 'end': as_fhir(self.end_time)}
         else:
             d['performedDateTime'] = as_fhir(self.start_time)
+        d['encounter'] = self.encounter.as_fhir()
         return d
 
     @classmethod
     def from_fhir(cls, data, audit):
         """Parses FHIR data to produce a new procedure instance"""
         p = cls(audit=audit)
-        p.encounter = get_user(audit.user_id).current_encounter
+        if 'encounter' in data:
+            p.encounter = Encounter.from_fhir(data['encounter'])
+        else:
+            p.encounter = get_user(audit.user_id).current_encounter
         p.user_id = Reference.parse(data['subject']).id
         if 'performedDateTime' in data:
             p.start_time = FHIR_datetime.parse(
