@@ -28,7 +28,7 @@ def create_missing_encounters(table_name):
     else:
         user_col = 'user_id'
 
-    for obj_id, user_id in session.execute("SELECT id, {} FROM {} where " \
+    for obj_id, user_id in session.execute("SELECT id, {} FROM {} where "
                         "encounter_id IS NULL".format(user_col, table_name)):
         enc = Encounter(
             status='finished', auth_method='staff_authenticated',
@@ -51,7 +51,7 @@ def remove_generated_encounters(table_name):
                         "encounters.auth_method = 'staff_authenticated' AND "
                         "encounters.start_time = '2000-01-01 01:01:01'".format(
                               table_name=table_name)):
-        session.execute('UPDATE {} SET encounter_id = NULL WHERE id = {}' \
+        session.execute('UPDATE {} SET encounter_id = NULL WHERE id = {}'
                         ''.format(table_name, obj_id))
         session.execute('DELETE FROM encounters WHERE id = {}'.format(enc_id))
 
