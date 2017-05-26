@@ -459,12 +459,9 @@
             })();
             return_url = getAccessUrl();
             if (hasValue(return_url)) {
-                body = "<p>Hello,</p>";
-                body += "<p>This email was sent to you from " + clinicName + ". This is an invitation to complete your registration.</p>";
-                body += "Verify your account now by clicking on the link below to visit TrueNTH:";
-                body += "<br/><br/>";
-                body += "<a href='" + return_url + "'>Complete Registration</a>";
-                subject = "Registration invite from " + clinicName;
+                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                subject = "{%trans%}Registration invite from {%endtrans%}{%trans%}" + clinicName + "{%endtrans%}";
             };
             if (body != '') {
                 $.ajax ({
@@ -473,9 +470,9 @@
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     data: {'subject': subject, 'recipients': email, 'body': body}
                 }).done(function(data) {
-                    $('#profileEmailMessage').text('invite email sent to ' + email);
+                    $('#profileEmailMessage').text('{%trans%}invite email sent to ' + email + "{%endtrans%}");
                 }).fail(function() {
-                    $('#profileEmailMessage').text('Unable to send email.');
+                    $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                 });
             };
         });
