@@ -1278,10 +1278,23 @@ h4.detail-title {
   overflow-x: hidden;
   max-width: 100%;
 }
-.core-data-procedure .profile-item-container {
-  background: none;
-  border: none;
+.core-data-procedure {
+  .profile-item-container {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  #profileProcedureContainer {
+    border-top: 1px solid #e8e7e7;
+    border-bottom: 1px solid #e8e7e7;
+    padding-top: 2em;
+  }
 }
+
+@media (min-width: 992px) {
+  .core-data-procedure {
+    max-width: 900px;
+  }
 #mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2em;

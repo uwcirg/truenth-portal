@@ -80,13 +80,15 @@
 {% if 'procedure' in require %}
 {{profileProcedures(user, user)}}
 </div>
-<br /><br />
 <!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
-<div class="btn btn-default continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
+<br/>
+<div class="btn btn-tnth-primary">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
+<br/><br/><br/><br/>
 
 {% endif %}
-
-
+{% endblock %}
+{% block footer %}
+<footer id="core_data_footer"></footer>
 {% endblock %}
 
 {% block document_ready %}
@@ -114,6 +116,7 @@ $(document).ready(function(){
         event.preventDefault();
         window.location.replace("{{ return_address | safe }}");
     });
+    tnthAjax.getPortalFooter({{user.id}}, false, "core_data_footer");
 });
 
 {% endblock %}
