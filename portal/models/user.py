@@ -1027,8 +1027,8 @@ class User(db.Model, UserMixin):
         # direct attributes on user
         # intentionally skip {email, reset_password_token}
         for attr in (
-            'password', 'first_name', 'last_name', 'birthdate',
-            'gender', 'phone', 'locale_id', 'timezone', 'confirmed_at',
+            'password', 'first_name', 'last_name', 'birthdate', 'phone_id',
+            'alt_phone_id', 'gender', 'locale_id', 'timezone', 'confirmed_at',
             'registered', 'image_url', 'active', 'deleted_id', 'deceased_id'):
             if not getattr(other, attr):
                 continue
