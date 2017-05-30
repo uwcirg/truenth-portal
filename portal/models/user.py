@@ -5,7 +5,7 @@ from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
-from sqlalchemy.orm import synonym
+from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
 from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
@@ -1008,6 +1008,11 @@ class User(db.Model, UserMixin):
             self.update_orgs(org_list, acting_user)
         db.session.add(self)
 
+    @classmethod
+    def column_names(cls):
+        return [prop.key for prop in class_mapper(cls).iterate_properties
+            if isinstance(prop, ColumnProperty)]
+
     def merge_with(self, other_id):
         """merge details from other user into self
 
@@ -1025,14 +1030,13 @@ class User(db.Model, UserMixin):
             abort(404, 'other_id {} not found'.format(other_id))
 
         # direct attributes on user
-        # intentionally skip {email, reset_password_token}
-        for attr in (
-            'password', 'first_name', 'last_name', 'birthdate', 'phone_id',
-            'alt_phone_id', 'gender', 'locale_id', 'timezone', 'confirmed_at',
-            'registered', 'image_url', 'active', 'deleted_id', 'deceased_id'):
-            if not getattr(other, attr):
-                continue
-            setattr(self, attr, getattr(other, attr))
+        # intentionally skip {id, email, reset_password_token}
+        exclude = ['id', 'email', 'reset_password_token']
+        for attr in self.column_names():
+            if attr not in exclude:
+                if not getattr(other, attr):
+                    continue
+                setattr(self, attr, getattr(other, attr))
 
         # n-to-n relationships on user
         for relationship in ('organizations', '_consents', 'procedures',
