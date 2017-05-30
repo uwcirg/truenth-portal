@@ -1032,11 +1032,10 @@ class User(db.Model, UserMixin):
         # direct attributes on user
         # intentionally skip {id, email, reset_password_token}
         exclude = ['id', 'email', 'reset_password_token']
-        for attr in self.column_names():
-            if attr not in exclude:
-                if not getattr(other, attr):
-                    continue
-                setattr(self, attr, getattr(other, attr))
+        for attr in (col for col in self.column_names() if col not in exclude):
+            if not getattr(other, attr):
+                continue
+            setattr(self, attr, getattr(other, attr))
 
         # n-to-n relationships on user
         for relationship in ('organizations', '_consents', 'procedures',
