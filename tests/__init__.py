@@ -18,6 +18,7 @@ from portal.extensions import db
 from portal.models.audit import Audit
 from portal.models.auth import Client
 from portal.models.coredata import configure_coredata
+from portal.models.encounter import Encounter
 from portal.models.fhir import CC, Coding, CodeableConcept
 from portal.models.fhir import add_static_concepts
 from portal.models.intervention import add_static_interventions, INTERVENTION
@@ -27,7 +28,7 @@ from portal.models.procedure import Procedure
 from portal.models.relationship import add_static_relationships
 from portal.models.role import Role, add_static_roles, ROLE
 from portal.models.tou import ToU
-from portal.models.user import User, UserRoles
+from portal.models.user import User, UserRoles, get_user
 from portal.models.user_consent import UserConsent, SEND_REMINDERS_MASK
 from portal.models.user_consent import STAFF_EDITABLE_MASK
 from portal.models.user_consent import INCLUDE_IN_REPORTS_MASK
@@ -133,7 +134,7 @@ class TestCase(Base):
     def add_required_clinical_data(self):
         " Add clinical data to get beyond the landing page "
         for cc in CC.BIOPSY, CC.PCaDIAG, CC.PCaLocalized:
-            self.test_user.save_constrained_observation(
+            get_user(TEST_USER_ID).save_constrained_observation(
                 codeable_concept=cc, value_quantity=CC.TRUE_VALUE,
                 audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
 
@@ -147,10 +148,13 @@ class TestCase(Base):
                             code=code,
                             display=display).add_if_not_found(True)
             code = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+            enc = Encounter(status='planned', auth_method='url_authenticated',
+                            user_id=TEST_USER_ID, start_time=datetime.utcnow())
             procedure.code = code
             procedure.user = db.session.merge(self.test_user)
             procedure.start_time = datetime.utcnow()
             procedure.end_time = datetime.utcnow()
+            procedure.encounter = enc
             db.session.add(procedure)
             db.session.commit()
 

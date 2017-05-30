@@ -61,7 +61,15 @@
     "end": "2011-06-27"
   },
   "encounter": {
-    "reference": "Encounter/f001"
+    "status": "in-progress",
+    "patient": {
+      "reference": "Patient/001",
+      "display": "P. van de Heuvel"
+    },
+    "period": {
+      "start": "2011-06-26"
+    },
+    "auth_method": "url_authenticated"
   },
   "outcome": {
     "text": "improved blood circulation"

@@ -25,9 +25,9 @@ class TestPortal(TestCase):
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
-        self.login()
         rv = self.client.get('/home')
 
         self.assertIn('Custom Label', rv.data)
@@ -49,10 +49,10 @@ class TestPortal(TestCase):
             db.session.add(ui)
             db.session.commit()
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
-        self.login()
 
         rv = self.client.get('/home')
 
@@ -96,9 +96,9 @@ class TestPortal(TestCase):
         client.intervention = intervention
         intervention.public_access = False
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
-        self.login()
         rv = self.client.get('/home')
 
         self.assertNotIn('Sexual Recovery', rv.data)

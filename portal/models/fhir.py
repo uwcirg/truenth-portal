@@ -387,7 +387,8 @@ class UserObservation(db.Model):
     observation_id = db.Column(db.ForeignKey('observations.id'),
                               nullable=False)
     encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'))
+        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
+        nullable=False)
 
     encounter = db.relationship('Encounter')
 
@@ -455,11 +456,12 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.ForeignKey('users.id'))
+    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
     encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'))
+        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
+        nullable=False)
     encounter = db.relationship("Encounter")
 
     # Fields derived from document content

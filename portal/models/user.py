@@ -687,8 +687,10 @@ class User(db.Model, UserMixin):
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
                                   value_quantity_id=value_quantity.id,
-                                  audit=audit)
-        self.observations.append(observation.add_if_not_found())
+                                  audit=audit).add_if_not_found(True)
+        encounter = get_user(audit.user_id).current_encounter
+        UserObservation(user_id=self.id, encounter=encounter,
+                        observation_id=observation.id).add_if_not_found()
 
     def clinical_history(self, requestURL=None):
         now = datetime.utcnow()
