@@ -1011,7 +1011,7 @@ class User(db.Model, UserMixin):
     @classmethod
     def column_names(cls):
         return [prop.key for prop in class_mapper(cls).iterate_properties
-            if isinstance(prop, ColumnProperty)]
+                if isinstance(prop, ColumnProperty)]
 
     def merge_with(self, other_id):
         """merge details from other user into self
