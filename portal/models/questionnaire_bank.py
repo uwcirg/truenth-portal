@@ -161,10 +161,8 @@ class QuestionnaireBankQuestionnaire(db.Model):
             assert self.id
             return self
         existing = QuestionnaireBankQuestionnaire.query.filter_by(
-            questionnaire_id=self.questionnaire_id,
-            days_till_due=self.days_till_due,
-            days_till_overdue=self.days_till_overdue,
-            rank=self.rank).first()
+                    questionnaire_bank_id=self.questionnaire_bank_id,
+                    questionnaire_id=self.questionnaire_id).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:
