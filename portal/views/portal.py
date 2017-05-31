@@ -5,6 +5,7 @@ from flask import render_template_string
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
+from pprint import pprint
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
@@ -18,7 +19,6 @@ from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, AboutATMA, VersionedResource
 from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
 from ..models.coredata import Coredata
-from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -37,11 +37,13 @@ def page_not_found(e):
     gil = current_app.config.get('GIL')
     return render_template('404.html' if not gil else '/gil/404.html', no_nav="true", user=current_user()), 404
 
+
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
     gil = current_app.config.get('GIL')
     return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
+
 
 @portal.before_app_request
 def debug_request_dump():
@@ -58,10 +60,43 @@ def debug_request_dump():
             output += " {0.form}"
         current_app.logger.debug(output.format(request))
 
-@portal.route('/intentional-error')
-def intentional_error():  # pragma: no cover
-    # useless method to test error handling
-    5/0
+
+@portal.route('/report-error')
+@oauth.require_oauth()
+def report_error():
+    """Useful from front end, client-side to raise attention to problems
+
+    On occasion, an exception will be generated in the front end code worthy of
+    gaining attention on the server side.  By making a GET request here, a
+    server side error will be generated (encouraging the system to handle it
+    as configured, such as by producing error email).
+
+    OAuth protected to prevent abuse.
+
+    Any of the following query string arguments (and their values) will be
+    included in the exception text, to better capture the context.  None are
+    required.
+
+    :subject_id: User on which action is being attempted
+    :message: Details of the error event
+    :page_url: The page requested resulting in the error
+
+    actor_id need not be sent, and will always be included - the OAuth
+    protection guarentees and defines a valid current user.
+
+    """
+    message = {'actor': "{}".format(current_user())}
+    accepted = ('subject_id', 'page_url', 'message')
+    for attr in accepted:
+        value = request.args.get(attr)
+        if value:
+            message[attr] = value
+
+    # log as an error message - but don't raise a server error
+    # for the front end to manage.
+    current_app.logger.error("Received error {}".format(pprint(message)))
+    return jsonify(error='received')
+
 
 @portal.route('/')
 def landing():
