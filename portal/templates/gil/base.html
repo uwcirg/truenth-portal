@@ -31,12 +31,6 @@
     <meta name="msapplication-square150x150logo" content="{{url_for('static', filename='img/mediumtile.png') }}">
     <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
     <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
-    <style>
-        #tnthNavWrapper {
-          position: relative;
-          z-index: 100;
-        }
-    </style>
     <script>
     var url = "{{PORTAL}}/user/sign-in";
     $.ajax({
@@ -111,7 +105,7 @@
   {% block upperbanner %}
       {% if not user %}
       <div class="upper-banner"><a class="upper-banner__text" data-toggle="modal" data-target="#modal-register">Click here to join us
-          <figure></figure></a><a class="upper-banner__close js-close-upper-banner" onclick="setNoBanner()">
+          <figure></figure></a><a class="upper-banner__close js-close-upper-banner">
           <figure></figure></a></div>
       {% endif %}
   {% endblock %}
@@ -219,13 +213,13 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">Login</h3>
-            <a href="#" onclick="goToLogin();" class="button button-large button--teal button--login--register">Login</a>
+            <a href="#" class="button button-large button--teal button--login--register">Login</a>
             <br/><br/>
             <div class="or">or</div>
             <div class="box-modal-or__divider"></div>
             <br/>
             <h3 class="box-modal__title">Join Us!</h3>
-            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/go" class="button button-large button--teal button--register">Create Account</a>
+            <p class="box-modal__copy">It’s going to take a group effort to improve the prostate cancer experience for future generations.</p><a href="{{PORTAL}}/user/register" class="button button-large button--teal button--register">Create Account</a>
           </div>
         </div>
       </div>
@@ -309,200 +303,86 @@
         <noscript><p><img src="//piwik.cirg.washington.edu/piwik.php?idsite={{ config.PIWIK_SITEID }}" style="border:0;" alt="" /></p></noscript>
       {% endif %}
       <script>
-          function _readCookie(name) {
-            var nameEQ = name + "=";
-            var ca = document.cookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-            };
-            return null;
-          };
-          var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
+          var __PORTAL = "{{PORTAL}}";
 
-          var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
-          // Set default sessionLifetime from Flask config
-          // Subtract 10 seconds to ensure the backend doesn't expire the session first
-          var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
-          var cookieTimeout = _readCookie("SS_TIMEOUT");
-          cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
-
-          if (cookieTimeout && cookieTimeout > 0) {
-              DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
-          } else {
-              try {
-                  CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} {{config.PERMANENT_SESSION_LIFETIME}} {% else %} "" {% endif %};
-                  if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
-                  DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
-              } catch(e) {
-                  DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+          // Configure and start the session timeout monitor
+          {% if user %}
+              function _readCookie(name) {
+                var nameEQ = name + "=";
+                var ca = document.cookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+                };
+                return null;
               };
-          };
+              var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
 
-          var loader = function(show) {
+              var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
+              // Set default sessionLifetime from Flask config
+              // Subtract 10 seconds to ensure the backend doesn't expire the session first
+              var CONFIG_SESSION_LIFETIME, DEFAULT_SESSION_LIFETIME;
+              var cookieTimeout = _readCookie("SS_TIMEOUT");
+              cookieTimeout = cookieTimeout ? parseInt(cookieTimeout) : null;
+
+              if (cookieTimeout && cookieTimeout > 0) {
+                  DEFAULT_SESSION_LIFETIME = (cookieTimeout * 1000) - (cookieTimeout > 10 ? (10 * 1000) : 0);
+              } else {
+                  try {
+                      CONFIG_SESSION_LIFETIME = {% if config.PERMANENT_SESSION_LIFETIME %} {{config.PERMANENT_SESSION_LIFETIME}} {% else %} "" {% endif %};
+                      if (!CONFIG_SESSION_LIFETIME || CONFIG_SESSION_LIFETIME === "") CONFIG_SESSION_LIFETIME = 15 * 60;
+                      DEFAULT_SESSION_LIFETIME = (CONFIG_SESSION_LIFETIME * 1000) - (CONFIG_SESSION_LIFETIME > 10 ? (10 * 1000) : 0);
+                  } catch(e) {
+                      DEFAULT_SESSION_LIFETIME = (15 * 60 * 1000) - (10 * 1000);
+                  };
+              };
+
+              var sessMon = sessionMonitor({
+                    sessionLifetime: DEFAULT_SESSION_LIFETIME,
+                    timeBeforeWarning: 1 * 60 * 1000,
+                    minPingInterval: 1 * 60 * 1000,  // 1 minute
+                    activityEvents: "mouseup",
+                    pingUrl: '{{PORTAL}}/api/ping',
+                    logoutUrl: '{{PORTAL}}/logout',
+                    timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
+                    onwarning: function() {$("#session-warning-modal").modal("show");}
+              });
+              window.sessMon = sessMon;
+               // Configure the session timeout warning modal
+              $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+                      .on("click", "#stay-logged-in", sessMon.extendsess)
+                      .on("click", "#log-out", sessMon.logout)
+                      .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
+          {% endif %}
+
+          var __loader = function(show) {
               if (show) {
                   VO.showLoader();
               } else {
-                  {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %} filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
                   VO.showMain();
               };
           };
 
-          function filterMenu(userId) {
-              if (!userId) return false;
-              $.ajax({
-                url: "{{PORTAL}}/gil-interventions-items/" + userId,
-                context: document.body,
-                async: false,
-                cache: false
-              }).done(function(data) {
-                //console.log(data)
-                var ct = 0, found_decision_support = false, found_symptom_tracker = false;
-                //$(".side-nav-items__item--decisionsupport").hide();
-                if (data.interventions) {
-                  if (data.interventions.length > 0) {
-                    var db = $(".side-nav-items__item--dashboard");
-                    if (db.length == 0) {
-                      $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="{{PORTAL}}/home">My Dashboard</a></li>');
-                      if ($("#portalMain").length > 0) {
-                           setSelectedNavItem($(".side-nav-items__item--dashboard"));
-                      };
-                    };
-                    $(".side-nav-items__item--home").hide();
-                  };
-                  (data.interventions).forEach(function(item) {
-                      var d = item.description;
-                      var b = item.link_url;
-                      var n = item.name.replace(/\_/g, " ")
-                      var disabled = item.link_url == "disabled";
-                      var dm = /decision\s?support/gi;
-                      var sm = /symptom\s?tracker/gi;
-                      var sm2 = /self[_\s]?management/gi;
-                      //console.log(n + " " + d)
-                      if (dm.test(d) || dm.test(n)) {
-                          if (!disabled) {
-                              //$(".side-nav-items__item--decisionsupport a").attr("href",b);
-                              //$(".side-nav-items__item--decisionsupport").show();
-                              var ditem = $("#intervention_item_decisionsupport");
-                              if (ditem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
-                              };
-
-                              found_decision_support = true;
-
-                              $(".decision-support-link").each(function() {
-                                $(this).attr("href", b);
-                                $(this).removeClass("icon-box__button--disabled");
-                              });
-                              $(".icon-box-decision-support").removeClass("icon-box--theme-inactive");
-                          } else {
-                            $(".decision-support-link").each(function() {
-                                $(this).removeAttr("href");
-                                $(this).addClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
-                          };
-                      }
-                      else if (sm.test(d) || sm2.test(n)) {
-                          //do nothing - always display symptom tracker
-                          if (!disabled) {
-                            //$(".side-nav-items__item--symptomtracker a").attr("href", b);
-                            var sitem = $("#intervention_item_symptomtracker");
-                            if (sitem.length == 0) { //only draw this when there isn't already one
-                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
-                            };
-
-                            found_symptom_tracker = true;
-
-                            $(this).removeClass("icon-box__button--disabled");
-                            $(".symptom-tracker-link").each(function() {
-                                $(this).attr("href", b)
-                                $(this).removeClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-symptom-tracker").removeClass("icon-box--theme-inactive");
-                          } else {
-                            $(".symptom-tracker-link").each(function() {
-                                $(this).removeAttr("href");
-                                $(this).addClass("icon-box__button--disabled");
-                            });
-                            $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
-                          };
-                      }
-                      else if ($.trim(d) != "") {
-                          if (!disabled) {
-                              var eitem = $("#intervention_item_" + ct);
-                              if (eitem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
-                                ct++;
-                              };
-                          };
-                      };
-                  });
-
-                  if (!found_decision_support) {
-                    $(".decision-support-link").each(function() {
-                          $(this).removeAttr("href");
-                          $(this).addClass("icon-box__button--disabled");
-                      });
-                    $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
-                    IO.clearSession("decision-support");
-                  } else {
-                      {% if user %}
-                        handleNoOrgs({{user.id}});
-                        if (IO.getSession("decision-support")) {
-                            var l =  $("#intervention_item_decisionsupport a");
-                            var la = l.attr("href");
-                            if (l.length > 0 && validateUrl(la)) {
-                              IO.clearSession("decision-support");
-                              VO.setRedirect();
-                              setTimeout('location.replace("' + l.attr("href") + '");', 0);
-                              return true;
-                            };
-                        };
-
-                      {% endif %}
-                  };
-
-                  if (!found_symptom_tracker) {
-                    $(".symptom-tracker-link").each(function() {
-                        $(this).removeAttr("href");
-                        $(this).addClass("icon-box__button--disabled");
-                    });
-                    $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
-                    IO.clearSession("symptom-tracker");
-                  } else {
-                    //#intervention_item_symptomtracker
-                    if (IO.getSession("symptom-tracker")) {
-                        var l =  $("#intervention_item_symptomtracker a");
-                        var la = l.attr("href");
-                        if (l.length > 0 && validateUrl(la)) {
-                          IO.clearSession("symptom-tracker");
-                          VO.setRedirect();
-                          setTimeout('location.replace("' + l.attr("href") + '");', 0);
-                          return true;
-                        };
-                    };
-                  };
-
-                };
-                VO.hideLoader();
-              }).fail(function() {
-                VO.hideLoader();
-              });
-          };
 
          $(document).ready(function(){
 
             checkBannerStatus();
+
+            {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %} MO.filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
 
             (function() {
               var __env = {% if config.SYSTEM_TYPE %}"{{config.SYSTEM_TYPE}}"{% else %}""{% endif %};
               if ((__env != "" && __env.toLowerCase() != "production") && ($(".watermark").length == 0)) $("<div class='watermark'>TRUE<sup>NTH</sup> - " + __env + " version - Not for study or clinical use</div>").appendTo("body");
             })();
 
+            $(".button--login--register").on("click", function () {
+                $('#modal-login-register').modal('hide');
+                setTimeout("$('#modal-login').modal('show'); ", 400);
+            });
+
             $("#modal-login").on("show.bs.modal", function(e) {
-                loader(false);
+                __loader(false);
             });
 
             $("#btnCreateAccount").on("click", function() {
@@ -542,12 +422,13 @@
                         };
 
                       });
-                      OT.updateOrg({{user.id}}, updateOrgCallback);
+                      OT.updateOrg({{user.id}}, OT.updateOrgCallback);
                     };
               });
             {% endif %}
 
             $("a.icon-box__button--disabled, .side-nave-items__item--selected a").on("click", function(e) {
+            	__loader(false);
                 e.preventDefault();
                 return false;
             });
@@ -576,9 +457,7 @@
 
                       });
                 } else $("#access_code_info").text("");
-            });
-
-            $("#shortcut_alias").on("keydown", function(e) {
+            }).on("keydown", function(e) {
                 if (e.keyCode == 13) {
                   e.preventDefault();
                   handleAccessCode();
@@ -597,31 +476,34 @@
                 };
             });
 
-            // Configure and start the session timeout monitor
-            {% if user %}
-                var sessMon = sessionMonitor({
-                      sessionLifetime: DEFAULT_SESSION_LIFETIME,
-                      timeBeforeWarning: 1 * 60 * 1000,
-                      minPingInterval: 1 * 60 * 1000,  // 1 minute
-                      activityEvents: "mouseup",
-                      pingUrl: '{{PORTAL}}/api/ping',
-                      logoutUrl: '{{PORTAL}}/logout',
-                      timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
-                      onwarning: function() {$("#session-warning-modal").modal("show");}
+            $("a.js-close-upper-banner").on("click", function() {
+            	if (typeof sessionStorage != "undefined") {
+      					sessionStorage.setItem('bannerAccessed', 'yes');
+      				};
+            });
+
+            $("input[type='text']").on("blur paste", function() {
+                  $(this).val($.trim($(this).val()));
+            });
+            var __LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
+            if (__LOGIN_AS_PATIENT) {
+                if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
+                window.addEventListener('popstate', function(event) {
+                  if (typeof history != 'undefined' && history.pushState) {
+                    history.pushState(null, null, location.href);
+                    setTimeout('location.reload();', 0);
+                  } else {
+                    window.history.forward(1);
+                    setTimeout('location.reload();', 0);
+                  };
                 });
-                window.sessMon = sessMon;
-                 // Configure the session timeout warning modal
-                $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
-                        .on("click", "#stay-logged-in", sessMon.extendsess)
-                        .on("click", "#log-out", sessMon.logout)
-                        .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
-            {% endif %}
+            };
 
             //uncomment if want to allow LR edit link to display on hot key
             //setTimeout("LRKeyEvent();", 500);
 
             //see gil.js to call loader onclick event of each nav.link
-            setTimeout("loader(false);", 0);
+            setTimeout("__loader(false);", 0);
           });
 
       </script>
