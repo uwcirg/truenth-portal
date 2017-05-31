@@ -1186,11 +1186,6 @@ h4.detail-title {
   border-bottom: 1px solid #e8e7e7;
   padding-top: 2em;
 }
-@media (min-width: 992px) {
-  .core-data-procedure {
-    max-width: 900px;
-  }
-}
 #mainDiv.profile .profile-item-edit-btn:hover,
 #mainDiv.profile .profile-item-edit-btn:active,
 #mainDiv.profile .profile-item-edit-btn:focus {
@@ -2008,6 +2003,9 @@ div.org-container input[type="checkbox"] {
 #profileProcedureContainer {
   margin-left: 1em;
 }
+#profileProcedureContainer table {
+  border: 0;
+}
 #profileProcedureContainer #tnthproc {
   max-width: 95%;
 }
@@ -2033,10 +2031,11 @@ div.org-container input[type="checkbox"] {
   display: none;
 }
 #eventListtnthproc {
-  margin-left: 0.5em
+  margin-left: 0.5em;
 }
 #eventListtnthproc td {
   padding: 0.15em;
+  line-height: 2.3em;
 }
 .registration-status-container {
   margin: 0 0 0.8em 0;

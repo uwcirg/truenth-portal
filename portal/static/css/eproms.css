@@ -1381,10 +1381,8 @@ div.right-panel {
   border-bottom: 1px solid #e8e7e7;
   padding-top: 2em;
 }
-@media (min-width: 992px) {
-  .core-data-procedure {
-    max-width: 900px;
-  }
+#profileProcedureContainer table {
+  border: 0;
 }
 
 #mainDiv.profile .profile-item-edit-btn {
