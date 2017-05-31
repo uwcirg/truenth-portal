@@ -89,12 +89,12 @@
 
 </div>
 {%- endmacro %}
-{% macro footer(splash_style=false, white_theme=False) -%}
+{% macro footer(splash_style=false, white_theme=False, user=None) -%}
 <div id="homeFooter" {% if splash_style %}class="container-fluid"{% else %}class="container footer-separate"{% endif %}>
     <div class="row">
         <div class="col-xs-6 col-lg-8 footer-container">
             <div class="copyright-container">
-                {{linksHTML()}}
+                {{linksHTML(user)}}
             </div>
         </div>
         <div class="col-xs-6 col-lg-4 footer-container logo-container">
@@ -105,10 +105,58 @@
     </div>
 </div>
 {%- endmacro %}  
-{% macro linksHTML()-%}
+{% macro linksHTML(user)-%}
     <p><small><a href="{{PORTAL}}{{url_for('portal.about')}}">{{ _("About") }}</a> | <a href="{{PORTAL}}{{url_for('portal.contact')}}">{{ _("Contact") }}</a> | <a href="{{PORTAL}}{{url_for('portal.privacy')}}">{{ _("Privacy") }}</a></small></p>
-    <p><small class="text-muted">&copy;{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small></p>
+    <p><small class="copyright text-muted">&copy;{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small></p>
+    {{copyright_text(user)}}
 {%- endmacro %}
 {% macro logo(white_theme=False) -%}
-    <a href="http://us.movember.com" title="{{ _('Movember') }}">{%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="Movember Logo"/>{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" alt="Movember logo" />{%-endif-%}</a>
+    <a href="http://us.movember.com" title="{{ _('Movember') }}">{%-if white_theme -%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_white.png')}}" height="86" width="86" alt="Movember Logo"/>&nbsp;<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/Movember-Footer-Logo.png')}}" height="86" width="86" alt="Movember Logo"/>{%-else-%}<img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" alt="Movember logo" />{%-endif-%}</a>
+{%- endmacro %}
+{% macro copyright_text(user) -%}
+     <script>
+        $(document).ready(function() {
+            var __countryCode = "";
+            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright-container";
+            var getContent = function(cc) {
+                  var content = "";
+                  switch(String(cc.toUpperCase())) {
+                      case "US":
+                      case "EN_US":
+                        content = "&copy; 2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization (Movember Foundation).";
+                        break;
+                      case "AU":
+                      case "EN_AU":
+                        content = "&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a registered charity in Australia ABN 48894537905 (Movember Foundation).";
+                        break;
+                      case "NZ":
+                      case "EN_NZ":
+                        content = "&copy; 2017 Movember Foundation. All rights reserved. Movember Foundation is a New Zealand registered charity number CC51320 (Movember Foundation).";
+                        break;
+                      default:
+                        content = "&copy; 2017 Movember Foundation (Movember Foundation). All rights reserved.";
+
+                  };
+                  return content;
+
+            };
+            {%- if user and user.locale_code-%}
+              __countryCode = "{{user.locale_code}}";
+              if (__countryCode) {
+                  $(footerElements).html(getContent("{{user.locale_code}}"));
+              }; 
+            {%- endif -%}
+            if (!__countryCode) {
+                $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
+                  if (data && data.country_code) {
+                      //country code 
+                      //Australia AU
+                      //New Zealand NZ
+                      //USA US
+                     $(footerElements).html(getContent(data.country_code));
+                  } else $(footerElements).html(getContent());
+                });
+            };
+        });
+      </script>
 {%- endmacro %}
