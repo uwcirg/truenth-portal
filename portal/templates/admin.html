@@ -51,6 +51,10 @@
 </div>
 
 {% endblock %}
+{% block footer %}
+{% from "flask_user/_macros.html" import footer %}
+{{footer(user=user)}}
+{% endblock %}
 {% block document_ready %}
 $("#adminTable").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
