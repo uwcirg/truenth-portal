@@ -26,7 +26,7 @@ Flask-Babel==0.11.2
 Flask-Celery-Helper==1.1.0
 Flask-Login==0.4.0
 Flask-Mail==0.9.1
-Flask-Migrate==2.0.3
+Flask-Migrate==2.0.4
 Flask-OAuthlib==0.9.3
 Flask-Script==2.0.5
 Flask-Session==0.3.1
