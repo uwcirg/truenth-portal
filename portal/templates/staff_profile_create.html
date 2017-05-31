@@ -58,7 +58,6 @@
 
                             var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
 
-                            //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
                                     $("#userOrgs").find(".help-block").html("");
@@ -249,14 +248,15 @@ $(document).ready(function(){
                     }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                         if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                        tnthAjax.reportError(_userId, "{{url_for('portal.staff_profile_create')}}", errorMessage, true);
                         $("#updateProfile").attr("disabled", false);
                     });
 
                 }).catch(function(error) {
                     //Display Error Here
-                    //console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                     if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                    tnthAjax.reportError(_userId, "{{url_for('portal.staff_profile_create')}}", errorMessage, true);
                     $("#updateProfile").attr("disabled", false);
                 });
 
@@ -265,7 +265,6 @@ $(document).ready(function(){
 
     function _get(apiUrl, requestType, requestData, sync) {
         var errorMessage = '';
-        console.log('apiUrl: ' + apiUrl)
         return new Promise (function(resolve, reject) {
             $.ajax ({
                 type: (requestType ? requestType : 'GET'),
@@ -278,10 +277,8 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
-                //console.log(requestData);
-                //console.log(errorMessage);
-                //console.log("response Text: " + xhr.responseText);
-                //console.log("response status: " +  xhr.status);
+                errorMessage += "\nstatus: " + xhr.status;
+                errorMessage +="\nresponse text: " + $.trim(xhr.responseText)
                 reject(Error(errorMessage));
             });
 
