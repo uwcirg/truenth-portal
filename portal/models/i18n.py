@@ -104,7 +104,10 @@ def smartling_upload():
                 'file'.format(current_app.config.get("SMARTLING_PROJECT_ID")),
                 data=data, files=files, headers=headers)
         resp.raise_for_status()
-    current_app.logger.debug("messages.pot uploaded to smartling")
+    current_app.logger.debug(
+        "messages.pot uploaded to smartling project %s",
+        current_app.config.get("SMARTLING_PROJECT_ID")
+    )
 
 
 def smartling_download(language=None):
