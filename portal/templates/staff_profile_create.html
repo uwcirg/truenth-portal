@@ -218,6 +218,7 @@ $(document).ready(function(){
 
                     _demoArray['birthDate'] = $('input[name=birthDate]').val();
 
+
                     _demoArray['telecom'] = [];
 
                     var emailVal = $.trim($('input[name=email]').val());
@@ -249,6 +250,7 @@ $(document).ready(function(){
                     }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                         if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                        tnthAjax.reportError(_userId, "{{url_for('portal.staff_profile_create')}}", errorMessage, true);
                         $("#updateProfile").attr("disabled", false);
                     });
 
@@ -257,6 +259,7 @@ $(document).ready(function(){
                     //console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
                     if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                    tnthAjax.reportError(_userId, "{{url_for('portal.staff_profile_create')}}", errorMessage, true);
                     $("#updateProfile").attr("disabled", false);
                 });
 
@@ -278,6 +281,8 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
+                errorMessage += "\nstatus: " + xhr.status;
+                errorMessage +="\nresponse text: " + $.trim(xhr.responseText)
                 //console.log(requestData);
                 //console.log(errorMessage);
                 //console.log("response Text: " + xhr.responseText);

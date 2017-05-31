@@ -1836,6 +1836,27 @@ OrgTool.prototype.getHereBelowOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "reportError": function(userId, page_url, message, sync) {
+        //params need to contain the following:
+        //:subject_id: User on which action is being attempted
+        //:message: Details of the error event
+        //:page_url: The page requested resulting in the error
+        var params = {};
+        params.subject_id = hasValue(userId)? userId : 0;
+        params.page_url = hasValue(page_url) ? page_url: window.location.href;
+        params.message = hasValue(message) ? message: "Not provided";
+
+        $.ajax ({
+            type: "GET",
+            url: "/report-error",
+            contentType: "application/json; charset=utf-8",
+            cache: false,
+            async: (sync ? false : true),
+            data: params
+        }).done(function(data) {
+        }).fail(function(){
+        });
+    },
     "getStillNeededCoreData": function(userId, sync, callback) {
         if (!hasValue(userId)) return false;
         $.ajax ({
