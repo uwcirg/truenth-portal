@@ -43,7 +43,7 @@
                     {% if display.link_url %}
                         <a class="icon-box__button icon-box__button--main intervention-link" href="{{ display.link_url }}"><span>{% if display.link_label %}{{_(display.link_label)}}{% else %}{{_("Start")}}{% endif %}<figure></figure></span></a>
                     {% elif display.link_url is none and display.link_label %}
-                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="javascript: loader(false);"><span class="home--disabled-button">{{_(display.link_label)}}<figure></figure></span></a>
+                        <a class="icon-box__button icon-box__button--main icon-box__button--disabled" href="#"><span class="home--disabled-button">{{_(display.link_label)}}<figure></figure></span></a>
                     {% endif %}
                     </div>
                 </div>

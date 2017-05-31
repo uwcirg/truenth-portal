@@ -1,4 +1,4 @@
-var VO, IO, OT;
+var VO, IO, OT, MO;
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = {
@@ -14,7 +14,7 @@ module.exports = {
 
 
 },{}],2:[function(require,module,exports){
-var admin, global, navToggle, upperBanner, video, windowResize, windowScroll, visObj, interventionSessionObj, orgTool;
+var admin, global, navToggle, upperBanner, video, windowResize, windowScroll, visObj, interventionSessionObj, orgTool, menuObj;
 
 upperBanner = require('./modules/upper-banner');
 
@@ -31,6 +31,8 @@ admin = require('./modules/admin');
 video = require('./modules/video');
 
 visObj = require('./modules/visobj');
+
+menuObj = require('./modules/menuObj');
 
 interventionSessionObj = require('./modules/interventionSessionObj');
 
@@ -49,11 +51,12 @@ $(function() {
   VO = new visObj();
   IO = new interventionSessionObj();
   OT = new orgTool();
+  MO = new menuObj();
   return window.app.video = new video();
 });
 
 
-},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12}],3:[function(require,module,exports){
+},{"./modules/admin":3,"./modules/global":4,"./modules/nav-toggle":5,"./modules/upper-banner":6,"./modules/video":7,"./modules/window-resize":8,"./modules/window-scroll":9, "./modules/visobj":10, "./modules/interventionSessionObj":11, "./modules/orgTool":12, "./modules/menuObj":13}],3:[function(require,module,exports){
 var Admin, loggedInAdminClass, loggedInClass, upperBannerClosedClass;
 
 loggedInAdminClass = 'is-showing-logged-in';
@@ -150,7 +153,7 @@ module.exports = NavToggle = (function() {
       e.preventDefault();
       href = $(this).attr('href');
       $('html').removeClass(navExpandedClass);
-      loader(true);
+      __loader(true);
       return setTimeout(function() {
         return window.location = href;
       }, 500);
@@ -277,7 +280,7 @@ module.exports = WindowScroll = (function() {
 var VisObj;
 
 module.exports = VisObj = (function() {
-  function VisObj() {
+  return function() {
     this.HAS_REDIRECT = false;
     this.hideMain = function () {
       $("#mainHolder").hide();
@@ -292,7 +295,9 @@ module.exports = VisObj = (function() {
     };
     this.showMain = function() {
       if (!this.HAS_REDIRECT) {
-        adjustHeaderHeight();
+        if ($(".watermark").length > 0) {
+          $("header.no-banner ").css("padding-top", "35px");
+        };
         $("#mainHolder").css({
                   "visibility" : "visible",
                   "-ms-filter": "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)",
@@ -301,6 +306,7 @@ module.exports = VisObj = (function() {
                   "-khtml-opacity": 1,
                   "opacity": 1
                 });
+        this.hideLoader();
       };
     };
     this.showLoader = function() {
@@ -316,7 +322,6 @@ module.exports = VisObj = (function() {
 
     };
   };
-  return VisObj;
 })();
 
 },{}],
@@ -324,7 +329,7 @@ module.exports = VisObj = (function() {
 var InterventionSessionObj;
 
 module.exports = InterventionSessionObj = (function() {
-  function InterventionSessionObj() {
+  return function () {
 
     var SESSION_ID_ENUM = {
       "decision-support": "decisionSupportInSession",
@@ -377,18 +382,43 @@ module.exports = InterventionSessionObj = (function() {
             break;
         };
     };
-  }
-  return InterventionSessionObj;
+  };
 
 })();
-
 
 },{}],
 12:[function(require,module,exports){
 var OrgTool;
 
 module.exports = OrgTool = (function() {
-  function OrgTool() {
+  return function () {
+
+    var OrgObj = function(orgId, orgName, parentOrg) {
+      this.id = orgId;
+      this.name = orgName;
+      this.children = [];
+      this.parentOrgId = parentOrg;
+      this.isTopLevel = false;
+    };
+
+    var CONSENT_ENUM = {
+        "consented": {
+            "staff_editable": true,
+            "include_in_reports": true,
+            "send_reminders": true
+        },
+         "suspended": {
+            "staff_editable": true,
+            "include_in_reports": true,
+            "send_reminders": false
+        },
+        "purged": {
+            "staff_editable": false,
+            "include_in_reports": false,
+            "send_reminders": false
+        }
+    };
+
     var TOP_LEVEL_ORGS = [];
     var orgsList = {};
 
@@ -766,36 +796,204 @@ module.exports = OrgTool = (function() {
             if (parentOrgsCt > 0 && orgsList[org].isTopLevel) $("#fillOrgs").append("<span class='divider'>&nbsp;</span>");
         };
     };
+    this.handleNoOrgs = function (userId) {
+        $(".intervention-link, a.decision-support-link").each(function() {
+          var dm = /decision\s?support/gi;
+          if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
+              var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
+              //allow modal to show once once action has been taken
+              if (hasSet) return false;
+              var self = this;
+              $.ajax ({
+                  type: "GET",
+                  url: '/api/demographics/' + userId,
+                  async: false
+              }).done(function(data) {
+                  //console.log(data)
+                  if (data && data.careProvider) {
+                      $.each(data.careProvider,function(i,val){
+                          var orgID = val.reference.split("/").pop();
+                          if (parseInt(orgID) === 0) {
+                            $(self).removeAttr("href");
+                            $(self).on("click", function() {
+                              $("figure.js-close-nav").trigger("click");
+                              setTimeout('$("#modal-org").modal("show");', 0);
+                            });
+                            IO.clearSession("decision-support");
+                          };
+                      });
+                  };
+              }).fail(function() {
+                 // console.log("Problem retrieving data from server.");
+              });
+          };
+       });
+    };
+
+    this.updateOrgCallback = function (errorMessage) {
+      if (!errorMessage) {
+        $("#modal-org a.box-modal__close").trigger("click");
+        __loader(true);
+        setTimeout("location.reload();", 1000);
+        if (typeof sessionStorage != "undefined") {
+          try {
+            sessionStorage.setItem("noOrgModalViewed", "true");
+          } catch(e) {
+
+          };
+        };
+      } else {
+        $("#modal-org-error").html(errorMessage);
+      };
+    };
   };
-  return OrgTool;
 
 })();
+},{}],
+13:[function(require,module,exports){
+  var menuObj;
+  module.exports = menuObj = (function() {
+      return function () {
+            this.filterMenu = function (userId) {
+              if (!userId) return false;
+              $.ajax({
+                url: __PORTAL + "/gil-interventions-items/" + userId,
+                context: document.body,
+                async: false,
+                cache: false
+              }).done(function(data) {
+                //console.log(data)
+                var ct = 0, found_decision_support = false, found_symptom_tracker = false;
+                //$(".side-nav-items__item--decisionsupport").hide();
+                if (data.interventions) {
+                  if (data.interventions.length > 0) {
+                    var db = $(".side-nav-items__item--dashboard");
+                    if (db.length == 0) {
+                      $(".side-nav-items").prepend('<li class="side-nav-items__item side-nav-items__item--dashboard"><a href="' + __PORTAL + '/home">My Dashboard</a></li>');
+                      if ($("#portalMain").length > 0) {
+                           setSelectedNavItem($(".side-nav-items__item--dashboard"));
+                      };
+                    };
+                    $(".side-nav-items__item--home").hide();
+                  };
+                  (data.interventions).forEach(function(item) {
+                      var d = item.description;
+                      var b = item.link_url;
+                      var n = item.name.replace(/\_/g, " ")
+                      var disabled = item.link_url == "disabled";
+                      var dm = /decision\s?support/gi;
+                      var sm = /symptom\s?tracker/gi;
+                      var sm2 = /self[_\s]?management/gi;
+                      //console.log(n + " " + d)
+                      if (dm.test(d) || dm.test(n)) {
+                          if (!disabled) {
+                              var ditem = $("#intervention_item_decisionsupport");
+                              if (ditem.length == 0) { //only draw this when there isn't already one
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
+                              };
+
+                              found_decision_support = true;
+
+                              $(".decision-support-link").each(function() {
+                                $(this).attr("href", b);
+                                $(this).removeClass("icon-box__button--disabled");
+                              });
+                              $(".icon-box-decision-support").removeClass("icon-box--theme-inactive");
+                          } else {
+                            $(".decision-support-link").each(function() {
+                                $(this).removeAttr("href");
+                                $(this).addClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
+                          };
+                      }
+                      else if (sm.test(d) || sm2.test(n)) {
+                          //do nothing - always display symptom tracker
+                          if (!disabled) {
+                            var sitem = $("#intervention_item_symptomtracker");
+                            if (sitem.length == 0) { //only draw this when there isn't already one
+                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
+                            };
+
+                            found_symptom_tracker = true;
+
+                            $(this).removeClass("icon-box__button--disabled");
+                            $(".symptom-tracker-link").each(function() {
+                                $(this).attr("href", b)
+                                $(this).removeClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-symptom-tracker").removeClass("icon-box--theme-inactive");
+                          } else {
+                            $(".symptom-tracker-link").each(function() {
+                                $(this).removeAttr("href");
+                                $(this).addClass("icon-box__button--disabled");
+                            });
+                            $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
+                          };
+                      }
+                      else if ($.trim(d) != "") {
+                          if (!disabled) {
+                              var eitem = $("#intervention_item_" + ct);
+                              if (eitem.length == 0) { //only draw this when there isn't already one
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_' + ct + '" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + n + '</a></li>');
+                                ct++;
+                              };
+                          };
+                      };
+                  });
+
+                  if (!found_decision_support) {
+                    $(".decision-support-link").each(function() {
+                          $(this).removeAttr("href");
+                          $(this).addClass("icon-box__button--disabled");
+                      });
+                    $(".icon-box-decision-support").addClass("icon-box--theme-inactive");
+                    IO.clearSession("decision-support");
+                  } else {
+                        OT.handleNoOrgs(userId);
+                        if (IO.getSession("decision-support")) {
+                            var l =  $("#intervention_item_decisionsupport a");
+                            var la = l.attr("href");
+                            if (l.length > 0 && validateUrl(la)) {
+                              IO.clearSession("decision-support");
+                              VO.setRedirect();
+                              setTimeout('location.replace("' + l.attr("href") + '");', 0);
+                              return true;
+                            };
+                        };
+                  };
+
+                  if (!found_symptom_tracker) {
+                    $(".symptom-tracker-link").each(function() {
+                        $(this).removeAttr("href");
+                        $(this).addClass("icon-box__button--disabled");
+                    });
+                    $(".icon-box-symptom-tracker").addClass("icon-box--theme-inactive");
+                    IO.clearSession("symptom-tracker");
+                  } else {
+                    //#intervention_item_symptomtracker
+                    if (IO.getSession("symptom-tracker")) {
+                        var l =  $("#intervention_item_symptomtracker a");
+                        var la = l.attr("href");
+                        if (l.length > 0 && validateUrl(la)) {
+                          IO.clearSession("symptom-tracker");
+                          VO.setRedirect();
+                          setTimeout('location.replace("' + l.attr("href") + '");', 0);
+                          return true;
+                        };
+                    };
+                  };
+
+                };
+                __loader(false);
+              }).fail(function() {
+                __loader(false);
+              });
+          }
+        };
+  })();
 },{}]
-
 },{},[2])
-
-$("input[type='text']").on("blur paste", function() {
-      $(this).val($.trim($(this).val()));
-});
-var LOGIN_AS_PATIENT = (typeof sessionStorage != "undefined") ? sessionStorage.getItem("loginAsPatient") : null;
-if (LOGIN_AS_PATIENT) {
-    if (typeof history != 'undefined' && history.pushState) history.pushState(null, null, location.href);
-    window.addEventListener('popstate', function(event) {
-      if (typeof history != 'undefined' && history.pushState) {
-        history.pushState(null, null, location.href);
-        setTimeout('location.reload();', 0);
-      } else {
-        window.history.forward(1);
-        setTimeout('location.reload();', 0);
-      };
-    });
-};
-
-function setNoBanner() {
-    if (typeof sessionStorage != "undefined") {
-      sessionStorage.setItem('bannerAccessed', 'yes');
-    };
-};
 
 function checkBannerStatus() {
   if (typeof sessionStorage != "undefined") {
@@ -806,23 +1004,13 @@ function checkBannerStatus() {
   }
 };
 
-function adjustHeaderHeight() {
-  if ($(".watermark").length > 0) {
-    $("header.no-banner ").css("padding-top", "35px");
-  };
-};
-
-function goToLogin() {
-    $('#modal-login-register').modal('hide');
-    setTimeout("$('#modal-login').modal('show'); ", 400);
-};
 function setSelectedNavItem(obj) {
     $(obj).addClass("side-nave-items__item--selected");
     $("li.side-nave-items__item--selected").find("a").attr("href", "#");
 
     $(obj).on("click", function(event) {
           event.preventDefault();
-          loader(false);
+          __loader(false);
           $(".side-nav__close").trigger("click");
           return;
      });
@@ -836,56 +1024,6 @@ function handleAccessCode() {
   } else {
     if ($("#access_code_error").text() != "") $("#access_code_error").show();
   };
-};
-function handleNoOrgs(userId) {
-      $(".intervention-link, a.decision-support-link").each(function() {
-        var dm = /decision\s?support/gi;
-        if (dm.test($(this).text()) || $(this).hasClass("decision-support-link")) {
-            var hasSet = (typeof sessionStorage != "undefined") && sessionStorage.getItem("noOrgModalViewed");
-            //allow modal to show once once action has been taken
-            if (hasSet) return false;
-            var self = this;
-            $.ajax ({
-                type: "GET",
-                url: '/api/demographics/' + userId,
-                async: false
-            }).done(function(data) {
-                //console.log(data)
-                if (data && data.careProvider) {
-                    $.each(data.careProvider,function(i,val){
-                        var orgID = val.reference.split("/").pop();
-                        if (parseInt(orgID) === 0) {
-                          $(self).removeAttr("href");
-                          $(self).on("click", function() {
-                            $("figure.js-close-nav").trigger("click");
-                            setTimeout('$("#modal-org").modal("show");', 0);
-                          });
-                          IO.clearSession("decision-support");
-                        };
-                    });
-                };
-            }).fail(function() {
-               // console.log("Problem retrieving data from server.");
-            });
-        };
-     });
-  };
-
-function updateOrgCallback(errorMessage) {
-    if (!errorMessage) {
-      $("#modal-org a.box-modal__close").trigger("click");
-      loader(true);
-      setTimeout("location.reload();", 1000);
-      if (typeof sessionStorage != "undefined") {
-        try {
-          sessionStorage.setItem("noOrgModalViewed", "true");
-        } catch(e) {
-
-        };
-      };
-    } else {
-      $("#modal-org-error").html(errorMessage);
-    };
 };
 
 var LR_INVOKE_KEYCODE = 187; // "=" sign
@@ -915,31 +1053,5 @@ function hasValue(val) {
 //this test for full URL - "https://stg-sm.us.truenth.org" etc.
 function validateUrl(val) {
     return  hasValue(val) && $.trim(val) != "#" &&/^(https?|ftp)?(:)?(\/\/)?([a-zA-Z0-9.-]+(:[a-zA-Z0-9.&%$-]+)*@)*((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(:[0-9]+)*(\/($|[a-zA-Z0-9.,?'\\+&%$#=~_-]+))*$/.test(val);
-};
-
-var OrgObj = function(orgId, orgName, parentOrg) {
-    this.id = orgId;
-    this.name = orgName;
-    this.children = [];
-    this.parentOrgId = parentOrg;
-    this.isTopLevel = false;
-};
-
-var CONSENT_ENUM = {
-    "consented": {
-        "staff_editable": true,
-        "include_in_reports": true,
-        "send_reminders": true
-    },
-     "suspended": {
-        "staff_editable": true,
-        "include_in_reports": true,
-        "send_reminders": false
-    },
-    "purged": {
-        "staff_editable": false,
-        "include_in_reports": false,
-        "send_reminders": false
-    }
 };
 
