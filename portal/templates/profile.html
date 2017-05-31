@@ -74,7 +74,7 @@
   </div>
 </form>
 {% endblock %}
-{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{{linksHTML()}}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
+{% block footer %}<div class="footer-wrapper right-panel"><div class="flex footer-container"><div class="copyright-container">{%-if providerPerspective== 'true' -%}{{linksHTML(user=current_user)}}{%-else-%}{{linksHTML(user=user)}}{%-endif-%}</div><div class="logo-container">{{logo(True)}}</div></div></div>{% endblock %}
 {% block document_ready %}
 {% if user.has_role(ROLE.PATIENT) and (user.id != current_user.id) %}var patientId = {{user.id}};{% endif %}
 var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-endif-%};

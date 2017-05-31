@@ -144,6 +144,10 @@
 </div>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
+{%- from "flask_user/_macros.html" import footer -%}
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
 {% block document_ready %}
 
 var org_list = {};

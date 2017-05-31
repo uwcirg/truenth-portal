@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
+{%- from "flask_user/_macros.html" import footer -%}
 {% block main %}
-
 <div id="staffList" class="reduce-font-sizes">
     <br/>
     <h3 class="tnth-headline">{{ _("Staff Administration") }}</h3>
@@ -51,9 +51,10 @@
             </tbody>
         </table>
     </div>
-
 </div>
-
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
 $("#adminTable").bootstrapTable({

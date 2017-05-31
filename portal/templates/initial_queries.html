@@ -71,7 +71,7 @@
   <div id="homeFooter" class="container-fluid">
     <div class="row">
         <div class="col-xs-6 col-lg-8 footer-container">
-            <div class="copyright-container">{{linksHTML()}}</div>
+            <div class="copyright-container">{{linksHTML(user)}}</div>
         </div>
         <div class="col-xs-6 col-lg-4 footer-container logo-container">
             <div class="pull-right">{{logo()}}</div>
@@ -786,7 +786,7 @@ $(document).ready(function(){
           subsections:
           {"clinics": {
                         config: "org",
-                        fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
+                        fields: [$("#userOrgs input[name='organization']")],
                         event: userOrgChangeEvent
                       }
           }}
