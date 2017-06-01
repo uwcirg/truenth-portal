@@ -157,7 +157,7 @@ $(document).ready(function(){
             timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
             modalShown: false,
             intervalMonitor: false, 
-            onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.logout() }, 2 * 60 * 1000);}
+            onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
       });
       window.sessMon = sessMon;
        // Configure the session timeout warning modal

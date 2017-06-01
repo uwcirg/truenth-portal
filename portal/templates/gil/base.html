@@ -261,6 +261,18 @@
         </div>
       </div>
     </div>
+    <div id="timeout-modal" class="modal fade">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content box-modal">
+          <div class="box-modal__inner"><a class="box-modal__close" type="button" data-dismiss="modal" aria-label="Close"></a>
+            <h4 class="box-modal__title">Session Timed Out</h4><p class="box-modal__copy">You have been logged out due to inactivity.  Please log in again to continue.</p>
+          </div>
+           <div class="box-modal__footer">
+              <button class="button button--teal" data-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
 {% endblock %}
 {% block consent %}
   {% if consent_agreements %}
@@ -348,7 +360,7 @@
                     timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
                     modalShown: false,
                     intervalMonitor: false, 
-                    onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.logout() }, 2 * 60 * 1000);}
+                    onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
                // Configure the session timeout warning modal
@@ -372,6 +384,10 @@
          $(document).ready(function(){
 
             checkBannerStatus();
+
+            {% if timed_out %}
+                $("#timeout-modal").modal("show");
+            {% endif %}
 
             {% if user and (user.has_role(ROLE.PATIENT) or user.has_role(ROLE.PARTNER)) %} MO.filterMenu({{user.id}}); {% else %} VO.hideLoader(); {% endif %}
 
