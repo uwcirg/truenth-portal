@@ -362,8 +362,15 @@ class User(db.Model, UserMixin):
             Encounter.status=='in-progress')
         if query.count() == 0:
             return None
-        assert (query.count() == 1)  # shouldn't have more than one active
-        return query.one()
+        if query.count() != 1:
+            # Not good - we should only have one `active` encounter for
+            # the current user.  Log details for debugging and return the
+            # first
+            msg = "Multiple active encounters found for {}: {}".format(
+                self.user,
+                [(e.status, str(e.start_time), str(e.end_time)) for e in query])
+            current_app.logger.error(msg)
+        return query.first()
 
     @property
     def locale(self):
