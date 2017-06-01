@@ -1,10 +1,12 @@
 {% extends "gil/base.html" %}
+{% block title %}About Truenth{% endblock %}
+{% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--about {%if user%}no-banner{%endif%}" style="background-image: url({{url_for('static', filename='img/About-Top-Background.jpg') }})">
         <div class="page-intro__content">
-          <h1 class="page-intro__main">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com', target='_blank'>The Movember Foundation</a>.</h1>
+          <h1 class="page-intro__main">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>
           <p class="page-intro__sub">Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers.</p>
           <div class="button-callout">
             <strong class="js-scroll-down" data-target=".page-intro">Learn More</strong>
@@ -12,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/a49bd1bd181ae3c72c/b947ee462a45662e?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/About-Video-Export.jpg') }}">
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/a49bd1bd181ae3c72c/b947ee462a45662e?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/About-Video-Export.jpg') }}" alt="Learn More">
         <div class="module-wrap--inner">
           <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
         </div>
@@ -76,22 +78,22 @@
           <p class="module__heading">Our USA Partners</p>
           <p class="module__body">We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer.</p>
           <div class="partner-grid">
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/colorado.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/DanaFarber.png') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/duke.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/emory.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/johnshopkins.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/karmanos.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/sloan.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/michigan.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/moffitt.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/colorado.gif') }}" alt="University of Colorado Cancer Center"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/DanaFarber.png') }}" alt="Dana Farber Cancer Institute"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/duke.gif') }}" alt="Duke University"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/emory.gif') }}" alt="Emory University"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/johnshopkins.gif') }}" alt="Johns Hopkins University"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/karmanos.gif') }}" alt="Karmanos Cancer Institute"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/sloan.gif') }}" alt="Memorial Sloan Kettering Cancer Center"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/michigan.gif') }}" alt="University of Michigan"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/moffitt.gif') }}" alt="Moffitt Cancer Center"></div>
             <!-- <div class="partner-grid__item"><img src="./img/music.gif"></div> -->
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/OHSU.png') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucdavis.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucla.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/UCSF.png') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/unc.gif') }}"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/uw.gif') }}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/OHSU.png') }}" alt="OHSU"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucdavis.gif') }}" alt="UC Davis"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucla.gif') }}" alt="UCLA"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/UCSF.png') }}" alt="UCSF"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/unc.gif') }}" alt="UNC"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/uw.gif') }}" alt="University of Washington"></div>
           </div>
         </div>
       </div>
@@ -100,7 +102,7 @@
           <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
           <p class="module__heading">Global Strategy</p>
           <p class="module__body">TrueNTH is currently active in 7 countries around the world:</p>
-          <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}">
+          <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}" alt="World Map">
             <ul class="tooltips">
               <li class="tooltips__item tooltips__item--usa"><strong>USA</strong><span>US</span>
                 <figure></figure>

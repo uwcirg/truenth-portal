@@ -1,10 +1,11 @@
 {% extends "gil/base.html" %}
-  <!-- class="page-home" -->
+{% block title %}Truenth Home{% endblock %}
+{% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main">
       {{ super() }}
       <div class="home-intro">
-        <div class="intro"><img class="intro__img intro__img--desktop" src="{{url_for('static', filename='img/Home-Truck-Top-001.jpg') }}"><img class="intro__img intro__img--mobile" src="{{url_for('static', filename='img/Home-Truck-Top-Mobile.jpg') }}">
+        <div class="intro"><img class="intro__img intro__img--desktop" src="{{url_for('static', filename='img/Home-Truck-Top-001.jpg') }}" alt="Truenth Home"><img class="intro__img intro__img--mobile" src="{{url_for('static', filename='img/Home-Truck-Top-Mobile.jpg') }}" alt="Truenth Home">
           <div class="intro__content">
             <p class="intro__sub">TrueNTH is a collective approach to improving your quality of life throughout your prostate cancer journey.</p><a class="intro__down js-scroll-down" data-target=".home-intro .intro">
               <figure></figure></a>
@@ -16,20 +17,20 @@
           <div class="more-arrow"><a class="more-arrow__link more-arrow--teal" href="{{PORTAL}}/about"><span>More About TrueNTH <figure></figure></span></a></div>
           <div class="photo-grid-container">
             <div class="photo-grid">
-              <figure class="photo-grid__item"><strong>Jim Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Jim.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Jim-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Jon and Mark Hirsch</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Hirsch.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Hirsch-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Dr. Drew Peterson<span>UROLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Drew.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Drew-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Alonzo McCann</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Alonzo.jpg') }}"><img class="photo-grid__img--hovered" width="212" src="{{url_for('static', filename='img/Home-People-Alonzo-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Dr. Elisabeth Heath<span>ONCOLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Elisabeth.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Elisabeth-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Andrew Maguire<span>FILM MAKER</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Andrew.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Andrew-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>Lois Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Lois.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Lois-Over.jpg') }}"></figure>
-              <figure class="photo-grid__item"><strong>David Perez</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-David.jpg') }}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-David-Over.jpg') }}"></figure>
+              <figure class="photo-grid__item"><strong>Jim Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Jim.jpg') }}" alt="Jim Williams"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Jim-Over.jpg') }}" alt="Jim Williams"></figure>
+              <figure class="photo-grid__item"><strong>Jon and Mark Hirsch</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Hirsch.jpg') }}" alt="Jon and Mark Hirsch"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Hirsch-Over.jpg') }}" alt="Jon and Mark Hirsch"></figure>
+              <figure class="photo-grid__item"><strong>Dr. Drew Peterson<span>UROLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Drew.jpg') }}" alt="Drew Peterson"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Drew-Over.jpg') }}" alt="Drew Peterson"></figure>
+              <figure class="photo-grid__item"><strong>Alonzo McCann</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Alonzo.jpg') }}" alt="Alonzo McCann"><img class="photo-grid__img--hovered" width="212" src="{{url_for('static', filename='img/Home-People-Alonzo-Over.jpg') }}" alt="Alonzo McCann"></figure>
+              <figure class="photo-grid__item"><strong>Dr. Elisabeth Heath<span>ONCOLOGIST</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Elisabeth.jpg') }}" alt="Elisabeth Heath"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Elisabeth-Over.jpg') }}" alt="Elisabeth Heath"></figure>
+              <figure class="photo-grid__item"><strong>Andrew Maguire<span>FILM MAKER</span></strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Andrew.jpg') }}" alt="Andrew Maguire"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Andrew-Over.jpg') }}" alt="Andrew Maguire"></figure>
+              <figure class="photo-grid__item"><strong>Lois Williams</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Lois.jpg') }}" alt="Lois Williams"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Lois-Over.jpg') }}" alt="Lois Williams"></figure>
+              <figure class="photo-grid__item"><strong>David Perez</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-David.jpg') }}" alt="David Perez"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-David-Over.jpg') }}" alt="David Perez"></figure>
             </div>
           </div>
           <div class="button-callout"><a href="#" class="button button--large button--teal" data-toggle="modal" data-target="#modal-register">Join Us</a></div>
         </div>
       </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/e89bd1bf1110e0ca60/4dbbcb0c46b54183?type=hd&amp;playerColor=2f3437&amp;autoPlay=true"><img src="{{url_for('static', filename='img/Home-Video-Export.jpg') }}">
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/e89bd1bf1110e0ca60/4dbbcb0c46b54183?type=hd&amp;playerColor=2f3437&amp;autoPlay=true"><img src="{{url_for('static', filename='img/Home-Video-Export.jpg') }}" alt="Learn more">
         <div class="module-wrap--inner">
           <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
         </div>

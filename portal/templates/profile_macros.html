@@ -1550,7 +1550,7 @@
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
-                <input type="text" style="position: fixed; left: -10000000px;" autofocus="true"/>
+                <input type="text" style="position: fixed; left: -10000000px;" autofocus/>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
@@ -1567,12 +1567,12 @@
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
-                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="manualEntryModalLabel">
+                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 class="modal-title" id="loginAsModalLabel">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                                <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
                               </div>
                               <div class="modal-body">
                                 <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>

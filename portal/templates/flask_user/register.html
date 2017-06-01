@@ -2,20 +2,7 @@
 
 {% block content %}
 {% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
-<style>
-    .password-popover { min-width: 200px; max-width: 250px; right: 50px !important;}
-    .password-popover .popover-content { padding: 1.2em 1em 1.5em 1em; width: 100%; margin: 0 auto;}
-    #pwdHintList {padding: 0; margin:2px; list-style-type: none}
-    .password-popover li { margin-left: 1em;}
-    .password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
-    .success-text { color: green; font-weight: bold;}
-    .default-text { color: #31708f; font-weight: normal;  }
-    .fail-text {color: #a94442; font-weight: bold;}
-    .password-popover li.fail-text::before { content: "\2715"; display: inline-block; margin-right: 4px; }
-
-</style>
-<form id="regForm" action="" method="POST" novalidate formnovalidate class="form to-validate" role="form" style="margin-left: 1em">
-
+<form id="regForm" action="" method="POST" novalidate class="form to-validate" style="margin-left: 1em">
     <div class="row">
         <div class="col-md-push-3 col-md-5 col-xs-11">
              <div class="btn-social-container">
