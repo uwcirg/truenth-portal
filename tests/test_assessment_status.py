@@ -44,6 +44,8 @@ localized_instruments = set(['eproms_add', 'epic26', 'comorb'])
 metastatic_baseline_instruments = set([
     'eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
+metastatic_recurring_instruments = set([
+    'eortc', 'hpfs', 'prems', 'epic26'])
 
 
 def mock_questionnairebanks():
@@ -61,40 +63,59 @@ def mock_questionnairebanks():
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
 
+    ## Localized baseline
     l_qb = QuestionnaireBank(
         name='localized',
         classification='baseline',
         organization_id=localized_org.id)
-    mb_qb = QuestionnaireBank(
-        name='metastatic',
-        classification='baseline',
-        organization_id=metastatic_org.id)
-    mi_qb = QuestionnaireBank(
-        name='metastatic_indefinite',
-        classification='indefinite',
-        organization_id=metastatic_org.id)
     for rank, instrument in enumerate(localized_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=7, days_till_overdue=90,
             rank=rank)
         l_qb.questionnaires.append(qbq)
+
+    ## Metastatic baseline
+    mb_qb = QuestionnaireBank(
+        name='metastatic',
+        classification='baseline',
+        organization_id=metastatic_org.id)
     for rank, instrument in enumerate(metastatic_baseline_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=30,
             rank=rank)
         mb_qb.questionnaires.append(qbq)
+
+    ## Metastatic indefinite
+    mi_qb = QuestionnaireBank(
+        name='metastatic_indefinite',
+        classification='indefinite',
+        organization_id=metastatic_org.id)
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=3000,
             rank=rank)
         mi_qb.questionnaires.append(qbq)
+
+    ## Metastatic recurring
+    mr_qb = QuestionnaireBank(
+        name='metastatic_recurring',
+        classification='recurring',
+        organization_id=metastatic_org.id)
+    for rank, instrument in enumerate(metastatic_recurring_instruments):
+        q = Questionnaire.query.filter_by(name=instrument).one()
+        qbq = QuestionnaireBankQuestionnaire(
+            questionnaire=q, days_till_due=1, days_till_overdue=30,
+            rank=rank)
+        mr_qb.questionnaires.append(qbq)
+
     with SessionScope(db):
         db.session.add(l_qb)
         db.session.add(mb_qb)
         db.session.add(mi_qb)
+        db.session.add(mr_qb)
         db.session.commit()
 
 
