@@ -257,6 +257,17 @@ select:not([multiple]) {
 #mainDiv.profile .logo-container * {
   color: #F5F5F5;
 }
+#mainDiv.profile .copyright-container,
+#mainDiv.portal .copyright-container  {
+  color: #F5F5F5;
+  margin-bottom: 1em;
+}
+.copyright-container {
+  font-size: 0.9em;
+}
+#mainDiv.profile .logo-container {
+  margin: auto;
+}
 #mainDiv.profile .footer-wrapper {
   margin-left: 25%;
   position: inherit !important;

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
+{% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
-{% from "flask_user/_macros.html" import back_btn %}
 {% from "profile_macros.html" import profileAssessment %}
 
 <br/>
@@ -25,12 +25,7 @@
 
 
 {% endblock %}
-
-{% block document_ready %}
-
-$(document).ready(function(){
-
-});
-
-
+{% block footer %}
+{{footer(user=current_user)}}
 {% endblock %}
+

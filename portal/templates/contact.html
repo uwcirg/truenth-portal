@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
+{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn, footer %}
 {% block main %}
-{% from "flask_user/_macros.html" import render_field, render_submit_field, back_btn %}
-
 {{ back_btn(PORTAL, _('Home')) }}
 
 <h3 class="tnth-headline">{{ _("Contact TrueNTH") }}</h3>
@@ -50,4 +49,7 @@
     })
   })
 </script>
+{% block footer %}
+{{footer(user=user)}}
+{% endblock %}
 {% endblock %}

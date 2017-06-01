@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
+{%- from "flask_user/_macros.html" import back_btn, footer -%}
 {% block main %}
-{%- from "flask_user/_macros.html" import back_btn -%}
 {%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
@@ -96,6 +96,9 @@
     {%- endif -%}
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
 
