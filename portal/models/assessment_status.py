@@ -138,22 +138,23 @@ class QuestionnaireDetails(object):
                 results['status'] = 'In Progress'
                 results['in-progress'] = recents['in-progress']
             today = datetime.utcnow()
-            delta = today - self.consent_date
-            if delta < timedelta(days=days_till_due + 1):
-                tmp = {
-                    'status': 'Due',
-                    'by_date': self.consent_date + timedelta(days=days_till_due)
-                   }
-                tmp.update(results)
-                return tmp
-            if delta < timedelta(days=days_till_overdue + 1):
-                tmp = {
-                    'status': 'Overdue',
-                    'by_date': self.consent_date + timedelta(
-                        days=days_till_overdue)
-                   }
-                tmp.update(results)
-                return tmp
+            if self.consent_date:
+                delta = today - self.consent_date
+                if delta < timedelta(days=days_till_due + 1):
+                    tmp = {
+                        'status': 'Due',
+                        'by_date': self.consent_date + timedelta(days=days_till_due)
+                       }
+                    tmp.update(results)
+                    return tmp
+                if delta < timedelta(days=days_till_overdue + 1):
+                    tmp = {
+                        'status': 'Overdue',
+                        'by_date': self.consent_date + timedelta(
+                            days=days_till_overdue)
+                       }
+                    tmp.update(results)
+                    return tmp
             return {'status': 'Expired'}
 
         self.qs[questionnaire.name] = {'name': questionnaire.name,

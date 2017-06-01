@@ -1,4 +1,6 @@
 {% extends "gil/base.html" %}
+{% block title %}Truenth Symptom Tracker{% endblock %}
+{% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main symptom-tracker-main">
       {{ super() }}
@@ -11,7 +13,7 @@
           </div>
         </div>
       </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}">
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/189ad9b61815eec490/086a7cdeac1b5ca1?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/ST-Video-Export.jpg') }}" alt="Learn More">
         <div class="module-wrap--inner">
           <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
         </div>
@@ -21,7 +23,7 @@
           <div class="accent-heading">Objective N<em>o</em>6: Custom Tools – Symptom Tracker</div>
           <h3 class="module__head">Monitoring and Tracking</h3>
           <p class="module__body">We’ve created a tool that asks you questions about your symptoms and side-effects throughout your prostate cancer journey from diagnosis through recovery.</p>
-          <p class="module__body">Every time you complete the tracking questionnaire it adds data to your graph, shows you how your experience compares with other men, and provides relevant tips.</p><img src="{{url_for('static', filename='img/Symptom_Tracker_Graph.png') }}">
+          <p class="module__body">Every time you complete the tracking questionnaire it adds data to your graph, shows you how your experience compares with other men, and provides relevant tips.</p><img src="{{url_for('static', filename='img/Symptom_Tracker_Graph.png') }}" alt="Symptom Tracker Graph">
           <div class="next-down">
             <p class="next-down__copy">We’ve created a tool to track your prostate cancer treatment side effects over time and provide personal guidance.</p>
           </div>

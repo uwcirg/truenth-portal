@@ -5,7 +5,6 @@
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 {% from "profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
-<style>.footerWrapper { display: none; border-top: solid 1px #eee; margin-top: 2em;}</style>
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
   {% if 'tou' in still_needed %}
       {{tou(terms)}}
@@ -15,7 +14,7 @@
         {% if user and user.email %}
             <input type="hidden" name="email" id="email" value="{{user.email}}" />
         {% endif %}
-        <div id="demographicsContainer" class="iq-container" parent-section="true">
+        <div id="demographicsContainer" class="iq-container" data-parent-section="true">
             <div class="content">
               <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
               <div class="content-body">
@@ -27,7 +26,7 @@
               </div>
             </div>
         </div>
-        <div id="clinicalContainer" class="iq-container" parent-section="true">
+        <div id="clinicalContainer" class="iq-container" data-parent-section="true">
           <div class="content">
             <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
             <div class="content-body">
@@ -36,7 +35,7 @@
             </div>
           </div>
         </div>
-        <div id="orgsContainer" class="iq-container" parent-section="true">
+        <div id="orgsContainer" class="iq-container" data-parent-section="true">
           <div class="content">
             <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
             <div class="content-body">
@@ -67,7 +66,7 @@
 {% from "flask_user/_macros.html" import footer, linksHTML, logo %}
 {% block footer %}
 <!-- custom footer -->
-<div class="footerWrapper">
+<div id="iqFooterWrapper" class="footerWrapper">
   <div id="homeFooter" class="container-fluid">
     <div class="row">
         <div class="col-xs-6 col-lg-8 footer-container">
@@ -257,10 +256,10 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
       };
     } else {
       if (field) {
-          var parentContainer = field.closest("[parent-section='true']");
+          var parentContainer = field.closest("[data-parent-section='true']");
           var found = false;
           if (parentContainer.length > 0) {
-              var nexts = parentContainer.nextAll("[parent-section='true']");
+              var nexts = parentContainer.nextAll("[data-parent-section='true']");
               nexts.each(function() {
                 var parentId = $(this).attr("id");
                 //console.log('parentId: ' + parentId)
@@ -293,7 +292,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
       if (fields) {
           fields.forEach(function(field) {
             if (field.length > 0 && (field.attr("skipped") != "true")) {
-                var type = field.attr('type');
+                var type = field.attr('type') || field.attr('data-type');
                 switch(String(type).toLowerCase()) {
                 case 'checkbox':
                 case 'radio':
@@ -425,7 +424,7 @@ function initIncompleteFields() {
                      fc.continueToFinish();
                   };
                 } else {
-                    var parentSection = $(this).closest("div[parent-section]").attr("id");
+                    var parentSection = $(this).closest("div[data-parent-section]").attr("id");
                     if (fc.sectionCompleted(parentSection)) fc.continueToNext(parentSection);
                     else fc.stopContinue(parentSection);
                 };

@@ -285,6 +285,11 @@ select:not([multiple]) {
   z-index: 20;
   position: relative;
 }
+#iqFooterWrapper .footerWrapper { 
+  display: none; 
+  border-top: solid 1px #eee; 
+  margin-top: 2em;
+}
 #mainHolder {
   visibility: hidden;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
@@ -3129,6 +3134,15 @@ div.or {
     margin: -1.3em auto 20px auto;
     width: 100%;
 }
+.password-popover { min-width: 200px; max-width: 250px; right: 50px !important;}
+.password-popover .popover-content { padding: 1.2em 1em 1.5em 1em; width: 100%; margin: 0 auto;}
+#pwdHintList {padding: 0; margin:2px; list-style-type: none}
+.password-popover li { margin-left: 1em;}
+.password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
+.success-text { color: green; font-weight: bold;}
+.default-text { color: #31708f; font-weight: normal;  }
+.fail-text {color: #a94442; font-weight: bold;}
+.password-popover li.fail-text::before { content: "\2715"; display: inline-block; margin-right: 4px; }
 
 @media (max-width: 640px) {
   #regForm input,

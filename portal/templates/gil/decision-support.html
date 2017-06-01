@@ -1,4 +1,6 @@
 {% extends "gil/base.html" %}
+{% block title %}Truenth Decision Support{% endblock %}
+{% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main decision-support-main">
      {{ super() }}
@@ -11,7 +13,7 @@
           </div>
         </div>
       </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/4c9ad9b61815eec5c4/882f75be6c8c66da?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/DS-Video-Export.jpg') }}">
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/4c9ad9b61815eec5c4/882f75be6c8c66da?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/DS-Video-Export.jpg') }}" alt="Learn more">
         <div class="module-wrap--inner">
           <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
         </div>

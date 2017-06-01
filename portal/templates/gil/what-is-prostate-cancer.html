@@ -1,4 +1,6 @@
 {% extends "gil/base.html" %}
+{% block title %}Truenth Prostate Cancer Information{% endblock %}
+{% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main">
       {{ super() }}
@@ -43,7 +45,7 @@
           <div class="accent-heading accent-heading--no-border">Education</div>
           <p class="module__heading">What is the <span class="module__heading--accent">Prostate</span>?</p>
           <p class="module__body module__body--left">The prostate is a part of the male reproductive system and is located just below the bladder and in front of the rectum. It produces fluid that makes up a part of semen.</p>
-          <div class="module__img"><img src="{{url_for('static', filename='img/what-is-the-prostate-graphic.png')}}"></div>
+          <div class="module__img"><img src="{{url_for('static', filename='img/what-is-the-prostate-graphic.png')}}" alt="Prostate Cancer Graph"></div>
         </div>
       </div>
       <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
@@ -222,15 +224,15 @@
           <div class="accent-heading accent-heading--no-border">ADDITIONAL RESOURCES</div>
           <p class="module__body module__body--left">
             <strong>Centers for Disease Control and Prevention</strong><br/> Information about Prostate Cancer
-<br /> <a href="https://www.cdc.gov/cancer/prostate/">https://www.cdc.gov/cancer/prostate/</a>
+<br/> <a href="https://www.cdc.gov/cancer/prostate/">https://www.cdc.gov/cancer/prostate/</a>
           </p>
           <p class="module__body module__body--left">
             <strong>Prostate Cancer Foundation</strong><br/ >Understanding Prostate Cancer
 <br/><a target="_blank" href="https://www.pcf.org/understanding-prostate-cancer/">https://www.pcf.org/understanding-prostate-cancer</a>
           </p>
           <p class="module__body module__body--left">
-            <strong>UsTOO</strong><br /> Education & Support for Prostate Cancer Patients & their Caregivers
-<br /> <a target="_blank" href="http://www.ustoo.org">http://www.ustoo.org</a>
+            <strong>UsTOO</strong><br/> Education & Support for Prostate Cancer Patients & their Caregivers
+<br/> <a target="_blank" href="http://www.ustoo.org">http://www.ustoo.org</a>
           </p>
           <p class="module__body module__body--left">
             <strong>UsTOO</strong><br/> Online Prostate Cancer Discussion Forum and Community

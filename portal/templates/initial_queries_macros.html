@@ -8,13 +8,12 @@
             <div id="termsText">
               {{ terms['asset']|safe if terms}}
             </div>
-            <meta id="termsURL"
-                  data-url="{{ terms['agreement_url']|safe if terms}}"/>
+            <input type="hidden" id="termsURL" data-url="{{ terms['agreement_url']|safe if terms}}" value=""/>
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div id="termsCheckbox">
-              <label id="agreeLabel" data-agree="false" type="terms">
+              <label id="agreeLabel" data-agree="false" data-type="terms">
                 <i class="fa fa-square-o fa-lg"></i> <span>{{ _("I consent and agree to the above terms.") }}</span>
               </label>
             </div>
@@ -98,7 +97,7 @@
                 <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="The birth day field is required and must be valid format" required />
               </div>
               <div class="col-md-4 col-xs-4">
-                <select type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="-- A birth month must be selected" required>
+                <select data-type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="-- A birth month must be selected" required>
                   <option value="">{{ _("Month") }}...</option>
                   <option value="01">{{ _("January") }}</option>
                   <option value="02">{{ _("February") }}</option>
