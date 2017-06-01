@@ -346,11 +346,15 @@
                     pingUrl: '{{PORTAL}}/api/ping',
                     logoutUrl: '{{PORTAL}}/logout',
                     timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
-                    onwarning: function() {$("#session-warning-modal").modal("show");}
+                    modalShown: false,
+                    intervalMonitor: false, 
+                    onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.logout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
                // Configure the session timeout warning modal
               $("#session-warning-modal").modal({"backdrop": false,"keyboard": false,"show": false})
+                      .on("show.bs.modal", function() { sessMon.modalShown = true})
+                      .on("hide.bs.modal", function() { sessMon.modalShown = false; if (sessMon.intervalMonitor) clearInterval(sessMon.intervalMonitor); })
                       .on("click", "#stay-logged-in", sessMon.extendsess)
                       .on("click", "#log-out", sessMon.logout)
                       .find("#remaining-time").text(sessMon.timeBeforeWarning / 1000);
