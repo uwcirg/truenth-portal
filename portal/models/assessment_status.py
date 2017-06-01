@@ -78,7 +78,9 @@ class QuestionnaireDetails(object):
     def __init__(self, user, consent_date):
         self.user = user
         self.consent_date = consent_date
-        self.qs = OrderedDict()
+        self._baseline_qs = OrderedDict()
+        self._recurring_qs = OrderedDict()
+        self._indefinite_qs = OrderedDict()
         for classification in ('baseline', 'recurring', 'indefinite'):
             for qb in qbs_for_user(user, classification):
                 for questionnaire in qb.questionnaires:
@@ -87,41 +89,47 @@ class QuestionnaireDetails(object):
                         questionnaire=questionnaire,
                         organization_id=qb.organization_id)
 
-    def __getitem__(self, key):
-        """Direct access to questionnaire by name"""
-        return self.qs[key]
+    def lookup(self, questionnaire_name, classification):
+        """Return element (if found) with matching criteria"""
+        if classification == 'all':
+            raise NotImplementedError(
+                "`lookup' not yet supporting `all` classifications")
+        storage = getattr(self, '_{}_qs'.format(classification))
+        if not storage:
+            raise ValueError("unknown classification: {}".format(
+                classification))
+        return storage.get(questionnaire_name)
 
     def all(self):
         """Generator to return all questionnaires"""
-        for q in self.qs.values():
+        for q in (
+                self._baseline_qs.values() +
+                self._recurring_qs.values() +
+                self._indefinite_qs.values()):
             yield q
 
     def baseline(self):
         """Generator to return all baseline questionnaires"""
-        gen = (q for q in self.qs.values()
-               if q['classification'] == 'baseline')
-
-        for q in gen:
+        for q in self._baseline_qs.values():
             yield q
 
     def indefinite(self):
         """Generator to return all indefinite questionnaires"""
-        gen = (
-            q for q in self.qs.values() if q['classification'] == 'indefinite')
-        for q in gen:
+        for q in self._indefinite_qs.values():
             yield q
 
     def recurring(self):
         """Generator to return all recurring questionnaires"""
-        gen = (
-            q for q in self.qs.values() if q['classification'] == 'recurring')
-        for q in gen:
+        for q in self._recurring_qs.values():
             yield q
 
     def _append_questionnaire(self, classification, questionnaire,
                               organization_id):
         """Build up internal ordered dict from given values"""
-        assert questionnaire.name not in self.qs
+        storage = getattr(self, '_{}_qs'.format(classification))
+        if questionnaire.name not in storage:
+            raise ValueError(
+                "questionnaires expected to be unique by classification")
 
         def status_from_recents(recents, days_till_due, days_till_overdue):
             """Returns dict defining available values from recents
@@ -160,12 +168,12 @@ class QuestionnaireDetails(object):
                 return tmp
             return {'status': 'Expired'}
 
-        self.qs[questionnaire.name] = {
+        storage[questionnaire.name] = {
             'name': questionnaire.name,
             'classification': classification,
             'organization_id': organization_id
         }
-        self.qs[questionnaire.name].update(
+        storage[questionnaire.name].update(
             status_from_recents(recents=most_recent_survey(
                 self.user, questionnaire.name),
                 days_till_due=questionnaire.days_till_due,
@@ -315,7 +323,9 @@ class AssessmentStatus(object):
             self.instruments_needing_full_assessment(classification)
             or self.instruments_in_progress(classification))
         for i in instruments:
-            due_date = self.questionnaire_data[i].get('by_date')
+            due_date = self.questionnaire_data.lookup(
+                questionnaire_name=i, classification=classification).get(
+                    'by_date')
             if due_date:
                 return due_date
 
