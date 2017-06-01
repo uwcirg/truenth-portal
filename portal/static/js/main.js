@@ -574,7 +574,7 @@ var fillContent = {
                             var option = $("#locale").find("option[value='" + l.code + "']");
                             if (option.length > 0) {
                                 $("#locale").find("option[value='" + l.code + "']").attr("selected", "selected");
-                                $("#locale").val(l.code);
+                                $("#locale").get(0).value = l.code;
                                 selected = true;
                             };
                         };
