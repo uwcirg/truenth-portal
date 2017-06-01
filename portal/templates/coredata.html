@@ -72,7 +72,6 @@
     <br/>
     <button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">Save</button> &nbsp;&nbsp;
     <div class="btn btn-default continue-btn">{{ _("Skip This") }} <i class="fa fa-chevron-right"></i></div>
-
 </form>
 {% endif %}
 
@@ -83,6 +82,8 @@
 <!--<button type="submit" class="btn btn-lg btn-tnth-primary continue-btn">I'm Done Entering Treatments</button> &nbsp;&nbsp;-->
 <br/>
 <div class="btn btn-tnth-primary continue-btn">{{ _("Continue") }} <i class="fa fa-chevron-right"></i></div>
+<div class="loading-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+<div class="error-continue error-message"></div>
 <br/><br/><br/><br/>
 
 {% endif %}
@@ -114,7 +115,17 @@ $(document).ready(function(){
     // Class for both "done" and "skip" buttons
     $(".continue-btn").on("click", function(event){
         event.preventDefault();
-        window.location.replace("{{ return_address | safe }}");
+        $(this).hide();
+        $(".loading-indicator").show();
+        try {
+            window.location.replace("{{ return_address | safe }}");
+        } catch(e) {
+            //report error if invalid return address is used here
+            tnthAjax.reportError({{user.id}}, "{{url_for('coredata_api.acquire')}}", e.message, true);
+            $(".loading-indicator").hide();
+            $(this).show();
+            $(".error-continue").text(e.message);
+        };
     });
     tnthAjax.getPortalFooter({{user.id}}, false, "core_data_footer");
 });
