@@ -1033,7 +1033,7 @@ class User(db.Model, UserMixin):
 
         # direct attributes on user
         # intentionally skip {id, email, reset_password_token}
-        exclude = ['id', 'email', 'reset_password_token']
+        exclude = ['id', '_email', 'reset_password_token']
         for attr in (col for col in self.column_names() if col not in exclude):
             if not getattr(other, attr):
                 continue
