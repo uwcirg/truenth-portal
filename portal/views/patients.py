@@ -171,7 +171,7 @@ def patient_profile(patient_id):
 
     return render_template(
         'profile.html', user=patient,
-        current_user=user, 
+        current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions,
