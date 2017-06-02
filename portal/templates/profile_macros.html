@@ -13,10 +13,10 @@
     <div class="form-group profile-section" id="bdGroup">
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer">
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
-            <div class="flex-item" id="bdMonthContainer">
+            <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -33,7 +33,7 @@
                     <option value="12">{{ _("December") }}</option>
                 </select>
             </div>
-            <div class="flex-item" id="bdYearContainer">
+            <div class="flex-item" id="bdYearContainer" data-loader-container="true">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
         </div>
@@ -70,7 +70,7 @@
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
-    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item">
+    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
           {%- if (person and ("en_US" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_US" -%}
@@ -94,13 +94,13 @@
 {% macro profileName(person, isFocus=False) -%}
     <div class="form-group profile-name-label"><label>{{ _("Name") }}</label></div>
     <div class="row profile-section name-section">
-        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
+        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
+        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
@@ -112,7 +112,7 @@
 {% macro profileGender(person) -%}
     <div class="form-group profile-section flex-item" id="genderGroup">
         <label id="genderLabel">{{ _("Gender") }}</label>
-        <div id="profile-gender-list" class="profile-radio-list">
+        <div id="profile-gender-list" class="profile-radio-list" data-loader-container="true">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
@@ -167,7 +167,7 @@
 
 {% macro profileRace(person) -%}
     {%- if person and person.org_coding_display_options.race -%}
-        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace">
+        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace" data-loader-container="true">
             <label>{{ _("Race") }}</label>
             <div class="profile-radio-list">
                 <div class="checkbox">
@@ -207,7 +207,7 @@
 
 {% macro profileEthnicity(person) -%}
     {%- if person and person.org_coding_display_options.ethnicity -%}
-        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" id="userEthnicity">
+        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" data-loader-container="true" id="userEthnicity">
             <label>{{ _("Ethnicity") }}</label>
             <div class="profile-radio-list">
                 <div class="radio">
@@ -226,7 +226,7 @@
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
-    <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail">
+    <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail" data-loader-container="true">
         <label for="email">{{ _("Email Address") }}</label>
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" required />
         <div class="help-block with-errors" id="erroremail"></div>
@@ -481,14 +481,14 @@
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
-    <div id="phoneGroup" class="form-group float-input-label profile-section">
+    <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <input type="text" class="form-control" id="phone" name="phone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.phone if person and person.phone }}" />
     </div>
 {%- endmacro %}
 
 {% macro profileAltPhone(person) -%}
-    <div id="altPhoneGroup" class="form-group float-input-label profile-section">
+    <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <input type="text" class="form-control" id="altPhone" name="altPhone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.alt_phone if person and person.alt_phone }}" />
     </div>
@@ -731,7 +731,7 @@
                     </div>
                     <div class="modal-body">
                     <h4>Terms</h4>
-                    <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreement.asset|safe}}</div>
+                    <div class="terms-container">{{consent_agreement.asset|safe}}</div>
                     <br/>
                     <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
                     <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
@@ -914,7 +914,7 @@
 
         /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
-            var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+            var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
             $("#profileConsentList").animate({opacity: 0}, function() {
                     $(this).html(eventLoading).css('opacity',1);
                     // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
@@ -955,17 +955,14 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json'
             }).done(function(data) {
-                //console.log(data["audits"]);
                 if (data["audits"] && data["audits"].length > 0 ) {
                     var fData = [];
                     data["audits"].forEach(function(item) {
                         item["by"] = item["by"]["reference"];
-                        //item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
                         var r = /\d+/g;
                         var m = r.exec(String(item["by"]));
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
-                        //console.log(r.exec(String(item["by"])));
                         item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
@@ -1041,7 +1038,7 @@
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" style="margin-left: 10px"></div>
+        <div class="form-group" id="rolesGroup" data-loader-container="true"></div>
     {% endif %}
     {% if person %}
     <script>
@@ -1445,7 +1442,7 @@
                     <div class="form-group">
                         <label class="text-muted">{{ _("Deceased Date") }}</label>
                     </div>
-                    <div class="row" style="margin-top:-8px">
+                    <div class="row deceased-date-container">
                         <div class="col-md-3 col-xs-6">
                             <div id="deathDayContainer" class="form-group profile-section">
                                 <input class="form-control" id="deathDay" name="deathDay" data-save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
@@ -1539,7 +1536,7 @@
     </script>
 {%- endmacro %}
 {% macro profileStudyID(person) -%}
-    <div id="profileStudyIDContainer" class="form-group">
+    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">Study ID</label>
         <input type="text" id="profileStudyId" class="form-control" required/>
         <div class="help-block with-errors"></div>
@@ -2052,7 +2049,7 @@
                                         <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"/>
                                     </div>
                                     <div class="flex-item">
-                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
+                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{{_("Save")}}</span></button>
                                     </div>
                                 </div>
                                 <div class="row">
