@@ -284,7 +284,7 @@ def update_card_html_on_completion():
 
         def completed_card_html(assessment_status):
             """Generates the appropriate HTML for the 'completed card'"""
-            header = _("Completed Questionnaire")
+            header = _("Completed Questionnaires")
             message = _("When you are done, completed questionnaires will be " \
                     "shown here.")
             completed_placeholder = """
