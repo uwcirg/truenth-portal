@@ -691,32 +691,9 @@ var fillContent = {
             var dataArray = data["consent_agreements"].sort(function(a,b){
                  return new Date(b.signed) - new Date(a.signed);
             });
-            //var orgs = {};
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            //userId, noOverride, sync, callback, noPopulate
-            /***********************
-            $.ajax ({
-                type: "GET",
-                url: '/api/organization',
-                async: false,
-                timeout: 20000
-            }).done(function(data) {
-                if (data) {
-                    data.entry.forEach(function(entry) {
-                        //console.log(entry["id"] +  " " + entry["name"] + " partOf: " + entry["partOf"])
-                        var oi = entry["id"];
-                        if (hasValue(oi)  && (parseInt(oi) != 0)) {
-                            orgs[oi] = {
-                                "_name" : entry["name"],
-                                "partOf": entry["partOf"] ? (entry["partOf"]["reference"]).split("/")[2] : null
-                            };
-                        };
-                    });
-                };
-            })******************/
-
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
             content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
@@ -726,35 +703,12 @@ var fillContent = {
 
             var hasContent = false;
 
-            //recursively get the top level org name
-            /**************
-            function getOrgName (_orgId) {
-                if (!(orgs[_orgId].partOf)) {
-                    return orgs[_orgId]._name;
-                }
-                else {
-                    return getOrgName(orgs[_orgId].partOf);
-                };
-            };
-            ***************/
-
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
-                    /************************************
-                    if (!ctop) {
-                        try {
-                            orgName = getOrgName(orgId);
-                        } catch(e) {
-                            orgName = orgs[orgId]._name;
-                        };
-                    } else orgName = orgs[orgId]._name;
-                    ************************************/
-
-
                     if (!ctop) {
                         try {
                             var topOrgID = OT.getTopLevelParentOrg(orgId);
@@ -765,7 +719,6 @@ var fillContent = {
                         }
                     } else orgName = OT.orgsList[orgId].name;
 
-                    //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
                     var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
