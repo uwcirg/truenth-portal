@@ -540,6 +540,7 @@ var fillContent = {
         this.race(data);
         this.indigenous(data);
         this.orgs(data);
+        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "name": function(data){
         if (data && data.name) {
@@ -672,7 +673,6 @@ var fillContent = {
             };
         });
         fillViews.org();
-        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -691,10 +691,12 @@ var fillContent = {
             var dataArray = data["consent_agreements"].sort(function(a,b){
                  return new Date(b.signed) - new Date(a.signed);
             });
-            var orgs = {};
+            //var orgs = {};
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
+            //userId, noOverride, sync, callback, noPopulate
+            /***********************
             $.ajax ({
                 type: "GET",
                 url: '/api/organization',
@@ -713,7 +715,7 @@ var fillContent = {
                         };
                     });
                 };
-            });
+            })******************/
 
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
@@ -725,6 +727,7 @@ var fillContent = {
             var hasContent = false;
 
             //recursively get the top level org name
+            /**************
             function getOrgName (_orgId) {
                 if (!(orgs[_orgId].partOf)) {
                     return orgs[_orgId]._name;
@@ -733,6 +736,7 @@ var fillContent = {
                     return getOrgName(orgs[_orgId].partOf);
                 };
             };
+            ***************/
 
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
@@ -740,6 +744,7 @@ var fillContent = {
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
+                    /************************************
                     if (!ctop) {
                         try {
                             orgName = getOrgName(orgId);
@@ -747,6 +752,18 @@ var fillContent = {
                             orgName = orgs[orgId]._name;
                         };
                     } else orgName = orgs[orgId]._name;
+                    ************************************/
+
+
+                    if (!ctop) {
+                        try {
+                            var topOrgID = OT.getTopLevelParentOrg(orgId);
+                            orgName = OT.orgsList[topOrgID].name;
+
+                        } catch(e) {
+                            orgName = OT.orgsList[orgId].name;
+                        }
+                    } else orgName = OT.orgsList[orgId].name;
 
                     //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
                     var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
@@ -1553,7 +1570,6 @@ OrgTool.prototype.populateUI = function() {
 
             });
         };
-
         if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
     };
 };
@@ -1902,12 +1918,13 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-            if (data && data.optional && data.optional.length > 0) {
+            if (data && data.optional) {
                 var self = this;
                 var sections = $("#profileForm .optional");
                 sections.each(function() {
                     var section = $(this).attr("data-section-id");
                     var parent = $(this).closest(".profile-item-container");
+                    var visibleRows = parent.find(".view-container tr:visible").length;
                     var noDataContainer = parent.find(".no-data-container");
                     var btn = parent.find(".profile-item-edit-btn").hide();
                     if (hasValue(section)) {
@@ -1917,8 +1934,10 @@ var tnthAjax = {
                             btn.show();
                         } else {
                             $(this).hide();
-                            noDataContainer.html("<p class='text-muted'>No information available</p>");
-                            btn.hide();
+                            if (visibleRows == 0) {
+                                noDataContainer.html("<p class='text-muted'>No information available</p>");
+                                btn.hide();
+                            };
                         };
                     };
                 });
@@ -1967,12 +1986,13 @@ var tnthAjax = {
         }).done(function(data) {
             $("#fillOrgs").attr("userId", userId);
             $(".get-orgs-error").remove();
-            OT.handlePreSelectedClinic();
             OT.populateOrgsList(data.entry);
-            if(!noPopulate) OT.populateUI();
-            tnthAjax.getDemo(userId, noOverride, sync, callback);
-            OT.handleEvent();
-
+            if(!noPopulate) {
+                OT.handlePreSelectedClinic();
+                OT.populateUI();
+                tnthAjax.getDemo(userId, noOverride, sync, callback);
+                OT.handleEvent();
+            };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
            if ($(".get-orgs-error").length == 0) $(".error-message").append("<div class='get-orgs-error'>Server error occurred retrieving organization/clinic information.</div>");

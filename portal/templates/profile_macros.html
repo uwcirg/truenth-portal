@@ -127,7 +127,6 @@
             </label>
         </div>
     </div>
-     <script>$(function (){fillViews.gender();});</script>
 {%- endmacro %}
 
 {% macro profileIndigenous(person) -%}
@@ -658,6 +657,8 @@
 
                   {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
                   OT.handleEvent();
+
+                  {% if consent_agreements %}if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
                 };
 
             }).fail(function() {
@@ -691,7 +692,6 @@
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
-            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
             setTimeout('tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);', 500);
         });
 
@@ -717,6 +717,7 @@
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
+            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
         };
     </script>
 {%- endmacro %}
@@ -925,9 +926,11 @@
 
             });
         };
+        /*******  NOTE, this call is already made when getting the organizations
         $(function () {
-            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 500);
+            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 1000);
         });
+        *******/
     </script>
     {% endif %}
 {%- endmacro %}
