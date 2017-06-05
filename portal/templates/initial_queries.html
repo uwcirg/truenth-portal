@@ -66,16 +66,22 @@
 {% from "flask_user/_macros.html" import footer, linksHTML, logo %}
 {% block footer %}
 <!-- custom footer -->
-<div id="iqFooterWrapper" class="footerWrapper">
-  <div id="homeFooter" class="container-fluid">
-    <div class="row">
-        <div class="col-xs-6 col-lg-8 footer-container">
-            <div class="copyright-container">{{linksHTML(user=user)}}</div>
-        </div>
-        <div class="col-xs-6 col-lg-4 footer-container logo-container">
-            <div class="pull-right">{{logo()}}</div>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-lg-12">
+      <div id="iqFooterWrapper" class="footerWrapper">
+        <div id="homeFooter" class="container-fluid">
+          <div class="row">
+              <div class="col-xs-6 col-lg-8 footer-container">
+                  <div class="copyright-container">{{linksHTML(user=user)}}</div>
+              </div>
+              <div class="col-xs-6 col-lg-4 footer-container logo-container">
+                  <div class="pull-right">{{logo()}}</div>
+              </div>
+            </div>
         </div>
       </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -175,15 +181,23 @@ FieldsChecker.prototype.constructProgressBar = function() {
   if ($("#topTerms").length > 0 && !fc.sectionCompleted("topTerms")) return false;
   var totalSections = this.getTotalSections();
   if (totalSections > 1) {
-      console.log(totalSections)
-      var w = (1/totalSections) * 100;
       var configData = configObj.getDefaultConfig();
+      var availableSections = 0;
       for (var section in mainSections) {
           if (configData && !configObj.inConfig(mainSections[section].config, configData)) continue;
           var active = fc.sectionCompleted(section);
-          $("#progressbar").append("<li sectionId='" + section + "' style='width:" + w + "%' " + (active? " class='active'": "") + ">" + mainSections[section].display + "</li>");
+          $("#progressbar").append("<li sectionId='" + section + "'  " + (active? " class='active'": "") + ">" + mainSections[section].display + "</li>");
+          availableSections++;
       };
-      $("#progressWrapper").show();
+      if (availableSections > 0) {
+          var w = (1/availableSections) * 100;
+          $("#progressbar li").each(function() {
+              $(this).css("width", w + "%");
+          });
+          if (availableSections > 1) {
+            $("#progressWrapper").show();
+          };
+      };
   } else $("#progressWrapper").remove();
 };
 

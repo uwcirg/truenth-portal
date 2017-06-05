@@ -540,6 +540,7 @@ var fillContent = {
         this.race(data);
         this.indigenous(data);
         this.orgs(data);
+        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "name": function(data){
         if (data && data.name) {
@@ -672,7 +673,6 @@ var fillContent = {
             };
         });
         fillViews.org();
-        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "subjectId": function(data) {
         if (data.identifier) {
@@ -691,30 +691,9 @@ var fillContent = {
             var dataArray = data["consent_agreements"].sort(function(a,b){
                  return new Date(b.signed) - new Date(a.signed);
             });
-            var orgs = {};
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            $.ajax ({
-                type: "GET",
-                url: '/api/organization',
-                async: false,
-                timeout: 20000
-            }).done(function(data) {
-                if (data) {
-                    data.entry.forEach(function(entry) {
-                        //console.log(entry["id"] +  " " + entry["name"] + " partOf: " + entry["partOf"])
-                        var oi = entry["id"];
-                        if (hasValue(oi)  && (parseInt(oi) != 0)) {
-                            orgs[oi] = {
-                                "_name" : entry["name"],
-                                "partOf": entry["partOf"] ? (entry["partOf"]["reference"]).split("/")[2] : null
-                            };
-                        };
-                    });
-                };
-            });
-
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
             content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
@@ -724,16 +703,6 @@ var fillContent = {
 
             var hasContent = false;
 
-            //recursively get the top level org name
-            function getOrgName (_orgId) {
-                if (!(orgs[_orgId].partOf)) {
-                    return orgs[_orgId]._name;
-                }
-                else {
-                    return getOrgName(orgs[_orgId].partOf);
-                };
-            };
-
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
@@ -742,13 +711,14 @@ var fillContent = {
                     var orgId = item.organization_id;
                     if (!ctop) {
                         try {
-                            orgName = getOrgName(orgId);
-                        } catch(e) {
-                            orgName = orgs[orgId]._name;
-                        };
-                    } else orgName = orgs[orgId]._name;
+                            var topOrgID = OT.getTopLevelParentOrg(orgId);
+                            orgName = OT.orgsList[topOrgID].name;
 
-                    //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
+                        } catch(e) {
+                            orgName = OT.orgsList[orgId].name;
+                        }
+                    } else orgName = OT.orgsList[orgId].name;
+
                     var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
@@ -1553,7 +1523,6 @@ OrgTool.prototype.populateUI = function() {
 
             });
         };
-
         if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
     };
 };
@@ -1908,6 +1877,7 @@ var tnthAjax = {
                 sections.each(function() {
                     var section = $(this).attr("data-section-id");
                     var parent = $(this).closest(".profile-item-container");
+                    var visibleRows = parent.find(".view-container tr:visible").length;
                     var noDataContainer = parent.find(".no-data-container");
                     var btn = parent.find(".profile-item-edit-btn").hide();
                     if (hasValue(section)) {
@@ -1917,14 +1887,16 @@ var tnthAjax = {
                             btn.show();
                         } else {
                             $(this).hide();
-                            noDataContainer.html("<p class='text-muted'>No information available</p>");
-                            btn.hide();
+                            if (visibleRows == 0) {
+                                noDataContainer.html("<p class='text-muted'>No information available</p>");
+                                btn.hide();
+                            };
                         };
                     };
                 });
                 if (callback) callback(data);
             } else {
-                if (callback) callback({});
+                if (callback) callback({"error": "no data found"});
             };
             if (target) {
                 target.find(".profile-item-loader").hide();
@@ -1967,12 +1939,13 @@ var tnthAjax = {
         }).done(function(data) {
             $("#fillOrgs").attr("userId", userId);
             $(".get-orgs-error").remove();
-            OT.handlePreSelectedClinic();
             OT.populateOrgsList(data.entry);
-            if(!noPopulate) OT.populateUI();
-            tnthAjax.getDemo(userId, noOverride, sync, callback);
-            OT.handleEvent();
-
+            if(!noPopulate) {
+                OT.handlePreSelectedClinic();
+                OT.populateUI();
+                tnthAjax.getDemo(userId, noOverride, sync, callback);
+                OT.handleEvent();
+            };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
            if ($(".get-orgs-error").length == 0) $(".error-message").append("<div class='get-orgs-error'>Server error occurred retrieving organization/clinic information.</div>");
