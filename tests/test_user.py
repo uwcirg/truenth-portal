@@ -200,7 +200,7 @@ class TestUser(TestCase):
         # created acting user and to-be-deleted user
         actor = self.add_user('actor')
         deleted = self.add_user('deleted')
-        deleted, actor = map(db.session.merge,(deleted, actor))
+        deleted, actor = map(db.session.merge, (deleted, actor))
         deleted_id, actor_id = deleted.id, actor.id
         deleted_email, actor_email = deleted.email, actor.email
         self.promote_user(user=actor, role_name=ROLE.ADMIN)
@@ -212,8 +212,8 @@ class TestUser(TestCase):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         observation = Observation(audit=audit)
         coding = Coding(system='SNOMED-CT', code='372278000',
-                display='Gleason score')
-        cc = CodeableConcept(codings=[coding,])
+                        display='Gleason score')
+        cc = CodeableConcept(codings=[coding, ])
         observation.codeable_concept = cc
         observation.value_quantity = ValueQuantity(value=2)
         performer = Performer(reference_txt=json.dumps(
@@ -228,8 +228,8 @@ class TestUser(TestCase):
         observation, enc = map(db.session.merge, (observation, enc))
         observation_id, enc_id = observation.id, enc.id
         user_obs = UserObservation(user_id=deleted_id,
-                                observation_id=observation_id,
-                                encounter_id=enc_id)
+                                   observation_id=observation_id,
+                                   encounter_id=enc_id)
         with SessionScope(db):
             db.session.add(user_obs)
             db.session.commit()
@@ -243,7 +243,8 @@ class TestUser(TestCase):
             db.session.add(subj_audit)
             db.session.add(user_audit)
             db.session.commit()
-        subj_audit, user_audit = map(db.session.merge,(subj_audit, user_audit))
+        subj_audit, user_audit = map(db.session.merge,
+                                     (subj_audit, user_audit))
         subj_audit_id, user_audit_id = subj_audit.id, user_audit.id
 
         # create user_consent and audit
@@ -261,7 +262,7 @@ class TestUser(TestCase):
                                 options=STAFF_EDITABLE_MASK))
             db.session.commit()
         consent_org, consent_audit = map(db.session.merge,
-                                        (consent_org, consent_audit))
+                                         (consent_org, consent_audit))
         co_id, ca_id = consent_org.id, consent_audit.id
 
         # permanently deleted user, check deletion cascades
