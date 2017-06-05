@@ -264,7 +264,7 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
             if assessment_status.overall_status == "Completed":
                 greeting = _("Thank you, {}.").format(user.display_name)
-                confirm = _("You have completed the {} Registry questionnaire"\
+                confirm = _("You have completed the {} Registry Study questionnaire"\
                         ".").format(assessment_status.organization.name)
                 reminder = _("You will be notified when the next " \
                         "questionnaire is ready to complete ({}).").format(
@@ -395,6 +395,7 @@ def update_card_html_on_completion():
             card_html = """
             <div class="container">
               {intro}
+              <div class="button-container portal-header-logout-container"><a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a></div>
               <div class="portal-main portal-flex-container">
                 <div class="portal-description">
                   <h4 class="portal-description-title">{header}</h4>
@@ -403,7 +404,6 @@ def update_card_html_on_completion():
                   </div>
                 </div>
                 {completed_card}
-                <div class="portal-header-logout-container"><a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a></div>
               </div>
             </div>
             """.format(
