@@ -150,6 +150,9 @@ class TestCase(Base):
             code = CodeableConcept(codings=[coding,]).add_if_not_found(True)
             enc = Encounter(status='planned', auth_method='url_authenticated',
                             user_id=TEST_USER_ID, start_time=datetime.utcnow())
+            db.session.add(enc)
+            db.session.commit()
+            enc = db.session.merge(enc)
             procedure.code = code
             procedure.user = db.session.merge(self.test_user)
             procedure.start_time = datetime.utcnow()
