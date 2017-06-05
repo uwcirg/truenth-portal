@@ -130,7 +130,8 @@ def post_procedure():
         context='procedure')
     try:
         procedure = Procedure.from_fhir(request.json, audit)
-        procedure.encounter = current_user().current_encounter
+        db.session.add(procedure)
+        db.session.commit()
     except ValueError as e:
         abort(400, str(e))
     if procedure.start_time.year < 1900:
