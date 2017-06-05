@@ -10,14 +10,20 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.encounter import Encounter
 from portal.models.fhir import Coding, UserEthnicity, UserIndigenous
+from portal.models.fhir import CodeableConcept, ValueQuantity
+from portal.models.fhir import Observation, UserObservation
 from portal.models.organization import Organization, OrganizationLocale
+from portal.models.performer import Performer
+from portal.models.reference import Reference
 from portal.models.relationship import Relationship, RELATIONSHIP
 from portal.models.role import STATIC_ROLES, ROLE
 from portal.models.user import User, UserEthnicityExtension, user_extension_map
 from portal.models.user import UserRelationship, UserTimezone
-from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
+from portal.models.user import permanently_delete_user
 from portal.models.user import UserIndigenousStatusExtension
+from portal.models.user_consent import UserConsent, STAFF_EDITABLE_MASK
 from portal.system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from portal.system_uri import TRUENTH_VALUESET_NHHD_291036
 
@@ -189,6 +195,84 @@ class TestUser(TestCase):
 
         with self.assertRaises(ValueError):
             user.first_name = 'DontDoIt'
+
+    def test_permanently_delete_user(self):
+        # created acting user and to-be-deleted user
+        actor = self.add_user('actor')
+        deleted = self.add_user('deleted')
+        deleted, actor = map(db.session.merge,(deleted, actor))
+        deleted_id, actor_id = deleted.id, actor.id
+        deleted_email, actor_email = deleted.email, actor.email
+        self.promote_user(user=actor, role_name=ROLE.ADMIN)
+        with SessionScope(db):
+            db.session.commit()
+        deleted = db.session.merge(deleted)
+
+        # create observation and user_observation
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        observation = Observation(audit=audit)
+        coding = Coding(system='SNOMED-CT', code='372278000',
+                display='Gleason score')
+        cc = CodeableConcept(codings=[coding,])
+        observation.codeable_concept = cc
+        observation.value_quantity = ValueQuantity(value=2)
+        performer = Performer(reference_txt=json.dumps(
+            Reference.patient(TEST_USER_ID).as_fhir()))
+        observation.performers.append(performer)
+        enc = Encounter(status='planned', auth_method='url_authenticated',
+                        user_id=TEST_USER_ID, start_time=datetime.utcnow())
+        with SessionScope(db):
+            db.session.add(observation)
+            db.session.add(enc)
+            db.session.commit()
+        observation, enc = map(db.session.merge, (observation, enc))
+        observation_id, enc_id = observation.id, enc.id
+        user_obs = UserObservation(user_id=deleted_id,
+                                observation_id=observation_id,
+                                encounter_id=enc_id)
+        with SessionScope(db):
+            db.session.add(user_obs)
+            db.session.commit()
+        user_obs = db.session.merge(user_obs)
+        user_obs_id = user_obs.id
+
+        # create user and subject audits
+        subj_audit = Audit(user_id=TEST_USER_ID, subject_id=deleted_id)
+        user_audit = Audit(user_id=deleted_id, subject_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(subj_audit)
+            db.session.add(user_audit)
+            db.session.commit()
+        subj_audit, user_audit = map(db.session.merge,(subj_audit, user_audit))
+        subj_audit_id, user_audit_id = subj_audit.id, user_audit.id
+
+        # create user_consent and audit
+        consent_org = Organization(name='test org')
+        consent_audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(consent_org)
+            db.session.add(consent_audit)
+            db.session.commit()
+            db.session.add(UserConsent(
+                                user_id=deleted_id,
+                                organization_id=consent_org.id,
+                                audit=consent_audit,
+                                agreement_url='http://example.org',
+                                options=STAFF_EDITABLE_MASK))
+            db.session.commit()
+        consent_org, consent_audit = map(db.session.merge,
+                                        (consent_org, consent_audit))
+        co_id, ca_id = consent_org.id, consent_audit.id
+
+        # permanently deleted user, check deletion cascades
+        permanently_delete_user(deleted_email, actor=actor_email)
+        self.assertFalse(User.query.get(deleted_id))
+        self.assertFalse(UserObservation.query.get(user_obs_id))
+        self.assertTrue(Observation.query.get(observation_id))
+        self.assertFalse(Audit.query.get(subj_audit_id))
+        self.assertFalse(Audit.query.get(user_audit_id))
+        self.assertFalse(UserConsent.query.get(co_id))
+        self.assertFalse(Audit.query.get(ca_id))
 
     def test_user_timezone(self):
         self.assertEquals(self.test_user.timezone, 'UTC')
