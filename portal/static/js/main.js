@@ -1902,7 +1902,7 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-            if (data && data.optional) {
+            if (data && data.optional && data.optional.length > 0) {
                 var self = this;
                 var sections = $("#profileForm .optional");
                 sections.each(function() {
@@ -1924,7 +1924,7 @@ var tnthAjax = {
                 });
                 if (callback) callback(data);
             } else {
-                if (callback) callback({});
+                if (callback) callback({"error": "no data found"});
             };
             if (target) {
                 target.find(".profile-item-loader").hide();
