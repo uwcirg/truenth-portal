@@ -390,7 +390,7 @@ class UserObservation(db.Model):
         db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
 
-    encounter = db.relationship('Encounter')
+    encounter = db.relationship('Encounter', cascade='delete')
 
     __table_args__ = (UniqueConstraint('user_id', 'observation_id',
         name='_user_observation'),)
@@ -462,7 +462,7 @@ class QuestionnaireResponse(db.Model):
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
         nullable=False)
-    encounter = db.relationship("Encounter")
+    encounter = db.relationship("Encounter", cascade='delete')
 
     # Fields derived from document content
     status = db.Column(

@@ -36,7 +36,7 @@ class UserConsent(db.Model):
     agreement_url = db.Column(db.Text, nullable=False)
     options = db.Column(db.Integer, nullable=False, default=0)
 
-    audit = db.relationship(Audit, cascade="save-update",
+    audit = db.relationship(Audit, cascade="save-update, delete",
                             foreign_keys=[audit_id])
     deleted = db.relationship(Audit, cascade="save-update",
                               foreign_keys=[deleted_id])

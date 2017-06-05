@@ -40,7 +40,7 @@ class Procedure(db.Model):
                                 name='procedures_encounter_fk'),
                                 nullable=False)
 
-    audit = db.relationship('Audit', cascade="save-update", lazy='joined')
+    audit = db.relationship('Audit', cascade="save-update, delete", lazy='joined')
     """tracks when and by whom the `procedure` was retained, included
     as *meta* data in the FHIR output
     """
@@ -50,7 +50,7 @@ class Procedure(db.Model):
     coding.system is required to be `http://snomed.info/sct`
     """
 
-    encounter = db.relationship('Encounter')
+    encounter = db.relationship('Encounter', cascade='delete')
 
     def as_fhir(self):
         """produces FHIR representation of procedure in JSON format"""
