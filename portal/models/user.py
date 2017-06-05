@@ -155,21 +155,11 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
 
         # purge all the types with user foreign keys, then the user itself
         UserRelationship.query.filter(
-            or_(UserRelationship.user_id==user.id,
-                UserRelationship.other_user_id==user.id)).delete()
-        UserObservation.query.filter_by(user_id=user.id).delete()
-        UserIntervention.query.filter_by(user_id=user.id).delete()
-        consent_audits = Audit.query.join(
-            UserConsent, UserConsent.audit_id==Audit.id).filter(
-            UserConsent.user_id==user.id)
-        UserConsent.query.filter_by(user_id=user.id).delete()
-        for ca in consent_audits:
-            db.session.delete(ca)
+                    or_(UserRelationship.user_id == user.id,
+                        UserRelationship.other_user_id == user.id)).delete()
         tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
         for t in tous:
             db.session.delete(t)
-        for o in user.observations:
-            db.session.delete(o)
         # Can't delete audit rows owned by this user, in cases like
         # observations. Update those to point to user doing the purge.
         ob_audits = Audit.query.join(
@@ -177,10 +167,6 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
                 Audit.user_id==user.id)
         for au in ob_audits:
             au.user_id = acting_user.id
-        Audit.query.filter_by(user_id=user.id).delete()
-        Audit.query.filter_by(subject_id=user.id).delete()
-        for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
-            db.session.delete(ap)
 
         # the rest should die on cascade rules
         db.session.delete(user)
@@ -277,11 +263,17 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
-    auth_providers = db.relationship('AuthProvider', lazy='dynamic')
-    _consents = db.relationship('UserConsent', lazy='dynamic')
+    user_audits = db.relationship('Audit', cascade='delete',
+                                  foreign_keys=[Audit.user_id])
+    subject_audits = db.relationship('Audit', cascade='delete',
+                                     foreign_keys=[Audit.subject_id])
+    auth_providers = db.relationship('AuthProvider', lazy='dynamic',
+                                     cascade='delete')
+    _consents = db.relationship('UserConsent', lazy='dynamic',
+                                cascade='delete')
     indigenous = db.relationship(Coding, lazy='dynamic',
             secondary="user_indigenous")
-    encounters = db.relationship('Encounter')
+    encounters = db.relationship('Encounter', cascade='delete')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
@@ -289,7 +281,7 @@ class User(db.Model, UserMixin):
     interventions = db.relationship('Intervention', lazy='dynamic',
             secondary="user_interventions", backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',
-            lazy='dynamic')
+                                              lazy='dynamic', cascade='delete')
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
@@ -297,7 +289,7 @@ class User(db.Model, UserMixin):
     organizations = db.relationship('Organization', lazy='dynamic',
             secondary="user_organizations", backref=db.backref('users'))
     procedures = db.relationship('Procedure', lazy='dynamic',
-            backref=db.backref('user'))
+                                 backref=db.backref('user'), cascade='delete')
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     _locale = db.relationship(CodeableConcept, cascade="save-update")
@@ -305,14 +297,15 @@ class User(db.Model, UserMixin):
                               foreign_keys=[deleted_id])
     deceased = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deceased_id])
-    documents = db.relationship('UserDocument', lazy='dynamic')
+    documents = db.relationship('UserDocument', lazy='dynamic',
+                                cascade='save-update, delete')
     _identifiers = db.relationship(
         'Identifier', lazy='dynamic', secondary='user_identifiers')
 
     _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
-            cascade="save-update")
+                             cascade="save-update, delete")
     _alt_phone = db.relationship('ContactPoint', foreign_keys=alt_phone_id,
-            cascade="save-update")
+                                 cascade="save-update, delete")
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
