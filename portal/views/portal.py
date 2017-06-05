@@ -665,13 +665,15 @@ def profile(user_id):
 
 @portal.route('/privacy')
 def privacy():
-    """ privacy use page"""
-    gil = current_app.config.get('GIL')
-    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
-    return render_template(
-        'privacy.html' if not gil else 'gil/privacy.html',
-        content=privacy_resource.asset, user=current_user(),
-        editorUrl=privacy_resource.editor_url)
+    """ privacy use page, ONLY in Truenth, Not Eproms"""
+    if current_app.config.get('GIL'):
+        privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+        return render_template(
+            'gil/privacy.html',
+            content=privacy_resource.asset, user=current_user(),
+            editorUrl=privacy_resource.editor_url)
+    else:
+        abort(400, "No publicly viewable privacy policy page available")
 
 @portal.route('/terms')
 def terms_and_conditions():
