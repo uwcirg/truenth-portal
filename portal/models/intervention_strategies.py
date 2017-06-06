@@ -264,12 +264,10 @@ def update_card_html_on_completion():
                     </div>""".format(greeting=greeting, reminder=reminder)
             if assessment_status.overall_status == "Completed":
                 greeting = _("Thank you, {}.").format(user.display_name)
-                confirm = _("You have completed the {} Registry Study questionnaire"
+                confirm = _("You've completed the {} Registry Study questionnaire"
                         ".").format(assessment_status.organization.name)
                 reminder = _("You will be notified when the next "
-                        "questionnaire is ready to complete ({}).").format(
-                        (assessment_status.completed_date +
-                            timedelta(days=365)).strftime('%-d %b %Y'))
+                        "questionnaire is ready to complete.")
                 return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting}</h2>
