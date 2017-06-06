@@ -169,7 +169,9 @@ def accept_tou(user_id=None):
         abort(400, "Requires JSON with the ToU 'agreement_url'")
     audit = Audit(user_id = user.id, subject_id=user.id,
         comment = "ToU accepted", context='tou')
-    tou = ToU(audit=audit, agreement_url=request.json['agreement_url'])
+    tou_type = request.json.get('type') or 'website terms of use'
+    tou = ToU(audit=audit, agreement_url=request.json['agreement_url'],
+              type=tou_type)
     db.session.add(tou)
     db.session.commit()
     # Note: skipping auditable_event, as there's a audit row created above

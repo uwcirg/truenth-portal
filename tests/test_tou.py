@@ -17,7 +17,8 @@ class TestTou(TestCase):
     def test_tou_str(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
                     comment="Agreed to ToU", context='other')
-        tou = ToU(audit=audit, agreement_url=tou_url)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='website terms of use')
         results = "{}".format(tou)
         self.assertTrue(tou_url in results)
 
@@ -51,7 +52,8 @@ class TestTou(TestCase):
 
     def test_get(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        tou = ToU(audit=audit, agreement_url=tou_url)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='website terms of use')
         with SessionScope(db):
             db.session.add(tou)
             db.session.commit()
