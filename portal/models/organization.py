@@ -573,6 +573,15 @@ class OrgTree(object):
             if other_organization_id in children:
                 return True
 
+    def find_top_level_org(self, organizations):
+        orgs_list = []
+        for org in (o for o in organizations if o.id):
+            top_org_id = self.find(org.id).top_level()
+            top_org = Organization.query.filter(Organization.id == top_org_id).one_or_none()
+            if top_org:
+                orgs_list.append(top_org)
+        return orgs_list
+
     def visible_patients(self, staff_user):
         """Returns patient IDs for whom the current staff_user can view
 

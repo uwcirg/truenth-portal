@@ -669,27 +669,24 @@ def privacy():
     gil = current_app.config.get('GIL')
     user = current_user()
     if user:
-        def get_top_org(user):
-            for org in (o for o in user.organizations if o.id):
-                top_org_id = OrgTree().find(org.id).top_level()
-                return Organization.query.filter(Organization.id == top_org_id).one_or_none()
-            return False
-
-        top_org = get_top_org(user)
-
-        if top_org:
-            if user.has_role(ROLE.PATIENT):
-                privacy_resource = VersionedResource(app_text(PrivacyATMA.\
-                                                    name_key(role=ROLE.PATIENT,
-                                                    organization=top_org)))
-            elif user.has_role(ROLE.STAFF):
-                privacy_resource = VersionedResource(app_text(PrivacyATMA.\
-                                                    name_key(role=ROLE.STAFF,
-                                                    organization=top_org)))
+        if gil:
+            privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+        else:
+            OT = OrgTree()
+            top_org = OT.find_top_level_org(user.organizations)
+            if len(top_org) > 0:
+                if user.has_role(ROLE.PATIENT):
+                    privacy_resource = VersionedResource(app_text(PrivacyATMA.\
+                                                        name_key(role=ROLE.PATIENT,
+                                                        organization=top_org[0])))
+                elif user.has_role(ROLE.STAFF):
+                    privacy_resource = VersionedResource(app_text(PrivacyATMA.\
+                                                        name_key(role=ROLE.STAFF,
+                                                        organization=top_org[0])))
+                else:
+                    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
             else:
                 privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
-        else:
-            privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
     else:
         abort(400, "No publicly viewable privacy policy page available")
 
@@ -704,24 +701,22 @@ def terms_and_conditions():
     gil = current_app.config.get('GIL')
     user = current_user()
     if user:
-        def get_top_org(user):
-            for org in (o for o in user.organizations if o.id):
-                top_org_id = OrgTree().find(org.id).top_level()
-                return Organization.query.filter(Organization.id == top_org_id).one_or_none()
-            return False
-
-        top_org = get_top_org(user)
-        if top_org:
-            if user.has_role(ROLE.PATIENT):
-                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT,
-                                                    organization=top_org)))
-            elif user.has_role(ROLE.STAFF):
-                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF,
-                                                    organization=top_org)))
+        if gil:
+            terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+        else:
+            OT = OrgTree()
+            top_org = OT.find_top_level_org(user.organizations)
+            if len(top_org) > 0:
+                if user.has_role(ROLE.PATIENT):
+                    terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT,
+                                                        organization=top_org[0])))
+                elif user.has_role(ROLE.STAFF):
+                    terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF,
+                                                        organization=top_org[0])))
+                else:
+                    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
             else:
                 terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-        else:
-            terms = VersionedResource(app_text(Terms_ATMA.name_key()))
     else:
         terms = VersionedResource(app_text(Terms_ATMA.name_key()))
 
