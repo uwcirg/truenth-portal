@@ -267,7 +267,7 @@ def update_card_html_on_completion():
                 confirm = _("You've completed the {} Registry Study questionnaire"
                         ".").format(assessment_status.organization.name)
                 reminder = _("You will be notified when the next "
-                        "questionnaire is ready to complete.")
+                            "questionnaire is ready to complete.")
                 return """
                     <div class="portal-header-container">
                       <h2 class="portal-header">{greeting}</h2>
