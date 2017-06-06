@@ -576,7 +576,7 @@ class OrgTree(object):
     def find_top_level_org(self, organizations):
         """Returns top level organization(s) based on the organizations provided
 
-        :param organizations: organizations again which top level organization(s) will be queried
+        :param organizations: organizations against which top level organization(s) will be queried
 
         :return: list of top level organization(s)
 
