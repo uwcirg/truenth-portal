@@ -168,6 +168,12 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
         for au in ob_audits:
             au.user_id = acting_user.id
 
+        ob_subj_audits = Audit.query.join(
+            Observation).filter(Audit.id==Observation.audit_id).filter(
+                Audit.subject_id==user.id)
+        for sau in ob_subj_audits:
+            sau.subject_id = acting_user.id
+
         # the rest should die on cascade rules
         db.session.delete(user)
         db.session.commit()
