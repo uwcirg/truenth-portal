@@ -574,12 +574,18 @@ class OrgTree(object):
                 return True
 
     def find_top_level_org(self, organizations):
+        """Returns top level organization(s) based on the organizations provided
+
+        :param organizations: organizations again which top level organization(s) will be queried
+
+        :return: list of top level organization(s)
+
+        """
         orgs_list = []
         for org in (o for o in organizations if o.id):
             top_org_id = self.find(org.id).top_level()
-            top_org = Organization.query.filter(Organization.id == top_org_id).one_or_none()
-            if top_org:
-                orgs_list.append(top_org)
+            orgs_list.append(Organization.query.get(top_org_id))
+
         return orgs_list
 
     def visible_patients(self, staff_user):
