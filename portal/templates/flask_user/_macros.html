@@ -104,9 +104,9 @@
         </div>
     </div>
 </div>
-{%- endmacro %}  
+{%- endmacro %}
 {% macro linksHTML(user)-%}
-    <p><small><a href="{{PORTAL}}{{url_for('portal.about')}}">{{ _("About") }}</a> | <a href="{{PORTAL}}{{url_for('portal.contact')}}">{{ _("Contact") }}</a> | <a href="{{PORTAL}}{{url_for('portal.privacy')}}">{{ _("Privacy") }}</a></small></p>
+    <p><small><a href="{{PORTAL}}{{url_for('portal.about')}}">{{ _("About") }}</a> | <a href="{{PORTAL}}{{url_for('portal.contact')}}">{{ _("Contact") }}</a>{%- if user -%}&nbsp;| <a href="{{PORTAL}}{{url_for('portal.privacy')}}">Privacy</a>{%- endif -%}&nbsp;| <a href="{{PORTAL}}{{url_for('portal.terms_and_conditions')}}">{{ _("Terms") }}</a></small></p>
     <p><small class="copyright text-muted">&copy;{{_("2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.")}}</small></p>
     {{copyright_text(user)}}
 {%- endmacro %}
@@ -117,7 +117,7 @@
      <script>
         $(document).ready(function() {
             var __countryCode = "";
-            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright-container";
+            var footerElements = "footer .copyright, #homeFooter .copyright, .footer-container .copyright";
             var getContent = function(cc) {
                   var content = "";
                   switch(String(cc.toUpperCase())) {
@@ -144,12 +144,12 @@
               __countryCode = "{{user.locale_code}}";
               if (__countryCode) {
                   $(footerElements).html(getContent("{{user.locale_code}}"));
-              }; 
+              };
             {%- endif -%}
             if (!__countryCode) {
                 $.getJSON('//freegeoip.net/json/?callback=?', function(data) {
                   if (data && data.country_code) {
-                      //country code 
+                      //country code
                       //Australia AU
                       //New Zealand NZ
                       //USA US

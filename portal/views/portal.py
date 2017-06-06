@@ -665,22 +665,64 @@ def profile(user_id):
 
 @portal.route('/privacy')
 def privacy():
-    """ privacy use page, ONLY in Truenth, Not Eproms"""
-    if current_app.config.get('GIL'):
-        privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
-        return render_template(
-            'gil/privacy.html',
-            content=privacy_resource.asset, user=current_user(),
-            editorUrl=privacy_resource.editor_url)
+    """ privacy use page"""
+    gil = current_app.config.get('GIL')
+    user=current_user()
+    if user:
+        def get_top_org(user):
+            for org in (o for o in user.organizations if o.id):
+                top_org_id = OrgTree().find(org.id).top_level()
+                return Organization.query.filter(Organization.id == top_org_id).one_or_none()
+            return False
+
+        top_org = get_top_org(user)
+
+        if top_org:
+            if user.has_role(ROLE.PATIENT):
+                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key(role=ROLE.PATIENT, \
+                                organization=top_org)))
+            elif user.has_role(ROLE.STAFF):
+                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key(role=ROLE.STAFF, \
+                               organization=top_org)))
+            else:
+                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+        else:
+            privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
     else:
         abort(400, "No publicly viewable privacy policy page available")
+
+    return render_template(
+        'privacy.html' if not gil else 'gil/privacy.html',
+        content=privacy_resource.asset, user=user,
+        editorUrl=privacy_resource.editor_url)
 
 @portal.route('/terms')
 def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    if user:
+        def get_top_org(user):
+            for org in (o for o in user.organizations if o.id):
+                top_org_id = OrgTree().find(org.id).top_level()
+                return Organization.query.filter(Organization.id == top_org_id).one_or_none()
+            return False
+
+        top_org = get_top_org(user)
+        if top_org:
+            if user.has_role(ROLE.PATIENT):
+                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT, \
+                        organization=top_org)))
+            elif user.has_role(ROLE.STAFF):
+                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF, \
+                        organization=top_org)))
+            else:
+                terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+        else:
+            terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    else:
+        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+        
     return render_template('terms.html' if not gil else 'gil/terms.html',
         content=terms.asset, editorUrl=terms.editor_url, user=user)
 
