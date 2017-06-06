@@ -667,7 +667,7 @@ def profile(user_id):
 def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
-    user=current_user()
+    user = current_user()
     if user:
         def get_top_org(user):
             for org in (o for o in user.organizations if o.id):
@@ -679,11 +679,13 @@ def privacy():
 
         if top_org:
             if user.has_role(ROLE.PATIENT):
-                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key(role=ROLE.PATIENT, \
-                                organization=top_org)))
+                privacy_resource = VersionedResource(app_text(PrivacyATMA.\
+                                                    name_key(role=ROLE.PATIENT,
+                                                    organization=top_org)))
             elif user.has_role(ROLE.STAFF):
-                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key(role=ROLE.STAFF, \
-                               organization=top_org)))
+                privacy_resource = VersionedResource(app_text(PrivacyATMA.\
+                                                    name_key(role=ROLE.STAFF,
+                                                    organization=top_org)))
             else:
                 privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
         else:
@@ -711,18 +713,18 @@ def terms_and_conditions():
         top_org = get_top_org(user)
         if top_org:
             if user.has_role(ROLE.PATIENT):
-                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT, \
-                        organization=top_org)))
+                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT,
+                                                    organization=top_org)))
             elif user.has_role(ROLE.STAFF):
-                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF, \
-                        organization=top_org)))
+                terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF,
+                                                    organization=top_org)))
             else:
                 terms = VersionedResource(app_text(Terms_ATMA.name_key()))
         else:
             terms = VersionedResource(app_text(Terms_ATMA.name_key()))
     else:
         terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-        
+
     return render_template('terms.html' if not gil else 'gil/terms.html',
         content=terms.asset, editorUrl=terms.editor_url, user=user)
 

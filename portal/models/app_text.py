@@ -99,6 +99,7 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
             raise ValueError("required organization parameter not defined")
         return "{} organization consent URL".format(organization.name)
 
+
 class WebsiteConsentByOrg_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
@@ -142,7 +143,8 @@ class Terms_ATMA(AppTextModelAdapter):
 
         """
         if kwargs.get('organization') and kwargs.get('role'):
-            return "{} {} terms and conditions URL".format(kwargs.get('organization').name, kwargs.get('role'))
+            return "{} {} terms and conditions URL".\
+                    format(kwargs.get('organization').name, kwargs.get('role'))
         return "Terms and Conditions URL"
 
 
