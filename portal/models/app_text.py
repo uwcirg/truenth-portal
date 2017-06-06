@@ -100,6 +100,21 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
 
+class WebsiteConsentByOrg_ATMA(AppTextModelAdapter):
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a consent agreement
+
+        :param organization: for which the consent agreement applies
+        :returns: string for AppText.name field
+
+        """
+        organization = kwargs.get('organization')
+        if not organization:
+            raise ValueError("required organization parameter not defined")
+        return "{} organization website consent URL".format(organization.name)
+
+
 class InitialConsent_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
 
@@ -120,14 +135,20 @@ class Terms_ATMA(AppTextModelAdapter):
 
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for a Terms and Conditions - new item just added
+        """Generate AppText name key for a Terms and Conditions
 
-        Not expecting any args at this time - may specialize per study
-        or organization in the future as needed.
-
+        :param organization: optional, present in tandem to role parameter
+        :param role: optional, role of the user
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('organization') and not kwargs.get('role'):
+            raise ValueError("'role' parameter not defined")
+        elif kwargs.get('role') and not kwargs.get('organization'):
+            raise ValueError("'organization' parameter not defined")
+        elif kwargs.get('organization') and kwargs.get('role'):
+            return "{} {} terms and conditions URL".\
+                    format(kwargs.get('organization').name, kwargs.get('role'))
         return "Terms and Conditions URL"
 
 
@@ -154,9 +175,17 @@ class PrivacyATMA(AppTextModelAdapter):
     def name_key(**kwargs):
         """Generate AppText name key for privacy URL
 
+        :param organization: optional, present in tandem to role
+        :param role: optional
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('organization') and not kwargs.get('role'):
+            raise ValueError("'role' parameter not defined")
+        elif kwargs.get('role') and not kwargs.get('organization'):
+            raise ValueError("'organization' parameter not defined")
+        elif kwargs.get('organization') and kwargs.get('role'):
+            return "{} {} privacy URL".format(kwargs.get('organization').name, kwargs.get('role'))
         return "Privacy URL"
 
 

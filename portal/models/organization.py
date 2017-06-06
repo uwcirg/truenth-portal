@@ -573,6 +573,21 @@ class OrgTree(object):
             if other_organization_id in children:
                 return True
 
+    def find_top_level_org(self, organizations):
+        """Returns top level organization(s) based on the organizations provided
+
+        :param organizations: organizations against which top level organization(s) will be queried
+
+        :return: list of top level organization(s)
+
+        """
+        orgs_list = []
+        for org in (o for o in organizations if o.id):
+            top_org_id = self.find(org.id).top_level()
+            orgs_list.append(Organization.query.get(top_org_id))
+
+        return orgs_list
+
     def visible_patients(self, staff_user):
         """Returns patient IDs for whom the current staff_user can view
 

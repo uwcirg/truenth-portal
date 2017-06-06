@@ -2,7 +2,8 @@
 {% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
   	{{ back_btn(PORTAL, _('Home')) }}
-    <h1 class="tnth-headline">{{ _("TrueNTH") }}</h1>
+    <h1 class="tnth-headline">{{ _("Privacy") }}</h1>
+    <br/>
 	<div id="privacyContentContainer"><p>{{ content|safe }}</p></div>
 	{% if editorUrl %}
 	<script>appendLREditContainer($("#privacyContentContainer"), "{{editorUrl}}", {% if user and user.has_role(ROLE.CONTENT_MANAGER) %}true{% else %}false{%endif%});</script>
