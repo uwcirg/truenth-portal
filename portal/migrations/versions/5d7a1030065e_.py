@@ -17,8 +17,9 @@ from sqlalchemy.dialects import postgresql
 Session = sa.orm.sessionmaker()
 
 tou_types = postgresql.ENUM('website terms of use', 'subject website consent',
-                			'stored website consent form', 'privacy policy',
-                			name='tou_types', create_type=False)
+							'stored website consent form', 'privacy policy',
+							name='tou_types', create_type=False)
+
 
 def upgrade():
     bind = op.get_bind()
