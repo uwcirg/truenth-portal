@@ -142,7 +142,11 @@ class Terms_ATMA(AppTextModelAdapter):
         :returns: string for AppText.name field
 
         """
-        if kwargs.get('organization') and kwargs.get('role'):
+        if kwargs.get('organization') and not kwargs.get('role'):
+            raise ValueError("'role' parameter not defined")
+        elif kwargs.get('role') and not kwargs.get('organization'):
+            raise ValueError("'organization' parameter not defined")
+        elif kwargs.get('organization') and kwargs.get('role'):
             return "{} {} terms and conditions URL".\
                     format(kwargs.get('organization').name, kwargs.get('role'))
         return "Terms and Conditions URL"
