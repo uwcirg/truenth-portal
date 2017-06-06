@@ -570,6 +570,7 @@ def assessment(patient_id, instrument_id):
         abort(400, "deleted user - operation not permitted")
     questionnaire_responses = QuestionnaireResponse.query.filter_by(subject_id=patient_id).order_by(QuestionnaireResponse.authored.desc())
 
+    instrument_id = request.args.get('instrument_id', instrument_id)
     if instrument_id is not None:
         questionnaire_responses = questionnaire_responses.filter(
             QuestionnaireResponse.document[
