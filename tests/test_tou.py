@@ -60,5 +60,20 @@ class TestTou(TestCase):
 
         self.login()
         rv = self.client.get('/api/user/{}/tou'.format(TEST_USER_ID))
+        doc = json.loads(rv.data)
+        self.assert200(rv)
+        self.assertEquals(len(doc['tous']), 1)
+
+    def test_get_by_type(self):
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='privacy policy')
+        with SessionScope(db):
+            db.session.add(tou)
+            db.session.commit()
+
+        self.login()
+        rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
+                             TEST_USER_ID))
         self.assert200(rv)
         self.assertEquals(rv.json['accepted'], True)
