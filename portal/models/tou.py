@@ -2,6 +2,7 @@
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
+from ..date_tools import FHIR_datetime
 
 tou_types = ENUM('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
@@ -27,6 +28,7 @@ class ToU(db.Model):
         d = {}
         d['id'] = self.id
         d['agreement_url'] = self.agreement_url
+        d['accepted'] = FHIR_datetime.as_fhir(self.audit.timestamp)
         d['type'] = self.type
 
         return d

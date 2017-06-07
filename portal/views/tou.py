@@ -70,11 +70,17 @@ def get_tou(user_id):
                 type: object
                 required:
                   - agreement_url
+                  - accepted
                   - type
                 properties:
                   agreement_url:
                     type: string
                     description: URL pointing to agreement text
+                  accepted:
+                    type: string
+                    format: date-time
+                    description:
+                      UTC date-time for when the agreement was accepted
                   type:
                     type: string
                     description:
@@ -120,10 +126,33 @@ def get_tou_by_type(user_id, tou_type):
         description: ToU type
         required: true
         type: string
+    produces:
+      - application/json
     responses:
       200:
         description:
-          Returns 'accepted' True or False for requested user & ToU type.
+          Returns the ToU agreement for the requested user & ToU type
+        schema:
+          id: tou
+          properties:
+            type: object
+            required:
+              - agreement_url
+              - accepted
+              - type
+            properties:
+              agreement_url:
+                type: string
+                description: URL pointing to agreement text
+              accepted:
+                type: string
+                format: date-time
+                description:
+                  UTC date-time for when the agreement was accepted
+              type:
+                type: string
+                description:
+                  Type of ToU agreement (privacy policy, website ToU, etc.)
       400:
         description:
           if the given type string does not match a valid ToU type
@@ -141,13 +170,13 @@ def get_tou_by_type(user_id, tou_type):
     tou_type = sub('-',' ',tou_type)
 
     try:
-        tous = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
+        tou = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
                                             ToU.type == tou_type)).first()
     except DataError:
         abort(400, 'invalid tou type')
 
-    if tous:
-        return jsonify(accepted=True)
+    if tou:
+        return jsonify(tou.as_json())
     return jsonify(accepted=False)
 
 

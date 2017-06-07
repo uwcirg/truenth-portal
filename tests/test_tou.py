@@ -1,5 +1,6 @@
 """Unit test module for terms of use logic"""
 import json
+from datetime import datetime
 from flask_webtest import SessionScope
 
 from tests import TestCase, TEST_USER_ID
@@ -65,7 +66,9 @@ class TestTou(TestCase):
         self.assertEquals(len(doc['tous']), 1)
 
     def test_get_by_type(self):
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
+        timestamp = datetime.utcnow()
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+                      timestamp=timestamp)
         tou = ToU(audit=audit, agreement_url=tou_url,
                   type='privacy policy')
         with SessionScope(db):
@@ -76,4 +79,6 @@ class TestTou(TestCase):
         rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
                              TEST_USER_ID))
         self.assert200(rv)
-        self.assertEquals(rv.json['accepted'], True)
+        self.assertEquals(rv.json['accepted'],
+                          timestamp.strftime("%Y-%m-%dT%H:%M:%S"))
+        self.assertEquals(rv.json['type'], 'privacy policy')
