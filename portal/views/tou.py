@@ -36,6 +36,65 @@ def get_current_tou_url():
     return jsonify(url=terms.url)
 
 
+@tou_api.route('/user/<int:user_id>/tou')
+@oauth.require_oauth()
+def get_tou(user_id):
+    """Access all Terms Of Use info for given user
+
+    Returns ToU json for requested user.
+    ---
+    tags:
+      - Terms Of Use
+    operationId: getToU
+    produces:
+      - application/json
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the list of ToU agreements for the requested user.
+        schema:
+          id: tous
+          properties:
+            tou_agreements:
+              type: array
+              items:
+                type: object
+                required:
+                  - agreement_url
+                  - type
+                properties:
+                  agreement_url:
+                    type: string
+                    description: URL pointing to agreement text
+                  type:
+                    type: string
+                    description:
+                      Type of ToU agreement (privacy policy, website ToU, etc.)
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    user = get_user(user_id)
+    if not user:
+        abort(404)
+    current_user().check_role(permission='view', other_id=user_id)
+
+    tous = ToU.query.join(Audit).filter(Audit.user_id == user_id)
+
+    return jsonify(tous=[d.as_json() for d in tous])
+
+
 @tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
 @oauth.require_oauth()
 def get_tou_by_type(user_id, tou_type):

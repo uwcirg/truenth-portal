@@ -22,3 +22,11 @@ class ToU(db.Model):
 
     def __str__(self):
         return "ToU ({0.audit}) {0.agreement_url}".format(self)
+
+    def as_json(self):
+        d = {}
+        d['id'] = self.id
+        d['agreement_url'] = self.agreement_url
+        d['type'] = self.type
+
+        return d
