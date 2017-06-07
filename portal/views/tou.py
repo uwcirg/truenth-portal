@@ -1,6 +1,8 @@
 """Views for Terms Of Use"""
 from flask import abort, jsonify, Blueprint, request
+from re import sub
 from sqlalchemy import and_
+from sqlalchemy.exc import DataError
 
 from ..database import db
 from ..extensions import oauth
@@ -34,12 +36,13 @@ def get_current_tou_url():
     return jsonify(url=terms.url)
 
 
-@tou_api.route('/user/<int:user_id>/tou')
+@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
 @oauth.require_oauth()
-def get_tou(user_id):
-    """Access Terms Of Use info for given user
+def get_tou_by_type(user_id, tou_type):
+    """Access Terms Of Use info for given user & ToU type
 
-    Returns ToU{'accepted': true|false} for requested user.
+    Returns ToU{'accepted': true|false} for requested user given the
+    specified ToU type.
     ---
     tags:
       - Terms Of Use
@@ -53,10 +56,18 @@ def get_tou(user_id):
         required: true
         type: integer
         format: int64
+      - name: tou_type
+        in: path
+        description: ToU type
+        required: true
+        type: string
     responses:
       200:
         description:
-          Returns 'accepted' True or False for requested user.
+          Returns 'accepted' True or False for requested user & ToU type.
+      400:
+        description:
+          if the given type string does not match a valid ToU type
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -68,9 +79,14 @@ def get_tou(user_id):
         abort(404)
     current_user().check_role(permission='view', other_id=user_id)
 
-    tou_type = request.args.get('type') or 'website terms of use'
-    tous = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
-                                        ToU.type == tou_type)).first()
+    tou_type = sub('-',' ',tou_type)
+
+    try:
+        tous = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
+                                            ToU.type == tou_type)).first()
+    except DataError:
+        abort(400, 'invalid tou type')
+
     if tous:
         return jsonify(accepted=True)
     return jsonify(accepted=False)
