@@ -46,8 +46,6 @@ def get_tou(user_id):
     tags:
       - Terms Of Use
     operationId: getToU
-    produces:
-      - application/json
     parameters:
       - name: user_id
         in: path
@@ -106,14 +104,12 @@ def get_tou(user_id):
 def get_tou_by_type(user_id, tou_type):
     """Access Terms Of Use info for given user & ToU type
 
-    Returns ToU{'accepted': true|false} for requested user given the
-    specified ToU type.
+    Returns ToU JSON for requested user and ToU type.
+    If no ToU agreement is found, {'accepted': false} returned instead.
     ---
     tags:
       - Terms Of Use
-    operationId: getToU
-    produces:
-      - application/json
+    operationId: getToUByType
     parameters:
       - name: user_id
         in: path
@@ -134,25 +130,23 @@ def get_tou_by_type(user_id, tou_type):
           Returns the ToU agreement for the requested user & ToU type
         schema:
           id: tou
+          required:
+            - agreement_url
+            - accepted
+            - type
           properties:
-            type: object
-            required:
-              - agreement_url
-              - accepted
-              - type
-            properties:
-              agreement_url:
-                type: string
-                description: URL pointing to agreement text
-              accepted:
-                type: string
-                format: date-time
-                description:
-                  UTC date-time for when the agreement was accepted
-              type:
-                type: string
-                description:
-                  Type of ToU agreement (privacy policy, website ToU, etc.)
+            agreement_url:
+              type: string
+              description: URL pointing to agreement text
+            accepted:
+              type: string
+              format: date-time
+              description:
+                UTC date-time for when the agreement was accepted
+            type:
+              type: string
+              description:
+                Type of ToU agreement (privacy policy, website ToU, etc.)
       400:
         description:
           if the given type string does not match a valid ToU type
