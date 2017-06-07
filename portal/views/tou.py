@@ -1,5 +1,6 @@
 """Views for Terms Of Use"""
 from flask import abort, jsonify, Blueprint, request
+from sqlalchemy import and_
 
 from ..database import db
 from ..extensions import oauth
@@ -66,7 +67,10 @@ def get_tou(user_id):
     if not user:
         abort(404)
     current_user().check_role(permission='view', other_id=user_id)
-    tous = ToU.query.join(Audit).filter(Audit.user_id==user_id).first()
+
+    tou_type = request.args.get('type') or 'website terms of use'
+    tous = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
+                                        ToU.type == tou_type)).first()
     if tous:
         return jsonify(accepted=True)
     return jsonify(accepted=False)

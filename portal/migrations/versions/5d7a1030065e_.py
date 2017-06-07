@@ -25,7 +25,7 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    tou_types.create(bind, checkfirst=False)
+    tou_types.create(bind, checkfirst=True)
     op.add_column('tou', sa.Column('type', tou_types, nullable=True))
 
     session.execute("UPDATE tou SET type = 'website terms of use'")
