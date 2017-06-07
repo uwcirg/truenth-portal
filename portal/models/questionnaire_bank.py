@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from .questionnaire import Questionnaire
+from .recur import Recur
 from .reference import Reference
 
 
@@ -102,8 +103,10 @@ class QuestionnaireBankQuestionnaire(db.Model):
     days_till_overdue = db.Column(db.Integer, nullable=False)
     rank = db.Column(db.Integer, nullable=False)
 
-    questionnaire = db.relationship('Questionnaire')
+    questionnaire = db.relationship(Questionnaire)
     questionnaire_bank = db.relationship('QuestionnaireBank')
+    recurs = db.relationship(
+        Recur, secondary='questionnaire_bank_questionnaire_recurs')
 
     __table_args__ = (
         UniqueConstraint(
