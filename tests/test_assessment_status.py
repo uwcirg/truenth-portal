@@ -9,6 +9,7 @@ from portal.models.organization import Organization
 from portal.models.questionnaire import Questionnaire
 from portal.models.questionnaire_bank import QuestionnaireBank
 from portal.models.questionnaire_bank import QuestionnaireBankQuestionnaire
+from portal.models.recur import Recur
 from portal.models.fhir import QuestionnaireResponse
 from tests import TestCase, TEST_USER_ID
 
@@ -52,22 +53,42 @@ def mock_questionnairebanks():
     # Define test Orgs and QuestionnaireBanks for each group
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
+
+    # Recurring assessments every 3 months up to 24 months, then every
+    # 6 months prems alternate with epic26 - start with prems
+    initial_recur = Recur(
+        days_to_start=30, days_in_cycle=90, days_till_termination=720)
+    initial_recur_prems = Recur(
+        days_to_start=30, days_in_cycle=180, days_till_termination=720)
+    initial_recur_epic26 = Recur(
+        days_to_start=60, days_in_cycle=180, days_till_termination=720)
+    every_six_thereafter = Recur(
+        days_to_start=720, days_in_cycle=180)
+    recur_rows = [
+        initial_recur, initial_recur_prems, initial_recur_epic26,
+        every_six_thereafter]
+
     with SessionScope(db):
         for name in (localized_instruments.union(*(
                 metastatic_baseline_instruments,
-                metastatic_indefinite_instruments))):
+                metastatic_indefinite_instruments,
+                metastatic_recurring_instruments))):
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
+        map(db.session.add, recur_rows)
         db.session.commit()
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
+    localized_org_id = localized_org.id
+    metastatic_org_id = metastatic_org.id
+    recur_rows = map(db.session.merge, recur_rows)
 
-    ## Localized baseline
+    # Localized baseline
     l_qb = QuestionnaireBank(
         name='localized',
         classification='baseline',
-        organization_id=localized_org.id)
+        organization_id=localized_org_id)
     for rank, instrument in enumerate(localized_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
@@ -75,11 +96,11 @@ def mock_questionnairebanks():
             rank=rank)
         l_qb.questionnaires.append(qbq)
 
-    ## Metastatic baseline
+    # Metastatic baseline
     mb_qb = QuestionnaireBank(
         name='metastatic',
         classification='baseline',
-        organization_id=metastatic_org.id)
+        organization_id=metastatic_org_id)
     for rank, instrument in enumerate(metastatic_baseline_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
@@ -87,11 +108,11 @@ def mock_questionnairebanks():
             rank=rank)
         mb_qb.questionnaires.append(qbq)
 
-    ## Metastatic indefinite
+    # Metastatic indefinite
     mi_qb = QuestionnaireBank(
         name='metastatic_indefinite',
         classification='indefinite',
-        organization_id=metastatic_org.id)
+        organization_id=metastatic_org_id)
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
@@ -99,16 +120,24 @@ def mock_questionnairebanks():
             rank=rank)
         mi_qb.questionnaires.append(qbq)
 
-    ## Metastatic recurring
+    # Metastatic recurring
     mr_qb = QuestionnaireBank(
         name='metastatic_recurring',
         classification='recurring',
-        organization_id=metastatic_org.id)
+        organization_id=metastatic_org_id)
     for rank, instrument in enumerate(metastatic_recurring_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
+        if instrument == 'prems':
+            recurs = [initial_recur_prems]
+        elif instrument == 'epic26':
+            recurs = [initial_recur_epic26]
+        else:
+            recurs = [initial_recur]
+        recurs.append(every_six_thereafter)
+
         qbq = QuestionnaireBankQuestionnaire(
             questionnaire=q, days_till_due=1, days_till_overdue=30,
-            rank=rank)
+            rank=rank, recurs=recurs)
         mr_qb.questionnaires.append(qbq)
 
     with SessionScope(db):
