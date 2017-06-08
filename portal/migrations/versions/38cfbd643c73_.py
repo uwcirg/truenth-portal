@@ -34,7 +34,8 @@ def upgrade():
     op.drop_constraint(u'observations_audit_id_fkey', 'observations', type_='foreignkey')
     op.drop_column('observations', 'audit_id')
     op.add_column('user_observations', sa.Column('audit_id', sa.Integer(), nullable=True))
-    op.create_foreign_key(u'user_observations_audit_id_fkey', 'user_observations', 'audit', ['audit_id'], ['id'])
+    op.create_foreign_key(u'user_observations_audit_id_fkey', 'user_observations',
+                          'audit', ['audit_id'], ['id'])
 
     # store existing audit_id values in UserObservations, based on observation_id
     for obs_id in audit_ids:
@@ -51,13 +52,16 @@ def downgrade():
 
     # get existing UserObservation.audit_id values
     audit_ids = {}
-    for obs_id, audit_id in session.execute('SELECT observation_id, audit_id FROM user_observations'):
+    for obs_id, audit_id in session.execute('SELECT observation_id, audit_id '
+                                            'FROM user_observations'):
         audit_ids[obs_id] = audit_id
 
     op.drop_constraint(u'user_observations_audit_id_fkey', 'user_observations', type_='foreignkey')
     op.drop_column('user_observations', 'audit_id')
-    op.add_column('observations', sa.Column('audit_id', sa.INTEGER(), autoincrement=False, nullable=True))
-    op.create_foreign_key(u'observations_audit_id_fkey', 'observations', 'audit', ['audit_id'], ['id'])
+    op.add_column('observations',
+                  sa.Column('audit_id', sa.INTEGER(), autoincrement=False, nullable=True))
+    op.create_foreign_key(u'observations_audit_id_fkey', 'observations',
+                          'audit', ['audit_id'], ['id'])
 
     # store existing audit_id values in Observations, based on obvervation id
     for obs_id in audit_ids:
@@ -66,9 +70,11 @@ def downgrade():
 
     # create audits for any Observations that don't have corresponding UserObservations
     admin = User.query.filter_by(email='bob25mary@gmail.com').first()
-    admin = admin or User.query.join(UserRoles).join(Role).filter(sa.and_(Role.id == UserRoles.role_id,
-                                                                          UserRoles.user_id == User.id,
-                                                                          Role.name == 'admin')).first()
+    admin = admin or User.query.join(UserRoles
+                                    ).join(Role
+                                    ).filter(sa.and_(Role.id == UserRoles.role_id,
+                                                     UserRoles.user_id == User.id,
+                                                     Role.name == 'admin')).first()
     admin_id = admin.id
 
     for obs_id in session.execute('SELECT id FROM observations where audit_id IS NULL'):
