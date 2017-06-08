@@ -70,11 +70,10 @@ def downgrade():
 
     # create audits for any Observations that don't have corresponding UserObservations
     admin = User.query.filter_by(email='bob25mary@gmail.com').first()
-    admin = admin or User.query.join(UserRoles
-                                    ).join(Role
-                                    ).filter(sa.and_(Role.id == UserRoles.role_id,
-                                                     UserRoles.user_id == User.id,
-                                                     Role.name == 'admin')).first()
+    admin = admin or User.query.join(
+            UserRoles).join(Role).filter(sa.and_(Role.id == UserRoles.role_id,
+                                                 UserRoles.user_id == User.id,
+                                                 Role.name == 'admin')).first()
     admin_id = admin.id
 
     for obs_id in session.execute('SELECT id FROM observations where audit_id IS NULL'):
