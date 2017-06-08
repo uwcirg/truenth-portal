@@ -26,11 +26,18 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
+    to_delete = set()
+    for obs_id, audit_id in session.execute('SELECT id, audit_id FROM observations'):
+        to_delete.add(audit_id)
+
     op.drop_constraint(u'observations_audit_id_fkey', 'observations', type_='foreignkey')
     op.drop_column('observations', 'audit_id')
     op.add_column('user_observations', sa.Column('audit_id', sa.Integer(), nullable=True))
     op.create_foreign_key(u'user_observations_audit_id_fkey', 'user_observations',
                           'audit', ['audit_id'], ['id'])
+
+    # delete old Observation audits
+    session.execute("DELETE from audit where id in {}".format(tuple(to_delete)))
 
     # create new audits for UserObservations
     for uo_id, user_id in session.execute('SELECT id, user_id FROM user_observations'):
@@ -44,14 +51,14 @@ def upgrade():
 
     op.alter_column('user_observations', 'audit_id', nullable=False)
 
-    # delete any audits created in any past downgrades
-    session.execute("DELETE from audit "
-                    "WHERE comment = 'entry replaces audit records for user observations'")
-
 
 def downgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
+
+    to_delete = set()
+    for obs_id, audit_id in session.execute('SELECT id, audit_id FROM user_observations'):
+        to_delete.add(audit_id)
 
     op.drop_constraint(u'user_observations_audit_id_fkey', 'user_observations', type_='foreignkey')
     op.drop_column('user_observations', 'audit_id')
@@ -59,6 +66,9 @@ def downgrade():
                   sa.Column('audit_id', sa.INTEGER(), autoincrement=False, nullable=True))
     op.create_foreign_key(u'observations_audit_id_fkey', 'observations',
                           'audit', ['audit_id'], ['id'])
+
+    # delete old UserObservation audits
+    session.execute("DELETE from audit where id in {}".format(tuple(to_delete)))
 
     # create new audits for Observations
     admin = User.query.filter_by(email='bob25mary@gmail.com').first()
@@ -78,7 +88,3 @@ def downgrade():
                         'WHERE id = {}'.format(aud.id, obs_id[0]))
 
     op.alter_column('observations', 'audit_id', nullable=False)
-
-    # delete any audits created in the upgrade
-    session.execute("DELETE from audit "
-                    "WHERE comment = 'entry predates audit records for user observations'")
