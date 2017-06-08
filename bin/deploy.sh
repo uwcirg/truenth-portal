@@ -111,6 +111,9 @@ if [[
     if [[ $VERBOSE ]]; then
         echo "Running database migrations"
     fi
+
+    # Prevent config bootstrap issue by removing old config
+    rm --verbose ${GIT_WORK_TREE}/instance/site.cfg
     flask sync
 fi
 
