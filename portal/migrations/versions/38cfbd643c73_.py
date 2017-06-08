@@ -32,11 +32,11 @@ def upgrade():
 
     if session.execute("SELECT * FROM information_schema.table_constraints "
                        "WHERE constraint_name='observations_audit_id_fkey'"
-                       "AND table_name='observations'").rowcount > 1:
+                       "AND table_name='observations'").rowcount > 0:
         op.drop_constraint(u'observations_audit_id_fkey', 'observations', type_='foreignkey')
     elif session.execute("SELECT * FROM information_schema.table_constraints "
                          "WHERE constraint_name='observations_audit_fk'"
-                         "AND table_name='observations'").rowcount > 1:
+                         "AND table_name='observations'").rowcount > 0:
         op.drop_constraint(u'observations_audit_fk', 'observations', type_='foreignkey')
     op.drop_column('observations', 'audit_id')
     op.add_column('user_observations', sa.Column('audit_id', sa.Integer(), nullable=True))
