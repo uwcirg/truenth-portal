@@ -591,7 +591,6 @@ class User(db.Model, UserMixin):
         issued = fhir.get('issued') and\
                 parser.parse(fhir.get('issued')) or None
         observation = Observation(
-            audit=audit,
             status=fhir.get('status'),
             issued=issued,
             codeable_concept_id=cc.id,
@@ -603,7 +602,7 @@ class User(db.Model, UserMixin):
         # The audit defines the acting user, to which the current
         # encounter is attached.
         encounter = get_user(audit.user_id).current_encounter
-        UserObservation(user_id=self.id, encounter=encounter,
+        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 
@@ -692,10 +691,10 @@ class User(db.Model, UserMixin):
                 self.observations.remove(existing[0])
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
-                                  value_quantity_id=value_quantity.id,
-                                  audit=audit).add_if_not_found(True)
+                                  value_quantity_id=value_quantity.id
+                                  ).add_if_not_found(True)
         encounter = get_user(audit.user_id).current_encounter
-        UserObservation(user_id=self.id, encounter=encounter,
+        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
                         observation_id=observation.id).add_if_not_found()
 
     def clinical_history(self, requestURL=None):
