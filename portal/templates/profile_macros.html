@@ -1146,6 +1146,7 @@
                     //console.log(data)
                     $(".report-error-message").hide();
                     $("#userSessionReportDetailTable").html('');
+                   
                     if (data.entry && data.entry.length > 0) {
                         var entries = data['entry'];
                         var entry;
@@ -1161,12 +1162,15 @@
                                          " <span class='gmt'>(GMT, Y-M-D)</span>" + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
-                            var q = entry['text'] ? entry['text'] : '', a = '';
-                            if (hasValue(q)) q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
+                            var q = entry['text'] ? entry['text'] : '', a = '', qcNeeded = true;
+                            if (hasValue(q)) {
+                                q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
+                                qcNeeded = false;
+                            };
                             if (entry['answer']) {
                                 (entry['answer']).forEach(function(item) {
-                                    if (!hasValue(a) && item.valueString) a = item.valueString;
-                                    if (!hasValue(q) && item.valueCoding && item.valueCoding.code) q = item.valueCoding.code;
+                                    if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
+                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) q += (hasValue(q) ? "<br/>" : "") + item.valueCoding.code;
                                 });
                             };
                             if (!hasValue(q)) q = entry['linkId'];
