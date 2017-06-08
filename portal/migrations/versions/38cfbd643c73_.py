@@ -35,7 +35,7 @@ def upgrade():
     # create new audits for UserObservations
     for uo_id, user_id in session.execute('SELECT id, user_id FROM user_observations'):
         aud = Audit(user_id=user_id, subject_id=user_id,
-                    comment="generated as part of migration 38cfbd643c73 upgrade")
+                    comment="entry predates audit records for user observations")
         session.add(aud)
         session.commit()
         aud = session.merge(aud)
@@ -46,7 +46,7 @@ def upgrade():
 
     # delete any audits created in any past downgrades
     session.execute("DELETE from audit "
-                    "WHERE comment = 'generated as part of migration 38cfbd643c73 downgrade'")
+                    "WHERE comment = 'entry replaces audit records for user observations'")
 
 
 def downgrade():
@@ -70,7 +70,7 @@ def downgrade():
 
     for obs_id in session.execute('SELECT id FROM observations where audit_id IS NULL'):
         aud = Audit(user_id=admin_id, subject_id=admin_id,
-                    comment="generated as part of migration 38cfbd643c73 downgrade")
+                    comment="entry replaces audit records for user observations")
         session.add(aud)
         session.commit()
         aud = session.merge(aud)
@@ -81,4 +81,4 @@ def downgrade():
 
     # delete any audits created in the upgrade
     session.execute("DELETE from audit "
-                    "WHERE comment = 'generated as part of migration 38cfbd643c73 upgrade'")
+                    "WHERE comment = 'entry predates audit records for user observations'")
