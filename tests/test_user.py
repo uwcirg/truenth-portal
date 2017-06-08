@@ -210,7 +210,7 @@ class TestUser(TestCase):
 
         # create observation and user_observation
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        observation = Observation(audit=audit)
+        observation = Observation()
         coding = Coding(system='SNOMED-CT', code='372278000',
                         display='Gleason score')
         cc = CodeableConcept(codings=[coding, ])
@@ -227,7 +227,7 @@ class TestUser(TestCase):
             db.session.commit()
         observation, enc = map(db.session.merge, (observation, enc))
         observation_id, enc_id = observation.id, enc.id
-        user_obs = UserObservation(user_id=deleted_id,
+        user_obs = UserObservation(user_id=deleted_id, audit=audit,
                                    observation_id=observation_id,
                                    encounter_id=enc_id)
         with SessionScope(db):
