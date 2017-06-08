@@ -160,19 +160,6 @@ def permanently_delete_user(username, user_id=None, acting_user=None, actor=None
         tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
         for t in tous:
             db.session.delete(t)
-        # Can't delete audit rows owned by this user, in cases like
-        # observations. Update those to point to user doing the purge.
-        ob_audits = Audit.query.join(
-            Observation).filter(Audit.id==Observation.audit_id).filter(
-                Audit.user_id==user.id)
-        for au in ob_audits:
-            au.user_id = acting_user.id
-
-        ob_subj_audits = Audit.query.join(
-            Observation).filter(Audit.id==Observation.audit_id).filter(
-                Audit.subject_id==user.id)
-        for sau in ob_subj_audits:
-            sau.subject_id = acting_user.id
 
         # the rest should die on cascade rules
         db.session.delete(user)
