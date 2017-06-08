@@ -101,8 +101,9 @@ var configObj = (function() {
       initConfig: function() {
         {%- if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}
         tnthAjax.getStillNeededCoreData({{user.id}}, true, this.setConfig);
-        {%- endif -%}
+        {%- else -%}
         CONFIG_REQUIRED_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
+        {%- endif -%}
       },
       inConfig: function(configMatch, dataArray) {
         if (! hasValue(configMatch)) return false;
