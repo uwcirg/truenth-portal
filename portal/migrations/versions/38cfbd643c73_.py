@@ -30,7 +30,14 @@ def upgrade():
     for obs_id, audit_id in session.execute('SELECT id, audit_id FROM observations'):
         to_delete.add(audit_id)
 
-    op.drop_constraint(u'observations_audit_id_fkey', 'observations', type_='foreignkey')
+    if session.execute("SELECT * FROM information_schema.table_constraints "
+                       "WHERE constraint_name='observations_audit_id_fkey'"
+                       "AND table_name='observations'").rowcount > 1:
+        op.drop_constraint(u'observations_audit_id_fkey', 'observations', type_='foreignkey')
+    elif session.execute("SELECT * FROM information_schema.table_constraints "
+                         "WHERE constraint_name='observations_audit_fk'"
+                         "AND table_name='observations'").rowcount > 1:
+        op.drop_constraint(u'observations_audit_fk', 'observations', type_='foreignkey')
     op.drop_column('observations', 'audit_id')
     op.add_column('user_observations', sa.Column('audit_id', sa.Integer(), nullable=True))
     op.create_foreign_key(u'user_observations_audit_id_fkey', 'user_observations',
