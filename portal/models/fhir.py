@@ -299,9 +299,6 @@ class Observation(db.Model):
                                    nullable=False)
     value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
                                  nullable=False)
-    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
-
-    audit = db.relationship('Audit', cascade="save-update")
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
     performers = db.relationship('Performer', lazy='dynamic',
@@ -318,8 +315,6 @@ class Observation(db.Model):
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
-        if self.audit:
-            fhir['meta'] = self.audit.as_fhir()
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
@@ -389,6 +384,9 @@ class UserObservation(db.Model):
     encounter_id = db.Column(
         db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
         nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+
+    audit = db.relationship('Audit', cascade="save-update, delete")
 
     encounter = db.relationship('Encounter', cascade='delete')
 
