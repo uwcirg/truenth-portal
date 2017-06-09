@@ -463,12 +463,14 @@ def initial_queries():
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     elif 'subject_website_consent' in still_needed:
         OT = OrgTree()
-        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+                name_key(organization=OT.find_top_level_org(user.organizations)[0])))
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
+
 
 @portal.route('/website-consent-script/<int:patient_id>', methods=['GET', 'POST'])
 @roles_required(ROLE.STAFF)
@@ -478,7 +480,8 @@ def website_consent_script(patient_id):
     redirect_url = request.args.get('redirect_url', None)
     user = current_user()
     OT = OrgTree()
-    terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+            name_key(organization=OT.find_top_level_org(user.organizations)[0])))
     return render_template(
         'website_consent_script.html', user=user, terms=terms, 
         entry_method=entry_method, redirect_url=redirect_url,
