@@ -19,7 +19,7 @@ def options():
     return jsonify(require_options=OPTIONS)
 
 
-def validate_request_args():
+def validate_request_args(request):
     """Validate values and return dict or raise exception
 
     Several endpoints take the same query string parameters.  Validate
