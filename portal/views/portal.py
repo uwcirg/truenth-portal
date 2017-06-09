@@ -462,8 +462,12 @@ def initial_queries():
     if 'subject_website_consent' in still_needed or \
         ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
         OT = OrgTree()
-        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
-                name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+        top_level_org = OT.find_top_level_org(user.organizations)
+        if top_level_org and len(top_level_org) > 0:
+            terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+                    name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+        else:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     else:
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     #need this at all time now for ui
@@ -481,8 +485,12 @@ def website_consent_script(patient_id):
     redirect_url = request.args.get('redirect_url', None)
     user = current_user()
     OT = OrgTree()
-    terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
-            name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    top_level_org = OT.find_top_level_org(user.organizations)
+    if top_level_org and len(top_level_org) > 0:
+        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+                name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     return render_template(
         'website_consent_script.html', user=user, terms=terms, 
         entry_method=entry_method, redirect_url=redirect_url,
