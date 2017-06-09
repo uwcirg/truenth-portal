@@ -1644,7 +1644,7 @@
                 if (hasValue(assessment_url)) {
                     var still_needed = false;
                     tnthAjax.getStillNeededCoreData('{{person.id if person}}', true, function(data) {
-                            if (data && ! data.error) still_needed = true;
+                            if (data && ! data.error && data.length > 0) still_needed = true;
                         }, method);
                     if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
                     else assessment_url += "?entry_method=" + method;
