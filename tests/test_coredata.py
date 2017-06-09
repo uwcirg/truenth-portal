@@ -7,12 +7,12 @@ from portal.models.coredata import Coredata, configure_coredata
 from portal.models.role import ROLE
 
 
-TRUENTH='TrueNTH'
-EPROMS='ePROMs'
-PRIVACY='privacy_policy'
-WEB_TOU='website_terms_of_use'
-SUBJ_CONSENT='subject_website_consent'
-STORED_FORM='stored_website_consent_form'
+TRUENTH = 'TrueNTH'
+EPROMS = 'ePROMs'
+PRIVACY = 'privacy_policy'
+WEB_TOU = 'website_terms_of_use'
+SUBJ_CONSENT = 'subject_website_consent'
+STORED_FORM = 'stored_website_consent_form'
 
 
 class TestCoredata(TestCase):
