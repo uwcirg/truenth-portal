@@ -1919,7 +1919,7 @@ var tnthAjax = {
         };
         $.ajax ({
             type: "GET",
-            url: "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+entry_method:""),
+            url: "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
             async: (sync ? false : true)
         }).done(function(data) {
             if (data && data.optional) {
@@ -2699,6 +2699,7 @@ var tnthAjax = {
             if (callback) callback(data);
         }).fail(function() {
            if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou data.</div>");
+           if (callback) callback({"error": "Server error retrieving tou data."})
         });
     },
     "postTermsByUser": function(userId, toSend) {
