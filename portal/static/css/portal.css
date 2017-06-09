@@ -2134,9 +2134,6 @@ div.timezone-warning.text-warning {
     float: left !important;
     max-width: 100%;
   }
-  #adminTable .email-data-field {
-    display: none;
-  }
 }
 @media (max-width: 640px) {
   body,
@@ -2183,9 +2180,6 @@ div.timezone-warning.text-warning {
   }
   #wellContainer .btn {
     font-size: 0.9em;
-  }
-  #adminTable .org-data-field {
-    display: none;
   }
   .profile-item-container {
     padding: 2em;
@@ -2275,9 +2269,6 @@ div.timezone-warning.text-warning {
   button.btn-delete-consent {
     padding: 2px;
   }
-  #adminTable .email-field {
-    display: none;
-  }
   #adminTableToolbar div.indent {
     padding: 0 0.2em;
   }
@@ -2314,10 +2305,6 @@ div.timezone-warning.text-warning {
 @media (max-width: 730px) {
   #userSessionsList {
     font-size: 0.85em;
-  }
-  #adminTable .status-field,
-  #adminTable .reports-field {
-    display: none;
   }
 }
 @media (min-width: 768px) {
@@ -2412,9 +2399,6 @@ div.timezone-warning.text-warning {
   .load-container {
     min-height: 1.5em;
   }
-  #adminTable .consentdate-field {
-    display: none;
-  }
   .admin-table .search .form-control {
     height: 35px;
   }
@@ -2497,9 +2481,6 @@ div.timezone-warning.text-warning {
 }
 @media (max-width: 1199px) {
   .profile-img {
-    display: none;
-  }
-  #adminTable .organization-field {
     display: none;
   }
   #profileForm #date {
