@@ -21,9 +21,8 @@
                 </label>
                 <br/>
                 <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
-                    {% set privacy_url=url_for('portal.privacy') %} {% set terms_url=url_for('portal.terms_and_conditions') %}
-                    {% trans %}
-                    <i class="fa fa-square-o fa-lg"></i>&nbsp;<span class="default-tou-text">I consent and agree to the above terms.</span>
+                    <i class="fa fa-square-o fa-lg"></i>&nbsp;<span class="default-tou-text">{{_("I consent and agree to the above terms.")}}</span>
+                    {% trans privacy_url=url_for('portal.privacy'), terms_url=url_for('portal.terms_and_conditions') %}
                     <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}" target="_blank" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}" target="_blank" class="required-link">terms</a></span>
                     {% endtrans %}
                 </label>
