@@ -29,6 +29,9 @@ def validate_request_args(request):
     """
     d = {}
     for k in request.args.keys():
+        # Skip JQuery cache-busting param
+        if k == '_':
+            continue
         if k == 'entry_method':
             accepted = ('paper', 'interview assisted')
             v = request.args.get(k)
