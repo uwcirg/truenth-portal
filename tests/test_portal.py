@@ -29,6 +29,7 @@ class TestPortal(TestCase):
         self.add_required_clinical_data()
         self.bless_with_basics()
         rv = self.client.get('/home')
+        self.assert200(rv)
 
         self.assertIn('Custom Label', rv.data)
         intervention = db.session.merge(intervention)
@@ -55,6 +56,7 @@ class TestPortal(TestCase):
         user = db.session.merge(self.test_user)
 
         rv = self.client.get('/home')
+        self.assert200(rv)
 
         ui = db.session.merge(ui)
         self.assertIn(ui.card_html, rv.data.decode('utf-8'))

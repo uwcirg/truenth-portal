@@ -36,45 +36,45 @@ class Coredata(object):
             if cls not in self._registered:
                 self._registered.append(cls)
 
-        def required(self, user):
+        def required(self, user, **kwargs):
             # Returns list of datapoints required for user
             items = []
             for cls in self._registered:
                 instance = cls()
-                if instance.required(user):
+                if instance.required(user, **kwargs):
                     items.append(instance.id)
             return items
 
-        def optional(self, user):
+        def optional(self, user, **kwargs):
             # Returns list of optional datapoints for user
             items = []
             for cls in self._registered:
                 instance = cls()
-                if instance.optional(user):
+                if instance.optional(user, **kwargs):
                     items.append(instance.id)
             return items
 
-        def initial_obtained(self, user):
+        def initial_obtained(self, user, **kwargs):
             # Check if all registered methods have data
             for cls in self._registered:
                 instance = cls()
-                if not instance.required(user):
+                if not instance.required(user, **kwargs):
                     continue
-                if instance.hasdata(user):
+                if instance.hasdata(user, **kwargs):
                     continue
                 current_app.logger.debug(
                     'intial NOT obtained for at least {}'.format(cls.__name__))
                 return False
             return True
 
-        def still_needed(self, user):
+        def still_needed(self, user, **kwargs):
             # Returns list of registered still needing data
             needed = []
             for cls in self._registered:
                 instance = cls()
-                if not instance.required(user):
+                if not instance.required(user, **kwargs):
                     continue
-                if not instance.hasdata(user):
+                if not instance.hasdata(user, **kwargs):
                     needed.append(instance.id)
             if needed:
                 current_app.logger.debug(
@@ -82,18 +82,24 @@ class Coredata(object):
             return needed
 
     instance = None
+
     def __new__(cls):
         if not Coredata.instance:
             Coredata.instance = Coredata.__singleton()
         return Coredata.instance
 
+    @staticmethod
+    def reset():
+        del Coredata.instance
+        Coredata.instance = None
+
     def __getattr__(self, name):
         """Delegate to hidden inner class"""
         return getattr(self.instance, name)
 
-    def __setattr__(self, name):
+    def __setattr__(self, name, value):
         """Delegate to hidden inner class"""
-        return setattr(self.instance, name)
+        return setattr(self.instance, name, value)
 
 
 class CoredataPoint(object):
@@ -101,7 +107,7 @@ class CoredataPoint(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def required(self, user):
+    def required(self, user, **kwargs):
         """Returns true if required for user, false otherwise
 
         Applications are configured to request a set of core data points.
@@ -121,7 +127,7 @@ class CoredataPoint(object):
         raise NotImplemented
 
     @abstractmethod
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         """Returns true if optional for user, false otherwise
 
         Applications are configured to request a set of core data points.
@@ -141,7 +147,7 @@ class CoredataPoint(object):
         raise NotImplemented
 
     @abstractmethod
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         """Returns true if the data has been obtained, false otherwise"""
         raise NotImplemented
 
@@ -179,32 +185,50 @@ def IRONMAN_user(user):
     return False
 
 
-###
-## Series of "datapoint" collection classes follow
-###
+def enter_manually_interview_assisted(user, **kwargs):
+    """helper to determine if we're in `enter manually - interview assisted`
+
+    Looks for 'entry_method' in kwargs - returns true if it has value
+    'interview assisted', false otherwise.
+
+    """
+    return kwargs.get('entry_method') == 'interview assisted'
+
+
+def enter_manually_paper(user, **kwargs):
+    """helper to determine if we're in `enter manually - paper`
+
+    Looks for 'entry_method' in kwargs - returns true if it has value
+    'paper', false otherwise.
+
+    """
+    return kwargs.get('entry_method') == 'paper'
+
+
+# Series of "datapoint" collection classes follow
 
 class DobData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         # DOB is only required for patient
         if user.has_role(ROLE.PATIENT):
             return True
         return False
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         # Optional for anyone, for whom it isn't required
         return not self.required(user)
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.birthdate is not None
 
 
 class RaceData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return False
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -213,16 +237,16 @@ class RaceData(CoredataPoint):
             return True
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.races.count() > 0
 
 
 class EthnicityData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return False
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -231,16 +255,16 @@ class EthnicityData(CoredataPoint):
             return True
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.ethnicities.count() > 0
 
 
 class IndigenousData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return False
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         if SR_user(user):
             return False
         if IRONMAN_user(user):
@@ -249,51 +273,51 @@ class IndigenousData(CoredataPoint):
             return True
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.indigenous.count() > 0
 
 
 class RoleData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return not SR_user(user)
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         if len(user.roles) > 0:
             return True
 
 
 class OrgData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         if SR_user(user) or CP_user(user):
             return False
         if any(map(
-            user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
+                user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
             return True
         return False
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.organizations.count() > 0
 
 
 class ClinicalData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         if SR_user(user):
             return False
         return user.has_role(ROLE.PATIENT)
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         required = {item: False for item in (
             CC.BIOPSY, CC.PCaDIAG)}
 
@@ -305,7 +329,7 @@ class ClinicalData(CoredataPoint):
 
 class LocalizedData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         if SR_user(user):
             return False
         if current_app.config.get('LOCALIZED_AFFILIATE_ORG'):
@@ -315,10 +339,10 @@ class LocalizedData(CoredataPoint):
             return False
         return user.has_role(ROLE.PATIENT)
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         for obs in user.observations:
             if obs.codeable_concept == CC.PCaLocalized:
                 return True
@@ -327,27 +351,70 @@ class LocalizedData(CoredataPoint):
 
 class NameData(CoredataPoint):
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return not SR_user(user)
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return not self.required(user)
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return user.first_name and user.last_name
 
 
-class TouData(CoredataPoint):
+class TOU_core(CoredataPoint):
+    """The flavors of Terms Of Use inherit from here to define the 'type'"""
 
-    def required(self, user):
+    def required(self, user, **kwargs):
         return not SR_user(user)
 
-    def optional(self, user):
+    def optional(self, user, **kwargs):
         return False
 
-    def hasdata(self, user):
+    def hasdata(self, user, **kwargs):
         return ToU.query.join(Audit).filter(
-            Audit.user_id==user.id).count() > 0
+            Audit.user_id == user.id,
+            ToU.type == self.tou_type).count() > 0
+
+
+class Website_Terms_Of_UseData(TOU_core):
+    tou_type = 'website terms of use'
+
+    def required(self, user, **kwargs):
+        if (not super(self.__class__, self).required(user, **kwargs) or
+                enter_manually_paper(user, **kwargs) or
+                enter_manually_interview_assisted(user, **kwargs)):
+            return False
+        return True
+
+
+class Subject_Website_ConsentData(TOU_core):
+    tou_type = 'subject website consent'
+
+    def required(self, user, **kwargs):
+        if not super(self.__class__, self).required(user, **kwargs):
+            return False
+        return user.has_role(ROLE.PATIENT)
+
+
+class Stored_Website_Consent_FormData(TOU_core):
+    tou_type = 'stored website consent form'
+
+    def required(self, user, **kwargs):
+        if (not super(self.__class__, self).required(user, **kwargs) or
+                not enter_manually_interview_assisted(user, **kwargs)):
+            return False
+        return user.has_role(ROLE.PATIENT)
+
+
+class Privacy_PolicyData(TOU_core):
+    tou_type = 'privacy policy'
+
+    def required(self, user, **kwargs):
+        if (not super(self.__class__, self).required(user, **kwargs) or
+                enter_manually_interview_assisted(user, **kwargs) or
+                enter_manually_paper(user, **kwargs)):
+            return False
+        return True
 
 
 def configure_coredata(app):
@@ -356,9 +423,12 @@ def configure_coredata(app):
 
     # Add static list of "configured" datapoints
     config_datapoints = app.config.get(
-        'REQUIRED_CORE_DATA',
-        ['name', 'dob', 'role', 'org', 'clinical', 'localized', 'tou',
-         'race', 'ethnicity', 'indigenous'])
+        'REQUIRED_CORE_DATA', [
+            'name', 'dob', 'role', 'org', 'clinical', 'localized',
+            'race', 'ethnicity', 'indigenous',
+            'website_terms_of_use', 'subject_website_consent',
+            'stored_website_consent_form', 'privacy_policy',
+        ])
 
     for name in config_datapoints:
         # Camel case with 'Data' suffix - expect to find class in local

@@ -177,6 +177,8 @@ class TestCase(Base):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
         tou = ToU(audit=audit, agreement_url='http://not.really.org',
                   type='website terms of use')
+        privacy = ToU(audit=audit, agreement_url='http://not.really.org',
+                  type='privacy policy')
         parent_org = OrgTree().find(org.id).top_level()
         options = (STAFF_EDITABLE_MASK | INCLUDE_IN_REPORTS_MASK |
                    SEND_REMINDERS_MASK)
@@ -185,6 +187,7 @@ class TestCase(Base):
             options=options, audit=audit, agreement_url='http://fake.org')
         with SessionScope(db):
             db.session.add(tou)
+            db.session.add(privacy)
             db.session.add(consent)
             db.session.commit()
 

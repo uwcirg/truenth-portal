@@ -19,17 +19,43 @@ def options():
     return jsonify(require_options=OPTIONS)
 
 
+def validate_request_args(request):
+    """Validate values and return dict or raise exception
+
+    Several endpoints take the same query string parameters.  Validate
+    the values received and return in a dictionary if legit, or raise
+    descriptive exception.
+
+    """
+    d = {}
+    for k in request.args.keys():
+        if k == 'entry_method':
+            accepted = ('paper', 'interview assisted')
+            v = request.args.get(k)
+            if v not in accepted:
+                abort(400, '{} value `{}` not in {}'.format(k, v, accepted))
+            d[k] = v
+        else:
+            abort(400, 'unsupported query param {}'.format(k))
+    return d
+
+
 @coredata_api.route('/user/<int:user_id>/still_needed', methods=('GET',))
 @oauth.require_oauth()
 def still_needed(user_id):
     """Looks up missing coredata elements for given user
+
+    :param entry_method: optional query string parameter used to define entry
+        method.  Useful from front end when in `enter manually` to
+        differentiate `enter manually - paper` from
+        `enter manually - interview assisted`
 
     :returns: simple JSON struct with a list (potentially empty) of the
         coredata elements still needed
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    still_needed = Coredata().still_needed(user)
+    still_needed = Coredata().still_needed(user, **validate_request_args())
     return jsonify(still_needed=still_needed)
 
 
@@ -37,6 +63,11 @@ def still_needed(user_id):
 @oauth.require_oauth()
 def requried(user_id):
     """Looks up required core data elements for user
+
+    :param entry_method: optional query string parameter used to define entry
+        method.  Useful from front end when in `enter manually` to
+        differentiate `enter manually - paper` from
+        `enter manually - interview assisted`
 
     :returns: simple JSON struct with a list of the coredata elements
         required for the given user.  The list is dependent on the application
@@ -46,7 +77,7 @@ def requried(user_id):
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    required = Coredata().required(user)
+    required = Coredata().required(user, **validate_request_args())
     return jsonify(required=required)
 
 
@@ -54,6 +85,11 @@ def requried(user_id):
 @oauth.require_oauth()
 def optional(user_id):
     """Looks up optional core data elements for user
+
+    :param entry_method: optional query string parameter used to define entry
+        method.  Useful from front end when in `enter manually` to
+        differentiate `enter manually - paper` from
+        `enter manually - interview assisted`
 
     :returns: simple JSON struct with a list of the coredata elements
         optional for the given user.  The list is dependent on the application
@@ -63,7 +99,7 @@ def optional(user_id):
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    optional = Coredata().optional(user)
+    optional = Coredata().optional(user, **validate_request_args())
     return jsonify(optional=optional)
 
 
