@@ -404,6 +404,37 @@ div.right-panel {
   margin: auto;
 }
 /***** initial queries page style ****/
+#topTerms .default-tou-text {
+  display: none;
+}
+#topTerms .custom-tou-text a {
+  text-decoration: underline;
+}
+#topTerms .terms-checkbox-container {
+  margin-left: 2em;
+  margin-top: 0.5em;
+}
+#termsCheckbox {
+  width: 1000px;
+  max-width: 100%;
+}
+#termsCheckbox .display-view {
+  font-weight: normal;
+  display: none;
+  margin: 1em auto;
+}
+#termsCheckbox a.form-link {
+  text-decoration: underline;
+}
+.box-consent-container {
+  width: 300px;
+  max-width: 100%;
+  border-top: solid 1px #000;
+}
+.continue-msg-wrapper {
+  margin: 1em auto;
+  display: none;
+}
 #aboutForm {
   max-width: 100%;
   padding: 1em;

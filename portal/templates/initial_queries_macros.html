@@ -1,5 +1,6 @@
 {% macro tou(terms) -%}
     <div id="topTerms">
+        <br/>
         <h4 class="tnth-headline">{{ _("Terms of Use") }}</h4>
         <hr/>
         <br/>
@@ -8,14 +9,28 @@
             <div id="termsText">
               {{ terms['asset']|safe if terms}}
             </div>
-            <input type="hidden" id="termsURL" data-url="{{ terms['agreement_url']|safe if terms}}" value=""/>
             <div id="termsExpand" class="tnth-hide">
               <a href=""><i class="fa fa-plus"></i> {{ _("View TrueNTH Terms") }}</a>
             </div>
             <div id="termsCheckbox">
-              <label id="agreeLabel" data-agree="false" data-type="terms">
-                <i class="fa fa-square-o fa-lg"></i> <span>{{ _("I consent and agree to the above terms.") }}</span>
-              </label>
+               <div class="terms-checkbox-container">
+               <!-- note these checkboxes are selectively hidden using css, as some are applicable only in Truenth and some only applicable in Eproms-->
+                <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent" data-url="{{terms['url'] if terms}}">
+                  <i class="fa fa-square-o fa-lg" class="edit-view"></i> <span class="edit-view">{{ _("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.") }}</span>
+                  <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
+                </label>
+                <br/>
+                <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
+                    <i class="fa fa-square-o fa-lg"></i>&nbsp;<span class="default-tou-text">{{_("I consent and agree to the above terms.")}}</span>
+                    {% trans privacy_url=url_for('portal.privacy'), terms_url=url_for('portal.terms_and_conditions') %}
+                    <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}" target="_blank" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}" target="_blank" class="required-link">terms</a></span>
+                    {% endtrans %}
+                </label>
+                <br/>
+                <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
+                  <i class="fa fa-square-o fa-lg"></i> <span>{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
+                </label>
+              </div>
             </div>
             <br/>
         </div>
@@ -29,7 +44,7 @@
               </div>
               <div class="modal-body">
                 <br/>
-                <p class="text-left text-danger">{{ _('You must agree to the terms and conditions by checking the provided checkbox.') }}</p>
+                <p id="termsReminderCheckboxText" class="text-left text-danger">{{ _('You must agree to the terms and conditions by checking the provided checkbox.')}}</p>
                 <br/>
               </div>
               <div class="modal-footer">
@@ -38,9 +53,141 @@
             </div>
           </div>
     </div>
+    {{tou_agreement_url()}}
    <!--  {% if terms and terms['editorUrl'] %}<script>appendLREditContainer($("#topTerms"), "{{terms['editorUrl']}}", false);</script>{% endif %} -->
   {%- endmacro %}
+  {% macro tou_agreement_url() -%}
+       <input type="hidden" id="termsURL" data-url="" value=""/>
+       <script>
+            $(function () {
+                tnthAjax.getTermsUrl();
+            });
+       </script>
+  {%- endmacro %}
 
+  {% macro paperWebsiteConsentScript(terms) -%}
+    <h4 class="tnth-headline">{{ _("Website Consent Script - Enter Manually - Paper Form") }}</h4>
+    <p class="text-muted">{{_("For Staff Use Only")}}</p>
+    <hr/>
+    <br/>
+    <div class="well">
+        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
+    </div>
+    <div>
+      <p>{{_("Do you have any questions?")}}</p>
+      <p>{{_("Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?")}}</p>
+      <ul>
+        <li>{{_("If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]")}}</li>
+        <li>{{_("If no, thank them for their time.")}}</li>
+      </ul>
+    </div>
+    <br/>
+    <div id="termsCheckbox">
+      <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
+          <div class="edit-view">
+          <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions.") }}</span></div>
+          <div class="display-view text-warning">Subject has given consent previously.</div>
+      </label>
+    </div>
+  {%- endmacro %}
+  {% macro interviewAssistedWebConsentScript(terms) -%}
+      <h4 class="tnth-headline hidden-print">{{ _("Website Consent Script - Enter Manually - Interview Assisted") }}</h4>
+      <p class="text-muted hidden-print">{{_("For Staff Use Only")}}</p>
+      <hr class="hidden-print"/>
+      <br class="hidden-print"/>
+      <div class="hidden-print">
+        <p>{{_("We are inviting you to use the TrueNTH website tool because you have agreed to participate in the IRONMAN Registry study.")}}</p>
+        <p>{{_("The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?")}}</p>
+        <ul>
+            <li>{{_("If yes, continue to read below text and Consent.")}}</li>
+            <li>{{_("If no, thank them for their time.")}}</li>
+        </ul>
+        <p>{{_("Read consent [exactly as written]")}}</p>
+      </div>
+      <br class="hidden-print"/>
+      <div class="well hidden-print">
+        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
+      </div>
+      <div>
+        <p class="hidden-print">{{_("Do you have any questions?")}}</p>
+        <p class="hidden-print">{{_("Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?")}}</p>
+        <ul class="hidden-print">
+          <li>{{_("If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]")}}</li>
+          <li>{{_("If no, thank them for their time.")}}</li>
+        </ul>
+        <div class="modal fade" id="websiteDeclarationFormModal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header hidden-print">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="termsReminderModalLabel">{{ _("Please print and fill out the form") }}</h4>
+              </div>
+              <div class="modal-body">
+                <div id="websiteDeclarationForm">
+                    <h4>{{_("Website declaration form")}}</h4>
+                    <br/>
+                    <p><em>{{_("Person Obtaining Consent must complete a form with the following text. This form must be entered into a central database and be retrievable in case there are any questions raised about the consent given at any time.")}}</em></p>
+                    <br/>
+                    <p><strong>{{_("Please tick the relevant box and complete the declaration below.")}}</strong><p>
+                    <p>{{_("For phone consent:")}}</p>
+                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox"></i> <strong>{{_("I have read this consent form to the subject.")}}</strong></p>
+                    <br/>
+                    <p>{{_("For face-to-face consent:")}}</p>
+                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox"></i> <strong>{{_("I have gone through and explained the consent form in the presence of the subject.")}}</strong></p>
+                    <br/>
+                    <p>{{_("Declaration:")}}</p>
+                    <p><strong>{{_("An explanation of the TrueNTH website tool was given and questions from the subject were solicited and answered to the subject’s satisfaction. In my judgment, the subject demonstrated comprehension of the information. The subject has provided oral consent to participate in the IRONMAN Registry Study on the terms set out above.")}}</strong></p>
+                    <br/><br/>
+                    <div class="box-consent-container">
+                    {{_("Name and Title")}}
+                    </div>
+                    <br/><br/>
+                    <div class="box-consent-container">
+                    {{_("Date")}}
+                    </div>
+                    <br/><br/>
+                    <div class="box-consent-container">
+                    {{_("Signature of Person Obtaining Consent")}}
+                    </div>
+                    <br/><br/>
+                </div>
+              </div>
+              <div class="modal-footer hidden-print">
+                <button type="button"  class="btn btn-default" id="consentPrintButton" onclick="window.print()">{{_("Print")|upper }}</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("CLOSE") }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br/>
+      <div id="termsCheckbox" class="hidden-print">
+        <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
+          <div class="edit-view">
+            <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool ") }}</span>
+          </div>
+          <div class="display-view text-warning">{{_("Subject has given consent previously.")}}</div>
+        </label>
+        <br/>
+        <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
+        <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
+           <div class="edit-view">
+            <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have created an electronic copy of this declaration and have stored said copy.") }}</span>
+          </div>
+          <div class="display-view text-warning">{{_("You had previously signed and stored an electronic copy of consent declaration.")}}
+          </div>
+        </label>
+      </div>
+      <script>
+        $(function() {
+            $(".consent-form-checkbox").each(function() {
+              $(this).on("click", function() {
+                  $(this).toggleClass("fa-square-o fa-check-square-o");
+              });
+            });
+        });
+      </script>
+  {%- endmacro %}
   {% macro nameGroup() -%}
     <div class="row" id="nameGroup">
         <div class="col-md-5 col-xs-6">
@@ -94,10 +241,10 @@
             <label>{{ _("Birth Date") }} <span class="bd-optional text-muted">{{_("(optional)")}}</span></label>
             <div class="row">
               <div class="col-md-4 col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="The birth day field is required and must be valid format" required />
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The birth day field is required and must be valid format')}}" required />
               </div>
               <div class="col-md-4 col-xs-4">
-                <select data-type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="-- A birth month must be selected" required>
+                <select data-type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="{{_('A birth month must be selected')}}" required>
                   <option value="">{{ _("Month") }}...</option>
                   <option value="01">{{ _("January") }}</option>
                   <option value="02">{{ _("February") }}</option>
@@ -114,7 +261,7 @@
                 </select>
               </div>
               <div class="col-md-4 col-xs-4">
-                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="The birth year is required and must be in valid format" required />
+                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="{{_('The birth year is required and must be in valid format')}}" required />
               </div>
             </div>
             <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>

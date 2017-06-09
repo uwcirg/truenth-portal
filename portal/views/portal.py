@@ -17,7 +17,7 @@ from .crossdomain import crossdomain
 from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, AboutATMA, VersionedResource
-from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
+from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA, WebsiteConsentByOrg_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -459,13 +459,42 @@ def initial_queries():
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
-    if 'tou' in still_needed:
+    if 'subject_website_consent' in still_needed or \
+        ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
+        OT = OrgTree()
+        top_level_org = OT.find_top_level_org(user.organizations)
+        if top_level_org and len(top_level_org) > 0:
+            terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+                    name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+        else:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    else:
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
+
+
+@portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
+@roles_required(ROLE.STAFF)
+@oauth.require_oauth()
+def website_consent_script(patient_id):
+    entry_method = request.args.get('entry_method', None)
+    redirect_url = request.args.get('redirect_url', None)
+    user = current_user()
+    OT = OrgTree()
+    top_level_org = OT.find_top_level_org(user.organizations)
+    if top_level_org and len(top_level_org) > 0:
+        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
+                name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    return render_template(
+        'website_consent_script.html', user=user, terms=terms, 
+        entry_method=entry_method, redirect_url=redirect_url,
+        patient_id=patient_id)
 
 @portal.route('/home')
 def home():
