@@ -82,6 +82,7 @@ class Coredata(object):
             return needed
 
     instance = None
+
     def __new__(cls):
         if not Coredata.instance:
             Coredata.instance = Coredata.__singleton()
@@ -204,9 +205,7 @@ def enter_manually_paper(user, **kwargs):
     return kwargs.get('entry_method') == 'paper'
 
 
-###
-## Series of "datapoint" collection classes follow
-###
+# Series of "datapoint" collection classes follow
 
 class DobData(CoredataPoint):
 
@@ -297,7 +296,7 @@ class OrgData(CoredataPoint):
         if SR_user(user) or CP_user(user):
             return False
         if any(map(
-            user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
+                user.has_role, (ROLE.PATIENT, ROLE.STAFF, ROLE.STAFF_ADMIN))):
             return True
         return False
 
@@ -382,8 +381,8 @@ class Website_Terms_Of_UseData(TOU_core):
 
     def required(self, user, **kwargs):
         if (not super(self.__class__, self).required(user, **kwargs) or
-            enter_manually_paper(user, **kwargs) or
-            enter_manually_interview_assisted(user, **kwargs)):
+                enter_manually_paper(user, **kwargs) or
+                enter_manually_interview_assisted(user, **kwargs)):
             return False
         return True
 
@@ -402,7 +401,7 @@ class Stored_Website_Consent_FormData(TOU_core):
 
     def required(self, user, **kwargs):
         if (not super(self.__class__, self).required(user, **kwargs) or
-            not enter_manually_interview_assisted(user, **kwargs)):
+                not enter_manually_interview_assisted(user, **kwargs)):
             return False
         return user.has_role(ROLE.PATIENT)
 
@@ -412,8 +411,8 @@ class Privacy_PolicyData(TOU_core):
 
     def required(self, user, **kwargs):
         if (not super(self.__class__, self).required(user, **kwargs) or
-            enter_manually_interview_assisted(user, **kwargs) or
-            enter_manually_paper(user, **kwargs)):
+                enter_manually_interview_assisted(user, **kwargs) or
+                enter_manually_paper(user, **kwargs)):
             return False
         return True
 
