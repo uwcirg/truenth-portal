@@ -19,7 +19,7 @@ def options():
     return jsonify(require_options=OPTIONS)
 
 
-def validate_request_args(request):
+def validate_request_args():
     """Validate values and return dict or raise exception
 
     Several endpoints take the same query string parameters.  Validate
@@ -28,18 +28,16 @@ def validate_request_args(request):
 
     """
     d = {}
-    for k in request.args.keys():
-        # Skip JQuery cache-busting param
-        if k == '_':
-            continue
-        if k == 'entry_method':
-            accepted = ('paper', 'interview assisted')
-            v = request.args.get(k)
-            if v not in accepted:
-                abort(400, '{} value `{}` not in {}'.format(k, v, accepted))
-            d[k] = v
-        else:
-            abort(400, 'unsupported query param {}'.format(k))
+    if request.args:
+        for k in request.args.keys():
+            if k == 'entry_method':
+                accepted = ('paper', 'interview assisted')
+                v = request.args.get(k)
+                if v not in accepted:
+                    abort(400, '{} value `{}` not in {}'.format(k, v, accepted))
+                d[k] = v
+            else:
+                abort(400, 'unsupported query param {}'.format(k))
     return d
 
 

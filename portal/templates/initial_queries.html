@@ -6,7 +6,7 @@
 {% from "profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
-  {% if 'tou' in still_needed %}
+  {% if 'website_terms_of_use' in still_needed or 'privacy_policy' in still_needed or 'subject_website_consent' in still_needed %}
       {{tou(terms)}}
   {% endif %}
   <div id="aboutForm" class="tnth-hide">
@@ -63,7 +63,7 @@
     </form>
   </div>
 {% endblock %}
-{% from "flask_user/_macros.html" import footer, linksHTML, logo %}
+{% from "flask_user/_macros.html" import linksHTML, logo %}
 {% block footer %}
 <!-- custom footer -->
 <div class="container">
@@ -143,12 +143,15 @@ configObj.initConfig();
 var FieldsChecker = function(mainSections) {
   this.mainSections = {};
   if (mainSections) {
-    if (!configObj.getConfig()) this.mainSections = mainSections;
+    if (!configObj.getConfig()) {
+      this.mainSections = mainSections;
+    }
     else {
       for (var section in mainSections) {
         if (mainSections[section].required) {
           this.mainSections[section] = mainSections[section];
         }
+
         else if (configObj.inConfig(mainSections[section].config)) {
           this.mainSections[section] = mainSections[section];
         };
@@ -328,7 +331,11 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                     else if (!(field.get(0).validity.valid)) isComplete = false;
                     break;
                 case 'terms':
-                    if (!(field.attr("data-agree") == "true")) isComplete = false;
+                    var _isAgreed = true;
+                    field.each(function() {
+                         if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
+                    });
+                    if (!_isAgreed) isComplete = false;
                     break;
                 };
                 if (hasValue(field.attr("data-require-validate"))) isComplete = false;
@@ -456,6 +463,7 @@ function initIncompleteFields() {
 
   //if term of use form not present - need to show the form
   if ($("#topTerms").length == 0)  {
+      $("#topTerms").hide();
       $("#aboutForm").fadeIn();
       fc.getNext();
       if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
@@ -469,7 +477,7 @@ function initIncompleteFields() {
         $("#termsReminderModal").modal("show");
       };
     };
-    $("#tnthLogo a, a[href]").not("a[href*='logout']").addClass("disabled").on("click", function(e) {
+    $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
         e.preventDefault();
         return false;
     });
@@ -487,13 +495,17 @@ function initIncompleteFields() {
 };
 
 $(document).ready(function(){
+  
+    tnthAjax.getTerms({{user.id}});
 
+    /*** event for the next button ***/
     $("#next").on("click", function() {
         $(this).hide();
         $(".loading-message-indicator").show();
         setTimeout("window.location.reload()", 100);
     });
 
+    /*** event for the arrow in the header**/
     $("div.heading").on("click", function() {
        $('html, body').animate({
           scrollTop: $(this).next('div.content-body').children().first().offset().top
@@ -722,15 +734,26 @@ $(document).ready(function(){
 
     var termsEvent = function(){
         if ($(this).attr("data-agree") == "false") {
-          var theTerms = {};
-          theTerms["agreement_url"] = $("#termsURL").data().url;
-          // Post terms agreement via API
-          tnthAjax.postTerms(theTerms);
+          var types = $(this).attr("data-tou-type");
+          var additional = $(this).find("[data-core-data-subtype]");
+          if (additional.length > 0) types += (hasValue(types)?",":"") + additional.attr("data-tou-type");
+          if (hasValue(types)) {
+              var arrTypes = types.split(",");
+              var self = $(this);
+              arrTypes.forEach(function(type) {
+                  var theTerms = {};
+                  theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
+                  theTerms["type"] = type;
+                   // Post terms agreement via API
+                  tnthAjax.postTerms(theTerms);
+              });
+          };
           // Update UI
-          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
-            .find("span").text("I consent and agree to the above terms.");
-          $("#aboutForm").fadeIn();
+          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
           $(this).attr("data-agree","true");
+          if (fc.sectionCompleted("topTerms")) {
+            $("#aboutForm").fadeIn();
+          };
           if (fc.allFieldsCompleted()) {
               fc.continueToFinish();
           } else fc.continueToNext("topTerms");
@@ -752,11 +775,10 @@ $(document).ready(function(){
     mainSections = {
       'topTerms': {
           display: "terms",
-          config: "tou",
+          config: "website_terms_of_use,subject_website_consent,stored_website_consent_form,privacy_policy",
           subsections: {
             "termsCheckbox": {
-                config: "tou",
-                fields: [$("#agreeLabel")],
+                fields: [$("[data-type='terms']:visible")],
                 event: termsEvent
             }
         }

@@ -82,6 +82,7 @@ function showWrapper(hasLoader) {
                     setTimeout('$("#loadingIndicator").fadeOut();', 1000);
                 };
             });
+
         } else $("#tnthNavWrapper").css(cssProp);
     };
 };
@@ -1040,6 +1041,46 @@ var fillContent = {
                 };
             }
         });
+    },
+    "terms": function(data) {
+        if (data.tous) {
+            //(data.tous).forEach(function(item) {
+            function typeInTous(type) {
+                var found = false;
+                (data.tous).forEach(function(item) {
+                    if (!found && item.type == type) found = true;
+                });
+                return found;
+            };
+
+            $("#termsCheckbox [data-type='terms']").each(function() {
+                var arrTypes = ($(this).attr("data-tou-type")).split(",");
+                var self = $(this);
+                var item_found  = 0;
+                arrTypes.forEach(function(type) {
+                    if (typeInTous(type)) item_found++;
+                });
+                var additional = $(this).find("[data-core-data-subtype]");
+                if (additional.length > 0) {
+                    at = additional.attr("data-tou-type");
+                    if (typeInTous(at)) item_found++;
+                };
+                if (item_found == (arrTypes.length+additional.length)) {
+                    self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    self.attr("data-agree", "true");
+                    var vs = self.find(".display-view");
+                    if (vs.length > 0) {
+                        self.show();
+                        vs.show();
+                        (self.find(".edit-view")).each(function() {
+                            $(this).hide();
+                        });
+                    };
+                };
+            });
+            //});
+        };
+        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("checkboxes.");
     }
 };
 
@@ -1826,18 +1867,29 @@ var tnthAjax = {
         }).fail(function(){
         });
     },
-    "getStillNeededCoreData": function(userId, sync, callback) {
+    "getStillNeededCoreData": function(userId, sync, callback, entry_method) {
         if (!hasValue(userId)) return false;
         $.ajax ({
             type: "GET",
-            url: "/api/coredata/user/" + userId + "/still_needed",
-            cache: false,
+            url: "/api/coredata/user/" + userId + "/still_needed" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
             async: (sync ? false : true)
         }).done(function(data) {
-            if (data && data.still_needed && data.still_needed.length > 0) {
+            if (data && data.still_needed) {
                 if (callback) callback(data.still_needed);
+                (data.still_needed).forEach(function(item) {
+                    $("#termsCheckbox [data-type='terms']").each(function() {
+                        var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
+                        dataTypes.forEach(function(type) {
+                            if (type == item) {
+                                self.show().removeClass("tnth-hide");
+                            };
+                        });
+                    });
+                });
             } else {
-                if (callback) callback({"error": "no data returned"});
+                if (callback) {
+                    callback({"error": "no data returned"});
+                };
             };
         }).fail(function(){
             if (callback) callback({"error": "unable to get needed core data"});
@@ -1860,15 +1912,14 @@ var tnthAjax = {
             if (callback) callback({"error": "unable to get required core data"});
         });
     },
-    "getOptionalCoreData": function(userId, sync, target, callback) {
+    "getOptionalCoreData": function(userId, sync, target, callback, entry_method) {
         if (!hasValue(userId)) return false;
         if (target) {
             target.find(".profile-item-loader").show();
         };
         $.ajax ({
             type: "GET",
-            url: "/api/coredata/user/" + userId + "/optional",
-            cache: false,
+            url: "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+entry_method:""),
             async: (sync ? false : true)
         }).done(function(data) {
             if (data && data.optional) {
@@ -2617,6 +2668,53 @@ var tnthAjax = {
             if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
             fillViews.clinical();
+        });
+    },
+    "getTermsUrl": function() {
+        $.ajax ({
+            type: "GET",
+            url: '/api/tou'
+        }).done(function(data) {
+            $(".get-tou-error").remove();
+            if (data.url) {
+                $("#termsURL").attr("data-url", data.url);
+                $("#topTerms .general-tou").each(function() {
+                    $(this).attr("data-url", data.url);
+                });
+            };
+            //fillContent.terms(data);
+        }).fail(function() {
+           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou url.</div>");
+        });
+    },
+    "getTerms": function(userId, type, sync, callback) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+'/tou'+(hasValue(type)?("/"+type):""),
+            cache: false,
+            async: (sync?false:true)
+        }).done(function(data) {
+            $(".get-tou-error").remove();
+            fillContent.terms(data);
+            if (callback) callback(data);
+        }).fail(function() {
+           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou data.</div>");
+        });
+    },
+    "postTermsByUser": function(userId, toSend) {
+        ///user/<user_id>/tou/accepted
+        $.ajax ({
+            type: "POST",
+            url: '/api/user/' + userId + '/tou/accepted',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: JSON.stringify(toSend)
+        }).done(function() {
+           // console.log('terms stored');
+           $(".post-tou-error").remove();
+        }).fail(function() {
+            //alert("There was a problem saving your answers. Please try again.");
+            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
         });
     },
     "postTerms": function(toSend) {
@@ -3431,6 +3529,7 @@ function hasValue(val) {
 function isString (obj) {
   return (Object.prototype.toString.call(obj) === '[object String]');
 };
+
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};
