@@ -113,6 +113,7 @@ var configObj = (function() {
             var found = false;
             var ma = configMatch.split(",");
             ma.forEach(function(item) {
+              if (dataArray.length == 0) return false;
               dataArray.forEach(function(v) {
                   if (!found && v == item) found = true;
               });

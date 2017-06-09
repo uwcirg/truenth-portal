@@ -459,12 +459,13 @@ def initial_queries():
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
-    if 'website_terms_of_use' or 'privacy_policy' in still_needed:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    elif 'subject_website_consent' in still_needed:
+    if 'subject_website_consent' in still_needed or \
+        ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
         OT = OrgTree()
         terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
                 name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
     return render_template(
@@ -472,7 +473,7 @@ def initial_queries():
         consent_agreements=consent_agreements, still_needed=still_needed)
 
 
-@portal.route('/website-consent-script/<int:patient_id>', methods=['GET', 'POST'])
+@portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
 @roles_required(ROLE.STAFF)
 @oauth.require_oauth()
 def website_consent_script(patient_id):

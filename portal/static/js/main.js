@@ -1044,7 +1044,6 @@ var fillContent = {
     },
     "terms": function(data) {
         if (data.tous) {
-            //(data.tous).forEach(function(item) {
             function typeInTous(type) {
                 var found = false;
                 (data.tous).forEach(function(item) {
@@ -1080,7 +1079,7 @@ var fillContent = {
             });
             //});
         };
-        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("checkboxes.");
+        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
     }
 };
 

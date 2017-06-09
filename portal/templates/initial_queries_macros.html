@@ -22,7 +22,7 @@
                 <br/>
                 <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
                     <i class="fa fa-square-o fa-lg"></i>&nbsp;<span class="default-tou-text">{{ _("I consent and agree to the above terms.") }}</span>
-                    <span class="custom-tou-text">{{ _("I have read the website ")}}<a href="{{url_for('portal.privacy')}}" target="_blank" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">{{_('privacy policy')}}</a>{{_(' and ')}}<a href="{{url_for('portal.terms_and_conditions')}}" target="_blank" class="required-link">{{_("terms") }}</a></span>
+                    <span class="custom-tou-text">{% set privacy_url=url_for('portal.privacy') %} {% set terms_url=url_for('portal.terms_and_conditions') %}{{ _("I have read the website ")}}<a href="{{privacy_url}}" target="_blank" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">{{_('privacy policy')}}</a>{{_(' and ')}}<a href="{{terms_url}}" target="_blank" class="required-link">{{_("terms") }}</a></span>
                 </label>
                 <br/>
                 <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
@@ -42,7 +42,7 @@
               </div>
               <div class="modal-body">
                 <br/>
-                <p class="text-left text-danger">{{ _('You must agree to the terms and conditions by checking the provided ')}}<span id="termsReminderCheckboxText">{{_('checkbox.')}}</span></p>
+                <p id="termsReminderCheckboxText" class="text-left text-danger">{{ _('You must agree to the terms and conditions by checking the provided checkbox.')}}</p>
                 <br/>
               </div>
               <div class="modal-footer">
@@ -151,7 +151,7 @@
                 </div>
               </div>
               <div class="modal-footer hidden-print">
-                <button type="button"  class="btn btn-default" id="consentPrintButton" onclick="window.print()">{{_("PRINT") }}</button>
+                <button type="button"  class="btn btn-default" id="consentPrintButton" onclick="window.print()">{{_("Print")|upper }}</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("CLOSE") }}</button>
               </div>
             </div>
@@ -164,7 +164,7 @@
           <div class="edit-view">
             <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool ") }}</span>
           </div>
-          <div class="display-view text-warning">Subject has given consent previously.</div>
+          <div class="display-view text-warning">{{_("Subject has given consent previously.")}}</div>
         </label>
         <br/>
         <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
@@ -172,8 +172,7 @@
            <div class="edit-view">
             <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have created an electronic copy of this declaration and have stored said copy.") }}</span>
           </div>
-          <div class="display-view text-warning">
-            You had previously signed and stored an electronic copy of consent declaration.
+          <div class="display-view text-warning">{{_("You had previously signed and stored an electronic copy of consent declaration.")}}
           </div>
         </label>
       </div>
