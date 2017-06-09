@@ -55,7 +55,7 @@ def still_needed(user_id):
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    still_needed = Coredata().still_needed(user, **validate_request_args())
+    still_needed = Coredata().still_needed(user, **validate_request_args(request))
     return jsonify(still_needed=still_needed)
 
 
@@ -77,7 +77,7 @@ def requried(user_id):
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    required = Coredata().required(user, **validate_request_args())
+    required = Coredata().required(user, **validate_request_args(request))
     return jsonify(required=required)
 
 
@@ -99,7 +99,7 @@ def optional(user_id):
     """
     current_user().check_role(permission='view', other_id=user_id)
     user = get_user(user_id)
-    optional = Coredata().optional(user, **validate_request_args())
+    optional = Coredata().optional(user, **validate_request_args(request))
     return jsonify(optional=optional)
 
 
