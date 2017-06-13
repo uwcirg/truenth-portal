@@ -2,6 +2,7 @@
 from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
@@ -9,7 +10,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.audit import Audit
+from ..models.auth import Client, Token
 from ..models.group import Group
+from ..models.intervention import Intervention
 from ..models.organization import Organization
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
@@ -1597,8 +1600,17 @@ def upload_user_document(user_id):
         return filedata
 
     file = posted_filename(request)
+
+    contributor = None
+    intervention = Intervention.query.join(Client).join(Token).filter(
+                   and_(Token.user_id == current_user().id,
+                        Token.client_id == Client.client_id,
+                        Client.client_id == Intervention.client_id)).first()
+    if intervention:
+        contributor = intervention.description
+
     data = {'user_id': user_id, 'document_type': "PatientReport",
-            'allowed_extensions': ['pdf']}
+            'allowed_extensions': ['pdf'], 'contributor': contributor}
     try:
         doc = UserDocument.from_post(file, data)
     except ValueError as e:
