@@ -65,7 +65,7 @@ class TestUserDocument(TestCase):
         with open(fpath, 'r') as udoc_file:
             self.assertEqual(udoc_file.read(),test_contents)
         os.remove(fpath)
-    
+
         self.assertEquals(udoc.user_id, TEST_USER_ID)
         self.assertEquals(udoc.intervention.description,
                           INTERVENTION.SEXUAL_RECOVERY.description)
