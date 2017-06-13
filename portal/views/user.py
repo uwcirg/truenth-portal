@@ -1602,10 +1602,18 @@ def upload_user_document(user_id):
     file = posted_filename(request)
 
     contributor = None
-    intervention = Intervention.query.join(Client).join(Token).filter(
-                   and_(Token.user_id == current_user().id,
-                        Token.client_id == Client.client_id,
-                        Client.client_id == Intervention.client_id)).first()
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split()[1]
+        intervention = Intervention.query.join(Client).join(Token).filter(
+                       and_(Token.access_token == token,
+                            Token.client_id == Client.client_id,
+                            Client.client_id == Intervention.client_id)).first()
+    else:
+        intervention = Intervention.query.join(Client).join(Token).filter(
+                       and_(Token.user_id == current_user().id,
+                            Token.client_id == Client.client_id,
+                            Client.client_id == Intervention.client_id)).first()
+
     if intervention:
         contributor = intervention.description
 
