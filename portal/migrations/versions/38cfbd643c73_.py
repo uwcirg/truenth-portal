@@ -44,7 +44,9 @@ def upgrade():
                           'audit', ['audit_id'], ['id'])
 
     # delete old Observation audits
-    session.execute("DELETE from audit where id in {}".format(tuple(to_delete)))
+    if to_delete:
+        session.execute("DELETE from audit where id in {}".format(
+            tuple(to_delete)))
 
     # create new audits for UserObservations
     for uo_id, user_id in session.execute('SELECT id, user_id FROM user_observations'):
