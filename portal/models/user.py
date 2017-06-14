@@ -353,7 +353,7 @@ class User(db.Model, UserMixin):
             # the current user.  Log details for debugging and return the
             # first
             msg = "Multiple active encounters found for {}: {}".format(
-                self.user,
+                self,
                 [(e.status, str(e.start_time), str(e.end_time)) for e in query])
             current_app.logger.error(msg)
         return query.first()
