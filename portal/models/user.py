@@ -534,13 +534,29 @@ class User(db.Model, UserMixin):
                 if org.default_locale:
                     locale_options.add(org.default_locale)
         return locale_options
-    
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
         org = Organization.query.filter_by(name=organization_name).one()
         if org not in self.organizations:
             self.organizations.append(org)
+
+    def first_top_organization(self):
+        """Return first top level organization for user
+
+        NB, none of the above doesn't count and will not be retuned.
+
+        A user may have any number of organizations, but most business
+        decisions, assume there is only one.  Arbitrarily returning the
+        first from the matchin query in case of multiple.
+
+        :returns: a single top level organization, or None
+
+        """
+        top_orgs = OrgTree().find_top_level_org(self.organizations)
+        if top_orgs:
+            return top_orgs[0]
+        return None
 
     def leaf_organizations(self):
         """Return list of 'leaf' organization ids for user's orgs

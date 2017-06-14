@@ -461,11 +461,10 @@ def initial_queries():
     terms, consent_agreements = None, {}
     if 'subject_website_consent' in still_needed or \
         ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
-        OT = OrgTree()
-        top_level_org = OT.find_top_level_org(user.organizations)
-        if top_level_org and len(top_level_org) > 0:
-            terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
-                    name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+        org = user.first_top_organization()
+        if org:
+            terms = VersionedResource(app_text(
+                WebsiteConsentByOrg_ATMA.name_key(organization=org)))
         else:
             terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     else:
@@ -484,15 +483,14 @@ def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
     user = current_user()
-    OT = OrgTree()
-    top_level_org = OT.find_top_level_org(user.organizations)
-    if top_level_org and len(top_level_org) > 0:
-        terms = VersionedResource(app_text(WebsiteConsentByOrg_ATMA.\
-                name_key(organization=OT.find_top_level_org(user.organizations)[0])))
+    org = user.first_top_organization()
+    if org:
+        terms = VersionedResource(app_text(
+            WebsiteConsentByOrg_ATMA.name_key(organization=org)))
     else:
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     return render_template(
-        'website_consent_script.html', user=user, terms=terms, 
+        'website_consent_script.html', user=user, terms=terms,
         entry_method=entry_method, redirect_url=redirect_url,
         patient_id=patient_id)
 
@@ -697,25 +695,20 @@ def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    if user:
-        if gil:
-            privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
-        else:
-            OT = OrgTree()
-            top_org = OT.find_top_level_org(user.organizations)
-            if len(top_org) > 0:
-                if user.has_role(ROLE.PATIENT):
-                    privacy_resource = VersionedResource(app_text(PrivacyATMA.\
-                                                        name_key(role=ROLE.PATIENT,
-                                                        organization=top_org[0])))
-                elif user.has_role(ROLE.STAFF):
-                    privacy_resource = VersionedResource(app_text(PrivacyATMA.\
-                                                        name_key(role=ROLE.STAFF,
-                                                        organization=top_org[0])))
-                else:
-                    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
-            else:
-                privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    if gil:
+        privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    elif user:
+        organization = user.first_top_organization()
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                role = r
+        # only include role and organization if both are defined
+        if not all((role, organization)):
+            role, organization = None, None
+
+        privacy_resource = VersionedResource(app_text(
+            PrivacyATMA.name_key(role=role, organization=organization)))
     else:
         abort(400, "No publicly viewable privacy policy page available")
 
@@ -729,23 +722,18 @@ def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    if user:
-        if gil:
-            terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-        else:
-            OT = OrgTree()
-            top_org = OT.find_top_level_org(user.organizations)
-            if len(top_org) > 0:
-                if user.has_role(ROLE.PATIENT):
-                    terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.PATIENT,
-                                                        organization=top_org[0])))
-                elif user.has_role(ROLE.STAFF):
-                    terms = VersionedResource(app_text(Terms_ATMA.name_key(role=ROLE.STAFF,
-                                                        organization=top_org[0])))
-                else:
-                    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
-            else:
-                terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    if user and not gil:
+        organization = user.first_top_organization()
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                role = r
+        # only include role and organization if both are defined
+        if not all((role, organization)):
+            role, organization = None, None
+
+        terms = VersionedResource(app_text(Terms_ATMA.name_key(
+            role=role, organzation=organization)))
     else:
         terms = VersionedResource(app_text(Terms_ATMA.name_key()))
 
