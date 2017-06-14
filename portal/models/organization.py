@@ -19,6 +19,8 @@ from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
 from .telecom import ContactPoint, Telecom
+from ..views.portal import stock_consent
+
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
@@ -299,7 +301,8 @@ class Organization(db.Model):
                 # the dummy template
                 url = url_for('portal.stock_consent', org_name=org.name,
                               _external=True)
-                resource = UnversionedResource(url)
+                asset = stock_consent(org_name=org.name)
+                resource = UnversionedResource(url=url, asset=asset)
 
             resource.organization_name = org.name
             agreements[org.id] = resource

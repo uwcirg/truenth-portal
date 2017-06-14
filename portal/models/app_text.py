@@ -191,10 +191,13 @@ class PrivacyATMA(AppTextModelAdapter):
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
-    def __init__(self, url):
+    def __init__(self, url, asset=None):
         """Initialize based on requested URL
 
         Attempts to fetch asset and mock a versioned URL
+
+        :param url: the URL to pull details and asset from
+        :param asset: if given, use as asset, otherwise, download
 
         :attribute asset: will contain the html asset downloaed, found in the
             cache, or the error message if that fails.
@@ -204,19 +207,22 @@ class UnversionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
-        try:
-            response = requests.get(url)
-            self._asset = response.text
-        except MissingSchema:
-            if current_app.config.get('TESTING'):
-                self._asset = '[TESTING - fake response]'
-            else:
+        if asset:
+            self._asset = asset
+        else:
+            try:
+                response = requests.get(url)
+                self._asset = response.text
+            except MissingSchema:
+                if current_app.config.get('TESTING'):
+                    self._asset = '[TESTING - fake response]'
+                else:
+                    self.error_msg = (
+                        "Could not retrieve remote content - Invalid URL")
+            except:
                 self.error_msg = (
-                    "Could not retrieve remote content - Invalid URL")
-        except:
-            self.error_msg = (
-                "Could not retrieve remove content - Server could not be "
-                "reached")
+                    "Could not retrieve remove content - Server could not be "
+                    "reached")
 
         if self.error_msg:
             current_app.logger.error(self.error_msg + ": {}".format(url))
