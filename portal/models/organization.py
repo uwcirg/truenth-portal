@@ -11,7 +11,7 @@ from werkzeug.exceptions import Unauthorized
 
 import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
-from .app_text import VersionedResource
+from .app_text import VersionedResource, UnversionedResource
 from ..database import db
 from ..date_tools import FHIR_datetime
 from .extension import CCExtension
@@ -293,10 +293,14 @@ class Organization(db.Model):
             # include only those with such defined
             try:
                 url = app_text(ConsentByOrg_ATMA.name_key(organization=org))
+                resource = VersionedResource(url)
             except UndefinedAppText:
-                # no consent found for this organization, continue
-                continue
-            resource = VersionedResource(url)
+                # no consent found for this organization, provide
+                # the dummy template
+                url = url_for('portal.stock_consent', org_name=org.name,
+                              _external=True)
+                resource = UnversionedResource(url)
+
             resource.organization_name = org.name
             agreements[org.id] = resource
         return agreements

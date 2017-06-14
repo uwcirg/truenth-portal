@@ -189,6 +189,46 @@ class PrivacyATMA(AppTextModelAdapter):
         return "Privacy URL"
 
 
+class UnversionedResource(object):
+    "Like VersionedResource for non versioned URLs (typically local)"
+    def __init__(self, url):
+        """Initialize based on requested URL
+
+        Attempts to fetch asset and mock a versioned URL
+
+        :attribute asset: will contain the html asset downloaed, found in the
+            cache, or the error message if that fails.
+        :attribute editor_url: always None
+        :attribute url: the original url.
+
+        """
+        self._asset, self.error_msg, self.editor_url = None, None, None
+        self.url = url
+        try:
+            response = requests.get(url)
+            self._asset = response.text
+        except MissingSchema:
+            if current_app.config.get('TESTING'):
+                self._asset = '[TESTING - fake response]'
+            else:
+                self.error_msg = (
+                    "Could not retrieve remote content - Invalid URL")
+        except:
+            self.error_msg = (
+                "Could not retrieve remove content - Server could not be "
+                "reached")
+
+        if self.error_msg:
+            current_app.logger.error(self.error_msg + ": {}".format(url))
+
+    @property
+    def asset(self):
+        """Return asset if available else error message"""
+        if self._asset:
+            return self._asset
+        return self.error_msg
+
+
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
