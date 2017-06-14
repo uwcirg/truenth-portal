@@ -20,6 +20,7 @@ from .reference import Reference
 from .role import Role, ROLE
 from .telecom import ContactPoint, Telecom
 
+
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
 ETHNICITY_CODINGS_MASK = 0b0100
@@ -286,6 +287,7 @@ class Organization(db.Model):
           is also added to the versioned resource to simplify UI code.
 
         """
+        from ..views.portal import stock_consent  # local avoids cycle
         agreements = {}
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
@@ -299,7 +301,8 @@ class Organization(db.Model):
                 # the dummy template
                 url = url_for('portal.stock_consent', org_name=org.name,
                               _external=True)
-                resource = UnversionedResource(url)
+                asset = stock_consent(org_name=org.name)
+                resource = UnversionedResource(url=url, asset=asset)
 
             resource.organization_name = org.name
             agreements[org.id] = resource
