@@ -119,7 +119,7 @@
                       <td>{{ patient.phone if patient.phone}}</td>
                       <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip text-center">{{ patient.staff_html() | safe }}{% for doc in patient.documents.filter_by(document_type='PatientReport') | sort(attribute='id') %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{{ doc.filename }}</a></div>{% endfor %}</td>
+                        <td class="rowlink-skip text-center">{{ patient.staff_html() | safe }}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}</td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} Withdrawn {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
