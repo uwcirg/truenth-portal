@@ -19,7 +19,6 @@ from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
 from .telecom import ContactPoint, Telecom
-from ..views.portal import stock_consent
 
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
@@ -288,6 +287,7 @@ class Organization(db.Model):
           is also added to the versioned resource to simplify UI code.
 
         """
+        from ..views.portal import stock_consent  # local avoids cycle
         agreements = {}
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
