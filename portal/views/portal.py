@@ -16,8 +16,9 @@ from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
 from ..extensions import oauth, user_manager
-from ..models.app_text import app_text, AboutATMA, VersionedResource
-from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA, WebsiteConsentByOrg_ATMA
+from ..models.app_text import app_text, AppText, VersionedResource
+from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
+from ..models.app_text import Terms_ATMA, WebsiteConsentByOrg_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -554,6 +555,7 @@ def admin():
         u.rolelist = ', '.join([r.name for r in u.roles])
     return render_template('admin.html', users=users, wide_container="true", user=current_user())
 
+
 @portal.route('/staff-profile-create')
 @roles_required(ROLE.STAFF_ADMIN)
 @oauth.require_oauth()
@@ -817,22 +819,45 @@ class SettingsForm(FlaskForm):
                            validators=[validators.Required()])
 
 
-@portal.route('/settings', methods=['GET','POST'])
+@portal.route('/settings', methods=['GET', 'POST'])
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def settings():
     """settings panel for admins"""
+    # load all top level orgs and consent agreements
+    organization_consents = Organization.consent_agreements()
+
+    # load all app text values - expand when possible
+    apptext = {}
+    for a in AppText.query.all():
+        try:
+            # expand strings with just config values, such as LR
+            apptext[a.name] = app_text(a.name)
+        except ValueError:
+            # lack context to expand, show with format strings
+            apptext[a.name] = a.custom_text
+
     form = SettingsForm(
         request.form, timeout=request.cookies.get('SS_TIMEOUT', 600))
     if not form.validate_on_submit():
-        return render_template('settings.html', form=form)
+
+        return render_template(
+            'settings.html',
+            form=form,
+            apptext=apptext,
+            organization_consents=organization_consents,
+            wide_container="true")
 
     # make max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5
-    response = make_response(render_template('settings.html', form=form))
+    response = make_response(render_template(
+        'settings.html',
+        form=form,
+        apptext=apptext,
+        organization_consents=organization_consents,
+        wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
-
 
 
 @portal.route('/spec')
