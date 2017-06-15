@@ -66,6 +66,7 @@ class BaseConfig(object):
     PROJECT = "portal"
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
+    SHOW_PUBLIC_TERMS = True
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = best_sql_url()

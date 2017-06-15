@@ -733,7 +733,7 @@ def terms_and_conditions():
             role, organization = None, None
 
         terms = VersionedResource(app_text(Terms_ATMA.name_key(
-            role=role, organzation=organization)))
+            role=role, organization=organization)))
     else:
         terms = VersionedResource(app_text(Terms_ATMA.name_key()))
 
