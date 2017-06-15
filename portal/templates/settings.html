@@ -2,11 +2,11 @@
 {% block main %}
 {% from "flask_user/_macros.html" import render_field %}
 
-    <h3 class="tnth-headline">TrueNTH Settings</h3><br />
+    <h3 class="tnth-headline">{{ _("System Settings and Status") }}</h3>
 
-    <p>Most settings are controlled via configuration files on the server
-    and don't yet have embedded controls for making changes.  Exceptions
-    are listed below.</p>
+    <p>{{ _("Most settings are controlled via configuration files on
+    the server and listed further below.  Browser based values can be set
+    in the immedate form.") }}</p>
 
     <form action="/settings" method="post">
         {{ form.hidden_tag() }}
@@ -15,5 +15,78 @@
 
         <button type="submit" class="btn btn-tnth-primary">Save Settings</button>
     </form>
+
+
+    <h2 class="tnth-headline">{{ _("Top Level Organizations") }}</h2>
+    <div class="admin-table table-responsive smaller-text">
+        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <table id="adminTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th>{{ _("ID") }}</th>
+                <th>{{ _("Name") }}</th>
+                <th>{{ _("Consent URL") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for org_id, resource in organization_consents.items() %}
+                <td>{{ org_id }}</td>
+                <td>{{ resource.organization_name }}</td>
+                <td><a href={{ resource.url }}>{{ resource.url }}></a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="tnth-headline">{{ _("Application Text Values") }}</h2>
+    <div class="admin-table table-responsive smaller-text">
+        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <table id="adminTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th>{{ _("Name") }}</th>
+                <th>{{ _("Value") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for k,v in apptext.items() %}
+                <td>{{ k }}</td>
+                {% if v.startswith('http') %}
+                <td><a href={{ v }}>{{ v }}</a></td>
+                {% else %}
+                <td>{{ v }}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="tnth-headline">{{ _("Config Values") }}</h2>
+    <div class="admin-table table-responsive smaller-text">
+        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <table id="adminTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th>{{ _("Variable") }}</th>
+                <th>{{ _("Value") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            {% for k,v in config.items() %}
+                <td>{{ k }}</td>
+                <td>{{ v }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
 {% endblock %}
