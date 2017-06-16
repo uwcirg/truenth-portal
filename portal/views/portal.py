@@ -463,9 +463,17 @@ def initial_queries():
     if 'subject_website_consent' in still_needed or \
         ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
         org = user.first_top_organization()
+        role = None
+        if not current_app.config.get('GIL'):
+            for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+                if user.has_role(r):
+                    # treat staff_admins as staff for this lookup
+                    r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+                    role = r
         if org:
             terms = VersionedResource(app_text(
-                WebsiteConsentByOrg_ATMA.name_key(organization=org)))
+                WebsiteConsentByOrg_ATMA.name_key(organization=org,
+                                                  role=role)))
         else:
             terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
     else:

@@ -106,14 +106,20 @@ class WebsiteConsentByOrg_ATMA(AppTextModelAdapter):
         """Generate AppText name key for a consent agreement
 
         :param organization: for which the consent agreement applies
+        :param role: for specific role selections, but only if
+          it makes sense.  (i.e. on ePROMs, staff see different content)
+
         :returns: string for AppText.name field
 
         """
         organization = kwargs.get('organization')
         if not organization:
             raise ValueError("required organization parameter not defined")
+        role = kwargs.get('role')
+        if role:
+            return "{} {} website consent URL".format(
+                organization.name, role)
         return "{} organization website consent URL".format(organization.name)
-
 
 class InitialConsent_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
@@ -131,7 +137,7 @@ class InitialConsent_ATMA(AppTextModelAdapter):
         return "Initial Consent Terms URL"
 
 class Terms_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for New Terms Of Use agreements - namely the URL"""
+    """AppTextModelAdapter for New Terms Of Use agreements, used for /terms"""
 
     @staticmethod
     def name_key(**kwargs):
