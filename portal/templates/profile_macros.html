@@ -1637,7 +1637,7 @@
 
         $(document).delegate("#meSubmit", "click", function(event){
             var method = "";
-            $("input[name='entryMethod'").each(function() {
+            $("input[name='entryMethod']").each(function() {
                 if ($(this).is(":checked")) {
                     method = $(this).val();
                 };
