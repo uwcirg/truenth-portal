@@ -144,17 +144,17 @@ def smartling_download(language=None):
 
 
 def download_po_file(language, headers, project_id, file_uri):
-    if not re.match(r'[a-z]{2}_[A-Z]{2}',language):
+    if not re.match(r'[a-z]{2}_[A-Z]{2}', language):
         sys.exit('invalid language code; expected format xx_XX')
-    language_id = re.sub('_','-',language)
+    language_id = re.sub('_', '-', language)
     url = 'https://api.smartling.com/files-api/v2/projects/' \
           '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
                                                  file_uri)
     resp = requests.get(url, headers=headers)
     if not resp.content:
         sys.exit('no file returned')
-    current_app.logger.debug("{} po file downloaded " \
-                            "from smartling".format(language))
+    current_app.logger.debug("{} po file downloaded "
+                             "from smartling".format(language))
     return resp.content
 
 
@@ -173,7 +173,7 @@ def download_zip_file(headers, project_id, file_uri):
 def extract_po_file(language, data):
     po_path = os.path.join(current_app.root_path, "translations", language,
                            'LC_MESSAGES', 'temp_messages.po')
-    with open(po_path,"wb") as fout:
+    with open(po_path, "wb") as fout:
         fout.write(data)
     current_app.logger.debug("{} po file extracted".format(language))
     merge_po_into_master(po_path, language)
