@@ -642,6 +642,26 @@ h4.detail-title {
 #adminTable div.card-view {
   display: flex;
 }
+#adminTable td.reports-field {
+  width: 150px;
+  max-width: 100%;
+}
+#adminTable td.reports-field div {
+  display: inline-block;
+  margin: 0.3em auto;
+}
+#adminTable td.reports-field a {
+  width: 4em;
+  max-width: 100%;
+  padding: 0.7em;
+  color: #fff;
+  background-color: #7C959E;
+  border-color: #7C959E;
+  transition: all 0.3s ease-in-out 0s;
+  -webkit-transition: all 0.3s ease-in-out 0s;
+  border-radius: 0;
+  letter-spacing: 2px;
+}
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
