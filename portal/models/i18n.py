@@ -1,11 +1,13 @@
 """Module for i18n methods and functionality"""
-import sys
 import os
 import re
 import requests
+import sys
+
 from collections import defaultdict
 from cStringIO import StringIO
 from flask import current_app
+from polib import pofile
 from subprocess import check_call
 from zipfile import ZipFile
 
@@ -19,12 +21,15 @@ def get_db_strings():
     elements = defaultdict(set)
     for entry in AppText.query:
         if entry.custom_text:
-            elements['"{}"'.format(entry.custom_text)].add("apptext: " + entry.name)
+            ct = re.sub('"', r'\\"', entry.custom_text)
+            elements['"{}"'.format(ct)].add("apptext: " + entry.name)
     for entry in Intervention.query:
         if entry.description:
-            elements['"{}"'.format(entry.description)].add("interventions: " + entry.name)
+            desc = re.sub('"', r'\\"', entry.description)
+            elements['"{}"'.format(desc)].add("interventions: " + entry.name)
         if entry.card_html:
-            elements['"{}"'.format(entry.card_html)].add("interventions: " + entry.name)
+            ch = re.sub('"', r'\\"', entry.card_html)
+            elements['"{}"'.format(ch)].add("interventions: " + entry.name)
     return elements
 
 
@@ -86,7 +91,7 @@ def smartling_upload():
     config_fpath = os.path.join(current_app.root_path, "../instance/babel.cfg")
     # create new .pot file from code
     check_call(['pybabel', 'extract', '-F', config_fpath, '-o', pot_fpath,
-                current_app.root_path])
+                current_app.root_path, '--no-wrap'])
     current_app.logger.debug("messages.pot file generated")
     # update .pot file with db values
     upsert_to_template_file()
@@ -117,29 +122,31 @@ def smartling_download(language=None):
     current_app.logger.debug("authenticated in smartling")
     # GET file(s) from smartling
     headers = {'Authorization': 'Bearer {}'.format(auth)}
+    project_id = current_app.config.get("SMARTLING_PROJECT_ID")
+    file_uri = 'portal/translations/messages.pot'
     if language:
         if not re.match(r'[a-z]{2}_[A-Z]{2}',language):
             sys.exit('invalid language code; expected format xx_XX')
         language_id = re.sub('_','-',language)
         url = 'https://api.smartling.com/files-api/v2/projects/' \
-            '{}/locales/{}/file?fileUri={}'.format(
-                current_app.config.get("SMARTLING_PROJECT_ID"), language_id,
-                'portal/translations/messages.pot')
+              '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
+                                                     file_uri)
         resp = requests.get(url, headers=headers)
         if not resp.content:
             sys.exit('no file returned')
         current_app.logger.debug("{} po file downloaded " \
                                 "from smartling".format(language))
         po_path = os.path.join(translation_fpath, language,
-                                'LC_MESSAGES', 'messages.po')
+                               'LC_MESSAGES', 'temp_messages.po')
         with open(po_path,"wb") as fout:
             fout.write(resp.content)
         current_app.logger.debug("{} po file saved".format(language))
+        merge_po_into_master(po_path, language)
+        os.remove(po_path)
     else:
         url = 'https://api.smartling.com/files-api/v2/projects/' \
-            '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
-            'published'.format(current_app.config.get("SMARTLING_PROJECT_ID"),
-                'portal/translations/messages.pot')
+              '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
+              'published'.format(project_id, file_uri)
         resp = requests.get(url, headers=headers)
         if not resp.content:
             sys.exit('no file returned')
@@ -149,16 +156,32 @@ def smartling_download(language=None):
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
             po_path = os.path.join(translation_fpath, langcode,
-                                'LC_MESSAGES', 'messages.po')
+                                   'LC_MESSAGES', 'temp_messages.po')
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
             with open(po_path,"wb") as fout:
                 fout.write(data)
-            current_app.logger.debug("{} po file saved".format(langcode))
-    # compile .mo file(s) from .po file(s)
-    check_call(['pybabel','compile','-f','-d',translation_fpath])
-    current_app.logger.debug("babel mo files compiled and updated")
+            current_app.logger.debug("{} po file extracted".format(langcode))
+            merge_po_into_master(po_path, langcode)
+            os.remove(po_path)
+    current_app.logger.debug("po files updated, and mo files recompiled")
+
+
+def merge_po_into_master(po_path, langcode):
+    master_path = os.path.join(current_app.root_path, "translations",
+                               langcode, 'LC_MESSAGES')
+    master_po = pofile(os.path.join(master_path, 'messages.po'))
+    incoming_po = pofile(po_path)
+
+    for entry in incoming_po:
+        if master_po.find(entry.msgid):
+            master_po.find(entry.msgid).msgstr = entry.msgstr
+        else:
+            master_po.append(entry)
+
+    master_po.save(os.path.join(master_path, 'messages.po'))
+    master_po.save_as_mofile(os.path.join(master_path, 'messages.mo'))
 
 
 @babel.localeselector

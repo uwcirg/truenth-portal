@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-18 11:12-0700\n"
+"POT-Creation-Date: 2017-06-19 12:18-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,72 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:235
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:251
+msgid "Hi {}"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:236
+msgid "Please complete your {} registry study questionnaire by {}."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:252
+msgid "Please complete your {} registry study questionnaire at your convenience."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:266
+msgid "Thank you, {}."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:267
+msgid "You've completed the {} Registry Study questionnaire."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:269
+msgid "You will be notified when the next questionnaire is ready to complete."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:285
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:313
+msgid "Completed Questionnaires"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:286
+msgid "When you are done, completed questionnaires will be shown here."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:314
+msgid "View questionnaire completed on {}"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:340
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:368
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:391
+msgid "Open Questionnaire"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:360
+msgid "Continue questionnaire"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:362
+msgid "Go to questionnaire"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:389
+msgid "View previous questionnaire"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:392
+msgid "No questionnaire is due."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/models/intervention_strategies.py:422
+msgid ""
+"The assessment is no longer available.\n"
+"A research staff member will contact you for assistance."
+msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/404.html:32
 msgid "Page Not Found."
@@ -59,24 +125,22 @@ msgid "Internal Server Error"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/500.html:34
-msgid ""
-"Your request is not processed due to server error(s). If you are still "
-"experiencing problem.  Please use the link below."
+msgid "Your request is not processed due to server error(s). If you are still experiencing problem.  Please use the link below."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/about.html:5
-#: /home/adam/truenth_ss/portal/templates/contact.html:5
+#: /home/adam/truenth_ss/portal/templates/about.html:4
+#: /home/adam/truenth_ss/portal/templates/contact.html:4
 #: /home/adam/truenth_ss/portal/templates/explore.html:48
 #: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:68
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:7
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:30
-#: /home/adam/truenth_ss/portal/templates/privacy.html:5
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:32
+#: /home/adam/truenth_ss/portal/templates/privacy.html:4
 #: /home/adam/truenth_ss/portal/templates/profile.html:18
-#: /home/adam/truenth_ss/portal/templates/terms.html:6
+#: /home/adam/truenth_ss/portal/templates/terms.html:4
 msgid "Home"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/about.html:7
+#: /home/adam/truenth_ss/portal/templates/about.html:6
 #: /home/adam/truenth_ss/portal/templates/portal_wrapper.html:82
 #: /home/adam/truenth_ss/portal/templates/portal_wrapper.html:125
 msgid "About TrueNTH"
@@ -95,6 +159,7 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/admin.html:26
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:96
+#: /home/adam/truenth_ss/portal/templates/settings.html:28
 #: /home/adam/truenth_ss/portal/templates/staff_by_org.html:33
 msgid "ID"
 msgstr ""
@@ -106,7 +171,7 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/admin.html:28
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:32
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:50
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:196
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:98
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:99
 #: /home/adam/truenth_ss/portal/templates/staff_by_org.html:34
@@ -115,7 +180,7 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/admin.html:29
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:40
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:57
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:203
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:99
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:105
 #: /home/adam/truenth_ss/portal/templates/staff_by_org.html:35
@@ -123,11 +188,11 @@ msgid "Last Name"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/admin.html:30
-#: /home/adam/truenth_ss/portal/templates/contact.html:21
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:32
+#: /home/adam/truenth_ss/portal/templates/contact.html:20
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:17
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:100
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1628
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1765
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1706
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1844
 #: /home/adam/truenth_ss/portal/templates/staff_by_org.html:36
 msgid "Email"
 msgstr ""
@@ -149,33 +214,33 @@ msgid "Identity Verification"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:18
-msgid ""
-"To ensure your personal details are not shared with others, please enter "
-"the following data for account confirmation."
+msgid "To ensure your personal details are not shared with others, please enter the following data for account confirmation."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:27
-#: /home/adam/truenth_ss/portal/templates/contact.html:14
+#: /home/adam/truenth_ss/portal/templates/contact.html:13
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:95
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1625
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1762
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1703
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1841
+#: /home/adam/truenth_ss/portal/templates/settings.html:29
+#: /home/adam/truenth_ss/portal/templates/settings.html:52
 msgid "Name"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:32
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:50
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:196
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:99
 msgid "First name is required"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:40
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:57
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:203
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:105
 msgid "Last name is required"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:46
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:95
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:241
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:14
 msgid "Birth Date"
 msgstr ""
@@ -186,106 +251,106 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:61
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:63
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:102
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:248
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:21
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1458
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1977
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1466
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2057
 msgid "Month"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:64
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:103
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:249
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:22
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1459
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1978
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1467
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2058
 msgid "January"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:65
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:104
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:250
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:23
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1460
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1979
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1468
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2059
 msgid "February"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:66
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:105
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:251
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:24
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1461
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1980
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1469
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2060
 msgid "March"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:67
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:106
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:252
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:25
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1462
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1981
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1470
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2061
 msgid "April"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:68
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:107
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:253
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:26
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1463
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1982
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1471
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2062
 msgid "May"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:69
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:108
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:254
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:27
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1464
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1983
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1472
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2063
 msgid "June"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:70
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:109
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:255
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:28
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1465
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1984
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1473
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2064
 msgid "July"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:71
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:110
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:256
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:29
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1466
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1985
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1474
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2065
 msgid "August"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:72
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:111
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:257
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:30
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1467
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1986
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1475
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2066
 msgid "September"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:73
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:112
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:258
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:31
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1468
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1987
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1476
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2067
 msgid "October"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:74
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:113
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:259
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:32
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1469
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1988
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1477
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2068
 msgid "November"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/challenge_identity.html:75
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:114
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:260
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:33
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1470
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1989
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1478
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2069
 msgid "December"
 msgstr ""
 
@@ -310,10 +375,7 @@ msgid "Obtain OAuth 2.0 Credentials from TrueNTH"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/client_add.html:9
-msgid ""
-"To add an application to TrueNTH, one must first register the application"
-" origin or URL.  Multiple origins may be entered, separated by white "
-"space."
+msgid "To add an application to TrueNTH, one must first register the application origin or URL.  Multiple origins may be entered, separated by white space."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/client_add.html:18
@@ -382,54 +444,54 @@ msgstr ""
 msgid "You have not created an client applications."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:7
+#: /home/adam/truenth_ss/portal/templates/contact.html:6
 #: /home/adam/truenth_ss/portal/templates/contact_sent.html:5
 msgid "Contact TrueNTH"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:8
+#: /home/adam/truenth_ss/portal/templates/contact.html:7
 msgid "You can use form below or write the TrueNTH team directly at"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:16
+#: /home/adam/truenth_ss/portal/templates/contact.html:15
 msgid "Please enter your name"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:17
+#: /home/adam/truenth_ss/portal/templates/contact.html:16
 msgid "Your Name"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:23
+#: /home/adam/truenth_ss/portal/templates/contact.html:22
 msgid "Your Email"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:24
+#: /home/adam/truenth_ss/portal/templates/contact.html:23
 msgid "This is not a valid e-mail address, please double-check."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:29
+#: /home/adam/truenth_ss/portal/templates/contact.html:28
 #: /home/adam/truenth_ss/portal/templates/invite.html:12
 #: /home/adam/truenth_ss/portal/templates/invite_sent.html:18
 msgid "Subject"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:30
+#: /home/adam/truenth_ss/portal/templates/contact.html:29
 msgid "What is this about?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:33
+#: /home/adam/truenth_ss/portal/templates/contact.html:32
 msgid "Text"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:34
+#: /home/adam/truenth_ss/portal/templates/contact.html:33
 msgid "Please add a message for TrueNTH"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:34
+#: /home/adam/truenth_ss/portal/templates/contact.html:33
 msgid "What is on your mind?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/contact.html:38
+#: /home/adam/truenth_ss/portal/templates/contact.html:37
 msgid "Send"
 msgstr ""
 
@@ -452,9 +514,7 @@ msgid "More About You"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:8
-msgid ""
-"The TrueNTH system asks these questions in order to give you information "
-"that best fits"
+msgid "The TrueNTH system asks these questions in order to give you information that best fits"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:8
@@ -464,57 +524,57 @@ msgid ""
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:16
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:211
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1652
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1789
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:210
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1730
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1868
 msgid "Ethnicity"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:21
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:215
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:214
 msgid "Hispanic or Latino"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:26
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:220
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:219
 msgid "Not Hispanic or Latino"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:35
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:171
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1653
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1790
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:170
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1731
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1869
 msgid "Race"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:40
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:175
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:174
 msgid "American Indian or Alaska Native"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:45
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:180
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:179
 msgid "Asian"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:50
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:185
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:184
 msgid "Black or African American"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:55
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:190
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:189
 msgid "Native Hawaiian or Other Pacific Islander"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:60
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:195
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:194
 msgid "White"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/coredata.html:65
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:126
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:200
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:199
 msgid "Other"
 msgstr ""
 
@@ -522,7 +582,7 @@ msgstr ""
 msgid "Skip This"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/coredata.html:85
+#: /home/adam/truenth_ss/portal/templates/coredata.html:84
 msgid "Continue"
 msgstr ""
 
@@ -537,15 +597,11 @@ msgid "Explore How TrueNTH Works"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:20
-msgid ""
-"A program aimed at improving the lives of men diagnosed and living with "
-"prostate cancer, and their partners, loved ones, and caregivers."
+msgid "A program aimed at improving the lives of men diagnosed and living with prostate cancer, and their partners, loved ones, and caregivers."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:21
-msgid ""
-"Coming soon … discover tools designed to help those affected by prostate "
-"cancer."
+msgid "Coming soon … discover tools designed to help those affected by prostate cancer."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:29
@@ -557,176 +613,309 @@ msgid "or"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/explore.html:31
-#: /home/adam/truenth_ss/portal/templates/gil/contact.html:14
-#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:14
+#: /home/adam/truenth_ss/portal/templates/gil/contact.html:16
+#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:16
 msgid "Log In"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:21
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:19
 msgid "Tell us a little about yourself."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:35
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:31
 msgid "Now it's time to build your prostate cancer profile."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:46
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:40
 msgid "Your clinic of care."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:61
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:54
 msgid "Thank you."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:62
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:55
 msgid "Click continue to start using TrueNTH"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:65
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:58
 #: /home/adam/truenth_ss/portal/templates/shortcut_alias.html:13
 msgid "Next"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:66
+#: /home/adam/truenth_ss/portal/templates/initial_queries.html:59
+#: /home/adam/truenth_ss/portal/templates/website_consent_script.html:13
 msgid "Continue to TrueNTH"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
-#: /home/adam/truenth_ss/portal/templates/gil/macros.html:8
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:81
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:31
-msgid "About"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
-#: /home/adam/truenth_ss/portal/templates/gil/macros.html:18
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:81
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:41
-msgid "Contact"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
-#: /home/adam/truenth_ss/portal/templates/gil/macros.html:17
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:81
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:40
-msgid "Privacy"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:113
-#: /home/adam/truenth_ss/portal/templates/initial_queries.html:87
-msgid "Movember"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:3
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:4
 msgid "Terms of Use"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:6
-msgid ""
-"Thanks for signing up for TrueNTH. First, please review the terms of use "
-"to access the TrueNTH tools"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:7
+msgid "Thanks for signing up for TrueNTH. First, please review the terms of use to access the TrueNTH tools"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:14
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:13
 msgid "View TrueNTH Terms"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:18
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:19
+msgid "I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:20
+msgid "You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:24
 msgid "I consent and agree to the above terms."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:29
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:25
+#, python-format
+msgid ""
+"\n"
+"                    <span class=\"custom-tou-text\">I have read the website <a href=\"%(privacy_url)s\" target=\"_blank\" class=\"required-link\" data-core-data-subtype=\"privacy_policy\" data-tou-type=\"privacy policy\">privacy policy</a> and <a href=\"%(terms_url)s\" target=\"_blank\" class=\"required-link\">terms</a></span>\n"
+"                    "
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:31
+msgid "I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:43
 msgid "To Continue"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:33
-msgid ""
-"You must agree to the terms and conditions by checking the provided "
-"checkbox."
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:47
+msgid "You must agree to the terms and conditions by checking the provided checkbox."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:37
-#: /home/adam/truenth_ss/portal/templates/profile.html:56
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:51
+#: /home/adam/truenth_ss/portal/templates/profile.html:58
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1607
 msgid "OK"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:77
-msgid "I'm a man who is concerned about prostate cancer for myself"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:69
+msgid "Website Consent Script - Enter Manually - Paper Form"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:82
-msgid ""
-"I'm a caregiver, spouse or partner who wants to learn more about prostate"
-" cancer"
-msgstr ""
-
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:70
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:95
-msgid "(optional)"
+msgid "For Staff Use Only"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:130
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1248
-msgid "Have you had a prostate cancer biopsy?"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:77
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:112
+msgid "Do you have any questions?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:134
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:182
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:204
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:740
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1206
-msgid "Yes"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:78
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:113
+msgid "Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:80
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:115
+msgid "If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:81
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:103
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:116
+msgid "If no, thank them for their time."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:88
+msgid "The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:94
+msgid "Website Consent Script - Enter Manually - Interview Assisted"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:99
+msgid "We are inviting you to use the TrueNTH website tool because you have agreed to participate in the IRONMAN Registry study."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:100
+msgid "The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:102
+msgid "If yes, continue to read below text and Consent."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:105
+msgid "Read consent [exactly as written]"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:123
+msgid "Please print and fill out the form"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:127
+msgid "Website declaration form"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:129
+msgid "Person Obtaining Consent must complete a form with the following text. This form must be entered into a central database and be retrievable in case there are any questions raised about the consent given at any time."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:131
+msgid "Please tick the relevant box and complete the declaration below."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:132
+msgid "For phone consent:"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:133
+msgid "I have read this consent form to the subject."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:135
+msgid "For face-to-face consent:"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:136
+msgid "I have gone through and explained the consent form in the presence of the subject."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:138
-msgid "Biopsy Date"
+msgid "Declaration:"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:144
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:209
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:745
-msgid "No"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:139
+msgid "An explanation of the TrueNTH website tool was given and questions from the subject were solicited and answered to the subject’s satisfaction. In my judgment, the subject demonstrated comprehension of the information. The subject has provided oral consent to participate in the IRONMAN Registry Study on the terms set out above."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:149
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:170
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:192
-msgid "I don't know"
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:142
+msgid "Name and Title"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:146
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2050
+msgid "Date"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:150
+msgid "Signature of Person Obtaining Consent"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:156
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1249
+msgid "Print"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:157
+msgid "CLOSE"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:167
+msgid "I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool "
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:169
+msgid "Subject has given consent previously."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:175
+msgid "I have created an electronic copy of this declaration and have stored said copy."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:177
+msgid "You had previously signed and stored an electronic copy of consent declaration."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:223
+msgid "I'm a man who is concerned about prostate cancer for myself"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:228
+msgid "I'm a caregiver, spouse or partner who wants to learn more about prostate cancer"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:241
+msgid "(optional)"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:244
+msgid "The birth day field is required and must be valid format"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:247
+msgid "A birth month must be selected"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:264
+msgid "The birth year is required and must be in valid format"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:276
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1256
+msgid "Have you had a prostate cancer biopsy?"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:280
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:328
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:350
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:741
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1214
+msgid "Yes"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:284
+msgid "Biopsy Date"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:290
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:355
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:746
+msgid "No"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:295
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:316
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:338
+msgid "I don't know"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:302
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1257
 msgid "Have you been diagnosed with prostate cancer?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:160
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:306
 msgid "Yes (my biopsy was positive)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:165
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:311
 msgid "No (my biopsy was negative)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:178
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1202
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1250
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:324
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1210
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1258
 msgid "Is the prostate cancer only within the prostate?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:187
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1211
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:333
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1219
 msgid "No (the cancer is in other parts of my body, too)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:200
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:346
 msgid "Have you begun prostate cancer treatment?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:265
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:540
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:411
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:536
 msgid "What is your main clinic for prostate cancer care?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:269
+#: /home/adam/truenth_ss/portal/templates/initial_queries_macros.html:415
 msgid "I'm not receiving care at any of the above clinics"
 msgstr ""
 
@@ -788,22 +977,18 @@ msgid "Log in"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/landing.html:40
-msgid ""
-"You have been logged out due to inactivity. Please log in again to "
-"continue."
+msgid "You have been logged out due to inactivity. Please log in again to continue."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:104
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:90
 #: /home/adam/truenth_ss/portal/templates/layout.html:77
 #: /home/adam/truenth_ss/portal/templates/layout.html:89
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:52
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:753
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:754
 msgid "Close"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/layout.html:78
-#: /home/adam/truenth_ss/portal/templates/privacy.html:6
-#: /home/adam/truenth_ss/portal/templates/terms.html:8
 msgid "TrueNTH"
 msgstr ""
 
@@ -813,10 +998,10 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/patient_profile_create.html:25
 #: /home/adam/truenth_ss/portal/templates/patient_profile_create.html:26
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:229
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:230
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:231
-#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:30
-#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:31
+#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:26
+#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:27
 msgid "Email Address"
 msgstr ""
 
@@ -826,7 +1011,7 @@ msgid "Study ID"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/patient_profile_create.html:41
-#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:39
+#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:35
 msgid "Clinics"
 msgstr ""
 
@@ -864,16 +1049,16 @@ msgid "Export"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:101
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:488
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1629
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1766
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:484
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1707
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1845
 msgid "Cell"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/patients_by_org.html:102
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:495
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1630
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1767
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:491
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1708
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1846
 msgid "Phone (Other)"
 msgstr ""
 
@@ -899,63 +1084,82 @@ msgstr ""
 msgid "Tools for navigating the prostate cancer journey"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/portal.html:56
+#: /home/adam/truenth_ss/portal/templates/gil/portal.html:58
 #: /home/adam/truenth_ss/portal/templates/portal.html:49
 msgid "Complete Registration"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/portal.html:57
+#: /home/adam/truenth_ss/portal/templates/gil/portal.html:59
 #: /home/adam/truenth_ss/portal/templates/portal.html:51
-msgid ""
-"Completing your registration will allow you to return here in the future "
-"to see the information you've previously entered."
+msgid "Completing your registration will allow you to return here in the future to see the information you've previously entered."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/portal.html:59
+#: /home/adam/truenth_ss/portal/templates/gil/portal.html:61
 #: /home/adam/truenth_ss/portal/templates/portal.html:53
 msgid "Registration"
 msgstr ""
 
+#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
+#: /home/adam/truenth_ss/portal/templates/gil/macros.html:8
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:33
+msgid "About"
+msgstr ""
+
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:9
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:32
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:34
+# interventions: decision_support_unavailable
+# interventions: decision_support_p3p
 msgid "Decision Support"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:10
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:33
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:35
+# interventions: self_management
 msgid "Symptom Tracker"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:13
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:36
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:38
 msgid "Prostate Cancer Facts"
 msgstr ""
 
+#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:16
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:39
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:41
 msgid "Terms"
 msgstr ""
 
+#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
+#: /home/adam/truenth_ss/portal/templates/gil/macros.html:17
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:42
+#: /home/adam/truenth_ss/portal/templates/privacy.html:5
+msgid "Privacy"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:109
+#: /home/adam/truenth_ss/portal/templates/gil/macros.html:18
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:43
+msgid "Contact"
+msgstr ""
+
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:21
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:44
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:46
 msgid "Contact Us"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:22
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:45
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:47
 msgid "Facebook"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:23
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:46
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:48
 msgid "Twitter"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/gil/macros.html:27
-#: /home/adam/truenth_ss/portal/templates/portal_footer.html:50
-msgid ""
-"2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-"
-"profit organization."
+#: /home/adam/truenth_ss/portal/templates/portal_footer.html:52
+msgid "2017 Movember Foundation.  All rights reserved. A registered 501(c)3 non-profit organization."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:70
@@ -1040,28 +1244,25 @@ msgstr ""
 msgid "TrueNTH Profile"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile.html:41
+#: /home/adam/truenth_ss/portal/templates/profile.html:42
 msgid "index list"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile.html:42
-#: /home/adam/truenth_ss/portal/templates/profile.html:48
+#: /home/adam/truenth_ss/portal/templates/profile.html:44
+#: /home/adam/truenth_ss/portal/templates/profile.html:50
 msgid "Log in as this patient"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile.html:52
-msgid ""
-"This is intended for \"kiosk\" style administration of an assessment, "
-"wherein the staff person \"logs in as the patient\", which logs the staff"
-" person out of their session, and automatically logs in this patient "
-"without their needing to enter login credentials. Proceed?"
+#: /home/adam/truenth_ss/portal/templates/profile.html:54
+msgid "This is intended for \"kiosk\" style administration of an assessment, wherein the staff person \"logs in as the patient\", which logs the staff person out of their session, and automatically logs in this patient without their needing to enter login credentials. Proceed?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile.html:57
+#: /home/adam/truenth_ss/portal/templates/profile.html:59
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1608
 msgid "Cancel"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile.html:64
+#: /home/adam/truenth_ss/portal/templates/profile.html:67
 msgid "Index List"
 msgstr ""
 
@@ -1072,8 +1273,8 @@ msgid "Birth date must be valid and in the required format."
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:74
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1719
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1904
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1798
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1984
 msgid "Language"
 msgstr ""
 
@@ -1091,8 +1292,8 @@ msgid "Australian English"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:114
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1651
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1788
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1729
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1867
 msgid "Gender"
 msgstr ""
 
@@ -1104,449 +1305,467 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:145
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:144
 msgid "Indigenous Status"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:262
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:409
+msgid "Registration status:"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:263
 #: /home/adam/truenth_ss/portal/templates/profile_macros.html:410
-msgid "Registration status:"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:264
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:411
 msgid "not yet registered"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:266
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:413
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:265
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:412
 msgid "registered"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:269
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:268
 msgid "Send email to "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:269
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:268
 msgid "patient"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:269
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:268
 msgid "user"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:271
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:270
 msgid "Select Email..."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:275
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:502
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1555
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:274
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:498
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1563
 msgid "Send email"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:416
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:415
 msgid "Send registration email"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:488
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:495
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:679
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:461
+msgid "<p>Hello, this is an invitation to complete your registration.</p>"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:462
+msgid "Verify your account to complete registration"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:463
+msgid "Registration invite from "
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:463
+msgid "\" + clinicName + \""
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:472
+msgid "invite email sent to ' + email + \""
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:474
+msgid "Unable to send email."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:484
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:491
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:677
 msgid "Optional"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:489
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:496
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:485
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:492
 msgid "XXX-XXX-XXXX"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:537
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:533
 msgid "In what state "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:537
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:533
 msgid "is the patient "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:537
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:533
 msgid "are you "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:537
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:533
 msgid "currently receiving prostate cancer care?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/base.html:248
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:545
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:683
+#: /home/adam/truenth_ss/portal/templates/gil/base.html:244
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:541
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:681
 msgid "None of the Above"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:678
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:676
 msgid "Main clinic for prostate cancer care"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:679
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:677
 msgid "Clinics "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:730
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:731
 msgid "Consent to share information"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:736
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:737
 msgid "I consent to sharing information with the "
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1009
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1014
 msgid "Date/Time <span class='gmt'> (GMT), Y-M-D</span>"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1041
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1046
 msgid "for"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1042
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1047
 msgid "Editable by admins only."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1071
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1076
 msgid "Session History"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1071
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1076
 msgid "click each row to review report"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1072
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1077
 msgid "Questionnaire Name"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1072
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1077
 msgid "Status"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1072
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1077
 msgid "Last Updated"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1072
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1077
 msgid "GMT, Y-M-D"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1196
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1204
 msgid "Clinical Question"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1197
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1205
 msgid "Question asked of the patient at account creation"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1243
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1251
 msgid "My Prostate Cancer Profile"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1243
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1251
 msgid "Clinical Questions"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1244
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1252
 msgid "Questions asked of the patient at registration"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1270
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1278
 msgid "no answers provided"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1367
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1375
 msgid "Intervention Reports"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1372
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1380
 msgid "No reports available."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1432
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1440
 msgid "Deceased Status"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1441
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1449
 msgid "Has the patient passed away?"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1446
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1454
 msgid "Deceased Date"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1551
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1559
 msgid "Three ways to complete questionnaire"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1557
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1565
 msgid "Invite or remind patient over email to complete their questionnaire"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1562
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1564
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1570
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1572
 msgid "Log in as patient"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1563
-msgid ""
-"This logs you out, and logs in the patient without their needing to enter"
-" credentials. This is so the patient can complete their questionnaire on "
-"this device. Ideal for tablet and kiosk computers."
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1571
+msgid "This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1567
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1570
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1575
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1577
 msgid "Enter manually"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1568
-msgid ""
-"Enter questionnaire responses on patient's behalf. Helpful if responses "
-"have been completed on paper."
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1576
+msgid "Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1622
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1583
+msgid "Enter questionnaire manually on patient's behalf"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1586
+msgid "Select the method in which the questionnaire will be completed:"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1591
+msgid "Interview assisted"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1596
+msgid "Paper"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1700
 msgid "My Information"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1626
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1763
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1704
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1842
 msgid "Date of Birth"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1627
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1764
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1705
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1843
 msgid "Study Id"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1648
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1726
 msgid "My Detail"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1654
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1791
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1732
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1870
 msgid "Indigenous"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1669
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1866
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1748
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1946
 msgid "My Questionnaires"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1680
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1689
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1707
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1759
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1768
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1786
 msgid "My Clinic"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1698
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1777
 msgid "My Agreement"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1716
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1795
 msgid "My Locale / Time Zone"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1720
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1905
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1799
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1985
 msgid "Time Zone"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1734
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1813
 msgid "My Roles"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1752
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1831
 msgid "Patient Details"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1759
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1838
 msgid "Patient Information"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1759
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1838
 msgid "User Information"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1785
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1864
 msgid "Patient Detail"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1785
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1864
 msgid "User Detail"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1808
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1825
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1888
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1905
 msgid "Communications"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1811
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1891
 msgid "Send reset password email to patient"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1815
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1895
 msgid "Send registration email to patient"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1828
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1908
 msgid "Send reset password email to staff"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1832
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1912
 msgid "Send registration email to user"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1842
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1922
 msgid "Clinic"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1851
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1931
 msgid "Agreement to Share Clinical Information"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1851
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1931
 msgid "Consent History"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1866
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1946
 msgid "PRO Questionnaires"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1889
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1969
 msgid "Patient Reports"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1901
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1981
 msgid "Locale / Time Zone"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1919
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1999
 msgid "User Roles"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1929
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2009
 msgid "Audit Log"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1942
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2022
 msgid "My Treatments"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1942
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2022
 msgid "Clinical Data"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1945
-msgid ""
-"Which of the following prostate cancer management options has the patient"
-" had, if any? If you don&#39;t remember the exact date, please make your "
-"best guess."
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2025
+msgid "Which of the following prostate cancer management options has the patient had, if any? If you don&#39;t remember the exact date, please make your best guess."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1945
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2025
 msgid ""
-"Which of the following prostate cancer management options have you had, "
-"if any? If you don&#39;t remember the exact\n"
+"Which of the following prostate cancer management options have you had, if any? If you don&#39;t remember the exact\n"
 "                            date, please make your best guess."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1949
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1954
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2029
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2034
 msgid "Select"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1949
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2029
 msgid "an option"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1955
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2035
 msgid "Started watchful waiting"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1956
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2036
 msgid "Started active surveillance"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1957
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2037
 msgid "Radical prostatectomy (nerve-sparing)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1958
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2038
 msgid "Radical prostatectomy (non-nerve-sparing)"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1959
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2039
 msgid "External beam radiation therapy"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1960
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2040
 msgid "Brachytherapy"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1961
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2041
 msgid "Androgen deprivation therapy"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1962
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2042
 msgid "None of the above"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1970
-msgid "Date"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1996
-msgid "Add"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:1996
-msgid " Option"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2008
-msgid "My History"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2010
-msgid "Past"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2010
-msgid "Management(s)"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2030
-msgid ""
-"You have updated your profile. Click the Save button to submit your "
-"changes."
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2030
-msgid "Or"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2030
-msgid "cancel"
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2031
-msgid "There is a problem with your profile. Please correct it before saving."
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2031
-msgid "Make sure all required fields are filled out and all entries are valid."
-msgstr ""
-
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2033
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2076
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2113
 msgid "Save"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2034
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2088
+msgid "My History"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2090
+msgid "Past"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2090
+msgid "Management(s)"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2110
+msgid "You have updated your profile. Click the Save button to submit your changes."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2110
+msgid "Or"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2110
+msgid "cancel"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2111
+msgid "There is a problem with your profile. Please correct it before saving."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2111
+msgid "Make sure all required fields are filled out and all entries are valid."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/profile_macros.html:2114
 msgid "Profile changes have been saved"
 msgstr ""
 
@@ -1568,6 +1787,42 @@ msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/sessionReport.html:17
 msgid "Unable to load report"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:5
+msgid "System Settings and Status"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:7
+msgid ""
+"Most settings are controlled via configuration files on\n"
+"    the server and listed further below.  Browser based values can be set\n"
+"    in the immedate form."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:20
+msgid "Top Level Organizations"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:30
+msgid "Consent URL"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:44
+msgid "Application Text Values"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:53
+#: /home/adam/truenth_ss/portal/templates/settings.html:79
+msgid "Value"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:70
+msgid "Config Values"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/settings.html:78
+msgid "Variable"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/shortcut_alias.html:8
@@ -1594,8 +1849,12 @@ msgstr ""
 msgid "Select a user below to view or update details."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:17
+#: /home/adam/truenth_ss/portal/templates/staff_profile_create.html:13
 msgid "New Staff"
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/terms.html:6
+msgid "General Terms"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:55
@@ -1615,9 +1874,11 @@ msgid "Movember.com"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:110
-msgid ""
-"2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-"
-"profit organization."
+msgid "2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization."
+msgstr ""
+
+#: /home/adam/truenth_ss/portal/templates/flask_user/_macros.html:114
+msgid "Movember"
 msgstr ""
 
 #: /home/adam/truenth_ss/portal/templates/flask_user/change_password.html:6
@@ -1649,100 +1910,88 @@ msgstr ""
 msgid "Manage Emails"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:27
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:13
 msgid "Email address"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:28
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:14
 msgid "Email address is required."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:36
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:22
 msgid "Password"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:37
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:23
 msgid "Oops, the password does not meet the minimum requirements."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:42
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:28
 msgid "Retype Password"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:43
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:29
 msgid "Oops, the two password fields do not match."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:44
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:205
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:30
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:191
 msgid "Please re-type your password."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:59
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:45
 msgid "Register using:"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:63
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:49
 msgid "Log In With Facebook"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:70
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:56
 msgid "Log In With Google"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:75
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:61
 msgid "Learn more about using Facebook or Google to sign up for TrueNTH."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:90
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:76
 msgid "About Using Google or Facebook for TrueNTH"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:96
-msgid ""
-"We offer users the ability to create a unique account for TrueNTH or the "
-"option to use their Facebook or Google logins. Choosing to use Google of "
-"Facebook provide a few additional benefits to you:"
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:82
+msgid "We offer users the ability to create a unique account for TrueNTH or the option to use their Facebook or Google logins. Choosing to use Google of Facebook provide a few additional benefits to you:"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:98
-msgid ""
-"A single login - you don't need to remember multiple user names or "
-"passwords. Assuming you have an active login with Facebook or Google, "
-"logging into TrueNTH is as simple as clicking a single button."
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:84
+msgid "A single login - you don't need to remember multiple user names or passwords. Assuming you have an active login with Facebook or Google, logging into TrueNTH is as simple as clicking a single button."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:99
-msgid ""
-"TrueNTH can automatically import basic profile information from those "
-"services, simplifying the amount of information you need to enter. This "
-"includes name, email address, birthdate and profile image."
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:85
+msgid "TrueNTH can automatically import basic profile information from those services, simplifying the amount of information you need to enter. This includes name, email address, birthdate and profile image."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:100
-msgid ""
-"Information is a one-way street - TrueNTH can pull basic profile "
-"information from Facebook and Google, but never share anything with them."
-" And we NEVER post or share anything to your accounts."
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:86
+msgid "Information is a one-way street - TrueNTH can pull basic profile information from Facebook and Google, but never share anything with them. And we NEVER post or share anything to your accounts."
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:148
 msgid "Password must have at least:"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:148
 msgid "Eight characters"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:148
 msgid "One lowercase letter"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:148
 msgid "One uppercase letter"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:162
+#: /home/adam/truenth_ss/portal/templates/flask_user/register.html:148
 msgid "One number"
 msgstr ""
 
@@ -1758,18 +2007,30 @@ msgstr ""
 msgid "User profile"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/contact.html:9
-#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:9
+#: /home/adam/truenth_ss/portal/templates/gil/contact.html:11
+#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:11
 msgid "Menu"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/contact.html:14
-#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:14
+#: /home/adam/truenth_ss/portal/templates/gil/contact.html:16
+#: /home/adam/truenth_ss/portal/templates/gil/lived-experience.html:16
 msgid "Join Us"
 msgstr ""
 
-#: /home/adam/truenth_ss/portal/templates/gil/portal.html:44
+#: /home/adam/truenth_ss/portal/templates/gil/portal.html:46
 msgid "Start"
+msgstr ""
+
+# interventions: exercise_diet
+msgid "To provide men and the people in their lives with the tools and support they need to optimize their health through exercise and diet."
+msgstr ""
+
+# apptext: About TrueNTH URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=285ed0c8-6ee6-52e1-4183-9c01be03ef4d&editorUrl=true"
+msgstr ""
+
+# apptext: profileSendEmail reminder email_body
+msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#0088cc\" style=\"background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
 msgstr ""
 
 # interventions: assessment_engine
@@ -1788,20 +2049,33 @@ msgstr ""
 msgid "Cellphone"
 msgstr ""
 
-# interventions: decision_support_p3p
-msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
+# interventions: self_management
+msgid "<p>Compare your symptoms over time with men like you, and manage symptoms that bother you.</p>"
+msgstr ""
+
+# interventions: decision_support_wisercare
+msgid "WiserCare helps patients and providers make smarter, more confident treatment choices"
 msgstr ""
 
 # interventions: decision_support_p3p
-msgid "Decision Support tool"
+msgid " <p>Explore your values, your preferences, and the current medical knowledge to help you discuss your treatment options with your doctors.</p>"
 msgstr ""
 
 # interventions: sexual_recovery
 msgid "<p>Learn strategies for developing a new normal in your sex life after treatment for prostate cancer.</p>"
 msgstr ""
 
+# apptext: registration prompt
+msgid "Create an account"
+msgstr ""
+
 # interventions: care_plan
 msgid "Care Plan"
+msgstr ""
+
+# interventions: community_of_wellness
+# interventions: exercise_diet
+msgid "Exercise and Diet"
 msgstr ""
 
 # apptext: Initial Consent Terms URL
@@ -1812,8 +2086,17 @@ msgstr ""
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52651"
 msgstr ""
 
-# interventions: self_management
-msgid "Symptom Tracker tool"
+# apptext: WiserCare Clinical Institution organization consent URL
+# apptext: P3P Clinical Institution organization consent URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=a3b73a90-d7b2-f6a0-f4b9-3b3d716ee6ca&editorUrl=true"
+msgstr ""
+
+# apptext: profileSendEmail invite email_body
+msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><body><p>Hello,</p><p>This message is an invitation to contribute data to the TrueNTH system.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#0088cc\" style=\"background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href=\"{0}\">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
+msgstr ""
+
+# interventions: lived_experience
+msgid "TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey."
 msgstr ""
 
 # apptext: layout title
@@ -1825,11 +2108,15 @@ msgid "Community of Wellness"
 msgstr ""
 
 # apptext: About Movember URL
-msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41565"
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=abaa79be-6106-8409-d499-51a3f35c1dc5&editorUrl=true"
 msgstr ""
 
 # apptext: Legal URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41577"
+msgstr ""
+
+# apptext: Privacy URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=0253efb2-e4dc-b16a-2801-084670326e53&editorUrl=true"
 msgstr ""
 
 # interventions: default
@@ -1840,8 +2127,8 @@ msgstr ""
 msgid "Social Support Network"
 msgstr ""
 
-# apptext: profileSendEmail invite email_body
-msgid "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"><html><head><style>.btn{{color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px; border-radius:8px; padding:0.5em;}} .btn:hover {{ background-color: #2a4531; text-decoration: underline; }}</style></head><body><p>Hello,</p><p>This email was sent to you by (clinic name). It is an invitation to use the TrueNTH website, where you will report on your health along your prostate cancer journey. The information collected will be used to determine where improvements in prostate cancer care can be made.</p><p>To complete your first questionnaire, you must verify your details and set up your account.</p><table><tr><td align=\"center\" width=\"300\" bgcolor=\"#79815D\" class=\"btn\"><a href=\"{0}\" style=\"color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px\" >Verify your account and answer questionnaire now</a></td></tr></table><p>Click the button above or use the link below to visit TrueNTH:<br /><a href=\"{0}\">{0}</a></p><p>If you have any questions or concerns, please contact (instructions for support go here)</p><p><em>&mdash; This email was sent because you consented to participate in the TrueNTH registry project</em></p></body></html>"
+# apptext: registration title
+msgid "Register for TrueNTH"
 msgstr ""
 
 # apptext: portal registration
@@ -1853,28 +2140,28 @@ msgstr ""
 msgid "TrueNTH Reminder"
 msgstr ""
 
+# interventions: lived_experience
+msgid "Lived Experience"
+msgstr ""
+
 # apptext: Terms of Use URL
 # apptext: New Terms of Use URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41603"
 msgstr ""
 
-# interventions: self_management
-msgid "<p>Learn about symptoms that are common in men with prostate cancer, and about ways to manage and improve these symptoms.</p>"
+# apptext: Terms and Conditions URL
+msgid "{config[LR_ORIGIN]}/c/portal/truenth/asset/detailed?groupId={config[LR_GROUP]}&version=latest&uuid=cbe17d0d-f25d-27fb-0d92-c22bc687bb0f&editorUrl=true"
 msgstr ""
 
 # interventions: care_plan
 msgid "<p>Organization and support for the many details of life as a prostate cancer survivor</p>"
 msgstr ""
 
-# apptext: profileSendEmail reminder email_body
-msgid "<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"><html><body><p>Hello,</p><p>This is a reminder of an invitation to contribute data to the TrueNTH system.</p><table><tr><td align="center" width="300" bgcolor="#0088cc" style="background: #0088cc; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; color: #fff; font-weight: bold; text-decoration: none; padding: 6px; font-family: Helvetica, Arial, sans-serif; display: block;"><a href="{0}" style="color: #fff; text-decoration: none; display: block; font-size: 16px; width: 300px">Visit TrueNTH</a></td></tr></table><p>Click on the button above or this link to visit TrueNTH and complete your questionnaire:<br /><a href="{0}">{0}</a></p><p><em>&mdash; An automatic reminder from the TrueNTH system</em></p></body></html>"
-msgstr ""
-
 # apptext: UCSF Medical Center organization consent URL
 msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset/detailed?groupId=20147&articleId=52668"
 msgstr ""
 
-# apptext: About TrueNTH URL
-msgid "https://stg-lr7.us.truenth.org/c/portal/truenth/asset?groupId=20147&articleId=41549"
+# interventions: decision_support_unavailable
+msgid "TrueNTH Decision Support is intended for use by men who have been diagnosed with localized prostate cancer (the cancer is not in other parts of the body), but who have not yet started active treatment."
 msgstr ""
 
