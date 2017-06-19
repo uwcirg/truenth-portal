@@ -303,16 +303,16 @@ $(document).ready(function(){
                         clear();
                     }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
-                        tnthAjax.reportError(_userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                        tnthAjax.reportError((hasValue(_userId) && parseInt(_userId) != 0? _userId: "None created"), "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                         $("#updateProfile").attr("disabled", false);
                     });
 
                 }).catch(function(error) {
                     //Display Error Here
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
-                    tnthAjax.reportError(_userId, "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                    tnthAjax.reportError((hasValue(_userId) && parseInt(_userId) != 0? _userId: "None created"), "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                     $("#updateProfile").attr("disabled", false);
                 });
 
@@ -343,24 +343,9 @@ $(document).ready(function(){
     };
 
     function clear() {
-        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone', 'altPhone'].forEach(function(fieldName) {
-            var currentElement = $('#' + fieldName);
-            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
-            switch(_tagName.toLowerCase()) {
-                case 'input':
-                    currentElement.val('');
-                    break;
-                case 'select':
-                    currentElement.find('option').prop('selected', false);
-                    break;
-                default:
-                    currentElement.val('');
-            };
-
-            $('#month').find('option').prop('selected', false);
-
-        });
-
+       $("input.form-control, select.form-control").each(
+        function() { $(this).val(""); 
+       });
     };
 
     clear();
