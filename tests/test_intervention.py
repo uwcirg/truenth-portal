@@ -17,6 +17,7 @@ from portal.models.role import ROLE
 from portal.models.user import add_role
 from portal.system_uri import DECISION_SUPPORT_GROUP, SNOMED
 
+
 class TestIntervention(TestCase):
 
     def test_intervention_wrong_service_user(self):
@@ -24,9 +25,10 @@ class TestIntervention(TestCase):
         self.login(user_id=service_user.id)
 
         data = {'user_id': TEST_USER_ID, 'access': 'granted'}
-        rv = self.client.put('/api/intervention/sexual_recovery',
-                content_type='application/json',
-                data=json.dumps(data))
+        rv = self.client.put(
+            '/api/intervention/sexual_recovery',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert401(rv)
 
     def test_intervention(self):
@@ -36,18 +38,20 @@ class TestIntervention(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
-        data = {'user_id': TEST_USER_ID,
-                'access': "granted",
-                'card_html': "unique HTML set via API",
-                'link_label': 'link magic',
-                'link_url': 'http://safe.com',
-                'status_text': 'status example',
-                'staff_html': "unique HTML for /patients view"
-               }
+        data = {
+            'user_id': TEST_USER_ID,
+            'access': "granted",
+            'card_html': "unique HTML set via API",
+            'link_label': 'link magic',
+            'link_url': 'http://safe.com',
+            'status_text': 'status example',
+            'staff_html': "unique HTML for /patients view"
+        }
 
-        rv = self.client.put('/api/intervention/sexual_recovery',
-                content_type='application/json',
-                data=json.dumps(data))
+        rv = self.client.put(
+            '/api/intervention/sexual_recovery',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
 
         ui = UserIntervention.query.one()
@@ -65,13 +69,15 @@ class TestIntervention(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
-        data = {'user_id': TEST_USER_ID,
-                'access': 'enabled',
-               }
+        data = {
+            'user_id': TEST_USER_ID,
+            'access': 'enabled',
+        }
 
-        rv = self.client.put('/api/intervention/sexual_recovery',
-                content_type='application/json',
-                data=json.dumps(data))
+        rv = self.client.put(
+            '/api/intervention/sexual_recovery',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert400(rv)
 
     def test_intervention_validation(self):
@@ -81,13 +87,15 @@ class TestIntervention(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
 
-        data = {'user_id': TEST_USER_ID,
-                'link_url': 'http://un-safe.com',
-               }
+        data = {
+            'user_id': TEST_USER_ID,
+            'link_url': 'http://un-safe.com',
+        }
 
-        rv = self.client.put('/api/intervention/sexual_recovery',
-                content_type='application/json',
-                data=json.dumps(data))
+        rv = self.client.put(
+            '/api/intervention/sexual_recovery',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert400(rv)
 
     def test_clinc_id(self):
@@ -109,13 +117,14 @@ class TestIntervention(TestCase):
             db.session.commit()
 
         org1, org2, org3 = map(db.session.merge, (org1, org2, org3))
-        d = {'function': 'limit_by_clinic_w_id',
-             'kwargs': [{'name': 'identifier_value',
-                         'value': 'pick me'}]
-            }
+        d = {
+            'function': 'limit_by_clinic_w_id',
+            'kwargs': [{'name': 'identifier_value',
+                        'value': 'pick me'}]
+        }
         strat = AccessStrategy(
             name="member of org with identifier",
-            intervention_id = cp_id,
+            intervention_id=cp_id,
             function_details=json.dumps(d))
 
         with SessionScope(db):
@@ -149,7 +158,7 @@ class TestIntervention(TestCase):
                             {'name': 'boolean_value', 'value': 'true'}]}
             strat = AccessStrategy(
                 name="has PCa diagnosis",
-                intervention_id = cp_id,
+                intervention_id=cp_id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -182,7 +191,7 @@ class TestIntervention(TestCase):
                  'kwargs': [{'name': 'boolean_value', 'value': 'false'}]}
             strat = AccessStrategy(
                 name="has not stared treatment",
-                intervention_id = cp_id,
+                intervention_id=cp_id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -227,7 +236,7 @@ class TestIntervention(TestCase):
                             'value': ds_wc.name}]}
             strat = AccessStrategy(
                 name="exclusive decision support strategy",
-                intervention_id = ds_p3p.id,
+                intervention_id=ds_p3p.id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -269,16 +278,16 @@ class TestIntervention(TestCase):
                   'value': 'not_in_role_list'},
                  {'name': 'strategy_2_kwargs',
                   'value': [{'name': 'role_list',
-                             'value': [ROLE.WRITE_ONLY,]}]}
+                             'value': [ROLE.WRITE_ONLY]}]}
                  ]
             }
 
         with SessionScope(db):
             strat = AccessStrategy(
                 name="SELF_MANAGEMENT if not SR and not in WRITE_ONLY",
-                intervention_id = sm.id,
+                intervention_id=sm.id,
                 function_details=json.dumps(d))
-            #print json.dumps(strat.as_json(), indent=2)
+            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, sm, sr = map(db.session.merge, (user, sm, sr))
@@ -320,13 +329,13 @@ class TestIntervention(TestCase):
              'function': 'in_role_list',
              'kwargs': [
                  {'name': 'role_list',
-                  'value': [ROLE.PATIENT,]}]
+                  'value': [ROLE.PATIENT]}]
             }
 
         with SessionScope(db):
             strat = AccessStrategy(
                 name="SELF_MANAGEMENT if PATIENT",
-                intervention_id = sm.id,
+                intervention_id=sm.id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -345,7 +354,7 @@ class TestIntervention(TestCase):
 
     def test_card_html_update(self):
         """Test strategy with side effects - card_html update"""
-        ae  = INTERVENTION.ASSESSMENT_ENGINE
+        ae = INTERVENTION.ASSESSMENT_ENGINE
         ae_id = ae.id
         self.bless_with_basics()
 
@@ -360,7 +369,7 @@ class TestIntervention(TestCase):
                  'kwargs': []}
             strat = AccessStrategy(
                 name="update assessment_engine card_html on completion",
-                intervention_id = ae_id,
+                intervention_id=ae_id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -384,14 +393,15 @@ class TestIntervention(TestCase):
 
     def test_strat_from_json(self):
         """Create access strategy from json"""
-        d = {'name': 'unit test example',
-             'description': 'a lovely way to test',
-             'function_details': {
-                 'function': 'allow_if_not_in_intervention',
-                 'kwargs': [{'name': 'intervention_name',
+        d = {
+            'name': 'unit test example',
+            'description': 'a lovely way to test',
+            'function_details': {
+                'function': 'allow_if_not_in_intervention',
+                'kwargs': [{'name': 'intervention_name',
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
-             }
             }
+        }
         acc_strat = AccessStrategy.from_json(d)
         self.assertEquals(d['name'], acc_strat.name)
         self.assertEquals(d['function_details'],
@@ -401,16 +411,18 @@ class TestIntervention(TestCase):
         """Test strategy view functions"""
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        d = {'name': 'unit test example',
-             'function_details': {
-                 'function': 'allow_if_not_in_intervention',
-                 'kwargs': [{'name': 'intervention_name',
+        d = {
+            'name': 'unit test example',
+            'function_details': {
+                'function': 'allow_if_not_in_intervention',
+                'kwargs': [{'name': 'intervention_name',
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
-             }
             }
-        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
-                content_type='application/json',
-                data=json.dumps(d))
+        }
+        rv = self.client.post(
+            '/api/intervention/sexual_recovery/access_rule',
+            content_type='application/json',
+            data=json.dumps(d))
         self.assert200(rv)
 
         # fetch it back and compare
@@ -426,30 +438,34 @@ class TestIntervention(TestCase):
         """Rank must be unique"""
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
-        d = {'name': 'unit test example',
-             'rank': 1,
-             'function_details': {
-                 'function': 'allow_if_not_in_intervention',
-                 'kwargs': [{'name': 'intervention_name',
+        d = {
+            'name': 'unit test example',
+            'rank': 1,
+            'function_details': {
+                'function': 'allow_if_not_in_intervention',
+                'kwargs': [{'name': 'intervention_name',
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
-             }
             }
-        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
-                content_type='application/json',
-                data=json.dumps(d))
+        }
+        rv = self.client.post(
+            '/api/intervention/sexual_recovery/access_rule',
+            content_type='application/json',
+            data=json.dumps(d))
         self.assert200(rv)
-        d = {'name': 'unit test same rank example',
-             'rank': 1,
-             'description': 'should not take with same rank',
-             'function_details': {
-                 'function': 'allow_if_not_in_intervention',
-                 'kwargs': [{'name': 'intervention_name',
+        d = {
+            'name': 'unit test same rank example',
+            'rank': 1,
+            'description': 'should not take with same rank',
+            'function_details': {
+                'function': 'allow_if_not_in_intervention',
+                'kwargs': [{'name': 'intervention_name',
                             'value': INTERVENTION.SELF_MANAGEMENT.name}]
-             }
             }
-        rv = self.client.post('/api/intervention/sexual_recovery/access_rule',
-                content_type='application/json',
-                data=json.dumps(d))
+        }
+        rv = self.client.post(
+            '/api/intervention/sexual_recovery/access_rule',
+            content_type='application/json',
+            data=json.dumps(d))
         self.assert400(rv)
 
     def test_and_strats(self):
@@ -473,25 +489,26 @@ class TestIntervention(TestCase):
             db.session.commit()
         user, uw, uw_child = map(db.session.merge, (user, uw, uw_child))
 
-        d = {'name': 'not in SR _and_ in clinc UW',
-             'function': 'combine_strategies',
-             'kwargs': [
-                 {'name': 'strategy_1',
-                  'value': 'allow_if_not_in_intervention'},
-                 {'name': 'strategy_1_kwargs',
-                  'value': [{'name': 'intervention_name',
-                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
-                 {'name': 'strategy_2',
-                  'value': 'limit_by_clinic_w_id'},
-                 {'name': 'strategy_2_kwargs',
-                  'value': [{'name': 'identifier_value',
-                             'value': 'decision_support_p3p'}]}
-                 ]
-            }
+        d = {
+            'name': 'not in SR _and_ in clinc UW',
+            'function': 'combine_strategies',
+            'kwargs': [
+                {'name': 'strategy_1',
+                 'value': 'allow_if_not_in_intervention'},
+                {'name': 'strategy_1_kwargs',
+                 'value': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                {'name': 'strategy_2',
+                 'value': 'limit_by_clinic_w_id'},
+                {'name': 'strategy_2_kwargs',
+                 'value': [{'name': 'identifier_value',
+                            'value': 'decision_support_p3p'}]}
+            ]
+        }
         with SessionScope(db):
             strat = AccessStrategy(
                 name=d['name'],
-                intervention_id = INTERVENTION.DECISION_SUPPORT_P3P.id,
+                intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
             db.session.add(strat)
             db.session.commit()
@@ -547,60 +564,62 @@ class TestIntervention(TestCase):
         ucsf, user, uw = map(db.session.merge, (ucsf, user, uw))
 
         # Full logic from story #127433167
-        description = ("[strategy_1: (user NOT IN sexual_recovery)] "
+        description = (
+            "[strategy_1: (user NOT IN sexual_recovery)] "
             "AND [strategy_2 <a nested combined strategy>: "
             "((user NOT IN list of clinics (including UCSF)) OR "
             "(user IN list of clinics including UCSF and UW))] "
             "AND [strategy_3: (user has NOT started TX)] "
             "AND [strategy_4: (user does NOT have PCaMETASTASIZE)]")
 
-        d = {'function': 'combine_strategies',
-             'kwargs': [
-                 # Not in SR (strat 1)
-                 {'name': 'strategy_1',
-                  'value': 'allow_if_not_in_intervention'},
-                 {'name': 'strategy_1_kwargs',
-                  'value': [{'name': 'intervention_name',
-                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
-                 # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
-                 {'name': 'strategy_2',
-                  'value': 'combine_strategies'},
-                 {'name': 'strategy_2_kwargs',
-                  'value': [
-                      {'name': 'combinator',
-                       'value': 'any'},  # makes this combination an 'OR'
-                      {'name': 'strategy_1',
-                       'value': 'not_in_clinic_w_id'},
-                      {'name': 'strategy_1_kwargs',
-                       'value': [{'name': 'identifier_value',
-                                  'value': 'decision_support_wisercare'}]},
-                      {'name': 'strategy_2',
-                       'value': 'limit_by_clinic_w_id'},
-                      {'name': 'strategy_2_kwargs',
-                       'value': [{'name': 'identifier_value',
-                                  'value': 'decision_support_p3p'}]},
-                  ]},
-                 # Not Started TX (strat 3)
-                 {'name': 'strategy_3',
-                  'value': 'tx_begun'},
-                 {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
-                 # Has Localized PCa (strat 4)
-                 {'name': 'strategy_4',
-                  'value': 'observation_check'},
-                 {'name': 'strategy_4_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.PCaLocalized.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'true'}]},
-                 ]
-            }
+        d = {
+            'function': 'combine_strategies',
+            'kwargs': [
+                # Not in SR (strat 1)
+                {'name': 'strategy_1',
+                 'value': 'allow_if_not_in_intervention'},
+                {'name': 'strategy_1_kwargs',
+                 'value': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
+                {'name': 'strategy_2',
+                 'value': 'combine_strategies'},
+                {'name': 'strategy_2_kwargs',
+                 'value': [
+                     {'name': 'combinator',
+                      'value': 'any'},  # makes this combination an 'OR'
+                     {'name': 'strategy_1',
+                      'value': 'not_in_clinic_w_id'},
+                     {'name': 'strategy_1_kwargs',
+                      'value': [{'name': 'identifier_value',
+                                 'value': 'decision_support_wisercare'}]},
+                     {'name': 'strategy_2',
+                      'value': 'limit_by_clinic_w_id'},
+                     {'name': 'strategy_2_kwargs',
+                      'value': [{'name': 'identifier_value',
+                                 'value': 'decision_support_p3p'}]},
+                 ]},
+                # Not Started TX (strat 3)
+                {'name': 'strategy_3',
+                 'value': 'tx_begun'},
+                {'name': 'strategy_3_kwargs',
+                 'value': [{'name': 'boolean_value', 'value': 'false'}]},
+                # Has Localized PCa (strat 4)
+                {'name': 'strategy_4',
+                 'value': 'observation_check'},
+                {'name': 'strategy_4_kwargs',
+                 'value': [{'name': 'display',
+                            'value': CC.PCaLocalized.codings[0].display},
+                           {'name': 'boolean_value', 'value': 'true'}]},
+            ]
+        }
         with SessionScope(db):
             strat = AccessStrategy(
                 name='P3P Access Conditions',
                 description=description,
                 intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            #print json.dumps(strat.as_json(), indent=2)
+            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -657,7 +676,8 @@ class TestIntervention(TestCase):
         ucsf, user, uw = map(db.session.merge, (ucsf, user, uw))
 
         # Full logic from story #127433167
-        description = ("[strategy_1: (user NOT IN sexual_recovery)] "
+        description = (
+            "[strategy_1: (user NOT IN sexual_recovery)] "
             "AND [strategy_2 <a nested combined strategy>: "
             "((user NOT IN list of clinics (including UCSF)) OR "
             "(user IN list of clinics including UCSF and UW))] "
@@ -665,26 +685,27 @@ class TestIntervention(TestCase):
             "AND [strategy_4: (user does NOT have PCaMETASTASIZE)] "
             "AND [startegy_5: (user does NOT have roll WRITE_ONLY)]")
 
-        d = {'function': 'combine_strategies',
-             'kwargs': [
-                 # Not in SR (strat 1)
-                 {'name': 'strategy_1',
-                  'value': 'allow_if_not_in_intervention'},
-                 {'name': 'strategy_1_kwargs',
-                  'value': [{'name': 'intervention_name',
-                             'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
-                 # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
-                 {'name': 'strategy_2',
-                  'value': 'combine_strategies'},
-                 {'name': 'strategy_2_kwargs',
-                  'value': [
-                      {'name': 'combinator',
-                       'value': 'any'},  # makes this combination an 'OR'
-                      {'name': 'strategy_1',
-                       'value': 'not_in_clinic_w_id'},
-                      {'name': 'strategy_1_kwargs',
-                       'value': [{'name': 'identifier_value',
-                                  'value': 'decision_support_wisercare'}]},
+        d = {
+            'function': 'combine_strategies',
+            'kwargs': [
+                # Not in SR (strat 1)
+                {'name': 'strategy_1',
+                 'value': 'allow_if_not_in_intervention'},
+                {'name': 'strategy_1_kwargs',
+                 'value': [{'name': 'intervention_name',
+                            'value': INTERVENTION.SEXUAL_RECOVERY.name}]},
+                # Not in clinic list (UCSF,) OR (In Clinic UW and UCSF) (#2)
+                {'name': 'strategy_2',
+                 'value': 'combine_strategies'},
+                {'name': 'strategy_2_kwargs',
+                 'value': [
+                     {'name': 'combinator',
+                      'value': 'any'},  # makes this combination an 'OR'
+                     {'name': 'strategy_1',
+                      'value': 'not_in_clinic_w_id'},
+                     {'name': 'strategy_1_kwargs',
+                      'value': [{'name': 'identifier_value',
+                                 'value': 'decision_support_wisercare'}]},
                      {'name': 'strategy_2',
                       'value': 'combine_strategies'},
                      {'name': 'strategy_2_kwargs',
@@ -700,34 +721,34 @@ class TestIntervention(TestCase):
                            'value': [{'name': 'identifier_value',
                                       'value': 'decision_support_p3p'}]},
                       ]},
-                  ]},
-                 # Not Started TX (strat 3)
-                 {'name': 'strategy_3',
-                  'value': 'tx_begun'},
-                 {'name': 'strategy_3_kwargs',
-                  'value': [{'name': 'boolean_value', 'value': 'false'}]},
-                 # Has Localized PCa (strat 4)
-                 {'name': 'strategy_4',
-                  'value': 'observation_check'},
-                 {'name': 'strategy_4_kwargs',
-                  'value': [{'name': 'display',
-                             'value': CC.PCaLocalized.codings[0].display},
-                            {'name': 'boolean_value', 'value': 'true'}]},
-                 # Does NOT have roll WRITE_ONLY (strat 5)
-                 {'name': 'strategy_5',
-                  'value': 'not_in_role_list'},
-                 {'name': 'strategy_5_kwargs',
-                  'value': [{'name': 'role_list',
-                             'value': [ROLE.WRITE_ONLY,]}]}
-                 ]
-            }
+                 ]},
+                # Not Started TX (strat 3)
+                {'name': 'strategy_3',
+                 'value': 'tx_begun'},
+                {'name': 'strategy_3_kwargs',
+                 'value': [{'name': 'boolean_value', 'value': 'false'}]},
+                # Has Localized PCa (strat 4)
+                {'name': 'strategy_4',
+                 'value': 'observation_check'},
+                {'name': 'strategy_4_kwargs',
+                 'value': [{'name': 'display',
+                            'value': CC.PCaLocalized.codings[0].display},
+                           {'name': 'boolean_value', 'value': 'true'}]},
+                # Does NOT have roll WRITE_ONLY (strat 5)
+                {'name': 'strategy_5',
+                 'value': 'not_in_role_list'},
+                {'name': 'strategy_5_kwargs',
+                 'value': [{'name': 'role_list',
+                            'value': [ROLE.WRITE_ONLY]}]}
+            ]
+        }
         with SessionScope(db):
             strat = AccessStrategy(
                 name='P3P Access Conditions',
                 description=description,
                 intervention_id=INTERVENTION.DECISION_SUPPORT_P3P.id,
                 function_details=json.dumps(d))
-            #print json.dumps(strat.as_json(), indent=2)
+            # print json.dumps(strat.as_json(), indent=2)
             db.session.add(strat)
             db.session.commit()
         user, ds_p3p = map(db.session.merge, (user, ds_p3p))
@@ -800,7 +821,6 @@ class TestIntervention(TestCase):
         self.assertEquals(rv.json['status_text'], "status example")
         self.assertEquals(rv.json['staff_html'], "custom ph")
 
-
     def test_communicate(self):
         email_group = Group(name='test_email')
         foo = self.add_user(username='foo@example.com')
@@ -808,12 +828,13 @@ class TestIntervention(TestCase):
         foo, boo = map(db.session.merge, (foo, boo))
         foo.groups.append(email_group)
         boo.groups.append(email_group)
-        data = {'protocol': 'email',
-                'group_name': 'test_email',
-                'subject': "Just a test, ignore",
-                'message':
-                    'Review results at <a href="http://www.example.com">here</a>'
-               }
+        data = {
+            'protocol': 'email',
+            'group_name': 'test_email',
+            'subject': "Just a test, ignore",
+            'message':
+            'Review results at <a href="http://www.example.com">here</a>'
+        }
         self.login()
         rv = self.client.post('/api/intervention/{}/communicate'.format(
                 INTERVENTION.DECISION_SUPPORT_P3P.name),
