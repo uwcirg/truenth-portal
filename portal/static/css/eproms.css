@@ -404,6 +404,12 @@ div.right-panel {
   margin: auto;
 }
 /***** initial queries page style ****/
+.terms-of-use-intro {
+  display: none;
+}
+#topTerms .well {
+  margin-top: 1em;
+}
 #topTerms .default-tou-text {
   display: none;
 }

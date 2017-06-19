@@ -100,10 +100,10 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
 
-class WebsiteConsentByOrg_ATMA(AppTextModelAdapter):
+class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for a consent agreement
+        """Generate AppText name key for website consent terms presented at initial queries
 
         :param organization: for which the consent agreement applies
         :param role: for specific role selections, but only if

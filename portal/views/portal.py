@@ -16,9 +16,9 @@ from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
 from ..extensions import oauth, user_manager
-from ..models.app_text import app_text, AppText, VersionedResource
+from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
-from ..models.app_text import Terms_ATMA, WebsiteConsentByOrg_ATMA
+from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -460,24 +460,15 @@ def initial_queries():
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
-    if 'subject_website_consent' in still_needed or \
-        ('website_terms_of_use' in still_needed and 'privacy_policy' in still_needed):
-        org = user.first_top_organization()
-        role = None
-        if not current_app.config.get('GIL'):
-            for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
-                if user.has_role(r):
-                    # treat staff_admins as staff for this lookup
-                    r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
-                    role = r
-        if org:
-            terms = VersionedResource(app_text(
-                WebsiteConsentByOrg_ATMA.name_key(organization=org,
-                                                  role=role)))
-        else:
-            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-    else:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    org = user.first_top_organization()
+    role = None
+    if not current_app.config.get('GIL'):
+        for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                # treat staff_admins as staff for this lookup
+                r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+                role = r
+    terms = get_terms(org, role)
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
     return render_template(
@@ -493,15 +484,28 @@ def website_consent_script(patient_id):
     redirect_url = request.args.get('redirect_url', None)
     user = current_user()
     org = user.first_top_organization()
-    if org:
-        terms = VersionedResource(app_text(
-            WebsiteConsentByOrg_ATMA.name_key(organization=org)))
-    else:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    terms = get_terms(org)
     return render_template(
         'website_consent_script.html', user=user, terms=terms,
         entry_method=entry_method, redirect_url=redirect_url,
         patient_id=patient_id)
+
+def get_terms(org, role):
+    terms = None
+
+    if org:
+        try:
+            terms = VersionedResource(app_text(
+                    WebsiteConsentTermsByOrg_ATMA.name_key(organization=org,
+                                                            role=role)))
+        except UndefinedAppText:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+
+    return terms
 
 @portal.route('/home')
 def home():
