@@ -96,8 +96,12 @@ def smartling_upload():
     # update .pot file with db values
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
+    upload_pot_file(pot_fpath)
+
+
+def upload_pot_file(fpath):
     # upload .pot file to smartling
-    with open(pot_fpath, 'rb') as potfile:
+    with open(fpath, 'rb') as potfile:
         headers = {'Authorization': 'Bearer {}'.format(auth)}
         files = {'file': ('messages.pot', potfile)}
         data = {
@@ -125,52 +129,60 @@ def smartling_download(language=None):
     project_id = current_app.config.get("SMARTLING_PROJECT_ID")
     file_uri = 'portal/translations/messages.pot'
     if language:
-        if not re.match(r'[a-z]{2}_[A-Z]{2}',language):
-            sys.exit('invalid language code; expected format xx_XX')
-        language_id = re.sub('_','-',language)
-        url = 'https://api.smartling.com/files-api/v2/projects/' \
-              '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
-                                                     file_uri)
-        resp = requests.get(url, headers=headers)
-        if not resp.content:
-            sys.exit('no file returned')
-        current_app.logger.debug("{} po file downloaded " \
-                                "from smartling".format(language))
-        po_path = os.path.join(translation_fpath, language,
-                               'LC_MESSAGES', 'temp_messages.po')
-        with open(po_path,"wb") as fout:
-            fout.write(resp.content)
-        current_app.logger.debug("{} po file saved".format(language))
-        merge_po_into_master(po_path, language)
-        os.remove(po_path)
+        response_content = download_po_file(language, headers,
+                                            project_id, file_uri)
+        extract_po_file(language, response_content)
     else:
-        url = 'https://api.smartling.com/files-api/v2/projects/' \
-              '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
-              'published'.format(project_id, file_uri)
-        resp = requests.get(url, headers=headers)
-        if not resp.content:
-            sys.exit('no file returned')
-        current_app.logger.debug("zip file downloaded from smartling")
-        fp = StringIO(resp.content)
-        zfp = ZipFile(fp, "r")
+        zfp = download_zip_file(headers, project_id, file_uri)
         for langfile in zfp.namelist():
             langcode = re.sub('-','_',langfile.split('/')[0])
-            po_path = os.path.join(translation_fpath, langcode,
-                                   'LC_MESSAGES', 'temp_messages.po')
             data = zfp.read(langfile)
             if not data or not langcode:
                 sys.exit('invalid po file for {}'.format(langcode))
-            with open(po_path,"wb") as fout:
-                fout.write(data)
-            current_app.logger.debug("{} po file extracted".format(langcode))
-            merge_po_into_master(po_path, langcode)
-            os.remove(po_path)
+            extract_po_file(langcode, data)
     current_app.logger.debug("po files updated, and mo files recompiled")
 
 
-def merge_po_into_master(po_path, langcode):
+def download_po_file(language, headers, project_id, file_uri):
+    if not re.match(r'[a-z]{2}_[A-Z]{2}',language):
+        sys.exit('invalid language code; expected format xx_XX')
+    language_id = re.sub('_','-',language)
+    url = 'https://api.smartling.com/files-api/v2/projects/' \
+          '{}/locales/{}/file?fileUri={}'.format(project_id, language_id,
+                                                 file_uri)
+    resp = requests.get(url, headers=headers)
+    if not resp.content:
+        sys.exit('no file returned')
+    current_app.logger.debug("{} po file downloaded " \
+                            "from smartling".format(language))
+    return resp.content
+
+
+def download_zip_file(headers, project_id, file_uri):
+    url = 'https://api.smartling.com/files-api/v2/projects/' \
+          '{}/locales/all/file/zip?fileUri={}&retrievalType=' \
+          'published'.format(project_id, file_uri)
+    resp = requests.get(url, headers=headers)
+    if not resp.content:
+        sys.exit('no file returned')
+    current_app.logger.debug("zip file downloaded from smartling")
+    fp = StringIO(resp.content)
+    return ZipFile(fp, "r")
+
+
+def extract_po_file(language, data):
+    po_path = os.path.join(current_app.root_path, "translations", language,
+                           'LC_MESSAGES', 'temp_messages.po')
+    with open(po_path,"wb") as fout:
+        fout.write(data)
+    current_app.logger.debug("{} po file extracted".format(language))
+    merge_po_into_master(po_path, language)
+    os.remove(po_path)
+
+
+def merge_po_into_master(po_path, language):
     master_path = os.path.join(current_app.root_path, "translations",
-                               langcode, 'LC_MESSAGES')
+                               language, 'LC_MESSAGES')
     master_po = pofile(os.path.join(master_path, 'messages.po'))
     incoming_po = pofile(po_path)
 
