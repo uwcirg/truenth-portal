@@ -82,9 +82,6 @@ def smartling_authenticate():
 
 
 def smartling_upload():
-    # authenticate smartling
-    auth = smartling_authenticate()
-    current_app.logger.debug("authenticated in smartling")
     # get relevant filepaths
     translation_fpath = os.path.join(current_app.root_path, "translations")
     pot_fpath = os.path.join(translation_fpath, 'messages.pot')
@@ -100,6 +97,9 @@ def smartling_upload():
 
 
 def upload_pot_file(fpath):
+    # authenticate smartling
+    auth = smartling_authenticate()
+    current_app.logger.debug("authenticated in smartling")
     # upload .pot file to smartling
     with open(fpath, 'rb') as potfile:
         headers = {'Authorization': 'Bearer {}'.format(auth)}
