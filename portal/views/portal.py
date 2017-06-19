@@ -490,20 +490,20 @@ def website_consent_script(patient_id):
         entry_method=entry_method, redirect_url=redirect_url,
         patient_id=patient_id)
 
+
 def get_terms(org, role):
     terms = None
 
     if org:
         try:
             terms = VersionedResource(app_text(
-                    WebsiteConsentTermsByOrg_ATMA.name_key(organization=org,
-                                                            role=role)))
+                                    WebsiteConsentTermsByOrg_ATMA.name_key(organization=org,
+                                                                            role=role)))
         except UndefinedAppText:
             terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     else:
         terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
-
 
     return terms
 
