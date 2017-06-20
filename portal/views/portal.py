@@ -496,9 +496,8 @@ def get_terms(org, role):
 
     if org:
         try:
-            terms = VersionedResource(app_text(
-                                    WebsiteConsentTermsByOrg_ATMA.name_key(organization=org,
-                                                                            role=role)))
+            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.\
+                                               name_key(organization=org, role=role)))
         except UndefinedAppText:
             terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
