@@ -1875,6 +1875,7 @@ var tnthAjax = {
         }).done(function(data) {
             if (data && data.still_needed) {
                 if (callback) callback(data.still_needed);
+                var __localizedFound = false;
                 (data.still_needed).forEach(function(item) {
                     $("#termsCheckbox [data-type='terms']").each(function() {
                         var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
@@ -1884,7 +1885,9 @@ var tnthAjax = {
                             };
                         });
                     });
+                    if (item == "localized") __localizedFound = true; 
                 });
+                if (!__localizedFound) $("#patMeta").remove(); 
             } else {
                 if (callback) {
                     callback({"error": "no data returned"});

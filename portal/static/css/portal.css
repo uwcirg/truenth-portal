@@ -386,12 +386,12 @@ h4.detail-title {
 #aboutForm {
   max-width: 100%;
   padding: 1em;
+  margin: 2em 0;
+  min-height: 20vh;
+}
+#topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
-}
-#topTerms ~ #aboutForm {
-  margin: 1em 0;
-  min-height: 20vh;
 }
 #aboutForm .reg-complete-container {
   width: 350px;

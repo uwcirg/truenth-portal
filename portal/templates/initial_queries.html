@@ -6,9 +6,7 @@
 {% from "profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
-  {% if 'website_terms_of_use' in still_needed or 'privacy_policy' in still_needed or 'subject_website_consent' in still_needed %}
-      {{tou(terms)}}
-  {% endif %}
+  {{tou(terms)}}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
         {% if user and user.email %}
@@ -30,7 +28,7 @@
           <div class="content">
             <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
             <div class="content-body">
-              <p class="subtitle">The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.</p>
+              <p class="subtitle">{{_("The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.")}}</p>
               {{patientQGroup(user)}}
             </div>
           </div>
@@ -138,7 +136,6 @@ var configObj = (function() {
   };
 
 })();
-configObj.initConfig();
 
 /***** helper class to keep track of missing fields ***/
 var FieldsChecker = function(mainSections) {
@@ -337,6 +334,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                          if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
                     });
                     if (!_isAgreed) isComplete = false;
+                
                     break;
                 };
                 if (hasValue(field.attr("data-require-validate"))) isComplete = false;
@@ -455,36 +453,6 @@ function initIncompleteFields() {
         };
     });
   });
-
-  $(".button-container").each(function() {
-      $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-  });
-
-  fc.constructProgressBar();
-
-  //if term of use form not present - need to show the form
-  if ($("#topTerms").length == 0)  {
-      $("#topTerms").hide();
-      $("#aboutForm").fadeIn();
-      fc.getNext();
-      if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
-        fc.continueToFinish();
-      };
-  } else {
-    $("#topTerms").fadeIn();
-    if (window.performance) {
-      if (performance.navigation.type == 1) {
-        //page has been reloaded;
-        $("#termsReminderModal").modal("show");
-      };
-    };
-    $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
-        e.preventDefault();
-        return false;
-    });
-  };
-
-  setTimeout('$(".footerWrapper").show()', 1000);
   /************
   //debugging code
   //incompleteFields.forEach(function(field, index) {
@@ -493,25 +461,47 @@ function initIncompleteFields() {
   //});
   ************/
 
+    /****** prep work after initializing incomplete fields *****/
+    /*****  set visuals e.g. top terms ************************/
+
+    fc.constructProgressBar();
+
+    //if term of use form not present - need to show the form
+    if ($("#topTerms").length == 0)  {
+        $("#topTerms").hide();
+        $("#aboutForm").fadeIn();
+        fc.getNext();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
+    } else {
+      if (!fc.sectionCompleted("topTerms")) {
+        $("#topTerms").removeClass("hide-terms").fadeIn();
+        if (window.performance) {
+          if (performance.navigation.type == 1) {
+            //page has been reloaded;
+            $("#termsReminderModal").modal("show");
+          };
+        };
+        $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
+            e.preventDefault();
+            return false;
+        });
+      } else {
+        $("#topTerms").hide();
+        fc.getNext();
+        $("#aboutForm").fadeIn();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
+      };
+    };
+
 };
 
+configObj.initConfig();
+
 $(document).ready(function(){
-  
-    tnthAjax.getTerms({{user.id}});
-
-    /*** event for the next button ***/
-    $("#next").on("click", function() {
-        $(this).hide();
-        $(".loading-message-indicator").show();
-        setTimeout("window.location.reload()", 100);
-    });
-
-    /*** event for the arrow in the header**/
-    $("div.heading").on("click", function() {
-       $('html, body').animate({
-          scrollTop: $(this).next('div.content-body').children().first().offset().top
-       }, 1000);
-    });
 
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
@@ -594,9 +584,10 @@ $(document).ready(function(){
 
     var patientQClickEvent = function(){
           var thisItem = $(this);
-          var toCall = thisItem.attr("name");
+          var toCall = thisItem.attr("name") || thisItem.attr("data-name");
+       
           // Get value from div - either true or false
-          var toSend = thisItem.val();
+          var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
           if (toCall != "tx" && toCall != "biopsy") {
               tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("data-status"), false);
@@ -607,7 +598,7 @@ $(document).ready(function(){
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  $("#biopsyDate").datepicker("hide").blur();
+                  $("#biopsyDate").datepicker("hide");
                   var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": biopsyDate});
                 };
@@ -776,7 +767,7 @@ $(document).ready(function(){
     mainSections = {
       'topTerms': {
           display: "terms",
-          config: "website_terms_of_use,subject_website_consent,stored_website_consent_form,privacy_policy",
+          config: "website_terms_of_use,subject_website_consent,privacy_policy",
           subsections: {
             "termsCheckbox": {
                 fields: [$("[data-type='terms']:visible")],
@@ -812,7 +803,7 @@ $(document).ready(function(){
           subsections:
           {"patientQ": {
                         config: "clinical",
-                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
+                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                         event: patientQClickEvent
                         }
           }},
@@ -829,10 +820,29 @@ $(document).ready(function(){
           }}
     };
 
-    {% if not ('localized' in still_needed) %} $("#patMeta").remove(); {% endif %}
+     /*** event for the next button ***/
+    $("#next").on("click", function() {
+        $(this).hide();
+        $(".loading-message-indicator").show();
+        setTimeout("window.location.reload()", 100);
+    });
 
+    /*** event for the arrow in the header**/
+    $("div.heading").on("click", function() {
+       $('html, body').animate({
+          scrollTop: $(this).next('div.content-body').children().first().offset().top
+       }, 1000);
+    });
+
+    $(".button-container").each(function() {
+      $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    });
+
+    tnthAjax.getTerms({{user.id}});
     fc = new FieldsChecker(mainSections);
-    setTimeout("initIncompleteFields();", 500);
+
+    setTimeout('$(".footerWrapper").show()', 1000);
+    setTimeout("initIncompleteFields();", 1000);
   });
 {% endblock %}
 
