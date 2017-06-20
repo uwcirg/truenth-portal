@@ -50,7 +50,7 @@ class Procedure(db.Model):
     coding.system is required to be `http://snomed.info/sct`
     """
 
-    encounter = db.relationship('Encounter', cascade='delete',
+    encounter = db.relationship('Encounter',
                                 foreign_keys=[encounter_id])
 
     def as_fhir(self):
