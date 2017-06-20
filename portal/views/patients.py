@@ -167,12 +167,10 @@ def patient_profile(patient_id):
             patient.assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
                 None)
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     return render_template(
         'profile.html', user=patient,
         current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
-        user_interventions=user_interventions,
-        terms=terms)
+        user_interventions=user_interventions)
