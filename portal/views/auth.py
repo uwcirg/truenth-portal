@@ -21,6 +21,7 @@ from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
@@ -710,6 +711,14 @@ def client_edit(client_id):
                     user_id=user.id, subject_id=client.user_id,
                     context='intervention')
 
+    def generate_callback(client):
+        # Trigger a callback for client editors to test
+        data = {
+            'event': 'test callback',
+            'UTC server time': FHIR_datetime.as_fhir(datetime.utcnow())
+        }
+        client.notify(data)
+
     if not form.validate_on_submit():
         return render_template(
             'client_edit.html', client=client, form=form,
@@ -739,6 +748,9 @@ def client_edit(client_id):
         auditable_event("service token generated for client {}".format(
             client.client_id), user_id=user.id, subject_id=client.user_id,
             context='authentication')
+        redirect_target = url_for('.client_edit', client_id=client.client_id)
+    elif request.form.get('generate_callback'):
+        generate_callback(client)
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
         form.populate_obj(client)
