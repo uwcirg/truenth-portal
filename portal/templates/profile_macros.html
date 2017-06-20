@@ -658,7 +658,7 @@
                   {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
                   OT.handleEvent();
 
-                  {% if consent_agreements %}if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
+                  if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
                 };
 
             }).fail(function() {
@@ -717,7 +717,7 @@
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
-            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
+            setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
         };
     </script>
 {%- endmacro %}
@@ -731,22 +731,25 @@
                     <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
                     <div class="modal-body">
-                    <h4>Terms</h4>
-                    <div class="terms-container">{{consent_agreement.asset|safe}}</div>
-                    <br/>
-                    <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
-                    <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                      <label class="radio-inline">
-                          <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                          {{ _("Yes") }}
-                      </label>
-                      <br/>
-                      <label class="radio-inline">
-                          <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                          {{ _("No") }}
-                      </label>
-                    </div>
-                    <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                        <div class="terms-wrapper">
+                            <h4>Terms</h4>
+                            <div class="terms-container">{{consent_agreement.asset|safe}}</div>
+                        </div>
+                        <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
+                        <br/>
+                        <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
+                        <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                          <label class="radio-inline">
+                              <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                              {{ _("Yes") }}
+                          </label>
+                          <br/>
+                          <label class="radio-inline">
+                              <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                              {{ _("No") }}
+                          </label>
+                        </div>
+                        <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
                      </div>
                      <br/>
                      <div class="modal-footer" >
@@ -756,6 +759,14 @@
                 </div>
             </div>
         </div>
+        <script>
+            $(function() {
+                (function() {
+                    var agreement_url = "{{consent_agreement.url}}";
+                    if (/stock\-org\-consent/.test(agreement_url)) $(".terms-wrapper").hide();
+                })();
+            });
+        </script>
     {%- endif -%}
 {%- endmacro %}
 {% macro consent(person, consent_agreements, current_user, includeModal) -%}
@@ -776,7 +787,7 @@
                 $("#consentContainer input[name='toConsent']").each(function() {
                     $(this).on("click", function(e) {
                         e.stopPropagation();
-                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true).hide();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true);
                         var orgId = $(this).attr("data-org");
                         $("#" + orgId + "_loader").show();
                         if ($(this).val() == "yes") {
@@ -806,12 +817,14 @@
                             assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                         };
                     });
-                    $(this).on("shown.bs.modal", function() {
+                    $(this).on("show.bs.modal", function() {
                         $("#consentContainer .loading-message-indicator").hide();
                         $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });
+                        var agreement_url = $(this).find(".agreement-url").val();
+                        if (/stock\-org\-consent/.test(agreement_url)) $(".terms-container").hide();
                     });
                 });
             });
@@ -909,16 +922,16 @@
      });</script>
 {%- endmacro %}
 
-{% macro profileConsent(person, current_user, terms) -%}
+{% macro profileConsent(person, current_user) -%}
     {% if person %}
-    <div id="profileConsentList"></div>
+    <div id="profileConsentList">No information available.</div>
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
         var isTestPatient = {%-if person and person.has_role(ROLE.TEST) and person.id != current_user.id-%}true{%-else-%}false{%-endif-%};
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
 
-        /**** this function is used when this section becomes editable ****/
+        /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
         function reloadConsentList() {
             var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
             $("#profileConsentList").animate({opacity: 0}, function() {
@@ -1693,7 +1706,7 @@
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions, terms) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1775,7 +1788,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
-                    {{profileConsent(person, current_user, terms)}}
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>
@@ -1818,7 +1831,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions, terms) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
@@ -1929,7 +1942,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user, terms)}}
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>

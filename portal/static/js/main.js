@@ -541,7 +541,7 @@ var fillContent = {
         this.race(data);
         this.indigenous(data);
         this.orgs(data);
-        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
+        tnthAjax.getOptionalCoreData(OT.getUserId(), false, $(".profile-item-container[data-sections='detail']"));
     },
     "name": function(data){
         if (data && data.name) {
@@ -686,6 +686,7 @@ var fillContent = {
         fillViews.studyId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
+        /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
         var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
         var content = "";
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
@@ -703,13 +704,23 @@ var fillContent = {
             });
 
             var hasContent = false;
+            var TERMS_URL = "";
+            tnthAjax.getTermsUrl(true, function(data) {
+                if (data && data.url) TERMS_URL = data.url;
+            }); 
+            var showInitialConsentTerms = (ctop && hasValue(TERMS_URL));
 
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!OT.initialized) tnthAjax.getOrgs(userId, false, true, null);
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
+                    /*****
+                        consent with top level org config value is only set in Truenth, we need to get the top level org name(s) for each consent
+                        for displaying purpose in EPROMs
+                            ******/
                     if (!ctop) {
                         try {
                             var topOrgID = OT.getTopLevelParentOrg(orgId);
@@ -728,7 +739,6 @@ var fillContent = {
                     var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    //if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -758,6 +768,7 @@ var fillContent = {
                     var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
+                        /****** modal content doe modifying consent status *******/
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -777,6 +788,8 @@ var fillContent = {
                             + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
+
+                        /**** modal content for editing consent date for test patient ****/
                         consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -849,15 +862,13 @@ var fillContent = {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
                  });
             } else {
-                if (ctop) {
-                    if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                if (showInitialConsentTerms) {
                         content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
                         content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
                         content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
                         content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
                         content += "</tr>";
                         $("#profileConsentList").html(content);
-                    } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
 
@@ -919,7 +930,7 @@ var fillContent = {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
             } else {
-                if (ctop && typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                if (showInitialConsentTerms) {
                     content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
                     content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
                     content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
@@ -1393,7 +1404,14 @@ var OrgObj = function(orgId, orgName, parentOrg) {
 var OrgTool = function() {
     this.TOP_LEVEL_ORGS = [];
     this.orgsList = {};
+    this.initialized = false;
 };
+OrgTool.prototype.setUserId = function(userId) {
+    $("#fillOrgs").attr("userId", userId);
+};
+OrgTool.prototype.getUserId = function() {
+    return $("#fillOrgs").attr("userId");
+}
 OrgTool.prototype.inArray = function( n, array) {
   if (n && array && Array.isArray(array)) {
     var found = false;
@@ -1518,6 +1536,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
             if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
         };
     });
+    this.initialized = true;
     return orgsList;
 };
 OrgTool.prototype.populateUI = function() {
@@ -1582,10 +1601,10 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 '<p>I consent to sharing information with the <span class="consent-clinic-name">' + orgName + '.</span></p>' +
                 '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
                 '<br/>' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
                 '</div>' +
                 '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
                 '</div>' +
@@ -1596,12 +1615,12 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 '</div></div></div></div>';
             if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
             $("#defaultConsentContainer").append(s);
-            $("#" + orgId + "_defaultConsentModal input[name='defaultToConsent']").each(function() {
+            $("#" + orgId + "_defaultConsentModal input[name='toConsent']").each(function() {
                 $(this).on("click", function(e) {
                     e.stopPropagation();
                     var orgId = $(this).attr("data-org");
-                    var userId = $("#fillOrgs").attr("userId");
-                    $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true).hide();
+                    var userId = OT.getUserId();
+                    $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true);
                     $("#" + orgId + "_loader").show();
                     if ($(this).val() == "yes") {
                         setTimeout("tnthAjax.setDefaultConsent(" + userId + "," +  orgId + ");", 100);
@@ -1619,17 +1638,17 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 setTimeout("location.reload();", 10);
              });
              $("#" + orgId + "_defaultConsentModal").on("hidden.bs.modal", function() {
-                if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                if ($(this).find("input[name='toConsent']:checked").length > 0) {
                     $("#userOrgs input[name='organization']").each(function() {
                         $(this).removeAttr("data-require-validate");
                     });
-                    var userId = $("#fillOrgs").attr("userId");
+                    var userId = OT.getUserId();
                     assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                 };
              }).on("shown.bs.modal", function() {
                 $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
                 $(this).find(".loading-message-indicator").hide();
-                $(this).find("input[name='defaultToConsent']").each(function(){
+                $(this).find("input[name='toConsent']").each(function(){
                     $(this).prop("checked", false);
                 });
              });
@@ -1642,14 +1661,13 @@ OrgTool.prototype.handlePreSelectedClinic = function() {
         if (ob.length > 0) {
             ob.prop("checked", true);
             var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-            var userId = $("#fillOrgs").attr("userId");
+            var userId = this.getUserId();
             if (!tnthAjax.hasConsent(userId, parentOrg)) {
                 var __modal = OT.getConsentModal();
                 if (__modal) {
                     ob.attr("data-require-validate", "true");
                      __modal.on("hidden.bs.modal", function() {
-                        if ($(this).find("input[name='toConsent']:checked").length > 0 ||
-                            $(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                        if ($(this).find("input[name='toConsent']:checked").length > 0) {
                               $("#userOrgs input[name='organization']").each(function() {
                                 $(this).removeAttr("data-require-validate");
                               });
@@ -1692,7 +1710,7 @@ OrgTool.prototype.handleEvent = function() {
     $("#userOrgs input[name='organization']").each(function() {
         $(this).attr("data-save-container-id", "userOrgs");
         $(this).on("click", function(e) {
-            var userId = $("#fillOrgs").attr("userId");
+            var userId = OT.getUserId();
             var parentOrg = OT.getElementParentOrg(this);
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
@@ -1990,7 +2008,7 @@ var tnthAjax = {
             url: '/api/organization',
             async: sync? false : true
         }).done(function(data) {
-            $("#fillOrgs").attr("userId", userId);
+            OT.setUserId(userId);
             $(".get-orgs-error").remove();
             OT.populateOrgsList(data.entry);
             if(!noPopulate) {
@@ -2013,18 +2031,7 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-            $(".get-consent-error").remove();
-            if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                d.forEach(function(item) {
-                    var orgId = item.organization_id;
-                    //console.log("org Id: " + orgId);
-                    var orgName = $("#" + orgId + "_org").attr("org_name");
-                    if ($("#" + orgId + "_consent").length > 0) {
-                        $("#" + orgId + "_consent").attr("checked", true);
-                    };
-                });
-            };
+           $(".get-consent-error").remove();
            fillContent.consentList(data, userId, null, null);
            loader();
            return true;
@@ -2672,10 +2679,11 @@ var tnthAjax = {
             fillViews.clinical();
         });
     },
-    "getTermsUrl": function() {
+    "getTermsUrl": function(sync, callback) {
         $.ajax ({
             type: "GET",
-            url: '/api/tou'
+            url: '/api/tou',
+            async: (sync? false: true)
         }).done(function(data) {
             $(".get-tou-error").remove();
             if (data.url) {
@@ -2683,10 +2691,14 @@ var tnthAjax = {
                 $("#topTerms .general-tou").each(function() {
                     $(this).attr("data-url", data.url);
                 });
-            };
+                if (callback) callback({"url": data.url});
+            } else {
+                if (callback) callback({"error": "no url returned"});
+            }
             //fillContent.terms(data);
         }).fail(function() {
            if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou url.</div>");
+           if (callback) callback({"error": "Server error"});
         });
     },
     "getTerms": function(userId, type, sync, callback) {
