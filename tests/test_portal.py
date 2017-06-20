@@ -5,6 +5,7 @@ from flask_webtest import SessionScope
 from flask_swagger import swagger
 from swagger_spec_validator import validate_spec_url
 import tempfile
+import urllib
 
 from portal.extensions import db
 from portal.models.intervention import INTERVENTION, UserIntervention
@@ -205,3 +206,14 @@ class TestPortal(TestCase):
             temp_spec.seek(0)
 
             validate_spec_url("file:%s" % temp_spec.name)
+
+    def test_report_error(self):
+        self.login()
+        params = {
+            'subject_id': 112,
+            'page_url': '/not/real',
+            'message': 'creative test string'
+        }
+        rv = self.client.get('/report-error?{}'.format(
+            urllib.urlencode(params)))
+        self.assert200(rv)

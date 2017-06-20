@@ -5,7 +5,7 @@ from flask import render_template_string
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
-from pprint import pprint
+from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
@@ -95,7 +95,7 @@ def report_error():
 
     # log as an error message - but don't raise a server error
     # for the front end to manage.
-    current_app.logger.error("Received error {}".format(pprint(message)))
+    current_app.logger.error("Received error {}".format(pformat(message)))
     return jsonify(error='received')
 
 
