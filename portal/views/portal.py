@@ -491,7 +491,7 @@ def website_consent_script(patient_id):
         patient_id=patient_id)
 
 
-def get_terms(org, role):
+def get_terms(org=None, role=None):
     terms = None
 
     if org:
