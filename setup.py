@@ -65,6 +65,7 @@ setup_kwargs = dict(
         "jsonschema",
         "oauthlib",
         "pkginfo",
+        "polib",
         "psycopg2",
         "python-dateutil",
         "python-Levenshtein",
