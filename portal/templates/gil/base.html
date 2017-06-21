@@ -461,9 +461,7 @@
                       function(data) {
                         if (data) {
                           if (data.name) {
-                            {% trans message1='Thank you, your access code ', message2='indicates you are located at the', message3='Proceeding to registration' %}
-                            $("#access_code_info").html("{{message1}}'" + $("#shortcut_alias").val() + "' {{message2}} " + data.name + ". {{message3}} . . .");
-                            {% endtrans %}
+                            $("#access_code_info").html("{%trans%}Thank you, your access code '" + $("#shortcut_alias").val() + "' indicates you are located at the " + data.name + ". Proceeding to registration . . .{%endtrans%}");
                             $("#access_code_error").text("");
 
                           } else {
