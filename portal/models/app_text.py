@@ -100,6 +100,27 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
         return "{} organization consent URL".format(organization.name)
 
 
+class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for website consent terms presented at initial queries
+
+        :param organization: for which the consent agreement applies
+        :param role: for specific role selections, but only if
+          it makes sense.  (i.e. on ePROMs, staff see different content)
+
+        :returns: string for AppText.name field
+
+        """
+        organization = kwargs.get('organization')
+        if not organization:
+            raise ValueError("required organization parameter not defined")
+        role = kwargs.get('role')
+        if role:
+            return "{} {} website consent URL".format(
+                organization.name, role)
+        return "{} organization website consent URL".format(organization.name)
+
 class InitialConsent_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
 
@@ -116,18 +137,24 @@ class InitialConsent_ATMA(AppTextModelAdapter):
         return "Initial Consent Terms URL"
 
 class Terms_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for New Terms Of Use agreements - namely the URL"""
+    """AppTextModelAdapter for New Terms Of Use agreements, used for /terms"""
 
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for a Terms and Conditions - new item just added
+        """Generate AppText name key for a Terms and Conditions
 
-        Not expecting any args at this time - may specialize per study
-        or organization in the future as needed.
-
+        :param organization: optional, present in tandem to role parameter
+        :param role: optional, role of the user
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('organization') and not kwargs.get('role'):
+            raise ValueError("'role' parameter not defined")
+        elif kwargs.get('role') and not kwargs.get('organization'):
+            raise ValueError("'organization' parameter not defined")
+        elif kwargs.get('organization') and kwargs.get('role'):
+            return "{} {} terms and conditions URL".\
+                    format(kwargs.get('organization').name, kwargs.get('role'))
         return "Terms and Conditions URL"
 
 
@@ -154,10 +181,64 @@ class PrivacyATMA(AppTextModelAdapter):
     def name_key(**kwargs):
         """Generate AppText name key for privacy URL
 
+        :param organization: optional, present in tandem to role
+        :param role: optional
         :returns: string for AppText.name field
 
         """
+        if kwargs.get('organization') and not kwargs.get('role'):
+            raise ValueError("'role' parameter not defined")
+        elif kwargs.get('role') and not kwargs.get('organization'):
+            raise ValueError("'organization' parameter not defined")
+        elif kwargs.get('organization') and kwargs.get('role'):
+            return "{} {} privacy URL".format(kwargs.get('organization').name, kwargs.get('role'))
         return "Privacy URL"
+
+
+class UnversionedResource(object):
+    "Like VersionedResource for non versioned URLs (typically local)"
+    def __init__(self, url, asset=None):
+        """Initialize based on requested URL
+
+        Attempts to fetch asset and mock a versioned URL
+
+        :param url: the URL to pull details and asset from
+        :param asset: if given, use as asset, otherwise, download
+
+        :attribute asset: will contain the html asset downloaed, found in the
+            cache, or the error message if that fails.
+        :attribute editor_url: always None
+        :attribute url: the original url.
+
+        """
+        self._asset, self.error_msg, self.editor_url = None, None, None
+        self.url = url
+        if asset:
+            self._asset = asset
+        else:
+            try:
+                response = requests.get(url)
+                self._asset = response.text
+            except MissingSchema:
+                if current_app.config.get('TESTING'):
+                    self._asset = '[TESTING - fake response]'
+                else:
+                    self.error_msg = (
+                        "Could not retrieve remote content - Invalid URL")
+            except:
+                self.error_msg = (
+                    "Could not retrieve remove content - Server could not be "
+                    "reached")
+
+        if self.error_msg:
+            current_app.logger.error(self.error_msg + ": {}".format(url))
+
+    @property
+    def asset(self):
+        """Return asset if available else error message"""
+        if self._asset:
+            return self._asset
+        return self.error_msg
 
 
 class VersionedResource(object):

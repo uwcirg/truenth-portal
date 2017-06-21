@@ -11,14 +11,15 @@ from werkzeug.exceptions import Unauthorized
 
 import address
 from .app_text import app_text, ConsentByOrg_ATMA, UndefinedAppText
-from .app_text import VersionedResource
+from .app_text import VersionedResource, UnversionedResource
 from ..database import db
 from ..date_tools import FHIR_datetime
 from .extension import CCExtension
 from .identifier import Identifier
 from .reference import Reference
 from .role import Role, ROLE
-from .telecom import Telecom
+from .telecom import ContactPoint, Telecom
+
 
 USE_SPECIFIC_CODINGS_MASK = 0b0001
 RACE_CODINGS_MASK = 0b0010
@@ -41,11 +42,13 @@ class Organization(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     email = db.Column(db.String(120))
-    phone = db.Column(db.String(40))
+    phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
     type_id = db.Column(db.ForeignKey('codeable_concepts.id',
                                       ondelete='cascade'))
     partOf_id = db.Column(db.ForeignKey('organizations.id'))
     coding_options = db.Column(db.Integer, nullable=False, default=0)
+    default_locale_id = db.Column(db.ForeignKey('codings.id'))
 
     addresses = db.relationship('Address', lazy='dynamic',
             secondary="organization_addresses")
@@ -53,6 +56,8 @@ class Organization(db.Model):
             secondary="organization_identifiers")
     locales = db.relationship('Coding', lazy='dynamic',
             secondary="organization_locales")
+    _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
+            cascade="save-update")
     type = db.relationship('CodeableConcept', cascade="save-update")
 
     def __init__(self, **kwargs):
@@ -128,6 +133,41 @@ class Organization(db.Model):
         else:
             self.coding_options = self.coding_options & ~INDIGENOUS_CODINGS_MASK
 
+    @property
+    def phone(self):
+        if self._phone:
+            return self._phone.value
+
+    @phone.setter
+    def phone(self, val):
+        if self._phone:
+            self._phone.value = val
+        else:
+            self._phone = ContactPoint(system='phone',use='work',value=val)
+
+    @property
+    def default_locale(self):
+        from .fhir import Coding  # local due to cycle
+        coding = None
+        org = self
+        if org.default_locale_id:
+            coding = Coding.query.get(org.default_locale_id)
+        while org.partOf_id and not coding:
+            org = Organization.query.get(org.partOf_id)
+            if org.default_locale_id:
+                coding = Coding.query.get(org.default_locale_id)
+        if coding:
+            return coding.code
+
+
+    @default_locale.setter
+    def default_locale(self, value):
+        from .fhir import Coding  # local due to cycle
+        coding = Coding.query.filter_by(
+                system='urn:ietf:bcp:47', code=value).first()
+        if coding:
+            self.default_locale_id = coding.id
+
     @classmethod
     def from_fhir(cls, data):
         org = cls()
@@ -142,8 +182,10 @@ class Organization(db.Model):
             self.name = data['name']
         if 'telecom' in data:
             telecom = Telecom.from_fhir(data['telecom'])
-            self.phone = telecom.phone
             self.email = telecom.email
+            telecom_cps = telecom.cp_dict()
+            self.phone = telecom_cps.get(('phone','work')) \
+                or telecom_cps.get(('phone',None))
         if 'address' in data:
             for addr in data['address']:
                 self.addresses.append(address.Address.from_fhir(addr))
@@ -164,6 +206,8 @@ class Organization(db.Model):
                 identifier = Identifier.from_fhir(id).add_if_not_found()
                 if identifier not in self.identifiers.all():
                     self.identifiers.append(identifier)
+        if 'language' in data:
+            self.default_locale = data['language']
         return self
 
     def as_fhir(self):
@@ -171,7 +215,7 @@ class Organization(db.Model):
         d['resourceType'] = 'Organization'
         d['id'] = self.id
         d['name'] = self.name
-        telecom = Telecom(email=self.email, phone=self.phone)
+        telecom = Telecom(email=self.email, contact_points=[self._phone])
         d['telecom'] = telecom.as_fhir()
         if self.addresses:
             d['address'] = []
@@ -201,6 +245,8 @@ class Organization(db.Model):
             d['identifier'] = []
         for id in self.identifiers:
             d['identifier'].append(id.as_fhir())
+        if self.default_locale:
+            d['language'] = self.default_locale
         return d
 
     @classmethod
@@ -241,6 +287,7 @@ class Organization(db.Model):
           is also added to the versioned resource to simplify UI code.
 
         """
+        from ..views.portal import stock_consent  # local avoids cycle
         agreements = {}
         for org_id in OrgTree().all_top_level_ids():
             org = Organization.query.get(org_id)
@@ -248,10 +295,15 @@ class Organization(db.Model):
             # include only those with such defined
             try:
                 url = app_text(ConsentByOrg_ATMA.name_key(organization=org))
+                resource = VersionedResource(url)
             except UndefinedAppText:
-                # no consent found for this organization, continue
-                continue
-            resource = VersionedResource(url)
+                # no consent found for this organization, provide
+                # the dummy template
+                url = url_for('portal.stock_consent', org_name=org.name,
+                              _external=True)
+                asset = stock_consent(org_name=org.name)
+                resource = UnversionedResource(url=url, asset=asset)
+
             resource.organization_name = org.name
             agreements[org.id] = resource
         return agreements
@@ -528,11 +580,30 @@ class OrgTree(object):
             if other_organization_id in children:
                 return True
 
+    def find_top_level_org(self, organizations):
+        """Returns top level organization(s) based on the organizations provided
+
+        :param organizations: organizations against which top level organization(s) will be queried
+
+        :return: list of top level organization(s)
+
+        """
+        orgs_list = []
+        for org in (o for o in organizations if o.id):
+            top_org_id = self.find(org.id).top_level()
+            orgs_list.append(Organization.query.get(top_org_id))
+
+        return orgs_list
+
     def visible_patients(self, staff_user):
         """Returns patient IDs for whom the current staff_user can view
 
         Staff users can view all patients at or below their own org
         level.
+
+        NB - no patients should ever have a consent on file with the special
+        organization 'none of the above' - said organization is ignored in the
+        search.
 
         """
         from .user import User, UserRoles  # local to avoid cycle
@@ -544,7 +615,7 @@ class OrgTree(object):
             raise Unauthorized("visible_patients() exclusive to staff use")
 
         staff_user_orgs = set()
-        for org in staff_user.organizations:
+        for org in (o for o in staff_user.organizations if o.id != 0):
             staff_user_orgs.update(self.here_and_below_id(org.id))
 
         if not staff_user_orgs:

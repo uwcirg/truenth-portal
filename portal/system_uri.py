@@ -8,6 +8,7 @@ TRUENTH_NAMESPACE = 'http://us.truenth.org'
 
 # Used for local clinical codes
 TRUENTH_CLINICAL_CODE_SYSTEM = '{}/clinical-codes'.format(TRUENTH_NAMESPACE)
+TRUENTH_ENCOUNTER_CODE_SYSTEM = '{}/encounter-types'.format(TRUENTH_NAMESPACE)
 
 # Auth identities - typically used with suffix for provider (i.e. google)
 # or to name identity type (i.e. TrueNTH-username)

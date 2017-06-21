@@ -52,6 +52,7 @@ class TestDemographics(TestCase):
         dod = '2027-12-31T09:10:00'
         gender = 'Male'
         phone = "867-5309"
+        alt_phone = "555-5555"
         data = {"name": {"family": family, "given": given},
                 "resourceType": "Patient",
                 "birthDate": dob,
@@ -60,7 +61,12 @@ class TestDemographics(TestCase):
                 "telecom": [
                     {
                         "system": "phone",
+                        "use": "mobile",
                         "value": phone,
+                    }, {
+                        "system": "phone",
+                        "use": "home",
+                        "value": alt_phone,
                     }, {
                         "system": 'email',
                         'value': '__no_email__'
@@ -94,7 +100,13 @@ class TestDemographics(TestCase):
         fhir = json.loads(rv.data)
         for item in fhir['telecom']:
             if item['system'] == 'phone':
-                self.assertEquals(phone, item['value'])
+                if item['use'] == 'home':
+                    self.assertEquals(alt_phone, item['value'])
+                elif item['use'] == 'mobile':
+                    self.assertEquals(phone, item['value'])
+                else:
+                    self.fail(
+                        'unexpected telecom use: {}'.format(item['use']))
             else:
                 self.fail(
                     'unexpected telecom system: {}'.format(item['system']))
@@ -295,3 +307,43 @@ class TestDemographics(TestCase):
             content_type='application/json',
             data=json.dumps(data))
         self.assert400(rv)
+
+    def test_alt_phone_removal(self):
+        user = User.query.get(TEST_USER_ID)
+        user.phone = '111-1111'
+        user.alt_phone = '555-5555'
+        with SessionScope(db):
+            db.session.add(user)
+            db.session.commit()
+
+        data = {"resourceType": "Patient",
+                "telecom": [
+                    {
+                        "system": "phone",
+                        "value": '867-5309',
+                    }, {
+                        "system": 'email',
+                        'value': '__no_email__'
+                    }]
+               }
+
+        self.login()
+        rv = self.client.put('/api/demographics/%s' % TEST_USER_ID,
+                content_type='application/json',
+                data=json.dumps(data))
+
+        self.assert200(rv)
+        fhir = json.loads(rv.data)
+        for item in fhir['telecom']:
+            if item['system'] == 'phone':
+                if item['use'] == 'mobile':
+                    self.assertEquals(item['value'], '867-5309')
+                elif item['use'] == 'home':
+                    self.assertEquals(item['value'], None)
+                else:
+                    self.fail(
+                        'unexpected telecom use: {}'.format(item['use']))
+            else:
+                self.fail(
+                    'unexpected telecom system: {}'.format(item['system']))
+

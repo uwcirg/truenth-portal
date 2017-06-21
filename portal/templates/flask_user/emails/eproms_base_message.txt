@@ -1,0 +1,4 @@
+Hello User,
+
+{% block message %}
+{% endblock %}

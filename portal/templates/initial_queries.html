@@ -5,57 +5,48 @@
 {% from "initial_queries_macros.html" import tou, nameGroup, rolesGroup, dobGroup, patientQGroup, clinic, consent %}
 {% from "profile_macros.html" import profileOrgsSelector %}
 <input type="hidden" id="iq_userId" value="{{user.id}}" />
-<style>.footerWrapper { display: none; border-top: solid 1px #eee; margin-top: 2em;}</style>
 <div id="progressWrapper"><ul id="progressbar" class="progressbar"></ul></div>
-  {% if 'tou' in still_needed %}
-      {{tou(terms)}}
-  {% endif %}
+  {{tou(terms)}}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
         {% if user and user.email %}
             <input type="hidden" name="email" id="email" value="{{user.email}}" />
         {% endif %}
-        {% if 'name' in still_needed or 'dob' in still_needed or 'role' in still_needed %}
-            <div id="demographicsContainer" class="iq-container" parent-section="true">
-                <div class="content">
-                  <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
-                  <div class="content-body">
-                    {{nameGroup()}}
-                    <br/><br/>
-                    {{dobGroup()}}
-                    <br/><br/>
-                    {{rolesGroup()}}
-                  </div>
-                </div>
-            </div>
-        {% endif %}
-        {% if 'clinical' in still_needed  or 'localized' in still_needed%}
-            <div id="clinicalContainer" class="iq-container" parent-section="true">
-              <div class="content">
-                <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
-                <div class="content-body">
-                  <p class="subtitle">The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.</p>
-                  {{patientQGroup(user)}}
-                </div>
+        <div id="demographicsContainer" class="iq-container" data-parent-section="true">
+            <div class="content">
+              <div class="heading"><h3 class="tnth-headline">{{ _("Tell us a little about yourself.") }}</h3></div>
+              <div class="content-body">
+                {{nameGroup()}}
+                <br/><br/>
+                {{dobGroup()}}
+                <br/><br/>
+                {{rolesGroup()}}
               </div>
             </div>
-        {% endif %}
-        {% if 'org' in still_needed or session.get('associate_clinic_id', '') %}
-            <div id="orgsContainer" class="iq-container" parent-section="true">
-              <div class="content">
-                <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
-                <div class="content-body">
-                 {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                     <div id="clinics">
-                        {{profileOrgsSelector(user, user, consent_agreements)}}
-                     </div>
-                 {% else %}
-                      {{clinic(consent_agreements)}}
-                 {% endif %}
-                  </div>
-              </div>
+        </div>
+        <div id="clinicalContainer" class="iq-container" data-parent-section="true">
+          <div class="content">
+            <div class="heading"><h3 class="tnth-headline">{{ _("Now it's time to build your prostate cancer profile.") }}</h3></div>
+            <div class="content-body">
+              <p class="subtitle">{{_("The questions we're asking will help us customize what you see and provide the best information to help you track and manage your prostate cancer journey.")}}</p>
+              {{patientQGroup(user)}}
             </div>
-        {% endif %}
+          </div>
+        </div>
+        <div id="orgsContainer" class="iq-container" data-parent-section="true">
+          <div class="content">
+            <div class="heading"><h3 class="tnth-headline">{{ _("Your clinic of care.") }}</h3></div>
+            <div class="content-body">
+             {% if session.get('associate_clinic_id', '') or ('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
+                 <div id="clinics">
+                    {{profileOrgsSelector(user, user, consent_agreements)}}
+                 </div>
+             {% else %}
+                  {{clinic(consent_agreements)}}
+             {% endif %}
+              </div>
+          </div>
+        </div>
         <div class="reg-buttons-msg-wrapper">
           <div class="reg-complete-container">
               <h4 class="profile-item-title"> {{ _("Thank you.") }}</h4>
@@ -70,24 +61,25 @@
     </form>
   </div>
 {% endblock %}
-{% from "flask_user/_macros.html" import footer %}
+{% from "flask_user/_macros.html" import linksHTML, logo %}
 {% block footer %}
 <!-- custom footer -->
-<div class="footerWrapper">
-  <div id="homeFooter" class="container-fluid">
-    <div class="row">
-        <div class="col-xs-6 col-lg-8 footer-container">
-            <div class="copyright-container">
-              <p><small><a href="{{PORTAL}}/about">{{ _("About") }}</a> | <a href="{{PORTAL}}/contact">{{ _("Contact") }}</a> | <a href="{{PORTAL}}/privacy">{{ _("Privacy") }} | <a href="{{PORTAL}}/logout">Logout</a></small></p>
-              <p><small class="text-muted">&copy;2017 Movember Foundation. All rights reserved. A registered 501(c)3 non-profit organization.</small></p>
-            </div>
-        </div>
-        <div class="col-xs-6 col-lg-4 footer-container logo-container">
-            <div class="pull-right">
-                <a href="http://us.movember.com" title="{{ _('Movember') }}"><img id="footerLockup" src="{{PORTAL}}{{url_for('static',filename='img/logo_movember_lockup.png')}}" /></a>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-12 col-lg-12">
+      <div id="iqFooterWrapper" class="footerWrapper">
+        <div id="homeFooter" class="container-fluid">
+          <div class="row">
+              <div class="col-xs-6 col-lg-8 footer-container">
+                  <div class="copyright-container">{{linksHTML(user=user)}}</div>
+              </div>
+              <div class="col-xs-6 col-lg-4 footer-container logo-container">
+                  <div class="pull-right">{{logo()}}</div>
+              </div>
             </div>
         </div>
       </div>
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -99,38 +91,80 @@ var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-
 
 var fc, mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
-var CONFIG_REQUIRED_CORE_DATA = {%if config.REQUIRED_CORE_DATA %}{{config.REQUIRED_CORE_DATA|safe}}{% else%}false{%endif%};
-
-function inConfig(configMatch) {
-  if (! hasValue(configMatch)) return false;
-  else {
-    if (CONFIG_REQUIRED_CORE_DATA) {
-      var found = false;
-      var ma = configMatch.split(",");
-      ma.forEach(function(item) {
-        CONFIG_REQUIRED_CORE_DATA.forEach(function(v) {
-            if (!found && v == item) found = true;
-        });
-      });
-      return found;
-    } else return true;
+/**** object for obtaining required core data ****/
+var configObj = (function() {
+  var CONFIG_DEFAULT_CORE_DATA = {%if config.REQUIRED_CORE_DATA %}{{config.REQUIRED_CORE_DATA|safe}}{% else%}false{%endif%};
+  var CONFIG_REQUIRED_CORE_DATA = null;
+  return {
+      initConfig: function() {
+        {%- if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}
+        tnthAjax.getStillNeededCoreData({{user.id}}, true, this.setConfig);
+        {%- else -%}
+        CONFIG_REQUIRED_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
+        {%- endif -%}
+      },
+      inConfig: function(configMatch, dataArray) {
+        if (! hasValue(configMatch)) return false;
+        else {
+          if (!dataArray) dataArray = CONFIG_REQUIRED_CORE_DATA;
+          if (dataArray) {
+            var found = false;
+            var ma = configMatch.split(",");
+            ma.forEach(function(item) {
+              if (dataArray.length == 0) return false;
+              dataArray.forEach(function(v) {
+                  if (!found && v == item) found = true;
+              });
+            });
+            return found;
+          } else return true;
+        };
+      },
+      getDefaultConfig: function() {
+        return CONFIG_DEFAULT_CORE_DATA;
+      },
+      getConfig: function() {
+        return CONFIG_REQUIRED_CORE_DATA;
+      },
+      setConfig: function(data) {
+        if (data) {
+          if (!data.error) {
+            CONFIG_REQUIRED_CORE_DATA = data;
+          };
+        }
+      }
   };
-};
+
+})();
 
 /***** helper class to keep track of missing fields ***/
 var FieldsChecker = function(mainSections) {
   this.mainSections = {};
   if (mainSections) {
-    for (var section in mainSections) {
-      if (inConfig(mainSections[section].config)) this.mainSections[section] = mainSections[section];
+    if (!configObj.getConfig()) {
+      this.mainSections = mainSections;
     }
+    else {
+      for (var section in mainSections) {
+        if (mainSections[section].required) {
+          this.mainSections[section] = mainSections[section];
+        }
+
+        else if (configObj.inConfig(mainSections[section].config)) {
+          this.mainSections[section] = mainSections[section];
+        };
+      };
+    };
   };
   this.incompleteFields = [];
 };
 
 FieldsChecker.prototype.getTotalSections = function() {
+  /*** note counting all the default main sections to show progress for each**/
+  var configData = configObj.getDefaultConfig();
+  if (configData) return configData.length;
   var ct=0;
-  for (var section in this.mainSections) {
+  for (var section in mainSections) {
     ct++;
   };
   return ct;
@@ -149,13 +183,34 @@ FieldsChecker.prototype.constructProgressBar = function() {
   if ($("#topTerms").length > 0 && !fc.sectionCompleted("topTerms")) return false;
   var totalSections = this.getTotalSections();
   if (totalSections > 1) {
-      var w = (1/totalSections) * 100;
-      for (var section in this.mainSections) {
+      var configData = configObj.getDefaultConfig();
+      var availableSections = 0;
+      for (var section in mainSections) {
+          if (configData && !configObj.inConfig(mainSections[section].config, configData)) continue;
           var active = fc.sectionCompleted(section);
-          $("#progressbar").append("<li sectionId='" + section + "' style='width:" + w + "%' " + (active? " class='active'": "") + ">" + this.mainSections[section].display + "</li>");
+          $("#progressbar").append("<li sectionId='" + section + "'  " + (active? " class='active'": "") + ">" + mainSections[section].display + "</li>");
+          availableSections++;
       };
-      $("#progressWrapper").show();
+      if (availableSections > 0) {
+          var w = (1/availableSections) * 100;
+          $("#progressbar li").each(function() {
+              $(this).css("width", w + "%");
+          });
+          if (availableSections > 1) {
+            $("#progressWrapper").show();
+          };
+      };
   } else $("#progressWrapper").remove();
+};
+
+FieldsChecker.prototype.setProgressBar = function (sectionId) {
+  if (this.allFieldsCompleted()) $("#progressWrapper").hide();
+  else {
+    if (hasValue(sectionId)) {
+      if (this.sectionCompleted(sectionId)) $("#progressbar li[sectionId='" + sectionId + "']").addClass("active");
+      else $("#progressbar li[sectionId='" + sectionId + "']").removeClass("active");
+    };
+  };
 };
 
 FieldsChecker.prototype.getIncompleteFields = function() {
@@ -217,10 +272,10 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
       };
     } else {
       if (field) {
-          var parentContainer = field.closest("[parent-section='true']");
+          var parentContainer = field.closest("[data-parent-section='true']");
           var found = false;
           if (parentContainer.length > 0) {
-              var nexts = parentContainer.nextAll("[parent-section='true']");
+              var nexts = parentContainer.nextAll("[data-parent-section='true']");
               nexts.each(function() {
                 var parentId = $(this).attr("id");
                 //console.log('parentId: ' + parentId)
@@ -253,7 +308,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
       if (fields) {
           fields.forEach(function(field) {
             if (field.length > 0 && (field.attr("skipped") != "true")) {
-                var type = field.attr('type');
+                var type = field.attr('type') || field.attr('data-type');
                 switch(String(type).toLowerCase()) {
                 case 'checkbox':
                 case 'radio':
@@ -274,7 +329,12 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                     else if (!(field.get(0).validity.valid)) isComplete = false;
                     break;
                 case 'terms':
-                    if (!(field.attr("data-agree") == "true")) isComplete = false;
+                    var _isAgreed = true;
+                    field.each(function() {
+                         if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
+                    });
+                    if (!_isAgreed) isComplete = false;
+                
                     break;
                 };
                 if (hasValue(field.attr("data-require-validate"))) isComplete = false;
@@ -289,7 +349,6 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
 FieldsChecker.prototype.allFieldsCompleted = function() {
   this.setIncompleteFields();
   var completed = (!hasValue($(".custom-error").text())) && this.incompleteFields.length == 0;
-  if (completed) this.showAll();
   return completed;
 };
 
@@ -309,8 +368,8 @@ FieldsChecker.prototype.showAll = function() {
   };
 };
 
-function continueToFinish() {
-  setProgressBar();
+FieldsChecker.prototype.continueToFinish = function() {
+  this.setProgressBar();
   $("div.reg-complete-container").fadeIn();
   $('html, body').animate({
     scrollTop: $('div.reg-complete-container').offset().top
@@ -320,15 +379,15 @@ function continueToFinish() {
   $("#updateProfile").removeAttr("disabled").addClass("open");
 };
 
-function stopContinue(sectionId) {
+FieldsChecker.prototype.stopContinue = function(sectionId) {
   $("#updateProfile").attr("disabled", true).removeClass("open");
   $("div.reg-complete-container").fadeOut();
   $("#next").show().attr("disabled", true);
-  setProgressBar(sectionId);
+  this.setProgressBar(sectionId);
 }
 
-function continueToNext(sectionId) {
-  setProgressBar(sectionId);
+FieldsChecker.prototype.continueToNext = function(sectionId) {
+  this.setProgressBar(sectionId);
   $("div.reg-complete-container").fadeOut();
   $("#next").show().removeAttr("disabled");
   if (!$("#next").isOnScreen()) {
@@ -339,10 +398,10 @@ function continueToNext(sectionId) {
   $("#updateProfile").attr("disabled", true).removeClass("open");
 };
 
-function getNext() {
-  var found = false;
-  for (var section in fc.mainSections) {
-    if (!found && !fc.sectionCompleted(section)) {
+FieldsChecker.prototype.getNext = function() {
+  var found = false, self = this;
+  for (var section in self.mainSections) {
+    if (!found && !self.sectionCompleted(section)) {
        if (section == "orgsContainer") {
           if (hasValue(preselectClinic)) {
               var __modal = OT.getConsentModal();
@@ -361,17 +420,7 @@ function getNext() {
        };
     };
   };
-  if (!found) continueToFinish();
-};
-
-function setProgressBar(sectionId) {
-  if (fc.allFieldsCompleted()) $("#progressWrapper").hide();
-  else {
-    if (hasValue(sectionId)) {
-      if (fc.sectionCompleted(sectionId)) $("#progressbar li[sectionId='" + sectionId + "']").addClass("active");
-      else $("#progressbar li[sectionId='" + sectionId + "']").removeClass("active");
-    };
-  };
+  if (!found) self.continueToFinish();
 };
 
 function initIncompleteFields() {
@@ -393,75 +442,72 @@ function initIncompleteFields() {
                 if ($(this).value != "" && this.validity.valid) {
                   var isComplete = fc.allFieldsCompleted();
                   if (isComplete) {
-                     continueToFinish();
+                     fc.continueToFinish();
                   };
                 } else {
-                    var parentSection = $(this).closest("div[parent-section]").attr("id");
-                    if (fc.sectionCompleted(parentSection)) continueToNext(parentSection);
-                    else stopContinue(parentSection);
+                    var parentSection = $(this).closest("div[data-parent-section]").attr("id");
+                    if (fc.sectionCompleted(parentSection)) fc.continueToNext(parentSection);
+                    else fc.stopContinue(parentSection);
                 };
             });
         };
     });
   });
+  /************
+  //debugging code
+  //incompleteFields.forEach(function(field, index) {
+  //    console.log(field.section.attr("id") + " " + field.element.length);
+  //    console.log(field.element)
+  //});
+  ************/
 
-  $(".button-container").each(function() {
-      $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
-  });
+    /****** prep work after initializing incomplete fields *****/
+    /*****  set visuals e.g. top terms ************************/
 
-  fc.constructProgressBar();
+    fc.constructProgressBar();
 
-  //if term of use form not present - need to show the form
-  if ($("#topTerms").length == 0)  {
-      $("#aboutForm").fadeIn();
-      getNext();
-      if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
-        continueToFinish();
-      };
-  } else {
-    $("#topTerms").fadeIn();
-    if (window.performance) {
-      if (performance.navigation.type == 1) {
-        //page has been reloaded;
-        $("#termsReminderModal").modal("show");
+    //if term of use form not present - need to show the form
+    if ($("#topTerms").length == 0)  {
+        $("#topTerms").hide();
+        $("#aboutForm").fadeIn();
+        fc.getNext();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
+    } else {
+      if (!fc.sectionCompleted("topTerms")) {
+        $("#topTerms").removeClass("hide-terms").fadeIn();
+        if (window.performance) {
+          if (performance.navigation.type == 1) {
+            //page has been reloaded;
+            $("#termsReminderModal").modal("show");
+          };
+        };
+        $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
+            e.preventDefault();
+            return false;
+        });
+      } else {
+        $("#topTerms").hide();
+        fc.getNext();
+        $("#aboutForm").fadeIn();
+        if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
+          fc.continueToFinish();
+        };
       };
     };
-    $("#tnthLogo a, a[href]").not("a[href*='logout']").addClass("disabled").on("click", function(e) {
-        e.preventDefault();
-        return false;
-    });
-  };
-
-  setTimeout('$(".footerWrapper").show()', 1000);
-  /************
-  incompleteFields.forEach(function(field, index) {
-      console.log(field.section.attr("id") + " " + field.element.length);
-      console.log(field.element)
-
-  });
-  ************/
 
 };
 
+configObj.initConfig();
+
 $(document).ready(function(){
 
-    $("#next").on("click", function() {
-        $(this).hide();
-        $(".loading-message-indicator").show();
-        setTimeout("window.location.reload()", 100);
-    });
-
-    $("div.heading").on("click", function() {
-       $('html, body').animate({
-          scrollTop: $(this).next('div.content-body').children().first().offset().top
-       }, 1000);
-    });
-
     var namesChangeEvent = function() {
-       if (fc.allFieldsCompleted()) continueToFinish();
+       if (fc.allFieldsCompleted()) fc.continueToFinish();
        else {
-          if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
-          else stopContinue("demographicsContainer");
+          if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
+          else fc.stopContinue("demographicsContainer");
        };
     };
 
@@ -490,16 +536,16 @@ $(document).ready(function(){
                   $("#errorbirthday").text("").hide();
                   assembleContent.demo($("#iq_userId").val());
                   if (fc.allFieldsCompleted()) {
-                     continueToFinish();
+                     fc.continueToFinish();
                   } else {
-                    if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
+                    if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
                   };
               } else {
-                  stopContinue("demographicsContainer");
+                  fc.stopContinue("demographicsContainer");
                   $("#errorbirthday").text(errorMsg).show();
               };
-          } else stopContinue("demographicsContainer");
-      } else stopContinue("demographicsContainer");
+          } else fc.stopContinue("demographicsContainer");
+      } else fc.stopContinue("demographicsContainer");
     };
 
     var rolesGroupClickEvent = function(){
@@ -525,24 +571,23 @@ $(document).ready(function(){
             $("#month").removeAttr("required").attr("skipped", "true");
             $("#year").removeAttr("required").attr("skipped", "true");
             $(".bd-optional").show();
-           //continueToFinish();
-           // return true;
           };
         };
 
         if (fc.allFieldsCompleted()) {
-          continueToFinish();
+          fc.continueToFinish();
         } else {
-          if (fc.sectionCompleted("demographicsContainer")) continueToNext("demographicsContainer");
-          else stopContinue("demographicsContainer");
+          if (fc.sectionCompleted("demographicsContainer")) fc.continueToNext("demographicsContainer");
+          else fc.stopContinue("demographicsContainer");
         };
     };
 
     var patientQClickEvent = function(){
           var thisItem = $(this);
-          var toCall = thisItem.attr("name");
+          var toCall = thisItem.attr("name") || thisItem.attr("data-name");
+       
           // Get value from div - either true or false
-          var toSend = thisItem.val();
+          var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
           if (toCall != "tx" && toCall != "biopsy") {
               tnthAjax.postClinical({{user.id}},toCall,toSend, $(this).attr("data-status"), false);
@@ -553,7 +598,7 @@ $(document).ready(function(){
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  $("#biopsyDate").datepicker("hide").blur();
+                  $("#biopsyDate").datepicker("hide");
                   var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
                   tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": biopsyDate});
                 };
@@ -619,10 +664,10 @@ $(document).ready(function(){
           };
 
           if (fc.allFieldsCompleted()) {
-            continueToFinish();
+            fc.continueToFinish();
           } else {
-            if (fc.sectionCompleted("clinicalContainer")) continueToNext("clinicalContainer");
-            else stopContinue("clinicalContainer");
+            if (fc.sectionCompleted("clinicalContainer")) fc.continueToNext("clinicalContainer");
+            else fc.stopContinue("clinicalContainer");
           }
       };
 
@@ -638,10 +683,10 @@ $(document).ready(function(){
         }
         else {
           if (fc.allFieldsCompleted()) {
-            continueToFinish();
+            fc.continueToFinish();
           } else {
-            if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
-            else stopContinue("orgsContainer");
+            if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
+            else fc.stopContinue("orgsContainer");
           };
         };
       };
@@ -654,10 +699,10 @@ $(document).ready(function(){
                 $(this).removeAttr("data-require-validate");
             });
             if (fc.allFieldsCompleted()) {
-              continueToFinish();
+              fc.continueToFinish();
             } else {
-              if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
-              else stopContinue("orgsContainer");
+              if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
+              else fc.stopContinue("orgsContainer");
             };
           };
         });
@@ -670,10 +715,10 @@ $(document).ready(function(){
                 $(this).removeAttr("data-require-validate");
               });
               if (fc.allFieldsCompleted()) {
-                continueToFinish();
+                fc.continueToFinish();
               } else {
-                if (fc.sectionCompleted("orgsContainer")) continueToNext("orgsContainer");
-                else stopContinue("orgsContainer");
+                if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
+                else fc.stopContinue("orgsContainer");
               };
             };
         });
@@ -681,21 +726,31 @@ $(document).ready(function(){
 
     var termsEvent = function(){
         if ($(this).attr("data-agree") == "false") {
-          var theTerms = {};
-          theTerms["agreement_url"] = $("#termsURL").data().url;
-          // Post terms agreement via API
-          tnthAjax.postTerms(theTerms);
+          var types = $(this).attr("data-tou-type");
+          var additional = $(this).find("[data-core-data-subtype]");
+          if (additional.length > 0) types += (hasValue(types)?",":"") + additional.attr("data-tou-type");
+          if (hasValue(types)) {
+              var arrTypes = types.split(",");
+              var self = $(this);
+              arrTypes.forEach(function(type) {
+                  var theTerms = {};
+                  theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
+                  theTerms["type"] = type;
+                   // Post terms agreement via API
+                  tnthAjax.postTerms(theTerms);
+              });
+          };
           // Update UI
-          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o").end()
-            .find("span").text("I consent and agree to the above terms.");
-          $("#aboutForm").fadeIn();
+          $(this).find("i").removeClass("fa-square-o").addClass("fa-check-square-o");
           $(this).attr("data-agree","true");
+          if (fc.sectionCompleted("topTerms")) {
+            $("#aboutForm").fadeIn();
+          };
           if (fc.allFieldsCompleted()) {
-              continueToFinish();
-          } else continueToNext("topTerms");
+              fc.continueToFinish();
+          } else fc.continueToNext("topTerms");
         };
     };
-
 
     $('#queriesForm').validator().on('submit', function (e) {
         if (e.isDefaultPrevented()) {
@@ -712,10 +767,10 @@ $(document).ready(function(){
     mainSections = {
       'topTerms': {
           display: "terms",
-          config: "tou",
+          config: "website_terms_of_use,subject_website_consent,privacy_policy",
           subsections: {
             "termsCheckbox": {
-                fields: [$("#agreeLabel")],
+                fields: [$("[data-type='terms']:visible")],
                 event: termsEvent
             }
         }
@@ -725,15 +780,19 @@ $(document).ready(function(){
           config: "name,dob,role",
           subsections:{
           "nameGroup": {
+                          config: "name",
                           fields: [$("#firstname"), $("#lastname")],
                           event: namesChangeEvent
                        }
           ,
-          "rolesGroup": {fields: [$("input[name='user_type']")],
+          "rolesGroup": {
+                          config: "role",
+                          fields: [$("input[name='user_type']")],
                           event: rolesGroupClickEvent
                         }
           ,
           "bdGroup": {
+                        config: "dob",
                         fields: [$("#month"), $("#date"), $("#year")],
                         event: bdChangeEvent
                      }
@@ -743,25 +802,47 @@ $(document).ready(function(){
           config: "clinical",
           subsections:
           {"patientQ": {
-                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), {% if 'localized' in still_needed %} $("input[name='pca_localized']"), {%endif%} $("input[name='tx']")],
+                        config: "clinical",
+                        fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                         event: patientQClickEvent
                         }
           }},
       'orgsContainer': {
           display: "your clinic",
           config: "org",
+          required: hasValue(preselectClinic) ? true: false,
           subsections:
           {"clinics": {
-                        fields: [$("#userOrgs input[name='organization']").not('[parent_org]')],
+                        config: "org",
+                        fields: [$("#userOrgs input[name='organization']")],
                         event: userOrgChangeEvent
                       }
           }}
     };
 
-    {% if not ('localized' in still_needed) %} $("#patMeta").remove(); {% endif %}
+     /*** event for the next button ***/
+    $("#next").on("click", function() {
+        $(this).hide();
+        $(".loading-message-indicator").show();
+        setTimeout("window.location.reload()", 100);
+    });
 
+    /*** event for the arrow in the header**/
+    $("div.heading").on("click", function() {
+       $('html, body').animate({
+          scrollTop: $(this).next('div.content-body').children().first().offset().top
+       }, 1000);
+    });
+
+    $(".button-container").each(function() {
+      $(this).prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    });
+
+    tnthAjax.getTerms({{user.id}});
     fc = new FieldsChecker(mainSections);
-    setTimeout("initIncompleteFields();", 500);
+
+    setTimeout('$(".footerWrapper").show()', 1000);
+    setTimeout("initIncompleteFields();", 1000);
   });
 {% endblock %}
 

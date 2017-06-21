@@ -2,6 +2,7 @@
 from flask import abort, Blueprint, jsonify, url_for, current_app
 from flask import request, make_response
 from flask_user import roles_required
+from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
@@ -9,7 +10,9 @@ from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.audit import Audit
+from ..models.auth import Client, Token
 from ..models.group import Group
+from ..models.intervention import Intervention
 from ..models.organization import Organization
 from ..models.role import ROLE, Role
 from ..models.relationship import Relationship
@@ -1415,11 +1418,11 @@ def user_documents(user_id):
                     type: integer
                     format: int64
                     description:
-                      User identifier defining with whom the document belongs to
+                      User identifier defining to whom the document belongs
                   document_type:
                     type: string
                     description:
-                      Type of document uploaded (e.g. WiserCare Patient Report,
+                      Type of document uploaded (e.g. patient report pdf,
                       user avatar image, etc)
                   uploaded_at:
                     type: string
@@ -1527,11 +1530,12 @@ def download_user_document(user_id,doc_id):
 @user_api.route('/user/<int:user_id>/patient_report', methods=('POST',))
 @oauth.require_oauth()
 def upload_user_document(user_id):
-    """Add a WiserCare Patient Report for the user
+    """Add a Patient Report for the user
+    (e.g. from WiserCare, P3P, Symptom Tracker, etc)
 
     File must be included in the POST call, and must be a valid PDF file.
-    File will be stored on server using uuid as filename; file metadata (including
-    reference uuid) will be stored in the db.
+    File will be stored on server using uuid as filename; file metadata
+    (including reference uuid) will be stored in the db.
 
     ---
     tags:
@@ -1596,8 +1600,25 @@ def upload_user_document(user_id):
         return filedata
 
     file = posted_filename(request)
+
+    contributor = None
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization'].split()[1]
+        intervention = Intervention.query.join(Client).join(Token).filter(
+                       and_(Token.access_token == token,
+                            Token.client_id == Client.client_id,
+                            Client.client_id == Intervention.client_id)).first()
+    else:
+        intervention = Intervention.query.join(Client).join(Token).filter(
+                       and_(Token.user_id == current_user().id,
+                            Token.client_id == Client.client_id,
+                            Client.client_id == Intervention.client_id)).first()
+
+    if intervention:
+        contributor = intervention.description
+
     data = {'user_id': user_id, 'document_type': "PatientReport",
-            'allowed_extensions': ['pdf']}
+            'allowed_extensions': ['pdf'], 'contributor': contributor}
     try:
         doc = UserDocument.from_post(file, data)
     except ValueError as e:

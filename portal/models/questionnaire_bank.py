@@ -1,16 +1,24 @@
 """Questionnaire Bank module"""
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
-from .organization import OrgTree
 from .questionnaire import Questionnaire
 from .reference import Reference
+
+
+classification_types = ('baseline', 'recurring', 'indefinite')
+classification_types_enum = ENUM(
+    *classification_types, name='classification_enum', create_type=False)
 
 
 class QuestionnaireBank(db.Model):
     __tablename__ = 'questionnaire_banks'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
+    classification = db.Column(
+        'classification', classification_types_enum,
+        server_default='baseline', nullable=False)
     questionnaires = db.relationship(
         'QuestionnaireBankQuestionnaire',
         back_populates='questionnaire_bank',
@@ -23,7 +31,8 @@ class QuestionnaireBank(db.Model):
 
     def __str__(self):
         """Print friendly format for logging, etc."""
-        return "QuestionnaireBank {0.id} {0.name}".format(self)
+        return "QuestionnaireBank {0.id} {0.name} {0.classification}".format(
+            self)
 
     @classmethod
     def from_json(cls, data):
@@ -33,19 +42,29 @@ class QuestionnaireBank(db.Model):
 
     def update_from_json(self, data):
         self.name = data['name']
+        if 'classification' in data:
+            self.classification = data['classification']
         self.organization_id = Reference.parse(
             data['organization']).id
-        self.add_if_not_found(commit_immediately=True)
+        self = self.add_if_not_found(commit_immediately=True)
+        qs_named = set()
         for q in data['questionnaires']:
             questionnaire = QuestionnaireBankQuestionnaire.from_fhir(
                 q)
             questionnaire.questionnaire_bank_id = self.id
             questionnaire = questionnaire.add_if_not_found(True)
+            qs_named.add(questionnaire)
+
+        # remove any stale
+        for unwanted in set(self.questionnaires) - qs_named:
+            self.questionnaires.remove(unwanted)
+            db.session.delete(unwanted)
 
     def as_json(self):
         d = {}
         d['resourceType'] = 'QuestionnaireBank'
         d['name'] = self.name
+        d['classification'] = self.classification
         d['organization'] = Reference.organization(
             self.organization_id).as_fhir()
         d['questionnaires'] = [q.as_fhir() for q in self.questionnaires]
@@ -70,26 +89,6 @@ class QuestionnaireBank(db.Model):
         self = db.session.merge(self)
         return self
 
-    @staticmethod
-    def q_for_user(user):
-        """Lookup and return all questionnaires for the given user
-
-        QuestionnaireBanks are associated with a user through the top
-        level organization affiliation.
-
-        :return: list of QuestionnaireBankQuestionnaire objects for given user
-
-        """
-        qs = []
-        OT = OrgTree()
-        for org in user.organizations:
-            # Only top level orgs named in associations w/ QuestionnairBanks
-            top = OT.find(org.id).top_level()
-            qb = QuestionnaireBank.query.filter_by(organization_id=top).first()
-            if qb:
-                qs += [q for q in qb.questionnaires]
-        return qs
-
 
 class QuestionnaireBankQuestionnaire(db.Model):
     """link table for n:n association between Questionnaires and Banks"""
@@ -111,7 +110,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
             questionnaire_bank_id, questionnaire_id,
             name='_questionnaire_bank_questionnaire'),
         UniqueConstraint(
-            questionnaire_id, rank,
+            questionnaire_bank_id, rank,
             name='_questionnaire_bank_questionnaire_rank')
     )
 
@@ -162,10 +161,8 @@ class QuestionnaireBankQuestionnaire(db.Model):
             assert self.id
             return self
         existing = QuestionnaireBankQuestionnaire.query.filter_by(
-            questionnaire_id=self.questionnaire_id,
-            days_till_due=self.days_till_due,
-            days_till_overdue=self.days_till_overdue,
-            rank=self.rank).first()
+                    questionnaire_bank_id=self.questionnaire_bank_id,
+                    questionnaire_id=self.questionnaire_id).first()
         if not existing:
             db.session.add(self)
             if commit_immediately:

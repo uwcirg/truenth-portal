@@ -48,6 +48,14 @@ function embed_page(data){
                 //console.log("in firefox")
             } else setTimeout("loader();", 0);
 
+            $("#tnthTopLinks li a, #tnthNavbarXs li a").each(function() {
+                $(this).on("click", function(e) {
+                    e.preventDefault();
+                    loader(true);
+                    window.location = $(this).attr("href");
+                });
+            });
+
         });
 }
 
@@ -74,6 +82,7 @@ function showWrapper(hasLoader) {
                     setTimeout('$("#loadingIndicator").fadeOut();', 1000);
                 };
             });
+
         } else $("#tnthNavWrapper").css(cssProp);
     };
 };
@@ -267,8 +276,11 @@ var fillViews = {
         this.dob();
         this.studyId();
         this.phone();
+        this.altPhone();
         this.email();
         this.deceased();
+        this.locale();
+        this.timezone();
         this.detail();
     },
     "name": function() {
@@ -291,6 +303,13 @@ var fillViews = {
             var content = $("#phone").val();
             if (hasValue(content)) $("#phone_view").text(content);
             else $("#phone_view").html("<p class='text-muted'>Not provided</p>");
+        };
+    },
+    "altPhone": function() {
+        if (!$("#altPhoneGroup").hasClass("has-error")) {
+            var content = $("#altPhone").val();
+            if (hasValue(content)) $("#alt_phone_view").text(content);
+            else $("#alt_phone_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "email": function() {
@@ -329,12 +348,12 @@ var fillViews = {
                 $("#userRace input:checkbox").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#race_view").html(content);
+                if (hasValue(content)) $("#race_view").html($.trim(content));
                 else $("#race_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else {
             $(".race-view").hide();
-        }
+        };
     },
     "ethnicity": function() {
         if ($("#userEthnicity").length > 0) {
@@ -343,7 +362,7 @@ var fillViews = {
                 $("#userEthnicity input[type='radio']").each(function() {
                     if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#ethnicity_view").html(content);
+                if (hasValue(content)) $("#ethnicity_view").html($.trim(content));
                 else $("#ethnicity_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".ethnicity-view").hide();
@@ -353,9 +372,9 @@ var fillViews = {
             if (!$("#userIndigenousStatus").hasClass("has-error")) {
                 var content = "";
                 $("#userIndigenousStatus input[type='radio']").each(function() {
-                    if ($(this).is(":checked")) content += "<p>" + $(this).closest("label").text() + "</p>";
+                    if ($(this).is(":checked")) content += "<p>" + $(this).next("label").text() + "</p>";
                 })
-                if (hasValue(content)) $("#indigenous_view").html(content);
+                if (hasValue($.trim(content))) $("#indigenous_view").html($.trim(content));
                 else $("#indigenous_view").html("<p class='text-muted'>Not provided</p>");
             };
         } else $(".indigenous-view").hide();
@@ -372,12 +391,15 @@ var fillViews = {
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
-            if (hasValue(content)) $("#biopsy_view").html(content);
+            if (hasValue(content)) $("#biopsy_view").html("<div>" + content + "</div>");
             else $("#biopsy_view").html("<p class='text-muted'>No answer provided</p>");
         };
         content = $("#patDiag input[name='pca_diag']:checked").closest("label").text();
-        if (hasValue(content)) $("#pca_diag_view").text(content);
+        if (hasValue(content)) $("#pca_diag_view").html("<div>" + content + "</div>");
         else $("#pca_diag_view").html("<p class='text-muted'>No answer provided</p>");
+        content = $("#patMeta input[name='pca_localized']:checked").closest("label").text();
+        if (hasValue(content)) $("#pca_localized_view").html("<div>" + content + "</div>");
+        else $("#pca_localized_view").html("<p class='text-muted'>No answer provided</p>");
     },
     "deceased": function() {
         if ($("#boolDeath").is(":checked")) {
@@ -398,7 +420,7 @@ var fillViews = {
     },
     "timezone": function() {
         if ($("#profileTimeZone").length > 0) {
-            var content = $("#profileTimeZone option:selected").val();
+            var content = $("#profileTimeZone").find("option:selected").val();
             if (hasValue(content)) $("#timezone_view").text(content);
             else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
         } else $(".timezone-view").hide();
@@ -452,12 +474,23 @@ var fillContent = {
                                 //d M y format
                                 $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
                                 $("#biopsyDateContainer").show();
+                                $("#biopsyDate").removeAttr("skipped");
                             };
                         } else {
                             $("#biopsyDate").val("");
                             $("#biopsyDateContainer").hide();
+                            $("#biopsyDate").attr("skipped", "true");
                         };
                     };
+                    if (clinicalItem == "pca_diag") {
+                        if ($("#pca_diag_no").is(":checked")) {
+                            $("#tx_yes").attr("skipped", "true");
+                            $("#tx_no").attr("skipped", "true");
+                        } else {
+                            $("#tx_yes").removeAttr("skipped");
+                            $("#tx_no").removeAttr("skipped");
+                        };
+                    }
                 };
             };
         });
@@ -508,6 +541,7 @@ var fillContent = {
         this.race(data);
         this.indigenous(data);
         this.orgs(data);
+        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
     },
     "name": function(data){
         if (data && data.name) {
@@ -525,6 +559,32 @@ var fillContent = {
             $("#date").val(bdArray[2]);
         };
         fillViews.dob();
+    },
+    "language": function(data) {
+        if (data.communication) {
+            data.communication.forEach(function(item) {
+                if (item.language && item.language.coding) {
+                    var selected = false;
+                    if (item.language.coding.length > 0) {
+                        $("#locale").find("option").each(function() {
+                             $(this).removeAttr("selected");
+                        });
+                    };
+                    item.language.coding.forEach(function(l) {
+                        //select the first available language
+                        if (!selected) {
+                            var option = $("#locale").find("option[value='" + l.code + "']");
+                            if (option.length > 0) {
+                                $("#locale").find("option[value='" + l.code + "']").attr("selected", "selected");
+                                $("#locale").get(0).value = l.code;
+                                selected = true;
+                            };
+                        };
+                    });
+                };
+            });
+        };
+        fillViews.locale();
     },
     "ethnicity": function(data) {
         data.extension.forEach(function(item, index) {
@@ -632,30 +692,9 @@ var fillContent = {
             var dataArray = data["consent_agreements"].sort(function(a,b){
                  return new Date(b.signed) - new Date(a.signed);
             });
-            var orgs = {};
             var existingOrgs = {};
             var hasConsent = false;
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
-            $.ajax ({
-                type: "GET",
-                url: '/api/organization',
-                async: false,
-                timeout: 20000
-            }).done(function(data) {
-                if (data) {
-                    data.entry.forEach(function(entry) {
-                        //console.log(entry["id"] +  " " + entry["name"] + " partOf: " + entry["partOf"])
-                        var oi = entry["id"];
-                        if (hasValue(oi)  && (parseInt(oi) != 0)) {
-                            orgs[oi] = {
-                                "_name" : entry["name"],
-                                "partOf": entry["partOf"] ? (entry["partOf"]["reference"]).split("/")[2] : null
-                            };
-                        };
-                    });
-                };
-            });
-
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
             content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
@@ -665,16 +704,6 @@ var fillContent = {
 
             var hasContent = false;
 
-            //recursively get the top level org name
-            function getOrgName (_orgId) {
-                if (!(orgs[_orgId].partOf)) {
-                    return orgs[_orgId]._name;
-                }
-                else {
-                    return getOrgName(orgs[_orgId].partOf);
-                };
-            };
-
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
@@ -683,13 +712,14 @@ var fillContent = {
                     var orgId = item.organization_id;
                     if (!ctop) {
                         try {
-                            orgName = getOrgName(orgId);
-                        } catch(e) {
-                            orgName = orgs[orgId]._name;
-                        };
-                    } else orgName = orgs[orgId]._name;
+                            var topOrgID = OT.getTopLevelParentOrg(orgId);
+                            orgName = OT.orgsList[topOrgID].name;
 
-                    //orgs[item.organization_id] ? orgs[item.organization_id]._name: item.organization_id;
+                        } catch(e) {
+                            orgName = OT.orgsList[orgId].name;
+                        }
+                    } else orgName = OT.orgsList[orgId].name;
+
                     var expired = (item.expires) ? tnthDates.getDateDiff(String(item.expires)) : 0;
                     var consentStatus = item.deleted ? "deleted" : (expired > 0 ? "expired": "active");
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
@@ -942,7 +972,7 @@ var fillContent = {
                 creator = creator.match(/\d+/)[0];// just the user ID, not eg "api/patient/46";
                 if (creator == currentUserId) {
                     creator = "you";
-                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='padding: 0.4em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
+                    deleteInvocation = "  <a data-toggle='popover' class='btn btn-default btn-xs confirm-delete' style='font-size: 0.95em; padding: 0.2em 0.6em; color:#777; border: 1px solid #bdb9b9; position: relative; top: -0.3em' data-content='Are you sure you want to delete this treatment?<br /><br /><a href=\"#\" class=\"btn-delete btn btn-tnth-primary\" style=\"font-size:0.95em\">Yes</a> &nbsp;&nbsp;&nbsp; <a class=\"btn cancel-delete\" style=\"font-size: 0.95em\">No</a>' rel='popover'><i class='fa fa-times'></i> Delete</span>";
                 }
                 else if (creator == subjectId) {
                     creator = "this patient";
@@ -950,7 +980,7 @@ var fillContent = {
                 else creator = "staff member, <span class='creator'>" + (hasValue(creatorDisplay) ? creatorDisplay: creator) + "</span>, ";
                 var dtEdited = val.resource.meta.lastUpdated;
                 dateEdited = new Date(dtEdited);
-                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "' style='font-family: Georgia serif; font-size:1.1em'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left'>&nbsp;" + deleteInvocation + "</td></tr>";
+                contentHTML += "<tr data-id='" + procID + "' data-code='" + code + "'><td width='1%' valign='top' class='list-cell'>&#9679;</td><td class='col-md-8 col-xs-8' valign='top'>" + (cPerformDate?cPerformDate:performedDate) + "&nbsp;--&nbsp;" + displayText + "&nbsp;<em>(data entered by " + creator + " on " + dateEdited.toLocaleDateString('en-GB', {day: 'numeric', month: 'short', year: 'numeric'}) + ")</em></td><td class='col-md-4 col-xs-4 lastCell text-left' valign='top'>&nbsp;" + deleteInvocation + "</td></tr>";
                 if (procID > highestId) {
                     highestId = procID;
                 };
@@ -990,7 +1020,6 @@ var fillContent = {
             };
         });
         fillViews.timezone();
-        fillViews.locale();
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
@@ -1012,6 +1041,45 @@ var fillContent = {
                 };
             }
         });
+    },
+    "terms": function(data) {
+        if (data.tous) {
+            function typeInTous(type) {
+                var found = false;
+                (data.tous).forEach(function(item) {
+                    if (!found && item.type == type) found = true;
+                });
+                return found;
+            };
+
+            $("#termsCheckbox [data-type='terms']").each(function() {
+                var arrTypes = ($(this).attr("data-tou-type")).split(",");
+                var self = $(this);
+                var item_found  = 0;
+                arrTypes.forEach(function(type) {
+                    if (typeInTous(type)) item_found++;
+                });
+                var additional = $(this).find("[data-core-data-subtype]");
+                if (additional.length > 0) {
+                    at = additional.attr("data-tou-type");
+                    if (typeInTous(at)) item_found++;
+                };
+                if (item_found == (arrTypes.length+additional.length)) {
+                    self.find("i").removeClass("fa-square-o").addClass("fa-check-square-o").addClass("edit-view");
+                    self.attr("data-agree", "true");
+                    var vs = self.find(".display-view");
+                    if (vs.length > 0) {
+                        self.show();
+                        vs.show();
+                        (self.find(".edit-view")).each(function() {
+                            $(this).hide();
+                        });
+                    };
+                };
+            });
+            //});
+        };
+        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
     }
 };
 
@@ -1031,12 +1099,6 @@ var assembleContent = {
 
         var bdFieldVal = $("input[name=birthDate]").val();
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
-
-        // $.each($("#userOrgs input"),function(i,v){
-        //     if ($(this).attr("data-parent-id")) {
-        //         if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") $("#userOrgs input[value="+$(this).attr("data-parent-id")+"]").prop('checked', false);
-        //     };
-        // });
 
         if ($("#userOrgs input[name='organization']").length > 0) {
             var orgIDs;
@@ -1226,7 +1288,8 @@ var assembleContent = {
             if ($.trim(emailVal) != "") {
                 demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
             };
-            demoArray["telecom"].push({ "system": "phone", "value": $.trim($("input[name=phone]").val()) });
+            demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
+            demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
            //console.log("demoArray", demoArray);
         };
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
@@ -1323,199 +1386,187 @@ var OrgObj = function(orgId, orgName, parentOrg) {
     this.children = [];
     this.parentOrgId = parentOrg;
     this.isTopLevel = false;
+    this.language = null;
+    this.extension = [];
 };
 
 var OrgTool = function() {
+    this.TOP_LEVEL_ORGS = [];
+    this.orgsList = {};
+};
+OrgTool.prototype.inArray = function( n, array) {
+  if (n && array && Array.isArray(array)) {
+    var found = false;
+    for (var index = 0; !found && index < array.length; index++) {
+        if (array[index] == n) found = true;
+    };
+    return found;
+  } else return false;
+};
+OrgTool.prototype.getElementParentOrg = function(o) {
+    var parentOrg;
+    if (o) {
+       parentOrg = $(o).attr("data-parent-id");
+       if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
+    };
+    return parentOrg;
+};
+OrgTool.prototype.getTopLevelOrgs = function() {
+  var ml = this.getOrgsList(), orgList = [];
+  for (var org in ml) {
+    if (ml[org].isTopLevel) orgList.push(org);
+  };
+  return orgList;
+};
+OrgTool.prototype.getOrgsList = function() {
+    return this.orgsList;
+};
+OrgTool.prototype.filterOrgs = function(leafOrgs) {
+    if (!leafOrgs) return false;
+    var self = this;
 
-    var TOP_LEVEL_ORGS = [];
-    var orgsList = {};
-
-    this.inArray = function (val, array) {
-        if (val && array) {
-            for (var i = 0; i < array.length; i++) {
-                if (array[i] == val) return true;
+    $("input[name='organization']").each(function() {
+        if (! self.inArray($(this).val(), leafOrgs)) {
+            $(this).hide();
+            if (self.orgsList[$(this).val()] && self.orgsList[$(this).val()].children.length == 0) {
+                var l = $(this).closest("label");
+                l.hide();
+                l.next(".divider").hide();
             };
         };
-        return false;
-    };
-    this.getElementParentOrg = function(o) {
-        var parentOrg;
-        if (o) {
-           parentOrg = $(o).attr("data-parent-id");
-           if (!hasValue(parentOrg)) parentOrg = $(o).closest(".org-container[data-parent-id]").attr("data-parent-id");
-        };
-        return parentOrg;
-    };
+    });
 
-    this.getTopLevelOrgs = function() {
-        return TOP_LEVEL_ORGS;
-    }
+    var topList = self.getTopLevelOrgs();
 
-    this.getOrgsList = function() {
-        return orgsList;
-    };
+    topList.forEach(function(orgId) {
+        var allChildrenHidden = true;
+        $(".org-container[data-parent-id='" + orgId + "']").each(function() {
+            var subOrgs = $(this).find(".org-container");
+            if (subOrgs.length > 0) {
+                var allSubOrgsHidden = true;
+                subOrgs.each(function() {
+                     var isVisible = false;
+                     $(this).find("input[name='organization']").each(function() {
+                         if ($(this).is(":visible") || $(this).css("display") != "none") {
+                            isVisible = true;
+                            allChildrenHidden = false;
+                         };
+                     });
 
-    this.filterOrgs = function(leafOrgs) {
-        //console.log(leafOrgs)
-        if (!leafOrgs) return false;
-        var self = this;
+                    if (!isVisible) {
+                        $(this).hide();
+                    } else allSubOrgsHidden = false;
 
-        $("input[name='organization']").each(function() {
-            if (! self.inArray($(this).val(), leafOrgs)) {
-                $(this).hide();
-                if (orgsList[$(this).val()] && orgsList[$(this).val()].children.length == 0) {
-                    var l = $(this).closest("label");
-                    l.hide();
-                    l.next(".divider").hide();
-                };
-            };
-        });
-
-        var topList = self.getTopLevelOrgs();
-
-        topList.forEach(function(orgId) {
-            var allChildrenHidden = true;
-            $(".org-container[data-parent-id='" + orgId + "']").each(function() {
-                var subOrgs = $(this).find(".org-container");
-                if (subOrgs.length > 0) {
-                    var allSubOrgsHidden = true;
-                    subOrgs.each(function() {
-                         var isVisible = false;
-                         $(this).find("input[name='organization']").each(function() {
-                             if ($(this).is(":visible") || $(this).css("display") != "none") {
-                                isVisible = true;
-                                allChildrenHidden = false;
-                             };
-                         });
-
-                        if (!isVisible) {
-                            $(this).hide();
-                        } else allSubOrgsHidden = false;
-
-                    });
-
-                    if (allSubOrgsHidden) {
-                        $(this).children("label").hide();
-                    };
-
-                } else {
-                    var ip = $(this).find("input[name='organization']");
-                    if (ip.length > 0) {
-                        ip.each(function() {
-                            if ($(this).is(":visible") || $(this).css("display") != "none") allChildrenHidden = false;
-                        });
-                    };
-                };
-            });
-            if (allChildrenHidden) {
-                $("#fillOrgs").find("legend[orgid='" + orgId + "']").hide();
-            };
-
-        });
-    };
-
-    this.findOrg = function(entry, orgId) {
-        var org;
-        if (entry && orgId) {
-            entry.forEach(function(item) {
-                if (!org) {
-                    if (item.id == orgId) org = item;
-                };
-            });
-        };
-        return org;
-    };
-    this.getTopLevelOrgs = function() {
-        if (TOP_LEVEL_ORGS.length == 0) {
-            var topOrgs = $("#fillOrgs").find(input[name='organization'][parent_org='true']);
-            if (topOrgs.length > 0) {
-                topOrgs.each(function() {
-                    TOP_LEVEL_ORGS.push[$(this).val()];
                 });
-            };
-        };
-        return TOP_LEVEL_ORGS;
-    };
 
-    this.populateOrgsList = function(items) {
-        if (!items) return false;
-        var entry = items, self = this, parentId;
-        items.forEach(function(item) {
-            if (item.partOf) {
-                parentId = item.partOf.reference.split("/").pop();
-                if (!orgsList[parentId]) {
-                    var o = self.findOrg(entry, parentId);
-                    orgsList[parentId] = new OrgObj(o.id, o.name);
+                if (allSubOrgsHidden) {
+                    $(this).children("label").hide();
                 };
-                orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
-                else orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+
             } else {
-                if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
-                if (item.id != 0) {
-                    orgsList[item.id].isTopLevel = true;
-                    TOP_LEVEL_ORGS.push(item.id);
+                var ip = $(this).find("input[name='organization']");
+                if (ip.length > 0) {
+                    ip.each(function() {
+                        if ($(this).is(":visible") || $(this).css("display") != "none") allChildrenHidden = false;
+                    });
                 };
             };
         });
-        items.forEach(function(item) {
-            if (item.partOf) {
-                parentId = item.partOf.reference.split("/").pop();
-                if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
-            };
-        });
-        //console.log(orgsList)
-        return orgsList;
-    };
-
-    this.populateUI = function() {
-        var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs");
-        for (org in orgsList) {
-            if (orgsList[org].isTopLevel) {
-                if (orgsList[org].children.length > 0) {
-                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                    parentOrgsCt++;
-                } else {
-                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
-                        orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
-                };
-            };
-            // Fill in each child clinic
-            if (orgsList[org].children.length > 0) {
-                var childClinic = "";
-                orgsList[org].children.forEach(function(item, index) {
-                    var _parentOrgId = item.parentOrgId;
-                    var _parentOrg = orgsList[_parentOrgId];
-                    var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
-                    childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
-
-                    if (orgsList[item.id].children.length > 0) {
-                        childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
-                        item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                        item.name +
-                        '</label>';
-
-                     } else {
-                        childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
-                        '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
-                        item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                        item.name +
-                        '</label>';
-                    };
-
-                    childClinic += '</div>';
-
-                    if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
-                    else container.append(childClinic);
-
-                });
-            };
-
-            if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
+        if (allChildrenHidden) {
+            $("#fillOrgs").find("legend[orgid='" + orgId + "']").hide();
         };
+
+    });
+};
+OrgTool.prototype.findOrg = function(entry, orgId) {
+    var org;
+    if (entry && orgId) {
+        entry.forEach(function(item) {
+            if (!org) {
+                if (item.id == orgId) org = item;
+            };
+        });
     };
-    this.getDefaultModal = function(o) {
+    return org;
+};
+OrgTool.prototype.populateOrgsList = function(items) {
+    if (!items) return false;
+    var entry = items, self = this, parentId, orgsList = self.orgsList;
+    items.forEach(function(item) {
+        if (item.partOf) {
+            parentId = item.partOf.reference.split("/").pop();
+            if (!orgsList[parentId]) {
+                var o = self.findOrg(entry, parentId);
+                orgsList[parentId] = new OrgObj(o.id, o.name);
+            };
+            orgsList[parentId].children.push(new OrgObj(item.id, item.name, parentId));
+            if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+            else orgsList[item.id] = new OrgObj(item.id, item.name, parentId);
+        } else {
+            if (!orgsList[item.id]) orgsList[item.id] = new OrgObj(item.id, item.name);
+            if (item.id != 0) {
+                orgsList[item.id].isTopLevel = true;
+                self.TOP_LEVEL_ORGS.push(item.id);
+            };
+        };
+        if (item.extension) orgsList[item.id].extension = item.extension;
+        if (hasValue(item.language)) orgsList[item.id].language = item.language;
+    });
+    items.forEach(function(item) {
+        if (item.partOf) {
+            parentId = item.partOf.reference.split("/").pop();
+            if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
+        };
+    });
+    return orgsList;
+};
+OrgTool.prototype.populateUI = function() {
+    var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList;
+    for (org in orgsList) {
+        if (orgsList[org].isTopLevel) {
+            if (orgsList[org].children.length > 0) {
+                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                parentOrgsCt++;
+            } else {
+                container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+            };
+        };
+        // Fill in each child clinic
+        if (orgsList[org].children.length > 0) {
+            var childClinic = "";
+            orgsList[org].children.forEach(function(item, index) {
+                var _parentOrgId = item.parentOrgId;
+                var _parentOrg = orgsList[_parentOrgId];
+                var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
+                childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
+
+                if (orgsList[item.id].children.length > 0) {
+                    childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
+                    item.name +
+                    '</label>';
+
+                 } else {
+                    childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
+                    item.name +
+                    '</label>';
+                };
+
+                childClinic += '</div>';
+
+                if ($("#" + _parentOrgId + "_container").length > 0) $("#" + _parentOrgId + "_container").append(childClinic);
+                else container.append(childClinic);
+
+            });
+        };
+        if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
+    };
+};
+OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
         var orgId = this.getElementParentOrg(o), orgName = $(o).attr("data-parent-name");
         if (hasValue(orgId) && $("#" + orgId + "_defaultConsentModal").length == 0) {
@@ -1543,6 +1594,7 @@ var OrgTool = function() {
                 '<div id="' + orgId + '_loader" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>' +
                 '<button type="button" class="btn btn-default btn-consent-close" data-org="' + orgId + '" data-dismiss="modal" aria-label="Close">Close</button>' +
                 '</div></div></div></div>';
+            if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
             $("#defaultConsentContainer").append(s);
             $("#" + orgId + "_defaultConsentModal input[name='defaultToConsent']").each(function() {
                 $(this).on("click", function(e) {
@@ -1583,112 +1635,353 @@ var OrgTool = function() {
              });
         };
         return $("#" + orgId + "_defaultConsentModal");
-    }
-    this.handlePreSelectedClinic = function() {
-        if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
-            var ob = $("#userOrgs input[value='"+preselectClinic+"']");
-            if (ob.length > 0) {
-                ob.prop("checked", true);
-                var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-                var userId = $("#fillOrgs").attr("userId");
-                if (!tnthAjax.hasConsent(userId, parentOrg)) {
-                    var __modal = OT.getConsentModal();
-                    if (__modal) {
-                        ob.attr("data-require-validate", "true");
-                         __modal.on("hidden.bs.modal", function() {
-                            if ($(this).find("input[name='toConsent']:checked").length > 0 ||
-                                $(this).find("input[name='defaultToConsent']:checked").length > 0) {
-                                  $("#userOrgs input[name='organization']").each(function() {
-                                    $(this).removeAttr("data-require-validate");
-                                  });
-                            };
-                        });
-                    } else {
-                        tnthAjax.setDefaultConsent(userId, parentOrg);
-                    };
-                };
-                var stateContainer = ob.closest(".state-container");
-                if (stateContainer.length > 0) {
-                    var st = stateContainer.attr("state");
-                    if (hasValue(st)) {
-                        $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
-                        stateContainer.show();
-                    };
-                };
-            };
-        };
-    };
-    this.getSelectedOrg = function() {
-        return $("#userOrgs input[name='organization']:checked");
-    };
-    this.getConsentModal = function(parentOrg) {
-        if (!hasValue(parentOrg)) {
-            parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-        };
-        if (hasValue(parentOrg)) {
-            var __modal = $("#" + parentOrg + "_consentModal");
-            if (__modal.length > 0) return __modal;
-            else {
-                var __defaultModal = this.getDefaultModal(this.getSelectedOrg());
-                if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
-                else return false;
-            };
-        } else return false;
-    };
-    this.handleEvent = function() {
-        getSaveLoaderDiv("profileForm", "userOrgs");
-        $("#userOrgs input[name='organization']").each(function() {
-            $(this).attr("data-save-container-id", "userOrgs");
-            $(this).on("click", function(e) {
-                var userId = $("#fillOrgs").attr("userId");
-                var parentOrg = OT.getElementParentOrg(this);
-                if ($(this).prop("checked")){
-                    if ($(this).attr("id") !== "noOrgs") {
-                        $("#noOrgs").prop('checked',false);
-                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
-                    } else {
-                        $("#userOrgs input[name='organization']").each(function() {
-                            //console.log("in id: " + $(this).attr("id"))
-                           if ($(this).attr("id") !== "noOrgs") {
-                                $(this).prop('checked',false);
-                           } else {
-                                if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
-                           };
-                        });
-                        if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
-                    };
-                } else {
-                    var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
-                    if (!isChecked) {
-                        if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
-                    };
-                };
-
-                if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
-                    if (tnthAjax.hasConsent(userId, parentOrg)) {
-                        assembleContent.demo(userId,true, $(this), true);
-                    } else {
-                        var __modal = OT.getConsentModal();
-                        if (__modal.length > 0) __modal.modal("show");
-                        else {
-                            tnthAjax.setDefaultConsent(userId, parentOrg);
-                            assembleContent.demo(userId,true, $(this), true);
+};
+OrgTool.prototype.handlePreSelectedClinic = function() {
+    if ((typeof preselectClinic != "undefined") && hasValue(preselectClinic)) {
+        var ob = $("#userOrgs input[value='"+preselectClinic+"']");
+        if (ob.length > 0) {
+            ob.prop("checked", true);
+            var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
+            var userId = $("#fillOrgs").attr("userId");
+            if (!tnthAjax.hasConsent(userId, parentOrg)) {
+                var __modal = OT.getConsentModal();
+                if (__modal) {
+                    ob.attr("data-require-validate", "true");
+                     __modal.on("hidden.bs.modal", function() {
+                        if ($(this).find("input[name='toConsent']:checked").length > 0 ||
+                            $(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                              $("#userOrgs input[name='organization']").each(function() {
+                                $(this).removeAttr("data-require-validate");
+                              });
                         };
-                    };
-                }
-                else {
-                    assembleContent.demo(userId,true, $(this), true);
-                    if (typeof reloadConsentList != "undefined") reloadConsentList();
-                    tnthAjax.handleConsent($(this));
+                    });
+                } else {
+                    tnthAjax.setDefaultConsent(userId, parentOrg);
                 };
-            });
-        });
+            };
+            var stateContainer = ob.closest(".state-container");
+            if (stateContainer.length > 0) {
+                var st = stateContainer.attr("state");
+                if (hasValue(st)) {
+                    $("#stateSelector").find("option[value='" + st + "']").prop("selected", true).val(st);
+                    stateContainer.show();
+                };
+            };
+        };
     };
 };
+OrgTool.prototype.getSelectedOrg = function() {
+    return $("#userOrgs input[name='organization']:checked");
+};
+OrgTool.prototype.getConsentModal = function(parentOrg) {
+    if (!hasValue(parentOrg)) {
+        parentOrg = this.getElementParentOrg(this.getSelectedOrg());
+    };
+    if (hasValue(parentOrg)) {
+        var __modal = $("#" + parentOrg + "_consentModal");
+        if (__modal.length > 0) return __modal;
+        else {
+            var __defaultModal = this.getDefaultModal(this.getSelectedOrg());
+            if (__defaultModal && __defaultModal.length > 0) return __defaultModal;
+            else return false;
+        };
+    } else return false;
+};
+OrgTool.prototype.handleEvent = function() {
+    getSaveLoaderDiv("profileForm", "userOrgs");
+    $("#userOrgs input[name='organization']").each(function() {
+        $(this).attr("data-save-container-id", "userOrgs");
+        $(this).on("click", function(e) {
+            var userId = $("#fillOrgs").attr("userId");
+            var parentOrg = OT.getElementParentOrg(this);
+            if ($(this).prop("checked")){
+                if ($(this).attr("id") !== "noOrgs") {
+                    $("#noOrgs").prop('checked',false);
+                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", false);
+                } else {
+                    $("#userOrgs input[name='organization']").each(function() {
+                        //console.log("in id: " + $(this).attr("id"))
+                       if ($(this).attr("id") !== "noOrgs") {
+                            $(this).prop('checked',false);
+                       } else {
+                            if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
+                       };
+                    });
+                    if ($("#btnProfileSendEmail").length > 0) $("#btnProfileSendEmail").attr("disabled", true);
+                };
 
+            } else {
+                var isChecked = $("#userOrgs input[name='organization']:checked").length > 0;
+                if (!isChecked) {
+                    //do not attempt to update if all orgs are unchecked for staff/staff admin
+                    var isStaff = false;
+                     $("#rolesGroup input[name='user_type']").each(function() {
+                        if (!isStaff && ($(this).is(":checked") && ($(this).val() == "staff" || $(this).val() == "staff_admin"))) {
+                            $("#userOrgs .help-block").addClass("error-message").text("Cannot ununcheck.  A staff member must be associated with an organization");
+                            isStaff = true;
+                        };
+                     });
+                     if (!isStaff) $("#userOrgs .help-block").removeClass("error-message").text("");
+                     else return false;
+                    if (typeof sessionStorage != "undefined" && sessionStorage.getItem("noOrgModalViewed")) sessionStorage.removeItem("noOrgModalViewed");
+                };
+            };
+            setTimeout("tnthAjax.getOptionalCoreData(" + userId + ", false, $(\".profile-item-container[data-sections='detail']\"));", 150);
+
+            $("#userOrgs .help-block").removeClass("error-message").text("");
+
+            if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
+                if (tnthAjax.hasConsent(userId, parentOrg)) {
+                    assembleContent.demo(userId,true, $(this), true);
+                } else {
+                    var __modal = OT.getConsentModal();
+                    if (__modal.length > 0) __modal.modal("show");
+                    else {
+                        tnthAjax.setDefaultConsent(userId, parentOrg);
+                        assembleContent.demo(userId,true, $(this), true);
+                    };
+                };
+            }
+            else {
+                assembleContent.demo(userId,true, $(this), true);
+                if (typeof reloadConsentList != "undefined") reloadConsentList();
+                tnthAjax.handleConsent($(this));
+            };
+            if ($("#locale").length > 0) {
+                tnthAjax.getLocale(userId);
+            }
+        });
+    });
+};
+OrgTool.prototype.getCommunicationArray = function() {
+    var arrCommunication = [];
+    $('#userOrgs input:checked').each(function() {
+        if ($(this).val() == 0) return true; //don't count none
+        var oList = OT.getOrgsList();
+        var oi = oList[$(this).val()];
+        if (!oi) return true;
+        if (oi.language) {
+            arrCommunication.push({"language": {"coding":[{
+            "code": oi.language,
+            "system": "urn:ietf:bcp:47"
+            }]}});
+        }
+        else if (oi.extension && oi.extension.length > 0) {
+            (oi.extension).forEach(function(ex) {
+                if (ex.url == "http://hl7.org/fhir/valueset/languages" && ex.valueCodeableConcept.coding) arrCommunication.push({"language": {"coding":ex.valueCodeableConcept.coding}});
+            });
+        };
+    });
+    if (arrCommunication.length == 0) {
+        var defaultLocale = $("#sys_default_locale").val();
+        if (hasValue(defaultLocale)) arrCommunication.push({"language": {"coding":[{
+            "code": defaultLocale,
+            "display":$("#locale").find("option[value='" + defaultLocale + "']").text(),
+            "system": "urn:ietf:bcp:47"
+        }]}});
+
+    };
+    return arrCommunication;
+};
+OrgTool.prototype.getUserTopLevelParentOrgs = function(uo) {
+  var parentList = [], self = this;
+  if (uo) {
+    uo.forEach(function(o) {
+      var p = self.getTopLevelParentOrg(o);
+      if (p && !self.inArray(p, parentList))  {
+        parentList.push(p);
+      };
+    });
+    return parentList;
+  } else return false;
+};
+OrgTool.prototype.getTopLevelParentOrg = function(currentOrg) {
+  if (!currentOrg) return false;
+  var ml = this.getOrgsList(), self = this;
+  if (ml && ml[currentOrg]) {
+    if (ml[currentOrg].isTopLevel) {
+      return currentOrg;
+    } else {
+      if (ml[currentOrg].parentOrgId) return self.getTopLevelParentOrg(ml[currentOrg].parentOrgId);
+      else return currentOrg;
+    };
+  } else return false;
+};
+OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
+    if (!orgs || (orgs.length == 0)) {
+      return orgList;
+    } else {
+      if (!orgList) orgList = [];
+      var mainOrgsList = this.getOrgsList();
+      var childOrgs = [];
+      orgs.forEach(function(org) {
+          var o = mainOrgsList[org.id];
+          if (o) {
+            orgList.push(org.id);
+            var c  = o.children ? o.children : null;
+            if (c && c.length > 0) {
+                c.forEach(function(i) {
+                  childOrgs.push(i);
+                });
+            };
+          };
+      });
+      return this.getChildOrgs(childOrgs, orgList);
+    };
+};
+OrgTool.prototype.getHereBelowOrgs = function() {
+  var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
+  var here_below_orgs = [];
+  userOrgs.forEach(function(orgId) {
+      here_below_orgs.push(orgId);
+      var co = mainOrgsList[orgId];
+      var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+      if (cOrgs && cOrgs.length > 0) {
+        here_below_orgs = here_below_orgs.concat(cOrgs);
+      };
+  });
+  return here_below_orgs;
+};
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "reportError": function(userId, page_url, message, sync) {
+        //params need to contain the following:
+        //:subject_id: User on which action is being attempted
+        //:message: Details of the error event
+        //:page_url: The page requested resulting in the error
+        var params = {};
+        params.subject_id = hasValue(userId)? userId : 0;
+        params.page_url = hasValue(page_url) ? page_url: window.location.href;
+        params.message = hasValue(message) ? message: "Not provided";
+
+        $.ajax ({
+            type: "GET",
+            url: "/report-error",
+            contentType: "application/json; charset=utf-8",
+            cache: false,
+            async: (sync ? false : true),
+            data: params
+        }).done(function(data) {
+        }).fail(function(){
+        });
+    },
+    "getStillNeededCoreData": function(userId, sync, callback, entry_method) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/still_needed" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.still_needed) {
+                if (callback) callback(data.still_needed);
+                var __localizedFound = false;
+                (data.still_needed).forEach(function(item) {
+                    $("#termsCheckbox [data-type='terms']").each(function() {
+                        var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
+                        dataTypes.forEach(function(type) {
+                            if (type == item) {
+                                self.show().removeClass("tnth-hide");
+                            };
+                        });
+                    });
+                    if (item == "localized") __localizedFound = true; 
+                });
+                if (!__localizedFound) $("#patMeta").remove(); 
+            } else {
+                if (callback) {
+                    callback({"error": "no data returned"});
+                };
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get needed core data"});
+        });
+    },
+    "getRequiredCoreData": function(userId, sync, callback) {
+        if (!hasValue(userId)) return false;
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/required",
+            cache: false,
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.required) {
+                if (callback) callback(data.still_needed);
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+        });
+    },
+    "getOptionalCoreData": function(userId, sync, target, callback, entry_method) {
+        if (!hasValue(userId)) return false;
+        if (target) {
+            target.find(".profile-item-loader").show();
+        };
+        $.ajax ({
+            type: "GET",
+            url: "/api/coredata/user/" + userId + "/optional" + (hasValue(entry_method)?"?entry_method="+(entry_method).replace(/\_/g, " "):""),
+            async: (sync ? false : true)
+        }).done(function(data) {
+            if (data && data.optional) {
+                var self = this;
+                var sections = $("#profileForm .optional");
+                sections.each(function() {
+                    var section = $(this).attr("data-section-id");
+                    var parent = $(this).closest(".profile-item-container");
+                    var visibleRows = parent.find(".view-container tr:visible").length;
+                    var noDataContainer = parent.find(".no-data-container");
+                    var btn = parent.find(".profile-item-edit-btn").hide();
+                    if (hasValue(section)) {
+                        if (OT.inArray(section, data.optional)) {
+                            $(this).show();
+                            noDataContainer.html("");
+                            btn.show();
+                        } else {
+                            $(this).hide();
+                            if (visibleRows == 0) {
+                                noDataContainer.html("<p class='text-muted'>No information available</p>");
+                                btn.hide();
+                            };
+                        };
+                    };
+                });
+                if (callback) callback(data);
+            } else {
+                if (callback) callback({"error": "no data found"});
+            };
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        }).fail(function(){
+            if (callback) callback({"error": "unable to get required core data"});
+            if (target) {
+                target.find(".profile-item-loader").hide();
+            };
+        });
+    },
+    "getPortalFooter": function(userId, sync, containerId, callback) {
+        if (!userId) {
+            if (callback) callback("<div class='error-message'>User Id is required</div>");
+            return false;
+        };
+        $.ajax ({
+            type: "GET",
+            url: '/api/portal-footer-html/',
+            async: sync? false : true
+        }).done(function(data) {
+            if (data) {
+                if (hasValue(containerId)) $("#" + containerId).html(data);
+                if (callback) callback(data);
+            } else {
+                if (callback) callback("<div class='error-message'>No data found</div>");
+            }
+        }).fail(function() {
+           if (callback) callback("<div class='error-message'>Unable to retrieve portal footer html</div>");
+        });
+
+    },
     "getOrgs": function(userId, noOverride, sync, callback, noPopulate) {
         loader(true);
         var self = this;
@@ -1699,12 +1992,13 @@ var tnthAjax = {
         }).done(function(data) {
             $("#fillOrgs").attr("userId", userId);
             $(".get-orgs-error").remove();
-            OT.handlePreSelectedClinic();
             OT.populateOrgsList(data.entry);
-            if(!noPopulate) OT.populateUI();
-            tnthAjax.getDemo(userId, noOverride, sync, callback);
-            OT.handleEvent();
-
+            if(!noPopulate) {
+                OT.handlePreSelectedClinic();
+                OT.populateUI();
+                tnthAjax.getDemo(userId, noOverride, sync, callback);
+                OT.handleEvent();
+            };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
            if ($(".get-orgs-error").length == 0) $(".error-message").append("<div class='get-orgs-error'>Server error occurred retrieving organization/clinic information.</div>");
@@ -2006,6 +2300,7 @@ var tnthAjax = {
                 fillContent.demo(data);
                 fillContent.timezone(data);
                 fillContent.subjectId(data);
+                fillContent.language(data);
             }
             $(".get-demo-error").remove();
             loader();
@@ -2061,6 +2356,29 @@ var tnthAjax = {
             loader();
         }).fail(function() {
             loader();
+        });
+    },
+    "getLocale": function(userId) {
+        $.ajax ({
+                type: "GET",
+                url: '/api/demographics/'+userId,
+                cache: false
+        }).done(function(data) {
+            if (data && data.communication) {
+                data.communication.forEach(function(item, index) {
+                    if (item.language) {
+                        locale = item["language"]["coding"][0].code;
+                        $("#locale").find("option").each(function() {
+                            $(this).removeAttr("selected");
+                        });
+                        $("#locale").find("option[value='" + locale + "']").attr("selected", "selected");
+                        $("#locale").val(locale);
+                        fillViews.locale();
+                    };
+                });
+            };
+
+        }).fail(function() {
         });
     },
     "hasTreatment": function(data) {
@@ -2352,6 +2670,54 @@ var tnthAjax = {
             if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
             flo.showError(targetField);
             fillViews.clinical();
+        });
+    },
+    "getTermsUrl": function() {
+        $.ajax ({
+            type: "GET",
+            url: '/api/tou'
+        }).done(function(data) {
+            $(".get-tou-error").remove();
+            if (data.url) {
+                $("#termsURL").attr("data-url", data.url);
+                $("#topTerms .general-tou").each(function() {
+                    $(this).attr("data-url", data.url);
+                });
+            };
+            //fillContent.terms(data);
+        }).fail(function() {
+           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou url.</div>");
+        });
+    },
+    "getTerms": function(userId, type, sync, callback) {
+        $.ajax ({
+            type: "GET",
+            url: '/api/user/'+userId+'/tou'+(hasValue(type)?("/"+type):""),
+            cache: false,
+            async: (sync?false:true)
+        }).done(function(data) {
+            $(".get-tou-error").remove();
+            fillContent.terms(data);
+            if (callback) callback(data);
+        }).fail(function() {
+           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou data.</div>");
+           if (callback) callback({"error": "Server error retrieving tou data."})
+        });
+    },
+    "postTermsByUser": function(userId, toSend) {
+        ///user/<user_id>/tou/accepted
+        $.ajax ({
+            type: "POST",
+            url: '/api/user/' + userId + '/tou/accepted',
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            data: JSON.stringify(toSend)
+        }).done(function() {
+           // console.log('terms stored');
+           $(".post-tou-error").remove();
+        }).fail(function() {
+            //alert("There was a problem saving your answers. Please try again.");
+            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
         });
     },
     "postTerms": function(toSend) {
@@ -3166,6 +3532,7 @@ function hasValue(val) {
 function isString (obj) {
   return (Object.prototype.toString.call(obj) === '[object String]');
 };
+
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};

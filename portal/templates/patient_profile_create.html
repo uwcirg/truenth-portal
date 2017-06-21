@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
+{%- from "flask_user/_macros.html" import back_btn, footer -%}
 {% block main %}
-{%- from "flask_user/_macros.html" import back_btn -%}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileSaveBtn -%}
+{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileSaveBtn -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" class="form tnth-form to-validate">
@@ -30,6 +30,7 @@
                         <div class="help-block with-errors" id="erroremail"></div>
                     </div>
                     {{profilePhone(False)}}
+                    {{profileAltPhone(False)}}
                     <div id="studyIdContainer" class="form-group">
                         <label for="studyId" class="study-id-label">{{_("Study ID")}}</label>
                         <input type="text" class="form-control" id="studyId" name="studyId"/>
@@ -63,7 +64,6 @@
                                 $(this).attr("type", "radio");
                              });
 
-                            //console.log(orgsList)
                             $("#userOrgs input[name='organization']").each(function() {
                                 $(this).on("click", function() {
                                     $("#userOrgs").find(".help-block").html("");
@@ -83,7 +83,7 @@
                     {{profileSaveBtn()}}
             </div>
             <br/>
-            <div>
+            <div class="back-button-container">
                 {{ back_btn('patients','patients list')}}
                 <a href="#" style="visibility:hidden" id="profileBackLink"></a>
             </div>
@@ -91,10 +91,14 @@
             </div>
         </div>
     </div>
+    <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
     {%- if consent_agreements -%}<div id="_consentContainer">{{consent_fields(consent_agreements)}}</div>
     {%- endif -%}
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
 
@@ -110,6 +114,14 @@ $(document).ready(function(){
     var _userId = '', _demoArray = {}, _accountArray = {};
     var hasError = false;
     var errorMessage = '';
+
+    $("#createProfileForm .back-button-container").prepend('<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>');
+    $("#createProfileForm .btn-tnth-back").on("click", function(e) {
+        e.preventDefault();
+        $(this).prev(".loading-message-indicator").show();
+        $(this).hide();
+        window.location = $(this).attr("href");
+    });
 
     $("#updateProfile").attr("disabled", true);
     $("#createProfileForm input, #createProfileForm select").on("change", function() {
@@ -153,6 +165,10 @@ $(document).ready(function(){
                 if (consent_org_id && !orgs[consent_org_id]) {
                     orgs[consent_org_id] = true;
                     var agreement = $("#" + getParentOrgId(this) + "_agreement_url").val();
+                    if (!hasValue(agreement)) {
+                        var stockConsentUrl = $("#stock_consent_url").val();
+                        agreement = stockConsentUrl.replace("placeholder", encodeURIComponent($(this).attr("data-parent-name")));
+                    };
                     if (hasValue(agreement)) {
                         consents.push({"organization_id": consent_org_id, "agreement_url": agreement, "staff_editable": true, "include_in_reports": true, "send_reminders": true});
                     };
@@ -171,6 +187,12 @@ $(document).ready(function(){
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
                 // handle the invalid form...
+                $("input[type='text'], select").each(function() {
+                    if (!hasValue($(this).val())) {
+                        //this should display error message associated with empty field
+                        $(this).trigger("change");
+                    };
+                });
                 $("#errorMsg").fadeIn("slow");
                 return false;
           } else {
@@ -197,7 +219,6 @@ $(document).ready(function(){
                 if ($("#clinicalGroup input:radio:checked").length == 0) {
                     setHelpText("clinicalGroup", "You must select Yes or No.", true);
                 } else setHelpText("clinicalGroup", "", false);
-
 
 
                 $("#createProfileForm .help-block.with-errors").each(function() {
@@ -249,13 +270,19 @@ $(document).ready(function(){
                     } else {
                         _demoArray['telecom'].push({ 'system': 'email', 'value': '__no_email__'});
                     };
-                    _demoArray['telecom'].push({ 'system': 'phone', 'value': $.trim($('input[name=phone]').val())});
+                    _demoArray['telecom'].push({ 'system': 'phone', 'use': 'mobile', 'value': $.trim($('input[name=phone]').val())});
+                    _demoArray['telecom'].push({ 'system': 'phone', 'use': 'home', 'value': $.trim($('input[name=altPhone]').val())});
 
                      var orgIDs = $('#userOrgs input:checked').map(function(){
                         return { reference: 'api/organization/'+$(this).val() };
                     }).get();
 
                     _demoArray['careProvider'] = orgIDs;
+
+                    var arrCommunication = OT.getCommunicationArray();
+                    if (arrCommunication.length > 0) {
+                        _demoArray['communication'] = arrCommunication;
+                    };
 
                     var studyId = $("#studyId").val();
                     if (hasValue(studyId)) {
@@ -266,7 +293,6 @@ $(document).ready(function(){
                         };
                         _demoArray["identifier"] = [studyIdObj];
                     };
-
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {
@@ -277,15 +303,16 @@ $(document).ready(function(){
                         clear();
                     }).catch(function(error) {
                         errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                        if (errorMessage != '') $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                        tnthAjax.reportError((hasValue(_userId) && parseInt(_userId) != 0? _userId: "None created"), "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                         $("#updateProfile").attr("disabled", false);
                     });
 
                 }).catch(function(error) {
                     //Display Error Here
-                    //console.log('error: ' + error);
                     errorMessage += (errorMessage != '' ? '<br/>' : '') + error;
-                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>Server processing error: ' + errorMessage + '</small>').fadeIn();
+                    if (errorMessage != '') $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
+                    tnthAjax.reportError((hasValue(_userId) && parseInt(_userId) != 0? _userId: "None created"), "{{url_for('patients.patient_profile_create')}}", errorMessage, true);
                     $("#updateProfile").attr("disabled", false);
                 });
 
@@ -294,7 +321,6 @@ $(document).ready(function(){
 
     function _get(apiUrl, requestType, requestData, sync) {
         var errorMessage = '';
-        console.log('apiUrl: ' + apiUrl)
         return new Promise (function(resolve, reject) {
             $.ajax ({
                 type: (requestType ? requestType : 'GET'),
@@ -307,10 +333,8 @@ $(document).ready(function(){
                 resolve(data);
             }).fail(function(xhr) {
                 errorMessage = 'Error processing request: ' + apiUrl;
-                console.log(requestData);
-                console.log(errorMessage);
-                console.log("response Text: " + xhr.responseText);
-                console.log("response status: " +  xhr.status);
+                errorMessage += "\nstatus: " + xhr.status;
+                errorMessage +="\nresponse text: " + $.trim(xhr.responseText);
                 reject(Error(errorMessage));
             });
 
@@ -319,24 +343,9 @@ $(document).ready(function(){
     };
 
     function clear() {
-        ['firstname', 'lastname', 'birthday', 'birthdayDay', 'birthdayMonth', 'birthdayYear', 'date', 'year', 'email', 'phone'].forEach(function(fieldName) {
-            var currentElement = $('#' + fieldName);
-            var _tagName = currentElement.get(0) ? currentElement.get(0).tagName : '';
-            switch(_tagName.toLowerCase()) {
-                case 'input':
-                    currentElement.val('');
-                    break;
-                case 'select':
-                    currentElement.find('option').prop('selected', false);
-                    break;
-                default:
-                    currentElement.val('');
-            };
-
-            $('#month').find('option').prop('selected', false);
-
-        });
-
+       $("input.form-control, select.form-control").each(
+        function() { $(this).val(""); 
+       });
     };
 
     clear();

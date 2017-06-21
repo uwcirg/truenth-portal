@@ -1,5 +1,6 @@
 """Unit test module for terms of use logic"""
 import json
+from datetime import datetime
 from flask_webtest import SessionScope
 
 from tests import TestCase, TEST_USER_ID
@@ -17,7 +18,8 @@ class TestTou(TestCase):
     def test_tou_str(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
                     comment="Agreed to ToU", context='other')
-        tou = ToU(audit=audit, agreement_url=tou_url)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='website terms of use')
         results = "{}".format(tou)
         self.assertTrue(tou_url in results)
 
@@ -51,12 +53,32 @@ class TestTou(TestCase):
 
     def test_get(self):
         audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-        tou = ToU(audit=audit, agreement_url=tou_url)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='website terms of use')
         with SessionScope(db):
             db.session.add(tou)
             db.session.commit()
 
         self.login()
         rv = self.client.get('/api/user/{}/tou'.format(TEST_USER_ID))
+        doc = json.loads(rv.data)
         self.assert200(rv)
-        self.assertEquals(rv.json['accepted'], True)
+        self.assertEquals(len(doc['tous']), 1)
+
+    def test_get_by_type(self):
+        timestamp = datetime.utcnow()
+        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+                      timestamp=timestamp)
+        tou = ToU(audit=audit, agreement_url=tou_url,
+                  type='privacy policy')
+        with SessionScope(db):
+            db.session.add(tou)
+            db.session.commit()
+
+        self.login()
+        rv = self.client.get('/api/user/{}/tou/privacy-policy'.format(
+                             TEST_USER_ID))
+        self.assert200(rv)
+        self.assertEquals(rv.json['accepted'],
+                          timestamp.strftime("%Y-%m-%dT%H:%M:%S"))
+        self.assertEquals(rv.json['type'], 'privacy policy')

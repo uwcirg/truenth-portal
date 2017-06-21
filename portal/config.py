@@ -66,6 +66,7 @@ class BaseConfig(object):
     PROJECT = "portal"
     SHOW_EXPLORE = True
     SHOW_PROFILE_MACROS = ['ethnicity', 'race']
+    SHOW_PUBLIC_TERMS = True
     SHOW_WELCOME = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = best_sql_url()
@@ -104,6 +105,10 @@ class BaseConfig(object):
     LR_GROUP = 20147
 
     SYSTEM_TYPE = 'development'
+
+    SMARTLING_USER_ID = os.environ.get('SMARTLING_USER_ID', None)
+    SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET', None)
+    SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', None)
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""

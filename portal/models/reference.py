@@ -5,6 +5,7 @@ from sqlalchemy import and_
 from ..database import db
 from .identifier import Identifier
 
+
 class MissingReference(Exception):
     """Raised when FHIR references cannot be found"""
     pass
@@ -127,11 +128,17 @@ class Reference(object):
         :returns: the appropriate JSON formatted reference string.
 
         """
+        from .organization import Organization  # local to avoid cyclic import
+        from .user import User  # local to avoid cyclic import
+
         if hasattr(self, 'patient_id'):
             ref = "api/patient/{}".format(self.patient_id)
+            display = User.query.get(self.patient_id).display_name
         if hasattr(self, 'organization_id'):
             ref = "api/organization/{}".format(self.organization_id)
+            display = Organization.query.get(self.organization_id).name
         if hasattr(self, 'questionnaire_name'):
             ref = "api/questionnaire/{}".format(self.questionnaire_name)
+            display = self.questionnaire_name
 
-        return {"reference": ref}
+        return {"reference": ref, "display": display}

@@ -1,5 +1,8 @@
 """Views for Terms Of Use"""
 from flask import abort, jsonify, Blueprint, request
+from re import sub
+from sqlalchemy import and_
+from sqlalchemy.exc import DataError
 
 from ..database import db
 from ..extensions import oauth
@@ -36,15 +39,13 @@ def get_current_tou_url():
 @tou_api.route('/user/<int:user_id>/tou')
 @oauth.require_oauth()
 def get_tou(user_id):
-    """Access Terms Of Use info for given user
+    """Access all Terms Of Use info for given user
 
-    Returns ToU{'accepted': true|false} for requested user.
+    Returns ToU json for requested user.
     ---
     tags:
       - Terms Of Use
     operationId: getToU
-    produces:
-      - application/json
     parameters:
       - name: user_id
         in: path
@@ -52,10 +53,36 @@ def get_tou(user_id):
         required: true
         type: integer
         format: int64
+    produces:
+      - application/json
     responses:
       200:
         description:
-          Returns 'accepted' True or False for requested user.
+          Returns the list of ToU agreements for the requested user.
+        schema:
+          id: tous
+          properties:
+            tou_agreements:
+              type: array
+              items:
+                type: object
+                required:
+                  - agreement_url
+                  - accepted
+                  - type
+                properties:
+                  agreement_url:
+                    type: string
+                    description: URL pointing to agreement text
+                  accepted:
+                    type: string
+                    format: date-time
+                    description:
+                      UTC date-time for when the agreement was accepted
+                  type:
+                    type: string
+                    description:
+                      Type of ToU agreement (privacy policy, website ToU, etc.)
       401:
         description:
           if missing valid OAuth token or logged-in user lacks permission
@@ -66,9 +93,84 @@ def get_tou(user_id):
     if not user:
         abort(404)
     current_user().check_role(permission='view', other_id=user_id)
-    tous = ToU.query.join(Audit).filter(Audit.user_id==user_id).first()
-    if tous:
-        return jsonify(accepted=True)
+
+    tous = ToU.query.join(Audit).filter(Audit.user_id == user_id)
+
+    return jsonify(tous=[d.as_json() for d in tous])
+
+
+@tou_api.route('/user/<int:user_id>/tou/<string:tou_type>')
+@oauth.require_oauth()
+def get_tou_by_type(user_id, tou_type):
+    """Access Terms Of Use info for given user & ToU type
+
+    Returns ToU JSON for requested user and ToU type.
+    If no ToU agreement is found, {'accepted': false} returned instead.
+    ---
+    tags:
+      - Terms Of Use
+    operationId: getToUByType
+    parameters:
+      - name: user_id
+        in: path
+        description: TrueNTH user ID
+        required: true
+        type: integer
+        format: int64
+      - name: tou_type
+        in: path
+        description: ToU type
+        required: true
+        type: string
+    produces:
+      - application/json
+    responses:
+      200:
+        description:
+          Returns the ToU agreement for the requested user & ToU type
+        schema:
+          id: tou
+          required:
+            - agreement_url
+            - accepted
+            - type
+          properties:
+            agreement_url:
+              type: string
+              description: URL pointing to agreement text
+            accepted:
+              type: string
+              format: date-time
+              description:
+                UTC date-time for when the agreement was accepted
+            type:
+              type: string
+              description:
+                Type of ToU agreement (privacy policy, website ToU, etc.)
+      400:
+        description:
+          if the given type string does not match a valid ToU type
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    user = get_user(user_id)
+    if not user:
+        abort(404)
+    current_user().check_role(permission='view', other_id=user_id)
+
+    tou_type = sub('-',' ',tou_type)
+
+    try:
+        tou = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
+                                            ToU.type == tou_type)).first()
+    except DataError:
+        abort(400, 'invalid tou type')
+
+    if tou:
+        return jsonify(tou.as_json())
     return jsonify(accepted=False)
 
 
@@ -169,7 +271,9 @@ def accept_tou(user_id=None):
         abort(400, "Requires JSON with the ToU 'agreement_url'")
     audit = Audit(user_id = user.id, subject_id=user.id,
         comment = "ToU accepted", context='tou')
-    tou = ToU(audit=audit, agreement_url=request.json['agreement_url'])
+    tou_type = request.json.get('type') or 'website terms of use'
+    tou = ToU(audit=audit, agreement_url=request.json['agreement_url'],
+              type=tou_type)
     db.session.add(tou)
     db.session.commit()
     # Note: skipping auditable_event, as there's a audit row created above

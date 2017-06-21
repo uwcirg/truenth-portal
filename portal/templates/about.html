@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
+{% from "flask_user/_macros.html" import back_btn, footer %}
 {% block main %}
-{% from "flask_user/_macros.html" import back_btn %}
-
   {{ back_btn(PORTAL, _('Home')) }}
 
   <h3 class="tnth-headline">{{ _("About TrueNTH") }}</h3>
@@ -16,5 +15,8 @@
     <div class="pull-right text-muted smaller-text">TrueNTH Version: {{ config.metadata.version }}</div>
     {% endif %}
   {% endif %}
+{% endblock %}
+{% block footer %}
+{{footer(user=user)}}
 {% endblock %}
 

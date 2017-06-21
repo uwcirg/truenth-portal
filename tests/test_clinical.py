@@ -9,6 +9,7 @@ from tests import TestCase, TEST_USER_ID
 
 from portal.extensions import db
 from portal.models.audit import Audit
+from portal.models.encounter import Encounter
 from portal.models.fhir import Observation, UserObservation
 from portal.models.fhir import Coding, CodeableConcept, ValueQuantity
 from portal.models.performer import Performer
@@ -22,7 +23,7 @@ class TestClinical(TestCase):
         # First push some clinical data into the db for the test user
         with SessionScope(db):
             audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID)
-            observation = Observation(audit=audit)
+            observation = Observation()
             coding = Coding(system='SNOMED-CT', code='372278000',
                     display='Gleason score')
             cc = CodeableConcept(codings=[coding,])
@@ -32,9 +33,13 @@ class TestClinical(TestCase):
                 Reference.patient(TEST_USER_ID).as_fhir()))
             observation.performers.append(performer)
             db.session.add(observation)
+            enc = Encounter(status='planned', auth_method='url_authenticated',
+                            user_id=TEST_USER_ID, start_time=datetime.utcnow())
+            db.session.add(enc)
             db.session.flush()
             db.session.add(UserObservation(user_id=int(TEST_USER_ID),
-                observation_id=observation.id))
+                                           observation_id=observation.id,
+                                           encounter_id=enc.id, audit=audit))
             db.session.commit()
 
     def test_clinicalGET(self):
@@ -52,17 +57,11 @@ class TestClinical(TestCase):
         self.assertEquals(
             json.dumps(Reference.patient(TEST_USER_ID).as_fhir()),
             clinical_data['entry'][0]['content']['performer'][0])
-        self.assertEquals(
-            Reference.patient(TEST_USER_ID).as_fhir()['reference'],
-            clinical_data['entry'][0]['content']['meta']['by']['reference'])
         found = parser.parse(
-                clinical_data['entry'][0]['content']['meta']['lastUpdated'])
+                clinical_data['entry'][0]['updated'])
         found = found.replace(tzinfo=None)
         self.assertAlmostEquals(datetime.utcnow(), found,
                                 delta= timedelta(seconds=5))
-        self.assertEquals(
-            current_app.config.metadata.version,
-            clinical_data['entry'][0]['content']['meta']['version'])
 
     def test_clinicalPOST(self):
         data = {"resourceType": "Observation",

@@ -100,10 +100,12 @@ class TestFHIR(TestCase):
         self.assertIn(c2.display, cc_str)
 
     def test_qr_format(self):
+        self.login()
         qr = QuestionnaireResponse(
             subject_id=TEST_USER_ID,
             status='in-progress',
             authored=datetime.utcnow(),
+            encounter=self.test_user.current_encounter
         )
         db.session.add(qr)
         db.session.commit()

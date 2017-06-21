@@ -98,11 +98,12 @@
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
                   <th data-field="email" data-sortable="true" data-class="email-field">{{ _("Email") }}</th>
-                   <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
-                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field">{{ _("Reports") }}</th>{% endif %}
-                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="false" data-card-visible="false" data-searchable="false" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
+                  <th data-field="phone" data-sortable="true" data-visible="false" data-width="10%" data-class="phone-field">{{ _("Cell") }}</th>
+                  <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field">{{ _("Phone (Other)") }}</th>
+                  {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center">{{ _("Reports") }}</th>{% endif %}
+                  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
                   {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="false" data-card-visible="false" data-searchable="false" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
@@ -112,20 +113,28 @@
                       <td>{{patient.id}}</td>
                       <td><a href="{{ url_for('patients.patient_profile', patient_id=patient.id) }}">{{ patient.id }}</a></td>
                       <td id="{{patient.id}}_username">{{ patient.username }}</td>
-                      <td style="width: 10%; word-wrap:break-word;">{{ patient.first_name if patient.first_name }}</td>
+                      <td>{{ patient.first_name if patient.first_name }}</td>
                       <td>{{ patient.last_name if patient.last_name }}</td>
                       <td>{{ patient.email if patient.email }}</td>
                       <td>{{ patient.phone if patient.phone}}</td>
+                      <td>{{ patient.alt_phone if patient.alt_phone}}</td>
                       {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td class="rowlink-skip">{{ patient.staff_html() | safe }}</td>
+                        <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div>{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
+                        </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%if patient.assessment_status and patient.assessment_status != "undetermined"%}{{ patient.assessment_status }}{% endif%}</td>
+                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} Withdrawn {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
                       {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{{ patient.external_study_id }}</td>
+                        <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
-                      <td><!--consent datefield--></td>
+                      <td>{%- if patient.valid_consents -%}
+                        {%-for consent in patient.valid_consents -%}
+                          <span class="tnth-hide">{{consent.audit.timestamp}}</span>
+                          {{consent.audit.timestamp.strftime('%-d %b %Y')}}<br/>
+                        {%-endfor-%}
+                      {%-endif-%}
+                      </td>
                       <td>{% for org in patient.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
                   </tr>
                {% endfor %}
@@ -135,6 +144,10 @@
   <div id="admin-table-error-message" class="text-danger smaller-text"></div>
 </div>
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+{%- from "flask_user/_macros.html" import footer -%}
+{% block footer %}
+{{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
 
@@ -149,14 +162,28 @@ var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
-  $("#adminTable").on("sort.bs.table reset-view.bs.table toggle.bs.table", function() {
-      AT.updateData();
-   });
-  $("#adminTable").on("page-change.bs.table", function() {
-      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},800);
-  });
-  setTimeout("AT.updateData();", 0);
+  /*****************
+  //client side update of data
+  //keep this here, in case we need to bring this back
+  //$("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
+  //    AT.updateData();
+  // });
+  //$("#adminTable").on("page-change.bs.table", function() {
+  //    if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
+  //    if ($(this).find(".card-view").length > 0) {
+  //      AT.updateData();
+  //    }
+  //});
+  //$("#adminTable").on("toggle.bs.table", function() {
+  //    if ($(this).find(".card-view").length > 0) {
+  //      AT.updateData();
+  //    }
+  //});
+  //setTimeout("AT.updateData();", 0);
+  ******************/
 
+   AT.fadeLoader();
+  
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");

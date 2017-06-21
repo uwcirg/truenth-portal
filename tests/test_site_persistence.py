@@ -6,6 +6,7 @@ integration tests.  For example, does a complicated strategy come
 to life and properly control the visiblity of a intervention card?
 
 """
+from datetime import datetime
 from flask_webtest import SessionScope
 import os
 from tests import TestCase, TEST_USER_ID
@@ -14,10 +15,12 @@ from portal.extensions import db
 from portal.site_persistence import SitePersistence
 from portal.models.app_text import app_text
 from portal.models.audit import Audit
+from portal.models.encounter import Encounter
 from portal.models.fhir import CC
 from portal.models.intervention import INTERVENTION
 from portal.models.organization import Organization
 from portal.models.role import ROLE
+from portal.models.user import get_user
 
 known_good_persistence_file =\
 "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7/site_persistence_file.json"
@@ -63,9 +66,14 @@ class TestSitePersistence(TestCase):
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
 
         # Fulfill conditions
+        enc = Encounter(status='in-progress', auth_method='url_authenticated',
+                        user_id=TEST_USER_ID, start_time=datetime.utcnow())
+        with SessionScope(db):
+            db.session.add(enc)
+            db.session.commit()
         self.add_procedure(
             code='424313000', display='Started active surveillance')
-        user.save_constrained_observation(
+        get_user(TEST_USER_ID).save_constrained_observation(
             codeable_concept=CC.PCaLocalized, value_quantity=CC.TRUE_VALUE,
             audit=Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID))
         self.promote_user(user, role_name=ROLE.PATIENT)

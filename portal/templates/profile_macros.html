@@ -13,10 +13,10 @@
     <div class="form-group profile-section" id="bdGroup">
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
-            <div class="flex-item" id="bdDateContainer">
+            <div class="flex-item" id="bdDateContainer" data-loader-container="true">
                 <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
-            <div class="flex-item" id="bdMonthContainer">
+            <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
                     <option value="">{{ _("Month") }}...</option>
                     <option value="01">{{ _("January") }}</option>
@@ -33,7 +33,7 @@
                     <option value="12">{{ _("December") }}</option>
                 </select>
             </div>
-            <div class="flex-item" id="bdYearContainer">
+            <div class="flex-item" id="bdYearContainer" data-loader-container="true">
                 <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
             </div>
         </div>
@@ -70,7 +70,7 @@
 {%- endmacro %}
 
 {% macro profileLocale(person) -%}
-    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item">
+    <div id="localeGroup" class="form-group float-input-label profile-section timezone-container flex-item" data-loader-container="true">
         <label for="locale">{{ _("Language") }}</label>
         <select class="form-control" name="locale" id="locale">
           {%- if (person and ("en_US" in person.locale_display_options)) or config.get("DEFAULT_LOCALE") == "en_US" -%}
@@ -80,6 +80,7 @@
           <option value="en_AU" {{ "selected" if ((person and person.locale_code == "en_AU") or ((not person or not person.locale_code) and config.get("DEFAULT_LOCALE") == "en_AU")) }}>{{ _("Australian English") }}{{(" (" + _("Default") + ")") if config.get("DEFAULT_LOCALE") == "en_AU" }}</option>
           {%- endif -%}
         </select>
+        <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
      </div>
      <script>$(function () {
         $('#locale').on('change', function() {
@@ -93,13 +94,13 @@
 {% macro profileName(person, isFocus=False) -%}
     <div class="form-group profile-name-label"><label>{{ _("Name") }}</label></div>
     <div class="row profile-section name-section">
-        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container">
+        <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
                 <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
                 <div class="help-block with-errors"></div>
             </div>
         </div>
-        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container">
+        <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
                 <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
                 <div class="help-block with-errors"></div>
@@ -111,7 +112,7 @@
 {% macro profileGender(person) -%}
     <div class="form-group profile-section flex-item" id="genderGroup">
         <label id="genderLabel">{{ _("Gender") }}</label>
-        <div id="profile-gender-list" class="profile-radio-list">
+        <div id="profile-gender-list" class="profile-radio-list" data-loader-container="true">
             <label class="radio-inline">
                 <input type="radio" name="sex" id="sexM" value="male" required {{ "checked" if person and person.gender == "male"}}/>
                 {{ _("Male") }}
@@ -126,12 +127,11 @@
             </label>
         </div>
     </div>
-     <script>$(function (){fillViews.gender();});</script>
 {%- endmacro %}
 
 {% macro profileIndigenous(person) -%}
     {%- if person and person.org_coding_display_options.indigenous -%}
-        <div id="userIndigenousStatusContainer" class="flex-item"></div>
+        <div id="userIndigenousStatusContainer" data-section-id="indigenous" class="flex-item"></div>
         <script>
         $(function () {
             (function() {
@@ -143,8 +143,8 @@
                     var html = '<div class="form-group profile-section" id="userIndigenousStatus">' +
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
-                        html += '<div>' + '<label>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '">&nbsp;&nbsp;' + o.display + '</label></div>';
+                        html += '<div>' +
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -166,7 +166,7 @@
 
 {% macro profileRace(person) -%}
     {%- if person and person.org_coding_display_options.race -%}
-        <div class="form-group profile-section flex-item" id="userRace">
+        <div class="form-group profile-section flex-item optional" data-section-id="race" id="userRace" data-loader-container="true">
             <label>{{ _("Race") }}</label>
             <div class="profile-radio-list">
                 <div class="checkbox">
@@ -206,7 +206,7 @@
 
 {% macro profileEthnicity(person) -%}
     {%- if person and person.org_coding_display_options.ethnicity -%}
-        <div class="form-group profile-section flex-item" id="userEthnicity">
+        <div class="form-group profile-section flex-item optional" data-section-id="ethnicity" data-loader-container="true" id="userEthnicity">
             <label>{{ _("Ethnicity") }}</label>
             <div class="profile-radio-list">
                 <div class="radio">
@@ -225,7 +225,7 @@
 {%- endmacro %}
 
 {% macro profileEmail(person) -%}
-    <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail">
+    <div class="form-group float-input-label profile-section" id="emailGroup" data-error-field="erroremail" data-loader-container="true">
         <label for="email">{{ _("Email Address") }}</label>
         <input type="text" class="form-control" id="email" name="email" data-save-container-id="emailGroup" placeholder="{{ _('Email Address') }}" value="{{ person.email if person and person.email and person.email != '__no_email__' }}" data-customemail="true" data-error-field="erroremail" required />
         <div class="help-block with-errors" id="erroremail"></div>
@@ -458,12 +458,9 @@
             })();
             return_url = getAccessUrl();
             if (hasValue(return_url)) {
-                body = "<p>Hello,</p>";
-                body += "<p>This email was sent to you from " + clinicName + ". This is an invitation to complete your registration.</p>";
-                body += "Verify your account now by clicking on the link below to visit TrueNTH:";
-                body += "<br/><br/>";
-                body += "<a href='" + return_url + "'>Complete Registration</a>";
-                subject = "Registration invite from " + clinicName;
+                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                subject = "{%trans%}Registration invite from {%endtrans%}{%trans%}" + clinicName + "{%endtrans%}";
             };
             if (body != '') {
                 $.ajax ({
@@ -472,9 +469,9 @@
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     data: {'subject': subject, 'recipients': email, 'body': body}
                 }).done(function(data) {
-                    $('#profileEmailMessage').text('invite email sent to ' + email);
+                    $('#profileEmailMessage').text('{%trans%}invite email sent to ' + email + "{%endtrans%}");
                 }).fail(function() {
-                    $('#profileEmailMessage').text('Unable to send email.');
+                    $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                 });
             };
         });
@@ -483,9 +480,16 @@
 {%- endmacro %}
 
 {% macro profilePhone(person) -%}
-    <div id="phoneGroup" class="form-group float-input-label profile-section">
+    <div id="phoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
         <label for="phone">{{ _("Cell") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
         <input type="text" class="form-control" id="phone" name="phone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.phone if person and person.phone }}" />
+    </div>
+{%- endmacro %}
+
+{% macro profileAltPhone(person) -%}
+    <div id="altPhoneGroup" class="form-group float-input-label profile-section" data-loader-container="true">
+        <label for="altPhone">{{ _("Phone (Other)") }} <span class="text-muted smaller-text">({{ _("Optional") }})</span></label>
+        <input type="text" class="form-control" id="altPhone" name="altPhone" placeholder="{{ _('XXX-XXX-XXXX') }}" value="{{ person.alt_phone if person and person.alt_phone }}" />
     </div>
 {%- endmacro %}
 
@@ -653,6 +657,8 @@
 
                   {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
                   OT.handleEvent();
+
+                  {% if consent_agreements %}if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
                 };
 
             }).fail(function() {
@@ -681,34 +687,22 @@
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
-        var orgsEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}true{% else %}false{% endif %};
-        //STAFF CANNOT EDIT THEIR OWN ORGS
-        {% if not(current_user.has_role(ROLE.ADMIN)) and current_user.has_role(ROLE.STAFF) and (current_user.id == person.id) %}orgsEditable = false;{% endif %}
-
-        function disableOrgs() {
-            $("#userOrgs input[name='organization']").not('[parent_org]').each(function() {
-                    $(this).attr("disabled", true);
-            });
-        };
         var leafOrgs = false;
-        {% if current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
+        {% if person and person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF) and not(current_user.has_role(ROLE.ADMIN)) %}
             leafOrgs = {% if current_user.leaf_organizations() %} {{current_user.leaf_organizations() | safe}} {% else %} false {% endif %};
         {% endif %}
         $(function () {
-            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
             setTimeout('tnthAjax.getOrgs({{ person.id if person }}, false, false, _handleOrgs);', 500);
         });
 
         function _handleOrgs() {
 
             if (leafOrgs) OT.filterOrgs(leafOrgs);
-            if (!orgsEditable) disableOrgs();
 
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
                 var userOrgs = $("#userOrgs input[name='organization']");
-                if (userOrgs.length == 0) userOrgs = $("#userOrgs input[name='organization']");
                 var checkedOrgs = {};
                 userOrgs.each(function() {
                     if ($(this).prop("checked")) {
@@ -720,32 +714,10 @@
                     };
                 });
             {%- endif -%}
-            {% if (current_user.has_role('patient') or current_user.has_role('write_only')) and not('patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) %}
-                var userOrgs = $("#userOrgs input[name='organization']").not('[parent_org]');
-                var checkedOrgs = [];
-                userOrgs.each(function() {
-                    if ($(this).prop("checked") && parseInt($(this).val()) != 0) {
-                        checkedOrgs.push({
-                            "id": $(this).val(),
-                            "name": $("#org-label-" + $(this).val()).text()
-                        });
-                    };
-                });
-                if (checkedOrgs.length > 0) {
-                    var html = "";
-                    checkedOrgs.forEach(function(item) {
-                        html += '<div id="' + item.id + '_container" class="org-container"><label id="org-label-' + item.id + '" class="org-label"><input class="clinic" type="checkbox" name="organization" id="' + item.id + '_org" value="' + item.id + '" disabled="disabled" checked>' + item.name + "</label></div>";
-                    });
-                    $("#fillOrgs").html(html);
-                    $("div.noOrg-container").hide();
-                } else {
-                    if ($("#noOrgs").is(":checked")) {
-                        $("#fillOrgs").html("<span class='text-muted'>No organization/affiliation</span>");
-                        $("div.noOrg-container").hide();
-                    };
-                }
-
-            {% endif %}
+            {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
+                $("#userOrgs .noOrg-container").hide();
+            {%- endif -%}
+            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
         };
     </script>
 {%- endmacro %}
@@ -760,7 +732,7 @@
                     </div>
                     <div class="modal-body">
                     <h4>Terms</h4>
-                    <div style="border-style:ridge; max-height: 250px; overflow: auto; padding: 1em; background-color:#F5F5F5">{{consent_agreement.asset|safe}}</div>
+                    <div class="terms-container">{{consent_agreement.asset|safe}}</div>
                     <br/>
                     <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
                     <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
@@ -913,6 +885,11 @@
                             sortable: true,
                             visible: false
                         }, {
+                            field: 'contributor',
+                            title: 'Contributor',
+                            sortable: true,
+                            searchable: true
+                        }, {
                             field: 'actions',
                             title: 'Actions',
                             sortable: false,
@@ -943,7 +920,7 @@
 
         /**** this function is used when this section becomes editable ****/
         function reloadConsentList() {
-            var eventLoading = '<div style="margin: 1em" id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
+            var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
             $("#profileConsentList").animate({opacity: 0}, function() {
                     $(this).html(eventLoading).css('opacity',1);
                     // Set a one second delay before getting updated list. Mostly to give user sense of progress/make it
@@ -954,9 +931,11 @@
 
             });
         };
+        /*******  NOTE, this call is already made when getting the organizations
         $(function () {
-            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 500);
+            setTimeout("tnthAjax.getConsent({{person.id}}, false);", 1000);
         });
+        *******/
     </script>
     {% endif %}
 {%- endmacro %}
@@ -984,17 +963,14 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: 'json'
             }).done(function(data) {
-                //console.log(data["audits"]);
                 if (data["audits"] && data["audits"].length > 0 ) {
                     var fData = [];
                     data["audits"].forEach(function(item) {
                         item["by"] = item["by"]["reference"];
-                        //item["lastUpdated"] = item["lastUpdated"].replace("T", " ");
                         var r = /\d+/g;
                         var m = r.exec(String(item["by"]));
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
-                        //console.log(r.exec(String(item["by"])));
                         item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
@@ -1070,7 +1046,7 @@
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" style="margin-left: 10px"></div>
+        <div class="form-group" id="rolesGroup" data-loader-container="true"></div>
     {% endif %}
     {% if person %}
     <script>
@@ -1187,15 +1163,18 @@
                                         entries[0]['questionnaire']['display'] +
                                         '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
                                         tnthDates.formatDateString(sessionAuthoredDate, "iso") +
-                                         " <span class='gmt'>(GMT), Y-M-D</span>" + '</span><hr/></caption>';
+                                         " <span class='gmt'>(GMT, Y-M-D)</span>" + '</span><hr/></caption>';
                         reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
-                            var q = entry['text'] ? entry['text'] : '', a = '';
-                            if (hasValue(q)) q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
+                            var q = entry['text'] ? entry['text'] : '', a = '', qcNeeded = true;
+                            if (hasValue(q)) {
+                                q = q.replace(/^[\d\w]{1,3}\./, '');  //replace question # in the beginning of the question
+                                qcNeeded = false;
+                            };
                             if (entry['answer']) {
                                 (entry['answer']).forEach(function(item) {
-                                    if (!hasValue(a) && item.valueString) a = item.valueString;
-                                    if (!hasValue(q) && item.valueCoding && item.valueCoding.code) q = item.valueCoding.code;
+                                    if (item.valueString) a += (hasValue(a) ? "<br/>" : "") + item.valueString;
+                                    if (qcNeeded && item.valueCoding && item.valueCoding.code) q += (hasValue(q) ? "<br/>" : "") + item.valueCoding.code;
                                 });
                             };
                             if (!hasValue(q)) q = entry['linkId'];
@@ -1276,9 +1255,10 @@
                      <table>
                         <tr><td class="text-muted">{{_("Have you had a prostate cancer biopsy?")}}</td><td><div id="biopsy_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Have you been diagnosed with prostate cancer?")}}</td><td><div id="pca_diag_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Is the prostate cancer only within the prostate?")}}</td><td><div id="pca_localized_view"></div></td></tr>
                    </table>
                 </div>
-                <div id="patientQContainer" class="edit-container well">
+                <div id="patientQContainer" class="edit-container">
                     {{patientQGroup(current_user)}}
                 </div>
             </div>
@@ -1303,9 +1283,8 @@
         };
         $(function () {
             $("#patientQ").show();
-            //don't show treatment & pca localized questions
+            //don't show treatment
             $("#patTx").remove();
-            $("#patMeta").remove();
 
             $("#patientQ hr").hide();
             {% if person and current_user and person.id != current_user.id %}
@@ -1327,6 +1306,7 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
+                              $("#biopsyDate").datepicker("hide").blur();
                               tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
                             };
                         };
@@ -1446,6 +1426,7 @@
             $(".timezone-error").html("");
             $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
+            fillViews.timezone();
         });
     });
     {% endif %}
@@ -1472,7 +1453,7 @@
                     <div class="form-group">
                         <label class="text-muted">{{ _("Deceased Date") }}</label>
                     </div>
-                    <div class="row" style="margin-top:-8px">
+                    <div class="row deceased-date-container">
                         <div class="col-md-3 col-xs-6">
                             <div id="deathDayContainer" class="form-group profile-section">
                                 <input class="form-control" id="deathDay" name="deathDay" data-save-container-id="deathDayContainer" placeholder="DD" type="text" pattern="\d[\d]?" maxlength="2" required />
@@ -1566,7 +1547,7 @@
     </script>
 {%- endmacro %}
 {% macro profileStudyID(person) -%}
-    <div id="profileStudyIDContainer" class="form-group">
+    <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">Study ID</label>
         <input type="text" id="profileStudyId" class="form-control" required/>
         <div class="help-block with-errors"></div>
@@ -1577,7 +1558,7 @@
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
             <div class="custom-container">
-                <input type="text" style="position: fixed; left: -10000000px;" autofocus="true"/>
+                <input type="text" style="position: fixed; left: -10000000px;" autofocus/>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customSendEmailLoc" class="profile-item-title index-item">{{_("Send email")}}</h4>
                     <br/>
@@ -1590,11 +1571,46 @@
                     <div class="custom-container-content text-muted">{{_("This logs you out, and logs in the patient without their needing to enter credentials. This is so the patient can complete their questionnaire on this device. Ideal for tablet and kiosk computers.")}}</div><br/>
                     <button id="loginAsButton" class="btn btn-tnth-primary custom-btn" type="button">{{_("Log in as patient")}}</button>
                 </div>
-                <div class="profile-item-container custom-container-item">
+                 <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
-                    <div id="enterManualInfoContainer" class="text-info small-text"></div>
-                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" href="{{person.assessment_link}}">{{_("Enter manually")}}</a>
+                    <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
+                    <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
+                          <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title">{{ _("Enter questionnaire manually on patient's behalf") }}</h4>
+                              </div>
+                              <div class="modal-body">
+                                <p class="text-left text-muted">{{ _('Select the method in which the questionnaire will be completed:') }}</p>
+                                 <div class="form-group">
+                                    <div class="profile-radio-list">
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="interviewAssisted" value="interview_assisted"/>
+                                          <span>{{ _("Interview assisted") }}</span>
+                                      </label>
+                                      <br/>
+                                      <label class="radio-inline">
+                                          <input type="radio" name="entryMethod" id="paper" value="paper"/>
+                                          <span>{{ _("Paper") }}</span>
+                                      </label>
+                                    </div>
+                                  </div>
+                                  <div id="manualEntryMessageContainer" class="error-message"></div>
+                              </div>
+                              <div class="modal-footer">
+                                <div id="manualEntryLoader" class="loading-message-indicator">
+                                    <i class="fa fa-spinner fa-spin fa-2x loading-message"></i>
+                                </div>
+                                <div id="manualEntryButtonsContainer">
+                                    <a href="#" id="meSubmit" class="btn btn-default">{{ _("OK") }}</a>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Cancel") }}</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1618,6 +1634,41 @@
             e.stopPropagation();
             handleLoginAs(e);
         });
+
+        $(document).delegate("#meSubmit", "click", function(event){
+            var method = "";
+            $("input[name='entryMethod']").each(function() {
+                if ($(this).is(":checked")) {
+                    method = $(this).val();
+                };
+            });
+            if (method != "") {
+                $("#manualEntryMessageContainer").text("");
+                //check if the user has given web consent here, if not redirect to form
+                var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+                if (hasValue(assessment_url)) {
+                    var still_needed = false;
+                    tnthAjax.getStillNeededCoreData('{{person.id if person}}', true, function(data) {
+                            if (data && ! data.error && data.length > 0) still_needed = true;
+                        }, method);
+                    if (/\?/.test(assessment_url)) assessment_url += "&entry_method=" + method;
+                    else assessment_url += "?entry_method=" + method;
+                    var winLocation = !still_needed ? assessment_url : "{{url_for('portal.website_consent_script', patient_id=person.id)}}" + "?entry_method=" + method + "&redirect_url=" + encodeURIComponent(assessment_url);
+                    $("#manualEntryButtonsContainer").hide();
+                    $("#manualEntryLoader").show();
+                    setTimeout(function() { window.location = winLocation;}, 100);
+                } else {
+                    $("#manualEntryMessageContainer").html("The user does not have a valid assessment link.");
+                };
+            } else {
+                $("#manualEntryMessageContainer").html("You must select a method.");
+            };
+          });
+
+          $("input[name='entryMethod']").on("click", function() {
+              if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
+          });
+
         {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
             $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
         {%- endif -%}
@@ -1654,6 +1705,7 @@
                         {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">
@@ -1662,6 +1714,7 @@
                     {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(person)}}{% endif -%}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
                 </div>
             </div>
         </div>
@@ -1674,9 +1727,9 @@
                     <div class="view-container">
                         <table>
                             <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr class="ethnicity-view"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr class="race-view"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                            <tr id="ethnicityViewRow" data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                            <tr id="raceViewRow" data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                            <tr id="indigenousViewRow" data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
                        </table>
                     </div>
                     <div class="flex edit-container">
@@ -1685,6 +1738,7 @@
                         {{profileRace(person)|show_macro('race')}}
                         {{profileIndigenous(person)|show_macro('indigenous')}}
                     </div>
+                    <div class="no-data-container"></div>
                 </div>
             </div>
         </div>
@@ -1789,6 +1843,7 @@
                         {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
+                        <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
                 </div>
                 <div class="edit-container">
@@ -1797,6 +1852,7 @@
                     {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
+                    {{profileAltPhone(person)}}
                 </div>
             </div>
         </div>
@@ -1809,9 +1865,9 @@
                     <div class="view-container">
                          <table>
                             <tr class="gender-view"><td class="text-muted">{{_("Gender")}}</td><td><div id="gender_view"></div></td></tr>
-                            <tr class="ethnicity-view"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
-                            <tr class="race-view"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
-                            <tr class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
+                            <tr data-section-id="ethnicity" class="ethnicity-view optional"><td class="text-muted">{{_("Ethnicity")}}</td><td><div id="ethnicity_view"></div></td></tr>
+                            <tr data-section-id="race" class="race-view optional"><td class="text-muted">{{_("Race")}}</td><td><div id="race_view"></div></td></tr>
+                            <tr data-section-id="indigenous" class="indigenous-view"><td class="text-muted">{{_("Indigenous")}}</td><td><div id="indigenous_view"></div></td></tr>
                        </table>
                     </div>
                     <div class="flex edit-container">
@@ -1820,6 +1876,7 @@
                         {{profileRace(person)|show_macro('race')}}
                         {{profileIndigenous(person)|show_macro('indigenous')}}
                     </div>
+                    <div class="no-data-container"></div>
                 </div>
             </div>
         </div>
@@ -2016,7 +2073,7 @@
                                         <input class="form-control" id="procYear" name="procYear" placeholder="YYYY" type="text" maxlength="4"/>
                                     </div>
                                     <div class="flex-item">
-                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i><em class="smaller-text">&nbsp;{{ _("Add") }}</em> <span class="smaller-text">{{_(" Option")}}</span></button>
+                                        <button class='btn btn-default' id='tnthproc-submit' name='tnthproc' data-name='' data-date='' data-date-read=''  type="submit" disabled><i class='fa fa-plus'></i>&nbsp;<span class="smaller-text">{{_("Save")}}</span></button>
                                     </div>
                                 </div>
                                 <div class="row">

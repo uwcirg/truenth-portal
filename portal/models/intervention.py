@@ -37,6 +37,7 @@ class Intervention(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
+    # nullable as interventions may not have a valid client
     client_id = db.Column(db.ForeignKey('clients.client_id'))
     card_html = db.Column(db.Text)
     link_label = db.Column(db.Text)
@@ -181,8 +182,8 @@ class UserIntervention(db.Model):
     link_label = db.Column(db.Text)
     link_url = db.Column(db.Text)
     status_text = db.Column(db.Text)
-    user_id = db.Column(db.ForeignKey('users.id'))
-    intervention_id = db.Column(db.ForeignKey('interventions.id'))
+    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
+    intervention_id = db.Column(db.ForeignKey('interventions.id'), nullable=False)
 
     def as_json(self):
         d = {'user_id': self.user_id}

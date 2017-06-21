@@ -5,6 +5,7 @@ from flask_webtest import SessionScope
 from flask_swagger import swagger
 from swagger_spec_validator import validate_spec_url
 import tempfile
+import urllib
 
 from portal.extensions import db
 from portal.models.intervention import INTERVENTION, UserIntervention
@@ -25,10 +26,11 @@ class TestPortal(TestCase):
         client.intervention = intervention
         intervention.card_html = "Custom Label"
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
-        self.login()
         rv = self.client.get('/home')
+        self.assert200(rv)
 
         self.assertIn('Custom Label', rv.data)
         intervention = db.session.merge(intervention)
@@ -49,12 +51,13 @@ class TestPortal(TestCase):
             db.session.add(ui)
             db.session.commit()
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
         user = db.session.merge(self.test_user)
-        self.login()
 
         rv = self.client.get('/home')
+        self.assert200(rv)
 
         ui = db.session.merge(ui)
         self.assertIn(ui.card_html, rv.data.decode('utf-8'))
@@ -96,9 +99,9 @@ class TestPortal(TestCase):
         client.intervention = intervention
         intervention.public_access = False
 
+        self.login()
         self.add_required_clinical_data()
         self.bless_with_basics()
-        self.login()
         rv = self.client.get('/home')
 
         self.assertNotIn('Sexual Recovery', rv.data)
@@ -203,3 +206,14 @@ class TestPortal(TestCase):
             temp_spec.seek(0)
 
             validate_spec_url("file:%s" % temp_spec.name)
+
+    def test_report_error(self):
+        self.login()
+        params = {
+            'subject_id': 112,
+            'page_url': '/not/real',
+            'message': 'creative test string'
+        }
+        rv = self.client.get('/report-error?{}'.format(
+            urllib.urlencode(params)))
+        self.assert200(rv)

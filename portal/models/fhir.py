@@ -9,7 +9,8 @@ from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .organization import OrgTree
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_VALUESET
+from .reference import Reference
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
@@ -163,24 +164,33 @@ class ClinicalConstants(object):
 
     @lazyprop
     def BIOPSY(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='111',
+            display='biopsy',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
     def PCaDIAG(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='121',
+            display='PCa diagnosis',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
 
     @lazyprop
     def PCaLocalized(self):
-        coding = Coding.query.filter_by(
-            system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141').one()
+        coding = Coding(
+            system=TRUENTH_CLINICAL_CODE_SYSTEM,
+            code='141',
+            display='PCa localized diagnosis',
+        ).add_if_not_found(True)
         cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
         assert coding in cc.codings
         return cc
@@ -199,6 +209,40 @@ class ClinicalConstants(object):
 
 CC = ClinicalConstants()
 
+class EncounterConstants(object):
+    """ TrueNTH Encounter type Codes
+    See http://www.hl7.org/FHIR/encounter-definitions.html#Encounter.type
+    """
+
+    def __iter__(self):
+        for attr in dir(self):
+            if attr.startswith('_'):
+                continue
+            yield getattr(self, attr)
+
+    @lazyprop
+    def PAPER(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='paper',
+            display='Information collected on paper',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+    @lazyprop
+    def PHONE(self):
+        coding = Coding(
+            system=TRUENTH_ENCOUNTER_CODE_SYSTEM,
+            code='phone',
+            display='Information collected over telephone system',
+        ).add_if_not_found(True)
+        cc = CodeableConcept(codings=[coding,]).add_if_not_found(True)
+        assert coding in cc.codings
+        return cc
+
+EC = EncounterConstants()
 
 class ValueQuantity(db.Model):
     __tablename__ = 'value_quantities'
@@ -255,9 +299,6 @@ class Observation(db.Model):
                                    nullable=False)
     value_quantity_id = db.Column(db.ForeignKey('value_quantities.id'),
                                  nullable=False)
-    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
-
-    audit = db.relationship('Audit', cascade="save-update")
     codeable_concept = db.relationship(CodeableConcept, cascade="save-update")
     value_quantity = db.relationship(ValueQuantity)
     performers = db.relationship('Performer', lazy='dynamic',
@@ -274,8 +315,6 @@ class Observation(db.Model):
     def as_fhir(self):
         """Return self in JSON FHIR formatted string"""
         fhir = {"resourceType": "Observation"}
-        if self.audit:
-            fhir['meta'] = self.audit.as_fhir()
         if self.issued:
             fhir['issued'] = as_fhir(self.issued)
         if self.status:
@@ -343,9 +382,13 @@ class UserObservation(db.Model):
     observation_id = db.Column(db.ForeignKey('observations.id'),
                               nullable=False)
     encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'))
+        db.ForeignKey('encounters.id', name='user_observation_encounter_id_fk'),
+        nullable=False)
+    audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
 
-    encounter = db.relationship('Encounter')
+    audit = db.relationship('Audit', cascade="save-update, delete")
+
+    encounter = db.relationship('Encounter', cascade='delete')
 
     __table_args__ = (UniqueConstraint('user_id', 'observation_id',
         name='_user_observation'),)
@@ -411,12 +454,13 @@ class QuestionnaireResponse(db.Model):
 
     __tablename__ = 'questionnaire_responses'
     id = db.Column(db.Integer, primary_key=True)
-    subject_id = db.Column(db.ForeignKey('users.id'))
+    subject_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     subject = db.relationship("User", back_populates="questionnaire_responses")
     document = db.Column(JSONB)
     encounter_id = db.Column(
-        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'))
-    encounter = db.relationship("Encounter")
+        db.ForeignKey('encounters.id', name='qr_encounter_id_fk'),
+        nullable=False)
+    encounter = db.relationship("Encounter", cascade='delete')
 
     # Fields derived from document content
     status = db.Column(
@@ -467,9 +511,19 @@ def aggregate_responses(instrument_ids, current_user):
 
     for questionnaire_response in questionnaire_responses:
         subject = questionnaire_response.subject
+        encounter = questionnaire_response.encounter
+        encounter_fhir = encounter.as_fhir()
+        questionnaire_response.document["encounter"] = encounter_fhir
+
         questionnaire_response.document["subject"] = {
             k:v for k,v in subject.as_fhir().items() if k in patient_fields
         }
+
+        if subject.organizations:
+            questionnaire_response.document["subject"]["careProvider"] = [
+                Reference.organization(org.id).as_fhir()
+                for org in subject.organizations
+            ]
 
         annotated_questionnaire_responses.append(questionnaire_response.document)
 
@@ -494,6 +548,12 @@ def generate_qnr_csv(qnr_bundle):
             else:
                 return identifier['value']
         return None
+    def get_site(qnr_data):
+        """Return name of first organization, else None"""
+        try:
+            return qnr_data['subject']['careProvider'][0]['display']
+        except (KeyError, IndexError):
+            return None
 
     def consolidate_answer_pairs(answers):
         """
@@ -526,11 +586,39 @@ def generate_qnr_csv(qnr_bundle):
 
         return filtered_answers
 
+    def entry_method(row_data, qnr_data):
+        # Todo: replace with EC.PAPER CodeableConcept
+        if (
+            'type' in qnr_data['encounter'] and
+            'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+        ):
+            return 'enter manually - paper'
+        if row_data.get('subject_id') == row_data.get('author_id'):
+            return 'online'
+        else:
+            return 'enter manually - interview assisted'
+
+    def author_role(row_data, qnr_data):
+        if (
+            row_data.get('subject_id') == row_data.get('author_id') or
+            (
+                'type' in qnr_data['encounter'] and
+                'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
+            )
+        ):
+            return 'Subject'
+        else:
+            return 'Site Resource'
+
     columns = (
         'identifier',
+        'status',
         'study_id',
+        'site_name',
         'subject_id',
         'author_id',
+        'author_role',
+        'entry_method',
         'authored',
         'instrument',
         'question_code',
@@ -542,11 +630,13 @@ def generate_qnr_csv(qnr_bundle):
     for qnr in qnr_bundle['entry']:
         row_data = {
             'identifier': qnr['identifier']['value'],
+            'status': qnr['status'],
             'subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
             ),
             'author_id': qnr['author']['reference'].split('/')[-1],
+            'site_name': get_site(qnr),
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
@@ -555,6 +645,10 @@ def generate_qnr_csv(qnr_bundle):
             'authored': qnr['authored'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],
         }
+        row_data.update({
+            'entry_method': entry_method(row_data, qnr),
+            'author_role': author_role(row_data, qnr),
+        })
         for question in qnr['group']['question']:
             row_data.update({'question_code': question['linkId']})
 
@@ -629,15 +723,7 @@ def add_static_concepts(only_quick=False):
     """
     from .procedure_codes import TxStartedConstants, TxNotStartedConstants
 
-    BIOPSY = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='111',
-                             display='biopsy')
-    PCaDIAG = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='121',
-                              display='PCa diagnosis')
-    PCaLocalized = Coding(system=TRUENTH_CLINICAL_CODE_SYSTEM, code='141',
-                              display='PCa localized diagnosis')
-
-    concepts = [BIOPSY, PCaDIAG, PCaLocalized]
-    concepts += fetch_local_valueset(NHHD_291036)
+    concepts = fetch_local_valueset(NHHD_291036)
     if not only_quick:
         concepts += fetch_HL7_V3_Namespace('Ethnicity')
         concepts += fetch_HL7_V3_Namespace('Race')
@@ -649,6 +735,10 @@ def add_static_concepts(only_quick=False):
     for clinical_concepts in CC:
         if not clinical_concepts in db.session():
             db.session.add(clinical_concepts)
+
+    for encounter_type in EC:
+        if not encounter_type in db.session():
+            db.session.add(encounter_type)
 
     for concept in TxStartedConstants(): pass  # looping is adequate
     for concept in TxNotStartedConstants(): pass  # looping is adequate

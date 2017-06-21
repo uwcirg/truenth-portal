@@ -2,8 +2,10 @@
 
 from ..database import db
 from ..date_tools import as_fhir, FHIR_datetime
+from .encounter import Encounter
 from .fhir import CodeableConcept
 from .reference import Reference
+from .user import get_user
 
 
 class Procedure(db.Model):
@@ -35,9 +37,10 @@ class Procedure(db.Model):
     user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
     encounter_id = db.Column(db.ForeignKey('encounters.id',
-                                           name='procedures_encounter_fk'))
+                                name='procedures_encounter_fk'),
+                                nullable=False)
 
-    audit = db.relationship('Audit', cascade="save-update", lazy='joined')
+    audit = db.relationship('Audit', cascade="save-update, delete", lazy='joined')
     """tracks when and by whom the `procedure` was retained, included
     as *meta* data in the FHIR output
     """
@@ -47,7 +50,8 @@ class Procedure(db.Model):
     coding.system is required to be `http://snomed.info/sct`
     """
 
-    encounter = db.relationship('Encounter')
+    encounter = db.relationship('Encounter',
+                                foreign_keys=[encounter_id])
 
     def as_fhir(self):
         """produces FHIR representation of procedure in JSON format"""
@@ -63,12 +67,17 @@ class Procedure(db.Model):
                 'end': as_fhir(self.end_time)}
         else:
             d['performedDateTime'] = as_fhir(self.start_time)
+        d['encounter'] = self.encounter.as_fhir()
         return d
 
     @classmethod
     def from_fhir(cls, data, audit):
         """Parses FHIR data to produce a new procedure instance"""
         p = cls(audit=audit)
+        if 'encounter' in data:
+            p.encounter = Encounter.from_fhir(data['encounter'])
+        else:
+            p.encounter = get_user(audit.user_id).current_encounter
         p.user_id = Reference.parse(data['subject']).id
         if 'performedDateTime' in data:
             p.start_time = FHIR_datetime.parse(

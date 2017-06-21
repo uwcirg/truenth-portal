@@ -36,7 +36,7 @@
 @bodyBgColor:      #FFF;
 @baseColor:       #333;
 @linkColor:       #4d4e50;
-@linkHover:       #606a73;
+@linkHover:       #576e76;
 @btnColor:        #606a73;
 @inputBorderColor: #bdb9b9;
 @featureBtnColor: #333;
@@ -233,6 +233,12 @@ select:not([multiple]) {
   }
 }
 
+#iqFooterWrapper .footerWrapper {
+  display: none;
+  border-top: solid 1px #eee;
+  margin-top: 2em;
+}
+
 #mainHolder {
   visibility: hidden;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
@@ -384,12 +390,45 @@ h4.detail-title {
 #aboutForm {
   max-width: 100%;
   padding: 1em;
+  margin: 2em 0;
+  min-height: 20vh;
+}
+#topTerms.hide-terms ~ #aboutForm {
   margin: 3em auto;
   min-height: 50vh;
 }
-#topTerms ~ #aboutForm {
-  margin: 1em 0;
-  min-height: 20vh;
+#topTerms .custom-tou, 
+#topTerms .custom-tou-text {
+  display: none;
+}
+
+#topTerms .custom-tou-text a {
+  text-decoration: underline;
+}
+#topTerms .terms-checkbox-container {
+  margin-left: 2em;
+  margin-top: 0.5em;
+}
+#termsCheckbox {
+  width: 1000px;
+  max-width: 100%;
+  .display-view {
+    font-weight: normal;
+    display: none;
+    margin: 1em auto;
+  }
+  a.form-link {
+    text-decoration: underline;
+  }
+}
+.box-consent-container {
+  width: 300px;
+  max-width: 100%;
+  border-top: solid 1px #000;
+}
+.continue-msg-wrapper {
+  margin: 1em auto;
+  display: none;
 }
 #aboutForm {
   .reg-complete-container {
@@ -644,6 +683,27 @@ h4.detail-title {
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
   }
+  td.reports-field {
+    width: 150px;
+    max-width: 100%;
+  }
+  td.reports-field div {
+    display: inline-block;
+    margin: 0.3em auto;
+  }
+  td.reports-field a {
+    width: 4em;
+    max-width: 100%;
+    padding: 0.7em;
+    color: #fff;
+    background-color: #7C959E;
+    border-color: #7C959E;
+    transition: all 0.3s ease-in-out 0s;
+    -webkit-transition: all 0.3s ease-in-out 0s;
+    border-radius: 0;
+    letter-spacing: 2px;
+    margin: 0 0.2em;
+  }
 }
 #adminTableToolbar {
   div.orglist-selector {
@@ -666,9 +726,8 @@ h4.detail-title {
       display: block;
       margin: -0.4em 0;
       label.org-label {
-        margin: -5em 0;
         font-size: 1em;
-        display: inline;
+        display: inline-block;
       }
     }
     #orglist-footer-container {
@@ -941,8 +1000,10 @@ h4.detail-title {
   transition: opacity 250ms ease-in;
   &.ready {
     opacity: 1;
+    z-index: 1;
     & + #instrumentListLoad {
       opacity: 0;
+      z-index: -1;
     }
   }
 }
@@ -1277,10 +1338,19 @@ h4.detail-title {
   overflow-x: hidden;
   max-width: 100%;
 }
-.core-data-procedure .profile-item-container {
-  background: none;
-  border: none;
+.core-data-procedure {
+  .profile-item-container {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  #profileProcedureContainer {
+    border-top: 1px solid #e8e7e7;
+    border-bottom: 1px solid #e8e7e7;
+    padding-top: 2em;
+  }
 }
+
 #mainDiv.profile .profile-item-edit-btn {
   position: absolute;
   top: 2em;
@@ -1341,6 +1411,29 @@ h4.detail-title {
 }
 #mainDiv.profile .profile-item-container.edit .view-container {
   display: none;
+}
+#mainDiv.profile .profile-item-loader {
+  position: absolute;
+  top: 1%;
+  left: 1%;
+  width: 98%;
+  height: 98%;
+  padding: 8%;
+  background-color: #FFF;
+  opacity: 0.3;
+  z-index: 21;
+  display: none;
+}
+#mainDiv.profile .copyright-container,
+#mainDiv.portal .copyright-container  {
+  color: #F5F5F5;
+  margin-bottom: 1em;
+}
+.copyright-container {
+  font-size: 0.9em;
+}
+#mainDiv.profile .logo-container {
+  margin: auto;
 }
 .profile-item-title {
   color: #5b5e61;
@@ -1528,7 +1621,7 @@ div.noOrg-container {
   select{
     height: 40px !important;
   }
-  #phone, #email {
+  #phone, #email, #altPhone  {
     width: 350px;
     max-width: 100%;
   }
@@ -1655,7 +1748,7 @@ div.noOrg-container {
 .create-account-container #bdGroup {
   margin-bottom: 0.1em;
   padding-bottom: 0;
-  min-height: 120px;
+  min-height: 124px;
 }
 
 .indent {
@@ -1867,7 +1960,7 @@ div.noOrg-container {
   }
 }
 
-#phone,#email {
+#phone,#email,#altPhone  {
   width: 300px;
   max-width: 100%;
 }
@@ -2154,6 +2247,9 @@ div.org-container {
 
 #profileProcedureContainer {
   margin-left: 1em;
+  table {
+    border: 0;
+  }
   #tnthproc {
     max-width: 95%
   }
@@ -2184,6 +2280,7 @@ div.org-container {
   margin-left: 0.5em
   td {
     padding: 0.15em;
+    line-height: 2.3em;
   }
 }
 
@@ -2241,9 +2338,6 @@ div.timezone-warning.text-warning {
      width: 50%;
      float: left !important;
      max-width: 100%;
-   }
-   #adminTable .email-data-field {
-     display: none;
    }
  }
 
@@ -2387,9 +2481,6 @@ div.timezone-warning.text-warning {
     padding: 2px;
   }
 
-   #adminTable .email-field {
-    display: none;
-  }
    #adminTableToolbar {
      div.indent {
       padding: 0 0.2em;
@@ -2433,10 +2524,6 @@ div.timezone-warning.text-warning {
 @media (max-width: 730px) {
   #userSessionsList {
     font-size: @smallerText;
-  }
-
-  #adminTable .status-field, #adminTable .reports-field {
-    display: none;
   }
 }
 
@@ -2537,12 +2624,6 @@ div.timezone-warning.text-warning {
   .load-container {
     min-height: 1.5em;
   }
-  #adminTable .consentdate-field {
-    display: none;
-  }
-  #adminTable .org-data-field {
-    display: none;
-  }
   .admin-table .search .form-control {
     height: 35px;
   }
@@ -2629,9 +2710,6 @@ div.timezone-warning.text-warning {
 }
 @media (max-width: 1199px) {
   .profile-img {
-    display: none;
-  }
-  #adminTable .organization-field {
     display: none;
   }
    #profileForm {
@@ -2846,6 +2924,9 @@ div.timezone-warning.text-warning {
   max-width: 100%;
   margin: 0 auto;
 }
+#createAcctTxt {
+  margin: 2em 0 0.5em 0;
+}
 #socialMediaRegistrationContainer .btn-social,
 #regForm input[type="submit"],
 #socialMediaLoginContainer .btn-social,
@@ -2934,6 +3015,15 @@ div.or {
     margin: -1.3em auto 20px auto;
     width: 100%;
 }
+.password-popover { min-width: 200px; max-width: 250px; right: 50px !important;}
+.password-popover .popover-content { padding: 1.2em 1em 1.5em 1em; width: 100%; margin: 0 auto;}
+#pwdHintList {padding: 0; margin:2px; list-style-type: none}
+.password-popover li { margin-left: 1em;}
+.password-popover li.success-text::before { content: "\2713"; display: inline-block; margin-right: 4px; }
+.success-text { color: green; font-weight: bold;}
+.default-text { color: #31708f; font-weight: normal;  }
+.fail-text {color: #a94442; font-weight: bold;}
+.password-popover li.fail-text::before { content: "\2715"; display: inline-block; margin-right: 4px; }
 @media (max-width: 640px) {
   #regForm input,
   #socialMediaRegistrationContainer .btn-social,

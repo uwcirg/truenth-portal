@@ -26,6 +26,7 @@ class EmailMessage(db.Model):
     sender = db.Column(db.String(255), nullable=False)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
     body = db.Column(db.Text, nullable=False)
+    # nullable as anonymous support requests won't have associated users
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id',
         ondelete='CASCADE'))
 

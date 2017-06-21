@@ -5,20 +5,19 @@ function AdminTool (userId) {
   this.requestsCounter = 0;
   this.userId = userId;
   this.userOrgs = [];
-  this.here_below_orgs = [];
+  OrgTool.call(this);
 };
 
 /*
-*
+* extends OrgTool class
 * see OT class definition in main.js should modularize it in the future so it can be instantiated/called safely
 *
 */
-
+AdminTool.prototype = Object.create(OrgTool.prototype);
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
   setTimeout('$("#loadingIndicator").fadeOut();', 300);
 };
-
 AdminTool.prototype.getData = function(userString) {
     var self = this;
     $.ajax ({
@@ -60,7 +59,7 @@ AdminTool.prototype.getData = function(userString) {
                               break;
                         };
                         a += (a != "" ? "<br/>" : "") + "<span class='" + cl  + " small-text' style='text-transform: capitalize'>" + status + "</span>";
-                        s += (s != "" ? "<br/>" : "") + "<span class='small-text'>" + sd + "</span>";
+                        s += (s != "" ? "<br/>" : "") + sd;
                         prevItem.assessment_status = item.assessment_status;
                         prevItem.consent_signed = item.consent.signed;
                       };
@@ -87,14 +86,22 @@ AdminTool.prototype.getData = function(userString) {
                   var cdField = row.children(".consentdate-field");
                  //console.log("status: " + statusField.length + " cdField: " + cdField.length);
                  if (d.data.status) statusField.html(d.data.status);
-                 if (d.data.consentdate) cdField.html(d.data.consentdate);
+                  var cdField = row.children(".consentdate-field");
+                  if (hasValue(d.data.consentdate)) {
+                    if (cdField.find(".formatted-consent-date").length == 0) cdField.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
+                    else cdField.find(".formatted-consent-date").text(d.data.consentdate);
+                  };
 
                  //card view
                  var cvf = row.find(".card-view");
                  cvf.each(function() {
                     var ctf = $(this).find(".title");
+                    var ctv = $(this).find(".value");
                     if ((/consent date/gi).test(ctf.text())) {
-                      ctf.next().html(d.data.consentdate);
+                       if (hasValue(d.data.consentdate)) {
+                          if (ctv.find(".formatted-consent-date").length == 0) ctv.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
+                          else ctv.find(".formatted-consent-date").text(d.data.consentdate);
+                       };
                     };
                  });
 
@@ -113,8 +120,26 @@ AdminTool.prototype.getData = function(userString) {
         $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
         self.fadeLoader();
     });
+};
+AdminTool.prototype.updateData = function() {
+  var arrUsers = this.getUserIdArray();
+  var self = this;
+  if (arrUsers.length > 0) {
+    self.requestsCounter = arrUsers.length;
+    $("#admin-table-error-message").text("");
+    loader(true);
+    arrUsers.forEach(function(us) {
+        try {
+         self.getData(us);
+        } catch(ex) {
+          //console.log("Error request: " + ex.message);
+          self.fadeLoader();
+        };
+    });
+  } else {
+    self.fadeLoader();
   };
-
+};
 AdminTool.prototype.getUserIdArray = function() {
   var us = "", _userIds = [], ct = 0, arrUsers = [];
 
@@ -136,28 +161,6 @@ AdminTool.prototype.getUserIdArray = function() {
   };
 
   return arrUsers;
-};
-AdminTool.prototype.updateData = function() {
-  var arrUsers = this.getUserIdArray();
-  var self = this;
-  if (arrUsers.length > 0) {
-    self.requestsCounter = arrUsers.length;
-    $("#admin-table-error-message").text("");
-    loader(true);
-    arrUsers.forEach(function(us) {
-        try {
-         self.getData(us);
-        } catch(ex) {
-          //console.log("Error request: " + ex.message);
-          self.fadeLoader();
-        };
-    });
-  } else {
-    self.fadeLoader();
-  };
-};
-AdminTool.prototype.getMainOrgList = function() {
-    return OT.getOrgsList();
 };
 AdminTool.prototype.setUserOrgs = function() {
   var self = this;
@@ -182,75 +185,6 @@ AdminTool.prototype.getUserOrgs = function() {
   if (this.userOrgs.length == 0) this.setUserOrgs(this.userId);
   return this.userOrgs;
 };
-__getChildOrgs = function(orgs, ref) {
-    var mainOrgsList = ref.getMainOrgList();
-    if (!orgs || (orgs.length == 0)) {
-      return ref.here_below_orgs;
-    } else {
-      var childOrgs = [];
-      orgs.forEach(function(org) {
-          var o = mainOrgsList[org.id];
-          if (o) {
-            if (ref) ref.here_below_orgs.push(org.id);
-            var c  = o.children ? o.children : null;
-            if (c && c.length > 0) {
-                c.forEach(function(i) {
-                  childOrgs.push(i);
-                });
-            };
-          };
-      });
-      return __getChildOrgs(childOrgs, ref);
-    };
-};
-AdminTool.prototype.getHereBelowOrgs = function() {
-  var userOrgs = this.userOrgs, mainOrgsList = OT.getOrgsList(), self = this;
-  userOrgs.forEach(function(orgId) {
-      self.here_below_orgs.push(orgId);
-      var co = mainOrgsList[orgId];
-      __getChildOrgs((co && co.children ? co.children : null), self);
-  });
-};
-AdminTool.prototype.inArray = function( n, array) {
-  if (n && array && Array.isArray(array)) {
-    var found = false;
-    for (var index = 0; !found && index < array.length; index++) {
-        if (array[index] == n) found = true;
-    };
-    return found;
-  } else return false;
-};
-AdminTool.prototype.getParentOrg = function(currentOrg) {
-  if (!currentOrg) return false;
-  var ml = this.getMainOrgList(), self = this;
-  if (ml && ml[currentOrg]) {
-    if (ml[currentOrg].isTopLevel) {
-      return currentOrg;
-    } else {
-      if (ml[currentOrg].parentOrgId) return self.getParentOrg(ml[currentOrg].parentOrgId);
-      else return currentOrg;
-    };
-  } else return false;
-};
-AdminTool.prototype.getUserParentOrgs = function() {
-  var uo = this.getUserOrgs(), parentList = [], self = this;
-  if (uo) {
-    uo.forEach(function(o) {
-      var p = self.getParentOrg(o);
-      if (p && !self.inArray(p, parentList))  {
-        parentList.push(p);
-      };
-    });
-    return parentList;
-  } else return false;
-};
-AdminTool.prototype.getTopLevelOrgs = function() {
-  var ml = this.getMainOrgList(), orgList = [];
-  for (var org in ml) {
-    if (ml[org].isTopLevel) orgList.push(org);
-  };
-  return orgList;
-};
 AdminTool.prototype.initOrgsList = function(request_org_list) {
     //set user orgs
     var self = this;
@@ -263,16 +197,16 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
         type: "GET",
         url: '/api/organization'
     }).done(function(data) {
-        OT.populateOrgsList(data.entry);
-        OT.populateUI();
+        self.populateOrgsList(data.entry);
+        self.populateUI();
         if (!noPatientData) {
-          self.getHereBelowOrgs();
-          OT.filterOrgs(self.here_below_orgs);
+            var hbOrgs = self.getHereBelowOrgs();
+	          self.filterOrgs(hbOrgs);
         };
         $("#dataDownloadModal").on('shown.bs.modal', function () {
-              var parentOrgList = AT.getUserParentOrgs();
+              var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
               if (parentOrgList && parentOrgList.length > 0) {
-                 var instrumentList = AT.getInstrumentList();
+                 var instrumentList = self.getInstrumentList();
                  var instrumentItems = [];
                  parentOrgList.forEach(function(o) {
                     var il = instrumentList[o];
@@ -293,7 +227,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
         });
         var ofields = $("#userOrgs input[name='organization']");
         ofields.each(function() {
-            if ((self.here_below_orgs).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
+            if ((AT.getHereBelowOrgs()).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
             $(this).on("click touchstart", function(e) {
                 e.stopPropagation();
                 var orgsList = [];
@@ -349,7 +283,7 @@ AdminTool.prototype.getInstrumentList = function() {
     //CRV
     '10000': ['epic26', 'eproms_add', 'comorb'],
     //IRONMAN
-    '20000': ['eortc', 'hpfs', 'prems', 'irondemog']
+    '20000': ['eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems', 'irondemog']
   };
 };
 __setOrgsMenuHeight = function(padding) {

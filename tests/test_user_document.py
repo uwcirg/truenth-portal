@@ -8,7 +8,10 @@ import os
 
 from tests import TestCase, TEST_USER_ID
 from portal.extensions import db
+from portal.models.auth import create_service_token
+from portal.models.intervention import INTERVENTION
 from portal.models.user_document import UserDocument
+from portal.models.user import get_user
 
 
 class TestUserDocument(TestCase):
@@ -37,7 +40,11 @@ class TestUserDocument(TestCase):
 
     def test_post_patient_report(self):
         #tests whether we can successfully post a patient report -type user doc file
+        client = self.add_client()
+        client.intervention = INTERVENTION.SEXUAL_RECOVERY
+        create_service_token(client=client, user=get_user(TEST_USER_ID))
         self.login()
+
         test_contents = "This is a test."
         with NamedTemporaryFile(
             prefix='udoc_test_',
@@ -58,6 +65,10 @@ class TestUserDocument(TestCase):
         with open(fpath, 'r') as udoc_file:
             self.assertEqual(udoc_file.read(),test_contents)
         os.remove(fpath)
+
+        self.assertEquals(udoc.user_id, TEST_USER_ID)
+        self.assertEquals(udoc.intervention.description,
+                          INTERVENTION.SEXUAL_RECOVERY.description)
 
 
     def test_download_user_document(self):

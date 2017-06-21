@@ -5,6 +5,7 @@ from flask import render_template_string
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
+from pprint import pformat
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import validators, HiddenField, IntegerField, StringField
@@ -15,10 +16,10 @@ from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
 from ..extensions import oauth, user_manager
-from ..models.app_text import app_text, AboutATMA, VersionedResource
-from ..models.app_text import PrivacyATMA, InitialConsent_ATMA, Terms_ATMA
+from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
+from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
+from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA
 from ..models.coredata import Coredata
-from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -37,11 +38,13 @@ def page_not_found(e):
     gil = current_app.config.get('GIL')
     return render_template('404.html' if not gil else '/gil/404.html', no_nav="true", user=current_user()), 404
 
+
 def server_error(e):  # pragma: no cover
     # NB - this is only hit if app.debug == False
     # exception is automatically sent to log by framework
     gil = current_app.config.get('GIL')
     return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
+
 
 @portal.before_app_request
 def debug_request_dump():
@@ -58,10 +61,43 @@ def debug_request_dump():
             output += " {0.form}"
         current_app.logger.debug(output.format(request))
 
-@portal.route('/intentional-error')
-def intentional_error():  # pragma: no cover
-    # useless method to test error handling
-    5/0
+
+@portal.route('/report-error')
+@oauth.require_oauth()
+def report_error():
+    """Useful from front end, client-side to raise attention to problems
+
+    On occasion, an exception will be generated in the front end code worthy of
+    gaining attention on the server side.  By making a GET request here, a
+    server side error will be generated (encouraging the system to handle it
+    as configured, such as by producing error email).
+
+    OAuth protected to prevent abuse.
+
+    Any of the following query string arguments (and their values) will be
+    included in the exception text, to better capture the context.  None are
+    required.
+
+    :subject_id: User on which action is being attempted
+    :message: Details of the error event
+    :page_url: The page requested resulting in the error
+
+    actor_id need not be sent, and will always be included - the OAuth
+    protection guarentees and defines a valid current user.
+
+    """
+    message = {'actor': "{}".format(current_user())}
+    accepted = ('subject_id', 'page_url', 'message')
+    for attr in accepted:
+        value = request.args.get(attr)
+        if value:
+            message[attr] = value
+
+    # log as an error message - but don't raise a server error
+    # for the front end to manage.
+    current_app.logger.error("Received error {}".format(pformat(message)))
+    return jsonify(error='received')
+
 
 @portal.route('/')
 def landing():
@@ -78,26 +114,38 @@ def landing():
     return render_template('landing.html' if not gil else 'gil/index.html', user=None, no_nav="true", timed_out=timed_out, init_login_modal=init_login_modal)
 
 #from GIL
-@portal.route('/gil-interventions-items')
-@oauth.require_oauth()
-def gil_interventions_items():
+@portal.route('/gil-interventions-items/<int:user_id>')
+@crossdomain()
+def gil_interventions_items(user_id):
     """ this is needed to filter the GIL menu based on user's intervention(s)
-        trying to do this so code is more easily managed from front end side """
-    user = current_user()
+        trying to do this so code is more easily managed from front end side
+        Currently it is also accessed via ajax call from portal footer
+        see: api/portal-footer-html/
+    """
+    user = None
+
+    if user_id:
+        user = get_user(user_id)
+    else:
+        user = current_user()
+
     user_interventions = []
-    interventions =\
-            Intervention.query.order_by(Intervention.display_rank).all()
-    for intervention in interventions:
-        display = intervention.display_for_user(user)
-        if display.access:
-            user_interventions.append({
-                "name": intervention.name,
-                "description": intervention.description if intervention.description else "",
-                "link_url": display.link_url if display.link_url is not None else "disabled",
-                "link_label": display.link_label if display.link_label is not None else ""
-            })
+
+    if user:
+        interventions =\
+                Intervention.query.order_by(Intervention.display_rank).all()
+        for intervention in interventions:
+            display = intervention.display_for_user(user)
+            if display.access:
+                user_interventions.append({
+                    "name": intervention.name,
+                    "description": intervention.description if intervention.description else "",
+                    "link_url": display.link_url if display.link_url is not None else "disabled",
+                    "link_label": display.link_label if display.link_label is not None else ""
+                })
 
     return jsonify(interventions=user_interventions)
+
 @portal.route('/gil-shortcut-alias-validation/<string:clinic_alias>')
 def gil_shortcut_alias_validation(clinic_alias):
     # Shortcut aliases are registered with the organization as identifiers.
@@ -412,13 +460,51 @@ def initial_queries():
 
     still_needed = Coredata().still_needed(user)
     terms, consent_agreements = None, {}
-    if 'tou' in still_needed:
-        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+    org = user.first_top_organization()
+    role = None
+    if not current_app.config.get('GIL'):
+        for r in (ROLE.STAFF_ADMIN, ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                # treat staff_admins as staff for this lookup
+                r = ROLE.STAFF if r == ROLE.STAFF_ADMIN else r
+                role = r
+    terms = get_terms(org, role)
     #need this at all time now for ui
     consent_agreements = Organization.consent_agreements()
     return render_template(
         'initial_queries.html', user=user, terms=terms,
         consent_agreements=consent_agreements, still_needed=still_needed)
+
+
+@portal.route('/website-consent-script/<int:patient_id>', methods=['GET'])
+@roles_required(ROLE.STAFF)
+@oauth.require_oauth()
+def website_consent_script(patient_id):
+    entry_method = request.args.get('entry_method', None)
+    redirect_url = request.args.get('redirect_url', None)
+    user = current_user()
+    org = user.first_top_organization()
+    terms = get_terms(org)
+    return render_template(
+        'website_consent_script.html', user=user, terms=terms,
+        entry_method=entry_method, redirect_url=redirect_url,
+        patient_id=patient_id)
+
+
+def get_terms(org=None, role=None):
+    terms = None
+
+    if org:
+        try:
+            terms = VersionedResource(app_text(WebsiteConsentTermsByOrg_ATMA.
+                                               name_key(organization=org, role=role)))
+        except UndefinedAppText:
+            terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    else:
+        terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
+
+    return terms
 
 @portal.route('/home')
 def home():
@@ -478,7 +564,8 @@ def admin():
     users = User.query.filter_by(deleted=None).all()
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users, wide_container="true")
+    return render_template('admin.html', users=users, wide_container="true", user=current_user())
+
 
 @portal.route('/staff-profile-create')
 @roles_required(ROLE.STAFF_ADMIN)
@@ -620,10 +707,27 @@ def profile(user_id):
 def privacy():
     """ privacy use page"""
     gil = current_app.config.get('GIL')
-    privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    user = current_user()
+    if gil:
+        privacy_resource = VersionedResource(app_text(PrivacyATMA.name_key()))
+    elif user:
+        organization = user.first_top_organization()
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                role = r
+        # only include role and organization if both are defined
+        if not all((role, organization)):
+            role, organization = None, None
+
+        privacy_resource = VersionedResource(app_text(
+            PrivacyATMA.name_key(role=role, organization=organization)))
+    else:
+        abort(400, "No publicly viewable privacy policy page available")
+
     return render_template(
         'privacy.html' if not gil else 'gil/privacy.html',
-        content=privacy_resource.asset, user=current_user(),
+        content=privacy_resource.asset, user=user,
         editorUrl=privacy_resource.editor_url)
 
 @portal.route('/terms')
@@ -631,7 +735,21 @@ def terms_and_conditions():
     """ terms-and-conditions of use page"""
     gil = current_app.config.get('GIL')
     user = current_user()
-    terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+    if user and not gil:
+        organization = user.first_top_organization()
+        role = None
+        for r in (ROLE.STAFF, ROLE.PATIENT):
+            if user.has_role(r):
+                role = r
+        # only include role and organization if both are defined
+        if not all((role, organization)):
+            role, organization = None, None
+
+        terms = VersionedResource(app_text(Terms_ATMA.name_key(
+            role=role, organization=organization)))
+    else:
+        terms = VersionedResource(app_text(Terms_ATMA.name_key()))
+
     return render_template('terms.html' if not gil else 'gil/terms.html',
         content=terms.asset, editorUrl=terms.editor_url, user=user)
 
@@ -712,22 +830,45 @@ class SettingsForm(FlaskForm):
                            validators=[validators.Required()])
 
 
-@portal.route('/settings', methods=['GET','POST'])
+@portal.route('/settings', methods=['GET', 'POST'])
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def settings():
     """settings panel for admins"""
+    # load all top level orgs and consent agreements
+    organization_consents = Organization.consent_agreements()
+
+    # load all app text values - expand when possible
+    apptext = {}
+    for a in AppText.query.all():
+        try:
+            # expand strings with just config values, such as LR
+            apptext[a.name] = app_text(a.name)
+        except ValueError:
+            # lack context to expand, show with format strings
+            apptext[a.name] = a.custom_text
+
     form = SettingsForm(
         request.form, timeout=request.cookies.get('SS_TIMEOUT', 600))
     if not form.validate_on_submit():
-        return render_template('settings.html', form=form)
+
+        return render_template(
+            'settings.html',
+            form=form,
+            apptext=apptext,
+            organization_consents=organization_consents,
+            wide_container="true")
 
     # make max_age outlast the browser session
     max_age = 60 * 60 * 24 * 365 * 5
-    response = make_response(render_template('settings.html', form=form))
+    response = make_response(render_template(
+        'settings.html',
+        form=form,
+        apptext=apptext,
+        organization_consents=organization_consents,
+        wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
-
 
 
 @portal.route('/spec')

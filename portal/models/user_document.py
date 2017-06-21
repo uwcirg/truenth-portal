@@ -7,12 +7,14 @@ import os
 
 from ..database import db
 from ..date_tools import FHIR_datetime
+from .intervention import Intervention
 from .user import User
 
 class UserDocument(db.Model):
     """ORM class for user document upload data
 
-    Capture and store uploaded user documents (e.g. WiserCare Patient Report, user avatar image, etc).
+    Capture and store uploaded user documents
+    (e.g. patient reports, user avatar images, etc).
 
     """
     __tablename__ = 'user_documents'
@@ -23,6 +25,9 @@ class UserDocument(db.Model):
     filetype = db.Column(db.Text, nullable=False)
     uuid = db.Column(db.Text, nullable=False)
     uploaded_at = db.Column(db.DateTime, nullable=False)
+    intervention_id = db.Column(db.ForeignKey('interventions.id'), nullable=True)
+
+    intervention = db.relationship('Intervention')
 
     def __str__(self):
         return self.filename
@@ -35,6 +40,8 @@ class UserDocument(db.Model):
         d['uploaded_at'] = FHIR_datetime.as_fhir(self.uploaded_at)
         d['filename'] = self.filename
         d['filetype'] = self.filetype
+        if self.intervention:
+            d['contributor'] = self.intervention.description
 
         return d
 
@@ -59,9 +66,17 @@ class UserDocument(db.Model):
             upload_file.save(os.path.join(upload_dir,str(file_uuid)))
         except:
             raise OSError("could not save file")
+        if 'contributor' in data:
+            interv = Intervention.query.filter_by(description=data['contributor']).first()
 
-        return cls(user_id=data['user_id'],document_type=data['document_type'],filename=filename,
-                    filetype=filetype,uuid=file_uuid,uploaded_at=datetime.utcnow())
+        return cls(user_id=data['user_id'],
+                   document_type=data['document_type'],
+                   filename=filename,
+                   filetype=filetype,
+                   uuid=file_uuid,
+                   uploaded_at=datetime.utcnow(),
+                   intervention=interv
+                   )
 
 
     def get_file_contents(self):

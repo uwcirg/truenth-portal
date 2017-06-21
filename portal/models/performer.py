@@ -16,6 +16,7 @@ class Performer(db.Model):
     codeable_concept_id = db.Column(db.ForeignKey('codeable_concepts.id'))
     """The codeable concept for performers including a role"""
 
+    # nullable due to FHIR inconsistencies in performer attributes
     codeable_concept = db.relationship('CodeableConcept', cascade="save-update")
     __table_args__ = (UniqueConstraint('reference_txt', 'codeable_concept_id',
         name='_reftxt_codeable_concept'),)

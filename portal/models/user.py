@@ -5,7 +5,7 @@ from flask import abort, current_app
 from flask_user import UserMixin, _call_or_get
 import pytz
 from sqlalchemy import text
-from sqlalchemy.orm import synonym
+from sqlalchemy.orm import synonym, class_mapper, ColumnProperty
 from sqlalchemy import and_, or_, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects.postgresql import ENUM
@@ -31,7 +31,7 @@ from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
 from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
-from .telecom import Telecom
+from .telecom import ContactPoint, Telecom
 
 INVITE_PREFIX = "__invite__"
 NO_EMAIL_PREFIX = "__no_email__"
@@ -113,7 +113,7 @@ class UserTimezone(CCExtension):
         raise NotImplementedError
 
 
-def permanently_delete_user(username, user_id=None, acting_user=None):
+def permanently_delete_user(username, user_id=None, acting_user=None, actor=None):
     """Given a username (email), purge the user from the system
 
     Includes wiping out audit rows, observations, etc.
@@ -128,15 +128,8 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
     from .auth import AuthProvider
     from .tou import ToU
     from .user_consent import UserConsent
-    # todo: move to click prompt
+
     if not acting_user:
-        actor = raw_input(
-            "\n\nWARNING!!!\n\n"
-            " This will permanently destroy user: {}\n"
-            " and all their related data.\n\n"
-            " If you want to contiue, enter a valid user\n"
-            " email as the acting party for our records: ".
-            format(username))
         acting_user = User.query.filter_by(username=actor).first()
     if not acting_user:
         raise ValueError("Acting user not found -- can't continue")
@@ -162,32 +155,11 @@ def permanently_delete_user(username, user_id=None, acting_user=None):
 
         # purge all the types with user foreign keys, then the user itself
         UserRelationship.query.filter(
-            or_(UserRelationship.user_id==user.id,
-                UserRelationship.other_user_id==user.id)).delete()
-        UserObservation.query.filter_by(user_id=user.id).delete()
-        UserIntervention.query.filter_by(user_id=user.id).delete()
-        consent_audits = Audit.query.join(
-            UserConsent, UserConsent.audit_id==Audit.id).filter(
-            UserConsent.user_id==user.id)
-        UserConsent.query.filter_by(user_id=user.id).delete()
-        for ca in consent_audits:
-            db.session.delete(ca)
+                    or_(UserRelationship.user_id == user.id,
+                        UserRelationship.other_user_id == user.id)).delete()
         tous = ToU.query.join(Audit).filter(Audit.user_id==user.id)
         for t in tous:
             db.session.delete(t)
-        for o in user.observations:
-            db.session.delete(o)
-        # Can't delete audit rows owned by this user, in cases like
-        # observations. Update those to point to user doing the purge.
-        ob_audits = Audit.query.join(
-            Observation).filter(Audit.id==Observation.audit_id).filter(
-                Audit.user_id==user.id)
-        for au in ob_audits:
-            au.user_id = acting_user.id
-        Audit.query.filter_by(user_id=user.id).delete()
-        Audit.query.filter_by(subject_id=user.id).delete()
-        for ap in AuthProvider.query.filter(AuthProvider.user_id==user.id):
-            db.session.delete(ap)
 
         # the rest should die on cascade rules
         db.session.delete(user)
@@ -256,7 +228,10 @@ class User(db.Model, UserMixin):
     _email = db.Column(
         'email', db.String(120), unique=True, nullable=False,
         default=default_email)
-    phone = db.Column(db.String(40))
+    phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
+    alt_phone_id = db.Column(db.Integer, db.ForeignKey('contact_points.id',
+                                      ondelete='cascade'))
     gender = db.Column('gender', gender_types)
     birthdate = db.Column(db.Date)
     image_url = db.Column(db.Text)
@@ -281,11 +256,17 @@ class User(db.Model, UserMixin):
     reset_password_token = db.Column(db.String(100))
     confirmed_at = db.Column(db.DateTime())
 
-    auth_providers = db.relationship('AuthProvider', lazy='dynamic')
-    _consents = db.relationship('UserConsent', lazy='dynamic')
+    user_audits = db.relationship('Audit', cascade='delete',
+                                  foreign_keys=[Audit.user_id])
+    subject_audits = db.relationship('Audit', cascade='delete',
+                                     foreign_keys=[Audit.subject_id])
+    auth_providers = db.relationship('AuthProvider', lazy='dynamic',
+                                     cascade='delete')
+    _consents = db.relationship('UserConsent', lazy='dynamic',
+                                cascade='delete')
     indigenous = db.relationship(Coding, lazy='dynamic',
             secondary="user_indigenous")
-    encounters = db.relationship('Encounter')
+    encounters = db.relationship('Encounter', cascade='delete')
     ethnicities = db.relationship(Coding, lazy='dynamic',
             secondary="user_ethnicities")
     groups = db.relationship('Group', secondary='user_groups',
@@ -293,7 +274,7 @@ class User(db.Model, UserMixin):
     interventions = db.relationship('Intervention', lazy='dynamic',
             secondary="user_interventions", backref=db.backref('users'))
     questionnaire_responses = db.relationship('QuestionnaireResponse',
-            lazy='dynamic')
+                                              lazy='dynamic', cascade='delete')
     races = db.relationship(Coding, lazy='dynamic',
             secondary="user_races")
     observations = db.relationship('Observation', lazy='dynamic',
@@ -301,7 +282,7 @@ class User(db.Model, UserMixin):
     organizations = db.relationship('Organization', lazy='dynamic',
             secondary="user_organizations", backref=db.backref('users'))
     procedures = db.relationship('Procedure', lazy='dynamic',
-            backref=db.backref('user'))
+                                 backref=db.backref('user'), cascade='delete')
     roles = db.relationship('Role', secondary='user_roles',
             backref=db.backref('users', lazy='dynamic'))
     _locale = db.relationship(CodeableConcept, cascade="save-update")
@@ -309,9 +290,15 @@ class User(db.Model, UserMixin):
                               foreign_keys=[deleted_id])
     deceased = db.relationship('Audit', cascade="save-update",
                               foreign_keys=[deceased_id])
-    documents = db.relationship('UserDocument', lazy='dynamic')
+    documents = db.relationship('UserDocument', lazy='dynamic',
+                                cascade='save-update, delete')
     _identifiers = db.relationship(
         'Identifier', lazy='dynamic', secondary='user_identifiers')
+
+    _phone = db.relationship('ContactPoint', foreign_keys=phone_id,
+                             cascade="save-update, delete")
+    _alt_phone = db.relationship('ContactPoint', foreign_keys=alt_phone_id,
+                                 cascade="save-update, delete")
 
     ###
     ## PLEASE maintain merge_with() as user model changes ##
@@ -361,8 +348,15 @@ class User(db.Model, UserMixin):
             Encounter.status=='in-progress')
         if query.count() == 0:
             return None
-        assert (query.count() == 1)  # shouldn't have more than one active
-        return query.one()
+        if query.count() != 1:
+            # Not good - we should only have one `active` encounter for
+            # the current user.  Log details for debugging and return the
+            # first
+            msg = "Multiple active encounters found for {}: {}".format(
+                self,
+                [(e.status, str(e.start_time), str(e.end_time)) for e in query])
+            current_app.logger.error(msg)
+        return query.first()
 
     @property
     def locale(self):
@@ -419,6 +413,31 @@ class User(db.Model, UserMixin):
         else:
             self._email = email
         assert(self._email and len(self._email))
+
+    @property
+    def phone(self):
+        if self._phone:
+            return self._phone.value
+
+    @phone.setter
+    def phone(self, val):
+        if self._phone:
+            self._phone.value = val
+        else:
+            self._phone = ContactPoint(system='phone',use='mobile',value=val)
+
+    @property
+    def alt_phone(self):
+        if self._alt_phone:
+            return self._alt_phone.value
+
+    @alt_phone.setter
+    def alt_phone(self, val):
+        if self._alt_phone:
+            self._alt_phone.value = val
+        else:
+            self._alt_phone = ContactPoint(system='phone',use='home',value=val)
+
 
     def mask_email(self, prefix=INVITE_PREFIX):
         """Mask temporary account email to avoid collision with registered
@@ -501,21 +520,43 @@ class User(db.Model, UserMixin):
         """Collates all the locale options from the user's orgs
         to establish which should be visible to the user"""
         locale_options = set()
+        if self.locale_code:
+            locale_options.add(self.locale_code)
         for org in self.organizations:
             for locale in org.locales:
                 locale_options.add(locale.code)
+            if org.default_locale:
+                locale_options.add(org.default_locale)
             while org.partOf_id:
                 org = Organization.query.get(org.partOf_id)
                 for locale in org.locales:
                     locale_options.add(locale.code)
+                if org.default_locale:
+                    locale_options.add(org.default_locale)
         return locale_options
-
 
     def add_organization(self, organization_name):
         """Shortcut to add a clinic/organization by name"""
         org = Organization.query.filter_by(name=organization_name).one()
         if org not in self.organizations:
             self.organizations.append(org)
+
+    def first_top_organization(self):
+        """Return first top level organization for user
+
+        NB, none of the above doesn't count and will not be retuned.
+
+        A user may have any number of organizations, but most business
+        decisions, assume there is only one.  Arbitrarily returning the
+        first from the matchin query in case of multiple.
+
+        :returns: a single top level organization, or None
+
+        """
+        top_orgs = OrgTree().find_top_level_org(self.organizations)
+        if top_orgs:
+            return top_orgs[0]
+        return None
 
     def leaf_organizations(self):
         """Return list of 'leaf' organization ids for user's orgs
@@ -553,7 +594,6 @@ class User(db.Model, UserMixin):
         issued = fhir.get('issued') and\
                 parser.parse(fhir.get('issued')) or None
         observation = Observation(
-            audit=audit,
             status=fhir.get('status'),
             issued=issued,
             codeable_concept_id=cc.id,
@@ -565,7 +605,7 @@ class User(db.Model, UserMixin):
         # The audit defines the acting user, to which the current
         # encounter is attached.
         encounter = get_user(audit.user_id).current_encounter
-        UserObservation(user_id=self.id, encounter=encounter,
+        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
                         observation_id=observation.id).add_if_not_found()
         return 200, "added {} to user {}".format(observation, self.id)
 
@@ -654,9 +694,11 @@ class User(db.Model, UserMixin):
                 self.observations.remove(existing[0])
 
         observation = Observation(codeable_concept_id=codeable_concept.id,
-                                  value_quantity_id=value_quantity.id,
-                                  audit=audit)
-        self.observations.append(observation.add_if_not_found())
+                                  value_quantity_id=value_quantity.id
+                                  ).add_if_not_found(True)
+        encounter = get_user(audit.user_id).current_encounter
+        UserObservation(user_id=self.id, encounter=encounter, audit=audit,
+                        observation_id=observation.id).add_if_not_found()
 
     def clinical_history(self, requestURL=None):
         now = datetime.utcnow()
@@ -723,7 +765,8 @@ class User(db.Model, UserMixin):
         d['status'] = 'registered' if self.registered else 'unknown'
         if self._locale:
             d['communication'] = [{"language": self._locale.as_fhir()}]
-        telecom = Telecom(email=self.email, phone=self.phone)
+        telecom = Telecom(email=self.email,
+                        contact_points=[self._phone, self._alt_phone])
         d['telecom'] = telecom.as_fhir()
         d['photo'] = []
         if self.image_url:
@@ -956,7 +999,10 @@ class User(db.Model, UserMixin):
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
             self.email = telecom.email
-            self.phone = telecom.phone
+            telecom_cps = telecom.cp_dict()
+            self.phone = telecom_cps.get(('phone','mobile')) \
+                or telecom_cps.get(('phone',None))
+            self.alt_phone = telecom_cps.get(('phone','home'))
         if 'communication' in fhir:
             for e in fhir['communication']:
                 if 'language' in e:
@@ -971,6 +1017,11 @@ class User(db.Model, UserMixin):
                         fhir['careProvider']]
             self.update_orgs(org_list, acting_user)
         db.session.add(self)
+
+    @classmethod
+    def column_names(cls):
+        return [prop.key for prop in class_mapper(cls).iterate_properties
+                if isinstance(prop, ColumnProperty)]
 
     def merge_with(self, other_id):
         """merge details from other user into self
@@ -989,11 +1040,9 @@ class User(db.Model, UserMixin):
             abort(404, 'other_id {} not found'.format(other_id))
 
         # direct attributes on user
-        # intentionally skip {email, reset_password_token}
-        for attr in (
-            'password', 'first_name', 'last_name', 'birthdate',
-            'gender', 'phone', 'locale_id', 'timezone', 'confirmed_at',
-            'registered', 'image_url', 'active', 'deleted_id', 'deceased_id'):
+        # intentionally skip {id, email, reset_password_token}
+        exclude = ['id', '_email', 'reset_password_token']
+        for attr in (col for col in self.column_names() if col not in exclude):
             if not getattr(other, attr):
                 continue
             setattr(self, attr, getattr(other, attr))

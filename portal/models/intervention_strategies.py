@@ -14,8 +14,9 @@ the parameters given to the closures.
 
 """
 from flask import current_app, url_for
+from flask_babel import gettext as _
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -210,109 +211,220 @@ def update_card_html_on_completion():
         # NB - this is by design, a method with side effects
         # namely, alters card_html and links depending on survey state
         assessment_status = AssessmentStatus(user=user)
+        current_app.logger.debug("{}".format(assessment_status))
+        indefinite_questionnaires = (
+            assessment_status.instruments_needing_full_assessment(
+                classification='indefinite'),
+            assessment_status.instruments_in_progress(
+                classification='indefinite'))
 
-        def get_top_level_org_name():
-            OT = OrgTree()
-            top_level_id = None
-            top_level_org_name = None
-            for org in user.organizations:
-                if not top_level_id:
-                    top_level_id = OrgTree().find(org.id).top_level()
-            if top_level_id:
-                o = Organization.query.filter(Organization.id == top_level_id).one_or_none()
-                if o:
-                    top_level_org_name = o.name
-            if not top_level_org_name:
-                return "current"
-            return top_level_org_name
+        def intro_html(assessment_status):
+            """Generates appropriate HTML for the intro paragraph"""
 
+            indefinite_questionnaires = (
+                assessment_status.instruments_needing_full_assessment(
+                    classification='indefinite'),
+                assessment_status.instruments_in_progress(
+                    classification='indefinite'))
+
+            if assessment_status.overall_status in (
+                'Due', 'Overdue', 'In Progress'):
+                due_date = assessment_status.next_available_due_date(
+                    classification='baseline')
+                assert due_date
+                greeting = _("Hi {}").format(user.display_name)
+                reminder = _("Please complete your {} registry "
+                        "study questionnaire by {}" \
+                        ".").format(assessment_status.organization.name,
+                        due_date.strftime('%-d %b %Y'))
+                return """
+                    <div class="portal-header-container">
+                      <h2 class="portal-header">{greeting},</h2>
+                      <h4 class="portal-intro-text">
+                        {reminder}
+                      </h4>
+                      <div class="button-callout">
+                        <figure id="portalScrollArrow"></figure>
+                      </div>
+                    </div>""".format(greeting=greeting, reminder=reminder)
+            if any(indefinite_questionnaires):
+                greeting = _("Hi {}").format(user.display_name)
+                reminder = _("Please complete your {} registry study "
+                        "questionnaire at your convenience.").format(
+                        assessment_status.organization.name)
+                return """
+                    <div class="portal-header-container">
+                      <h2 class="portal-header">{greeting},</h2>
+                      <h4 class="portal-intro-text">
+                        {reminder}
+                      </h4>
+                      <div class="button-callout">
+                        <figure id="portalScrollArrow"></figure>
+                      </div>
+                    </div>""".format(greeting=greeting, reminder=reminder)
+            if assessment_status.overall_status == "Completed":
+                greeting = _("Thank you, {}.").format(user.display_name)
+                confirm = _("You've completed the {} Registry Study questionnaire"
+                        ".").format(assessment_status.organization.name)
+                reminder = _("You will be notified when the next "
+                            "questionnaire is ready to complete.")
+                return """
+                    <div class="portal-header-container">
+                      <h2 class="portal-header">{greeting}</h2>
+                      <p>{confirm}</p>
+                      <p>{reminder}</p>
+                      <div class="button-callout">
+                        <figure id="portalScrollArrow"></figure>
+                      </div>
+                    </div>""".format(greeting=greeting, confirm=confirm,
+                                    reminder=reminder)
+            raise ValueError("Unexpected state generating intro_heml")
+
+        def completed_card_html(assessment_status):
+            """Generates the appropriate HTML for the 'completed card'"""
+            header = _("Completed Questionnaires")
+            message = _("When you are done, completed questionnaires will be "
+                    "shown here.")
+            completed_placeholder = """
+                <div class="portal-description disabled">
+                  <h4 class="portal-description-title">
+                    {header}
+                  </h4>
+                  <div class="portal-description-body">
+                    <p>{message}</p>
+                  </div>
+                </div>""".format(header=header, message=message)
+
+            completed_html = """
+                <div class="portal-description">
+                  <h4 class="portal-description-title">
+                    {header}
+                  </h4>
+                  <div class="portal-description-body">
+                    <p>
+                      <a href="{recent_survey_link}">
+                        {message}
+                      </a>
+                    </p>
+                  </div>
+                 </div>"""
+
+            if assessment_status.overall_status == "Completed":
+                header = _("Completed Questionnaires")
+                message = _("View questionnaire completed on {}").format(
+                            assessment_status.completed_date.strftime(
+                            '%-d %b %Y'))
+                return completed_html.format(header=header, message=message,
+                    recent_survey_link= url_for(
+                        "portal.profile", _anchor="proAssessmentsLoc"))
+            else:
+                return completed_placeholder
+
+        ###
+        #  Generate link_url, link_label and card_html to
+        #  match state of users questionnaires (aka assessments)
+        ####
         if assessment_status.overall_status in (
             'Due', 'Overdue', 'In Progress'):
-            due_date = assessment_status.next_available_due_date()
-            assert(due_date)  # given the status condition, should be defined
-            link_label = 'Go to questionnaire'
-            if assessment_status.overall_status == 'In Progress':
-                link_label = 'Continue questionnaire'
+            # User has unfinished baseline assessment work
+            link_label = 'Continue questionnaire' if (
+                assessment_status.overall_status == 'In Progress') else (
+                    'Go to questionnaire')
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
-                instrument_id=assessment_status.instruments_needing_full_assessment(),
-                resume_instrument_id=assessment_status.instruments_in_process())
+                instrument_id=assessment_status.\
+                instruments_needing_full_assessment(classification='all'),
+                resume_instrument_id=assessment_status.instruments_in_progress(
+                classification='all'))
 
-            intro = """
-                <div class="portal-header-container">
-                    <h2 class="portal-header">Hi {},</h2>
-                    <h4 class="portal-intro-text">Please complete your {parent_org} registry study questionnaire by {due_date}.</h4>
-                    <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
-                </div>
-            """.format(user.display_name, due_date=due_date.strftime('%-d %b %Y'), parent_org=get_top_level_org_name())
-
+            header = _("Open Questionnaire")
             card_html = """
             {intro}
             <div class="portal-main portal-flex-container">
-                <div class="portal-description portal-description-incomplete">
-                  <h4 class="portal-description-title">Open Questionnaire</h4>
-                  <div class="button-container">
-                    <a class="btn-lg btn-tnth-primary" href="{link_url}">
-                       {link_label}
-                    </a>
-                  </div>
+              <div class="portal-description portal-description-incomplete">
+                <h4 class="portal-description-title">{header}</h4>
+                <div class="button-container">
+                  <a class="btn-lg btn-tnth-primary" href="{link_url}">
+                     {link_label}
+                  </a>
                 </div>
-                <div class="portal-description disabled">
-                    <h4 class="portal-description-title">Completed Questionnaire</h4>
-                    <div class="portal-description-body">
-                        <p>When you are done, completed questionnaires will be shown here.</p>
-                    </div>
-                </div>
-            </div>
-            """.format(intro=intro, link_url=link_url, link_label=link_label)
-        elif assessment_status.overall_status == "Completed":
-            link_label = 'View previous questionnaire'
-            link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
-            next_survey_date = assessment_status.completed_date + timedelta(days=365)
-            most_recent_survey_date = assessment_status.completed_date.strftime('%-d %b %Y')
-            intro = """
-                    <div class="portal-header-container">
-                        <h2 class="portal-header">Thank you, {}.</h2>
-                        <p>You have completed the {parent_org} Registry questionnaire.</p>
-                        <p>You will be notified when the next questionnaire is ready to complete ( {next_survey_date} ).</p>
-                        <div class="button-callout"><figure id="portalScrollArrow"></figure></div>
-                    </div>
-                    """.format(user.display_name, parent_org=get_top_level_org_name(), next_survey_date=next_survey_date.strftime('%-d %b %Y'))
+              </div>
+              {completed_card}
+            </div>""".format(
+                intro=intro_html(assessment_status), header=header,
+                link_url=link_url, link_label=link_label,
+                completed_card=completed_card_html(assessment_status))
+
+        elif any(indefinite_questionnaires):
+            # User completed baseline, but has outstanding indefinite work
+            link_label = _('Continue questionnaire') if (
+                indefinite_questionnaires[1]) else (
+                    _('Go to questionnaire'))
+            link_url = url_for(
+                'assessment_engine_api.present_assessment',
+                instrument_id=indefinite_questionnaires[0],
+                resume_instrument_id=indefinite_questionnaires[1])
+
+            header = _("Open Questionnaire")
             card_html = """
-            <div class="container">
-                {intro}
-                <div class="portal-main portal-flex-container">
-                    <div class="portal-description">
-                        <h4 class="portal-description-title">Open Questionnaire</h4>
-                        <div class="portal-description-body">
-                            <p>No questionnaire is due.</p>
-                        </div>
-                    </div>
-                    <div class="portal-description">
-                        <h4 class="portal-description-title">Completed Questionnaires</h4>
-                        <div class="portal-description-body">
-                            <p><a href="{recent_survey_link}">View questionnaire completed on {most_recent_survey_date}</a></p>
-                        </div>
-                    </div>
-                    <div class="portal-header-logout-container"><a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a></div>
+            {intro}
+            <div class="portal-main portal-flex-container">
+              <div class="portal-description portal-description-incomplete">
+                <h4 class="portal-description-title">{header}</h4>
+                <div class="button-container">
+                  <a class="btn-lg btn-tnth-primary" href="{link_url}">
+                     {link_label}
+                  </a>
                 </div>
+              </div>
+              {completed_card}
             </div>
             """.format(
-                intro=intro,
-                recent_survey_link=link_url,
-                most_recent_survey_date=most_recent_survey_date)
+                intro=intro_html(assessment_status), header=header,
+                link_url=link_url, link_label=link_label,
+                completed_card=completed_card_html(assessment_status))
+
+        elif assessment_status.overall_status == "Completed":
+            # User completed both baseline and indefinite
+            link_label = _('View previous questionnaire')
+            link_url = url_for("portal.profile", _anchor="proAssessmentsLoc")
+            header = _("Open Questionnaire")
+            message = _("No questionnaire is due.")
+            card_html = """
+            <div class="container">
+              {intro}
+              <div class="button-container portal-header-logout-container"><a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a></div>
+              <div class="portal-main portal-flex-container">
+                <div class="portal-description">
+                  <h4 class="portal-description-title">{header}</h4>
+                  <div class="portal-description-body">
+                      <p>{message}</p>
+                  </div>
+                </div>
+                {completed_card}
+              </div>
+            </div>
+            """.format(
+                intro=intro_html(assessment_status),
+                header=header, message=message,
+                completed_card=completed_card_html(assessment_status))
         else:
-            # Should only land here in expired or partially completed state
+            # User has completed indefinite work, and the baseline
+            # is either Expired or Partially Completed
             if assessment_status.overall_status not in (
                 "Expired", "Partially Completed"):
-                current_app.logger.error(
+                raise ValueError(
                     "Unexpected state {} for {}".format(
                         assessment_status.overall_status, user))
-            card_html = (
-                "<div class='portal-description portal-no-description-container'>The assessment is no longer available. "
-                "A research staff member will contact you for assistance.</div>")
+
             link_label = "N/A"
             link_url = None
+            message = _("The assessment is no longer available.\n"
+                    "A research staff member will contact you for assistance.")
+            card_html = """
+                <div class='portal-description portal-no-description-container'>
+                  {message}
+                </div>""".format(message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
