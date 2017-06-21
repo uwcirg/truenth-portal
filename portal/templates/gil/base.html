@@ -166,7 +166,7 @@
             <br/>
             <p class="box-modal__copy">{{_("Do you have an access code?")}}</p>
             <form action="/go" method="post">
-              <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="Enter Access Code" required autocomplete="off"/>
+              <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="{{_('Enter Access Code')}}" required autocomplete="off"/>
               <div id="access_code_info" class="box-modal__copy text-left tnth-hide"></div>
               <div id="access_code_error" class="tnth-hide"></div>
               <div class="access-code-container">
@@ -188,8 +188,8 @@
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
              <form action="{{PORTAL}}/user/sign-in" method="POST" class="form">
-              <input name="email" type="text" placeholder="Email Address" required>
-              <input name="password" type="password" placeholder="Password" required>
+              <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
+              <input name="password" type="password" placeholder="{{_('Password')}}" required>
               <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
               <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
