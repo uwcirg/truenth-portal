@@ -64,7 +64,7 @@
                   <use xlink:href="#DS-Compass"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main decision-support-link {% if not user %}icon-box__button--disabled{% endif %}" href="{%if user%}{{PORTAL}}/home{%else%}/{%endif%}"><span>{{_("Start")}}<figure></figure></span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main decision-support-link {% if not user %}icon-box__button--disabled{% endif %}" href="{%if user%}{{PORTAL}}{{url_for('portal.home')}}{%else%}/{%endif%}"><span>{{_("Start")}}<figure></figure></span></a></div>
             </div>
           </div>
         </div>

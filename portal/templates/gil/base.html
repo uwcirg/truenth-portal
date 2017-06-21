@@ -67,38 +67,38 @@
       <div class="side-nav__inner">
         <h3 class="side-nav__heading">{{_("Navigation")}}</h3>
         <ul class="side-nav-items">
-          <li class="side-nav-items__item side-nav-items__item--home"><a href="{{PORTAL}}/">{{_("Home")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--home"><a href="/">{{_("Home")}}</a></li>
           {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
-              <li class="side-nav-items__item"><a href="{{PORTAL}}/patients">{{_("Patients")}}</a></li>
+              <li class="side-nav-items__item"><a href="{{PORTAL}}{{url_for('patients.patients_root')}}">{{_("Patients")}}</a></li>
           {% endif %}
           {% if user %}
-              <li class="side-nav-items__item"><a href="{{PORTAL}}/profile">{{_("My TrueNTH Profile")}}</a></li>
+              <li class="side-nav-items__item"><a href="{{PORTAL}}{{url_for('portal.profile')}}">{{_("My TrueNTH Profile")}}</a></li>
           {% endif %}
-          <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}/about">{{_("About TrueNTH")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}{{url_for('portal.about')}}">{{_("About TrueNTH")}}</a></li>
           {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}
-              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}/clients">{{_("Client Applications")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}{{url_for('auth.clients_list')}}">{{_("Client Applications")}}</a></li>
           {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
-              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{PORTAL}}/admin">{{_("User Administration")}}</a></li>
-              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{PORTAL}}/settings">{{_("Settings")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{PORTAL}}{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{PORTAL}}{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
           {% endif %}
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}/decision-support">
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}{{url_for('portal.decision_support')}}">
               <svg width="32" height="32">
                 <use xlink:href="#DS-Icon-Nav"></use>
               </svg>{{_("Decision Support")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{PORTAL}}/symptom-tracker">
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{PORTAL}}{{url_for('portal.symptom_tracker')}}">
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>{{_("Symptom Tracker")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}/exercise-and-diet">{{_("Exercise and Diet")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}{{url_for('portal.exercise_and_diet')}}">{{_("Exercise and Diet")}}</a></li>
           <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">{{_("Lived Experience")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}/what-is-prostate-cancer">{{_("Prostate Cancer Facts")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}/contact">{{_("Contact")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}{{url_for('portal.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}{{url_for('portal.contact')}}">{{_("Contact")}}</a></li>
           {% if not user %}
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></li>
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a></li>
           {% else %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{PORTAL}}/logout">{{_("Log Out")}}</a></li>
+            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{PORTAL}}{{url_for('auth.logout')}}">{{_("Log Out")}}</a></li>
           {% endif %}
         </ul>
       </div>
@@ -231,7 +231,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <br/>
-            <h4 class="box-modal__copy">{{_("What is your main clinic for prostate cancer care")}}?</h4>
+            <h4 class="box-modal__copy">{{_("What is your main clinic for prostate cancer care?")}}</h4>
             <div class="box-modal__divider"></div>
             <br/>
             <div class="form-group profile-section" id="userOrgs">
@@ -254,10 +254,8 @@
     <div id="session-warning-modal" class="modal fade">
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">
-          <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
-            {% trans title='Session Expiration Warning', message1='Your session will expire in approximately', message2='seconds due to inactivity' %}
-            <h4 class="box-modal__title">{{title}}</h4><p class="box-modal__copy">{{message1}} <span id="remaining-time"></span> {{message2}}</p>
-            {% endtrans %}
+          <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
+            <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4><p class="box-modal__copy">{{_("Your session will expire in approximately")}} <span id="remaining-time"></span> {{_("seconds due to inactivity")}}</p>
           </div>
            <div class="box-modal__footer">
             <button id="log-out" class="button button--teal" data-dismiss="modal">{{_("Log Out")}}</button>&nbsp;<button id="stay-logged-in" class="button button--teal" data-dismiss="modal">{{_("Stay Logged In")}}</button>
@@ -268,11 +266,9 @@
     <div id="timeout-modal" class="modal fade">
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">
-          {% trans title='Session Timed Out', message='You have been logged out due to inactivity.  Please log in again to continue.' %}
-          <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
-            <h4 class="box-modal__title">{{title}}</h4><p class="box-modal__copy">{{message}}</p>
+          <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
+            <h4 class="box-modal__title">{{_("Session Timed Out")}}</h4><p class="box-modal__copy">{{_("You have been logged out due to inactivity.  Please log in again to continue.")}}</p>
           </div>
-          {% endtrans %}
            <div class="box-modal__footer">
               <button class="button button--teal" data-dismiss="modal">{{_("OK")}}</button>
           </div>
@@ -479,7 +475,7 @@
                         } else {
                             if (hasValue($("#shortcut_alias").val())) {
                               $("#access_code_info").text("");
-                              $("#access_code_error").text("{{_('System is unable to process your request.')}}");
+                              $("#access_code_error").text("{{_('System was unable to process your request.')}}");
                             };
                         };
 

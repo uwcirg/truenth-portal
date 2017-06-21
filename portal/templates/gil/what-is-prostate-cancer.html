@@ -6,9 +6,7 @@
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--top-img page-intro--prostate-facts" style="background-image: url({{url_for('static', filename='img/PCF2-Background.jpg') }})">
         <div class="page-intro__content">
-          {% trans intro1="What is", intro2="Prostate Cancer?" %}
-          <h1 class="page-intro__main">{{intro1}} <span class="page-intro__main--accent">{{intro2}}</span></h1>
-          {% endtrans %}
+          <h1 class="page-intro__main"><span>{{_("What is")}}<span> <span class="page-intro__main--accent">{{_("Prostate Cancer?")}}</span></h1>
           <p class="page-intro__sub">{{_("Cancer is a disease in which cells in the body grow out of control. Prostate Cancer is when cancer starts in the prostate. Many men with prostate cancer die of other causes without ever having any symptoms from the cancer.")}}</p>
           <div class="button-callout button-callout--has-text"><strong class="js-scroll-down" data-target=".page-intro">{{_("Learn More")}}</strong>
             <figure class="button-callout__scroll js-scroll-down" data-target=".page-intro"></figure>
@@ -45,18 +43,14 @@
       <div class="module-wrap module-wrap--theme-brown">
         <div class="module">
           <div class="accent-heading accent-heading--no-border">{{_("Education")}}</div>
-          {% trans intro1="What is the", intro2="Prostate" %}
-          <p class="module__heading">{{intro1}} <span class="module__heading--accent">{{intro2}}</span>?</p>
-          {% endtrans %}
+          <p class="module__heading"><span>{{_("What is the")}} </span><span class="module__heading--accent">{{_("Prostate")}}</span>?</p>
           <p class="module__body module__body--left">{{_("The prostate is a part of the male reproductive system and is located just below the bladder and in front of the rectum. It produces fluid that makes up a part of semen.")}}</p>
           <div class="module__img"><img src="{{url_for('static', filename='img/what-is-the-prostate-graphic.png')}}" alt="{{_('Prostate Cancer Graph')}}"></div>
         </div>
       </div>
       <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
         <div class="module">
-          {% trans text1="What are the", text2="Risk Factors", text3="for", text4="Prostate Cancer" %}
-          <p class="module__heading">{{text1}} <span class="module__heading--accent">{{text2}}</span> {{text3}}<br/> {{text4}}?</p>
-          {% endtrans %}
+          <p class="module__heading"><span>{{_("What are the")}}</span> <span class="module__heading--accent">{{_("Risk Factors")}}</span> <span>{{_("for")}}<br/> {{_("Prostate Cancer?")}}</p>
           <p class="module__body module__body--left">{{_("There are some risk factors that increase your chances of getting prostate cancer:")}}</p>
           <div class="mini-boxes mini-boxes--theme-gray mini-boxes--half-width">
             <div class="mini-boxes__item mini-boxes__item-col">
@@ -80,9 +74,7 @@
       </div>
       <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
         <div class="module">
-          {% trans text1="What are the", text2="Symptoms", text3="of", text4="Prostate Cancer" %}
-          <p class="module__heading">{{text1}} <span class="module__heading--accent">{{text2}}</span> {{text3}}<br/> {{text4}}?</p>
-          {% endtrans %}
+          <p class="module__heading"><span>{{_("What are the")}} </span><span class="module__heading--accent">{{_("Symptoms")}}</span> <span>{{_("of")}}</span><br/> <span>{{_("Prostate Cancer?")}}</span></p>
           <p class="module__body module__body--left">{{_("Most men will not experience any symptoms, especially when the prostate cancer is caught at early stages. Some men do have symptoms for prostate cancer which might include:")}}</p>
           <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
             <div class="mini-boxes__item mini-boxes__item-col">
@@ -103,9 +95,7 @@
       </div>
       <div class="module-wrap module-wrap--theme-brown module-wrap--has-border">
         <div class="module">
-          {% trans text1="What", text2="Screening Tests", text3="Are There for", text4="Prostate Cancer" %}
-          <p class="module__heading">{{text1}} <span class="module__heading--accent">{{text2}}</span> {{text3}} <br/>{{text4}}?</p>
-          {% endtrans %}
+          <p class="module__heading"><span>{{_("What")}} <span class="module__heading--accent">{{_("Screening Tests")}}</span> <span>{{_("Are There for")}}</span> <br/><span>{{_("Prostate Cancer?")}}</span></p>
           <p class="module__body module__body--left">{{_("Cancer screening means looking for cancer before it causes symptoms. However, most prostate cancers grow slowly or not at all. ")}}</p>
           <p class="module__body module__body--left">{{_("Two tests are commonly used to screen for prostate cancer: ")}}</p>
           <div class="mini-boxes mini-boxes--theme-gray mini-boxes--full-width">
@@ -158,9 +148,7 @@
       <div class="module-wrap module-wrap--theme-blue">
         <div class="module">
           <div class="accent-heading accent-heading--no-border">{{_("Treatment")}}</div>
-          {% trans text1="How Is Prostate Cancer", text2="Treated" %}
-          <p class="module__heading">{{text1}} <span class="module__heading--accent">{{text2}}?</span></p>
-          {% endtrans %}
+          <p class="module__heading"><span>{{_("How Is Prostate Cancer")}} </span> <span class="module__heading--accent">{{_("Treated?")}}</span></p>
           <p class="module__body module__body--left">{{_("Men have different stages of prostate cancer and have different treatment options available to them:")}}</p>
           <div class="mini-boxes mini-boxes--theme-blue mini-boxes--half-width">
             <div class="mini-boxes__item">
@@ -223,9 +211,7 @@
             </div>
             <div class="mini-boxes__item">
               <div class="mini-box">
-                {% trans text1="COMPLIMENTARY AND", text2="ALTERNATIVE MEDICINE" %}
-                <h5 class="mini-box__head">{{text1}} <br/>{{text2}}</h5>
-                {% endtrans %}
+                <h5 class="mini-box__head">{{_("COMPLIMENTARY AND")}} <br/>{{_("ALTERNATIVE MEDICINE")}}</h5>
                 <p class="mini-box__copy">{{_("Medicines and health practices that are not standard cancer treatments.")}}<br/><br/></p>
                 <p class="mini-box__copy--smaller">{{_("Meditation, yoga, and supplements like vitamins and herbs are some examples. Many kinds of complementary and alternative medicine have not been tested scientifically and may not be safe. Talk to your doctor about the risks and benefits before you start any kind of complementary or alternative medicine.")}}</p>
               </div>

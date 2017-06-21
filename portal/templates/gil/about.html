@@ -6,8 +6,8 @@
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--about {%if user%}no-banner{%endif%}" style="background-image: url({{url_for('static', filename='img/About-Top-Background.jpg') }})">
         <div class="page-intro__content">
-          {% trans intro="We're a collaborative program", intro2="funded and created by", into3="The Movember Foundation" %}
-          <h1 class="page-intro__main">{{intro}} <br/>{{intro2}} <a href='http://www.movember.com' target='_blank'>{{intro3}}</a>.</h1>
+          {% trans%}
+          <h1 class="page-intro__main">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>
           {% endtrans %}
           <p class="page-intro__sub">{{_("Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers.")}}</p>
           <div class="button-callout">
@@ -23,23 +23,23 @@
       </div>
       <div class="module-wrap module-wrap--theme-brown">
         <div class="module module--theme-brown">
-          <div class="accent-heading">{{_("Objective N")}}<em>o</em>6: {{_("Custom Tools")}}</div>
+          <div class="accent-heading">{{_("Objective")}} N<em>o</em>6: {{_("Custom Tools")}}</div>
           <p class="module__heading">{{_("Our Current Projects")}}</p>
           <p class="module__body">{{_("We have two tools currently running and more on the way.")}}</p>
           <div class="icon-box-group__wrapper">
             <div class="icon-box-group">
-              <div class="icon-box-wrap icon-box-decision-support"><a class="icon-box icon-box--theme-compass decision-support-link" href="{{PORTAL}}/decision-support"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>1: {{_("Post Diagnosis")}}</strong>
+              <div class="icon-box-wrap icon-box-decision-support"><a class="icon-box icon-box--theme-compass decision-support-link" href="{{PORTAL}}/decision-support"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>1: {{_("Post Diagnosis")}}</strong>
                   <h4 class="icon-box__head">{{_("Decision Support")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Education / Report")}}</span>
                   <svg class="icon-box__icon" width="92" height="92">
                     <use xlink:href="#DS-Compass"></use>
                   </svg></a></div>
-              <div class="icon-box-wrap icon-box-symptom-tracker"><a class="icon-box icon-box--theme-compass icon-box--theme-brown symptom-tracker-link" href="{{PORTAL}}/symptom-tracker"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("2: Monitoring")}}</strong>
+              <div class="icon-box-wrap icon-box-symptom-tracker"><a class="icon-box icon-box--theme-compass icon-box--theme-brown symptom-tracker-link" href="{{PORTAL}}/symptom-tracker"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>{{_("2: Monitoring")}}</strong>
                   <h4 class="icon-box__head">{{_("Symptom Tracker")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Reports / Tips")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#ST-Graph"></use>
                   </svg></a></div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("3: All Stages")}}</strong>
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>{{_("3: All Stages")}}</strong>
                   <h4 class="icon-box__head">{{_("Exercise And Diet")}}</h4><span class="icon-box__lowhead">{{_("Personalized Guides")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
@@ -47,7 +47,7 @@
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("4: All Stages")}}</strong>
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>{{_("4: All Stages")}}</strong>
                   <h4 class="icon-box__head">{{_("Lived Experience")}}</h4><span class="icon-box__lowhead">{{_("Shared Stories")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
@@ -55,7 +55,7 @@
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("5: All Stages")}}</strong>
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>{{_("5: All Stages")}}</strong>
                   <h4 class="icon-box__head">{{_("Sexual Health")}}</h4><span class="icon-box__lowhead">{{_("Recovery Plans")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Coming-Soon"></use>
@@ -63,7 +63,7 @@
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("6: Post Diagnosis")}}</strong>
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>{{_("6: Post Diagnosis")}}</strong>
                   <h4 class="icon-box__head">{{_("Care Plan")}}</h4><span class="icon-box__lowhead">{{_("Navigation Resources")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Coming-Soon"></use>
@@ -76,7 +76,7 @@
       </div>
       <div class="module-wrap module-wrap--theme-gray-light">
         <div class="module module--theme-gray">
-          <div class="accent-heading">{{_("Objective N")}}<em>o</em>{{_("1: TrueNTH Community")}}</div>
+          <div class="accent-heading">{{_("Objective")}} N<em>o</em>{{_("1: TrueNTH Community")}}</div>
           <p class="module__heading">{{_("Our USA Partners")}}</p>
           <p class="module__body">{{_("We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer.")}}</p>
           <div class="partner-grid">
@@ -101,7 +101,7 @@
       </div>
       <div class="module-wrap module-wrap--theme-blue">
         <div class="module module--theme-gray">
-          <div class="accent-heading">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("1: TrueNTH Community")}}</div>
+          <div class="accent-heading">{{_("Objective")}} N<em>o</em>{{_("1: TrueNTH Community")}}</div>
           <p class="module__heading">{{_("Global Strategy")}}</p>
           <p class="module__body">{{_("TrueNTH is currently active in 7 countries around the world:")}}</p>
           <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}" alt="{{_('World Map')}}">
