@@ -1,5 +1,5 @@
 {% extends "gil/lived_experience_base.html" %}
-{% block title %}Truenth Lived Experience - Alonzo McCann Story{% endblock %}
+{% block title %}{{_("Truenth Lived Experience - Alonzo McCann Story")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main main--story">
@@ -7,14 +7,14 @@
       <div class="page-intro module-wrap module-wrap--story">
         <div class="module">
           <div class="accent-heading">
-            Objective N<em>o</em>2: LIVED EXPERIENCE
+            {{_("Objective N")}}<em>{{_("o")}}</em>{{_("2: LIVED EXPERIENCE")}}
           </div>
           <div class="module__body">
-            <p class="story-title">ALONZO McCANN</p>
-            <p class="story-text">A Detroit football coach, preacher, husband and father, Alonzo McCann has dedicated his life to helping others. 9 years after his prostate cancer diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on his path and his own trials in finding the help he needs.</p>
+            <p class="story-title">{{_("ALONZO McCANN")}}</p>
+            <p class="story-text">{{_("A Detroit football coach, preacher, husband and father, Alonzo McCann has dedicated his life to helping others. 9 years after his prostate cancer diagnosis, Alonzo is still on his journey to recovery. Today, he reflects on his path and his own trials in finding the help he needs.")}}</p>
             <div class="sprout-video-container">
               <div class="button--video__overlay"></div>
-              <button class="button--teal button--video">WATCH THE FILM</button>
+              <button class="button--teal button--video">{{_("WATCH THE FILM")}}</button>
               <iframe class='embed-video' src='//videos.sproutvideo.com/embed/d49ad8b51f1fedcf5c/b0bc914cac600697' frameborder='0' allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="630" height="354"></iframe>
             </div>
           </div>

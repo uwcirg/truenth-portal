@@ -1,13 +1,13 @@
 {% extends "gil/base.html" %}
-{% block title %}Truenth Page Not Found{% endblock %}
+{% block title %}{{_("Truenth Page Not Found")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main">
       {{super()}}
       <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
         <div class="page-intro__content">
-          <h1 class="page-intro__main">Page Not found</h1>
-          <p class="page-intro__sub">Sorry, the page you requested is not found. It may have been moved.</p>
+          <h1 class="page-intro__main">{{_("Page Not found")}}</h1>
+          <p class="page-intro__sub">{{_("Sorry, the page you requested is not found. It may have been moved.")}}</p>
         </div>
       </div>
     </main>

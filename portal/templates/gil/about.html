@@ -1,68 +1,70 @@
 {% extends "gil/base.html" %}
-{% block title %}About Truenth{% endblock %}
+{% block title %}{{_("About Truenth")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main">
       {{ super() }}
       <div class="page-intro page-intro--dark page-intro--about {%if user%}no-banner{%endif%}" style="background-image: url({{url_for('static', filename='img/About-Top-Background.jpg') }})">
         <div class="page-intro__content">
-          <h1 class="page-intro__main">We're a collaborative program <br/>funded and created by <a href='http://www.movember.com' target='_blank'>The Movember Foundation</a>.</h1>
-          <p class="page-intro__sub">Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers.</p>
+          {% trans intro="We're a collaborative program", intro2="funded and created by", into3="The Movember Foundation" %}
+          <h1 class="page-intro__main">{{intro}} <br/>{{intro2}} <a href='http://www.movember.com' target='_blank'>{{intro3}}</a>.</h1>
+          {% endtrans %}
+          <p class="page-intro__sub">{{_("Our mission is to improve the prostate cancer journey for men and their partners and caregivers, by bringing their voices together with doctors, researchers, and volunteers.")}}</p>
           <div class="button-callout">
-            <strong class="js-scroll-down" data-target=".page-intro">Learn More</strong>
+            <strong class="js-scroll-down" data-target=".page-intro">{{_("Learn More")}}</strong>
             <figure class="js-scroll-down" data-target=".page-intro"></figure>
           </div>
         </div>
       </div>
-      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/a49bd1bd181ae3c72c/b947ee462a45662e?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/About-Video-Export.jpg') }}" alt="Learn More">
+      <div class="module-wrap module-wrap--watch js-video-toggle" data-iframe-src="//videos.sproutvideo.com/embed/a49bd1bd181ae3c72c/b947ee462a45662e?type=hd&amp;autoPlay=true"><img src="{{url_for('static', filename='img/About-Video-Export.jpg') }}" alt="{{_('Learn More')}}">
         <div class="module-wrap--inner">
-          <div class="button-callout"><a class="button button--large button--teal" href="#">Watch</a></div>
+          <div class="button-callout"><a class="button button--large button--teal" href="#">{{_("Watch")}}</a></div>
         </div>
       </div>
       <div class="module-wrap module-wrap--theme-brown">
         <div class="module module--theme-brown">
-          <div class="accent-heading">Objective N<em>o</em>6: Custom Tools</div>
-          <p class="module__heading">Our Current Projects</p>
-          <p class="module__body">We have two tools currently running and more on the way.</p>
+          <div class="accent-heading">{{_("Objective N")}}<em>o</em>6: {{_("Custom Tools")}}</div>
+          <p class="module__heading">{{_("Our Current Projects")}}</p>
+          <p class="module__body">{{_("We have two tools currently running and more on the way.")}}</p>
           <div class="icon-box-group__wrapper">
             <div class="icon-box-group">
-              <div class="icon-box-wrap icon-box-decision-support"><a class="icon-box icon-box--theme-compass decision-support-link" href="{{PORTAL}}/decision-support"><strong class="icon-box__subhead">Tool N<em>o</em>1: Post Diagnosis</strong>
-                  <h4 class="icon-box__head">Decision Support</h4><span class="icon-box__lowhead">Questionnaire / Education / Report</span>
+              <div class="icon-box-wrap icon-box-decision-support"><a class="icon-box icon-box--theme-compass decision-support-link" href="{{PORTAL}}/decision-support"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>1: {{_("Post Diagnosis")}}</strong>
+                  <h4 class="icon-box__head">{{_("Decision Support")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Education / Report")}}</span>
                   <svg class="icon-box__icon" width="92" height="92">
                     <use xlink:href="#DS-Compass"></use>
                   </svg></a></div>
-              <div class="icon-box-wrap icon-box-symptom-tracker"><a class="icon-box icon-box--theme-compass icon-box--theme-brown symptom-tracker-link" href="{{PORTAL}}/symptom-tracker"><strong class="icon-box__subhead">Tool N<em>o</em>2: Monitoring</strong>
-                  <h4 class="icon-box__head">Symptom Tracker</h4><span class="icon-box__lowhead">Questionnaire / Reports / Tips</span>
+              <div class="icon-box-wrap icon-box-symptom-tracker"><a class="icon-box icon-box--theme-compass icon-box--theme-brown symptom-tracker-link" href="{{PORTAL}}/symptom-tracker"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("2: Monitoring")}}</strong>
+                  <h4 class="icon-box__head">{{_("Symptom Tracker")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Reports / Tips")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#ST-Graph"></use>
                   </svg></a></div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>3: All Stages</strong>
-                  <h4 class="icon-box__head">Exercise And Diet</h4><span class="icon-box__lowhead">Personalized Guides</span>
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("3: All Stages")}}</strong>
+                  <h4 class="icon-box__head">{{_("Exercise And Diet")}}</h4><span class="icon-box__lowhead">{{_("Personalized Guides")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
                   </svg>
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>4: All Stages</strong>
-                  <h4 class="icon-box__head">Lived Experience</h4><span class="icon-box__lowhead">Shared Stories</span>
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("4: All Stages")}}</strong>
+                  <h4 class="icon-box__head">{{_("Lived Experience")}}</h4><span class="icon-box__lowhead">{{_("Shared Stories")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Sexual-Recovery-Coming-Soon"></use>
                   </svg>
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>5: All Stages</strong>
-                  <h4 class="icon-box__head">Sexual Health</h4><span class="icon-box__lowhead">Recovery Plans</span>
+                <div class="icon-box icon-box--theme-brown icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("5: All Stages")}}</strong>
+                  <h4 class="icon-box__head">{{_("Sexual Health")}}</h4><span class="icon-box__lowhead">{{_("Recovery Plans")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Coming-Soon"></use>
                   </svg>
                 </div>
               </div>
               <div class="icon-box-wrap">
-                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">Tool N<em>o</em>6: Post Diagnosis</strong>
-                  <h4 class="icon-box__head">Care Plan</h4><span class="icon-box__lowhead">Navigation Resources</span>
+                <div class="icon-box icon-box--theme-inactive"><strong class="icon-box__subhead">{{_("Tool N")}}<em>o</em>{{_("6: Post Diagnosis")}}</strong>
+                  <h4 class="icon-box__head">{{_("Care Plan")}}</h4><span class="icon-box__lowhead">{{_("Navigation Resources")}}</span>
                   <svg class="icon-box__icon" width="90" height="90">
                     <use xlink:href="#Coming-Soon"></use>
                   </svg>
@@ -74,60 +76,60 @@
       </div>
       <div class="module-wrap module-wrap--theme-gray-light">
         <div class="module module--theme-gray">
-          <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
-          <p class="module__heading">Our USA Partners</p>
-          <p class="module__body">We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer.</p>
+          <div class="accent-heading">{{_("Objective N")}}<em>o</em>{{_("1: TrueNTH Community")}}</div>
+          <p class="module__heading">{{_("Our USA Partners")}}</p>
+          <p class="module__body">{{_("We have brought together a Network that is actively working with us on the best tools for living with and beyond prostate cancer.")}}</p>
           <div class="partner-grid">
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/colorado.gif') }}" alt="University of Colorado Cancer Center"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/DanaFarber.png') }}" alt="Dana Farber Cancer Institute"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/duke.gif') }}" alt="Duke University"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/emory.gif') }}" alt="Emory University"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/johnshopkins.gif') }}" alt="Johns Hopkins University"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/karmanos.gif') }}" alt="Karmanos Cancer Institute"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/sloan.gif') }}" alt="Memorial Sloan Kettering Cancer Center"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/michigan.gif') }}" alt="University of Michigan"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/moffitt.gif') }}" alt="Moffitt Cancer Center"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/colorado.gif') }}" alt="{{_('University of Colorado Cancer Center')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/DanaFarber.png') }}" alt="{{_('Dana Farber Cancer Institute')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/duke.gif') }}" alt="{{_('Duke University')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/emory.gif') }}" alt="{{_('Emory University')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/johnshopkins.gif') }}" alt="{{_('Johns Hopkins University')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/karmanos.gif') }}" alt="{{_('Karmanos Cancer Institute')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/sloan.gif') }}" alt="{{_('Memorial Sloan Kettering Cancer Center')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/michigan.gif') }}" alt="{{_('University of Michigan')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/moffitt.gif') }}" alt="{{_('Moffitt Cancer Center')}}"></div>
             <!-- <div class="partner-grid__item"><img src="./img/music.gif"></div> -->
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/OHSU.png') }}" alt="OHSU"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucdavis.gif') }}" alt="UC Davis"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucla.gif') }}" alt="UCLA"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/UCSF.png') }}" alt="UCSF"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/unc.gif') }}" alt="UNC"></div>
-            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/uw.gif') }}" alt="University of Washington"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/OHSU.png') }}" alt="{{_('OHSU')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucdavis.gif') }}" alt="{{_('UC Davis')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/ucla.gif') }}" alt="{{_('UCLA')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/UCSF.png') }}" alt="{{_('UCSF')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/unc.gif') }}" alt="{{_('UNC')}}"></div>
+            <div class="partner-grid__item"><img src="{{url_for('static', filename='img/uw.gif') }}" alt="{{_('University of Washington')}}"></div>
           </div>
         </div>
       </div>
       <div class="module-wrap module-wrap--theme-blue">
         <div class="module module--theme-gray">
-          <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
-          <p class="module__heading">Global Strategy</p>
-          <p class="module__body">TrueNTH is currently active in 7 countries around the world:</p>
-          <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}" alt="World Map">
+          <div class="accent-heading">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("1: TrueNTH Community")}}</div>
+          <p class="module__heading">{{_("Global Strategy")}}</p>
+          <p class="module__body">{{_("TrueNTH is currently active in 7 countries around the world:")}}</p>
+          <div class="world-map"><img src="{{url_for('static', filename='img/World-Map@2x.png') }}" alt="{{_('World Map')}}">
             <ul class="tooltips">
-              <li class="tooltips__item tooltips__item--usa"><strong>USA</strong><span>US</span>
+              <li class="tooltips__item tooltips__item--usa"><strong>{{_("USA")}}</strong><span>{{_("US")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--can"><strong>Canada</strong><span>CA</span>
+              <li class="tooltips__item tooltips__item--can"><strong>{{_("Canada")}}</strong><span>{{_("CA")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--ire"><strong>Ireland</strong><span>IE</span>
+              <li class="tooltips__item tooltips__item--ire"><strong>{{_("Ireland")}}</strong><span>{{_("IE")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--uk"><strong>UK</strong><span>UK</span>
+              <li class="tooltips__item tooltips__item--uk"><strong>{{_("UK")}}</strong><span>{{_("UK")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--sing"><strong>Singapore</strong><span>SG</span>
+              <li class="tooltips__item tooltips__item--sing"><strong>{{_("Singapore")}}</strong><span>{{_("SG")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--aus"><strong>Australia</strong><span>AU</span>
+              <li class="tooltips__item tooltips__item--aus"><strong>{{_("Australia")}}</strong><span>{{_("AU")}}</span>
                 <figure></figure>
               </li>
-              <li class="tooltips__item tooltips__item--nz"><strong>New Zealand</strong><span>NZ</span>
+              <li class="tooltips__item tooltips__item--nz"><strong>{{_("New Zealand")}}</strong><span>{{_("NZ")}}</span>
                 <figure></figure>
               </li>
             </ul>
           </div>
-          <p class="module__body">TrueNTH has invested 42 million USD to support the work of more than 350 global experts in prostate cancer care in these countries.</p>
+          <p class="module__body">{{_("TrueNTH has invested 42 million USD to support the work of more than 350 global experts in prostate cancer care in these countries.")}}</p>
         </div>
       </div>
     </main>
