@@ -1624,6 +1624,7 @@ def upload_user_document(user_id):
     except ValueError as e:
         abort(400, str(e))
     except OSError as e:
+        current_app.logger.error('patient_report post error - {}'.format(e))
         abort(500, str(e))
 
     db.session.add(doc)
