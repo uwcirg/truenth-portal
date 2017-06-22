@@ -98,7 +98,9 @@ class QuestionnaireDetails(object):
 
     def baseline(self):
         """Generator to return all baseline questionnaires"""
-        gen = (q for q in self.qs.values() if q['classification'] == 'baseline')
+        gen = (q for q in self.qs.values()
+               if q['classification'] == 'baseline')
+
         for q in gen:
             yield q
 
@@ -116,8 +118,8 @@ class QuestionnaireDetails(object):
         for q in gen:
             yield q
 
-    def _append_questionnaire(
-        self, classification, questionnaire, organization_id):
+    def _append_questionnaire(self, classification, questionnaire,
+                              organization_id):
         """Build up internal ordered dict from given values"""
         assert questionnaire.name not in self.qs
 
@@ -131,9 +133,10 @@ class QuestionnaireDetails(object):
             """
             results = {}
             if 'completed' in recents:
-                return {'status': 'Completed',
-                   'completed': recents['completed']
-                   }
+                return {
+                    'status': 'Completed',
+                    'completed': recents['completed']
+                }
             if 'in-progress' in recents:
                 results['status'] = 'In Progress'
                 results['in-progress'] = recents['in-progress']
@@ -142,7 +145,8 @@ class QuestionnaireDetails(object):
             if delta < timedelta(days=days_till_due + 1):
                 tmp = {
                     'status': 'Due',
-                    'by_date': self.consent_date + timedelta(days=days_till_due)
+                    'by_date': (
+                        self.consent_date + timedelta(days=days_till_due))
                    }
                 tmp.update(results)
                 return tmp
@@ -156,10 +160,11 @@ class QuestionnaireDetails(object):
                 return tmp
             return {'status': 'Expired'}
 
-        self.qs[questionnaire.name] = {'name': questionnaire.name,
-           'classification': classification,
-           'organization_id': organization_id
-           }
+        self.qs[questionnaire.name] = {
+            'name': questionnaire.name,
+            'classification': classification,
+            'organization_id': organization_id
+        }
         self.qs[questionnaire.name].update(
             status_from_recents(recents=most_recent_survey(
                 self.user, questionnaire.name),
@@ -207,7 +212,7 @@ class AssessmentStatus(object):
         else:
             if not self._consent:
                 if self.user.valid_consents and len(list(
-                    self.user.valid_consents)) > 0:
+                        self.user.valid_consents)) > 0:
                     self._consent = self.user.valid_consents[0]
             if self._consent:
                 self._consent_date = self._consent.audit.timestamp
@@ -334,7 +339,8 @@ class AssessmentStatus(object):
                 self.questionnaire_data.baseline()]
             if all((status_strings[0] == status for status in status_strings)):
                 if not status_strings[0] in (
-                    'Completed', 'Due', 'In Progress', 'Overdue', 'Expired'):
+                        'Completed', 'Due', 'In Progress', 'Overdue',
+                        'Expired'):
                     raise ValueError('Unexpected common status {}'.format(
                         status_strings[0]))
                 self._overall_status = status_strings[0]
