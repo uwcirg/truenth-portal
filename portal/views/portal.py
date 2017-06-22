@@ -877,7 +877,7 @@ def config_settings(config_key):
     key = config_key.upper()
     available = ['LR_ORIGIN', 'LR_GROUP']
     if key in available:
-        return jsonify({key:current_app.config.get(key)})
+        return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))
 
