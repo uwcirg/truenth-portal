@@ -45,14 +45,15 @@ metastatic_baseline_instruments = set([
     'eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
 
+
 def mock_questionnairebanks():
     # Define test Orgs and QuestionnaireBanks for each group
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
     with SessionScope(db):
         for name in (localized_instruments.union(*(
-            metastatic_baseline_instruments,
-            metastatic_indefinite_instruments))):
+                metastatic_baseline_instruments,
+                metastatic_indefinite_instruments))):
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
@@ -95,6 +96,7 @@ def mock_questionnairebanks():
         db.session.add(mb_qb)
         db.session.add(mi_qb)
         db.session.commit()
+
 
 class TestAssessment(TestCase):
 
@@ -166,7 +168,8 @@ class TestAssessment(TestCase):
         # confirm appropriate instruments
         self.assertFalse(a_s.instruments_needing_full_assessment('all'))
         self.assertEquals(
-            set(a_s.instruments_in_progress('baseline')), localized_instruments)
+            set(a_s.instruments_in_progress('baseline')),
+            localized_instruments)
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
