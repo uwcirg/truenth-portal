@@ -27,7 +27,7 @@ from ..models.organization import Organization, OrganizationIdentifier, OrgTree,
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
-from ..tasks import add, post_request
+from ..tasks import add, info, post_request
 from jinja2 import TemplateNotFound
 
 
@@ -966,6 +966,17 @@ def celery_test(x=16, y=16):
     if request.args.get('redirect-to-result', None):
         return redirect(result_url)
     return jsonify(result=result, task_id=task_id, result_url=result_url)
+
+
+@portal.route("/celery-info")
+def celery_info():
+    res = info.apply_async(())
+    context = {"id": res.task_id}
+    task_id = "{}".format(context['id'])
+    result_url = url_for('.celery_result', task_id=task_id)
+    if request.args.get('redirect-to-result', None):
+        return redirect(result_url)
+    return jsonify(task_id=task_id, result_url=result_url)
 
 
 @portal.route("/celery-result/<task_id>")

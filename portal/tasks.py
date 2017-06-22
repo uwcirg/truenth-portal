@@ -7,6 +7,7 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
+from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
@@ -25,6 +26,14 @@ logger = get_task_logger(__name__)
 @celery.task
 def add(x, y):
     return x + y
+
+
+@celery.task
+def info():
+    return "CELERY_BROKER_URL: {} <br/> SERVER_NAME: {}".format(
+        current_app.config.get('CELERY_BROKER_URL'),
+        current_app.config.get('SERVER_NAME'))
+
 
 @celery.task(bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
@@ -50,7 +59,8 @@ def post_request(self, url, data, timeout=10, retries=3):
         if self.request.retries < retries:
             raise self.retry(exc=exc, countdown=20)
         else:
-            logger.error("max retries exceeded for {}, last failure: {}".\
-                         format(url, exc))
+            logger.error(
+                "max retries exceeded for {}, last failure: {}".format(
+                    url, exc))
     except Exception as exc:
         logger.error("Unexpected exception on {} : {}".format(url, exc))
