@@ -224,6 +224,8 @@ def next_after_login():
                         request.cookies['SS_TIMEOUT_REVERT'],
                         max_age=max_age)
         resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
+    else:
+        resp.set_cookie('SS_TIMEOUT', '', expires=0)
     return resp
 
 
