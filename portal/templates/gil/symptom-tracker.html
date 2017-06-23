@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}{{_("Truenth Symptom Tracker")}}{% endblock %}
+{% block title %}{{_("TrueNTH Symptom Tracker")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main symptom-tracker-main">
@@ -20,7 +20,7 @@
       </div>
       <div class="module-wrap module-wrap--symptom module-wrap--theme-brown">
         <div class="module">
-          <div class="accent-heading">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("6: Custom Tools – Symptom Tracker")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>6: Custom Tools – Symptom Tracker {% endtrans %}</div>
           <h3 class="module__head">{{_("Monitoring and Tracking")}}</h3>
           <p class="module__body">{{_("We’ve created a tool that asks you questions about your symptoms and side-effects throughout your prostate cancer journey from diagnosis through recovery.")}}</p>
           <p class="module__body">{{_("Every time you complete the tracking questionnaire it adds data to your graph, shows you how your experience compares with other men, and provides relevant tips.")}}</p><img src="{{url_for('static', filename='img/Symptom_Tracker_Graph.png') }}" alt="{{_('Symptom Tracker Graph')}}">
@@ -29,7 +29,7 @@
           </div>
           <div class="icon-box-wrap">
             <div class="icon-box-wrap__main icon-box icon-box--theme-compass icon-box--theme-brown">
-              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("2: Monitoring")}}</strong>
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{% trans %}Tool N<em>o</em>2: Monitoring {% endtrans %}</strong>
                 <h4 class="icon-box__head">{{_("Symptom Tracker")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / 10 Mins")}}</span>
                 <svg class="icon-box__icon" width="90" height="90">
                   <use xlink:href="#ST-Graph"></use>

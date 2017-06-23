@@ -1,5 +1,5 @@
 {% extends "gil/lived_experience_base.html" %}
-{% block title %}{{_("Truenth Lived Experience")}}{% endblock %}
+{% block title %}{{_("TrueNTH Lived Experience")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main main--white">
@@ -19,7 +19,7 @@
       {% endblock %}
       <div class="page-intro page-intro--dark page-intro--lived-experience" style="background-image: url({{ url_for('static', filename='img/LE_Main.jpg') }})">
         <div class="page-intro__content">
-          <div class="accent-heading accent-heading--white">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("2: LIVED EXPERIENCE")}}</div>
+          <div class="accent-heading accent-heading--white">{% trans %}Objective N<em>o</em>2: LIVED EXPERIENCE{% endtrans %}</div>
           <p class="page-intro__sub">{{_("TrueNTH brings lived experiences from men, their caregivers and clinicians to help you in your prostate cancer journey.")}}</p>
         </div>
       </div>

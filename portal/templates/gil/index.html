@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}Truenth Home{% endblock %}
+{% block title %}TrueNTH Home{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main">
@@ -12,7 +12,7 @@
           </div>
         </div>
         <div class="module">
-          <div class="accent-heading">{{_("Objective")}} N<em>o</em>1: {{_("TrueNTH Community")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>1: TrueNTH Community {% endtrans %}</div>
           <p class="module__copy">{{_("We are here to help you navigate your prostate cancer journey.")}}</p>
           <div class="more-arrow"><a class="more-arrow__link more-arrow--teal" href="{{PORTAL}}{{url_for('portal.about')}}"><span>{{_("More About TrueNTH")}} <figure></figure></span></a></div>
           <div class="photo-grid-container">
@@ -37,7 +37,7 @@
       </div>
       <div class="module-wrap module-wrap--theme-teal">
         <div class="module">
-          <div class="accent-heading">{{_("Objective")}} N<em>o</em>3: {{_("Useful Information")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>3: Useful Information{% endtrans %}</div>
           <h3 class="module__head">{{_("What is Prostate Cancer?")}}</h3>
           <p class="module__body">{{_("Prostate cancer is the second most common cancer in men.")}}</p>
           <p class="module__body">{{_("1 in 7 men will be diagnosed with prostate cancer in their lifetime.")}}</p>
@@ -47,7 +47,7 @@
       </div>
       <div class="module-wrap module-wrap--confidence">
         <div class="module">
-          <div class="accent-heading">{{_("Objective")}} N<em>o</em>6: {{_("Custom Tools – Decision Support")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>6: Custom Tools – Decision Support{% endtrans %}</div>
           <h3 class="module__head">{{_("Men have different stages of prostate cancer and have different treatment options available to them.")}}</h3>
           <div class="mini-boxes">
             <div class="mini-boxes__item">
@@ -74,7 +74,7 @@
           </div>
           <div class="icon-box-wrap">
             <div class="icon-box-wrap__main icon-box icon-box--theme-compass">
-              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>1: {{_("Post Diagnosis")}}</strong>
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{% trans %}Tool N<em>o</em>1: Post Diagnosis{% endtrans %}</strong>
                 <h4 class="icon-box__head">{{_("Decision Support")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Education / Report")}}</span>
                 <svg class="icon-box__icon" width="92" height="92">
                   <use xlink:href="#DS-Compass"></use>
@@ -87,7 +87,7 @@
       </div>
       <div class="module-wrap module-wrap--symptom module-wrap--theme-brown">
         <div class="module">
-          <div class="accent-heading">{{_("Objective")}} N<em>o</em>6: {{_("Custom Tools – Symptom Tracker")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>6: Custom Tools – Symptom Tracker{% endtrans %}</div>
           <h3 class="module__head">{{_("Managing symptoms and side effects is an important part of the prostate cancer journey.")}}</h3>
           <div class="mini-boxes mini-boxes--theme-brown">
             <div class="mini-boxes__item">
@@ -114,7 +114,7 @@
           </div>
           <div class="icon-box-wrap">
             <div class="icon-box-wrap__main icon-box icon-box--theme-graph icon-box--theme-brown icon-box--theme-two">
-              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{{_("Tool")}} N<em>o</em>2: {{_("Monitoring")}}</strong>
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{% trans %} N<em>o</em>2: Monitoring {% endtrans %}</strong>
                 <h4 class="icon-box__head">{{_("Symptom Tracker")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Reports / Tips")}}</span>
                 <svg class="icon-box__icon" width="92" height="92">
                   <use xlink:href="#ST-Graph"></use>

@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}{{_("Contact Truenth")}}{% endblock %}
+{% block title %}{{_("Contact TrueNTH")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main">
@@ -29,7 +29,7 @@
       <div class="module-wrap module-wrap--theme-brown">
         <div class="module">
           <div class="contact-form-wrap">
-            <div class="accent-heading">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("1: TrueNTH Community")}}</div>
+            <div class="accent-heading">{% trans %}Objective N<em>o</em>1: TrueNTH Community{% endtrans %}</div>
             <h3 class="module__heading">{{_("Contact Form")}}</h3>
             <p class="module__body">{{_("Use this form to get in touch with TrueNTH USA.")}}</p>
             <form id="contactForm" class="module__form" action="" method="post">

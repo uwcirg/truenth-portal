@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}{{_("Truenth Decision Support")}}{% endblock %}
+{% block title %}{{_("TrueNTH Decision Support")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main decision-support-main">
@@ -20,11 +20,11 @@
       </div>
       <div class="module-wrap module-wrap--theme-blue">
         <div class="module module--theme-blue">
-          <div class="accent-heading">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("6: Custom Tools – Decision Support")}}</div>
+          <div class="accent-heading">{% trans %}Objective N<em>o</em>6: Custom Tools – Decision Support{% endtrans %}</div>
           <p class="module__heading">{{_("Making Your Decision")}}</p>
           <p class="module__body">{{_("As you decide which treatment is best for you, it is important to prepare for the discussions with your doctor:")}}</p>
           <div class="list-module">
-            <div class="accent-heading">{{_("Helpful Tip N")}}<em>{{_("o")}}</em>{{_("3: Decision Making Checklist")}}</div>
+            <div class="accent-heading">{% trans %}Helpful Tip N<em>o</em>3: Decision Making Checklist{% endtrans %}</div>
             <ul class="list-module__items">
               <li class="list-module__item checkbox-item">
                 <div class="checkbox-item__check">
@@ -51,14 +51,14 @@
       </div>
       <div class="module-wrap module-wrap--confidence">
         <div class="module">
-          <div class="accent-heading">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("1: Post Diagnosis")}}</div>
+          <div class="accent-heading">{% trans %}Tool N<em>o</em>1: Post Diagnosis{% endtrans %}</div>
           <h3 class="module__head">{{_("Decision Support Tool")}}</h3>
           <p class="module__body">{{_("Our tool was created to help you determine which option is best for you.")}}</p>
           <p class="module__body">{{_("After you have answered the questionnaire, you will receive personalized education and support to discuss the best path forward with your doctor.")}}</p>
           <p class="module__body">{{_("You can then download the report and share it with your doctor.")}}</p>
           <div class="icon-box-wrap">
             <div class="icon-box-wrap__main icon-box icon-box--theme-compass">
-              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{{_("Tool N")}}<em>{{_("o")}}</em>{{_("1: Post Diagnosis")}}</strong>
+              <div class="icon-box-wrap__main__left"><strong class="icon-box__subhead">{% trans %}Tool N<em>o</em>1: Post Diagnosis{% endtrans %}</strong>
                 <h4 class="icon-box__head">{{_("Decision Support")}}</h4><span class="icon-box__lowhead">{{_("Questionnaire / Education / Report")}}</span>
                 <svg class="icon-box__icon" width="92" height="92">
                   <use xlink:href="#DS-Compass"></use>

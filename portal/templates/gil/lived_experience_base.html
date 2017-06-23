@@ -3,7 +3,7 @@
 <aside>
      <div class="module-wrap module-wrap--background" style="background-image: url({{ url_for('static', filename='img/LE_Share_Story.jpg') }})">
         <div class="module">
-          <div class="accent-heading accent-heading--white">{{_("Objective N")}}<em>{{_("o")}}</em>{{_("1: TrueNTH Community")}}</div>
+          <div class="accent-heading accent-heading--white">{% trans %}Objective N<em>o</em>1: TrueNTH Community {% endtrans %}</div>
           <h3 class="module__head">{{_("Everyone has a part to play in improving the prostate cancer journey.")}}</h3>
           <div class="module--flex">
             <div class="button-callout"><a href="{{PORTAL}}{{url_for('portal.contact')}}" class="button button--large button--teal" id="lnShareYourStory">{{_("Share Your Story")}}</a></div>
