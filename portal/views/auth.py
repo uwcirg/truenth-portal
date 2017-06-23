@@ -179,35 +179,52 @@ def next_after_login():
        ) and not Coredata().initial_obtained(user):
         current_app.logger.debug("next_after_login: [need data] -> "
                                  "initial_queries")
-        return redirect(url_for('portal.initial_queries'))
+        resp = redirect(url_for('portal.initial_queries'))
 
     # Clients/interventions trying to obtain an OAuth token for protected
     # access need to be put in a pending state, if the user isn't already
     # authenticated with the portal.  It's now time to resume that process;
     # pop the pending state from the session and resume, if found.
-    if 'pending_authorize_args' in session:
+    elif 'pending_authorize_args' in session:
         args = session['pending_authorize_args']
         current_app.logger.debug("next_after_login: [resume pending] ->"
                                  "authorize: {}".format(args))
         del session['pending_authorize_args']
-        return redirect(url_for('auth.authorize', **args))
+        resp = redirect(url_for('auth.authorize', **args))
 
     # 'next' is typically set on the way in when gathering authentication.
     # It's stored in the session to survive the various redirections needed
     # for external auth, etc.  If found in the session, pop and redirect
     # as defined.
-    if 'next' in session:
+    elif 'next' in session:
         next_url = session['next']
         del session['next']
         current_app.logger.debug("next_after_login: [have session['next']] "
                                  "-> {}".format(next_url))
         if 'suspend_initial_queries' in session:
             del session['suspend_initial_queries']
-        return redirect(next_url)
+        resp = redirect(next_url)
 
-    # No better place to go, send user home
-    current_app.logger.debug("next_after_login: [no state] -> home")
-    return redirect(url_for('portal.home'))
+    else:
+        # No better place to go, send user home
+        current_app.logger.debug("next_after_login: [no state] -> home")
+        resp = redirect(url_for('portal.home'))
+
+    # make cookie max_age outlast the browser session
+    max_age = 60 * 60 * 24 * 365 * 5
+    # set timeout cookies
+    if session.get('login_as_id'):
+        if request.cookies.get('SS_TIMEOUT'):
+            resp.set_cookie('SS_TIMEOUT_REVERT',
+                                request.cookies['SS_TIMEOUT'],
+                                max_age=max_age)
+        resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
+    elif request.cookies.get('SS_TIMEOUT_REVERT'):
+        resp.set_cookie('SS_TIMEOUT',
+                        request.cookies['SS_TIMEOUT_REVERT'],
+                        max_age=max_age)
+        resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
+    return resp
 
 
 @auth.route('/login/<provider_name>/')
