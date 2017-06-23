@@ -218,6 +218,25 @@ def update_card_html_on_completion():
             assessment_status.instruments_in_progress(
                 classification='indefinite'))
 
+        def thank_you_block(name, registry):
+            greeting = _("Thank you, {}.").format(name)
+            confirm = _(
+                "You've completed the {} Registry Study questionnaire"
+                ".").format(registry)
+            reminder = _(
+                "You will be notified when the next "
+                "questionnaire is ready to complete.")
+            return """
+                <div class="portal-header-container">
+                  <h2 class="portal-header">{greeting}</h2>
+                  <p>{confirm}</p>
+                  <p>{reminder}</p>
+                  <div class="button-callout">
+                    <figure id="portalScrollArrow"></figure>
+                  </div>
+                </div>""".format(
+                    greeting=greeting, confirm=confirm, reminder=reminder)
+
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
 
@@ -248,6 +267,7 @@ def update_card_html_on_completion():
                         <figure id="portalScrollArrow"></figure>
                       </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
+
             if any(indefinite_questionnaires):
                 greeting = _("Hi {}").format(user.display_name)
                 reminder = _(
@@ -264,24 +284,11 @@ def update_card_html_on_completion():
                         <figure id="portalScrollArrow"></figure>
                       </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
+
             if assessment_status.overall_status == "Completed":
-                greeting = _("Thank you, {}.").format(user.display_name)
-                confirm = _(
-                    "You've completed the {} Registry Study questionnaire"
-                    ".").format(assessment_status.organization.name)
-                reminder = _(
-                    "You will be notified when the next "
-                    "questionnaire is ready to complete.")
-                return """
-                    <div class="portal-header-container">
-                      <h2 class="portal-header">{greeting}</h2>
-                      <p>{confirm}</p>
-                      <p>{reminder}</p>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
-                    </div>""".format(
-                        greeting=greeting, confirm=confirm, reminder=reminder)
+                return thank_you_block(
+                    name=user.display_name,
+                    registry=assessment_status.organization.name)
             raise ValueError("Unexpected state generating intro_heml")
 
         def completed_card_html(assessment_status):
@@ -428,14 +435,22 @@ def update_card_html_on_completion():
 
             link_label = "N/A"
             link_url = None
-            message = _(
-                "The assessment is no longer available.\n"
-                "A research staff member will contact you for assistance.")
-            card_html = """
-                "<div class='portal-description
-                    portal-no-description-container'>
-                  {message}
-                </div>""".format(message=message)
+
+            # If the user was enrolled in indefinite work and lands
+            # here, they should see the thank you text.
+            if assessment_status.enrolled_in_classification('indefinite'):
+                card_html = thank_you_block(
+                    name=user.display_name,
+                    registry=assessment_status.organization.name)
+            else:
+                message = _(
+                    "The assessment is no longer available.\n"
+                    "A research staff member will contact you for assistance.")
+                card_html = """
+                    "<div class='portal-description
+                        portal-no-description-container'>
+                      {message}
+                    </div>""".format(message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,

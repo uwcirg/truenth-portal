@@ -250,8 +250,19 @@ class AssessmentStatus(object):
         else:
             return
 
+    def enrolled_in_classification(self, classification):
+        """Returns true if user has at least one q for given classification"""
+        filter = getattr(self.questionnaire_data, classification)
+        for one in filter():
+            return True
+        return False
+
     def instruments_needing_full_assessment(self, classification):
         """Return list of questionnaire names needed for classification
+
+        NB - if the questionnaire is outside the valid date range, such as in
+        an expired state, it will not be included in the list regardless of
+        its needing assessment status.
 
         :param classification: set to restrict lookup to a single
             QuestionnaireBank.classification or 'all' to consider all.
@@ -261,7 +272,8 @@ class AssessmentStatus(object):
         filter = getattr(self.questionnaire_data, classification)
         results = []
         for data in filter():
-            if 'completed' in data or 'in-progress' in data:
+            if ('completed' in data or 'in-progress' in data or
+                    data.get('status') == 'Expired'):
                 continue
             results.append(data['name'])
 
@@ -269,6 +281,10 @@ class AssessmentStatus(object):
 
     def instruments_in_progress(self, classification):
         """Return list of questionnaire names in-progress for classification
+
+        NB - if the questionnaire is outside the valid date range, such as in
+        an expired state, it will not be included in the list regardless of
+        its in-progress status.
 
         :param classification: set to restrict lookup to a single
             QuestionnaireBank.classification or 'all' to consider all.
