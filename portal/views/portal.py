@@ -483,8 +483,11 @@ def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
     user = current_user()
-    org = user.first_top_organization()
-    terms = get_terms(org)
+    patient = get_user(patient_id)
+    org = patient.first_top_organization()
+    #NOTE, we are getting PATIENT's website consent terms here
+    #as STAFF member needs to read the terms to the patient
+    terms = get_terms(org, ROLE.PATIENT)
     return render_template(
         'website_consent_script.html', user=user, terms=terms,
         entry_method=entry_method, redirect_url=redirect_url,
