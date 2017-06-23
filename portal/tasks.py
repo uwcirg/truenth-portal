@@ -26,6 +26,7 @@ logger = get_task_logger(__name__)
 def add(x, y):
     return x + y
 
+
 @celery.task(bind=True)
 def post_request(self, url, data, timeout=10, retries=3):
     """Wrap requests.post for asyncronous posts - includes timeout & retry"""
@@ -50,7 +51,8 @@ def post_request(self, url, data, timeout=10, retries=3):
         if self.request.retries < retries:
             raise self.retry(exc=exc, countdown=20)
         else:
-            logger.error("max retries exceeded for {}, last failure: {}".\
-                         format(url, exc))
+            logger.error(
+                "max retries exceeded for {}, last failure: {}".format(
+                    url, exc))
     except Exception as exc:
         logger.error("Unexpected exception on {} : {}".format(url, exc))

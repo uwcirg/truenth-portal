@@ -71,6 +71,13 @@
                 {% endif %}
             </button>
         {% endif %}
+
+        {% if client.callback_url %}
+            <button type="submit" name="generate_callback"
+              value="generate_callback" class="btn btn-default">
+                {{ _("Test Callback URL") }}
+            </button>
+        {% endif %}
     </form>
 
     {% macro render_field(field) %}
