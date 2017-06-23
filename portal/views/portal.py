@@ -485,8 +485,10 @@ def website_consent_script(patient_id):
     user = current_user()
     patient = get_user(patient_id)
     org = patient.first_top_organization()
-    #NOTE, we are getting PATIENT's website consent terms here
-    #as STAFF member needs to read the terms to the patient
+    """
+    NOTE, we are getting PATIENT's website consent terms here
+    as STAFF member needs to read the terms to the patient
+    """
     terms = get_terms(org, ROLE.PATIENT)
     return render_template(
         'website_consent_script.html', user=user, terms=terms,
