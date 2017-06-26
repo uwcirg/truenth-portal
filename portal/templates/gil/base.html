@@ -33,7 +33,7 @@
     <meta name="msapplication-wide310x150logo" content="{{url_for('static', filename='img/widetile.png') }}">
     <meta name="msapplication-square310x310logo" content="{{url_for('static', filename='img/largetile.png') }}">
     <script>
-    var url = "{{PORTAL}}/user/sign-in";
+    var url = "{{url_for('user.login')}}";
     $.ajax({
         url: url,
         cache: false,
@@ -177,7 +177,7 @@
             <div class="or">{{_("otherwise")}}</div>
             <div class="box-modal-or__divider"></div>
             <br/>
-            <a id="btnCreateAccount" href="user/register" class="button button-large button--teal">{{_("Create Account")}}</a>
+            <a id="btnCreateAccount" href="{{url_for('user.register')}}" class="button button-large button--teal">{{_("Create Account")}}</a>
           </div>
         </div>
       </div>
@@ -187,12 +187,12 @@
         <div class="modal-content box-modal box-modal--login">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
-             <form action="/user/sign-in" method="POST" class="form">
+             <form action="{{url_for('user.login')}}" method="POST" class="form">
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>
               <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
-              <a href="user/forgot-password"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
+              <a href="{{url_for('user.forgot_password')}}"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
             </form>
             <div class="or">{{_("or")}}</div>
             <div class="box-modal-or__divider"></div>
@@ -221,7 +221,7 @@
             <div class="box-modal-or__divider"></div>
             <br/>
             <h3 class="box-modal__title">{{_("Join Us")}}!</h3>
-            <p class="box-modal__copy">{{_("It’s going to take a group effort to improve the prostate cancer experience for future generations.")}}</p><a href="user/register" class="button button-large button--teal button--register">{{_("Create Account")}}</a>
+            <p class="box-modal__copy">{{_("It’s going to take a group effort to improve the prostate cancer experience for future generations.")}}</p><a href="{{url_for('user.register')}}" class="button button-large button--teal button--register">{{_("Create Account")}}</a>
           </div>
         </div>
       </div>
