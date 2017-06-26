@@ -388,27 +388,9 @@
         <br/>
       </div>
       <script>
-        /****************** old date picker function ***********/
-        /******************************************************
-        function checkBiopsyDate(val) {
-           var isValid = tnthDates.isValidDefaultDateFormat(val, $("#biopsyDateError"));
-           if (isValid) {
-              $("#biopsy_yes").trigger("click");
-              return true;
-           } else {
-              $("#biopsyDate").datepicker("hide");
-              return false;
-           };
-        };
-        ******************************************************/
         $(function () {
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
-          // $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-          // $("#biopsyDate").on("keydown", function() {
-          //   $("#biopsyDateError").text("");
-          //   $(this).datepicker("hide");
-          // });
           $("input[name='biopsy']").each(function() {
           	$(this).on("click", function(e) {
               e.stopPropagation();
@@ -425,9 +407,6 @@
           		};
           	});
           });
-          // $("#biopsyDate").on("change", function() {
-          //     return checkBiopsyDate($(this).val());
-          // });
           $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
               $(this).on("change", function() {
                   var d = $("#biopsy_day");
