@@ -2940,7 +2940,7 @@ var tnthDates = {
                     return false;
                 }
                 else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    errorField.html("Birthday must not be in the future. Please try again.").show();
+                    errorField.html("Date must not be in the future. Please try again.").show();
                     return false; //shouldn't be in the future
                 }
                 else if (y < 1900) {
