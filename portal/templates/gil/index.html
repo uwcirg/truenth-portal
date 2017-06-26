@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}TrueNTH Home{% endblock %}
+{% block title %}{{super()}} {{_('Home')}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main">
@@ -14,7 +14,7 @@
         <div class="module">
           <div class="accent-heading">{% trans %}Objective N<em>o</em>1: TrueNTH Community {% endtrans %}</div>
           <p class="module__copy">{{_("We are here to help you navigate your prostate cancer journey.")}}</p>
-          <div class="more-arrow"><a class="more-arrow__link more-arrow--teal" href="{{PORTAL}}{{url_for('portal.about')}}"><span>{{_("More About TrueNTH")}} <figure></figure></span></a></div>
+          <div class="more-arrow"><a class="more-arrow__link more-arrow--teal" href="{{url_for('portal.about')}}"><span>{{_("More About TrueNTH")}} <figure></figure></span></a></div>
           <div class="photo-grid-container">
             <div class="photo-grid">
               <figure class="photo-grid__item"><strong>{{_("Jim Williams")}}</strong><img class="photo-grid__img" src="{{url_for('static', filename='img/Home-People-Jim.jpg') }}" alt="{{_('Jim Williams')}}"><img class="photo-grid__img--hovered" src="{{url_for('static', filename='img/Home-People-Jim-Over.jpg') }}" alt="{{_('Jim Williams')}}"></figure>
@@ -42,7 +42,7 @@
           <p class="module__body">{{_("Prostate cancer is the second most common cancer in men.")}}</p>
           <p class="module__body">{{_("1 in 7 men will be diagnosed with prostate cancer in their lifetime.")}}</p>
           <p class="module__body">{{_("In 2015, approximately 220,800 men will be diagnosed with prostate cancer in the USA.")}}</p>
-          <div class="more-arrow"><a class="more-arrow__linka" href="{{PORTAL}}/what-is-prostate-cancer"><span>{{_("Prostate Cancer Facts")}} <figure></figure></span></a></div>
+          <div class="more-arrow"><a class="more-arrow__linka" href="{{url_for('portal.prostate_cancer_facts')}}"><span>{{_("Prostate Cancer Facts")}} <figure></figure></span></a></div>
         </div>
       </div>
       <div class="module-wrap module-wrap--confidence">
@@ -80,7 +80,7 @@
                   <use xlink:href="#DS-Compass"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{PORTAL}}/decision-support"><span>{{_("More Info")}}</span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{url_for('portal.decision_support')}}"><span>{{_("More Info")}}</span></a></div>
             </div>
           </div>
         </div>
@@ -120,7 +120,7 @@
                   <use xlink:href="#ST-Graph"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{PORTAL}}/symptom-tracker"><span>{{_("More Info")}}</span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main icon-box__button--more-info" href="{{url_for('portal.symptom_tracker')}}"><span>{{_("More Info")}}</span></a></div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}{{_("TrueNTH Symptom Tracker")}}{% endblock %}
+{% block title %}{{super()}} {{_("Symptom Tracker")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main symptom-tracker-main">
@@ -35,7 +35,7 @@
                   <use xlink:href="#ST-Graph"></use>
                 </svg>
               </div>
-              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main symptom-tracker-link {% if not user %}icon-box__button--disabled{% endif %}" href="{{PORTAL}}{%if user%}/home{%else%}/{%endif%}"><span>{{_("Start")}}<figure></figure></span></a></div>
+              <div class="icon-box-wrap__main__right"><a class="icon-box__button icon-box__button--main symptom-tracker-link {% if not user %}icon-box__button--disabled{% endif %}" href="/"><span>{{_("Start")}}<figure></figure></span></a></div>
             </div>
           </div>
         </div>

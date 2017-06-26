@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}{{_("TrueNTH Error")}}{% endblock %}
+{% block title %}{{super()}} {{_("Error")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main">
@@ -9,7 +9,7 @@
           <h1 class="page-intro__main">{{_("Internal Server Error")}}</h1>
           <p class="page-intro__sub">{{_("Your request was not processed due to server error(s). If you are still experiencing problem.  Please use the link below.")}}</p>
           <br/>
-          <p><a href="{{PORTAL}}{{url_for('portal.contact')}}" class="icon-box__button icon-box__button--main">{{_("Send Message")}}</a></p>
+          <p><a href="{{url_for('portal.contact')}}" class="icon-box__button icon-box__button--main">{{_("Send Message")}}</a></p>
         </div>
       </div>
     </main>

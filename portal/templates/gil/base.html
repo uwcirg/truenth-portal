@@ -69,36 +69,36 @@
         <ul class="side-nav-items">
           <li class="side-nav-items__item side-nav-items__item--home"><a href="/">{{_("Home")}}</a></li>
           {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}
-              <li class="side-nav-items__item"><a href="{{PORTAL}}{{url_for('patients.patients_root')}}">{{_("Patients")}}</a></li>
+              <li class="side-nav-items__item"><a href="{{url_for('patients.patients_root')}}">{{_("Patients")}}</a></li>
           {% endif %}
           {% if user %}
-              <li class="side-nav-items__item"><a href="{{PORTAL}}{{url_for('portal.profile')}}">{{_("My TrueNTH Profile")}}</a></li>
+              <li class="side-nav-items__item"><a href="{{url_for('portal.profile')}}">{{_("My TrueNTH Profile")}}</a></li>
           {% endif %}
-          <li class="side-nav-items__item side-nav-items__item--about"><a href="{{PORTAL}}{{url_for('portal.about')}}">{{_("About TrueNTH")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--about"><a href="{{url_for('portal.about')}}">{{_("About TrueNTH")}}</a></li>
           {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}
-              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{PORTAL}}{{url_for('auth.clients_list')}}">{{_("Client Applications")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--clients"><a href="{{url_for('auth.clients_list')}}">{{_("Client Applications")}}</a></li>
           {% endif %}
           {% if user and user.has_role(ROLE.ADMIN) %}
-              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{PORTAL}}{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
-              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{PORTAL}}{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--admin"><a href="{{url_for('portal.admin')}}">{{_("User Administration")}}</a></li>
+              <li class="side-nav-items__item side-nav-items__item--settings"><a href="{{url_for('portal.settings')}}">{{_("Settings")}}</a></li>
           {% endif %}
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{PORTAL}}{{url_for('portal.decision_support')}}">
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--decisionsupport"><a href="{{url_for('portal.decision_support')}}">
               <svg width="32" height="32">
                 <use xlink:href="#DS-Icon-Nav"></use>
               </svg>{{_("Decision Support")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{PORTAL}}{{url_for('portal.symptom_tracker')}}">
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--symptomtracker"><a href="{{url_for('portal.symptom_tracker')}}">
               <svg width="32" height="32">
                 <use xlink:href="#ST-Icon-Nav"></use>
               </svg>{{_("Symptom Tracker")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{PORTAL}}{{url_for('portal.exercise_and_diet')}}">{{_("Exercise and Diet")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{PORTAL}}/lived-experience">{{_("Lived Experience")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{PORTAL}}{{url_for('portal.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
-          <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{PORTAL}}{{url_for('portal.contact')}}">{{_("Contact")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--exercisediet"><a href="{{url_for('portal.exercise_and_diet')}}">{{_("Exercise and Diet")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated side-nav-items__item--livedexperience"><a href="{{url_for('portal.lived_experience')}}">{{_("Lived Experience")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--whatisprostatecancer"><a href="{{url_for('portal.prostate_cancer_facts')}}">{{_("Prostate Cancer Facts")}}</a></li>
+          <li class="side-nav-items__item side-nav-items__item--contact"><a href="{{url_for('portal.contact')}}">{{_("Contact")}}</a></li>
           {% if not user %}
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></li>
             <li class="side-nav-items__button"><a href="#" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a></li>
           {% else %}
-            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{PORTAL}}{{url_for('auth.logout')}}">{{_("Log Out")}}</a></li>
+            <li class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="{{url_for('auth.logout')}}">{{_("Log Out")}}</a></li>
           {% endif %}
         </ul>
       </div>
@@ -119,7 +119,7 @@
                 <figure></figure><span>{{_("Menu")}}</span>
             </a>
           </div>
-          <a class="logo" href="{{PORTAL}}/"></a>
+          <a class="logo" href="/"></a>
           {% if not user %}
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
           {% endif %}
@@ -177,7 +177,7 @@
             <div class="or">{{_("otherwise")}}</div>
             <div class="box-modal-or__divider"></div>
             <br/>
-            <a id="btnCreateAccount" href="{{PORTAL}}/user/register" class="button button-large button--teal">{{_("Create Account")}}</a>
+            <a id="btnCreateAccount" href="user/register" class="button button-large button--teal">{{_("Create Account")}}</a>
           </div>
         </div>
       </div>
@@ -187,21 +187,21 @@
         <div class="modal-content box-modal box-modal--login">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
-             <form action="{{PORTAL}}/user/sign-in" method="POST" class="form">
+             <form action="/user/sign-in" method="POST" class="form">
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>
               <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
               <br/><br/>
-              <a href="{{PORTAL}}/user/forgot-password"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
+              <a href="user/forgot-password"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
             </form>
             <div class="or">{{_("or")}}</div>
             <div class="box-modal-or__divider"></div>
             <br/>
             <div>
-            <a href="{{PORTAL}}/login/facebook/" class="button button--facebook button-large button--teal button--has-svg">
+            <a href="{{url_for('auth.login', provider_name='facebook')}}" class="button button--facebook button-large button--teal button--has-svg">
               <svg width="15" height="31">
                 <use xlink:href="#Facebook-Icon"></use>
-              </svg>{{_("Log in with Facebook")}}</a><a href="{{PORTAL}}/login/google/" class="button button--google button-large button--teal button--has-svg">
+              </svg>{{_("Log in with Facebook")}}</a><a href="{{url_for('auth.login',provider_name='google')}}" class="button button--google button-large button--teal button--has-svg">
               <svg width="20" height="31">
                 <use xlink:href="#Google-Icon"></use>
               </svg>{{_("Log in with Google")}}</a>
@@ -221,7 +221,7 @@
             <div class="box-modal-or__divider"></div>
             <br/>
             <h3 class="box-modal__title">{{_("Join Us")}}!</h3>
-            <p class="box-modal__copy">{{_("It’s going to take a group effort to improve the prostate cancer experience for future generations.")}}</p><a href="{{PORTAL}}/user/register" class="button button-large button--teal button--register">{{_("Create Account")}}</a>
+            <p class="box-modal__copy">{{_("It’s going to take a group effort to improve the prostate cancer experience for future generations.")}}</p><a href="user/register" class="button button-large button--teal button--register">{{_("Create Account")}}</a>
           </div>
         </div>
       </div>
@@ -255,7 +255,10 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="{{_('Close')}}"></a>
-            <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4><p class="box-modal__copy">{{_("Your session will expire in approximately")}} <span id="remaining-time"></span> {{_("seconds due to inactivity")}}</p>
+            <h4 class="box-modal__title">{{_("Session Expiration Warning")}}</h4>
+            {% trans remaining_time='<span id="remaining-time"></span>' %}
+            <p class="box-modal__copy">Your session will expire in approximately {{remaining_time}}.</p>
+            {% endtrans %}
           </div>
            <div class="box-modal__footer">
             <button id="log-out" class="button button--teal" data-dismiss="modal">{{_("Log Out")}}</button>&nbsp;<button id="stay-logged-in" class="button button--teal" data-dismiss="modal">{{_("Stay Logged In")}}</button>
@@ -289,9 +292,9 @@
     {% endif %}
 {% endblock %}
 {% block init_scripts %}
-    <script src="{{PORTAL}}{{url_for('static', filename='js/vendor.js') }}"></script>
-    <script src="{{PORTAL}}{{url_for('static', filename='js/gil.js') }}"></script>
-    <script src="{{PORTAL}}{{ url_for('static', filename='js/tnth.js') }}"></script>
+    <script src="{{url_for('static', filename='js/vendor.js') }}"></script>
+    <script src="{{url_for('static', filename='js/gil.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tnth.js') }}"></script>
     {% if config.PIWIK_SITEID %}
         <script type="text/javascript">
             var _paq = _paq || [];

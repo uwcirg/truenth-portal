@@ -1,5 +1,5 @@
 {% extends "gil/lived_experience_base.html" %}
-{% block title %}{{_("TrueNTH Lived Experience - Alonzo McCann Story")}}{% endblock %}
+{% block title %}{{super()}} {{_("Lived Experience - Alonzo McCann Story")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main main--story">
@@ -7,7 +7,7 @@
       <div class="page-intro module-wrap module-wrap--story">
         <div class="module">
           <div class="accent-heading">
-            {% trans %}Objective N<em>o</em><span class="text-uppercase">2: Lived Experience{% endtrans %}</span>
+            {% trans %}Objective N<em>o</em><span class="text-uppercase">2: Lived Experience</span>{% endtrans %}
           </div>
           <div class="module__body">
             <p class="story-title">{{_("ALONZO McCANN")}}</p>

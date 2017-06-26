@@ -1,6 +1,6 @@
 {%- from "gil/macros.html" import footerHTML -%}
 {%- extends "gil/base.html" -%}
-{% block title %}{{_("TrueNTH Dashboard")}}{% endblock %}
+{% block title %}{{super()}} {{_("Dashboard")}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
 {{ super() }}
@@ -26,10 +26,10 @@
         {% if user.has_role(ROLE.PARTNER) %}
             <div class="icon-box-group link-container">
                 <div class="link-box">
-                  <h4><a href="{{PORTAL}}/about">{{_("About TrueNTH")}}</a></h4>
+                  <h4><a href="{{url_for('portal.about')}}">{{_("About TrueNTH")}}</a></h4>
                 </div>
                 <div class="link-box">
-                  <h4><a href="{{PORTAL}}/what-is-prostate-cancer">{{_("About Prostate Cancer")}}</a></h4>
+                  <h4><a href="{{url_for('portal.prostate_cancer_facts')}}">{{_("About Prostate Cancer")}}</a></h4>
                 </div>
             </div>
         {% endif %}
@@ -58,7 +58,7 @@
                     <h4 class="icon-box__lowhead">{{ _("Complete Registration") }}</h4>
                     <p class="text-left">{{ _("Completing your registration will allow you to return here in the future to see the information you've previously entered.") }}</p>
                     <div class="home--registration-button-container">
-                    <a class="icon-box__button icon-box__button--main" href="{{PORTAL}}{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a></div>
+                    <a class="icon-box__button icon-box__button--main" href="{{ url_for('user.register', email=user.email if user.email)}}"><span>{{ _("Registration") }}<figure></figure></span></a></div>
                 </div>
             </div>
         {% endif %}

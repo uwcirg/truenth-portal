@@ -1,5 +1,5 @@
 {% extends "gil/lived_experience_base.html" %}
-{% block title %}{{_("TrueNTH Lived Experience")}}{% endblock %}
+{% block title %}{{super()}} {{_("Lived Experience")}}{% endblock %}
 {% block head %} {{super()}}{% endblock %}
 {% block main %}
     <main class="main main--white">
@@ -11,7 +11,7 @@
                 <figure></figure><span>{{_("Menu")}}</span>
             </a>
           </div>
-          <a class="logo" href="{{PORTAL}}/"></a>
+          <a class="logo" href="/"></a>
           {% if not user %}
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
           {% endif %}
@@ -28,7 +28,7 @@
             <p class="module__heading">{{_("ALONZO McCANN")}}</p>
             <img src="{{ url_for('static', filename='img/LE_Alonzo_McCann_Mobile.jpg') }}" class="mobile" alt="{{_('Alonzo McCann Mobile Image')}}">
             <p class="module__body">{{_("Alonzo McCann is a Detroit football coach, preacher, husband and father. After one of the darkest periods of his life, he now reflects on the route he took through recovery.")}}</p>
-            <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories',page_name='alonzo-mccann-story')}}">{{_("Watch Alonzo's Film")}}</a></div>
+            <div class="button-callout"><a class="button button--large button--brown" href="{{url_for('portal.stories',page_name='alonzo-mccann-story')}}">{{_("Watch Alonzo's Film")}}</a></div>
            </div>
       </div>
       <div class="module-wrap module-wrap--background module-wrap--background__andrew blue-theme">
@@ -36,7 +36,7 @@
           <p class="module__heading">{{_("DAVID AND ANDREW PEREZ")}}</p>
           <img src="{{ url_for('static', filename='img/LE_David_Andrew_Perez_Mobile.jpg') }}" class="mobile" alt="{{_('David and Andrew Perez Mobile Image')}}">
           <p class="module__body">{{_("Andrew proved he would be there for his father as he began his Prostate Cancer journey.")}}</p>
-          <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories',page_name='david-andrew-story')}}">{{_("READ DAVID AND ANDREW'S STORY")}}</a></div>
+          <div class="button-callout"><a class="button button--large button--brown" href="{{url_for('portal.stories',page_name='david-andrew-story')}}">{{_("READ DAVID AND ANDREW'S STORY")}}</a></div>
         </div>
       </div>
       <div class="module-wrap module-wrap--background module-wrap--background__twins">
@@ -44,7 +44,7 @@
           <p class="module__heading">{{_("THE HIRSCH BROTHERS")}}</p>
           <img src="{{ url_for('static', filename='img/LE_Hirsch_Brothers_Mobile.jpg') }}" class="mobile" alt="{{_('Hirsch Brothers Mobile Image')}}">
           <p class="module__body">{{_("Twin brothers Mark and Jon Hirsch learned how family history and early detection would play a role in their shared Prostate Cancer journey.")}}</p>
-          <div class="button-callout"><a class="button button--large button--brown" href="{{PORTAL}}{{url_for('portal.stories', page_name='hirsch-brothers-story')}}">{{_("Watch Mark and Jon's Film")}}</a></div>
+          <div class="button-callout"><a class="button button--large button--brown" href="{{url_for('portal.stories', page_name='hirsch-brothers-story')}}">{{_("Watch Mark and Jon's Film")}}</a></div>
         </div>
       </div>
     </main>
