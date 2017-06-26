@@ -2074,6 +2074,9 @@ div.biopsy-option:last-of-type{
   max-width: 100%;
   display: inline-block;
 }
+#biopsyDateContainer {
+  min-height: 4.5em;
+}
 .modal-dialog {
   border-radius: 0;
 }

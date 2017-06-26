@@ -332,7 +332,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                          if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
                     });
                     if (!_isAgreed) isComplete = false;
-                
+
                     break;
                 };
                 if (hasValue(field.attr("data-require-validate"))) isComplete = false;
@@ -515,21 +515,8 @@ $(document).ready(function(){
        var y = $("#year");
        if (d.val() != "" && m.val() != "" && y.val() != "") {
           if (this.validity.valid) {
-              var today = new Date();
-              // Check to see if this is a real date
-              var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
-              var date = new Date(iy,im-1,iid);
-              var errorMsg = "";
-
-              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                  if (iy < 1900) errorMsg = "Year must be after 1900";
-                  // Only allow if birthdate is before today
-                  if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                      errorMsg = "The date must not be in the future.";
-                  };
-              } else errorMsg = "Invalid Date. Please enter a valid date.";
-
-              if (errorMsg == "") {
+              var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+              if (isValid) {
                   $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
                   $("#errorbirthday").text("").hide();
                   assembleContent.demo($("#iq_userId").val());
@@ -540,7 +527,6 @@ $(document).ready(function(){
                   };
               } else {
                   fc.stopContinue("demographicsContainer");
-                  $("#errorbirthday").text(errorMsg).show();
               };
           } else fc.stopContinue("demographicsContainer");
       } else fc.stopContinue("demographicsContainer");
@@ -583,7 +569,7 @@ $(document).ready(function(){
     var patientQClickEvent = function(){
           var thisItem = $(this);
           var toCall = thisItem.attr("name") || thisItem.attr("data-name");
-       
+
           // Get value from div - either true or false
           var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
@@ -596,9 +582,9 @@ $(document).ready(function(){
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  $("#biopsyDate").datepicker("hide");
-                  var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
-                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": biopsyDate});
+                  //$("#biopsyDate").datepicker("hide");
+                  //var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
+                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
             };
 
@@ -689,7 +675,7 @@ $(document).ready(function(){
         };
       };
     };
-    
+
     $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($(this).find("input[name='toConsent']:checked").length > 0) {

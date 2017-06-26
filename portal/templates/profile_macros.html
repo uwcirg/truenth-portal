@@ -55,7 +55,7 @@
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
                     if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateBirthDate(m.val(), d.val(), y.val() );
+                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
                         if (isValid) {
                             $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
                         } else {
@@ -1303,7 +1303,10 @@
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
-                $("#biopsyDate").attr("disabled", true);
+                //$("#biopsyDate").attr("disabled", true);
+                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+                    $(this).attr("disabled", true);
+                });
             {% endif %}
 
             {% if person %}
@@ -1318,8 +1321,8 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              $("#biopsyDate").datepicker("hide").blur();
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
+                              //$("#biopsyDate").datepicker("hide").blur();
+                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
@@ -1950,6 +1953,17 @@
 
     {%- if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
         {{profileInterventions(user_interventions) | show_macro('interventions')}}
+    {%- endif %}
+
+    {%- if person and person.has_role(ROLE.PATIENT) %}
+        <div class="row">
+            <div class="col-md-12 col-xs-12">
+                <div class="profile-item-container">
+                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
+                    {{patientReports(person)}}
+                </div>
+            </div>
+        </div>
     {%- endif %}
 
     {%- if person and person.has_role(ROLE.PATIENT)%}
