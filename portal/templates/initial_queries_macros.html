@@ -277,7 +277,33 @@
             </div>
             <div id="biopsyDateContainer" class="indent form-group">
             	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
-            	<input id="biopsyDate" type="text" data-name="biopsy" class="form-control" placeholder="d M yyyy" maxlength="11">
+            	<input id="biopsyDate" type="hidden" data-name="biopsy" class="form-control" value="">
+              <div class="row">
+                <div class="col-md-3 col-xs-4">
+                  <input class="form-control biopsy-date-element init-queries-field" id="biopsy_day" name="biopsy_day" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The biopsy day field is required and must be valid format')}}" required />
+                </div>
+                <div class="col-md-3 col-xs-4">
+                  <select data-type="select" class="form-control biopsy-date-element init-queries-field" id="biopsy_month" name="biopsy_month" data-error="{{_('A biopsy month must be selected')}}" required>
+                    <option value="">{{ _("Month") }}...</option>
+                    <option value="01">{{ _("January") }}</option>
+                    <option value="02">{{ _("February") }}</option>
+                    <option value="03">{{ _("March") }}</option>
+                    <option value="04">{{ _("April") }}</option>
+                    <option value="05">{{ _("May") }}</option>
+                    <option value="06">{{ _("June") }}</option>
+                    <option value="07">{{ _("July") }}</option>
+                    <option value="08">{{ _("August") }}</option>
+                    <option value="09">{{ _("September") }}</option>
+                    <option value="10">{{ _("October") }}</option>
+                    <option value="11">{{ _("November") }}</option>
+                    <option value="12">{{ _("December") }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-xs-4">
+                  <input class="form-control biopsy-element init-queries-field" id="biopsy_year" name="biopsy_year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="{{_('The biopsy year is required and must be in valid format')}}" required />
+                </div>
+              </div>
+              <div class="help-block with-errors"></div>
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
             </div>
             <div class="radio biopsy-option">
@@ -355,41 +381,47 @@
         <br/>
       </div>
       <script>
-        function checkBiopsyDate(val) {
-           var isValid = tnthDates.isValidDefaultDateFormat(val, $("#biopsyDateError"));
-           if (isValid) {
-              $("#biopsy_yes").trigger("click");
-              return true;
-           } else {
-              $("#biopsyDate").datepicker("hide");
-              return false;
-           };
-        };
         $(function () {
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
-          var today = new Date();
-          $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-          $("#biopsyDate").on("keydown", function() {
-            $("#biopsyDateError").text("");
-            $(this).datepicker("hide");
-          });
           $("input[name='biopsy']").each(function() {
           	$(this).on("click", function(e) {
               e.stopPropagation();
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
-                $("#biopsyDate").focus();
+                $("#biopsy_day").focus();
           		} else {
           			$("#biopsyDate").val("");
+                $("#biopsy_day").val("");
+                $("#biopsy_month").val("");
+                $("#biopsy_year").val("");
                 $("#biopsyDateError").text("");
           			$("#biopsyDateContainer").hide();
           		};
           	});
           });
-          $("#biopsyDate").on("change", function() {
-              return checkBiopsyDate($(this).val());
+          $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+              $(this).on("change", function() {
+                  var d = $("#biopsy_day");
+                  var m = $("#biopsy_month");
+                  var y = $("#biopsy_year");
+                  if (d.val() != "" && m.val() != "" && y.val() != "") {
+                      if (this.validity.valid) {
+                          var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "biopsyDateError");
+                          if (isValid) {
+                            $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                            $("#biopsyDateError").text("").hide();
+                            $("#biopsy_yes").trigger("click");
+                            //success
+                          } else {
+                             //fail
+                            $("#biopsyDate").val("");
+                          };
+                      };
+                  };
+              });
           });
+
           $("input[name='tx']").each(function() {
                $(this).on("click", function() {
                   if ($(this).val() == "true") {

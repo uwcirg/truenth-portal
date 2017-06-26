@@ -1900,6 +1900,7 @@ table.profile-audit-log TH,
 }
 #biopsyDateContainer {
   display: none;
+  min-height: 4.5em;
 }
 #biopsyDateContainer label {
   margin-right: 0.2em;

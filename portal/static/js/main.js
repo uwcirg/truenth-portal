@@ -385,9 +385,11 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
-                //note, biopsy date is formatted as mm/dd/yyyy
-                var cDate = new Date(biopsyDate);
-                displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
+                var displayDate = "";
+                if (hasValue($.trim($("#biopsy_month option:selected").val()+$("#biopsy_year").val()+$("#biopsy_day").val()))) {
+                    displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
+                };
+                if (!hasValue(displayDate)) displayDate = "Not provided";
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
@@ -471,8 +473,12 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                //d M y format
-                                $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
+                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short"); 
+                                var dArray = dString.split("-");
+                                $("#biopsyDate").val(dString);
+                                $("#biopsy_year").val(dArray[0]);
+                                $("#biopsy_month").val(dArray[1]);
+                                $("#biopsy_day").val(dArray[2]);
                                 $("#biopsyDateContainer").show();
                                 $("#biopsyDate").removeAttr("skipped");
                             };
@@ -707,7 +713,7 @@ var fillContent = {
             var TERMS_URL = "";
             tnthAjax.getTermsUrl(true, function(data) {
                 if (data && data.url) TERMS_URL = data.url;
-            }); 
+            });
             var showInitialConsentTerms = (ctop && hasValue(TERMS_URL));
 
             dataArray.forEach(function(item, index) {
@@ -1903,9 +1909,9 @@ var tnthAjax = {
                             };
                         });
                     });
-                    if (item == "localized") __localizedFound = true; 
+                    if (item == "localized") __localizedFound = true;
                 });
-                if (!__localizedFound) $("#patMeta").remove(); 
+                if (!__localizedFound) $("#patMeta").remove();
             } else {
                 if (callback) {
                     callback({"error": "no data returned"});
@@ -2645,6 +2651,7 @@ var tnthAjax = {
                 code = "141";
                 display = "PCa localized diagnosis";
         };
+        if (!hasValue(code)) return false;
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -2909,34 +2916,36 @@ $(document).ready(function() {
 });
 
 var tnthDates = {
-    /** validateBirthDate  check whether the date is a sensible date.
+    /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
+     ** params: month, day and year values and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateBirthDate": function(m, d, y) {
+    "validateDateInputFields": function(m, d, y, errorFieldId) {
         if (hasValue(m) && hasValue(d) && hasValue(y)) {
 
             var m = parseInt(m);
             var d = parseInt(d);
             var y = parseInt(y);
+            var errorField = $("#" + errorFieldId);
 
             if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
                 var today = new Date();
                 // Check to see if this is a real date
                 var date = new Date(y,m-1,d);
                 if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    $("#errorbirthday").html("Invalid date. Please try again.").show();
+                    errorField.html("Invalid date. Please try again.").show();
                     return false;
                 }
                 else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    $("#errorbirthday").html("Birthday must not be in the future. Please try again.").show();
+                    errorField.html("Date must not be in the future. Please try again.").show();
                     return false; //shouldn't be in the future
                 }
                 else if (y < 1900) {
-                    $("#errorbirthday").html("Date must not be before 1900. Please try again.").show();
+                    errorField.html("Date must not be before 1900. Please try again.").show();
                     return false;
                 };
 
-                $("#errorbirthday").html("").hide();
+                errorField.html("").hide();
 
                 return true;
 
