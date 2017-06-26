@@ -385,9 +385,6 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
-                //note, biopsy date is formatted as mm/dd/yyyy
-                //var cDate = new Date(biopsyDate);
-                //displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
                 var displayDate = "";
                 if (hasValue($.trim($("#biopsy_month option:selected").val()+$("#biopsy_year").val()+$("#biopsy_day").val()))) {
                     displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
