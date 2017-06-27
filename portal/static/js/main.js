@@ -748,7 +748,7 @@ var fillContent = {
                 touObj.forEach(function(item) {
                     touContent += "<tr>";
                     touContent += "<td><span class='eproms-tou-table-text'> -- </span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <span class='text-capitalize'>" + item.type + "</span></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
                     touContent += "<td><span class='eproms-tou-table-text text-capitalize'>" + item.type + "</span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
                 });
