@@ -473,7 +473,7 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
+                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short"); 
                                 var dArray = dString.split("-");
                                 $("#biopsyDate").val(dString);
                                 $("#biopsy_year").val(dArray[0]);
