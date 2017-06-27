@@ -912,12 +912,12 @@
                     ]
                 } );
             } else {
-                $("#patientReportErrorMessage").text("{%trans%}No patient report found.{%endtrans%}").removeClass("error-message");
+                $("#patientReportErrorMessage").text("{%trans%}No reports available.{%endtrans%}").removeClass("error-message");
             }
 
         }).fail(function() {
             $("#profilePatientReportTable").closest("div.profile-item-container").hide();
-            $("#patientReportErrorMessage").text("{%trans%}Problem retrieving patient reports from server.{%endtrans%}").addClass("error-message");
+            $("#patientReportErrorMessage").text("{%trans%}Problem retrieving reports from server.{%endtrans%}").addClass("error-message");
         });
      });</script>
 {%- endmacro %}
@@ -1766,9 +1766,19 @@
                 </div>
             </div>
         </div>
+        {%- if person and person.has_role(ROLE.PATIENT) %}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
+                        {{patientReports(person)}}
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
         {{profileProcedures(person, current_user) | show_macro('procedures')}}
-       {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+        {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
             <div class="row">
                 <div class="col-md-12 col-xs-12">
                     <div class="profile-item-container editable" data-sections="org">
@@ -1953,17 +1963,6 @@
 
     {%- if person and (person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.INTERVENTION_STAFF) %}
         {{profileInterventions(user_interventions) | show_macro('interventions')}}
-    {%- endif %}
-
-    {%- if person and person.has_role(ROLE.PATIENT) %}
-        <div class="row">
-            <div class="col-md-12 col-xs-12">
-                <div class="profile-item-container">
-                    <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
-                    {{patientReports(person)}}
-                </div>
-            </div>
-        </div>
     {%- endif %}
 
     {%- if person and person.has_role(ROLE.PATIENT)%}
