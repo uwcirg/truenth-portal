@@ -1,4 +1,5 @@
 """Unit test module for Intervention API"""
+from datetime import timedelta
 from flask_webtest import SessionScope
 import json
 from tests import TestCase, TEST_USER_ID
@@ -388,6 +389,36 @@ class TestIntervention(TestCase):
         mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
 
         user, ae = map(db.session.merge, (self.test_user, ae))
+        self.assertTrue(
+            "Thank you" in ae.display_for_user(user).card_html)
+
+    def test_thankyou_on_expired(self):
+        """If baseline expired and other QB's done, should see thank you"""
+        ae = INTERVENTION.ASSESSMENT_ENGINE
+        ae_id = ae.id
+        # backdate so baseline is expired
+        self.bless_with_basics(backdate=timedelta(days=60))
+
+        # generate questionnaire banks and associate user with
+        # metastatic organization
+        mock_questionnairebanks()
+        metastatic_org = Organization.query.filter_by(name='metastatic').one()
+        self.test_user.organizations.append(metastatic_org)
+
+        # Add a fake assessment only to non-expired one from indefinite
+        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+
+        with SessionScope(db):
+            d = {'function': 'update_card_html_on_completion',
+                 'kwargs': []}
+            strat = AccessStrategy(
+                name="update assessment_engine card_html on completion",
+                intervention_id=ae_id,
+                function_details=json.dumps(d))
+            db.session.add(strat)
+            db.session.commit()
+        user, ae = map(db.session.merge, (self.test_user, ae))
+
         self.assertTrue(
             "Thank you" in ae.display_for_user(user).card_html)
 

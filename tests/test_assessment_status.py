@@ -1,5 +1,5 @@
 """Module to test assessment_status"""
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_webtest import SessionScope
 
 from portal.extensions import db
@@ -45,14 +45,15 @@ metastatic_baseline_instruments = set([
     'eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems'])
 metastatic_indefinite_instruments = set(['irondemog'])
 
+
 def mock_questionnairebanks():
     # Define test Orgs and QuestionnaireBanks for each group
     localized_org = Organization(name='localized')
     metastatic_org = Organization(name='metastatic')
     with SessionScope(db):
         for name in (localized_instruments.union(*(
-            metastatic_baseline_instruments,
-            metastatic_indefinite_instruments))):
+                metastatic_baseline_instruments,
+                metastatic_indefinite_instruments))):
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
@@ -87,7 +88,7 @@ def mock_questionnairebanks():
     for rank, instrument in enumerate(metastatic_indefinite_instruments):
         q = Questionnaire.query.filter_by(name=instrument).one()
         qbq = QuestionnaireBankQuestionnaire(
-            questionnaire=q, days_till_due=1, days_till_overdue=30,
+            questionnaire=q, days_till_due=1, days_till_overdue=3000,
             rank=rank)
         mi_qb.questionnaires.append(qbq)
     with SessionScope(db):
@@ -96,10 +97,11 @@ def mock_questionnairebanks():
         db.session.add(mi_qb)
         db.session.commit()
 
-class TestAssessment(TestCase):
+
+class TestAssessmentStatus(TestCase):
 
     def setUp(self):
-        super(TestAssessment, self).setUp()
+        super(self.__class__, self).setUp()
         mock_questionnairebanks()
         self.localized_org_id = Organization.query.filter_by(
             name='localized').one().id
@@ -113,6 +115,26 @@ class TestAssessment(TestCase):
     def mark_metastatic(self):
         self.test_user.organizations.append(Organization.query.get(
             self.metastatic_org_id))
+
+    def test_enrolled_in_metastatic(self):
+        """metastatic should include baseline and indefinite"""
+        self.bless_with_basics()
+        self.mark_metastatic()
+        user = db.session.merge(self.test_user)
+
+        a_s = AssessmentStatus(user=user)
+        self.assertTrue(a_s.enrolled_in_classification('baseline'))
+        self.assertTrue(a_s.enrolled_in_classification('indefinite'))
+
+    def test_enrolled_in_localized(self):
+        """localized should include baseline but not indefinite"""
+        self.bless_with_basics()
+        self.mark_localized()
+        user = db.session.merge(self.test_user)
+
+        a_s = AssessmentStatus(user=user)
+        self.assertTrue(a_s.enrolled_in_classification('baseline'))
+        self.assertFalse(a_s.enrolled_in_classification('indefinite'))
 
     def test_localized_using_org(self):
         self.bless_with_basics()
@@ -166,7 +188,8 @@ class TestAssessment(TestCase):
         # confirm appropriate instruments
         self.assertFalse(a_s.instruments_needing_full_assessment('all'))
         self.assertEquals(
-            set(a_s.instruments_in_progress('baseline')), localized_instruments)
+            set(a_s.instruments_in_progress('baseline')),
+            localized_instruments)
 
     def test_localized_in_process(self):
         # User finished one, time remains for other
@@ -223,6 +246,33 @@ class TestAssessment(TestCase):
         self.assertEquals(
             metastatic_indefinite_instruments,
             set(a_s.instruments_needing_full_assessment('indefinite')))
+        self.assertFalse(a_s.instruments_in_progress('indefinite'))
+
+    def test_metastatic_overdue(self):
+        # if the user completed something on time, and nothing else
+        # is due, should see the thankyou message.
+
+        # backdate so the baseline q's have expired
+        mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
+                status='in-progress')
+        self.bless_with_basics(backdate=timedelta(days=60))
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Expired")
+
+        # with all q's from baseline expired,
+        # instruments_needing_full_assessment and insturments_in_progress
+        # should be empty
+        self.assertFalse(a_s.instruments_needing_full_assessment('baseline'))
+        self.assertFalse(a_s.instruments_in_progress('baseline'))
+
+        # mock completing the indefinite QB and expect to see 'thank you'
+        mock_qr(user_id=TEST_USER_ID, instrument_id='irondemog')
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertTrue(a_s.enrolled_in_classification('indefinite'))
+        self.assertFalse(a_s.instruments_needing_full_assessment('indefinite'))
         self.assertFalse(a_s.instruments_in_progress('indefinite'))
 
     def test_batch_lookup(self):

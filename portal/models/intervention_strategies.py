@@ -16,7 +16,6 @@ the parameters given to the closures.
 from flask import current_app, url_for
 from flask_babel import gettext as _
 import json
-from datetime import timedelta
 from sqlalchemy import and_, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -33,21 +32,21 @@ from .role import Role
 from ..system_uri import DECISION_SUPPORT_GROUP, TRUENTH_CLINICAL_CODE_SYSTEM
 
 
-###
-## functions implementing the 'access_strategy' API
-#
+# ##
+# # functions implementing the 'access_strategy' API
+# ##
 
 def _log(**kwargs):
     """Wrapper to log all the access lookup results within"""
     msg = kwargs.get('message', '')  # optional
     current_app.logger.debug(
-        "{func_name} returning {result} for {user} on intervention "\
+        "{func_name} returning {result} for {user} on intervention "
         "{intervention}".format(**kwargs) + msg)
 
 
 def limit_by_clinic_w_id(
-    identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
-    combinator='any', include_children=True):
+        identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
+        combinator='any', include_children=True):
     """Requires user is associated with {any,all} clinics with identifier
 
     :param identifier_value: value string for identifer associated with org(s)
@@ -100,8 +99,8 @@ def limit_by_clinic_w_id(
 
 
 def not_in_clinic_w_id(
-    identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
-    include_children=True):
+        identifier_value, identifier_system=DECISION_SUPPORT_GROUP,
+        include_children=True):
     """Requires user isn't associated with any clinic in the list
 
     :param identifier_value: value string for identifer associated with org(s)
@@ -126,7 +125,8 @@ def not_in_clinic_w_id(
 
     if include_children:
         ot = OrgTree()
-        dont_want = set([o for og in orgs for o in ot.here_and_below_id(og.id)])
+        dont_want = set(
+            [o for og in orgs for o in ot.here_and_below_id(og.id)])
     else:
         dont_want = set((o.id for o in orgs))
 
@@ -191,7 +191,7 @@ def not_in_role_list(role_list):
 
 
 def allow_if_not_in_intervention(intervention_name):
-    """Returns function implementing strategy API checking that user does not belong to named intervention"""
+    """Strategy API checks user does not belong to named intervention"""
 
     exclusive_intervention = getattr(INTERVENTION, intervention_name)
 
@@ -218,6 +218,25 @@ def update_card_html_on_completion():
             assessment_status.instruments_in_progress(
                 classification='indefinite'))
 
+        def thank_you_block(name, registry):
+            greeting = _("Thank you, {}.").format(name)
+            confirm = _(
+                "You've completed the {} Registry Study questionnaire"
+                ".").format(registry)
+            reminder = _(
+                "You will be notified when the next "
+                "questionnaire is ready to complete.")
+            return """
+                <div class="portal-header-container">
+                  <h2 class="portal-header">{greeting}</h2>
+                  <p>{confirm}</p>
+                  <p>{reminder}</p>
+                  <div class="button-callout">
+                    <figure id="portalScrollArrow"></figure>
+                  </div>
+                </div>""".format(
+                    greeting=greeting, confirm=confirm, reminder=reminder)
+
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
 
@@ -228,14 +247,15 @@ def update_card_html_on_completion():
                     classification='indefinite'))
 
             if assessment_status.overall_status in (
-                'Due', 'Overdue', 'In Progress'):
+                    'Due', 'Overdue', 'In Progress'):
                 due_date = assessment_status.next_available_due_date(
                     classification='baseline')
                 assert due_date
                 greeting = _("Hi {}").format(user.display_name)
-                reminder = _("Please complete your {} registry "
-                        "study questionnaire by {}" \
-                        ".").format(assessment_status.organization.name,
+                reminder = _(
+                    "Please complete your {} registry study "
+                    "questionnaire by {}.").format(
+                        assessment_status.organization.name,
                         due_date.strftime('%-d %b %Y'))
                 return """
                     <div class="portal-header-container">
@@ -247,10 +267,12 @@ def update_card_html_on_completion():
                         <figure id="portalScrollArrow"></figure>
                       </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
+
             if any(indefinite_questionnaires):
                 greeting = _("Hi {}").format(user.display_name)
-                reminder = _("Please complete your {} registry study "
-                        "questionnaire at your convenience.").format(
+                reminder = _(
+                    "Please complete your {} registry study "
+                    "questionnaire at your convenience.").format(
                         assessment_status.organization.name)
                 return """
                     <div class="portal-header-container">
@@ -262,29 +284,19 @@ def update_card_html_on_completion():
                         <figure id="portalScrollArrow"></figure>
                       </div>
                     </div>""".format(greeting=greeting, reminder=reminder)
+
             if assessment_status.overall_status == "Completed":
-                greeting = _("Thank you, {}.").format(user.display_name)
-                confirm = _("You've completed the {} Registry Study questionnaire"
-                        ".").format(assessment_status.organization.name)
-                reminder = _("You will be notified when the next "
-                            "questionnaire is ready to complete.")
-                return """
-                    <div class="portal-header-container">
-                      <h2 class="portal-header">{greeting}</h2>
-                      <p>{confirm}</p>
-                      <p>{reminder}</p>
-                      <div class="button-callout">
-                        <figure id="portalScrollArrow"></figure>
-                      </div>
-                    </div>""".format(greeting=greeting, confirm=confirm,
-                                    reminder=reminder)
+                return thank_you_block(
+                    name=user.display_name,
+                    registry=assessment_status.organization.name)
             raise ValueError("Unexpected state generating intro_heml")
 
         def completed_card_html(assessment_status):
             """Generates the appropriate HTML for the 'completed card'"""
             header = _("Completed Questionnaires")
-            message = _("When you are done, completed questionnaires will be "
-                    "shown here.")
+            message = _(
+                "When you are done, completed questionnaires will be "
+                "shown here.")
             completed_placeholder = """
                 <div class="portal-description disabled">
                   <h4 class="portal-description-title">
@@ -311,11 +323,13 @@ def update_card_html_on_completion():
 
             if assessment_status.overall_status == "Completed":
                 header = _("Completed Questionnaires")
-                message = _("View questionnaire completed on {}").format(
-                            assessment_status.completed_date.strftime(
+                message = _(
+                    "View questionnaire completed on {}").format(
+                        assessment_status.completed_date.strftime(
                             '%-d %b %Y'))
-                return completed_html.format(header=header, message=message,
-                    recent_survey_link= url_for(
+                return completed_html.format(
+                    header=header, message=message,
+                    recent_survey_link=url_for(
                         "portal.profile", _anchor="proAssessmentsLoc"))
             else:
                 return completed_placeholder
@@ -325,17 +339,17 @@ def update_card_html_on_completion():
         #  match state of users questionnaires (aka assessments)
         ####
         if assessment_status.overall_status in (
-            'Due', 'Overdue', 'In Progress'):
+                'Due', 'Overdue', 'In Progress'):
             # User has unfinished baseline assessment work
             link_label = 'Continue questionnaire' if (
                 assessment_status.overall_status == 'In Progress') else (
                     'Go to questionnaire')
             link_url = url_for(
                 'assessment_engine_api.present_assessment',
-                instrument_id=assessment_status.\
+                instrument_id=assessment_status.
                 instruments_needing_full_assessment(classification='all'),
-                resume_instrument_id=assessment_status.instruments_in_progress(
-                classification='all'))
+                resume_instrument_id=assessment_status.
+                instruments_in_progress(classification='all'))
 
             header = _("Open Questionnaire")
             card_html = """
@@ -393,7 +407,9 @@ def update_card_html_on_completion():
             card_html = """
             <div class="container">
               {intro}
-              <div class="button-container portal-header-logout-container"><a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a></div>
+              <div class="button-container portal-header-logout-container">
+                <a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a>
+              </div>
               <div class="portal-main portal-flex-container">
                 <div class="portal-description">
                   <h4 class="portal-description-title">{header}</h4>
@@ -412,19 +428,29 @@ def update_card_html_on_completion():
             # User has completed indefinite work, and the baseline
             # is either Expired or Partially Completed
             if assessment_status.overall_status not in (
-                "Expired", "Partially Completed"):
+                    "Expired", "Partially Completed"):
                 raise ValueError(
                     "Unexpected state {} for {}".format(
                         assessment_status.overall_status, user))
 
             link_label = "N/A"
             link_url = None
-            message = _("The assessment is no longer available.\n"
+
+            # If the user was enrolled in indefinite work and lands
+            # here, they should see the thank you text.
+            if assessment_status.enrolled_in_classification('indefinite'):
+                card_html = thank_you_block(
+                    name=user.display_name,
+                    registry=assessment_status.organization.name)
+            else:
+                message = _(
+                    "The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
-            card_html = """
-                <div class='portal-description portal-no-description-container'>
-                  {message}
-                </div>""".format(message=message)
+                card_html = """
+                    "<div class='portal-description
+                        portal-no-description-container'>
+                      {message}
+                    </div>""".format(message=message)
 
         ui = UserIntervention.query.filter(and_(
             UserIntervention.user_id == user.id,
@@ -465,7 +491,7 @@ def tx_begun(boolean_value):
     if boolean_value == 'true':
         check_func = known_treatment_started
     elif boolean_value == 'false':
-        check_func = lambda u: not known_treatment_started(u)
+        def check_func(u): return not known_treatment_started(u)
     else:
         raise ValueError("expected 'true' or 'false' for boolean_value")
 
@@ -477,7 +503,8 @@ def tx_begun(boolean_value):
 def observation_check(display, boolean_value):
     """Returns strategy function for a particular observation and logic value
 
-    :param display: observation coding.display from TRUENTH_CLINICAL_CODE_SYSTEM
+    :param display: observation coding.display from
+      TRUENTH_CLINICAL_CODE_SYSTEM
     :param boolean_value: ValueQuantity boolean true or false expected
 
     """
@@ -550,11 +577,13 @@ def combine_strategies(**kwargs):
         "Returns True if ALL of the combined strategies return True"
         for strategy in strats:
             if not strategy(intervention, user):
-                _log(result=False, func_name='combine_strategies', user=user,
+                _log(
+                    result=False, func_name='combine_strategies', user=user,
                     intervention=intervention.name)
                 return
         # still here?  effective AND passed as all returned true
-        _log(result=True, func_name='combine_strategies', user=user,
+        _log(
+            result=True, func_name='combine_strategies', user=user,
             intervention=intervention.name)
         return True
 
@@ -562,11 +591,13 @@ def combine_strategies(**kwargs):
         "Returns True if ANY of the combined strategies return True"
         for strategy in strats:
             if strategy(intervention, user):
-                _log(result=True, func_name='combine_strategies', user=user,
+                _log(
+                    result=True, func_name='combine_strategies', user=user,
                     intervention=intervention.name)
                 return True
         # still here?  effective ANY failed as none returned true
-        _log(result=False, func_name='combine_strategies', user=user,
+        _log(
+            result=False, func_name='combine_strategies', user=user,
             intervention=intervention.name)
         return
 
@@ -637,10 +668,11 @@ class AccessStrategy(db.Model):
 
     def as_json(self):
         """Return self in JSON friendly dictionary"""
-        d = {"name": self.name,
-             "function_details": json.loads(self.function_details),
-             "resourceType": 'AccessStrategy'
-            }
+        d = {
+            "name": self.name,
+            "function_details": json.loads(self.function_details),
+            "resourceType": 'AccessStrategy'
+        }
         d['intervention_name'] = Intervention.query.get(
             self.intervention_id).name
         if self.id:
@@ -664,7 +696,8 @@ class AccessStrategy(db.Model):
         if 'kwargs' not in details:
             raise ValueError("'kwargs' not found in function_details")
         func_name = details['function']
-        func = getattr(sys.modules[__name__], func_name) # limit to this module
+        # limit to this module
+        func = getattr(sys.modules[__name__], func_name)
         kwargs = {}
         for argset in details['kwargs']:
             kwargs[argset['name']] = argset['value']
