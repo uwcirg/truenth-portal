@@ -704,17 +704,56 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
+            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive table-striped' style='width: 100%; max-width:100%'>";
+            /********* Note that column headings are different between TrueNTH and EPROMs.
+                 Use css class to hide/show headings accordingly
+                 please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
+             ********/
+            var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
+                                '<span class="agreement">Agreement</span>',
+                                '<span class="eproms-consent-date-header">Consented Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+            headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
 
             var hasContent = false;
-            var TERMS_URL = "";
-            tnthAjax.getTermsUrl(true, function(data) {
-                if (data && data.url) TERMS_URL = data.url;
+            var touObj = [];
+
+            //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
+            //and also website terms of use
+            // WILL NEED TO CLARIFY
+            tnthAjax.getTerms(userId, false, true, function(data) {
+                if (data && data.tous) {
+                    (data.tous).forEach(function(item) {
+                        var fType = $.trim(item.type).toLowerCase();
+                        if (fType == "subject website consent" || fType == "website terms of use") {
+                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                            touObj.push(item);
+                        };
+                    });
+                };
             });
-            var showInitialConsentTerms = (ctop && hasValue(TERMS_URL));
+
+            //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
+            var showInitialConsentTerms = (touObj.length > 0);
+            var getTOUTableHTML = function(includeHeader) {
+                var touContent = "";
+                if (includeHeader) {
+                    headerArray.forEach(function(title) {
+                        touContent += "<th class='consentlist-header'>" + title + "</th>";
+                    });
+                };
+                //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
+                //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+                touObj.forEach(function(item) {
+                    touContent += "<tr>";
+                    touContent += "<td><span class='eproms-tou-table-text'> -- </span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+                    touContent += "<td><span class='text-success small-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'>" + item.type + "</span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td>" + item.accepted + "</td></tr>";
+                });
+                return touContent;
+            };
 
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
@@ -818,11 +857,7 @@ var fillContent = {
 
                     };
 
-                    if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + signedDate + "</td></tr>";
-                    };
+                    if (showInitialConsentTerms) content += getTOUTableHTML();
 
                     content += "<tr>";
 
@@ -870,10 +905,8 @@ var fillContent = {
             } else {
                 if (showInitialConsentTerms) {
                         content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                        content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "</tr>";
+                        content += getTOUTableHTML(true);
+                        content += "</table>"
                         $("#profileConsentList").html(content);
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
@@ -938,10 +971,8 @@ var fillContent = {
             } else {
                 if (showInitialConsentTerms) {
                     content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                    content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                    content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                    content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                    content += "</tr>";
+                    content += getTOUTableHTML(true);
+                    content += "</table>";
                     $("#profileConsentList").html(content);
                 } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
@@ -1912,6 +1943,7 @@ var tnthAjax = {
                     if (item == "localized") __localizedFound = true;
                 });
                 if (!__localizedFound) $("#patMeta").remove();
+                else $("#patientQ").show();
             } else {
                 if (callback) {
                     callback({"error": "no data returned"});

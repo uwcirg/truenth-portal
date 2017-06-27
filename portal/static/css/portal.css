@@ -2048,8 +2048,10 @@ sub.pointer:hover {
   padding-left: 0.6em;
   padding-right: 0.6em;
 }
-#profileConsentList .consentlist-cell {
-  background-color: #fbf9f9;
+#profileConsentList .eproms-consent-status-header,
+#profileConsentList .eproms-consent-date-header,
+#profileConsentList .eproms-tou-table-text {
+  display: none;
 }
 #consentListLoad {
   margin-top: 1em;
