@@ -673,6 +673,9 @@ h4.detail-title {
   letter-spacing: 2px;
   margin: 0 0.2em;
 }
+#adminTable .eproms-id-label {
+  display: none;
+}
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
