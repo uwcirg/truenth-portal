@@ -195,6 +195,11 @@ select:not([multiple]) {
 #profileConsentList .button--LR[data-show='false'] {
     opacity: 0;
 }
+#profileConsentList .truenth-consent-status-header,
+#profileConsentList .truenth-consent-date-header,
+#profileConsentList .truenth-tou-table-text {
+  display: none;
+}
 .consent-date-modal.fade {
     -webkit-transition: opacity .7s ease-out !important;
     -o-transition: opacity .7s ease-out !important;
@@ -2227,9 +2232,6 @@ sub.pointer:hover {
   font-weight: normal;
   padding-left: 0.6em;
   padding-right: 0.6em;
-}
-#profileConsentList .consentlist-cell {
-  background-color: #fbf9f9;
 }
 #consentListLoad {
   margin-top: 1em;

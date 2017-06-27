@@ -169,9 +169,11 @@ a.btn {
    width: 160px;
    margin: 2em 0;
 }
-#profileConsentList .button--LR {
-  margin: 0 0.5em;
-  display: inline-block;
+#profileConsentList {
+  .button--LR {
+    margin: 0 0.5em;
+    display: inline-block;
+
 }
 .button--LR.data-show,
 #profileConsentList .button--LR[data-show = 'true'] {
@@ -2192,8 +2194,10 @@ color: #777
     padding-left: 0.6em;
     padding-right: 0.6em;
   }
-  .consentlist-cell{
-    background-color: #fbf9f9;
+  .eproms-consent-status-header,
+  .eproms-consent-date-header,
+  .eproms-tou-table-text {
+      display: none;
   }
 }
 
