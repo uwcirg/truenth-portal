@@ -13,7 +13,7 @@ TRUENTH_ENCOUNTER_CODE_SYSTEM = '{}/encounter-types'.format(TRUENTH_NAMESPACE)
 # Auth identities - typically used with suffix for provider (i.e. google)
 # or to name identity type (i.e. TrueNTH-username)
 TRUENTH_IDENTITY_SYSTEM = '{}/identity-codes'.format(TRUENTH_NAMESPACE)
-TRUENTH_ID ='{system}/{provider}'.format(
+TRUENTH_ID = '{system}/{provider}'.format(
     system=TRUENTH_IDENTITY_SYSTEM,
     provider='TrueNTH-identity')
 TRUENTH_USERNAME = '{system}/{provider}'.format(
@@ -43,4 +43,3 @@ NHHD_291036 = "AU-NHHD-METeOR-id-291036"
 TRUENTH_VALUESET_NHHD_291036 = "{}/{}".format(TRUENTH_VALUESET, NHHD_291036)
 TRUENTH_EXTENSTION_NHHD_291036 = "{}/{}".format(
     TRUENTH_STRUCTURE_DEFINITION, NHHD_291036)
-
