@@ -476,7 +476,7 @@ h4.detail-title {
 }
 #aboutForm input[type='text'],
 #aboutForm select {
-  height: 42px;
+  height: 2.4em;
 }
 #aboutForm .prompt {
   color: #333;
@@ -1903,6 +1903,7 @@ table.profile-audit-log TH,
   min-height: 4.5em;
 }
 #biopsyDateContainer label {
+  font-size: 1em !important;
   margin-right: 0.2em;
 }
 div.biopsy-option:last-of-type{
@@ -2048,8 +2049,10 @@ sub.pointer:hover {
   padding-left: 0.6em;
   padding-right: 0.6em;
 }
-#profileConsentList .consentlist-cell {
-  background-color: #fbf9f9;
+#profileConsentList .eproms-consent-status-header,
+#profileConsentList .eproms-consent-date-header,
+#profileConsentList .eproms-tou-table-text {
+  display: none;
 }
 #consentListLoad {
   margin-top: 1em;

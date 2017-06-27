@@ -389,9 +389,11 @@ FieldsChecker.prototype.continueToNext = function(sectionId) {
   $("div.reg-complete-container").fadeOut();
   $("#next").show().removeAttr("disabled");
   if (!$("#next").isOnScreen()) {
-    $('html, body').animate({
-      scrollTop: $('#next').offset().top
-    }, 1000);
+    setTimeout(function() {
+        $('html, body').animate({
+          scrollTop: $('#next').offset().top
+        }, 1500);
+    }(), 500);
   };
   $("#updateProfile").attr("disabled", true).removeClass("open");
 };
@@ -748,29 +750,25 @@ $(document).ready(function(){
           config: "name,dob,role",
           subsections:{
           "nameGroup": {
-                          config: "name",
                           fields: [$("#firstname"), $("#lastname")],
                           event: namesChangeEvent
                        }
           ,
           "rolesGroup": {
-                          config: "role",
                           fields: [$("input[name='user_type']")],
                           event: rolesGroupClickEvent
                         }
           ,
           "bdGroup": {
-                        config: "dob",
                         fields: [$("#month"), $("#date"), $("#year")],
                         event: bdChangeEvent
                      }
           }},
       'clinicalContainer': {
           display: "your clinical profile",
-          config: "clinical",
+          config: "clinical,localized",
           subsections:
           {"patientQ": {
-                        config: "clinical",
                         fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                         event: patientQClickEvent
                         }
@@ -781,7 +779,6 @@ $(document).ready(function(){
           required: hasValue(preselectClinic) ? true: false,
           subsections:
           {"clinics": {
-                        config: "org",
                         fields: [$("#userOrgs input[name='organization']")],
                         event: userOrgChangeEvent
                       }
