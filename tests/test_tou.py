@@ -16,8 +16,9 @@ class TestTou(TestCase):
     """Terms Of Use tests"""
 
     def test_tou_str(self):
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-                    comment="Agreed to ToU", context='other')
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+            comment="Agreed to ToU", context='other')
         tou = ToU(audit=audit, agreement_url=tou_url,
                   type='website terms of use')
         results = "{}".format(tou)
@@ -31,21 +32,39 @@ class TestTou(TestCase):
     def test_accept(self):
         self.login()
         data = {'agreement_url': tou_url}
-        rv = self.client.post('/api/tou/accepted',
-                           content_type='application/json',
-                           data=json.dumps(data))
+        rv = self.client.post(
+            '/api/tou/accepted',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
         tou = ToU.query.one()
         self.assertEquals(tou.agreement_url, tou_url)
         self.assertEquals(tou.audit.user_id, TEST_USER_ID)
 
+    def test_accept_w_org(self):
+        self.login()
+        self.bless_with_basics()
+        self.test_user = db.session.merge(self.test_user)
+        org_id = self.test_user.organizations.first().id
+        data = {'agreement_url': tou_url, 'organization_id': org_id}
+        rv = self.client.post(
+            '/api/tou/accepted',
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+        tou = ToU.query.filter(ToU.agreement_url == tou_url).one()
+        self.assertEquals(tou.agreement_url, tou_url)
+        self.assertEquals(tou.audit.user_id, TEST_USER_ID)
+        self.assertEquals(tou.organization_id, org_id)
+
     def test_service_accept(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'agreement_url': tou_url}
-        rv = self.client.post('/api/user/{}/tou/accepted'.format(TEST_USER_ID),
-                           content_type='application/json',
-                           data=json.dumps(data))
+        rv = self.client.post(
+            '/api/user/{}/tou/accepted'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
         tou = ToU.query.one()
         self.assertEquals(tou.agreement_url, tou_url)
