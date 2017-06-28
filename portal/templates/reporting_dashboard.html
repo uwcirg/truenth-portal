@@ -5,7 +5,7 @@
     <h3 class="tnth-headline">{{ _("Reporting Dashboard") }}</h3>
 
     <h2 class="tnth-headline">{{ _("User Statistics") }}</h2>
-    <div>
+    <div id="userStatsContainer">
         <table id="userRoleStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -21,19 +21,19 @@
                 <td>{{ counts['roles']['patient'] }}</td>
             </tr>
             <tr>
-                <td><div style="padding: 0 2em">{{ _("No Diagnosis") }}</div></td>
+                <td><div class="indent">{{ _("No Diagnosis") }}</div></td>
                 <td>{{ counts['patients']['pre-dx'] }}</td>
             </tr>
             <tr>
-                <td><div style="padding: 0 2em">{{ _("Diagnosis, No Treatment") }}</div></td>
+                <td><div class="indent">{{ _("Diagnosis, No Treatment") }}</div></td>
                 <td>{{ counts['patients']['dx-nt'] }}</td>
             </tr>
             <tr>
-                <td><div style="padding: 0 2em">{{ _("Diagnosis and Treatment") }}</div></td>
+                <td><div class="indent">{{ _("Diagnosis and Treatment") }}</div></td>
                 <td>{{ counts['patients']['dx-t'] }}</td>
             </tr>
             <tr>
-                <td><div style="padding: 0 2em">{{ _("Metastasis") }}</div></td>
+                <td><div class="indent">{{ _("Metastasis") }}</div></td>
                 <td>{{ counts['patients']['meta'] }}</td>
             </tr>
             <tr>
@@ -62,14 +62,14 @@
             </tr>
             {% if k in counts['intervention_reports'] %}
             <tr>
-                <td><div style="padding: 0 2em">{{ _("Completed Reports") }}</div></td>
+                <td><div class="indent">{{ _("Completed Reports") }}</div></td>
                 <td>{{ counts['intervention_reports'][k] }}</td>
             </tr>
             {% endif %}
             {% endfor %}
         </table>
     </div>
-
+    <br/>
     <h2 class="tnth-headline">{{ _("Institution Statistics") }}</h2>
     <div>
         <table id="orgStatsTable"

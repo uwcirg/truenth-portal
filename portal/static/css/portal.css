@@ -732,6 +732,9 @@ h4.detail-title {
   background-color: #ececea;
   color: #606a73;
 }
+#userStatsContainer .indent {
+  padding: 0 2em !important;
+}
 #loginEmailReminderText {
   margin-left: 8px;
   font-size: 0.87em;
