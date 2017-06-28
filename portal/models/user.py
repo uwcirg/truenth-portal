@@ -29,7 +29,9 @@ from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
+from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
+from ..system_uri import TRUENTH_PROVIDER_SYSTEMS
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import ContactPoint, Telecom
 
@@ -494,8 +496,8 @@ class User(db.Model, UserMixin):
         values will be joined by ', '
 
         """
-        ext_ids = self._identifiers.filter_by(system='http://us.truenth.org/' \
-                                    'identity-codes/external-study-id')
+        ext_ids = self._identifiers.filter_by(
+            system=TRUENTH_EXTERNAL_STUDY_SYSTEM)
         if ext_ids.count():
             return ', '.join([ext_id.value for ext_id in ext_ids])
 

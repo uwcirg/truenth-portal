@@ -169,9 +169,11 @@ a.btn {
    width: 160px;
    margin: 2em 0;
 }
-#profileConsentList .button--LR {
-  margin: 0 0.5em;
-  display: inline-block;
+#profileConsentList {
+  .button--LR {
+    margin: 0 0.5em;
+    display: inline-block;
+  }
 }
 .button--LR.data-show,
 #profileConsentList .button--LR[data-show = 'true'] {
@@ -275,6 +277,20 @@ select:not([multiple]) {
     margin: 1em 4em;
     border-top: 1px solid #ddd;
   }
+  #site_id_view {
+    margin-top: 0.2em;
+    margin-bottom: 0.2em;
+  }
+  .site-id-view td {
+    margin-top: 0.4em;
+  }
+  #profileSiteIDContainer {
+    margin-bottom: 1.8em;
+  }
+}
+#profileSiteId {
+  width: 300px;
+  max-width: 100%;
 }
 @media (max-width: 1199px) {
   #mainDiv.profile .footer-container.flex{
@@ -397,7 +413,7 @@ h4.detail-title {
   margin: 3em auto;
   min-height: 50vh;
 }
-#topTerms .custom-tou, 
+#topTerms .custom-tou,
 #topTerms .custom-tou-text {
   display: none;
 }
@@ -420,6 +436,16 @@ h4.detail-title {
   a.form-link {
     text-decoration: underline;
   }
+}
+.terms-tick-box {
+  float: left;
+  width: 2%;
+  margin: 0.3em 0.5em 0 0;
+}
+.terms-tick-box-text {
+  float: left;
+  width: 94.5%;
+  max-width: 100%;
 }
 .box-consent-container {
   width: 300px;
@@ -493,7 +519,7 @@ h4.detail-title {
   }
   input[type='text'],
   select {
-    height: 42px;
+    height: 2.4em;
   }
   .prompt {
     color: #333;
@@ -703,6 +729,9 @@ h4.detail-title {
     border-radius: 0;
     letter-spacing: 2px;
     margin: 0 0.2em;
+  }
+  .eproms-id-label {
+    display: none
   }
 }
 #adminTableToolbar {
@@ -2025,8 +2054,10 @@ div.noOrg-container {
 }
 #biopsyDateContainer {
   display: none;
+  min-height: 4.5em;
 }
 #biopsyDateContainer label {
+  font-size: 1em !important;
   margin-right: 0.2em;
 }
 div.biopsy-option:last-of-type{
@@ -2037,7 +2068,6 @@ div.biopsy-option:last-of-type{
   max-width: 100%;
   display: inline-block;
 }
-
 .modal-dialog {
   border-radius: 0;
 }
@@ -2182,8 +2212,10 @@ color: #777
     padding-left: 0.6em;
     padding-right: 0.6em;
   }
-  .consentlist-cell{
-    background-color: #fbf9f9;
+  .eproms-consent-status-header,
+  .eproms-consent-date-header,
+  .eproms-tou-table-text {
+      display: none;
   }
 }
 

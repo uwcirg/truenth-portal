@@ -217,3 +217,12 @@ class TestPortal(TestCase):
         rv = self.client.get('/report-error?{}'.format(
             urllib.urlencode(params)))
         self.assert200(rv)
+
+    def test_configuration_settings(self):
+        self.login()
+        lr_group = self.app.config['LR_GROUP']
+        rv = self.client.get('/settings/lr_group')
+        self.assert200(rv)
+        self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
+        rv2 = self.client.get('/settings/bad_value')
+        self.assertEquals(rv2.status_code, 400)

@@ -183,6 +183,14 @@ a.btn {
     margin: 0 0.5em;
     display: inline-block !important;
   }
+  .truenth-consent-status-header,
+  .truenth-consent-date-header,
+  .truenth-tou-table-text {
+    display: none;
+  }
+}
+#profileSiteIDContainer, #mainDiv.profile .site-id-view {
+  display: none;
 }
 #consentListLoad {
   margin-top: 1em;
@@ -482,6 +490,16 @@ div.right-panel {
     margin-top: 0.5em;
   }
 }
+.terms-tick-box {
+  float: left;
+  width: 2%;
+  margin: 0.3em 0.5em 0 0;
+}
+.terms-tick-box-text {
+  float: left;
+  width: 94.5%;
+  max-width: 100%;
+}
 #termsCheckbox {
   width: 1000px;
   max-width: 100%;
@@ -749,6 +767,9 @@ div.right-panel {
       left: -3%;
   }
 }
+#biopsyDateContainer {
+  min-height: 4.5em;
+}
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
@@ -763,6 +784,9 @@ div.right-panel {
     background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
+  }
+  .truenth-id-label {
+    display: none;
   }
 }
 #adminTableToolbar {
@@ -1860,10 +1884,21 @@ div.noOrg-container {
   font-weight: normal;
 }
 
- #profileStudyIDContainer {
+#profileStudyIDContainer {
   margin-bottom: 2em;
   input {
-    width: 30%;
+    width: 300px;
+    max-width: 100%;
+  }
+}
+
+#createProfileForm {
+  #profileStudyIDContainer {
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+  #profileStudyIDContainer input {
+    width: 350px;
     max-width: 100%;
   }
 }

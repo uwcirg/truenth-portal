@@ -21,6 +21,7 @@ from validators import url as url_validation
 
 from ..audit import auditable_event
 from ..database import db
+from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
 from ..models.auth import validate_client_origin
@@ -59,8 +60,8 @@ def deauthorized():
     data = base64_url_decode(payload)
 
     secret = current_app.config['FB_CONSUMER_SECRET']
-    expected_sig = hmac.new(secret, msg=payload,
-            digestmod=hashlib.sha256).digest()
+    expected_sig = hmac.new(
+        secret, msg=payload, digestmod=hashlib.sha256).digest()
     if expected_sig != sig:
         current_app.logger.error("Signed request from FB doesn't match!")
         return jsonify(error='bad signature')
@@ -69,8 +70,8 @@ def deauthorized():
     data = json.loads(data)
     # Should probably remove all tokens obtained during this session
     # for now, just logging the event.
-    message = 'User {0} deauthorized TrueNTH from Facebook'.\
-            format(data['user_id'])
+    message = 'User {0} deauthorized TrueNTH from Facebook'.format(
+        data['user_id'])
     current_app.logger.info(message)
     return jsonify(message=message)
 
@@ -82,13 +83,15 @@ def flask_user_login_event(app, user, **extra):
 
 
 def flask_user_registered_event(app, user, **extra):
-    auditable_event("local user registered", user_id=user.id, subject_id=user.id,
-                    context='account')
+    auditable_event(
+        "local user registered", user_id=user.id, subject_id=user.id,
+        context='account')
 
 
 # Register functions to receive signals from flask_user
 user_logged_in.connect(flask_user_login_event)
 user_registered.connect(flask_user_registered_event)
+
 
 def capture_next_view_function(real_function):
     """closure to hang onto real view function to use after saving 'next'"""
@@ -160,7 +163,8 @@ def next_after_login():
     # time to promote the invited account.  This also inverts
     # current_user to the invited one once promoted.
     if 'invited_verified_user_id' in session or (
-        'login_as_id' in session and user.id != int(session['login_as_id'])) :
+            'login_as_id' in session and
+            user.id != int(session['login_as_id'])):
         invited_id = session.get('invited_verified_user_id') or session.get(
             'login_as_id')
         invited_user = User.query.get(invited_id)
@@ -175,39 +179,58 @@ def next_after_login():
     # Present intial questions (TOU et al) if not already obtained
     # NB - this act may be suspended by request from an external
     # client during patient registration
-    if (not session.get('suspend_initial_queries', None)
-       ) and not Coredata().initial_obtained(user):
+    if (not session.get('suspend_initial_queries', None) and
+            not Coredata().initial_obtained(user)):
         current_app.logger.debug("next_after_login: [need data] -> "
                                  "initial_queries")
-        return redirect(url_for('portal.initial_queries'))
+        resp = redirect(url_for('portal.initial_queries'))
 
     # Clients/interventions trying to obtain an OAuth token for protected
     # access need to be put in a pending state, if the user isn't already
     # authenticated with the portal.  It's now time to resume that process;
     # pop the pending state from the session and resume, if found.
-    if 'pending_authorize_args' in session:
+    elif 'pending_authorize_args' in session:
         args = session['pending_authorize_args']
         current_app.logger.debug("next_after_login: [resume pending] ->"
                                  "authorize: {}".format(args))
         del session['pending_authorize_args']
-        return redirect(url_for('auth.authorize', **args))
+        resp = redirect(url_for('auth.authorize', **args))
 
     # 'next' is typically set on the way in when gathering authentication.
     # It's stored in the session to survive the various redirections needed
     # for external auth, etc.  If found in the session, pop and redirect
     # as defined.
-    if 'next' in session:
+    elif 'next' in session:
         next_url = session['next']
         del session['next']
         current_app.logger.debug("next_after_login: [have session['next']] "
                                  "-> {}".format(next_url))
         if 'suspend_initial_queries' in session:
             del session['suspend_initial_queries']
-        return redirect(next_url)
+        resp = redirect(next_url)
 
-    # No better place to go, send user home
-    current_app.logger.debug("next_after_login: [no state] -> home")
-    return redirect(url_for('portal.home'))
+    else:
+        # No better place to go, send user home
+        current_app.logger.debug("next_after_login: [no state] -> home")
+        resp = redirect(url_for('portal.home'))
+
+    # make cookie max_age outlast the browser session
+    max_age = 60 * 60 * 24 * 365 * 5
+    # set timeout cookies
+    if session.get('login_as_id'):
+        if request.cookies.get('SS_TIMEOUT'):
+            resp.set_cookie('SS_TIMEOUT_REVERT',
+                            request.cookies['SS_TIMEOUT'],
+                            max_age=max_age)
+        resp.set_cookie('SS_TIMEOUT', '300', max_age=max_age)
+    elif request.cookies.get('SS_TIMEOUT_REVERT'):
+        resp.set_cookie('SS_TIMEOUT',
+                        request.cookies['SS_TIMEOUT_REVERT'],
+                        max_age=max_age)
+        resp.set_cookie('SS_TIMEOUT_REVERT', '', expires=0)
+    else:
+        resp.set_cookie('SS_TIMEOUT', '', expires=0)
+    return resp
 
 
 @auth.route('/login/<provider_name>/')
@@ -232,8 +255,9 @@ def login(provider_name):
         image_url = result.user.picture
         if provider_name == 'facebook':
             # Additional request needed for FB profile image
-            url = '?'.join(("https://graph.facebook.com/{0}/picture",
-                "redirect=false&width=160")).format(result.user.id)
+            url = '?'.join(
+                ("https://graph.facebook.com/{0}/picture",
+                 "redirect=false&width=160")).format(result.user.id)
             response = result.provider.access(url)
             if response.status == 200:
                 image_url = response.data['data']['url']
@@ -282,21 +306,21 @@ def login(provider_name):
             return render_template('force_reload.html',
                                    message=result.error.message)
         elif result.user:
-            current_app.logger.debug("Successful authentication at %s",
-                    provider_name)
+            current_app.logger.debug(
+                "Successful authentication at %s", provider_name)
             if not (result.user.name and result.user.id):
                 result.user.update()
                 image_url = picture_url(result)
 
             # Success - add or pull this user to/from database
-            ap = AuthProvider.query.filter_by(provider=provider_name,
-                    provider_id=result.user.id).first()
+            ap = AuthProvider.query.filter_by(
+                provider=provider_name, provider_id=result.user.id).first()
             if ap:
                 auditable_event("login via {0}".format(provider_name),
                                 user_id=ap.user_id, subject_id=ap.user.id,
                                 context='login')
                 user = User.query.filter_by(id=ap.user_id).first()
-                user.image_url=image_url
+                user.image_url = image_url
                 db.session.commit()
             else:
                 # Experiencing problems pulling email from IdPs.
@@ -305,24 +329,30 @@ def login(provider_name):
                         result.user.id, provider_name))
 
                 # Confirm we haven't seen user from a different IdP
-                user = User.query.filter_by(email=result.user.email).\
-                        first() if result.user.email else None
+                user = (User.query.filter_by(
+                    email=result.user.email).first()
+                    if result.user.email else None)
 
                 if not user:
                     user = add_authomatic_user(result.user, image_url)
                     db.session.commit()
-                    auditable_event("register new user via {0}".\
-                                    format(provider_name), user_id=user.id,
-                                    subject_id=user.id, context='account')
+                    auditable_event(
+                        "register new user via {0}".format(provider_name),
+                        user_id=user.id,
+                        subject_id=user.id,
+                        context='account')
                 else:
-                    auditable_event("login user via NEW IdP {0}".\
-                                    format(provider_name), user_id=user.id,
-                                    subject_id=user.id, context='login')
-                    user.image_url=image_url
+                    auditable_event(
+                        "login user via NEW IdP {0}".format(provider_name),
+                        user_id=user.id,
+                        subject_id=user.id,
+                        context='login')
+                    user.image_url = image_url
 
-                ap = AuthProvider(provider=provider_name,
-                        provider_id=result.user.id,
-                        user_id=user.id)
+                ap = AuthProvider(
+                    provider=provider_name,
+                    provider_id=result.user.id,
+                    user_id=user.id)
                 db.session.add(ap)
                 db.session.commit()
             session['id'] = user.id
@@ -399,11 +429,11 @@ def logout(prevent_redirect=False, reason=None):
         authentication.
 
         """
-        ap = AuthProvider.query.filter_by(provider='facebook',
-                user_id=user_id).first()
+        ap = AuthProvider.query.filter_by(
+            provider='facebook', user_id=user_id).first()
         if ap:
-            headers = {'Authorization':
-                'Bearer {0}'.format(session['remote_token'])}
+            headers = {
+                'Authorization': 'Bearer {0}'.format(session['remote_token'])}
             url = "https://graph.facebook.com/{0}/permissions".\
                 format(ap.provider_id)
             requests.delete(url, headers=headers)
@@ -430,8 +460,8 @@ def logout(prevent_redirect=False, reason=None):
         event = 'logout' if not timed_out else 'logout due to timeout'
         if reason:
             event = ':'.join((event, reason))
-        auditable_event(event, user_id=user_id, subject_id=user_id,
-            context='login')
+        auditable_event(
+            event, user_id=user_id, subject_id=user_id, context='login')
         # delete_facebook_authorization()  #Not using at this time
 
     logout_user()
@@ -443,6 +473,7 @@ def logout(prevent_redirect=False, reason=None):
     if prevent_redirect:
         return
     return redirect('/' if not timed_out else '/?timed_out=1')
+
 
 class InterventionEditForm(FlaskForm):
     """Intervention portion of client edits - part of ClientEditForm"""
@@ -463,21 +494,25 @@ class InterventionEditForm(FlaskForm):
             try:
                 validate_client_origin(field.data)
             except Unauthorized:
-                raise validators.ValidationError("Invalid URL (unknown origin)")
+                raise validators.ValidationError(
+                    "Invalid URL (unknown origin)")
+
 
 class ClientEditForm(FlaskForm):
     """wtform class for validation during client edits"""
     intervention_names = [(k, v) for k, v in STATIC_INTERVENTIONS.items()]
 
     client_id = HiddenField('Client ID')
-    application_role = SelectField('Application Role',
-            choices=intervention_names,
-            validators=[validators.Required()])
-    application_origins = TextField('Application URL',
-            validators=[validators.Required()])
-    callback_url = TextField('Callback URL',
-            validators=[validators.optional(),
-                validators.URL(require_tld=False)])
+    application_role = SelectField(
+        'Application Role',
+        choices=intervention_names,
+        validators=[validators.Required()])
+    application_origins = TextField(
+        'Application URL',
+        validators=[validators.Required()])
+    callback_url = TextField(
+        'Callback URL',
+        validators=[validators.optional(), validators.URL(require_tld=False)])
     intervention_or_default = FormField(InterventionEditForm)
 
     def validate_application_role(form, field):
@@ -494,8 +529,8 @@ class ClientEditForm(FlaskForm):
 
         # if the selected intervention already has a client, make sure
         # it's the client being edited or raise a validation error
-        if intervention and intervention.client_id and \
-            intervention.client_id != form.data['client_id']:
+        if (intervention and intervention.client_id and
+                intervention.client_id != form.data['client_id']):
             raise validators.ValidationError(
                 "This role currently belongs to another application")
 
@@ -668,7 +703,8 @@ def client_edit(client_id):
     if request.method == 'POST':
         form = ClientEditForm(request.form)
     else:
-        form = ClientEditForm(obj=client,
+        form = ClientEditForm(
+            obj=client,
             application_role=client.intervention_or_default.name)
 
     # work around a testing bug in wtforms
@@ -694,9 +730,18 @@ def client_edit(client_id):
                     user_id=user.id, subject_id=client.user_id,
                     context='intervention')
 
+    def generate_callback(client):
+        # Trigger a callback for client editors to test
+        data = {
+            'event': 'test callback',
+            'UTC server time': FHIR_datetime.as_fhir(datetime.utcnow())
+        }
+        client.notify(data)
+
     if not form.validate_on_submit():
-        return render_template('client_edit.html', client=client, form=form,
-                              service_token=client.lookup_service_token())
+        return render_template(
+            'client_edit.html', client=client, form=form,
+            service_token=client.lookup_service_token())
 
     b4 = str(client)
     redirect_target = url_for('.clients_list')
@@ -715,12 +760,16 @@ def client_edit(client_id):
         if existing:
             db.session.delete(existing)
         service_user = user.add_service_account()
-        auditable_event("service account created by", user_id=user.id,
+        auditable_event(
+            "service account created by", user_id=user.id,
             subject_id=client.user_id, context='authentication')
         create_service_token(client=client, user=service_user)
         auditable_event("service token generated for client {}".format(
             client.client_id), user_id=user.id, subject_id=client.user_id,
             context='authentication')
+        redirect_target = url_for('.client_edit', client_id=client.client_id)
+    elif request.form.get('generate_callback'):
+        generate_callback(client)
         redirect_target = url_for('.client_edit', client_id=client.client_id)
     else:
         form.populate_obj(client)
@@ -729,10 +778,10 @@ def client_edit(client_id):
     db.session.commit()
     after = str(client)
     if b4 != after:
-        auditable_event("edited intervention/client {}"
-                        " before: <{}> after: <{}>".format(
-                        client.client_id, b4, after), user_id=user.id,
-                        subject_id=client.user_id, context='intervention')
+        auditable_event(
+            "edited intervention/client {} before: <{}> after: <{}>".format(
+                client.client_id, b4, after), user_id=user.id,
+            subject_id=client.user_id, context='intervention')
     return redirect(redirect_target)
 
 
@@ -839,9 +888,10 @@ def token_status():
     if not token:
         abort(404, "token not found")
     expires_in = token.expires - datetime.utcnow()
-    return jsonify(access_token=access_token,
-            refresh_token=token.refresh_token, token_type=token_type,
-            expires_in=expires_in.seconds, scopes=token._scopes)
+    return jsonify(
+        access_token=access_token,
+        refresh_token=token.refresh_token, token_type=token_type,
+        expires_in=expires_in.seconds, scopes=token._scopes)
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
@@ -1035,8 +1085,9 @@ def authorize(*args, **kwargs):
         # the user has yet to authenticate via FB or otherwise.  Need
         # to retain the request, and replay after TrueNTH login
         # has completed.
-        current_app.logger.debug('Postponing oauth client authorization' +
-            ' till user authenticates with CS: %s', str(request.args))
+        current_app.logger.debug(
+            'Postponing oauth client authorization till user '
+            'authenticates with CS: %s', str(request.args))
         session['pending_authorize_args'] = request.args
 
         return redirect('/')

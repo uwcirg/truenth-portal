@@ -251,6 +251,11 @@ var CONSENT_ENUM = {
         "send_reminders": false
     }
 };
+var SYSTEM_IDENTIFIER_ENUM = {
+    "external_study_id" : "http://us.truenth.org/identity-codes/external-study-id",
+    "external_site_id" : "http://us.truenth.org/identity-codes/external-site-id",
+    "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
+};
 
 var fillViews = {
     "org": function() {
@@ -275,6 +280,7 @@ var fillViews = {
         this.name();
         this.dob();
         this.studyId();
+        this.siteId();
         this.phone();
         this.altPhone();
         this.email();
@@ -324,6 +330,13 @@ var fillViews = {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
             else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
+        };
+    },
+    "siteId": function() {
+        if (!$("#profileSiteIDContainer").hasClass("has-error")) {
+            var content = $("#profileSiteId").val();
+            if (hasValue(content)) $("#site_id_view").text(content);
+            else $("#site_id_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "detail": function() {
@@ -385,9 +398,11 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
-                //note, biopsy date is formatted as mm/dd/yyyy
-                var cDate = new Date(biopsyDate);
-                displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
+                var displayDate = "";
+                if (hasValue($.trim($("#biopsy_month option:selected").val()+$("#biopsy_year").val()+$("#biopsy_day").val()))) {
+                    displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
+                };
+                if (!hasValue(displayDate)) displayDate = "Not provided";
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
@@ -471,8 +486,12 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                //d M y format
-                                $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
+                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
+                                var dArray = dString.split("-");
+                                $("#biopsyDate").val(dString);
+                                $("#biopsy_year").val(dArray[0]);
+                                $("#biopsy_month").val(dArray[1]);
+                                $("#biopsy_day").val(dArray[2]);
                                 $("#biopsyDateContainer").show();
                                 $("#biopsyDate").removeAttr("skipped");
                             };
@@ -678,12 +697,22 @@ var fillContent = {
     "subjectId": function(data) {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
-                if (item.system == "http://us.truenth.org/identity-codes/external-study-id") {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_study_id"]) {
                     if (hasValue(item.value)) $("#profileStudyId").val(item.value);
                 };
             });
         };
         fillViews.studyId();
+    },
+    "siteId": function(data) {
+        if (data.identifier) {
+            (data.identifier).forEach(function(item) {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_site_id"]) {
+                    if (hasValue(item.value)) $("#profileSiteId").val(item.value);
+                };
+            });
+        };
+        fillViews.siteId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
         /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
@@ -698,17 +727,56 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
+            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive table-striped' style='width: 100%; max-width:100%'>";
+            /********* Note that column headings are different between TrueNTH and EPROMs.
+                 Use css class to hide/show headings accordingly
+                 please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
+             ********/
+            var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
+                                '<span class="agreement">Agreement</span>',
+                                '<span class="eproms-consent-date-header">Consented Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+            headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
 
             var hasContent = false;
-            var TERMS_URL = "";
-            tnthAjax.getTermsUrl(true, function(data) {
-                if (data && data.url) TERMS_URL = data.url;
-            }); 
-            var showInitialConsentTerms = (ctop && hasValue(TERMS_URL));
+            var touObj = [];
+
+            //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
+            //and also website terms of use
+            // WILL NEED TO CLARIFY
+            tnthAjax.getTerms(userId, false, true, function(data) {
+                if (data && data.tous) {
+                    (data.tous).forEach(function(item) {
+                        var fType = $.trim(item.type).toLowerCase();
+                        if (fType == "subject website consent" || fType == "website terms of use") {
+                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                            touObj.push(item);
+                        };
+                    });
+                };
+            });
+
+            //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
+            var showInitialConsentTerms = (touObj.length > 0);
+            var getTOUTableHTML = function(includeHeader) {
+                var touContent = "";
+                if (includeHeader) {
+                    headerArray.forEach(function(title) {
+                        touContent += "<th class='consentlist-header'>" + title + "</th>";
+                    });
+                };
+                //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
+                //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+                touObj.forEach(function(item) {
+                    touContent += "<tr>";
+                    touContent += "<td><span class='eproms-tou-table-text'> -- </span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <span class='text-capitalize'>" + item.type + "</span></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'>" + item.type + "</span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td>" + item.accepted + "</td></tr>";
+                });
+                return touContent;
+            };
 
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
@@ -812,11 +880,7 @@ var fillContent = {
 
                     };
 
-                    if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + signedDate + "</td></tr>";
-                    };
+                    if (showInitialConsentTerms) content += getTOUTableHTML();
 
                     content += "<tr>";
 
@@ -864,10 +928,8 @@ var fillContent = {
             } else {
                 if (showInitialConsentTerms) {
                         content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                        content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "</tr>";
+                        content += getTOUTableHTML(true);
+                        content += "</table>"
                         $("#profileConsentList").html(content);
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
@@ -932,10 +994,8 @@ var fillContent = {
             } else {
                 if (showInitialConsentTerms) {
                     content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                    content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                    content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                    content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                    content += "</tr>";
+                    content += getTOUTableHTML(true);
+                    content += "</table>";
                     $("#profileConsentList").html(content);
                 } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
@@ -1236,15 +1296,17 @@ var assembleContent = {
                 };
             };
 
-
             var studyId = $("#profileStudyId").val();
+            var siteId = $("#profileSiteId").val();
             var states = [];
+
             $("#userOrgs input[name='organization']").each(function() {
                 if ($(this).is(":checked")) {
                     if (hasValue($(this).attr("state")) && parseInt($(this).val()) != 0) states.push($(this).attr("state"));
                 };
             });
-            if (hasValue(studyId) || states.length > 0) {
+
+            if (hasValue(studyId) || hasValue(siteId) || states.length > 0) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
@@ -1255,8 +1317,9 @@ var assembleContent = {
                     if (data && data.identifier) {
                         identifiers = [];
                         (data.identifier).forEach(function(identifier) {
-                            if (identifier.system != "http://us.truenth.org/identity-codes/external-study-id" &&
-                                identifier.system != "http://us.truenth.org/identity-codes/practice-region") identifiers.push(identifier);
+                            if (identifier.system != SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["external_site_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) identifiers.push(identifier);
                         });
                     };
                 }).fail(function() {
@@ -1266,7 +1329,7 @@ var assembleContent = {
                 if (hasValue(studyId)) {
                     studyId = $.trim(studyId);
                     var studyIdObj = {
-                        system: "http://us.truenth.org/identity-codes/external-study-id",
+                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
                         use: "secondary",
                         value: studyId
                     };
@@ -1278,10 +1341,25 @@ var assembleContent = {
                     };
                 };
 
+                if (hasValue(siteId)) {
+                    siteId = $.trim(siteId);
+                    var siteIdObj = {
+                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                        use: "secondary",
+                        value: siteId
+                    };
+
+                    if (identifiers) {
+                        identifiers.push(siteIdObj);
+                    } else {
+                        identifiers = [siteIdObj];
+                    };
+                };
+
                 if (states.length > 0) {
                     states.forEach(function(state) {
                         identifiers.push({
-                            system: "http://us.truenth.org/identity-codes/practice-region",
+                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
                             use: "secondary",
                             value: "state:" + state
                         });
@@ -1903,9 +1981,10 @@ var tnthAjax = {
                             };
                         });
                     });
-                    if (item == "localized") __localizedFound = true; 
+                    if (item == "localized") __localizedFound = true;
                 });
-                if (!__localizedFound) $("#patMeta").remove(); 
+                if (!__localizedFound) $("#patMeta").remove();
+                else $("#patientQ").show();
             } else {
                 if (callback) {
                     callback({"error": "no data returned"});
@@ -2307,6 +2386,7 @@ var tnthAjax = {
                 fillContent.demo(data);
                 fillContent.timezone(data);
                 fillContent.subjectId(data);
+                fillContent.siteId(data);
                 fillContent.language(data);
             }
             $(".get-demo-error").remove();
@@ -2645,6 +2725,7 @@ var tnthAjax = {
                 code = "141";
                 display = "PCa localized diagnosis";
         };
+        if (!hasValue(code)) return false;
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -2909,34 +2990,36 @@ $(document).ready(function() {
 });
 
 var tnthDates = {
-    /** validateBirthDate  check whether the date is a sensible date.
+    /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
+     ** params: month, day and year values and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateBirthDate": function(m, d, y) {
+    "validateDateInputFields": function(m, d, y, errorFieldId) {
         if (hasValue(m) && hasValue(d) && hasValue(y)) {
 
             var m = parseInt(m);
             var d = parseInt(d);
             var y = parseInt(y);
+            var errorField = $("#" + errorFieldId);
 
             if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
                 var today = new Date();
                 // Check to see if this is a real date
                 var date = new Date(y,m-1,d);
                 if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    $("#errorbirthday").html("Invalid date. Please try again.").show();
+                    errorField.html("Invalid date. Please try again.").show();
                     return false;
                 }
                 else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    $("#errorbirthday").html("Birthday must not be in the future. Please try again.").show();
+                    errorField.html("Date must not be in the future. Please try again.").show();
                     return false; //shouldn't be in the future
                 }
                 else if (y < 1900) {
-                    $("#errorbirthday").html("Date must not be before 1900. Please try again.").show();
+                    errorField.html("Date must not be before 1900. Please try again.").show();
                     return false;
                 };
 
-                $("#errorbirthday").html("").hide();
+                errorField.html("").hide();
 
                 return true;
 
