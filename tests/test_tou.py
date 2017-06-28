@@ -16,8 +16,9 @@ class TestTou(TestCase):
     """Terms Of Use tests"""
 
     def test_tou_str(self):
-        audit = Audit(user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
-                    comment="Agreed to ToU", context='other')
+        audit = Audit(
+            user_id=TEST_USER_ID, subject_id=TEST_USER_ID,
+            comment="Agreed to ToU", context='other')
         tou = ToU(audit=audit, agreement_url=tou_url,
                   type='website terms of use')
         results = "{}".format(tou)
@@ -31,9 +32,10 @@ class TestTou(TestCase):
     def test_accept(self):
         self.login()
         data = {'agreement_url': tou_url}
-        rv = self.client.post('/api/tou/accepted',
-                           content_type='application/json',
-                           data=json.dumps(data))
+        rv = self.client.post(
+            '/api/tou/accepted',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
         tou = ToU.query.one()
         self.assertEquals(tou.agreement_url, tou_url)
@@ -43,9 +45,10 @@ class TestTou(TestCase):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)
         data = {'agreement_url': tou_url}
-        rv = self.client.post('/api/user/{}/tou/accepted'.format(TEST_USER_ID),
-                           content_type='application/json',
-                           data=json.dumps(data))
+        rv = self.client.post(
+            '/api/user/{}/tou/accepted'.format(TEST_USER_ID),
+            content_type='application/json',
+            data=json.dumps(data))
         self.assert200(rv)
         tou = ToU.query.one()
         self.assertEquals(tou.agreement_url, tou_url)
