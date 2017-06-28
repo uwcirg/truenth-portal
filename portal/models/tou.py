@@ -32,5 +32,6 @@ class ToU(db.Model):
         d['agreement_url'] = self.agreement_url
         d['accepted'] = FHIR_datetime.as_fhir(self.audit.timestamp)
         d['type'] = self.type
+        d['organization_id'] = self.organization_id
 
         return d
