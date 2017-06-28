@@ -304,6 +304,26 @@ $(document).ready(function(){
                         if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
                         _demoArray["identifier"].push(siteIdObj);
                     };
+
+
+                    var states = [];
+                    $("#userOrgs input[name='organization']").each(function() {
+                        if ($(this).is(":checked")) {
+                            if (hasValue($(this).attr("state"))) states.push($(this).attr("state"));
+                        };
+                    });
+
+                    if (states.length > 0) {
+                        if (!_demoArray["identifier"]) _demoArray["identifier"] = [];
+                        states.forEach(function(state) {
+                            _demoArray["identifier"].push({
+                                system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
+                                use: "secondary",
+                                value: "state:" + state
+                            });
+                        });
+                    };
+
                     Promise.all([
                        _get('/api/demographics/'+_userId, 'PUT', JSON.stringify(_demoArray))])
                     .then(function(results) {

@@ -615,7 +615,7 @@
                     var __state = "";
                     if (item.identifier) {
                         (item.identifier).forEach(function(region) {
-                            if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
+                            if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
                                 __state = (region.value).split(":")[1];
                                 if (!states[__state]) {
                                     $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");

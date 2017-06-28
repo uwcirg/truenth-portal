@@ -1608,6 +1608,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
         };
         if (item.extension) orgsList[item.id].extension = item.extension;
         if (hasValue(item.language)) orgsList[item.id].language = item.language;
+        if (item.identifier) orgsList[item.id].identifier = item.identifier;
     });
     items.forEach(function(item) {
         if (item.partOf) {
@@ -1620,13 +1621,25 @@ OrgTool.prototype.populateOrgsList = function(items) {
 };
 OrgTool.prototype.populateUI = function() {
     var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList;
+    var getState = function(item) {
+                    var s = "", found = false;
+                    if (item.identifier) {
+                        (item.identifier).forEach(function(i) {
+                            if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                                s = (i.value).split(":")[1];
+                                found = true;
+                            };
+                        });
+                    };
+                    return s;
+                };
     for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
-                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
+                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
                 parentOrgsCt++;
             } else {
-                container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
                     orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
             };
         };
@@ -1637,18 +1650,20 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrgId = item.parentOrgId;
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
+                var state = getState(item);
+
                 childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
 
                 if (orgsList[item.id].children.length > 0) {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                     item.name +
                     '</label>';
 
                  } else {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                     item.name +
                     '</label>';
