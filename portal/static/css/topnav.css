@@ -16,7 +16,7 @@
   text-decoration: none;
 }
 #tnthNavWrapper img {
-  margin: 0 0.5em;
+  margin: 0 1em;
   vertical-align: middle;
 }
 #tnthNavWrapper * {
@@ -127,9 +127,10 @@
 }
 /** Logo **/
 #tnthLogo {
-  width: 160px;
+  width: 500px;
   margin: 0 auto;
   transition: margin 10ms ease-in;
+  text-align: center;
 }
 #tnthLogo img {
   height: 75px;
@@ -139,7 +140,6 @@
 }
 #tnthLogoXs img {
   height: 40px;
-  float: right;
 }
 #tnthTopLinks {
   position: absolute;
@@ -269,6 +269,10 @@
 .tnth-open > a {
   outline: 0;
 }
+.welcome-text {
+  display: block;
+  margin: 0.2em 0;
+}
 @media screen\0 {
   /* IE9+ */
   .tnth-dropdown-menu li {
@@ -329,18 +333,32 @@
   background-color: #fff;
   color: #333;
 }
+.tnth-navbarXs-img-container {
+  text-align: center;
+  width: 160px;
+  margin: 0 auto;
+}
 /** Responsive sizes **/
 @media (max-width: 498px) {
   #tnthLogoXs img {
     margin-right: 2em !important;
   }
+  .tnth-navbarXs-img-container img {
+    width: 25% !important;
+  } 
 }
 @media (max-width: 640px) {
-   .watermark {
-    top: 8em;
-    width: 100% !important;
+  .watermark {
+    width: 30% !important;
     max-width: 100% !important;
     font-size: 0.5em !important;
+  }
+  .tnth-navbarXs-img-container img {
+    margin: 0 !important;
+    width: 40% !important;
+  }
+  .profile-img {
+    display: none;
   }
 }
 @media (max-width: 991px) {
@@ -355,7 +373,7 @@
     display: block;
   }
   #tnthLogoXs img {
-    margin-right: 40%;
+    margin-right: 45%;
   }
   .watermark {
     width: 270px;
@@ -367,14 +385,29 @@
   .watermark-nowrapper {
     font-size: 0.7em;
   }
+  .tnth-navbarXs-img-container img {
+    width: 65%;
+  } 
+}
+@media(min-width: 499px) {
+  #tnthLogoXs img {
+    float: right;
+  }
 }
 @media (min-width: 992px) {
   #tnthNavMainContainer {
     max-width: 940px;
   }
+  #tnthNavWrapper img {
+    margin: 0 0.5em;
+    vertical-align: middle;
+  }
 }
 @media (min-width: 1220px) {
   #tnthNavMainContainer {
     max-width: none;
+  }
+  .welcome-text {
+    display: inline-block;
   }
 }
