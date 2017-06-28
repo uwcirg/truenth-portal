@@ -33,22 +33,17 @@ class BaseConfig(object):
     # NB: The value of REDIS_URL may change at any point
     REDIS_URL = os.environ.get(
         'REDIS_URL',
-        'redis://localhost:6379'
-    )
-
-    REDIS_DB = os.environ.get(
-        'REDIS_DB',
-        0
+        'redis://localhost:6379/0'
     )
 
     ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = os.environ.get(
         'CELERY_BROKER_URL',
-        '{}/{}'.format(REDIS_URL, REDIS_DB)
+        REDIS_URL
     )
     REQUEST_CACHE_URL = os.environ.get(
         'REQUEST_CACHE_URL',
-        '{}/{}'.format(REDIS_URL, REDIS_DB)
+        REDIS_URL
     )
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis'
@@ -81,7 +76,7 @@ class BaseConfig(object):
 
     SESSION_REDIS_URL = os.environ.get(
         'SESSION_REDIS_URL',
-        '{}/{}'.format(REDIS_URL, REDIS_DB)
+        REDIS_URL
     )
 
     # Todo: create issue @ fengsp/flask-session
