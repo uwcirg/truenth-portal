@@ -922,16 +922,16 @@ def reporting_dashboard():
             counts['roles'][role.name] += 1
             if role.name == 'patient':
                 if not any((obs.codeable_concept == CC.BIOPSY
-                            and obs.value_quantity.value == True)
-                            for obs in user.observations):
+                            and obs.value_quantity.value)
+                           for obs in user.observations):
                     counts['patients']['pre-dx'] += 1
                 elif known_treatment_not_started(user):
                     counts['patients']['dx-nt'] += 1
                 elif known_treatment_started(user):
                     counts['patients']['dx-t'] += 1
                 if any((obs.codeable_concept == CC.PCaDIAG
-                        and obs.value_quantity.value == False)
-                        for obs in user.observations):
+                        and not obs.value_quantity.value)
+                       for obs in user.observations):
                     counts['patients']['meta'] += 1
         for interv in user.interventions:
             counts['interventions'][interv.description] += 1
