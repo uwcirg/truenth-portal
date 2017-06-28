@@ -706,7 +706,12 @@ $(document).ready(function(){
                   var theTerms = {};
                   theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
                   theTerms["type"] = type;
-                   // Post terms agreement via API
+                  var userOrgId = $("#userOrgs input[name='organization']:checked").val();
+                  if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
+                    var topOrg = OT.getTopLevelParentOrg(userOrgId);
+                    if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
+                  };
+                  // Post terms agreement via API
                   tnthAjax.postTerms(theTerms);
               });
           };
