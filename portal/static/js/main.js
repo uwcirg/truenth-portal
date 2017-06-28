@@ -769,8 +769,9 @@ var fillContent = {
                 //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
                 //wording is not spec'd out for EPROMs. won't add anything specific until instructed
                 touObj.forEach(function(item) {
+                    var org = OT.orgsList[item.organization_id];
                     touContent += "<tr>";
-                    touContent += "<td><span class='eproms-tou-table-text'> -- </span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
                     touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <span class='text-capitalize'>" + item.type + "</span></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
                     touContent += "<td><span class='eproms-tou-table-text text-capitalize'>" + item.type + "</span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
