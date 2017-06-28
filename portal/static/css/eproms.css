@@ -200,6 +200,9 @@ select:not([multiple]) {
 #profileConsentList .truenth-tou-table-text {
   display: none;
 }
+#profileSiteIDContainer, #mainDiv.profile .site-id-view {
+  display: none;
+}
 .consent-date-modal.fade {
     -webkit-transition: opacity .7s ease-out !important;
     -o-transition: opacity .7s ease-out !important;
@@ -1738,7 +1741,15 @@ div.noOrg-container span {
   margin-bottom: 2em;
 }
 #profileStudyIDContainer input {
-  width: 30%;
+  width: 300px;
+  max-width: 100%;
+}
+#createProfileForm #profileStudyIDContainer {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+#createProfileForm #profileStudyIDContainer input {
+  width: 350px;
   max-width: 100%;
 }
 #userSessionReportDetailTable {

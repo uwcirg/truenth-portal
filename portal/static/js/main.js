@@ -251,6 +251,11 @@ var CONSENT_ENUM = {
         "send_reminders": false
     }
 };
+var SYSTEM_IDENTIFIER_ENUM = {
+    "external_study_id" : "http://us.truenth.org/identity-codes/external-study-id",
+    "external_site_id" : "http://us.truenth.org/identity-codes/external-site-id",
+    "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
+};
 
 var fillViews = {
     "org": function() {
@@ -275,6 +280,7 @@ var fillViews = {
         this.name();
         this.dob();
         this.studyId();
+        this.siteId();
         this.phone();
         this.altPhone();
         this.email();
@@ -324,6 +330,13 @@ var fillViews = {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
             else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
+        };
+    },
+    "siteId": function() {
+        if (!$("#profileSiteIDContainer").hasClass("has-error")) {
+            var content = $("#profileSiteId").val();
+            if (hasValue(content)) $("#site_id_view").text(content);
+            else $("#site_id_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "detail": function() {
@@ -473,7 +486,7 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short"); 
+                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
                                 var dArray = dString.split("-");
                                 $("#biopsyDate").val(dString);
                                 $("#biopsy_year").val(dArray[0]);
@@ -684,12 +697,22 @@ var fillContent = {
     "subjectId": function(data) {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
-                if (item.system == "http://us.truenth.org/identity-codes/external-study-id") {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_study_id"]) {
                     if (hasValue(item.value)) $("#profileStudyId").val(item.value);
                 };
             });
         };
         fillViews.studyId();
+    },
+    "siteId": function(data) {
+        if (data.identifier) {
+            (data.identifier).forEach(function(item) {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_site_id"]) {
+                    if (hasValue(item.value)) $("#profileSiteId").val(item.value);
+                };
+            });
+        };
+        fillViews.siteId();
     },
     "consentList" : function(data, userId, errorMessage, errorCode) {
         /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
@@ -1273,15 +1296,17 @@ var assembleContent = {
                 };
             };
 
-
             var studyId = $("#profileStudyId").val();
+            var siteId = $("#profileSiteId").val();
             var states = [];
+
             $("#userOrgs input[name='organization']").each(function() {
                 if ($(this).is(":checked")) {
                     if (hasValue($(this).attr("state")) && parseInt($(this).val()) != 0) states.push($(this).attr("state"));
                 };
             });
-            if (hasValue(studyId) || states.length > 0) {
+
+            if (hasValue(studyId) || hasValue(siteId) || states.length > 0) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
@@ -1292,8 +1317,9 @@ var assembleContent = {
                     if (data && data.identifier) {
                         identifiers = [];
                         (data.identifier).forEach(function(identifier) {
-                            if (identifier.system != "http://us.truenth.org/identity-codes/external-study-id" &&
-                                identifier.system != "http://us.truenth.org/identity-codes/practice-region") identifiers.push(identifier);
+                            if (identifier.system != SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["external_site_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) identifiers.push(identifier);
                         });
                     };
                 }).fail(function() {
@@ -1303,7 +1329,7 @@ var assembleContent = {
                 if (hasValue(studyId)) {
                     studyId = $.trim(studyId);
                     var studyIdObj = {
-                        system: "http://us.truenth.org/identity-codes/external-study-id",
+                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
                         use: "secondary",
                         value: studyId
                     };
@@ -1315,10 +1341,25 @@ var assembleContent = {
                     };
                 };
 
+                if (hasValue(siteId)) {
+                    siteId = $.trim(siteId);
+                    var siteIdObj = {
+                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                        use: "secondary",
+                        value: siteId
+                    };
+
+                    if (identifiers) {
+                        identifiers.push(siteIdObj);
+                    } else {
+                        identifiers = [siteIdObj];
+                    };
+                };
+
                 if (states.length > 0) {
                     states.forEach(function(state) {
                         identifiers.push({
-                            system: "http://us.truenth.org/identity-codes/practice-region",
+                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
                             use: "secondary",
                             value: "state:" + state
                         });
@@ -2345,6 +2386,7 @@ var tnthAjax = {
                 fillContent.demo(data);
                 fillContent.timezone(data);
                 fillContent.subjectId(data);
+                fillContent.siteId(data);
                 fillContent.language(data);
             }
             $(".get-demo-error").remove();

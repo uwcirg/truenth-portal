@@ -241,6 +241,20 @@ select:not([multiple]) {
   margin: 1em 4em;
   border-top: 1px solid #ddd;
 }
+#mainDiv.profile #site_id_view {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+#mainDiv.profile .site-id-view td {
+  margin-top: 0.4em;
+}
+#mainDiv.profile #profileSiteIDContainer {
+  margin-bottom: 1.8em;
+}
+#profileSiteId {
+  width: 300px;
+  max-width: 100%;
+}
 @media (max-width: 1199px) {
   #mainDiv.profile .footer-container.flex{
     justify-content: center;
@@ -349,7 +363,7 @@ h4.detail-title {
   display: none;
 }
 /***** initial queries page style ****/
-#topTerms .custom-tou, 
+#topTerms .custom-tou,
 #topTerms .custom-tou-text {
   display: none;
 }
@@ -640,6 +654,7 @@ h4.detail-title {
 .study-id-view {
   display: none;
 }
+
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
