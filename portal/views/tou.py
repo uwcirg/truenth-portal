@@ -161,11 +161,12 @@ def get_tou_by_type(user_id, tou_type):
         abort(404)
     current_user().check_role(permission='view', other_id=user_id)
 
-    tou_type = sub('-',' ',tou_type)
+    tou_type = sub('-', ' ', tou_type)
 
     try:
-        tou = ToU.query.join(Audit).filter(and_(Audit.user_id == user_id,
-                                            ToU.type == tou_type)).first()
+        tou = ToU.query.join(Audit).filter(and_(
+            Audit.user_id == user_id,
+            ToU.type == tou_type)).first()
     except DataError:
         abort(400, 'invalid tou type')
 
@@ -220,9 +221,10 @@ def post_user_accepted_tou(user_id):
     """
     authd_user = current_user()
     authd_user.check_role(permission='edit', other_id=user_id)
-    audit = Audit(user_id = authd_user.id, subject_id=user_id,
-                  comment = "user {} posting accepted ToU for user {}".format(
-                      authd_user.id, user_id), context='tou')
+    audit = Audit(
+        user_id=authd_user.id, subject_id=user_id,
+        comment="user {} posting accepted ToU for user {}".format(
+            authd_user.id, user_id), context='tou')
     db.session.add(audit)
     return accept_tou(user_id)
 
@@ -264,13 +266,14 @@ def accept_tou(user_id=None):
 
     """
     if user_id:
-        user=get_user(user_id)
+        user = get_user(user_id)
     else:
         user = current_user()
     if not request.json or 'agreement_url' not in request.json:
         abort(400, "Requires JSON with the ToU 'agreement_url'")
-    audit = Audit(user_id = user.id, subject_id=user.id,
-        comment = "ToU accepted", context='tou')
+    audit = Audit(
+        user_id=user.id, subject_id=user.id,
+        comment="ToU accepted", context='tou')
     tou_type = request.json.get('type') or 'website terms of use'
     tou = ToU(audit=audit, agreement_url=request.json['agreement_url'],
               type=tou_type)
