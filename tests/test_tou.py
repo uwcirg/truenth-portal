@@ -41,6 +41,22 @@ class TestTou(TestCase):
         self.assertEquals(tou.agreement_url, tou_url)
         self.assertEquals(tou.audit.user_id, TEST_USER_ID)
 
+    def test_accept_w_org(self):
+        self.login()
+        self.bless_with_basics()
+        self.test_user = db.session.merge(self.test_user)
+        org_id = self.test_user.organizations.first().id
+        data = {'agreement_url': tou_url, 'organization_id': org_id}
+        rv = self.client.post(
+            '/api/tou/accepted',
+            content_type='application/json',
+            data=json.dumps(data))
+        self.assert200(rv)
+        tou = ToU.query.filter(ToU.agreement_url == tou_url).one()
+        self.assertEquals(tou.agreement_url, tou_url)
+        self.assertEquals(tou.audit.user_id, TEST_USER_ID)
+        self.assertEquals(tou.organization_id, org_id)
+
     def test_service_accept(self):
         service_user = self.add_service_user()
         self.login(user_id=service_user.id)

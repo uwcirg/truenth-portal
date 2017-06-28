@@ -208,6 +208,10 @@ def post_user_accepted_tou(user_id):
             agreement_url:
               description: URL for Terms Of Use text
               type: string
+            organization_id:
+              description: ID of associated organization, IFF applicable
+              type: integer
+              format: int64
     responses:
       200:
         description: message detailing success
@@ -254,6 +258,10 @@ def accept_tou(user_id=None):
             agreement_url:
               description: URL for Terms Of Use text
               type: string
+            organization_id:
+              description: ID of associated organization, IFF applicable
+              type: integer
+              format: int64
     responses:
       200:
         description: message detailing success
@@ -275,8 +283,9 @@ def accept_tou(user_id=None):
         user_id=user.id, subject_id=user.id,
         comment="ToU accepted", context='tou')
     tou_type = request.json.get('type') or 'website terms of use'
+    organization_id = request.json.get('organization_id')
     tou = ToU(audit=audit, agreement_url=request.json['agreement_url'],
-              type=tou_type)
+              type=tou_type, organization_id=organization_id)
     db.session.add(tou)
     db.session.commit()
     # Note: skipping auditable_event, as there's a audit row created above

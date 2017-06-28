@@ -8,6 +8,7 @@ tou_types = ENUM('website terms of use', 'subject website consent',
                  'stored website consent form', 'privacy policy',
                  name='tou_types', create_type=False)
 
+
 class ToU(db.Model):
     """SQLAlchemy class for `tou` table"""
     __tablename__ = 'tou'
@@ -16,6 +17,7 @@ class ToU(db.Model):
                               server_default='predates agreement_url',
                               nullable=False)
     audit_id = db.Column(db.ForeignKey('audit.id'), nullable=False)
+    organization_id = db.Column(db.ForeignKey('organizations.id'))
     type = db.Column('type', tou_types, nullable=False)
 
     audit = db.relationship('Audit', cascade="save-update", lazy='joined')
