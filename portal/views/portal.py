@@ -1,4 +1,5 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from collections import defaultdict
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
@@ -20,10 +21,13 @@ from ..models.app_text import app_text, AppText, VersionedResource, UndefinedApp
 from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA
 from ..models.coredata import Coredata
+from ..models.fhir import CC
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.procedure_codes import known_treatment_started
+from ..models.procedure_codes import known_treatment_not_started
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
@@ -885,6 +889,56 @@ def config_settings(config_key):
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))
+
+
+@portal.route('/reporting')
+@roles_required([ROLE.ADMIN, ROLE.ANALYST])
+@oauth.require_oauth()
+def reporting_dashboard():
+    """Executive Reporting Dashboard
+
+    Only accessible to Admins, or those with the Analyst role (no PHI access).
+
+    Usage: graphs showing user registrations and logins per day;
+           filterable by date and/or by intervention
+
+    User Stats: counts of users by role, intervention, etc.
+
+    Institution Stats: counts of users per org
+
+    Analytics: Usage stats from piwik (time on site, geographic usage,
+               referral sources for new visitors, etc)
+
+    """
+    counts = {}
+    counts['roles'] = defaultdict(int)
+    counts['patients'] = defaultdict(int)
+    counts['interventions'] = defaultdict(int)
+    counts['intervention_reports'] = defaultdict(int)
+    counts['organizations'] = defaultdict(int)
+
+    for user in User.query.filter_by(active=True):
+        for role in user.roles:
+            counts['roles'][role.name] += 1
+            if role.name == 'patient':
+                if not any(obs.codeable_concept == CC.BIOPSY
+                       for obs in user.observations):
+                    counts['patients']['pre-dx'] += 1
+                elif known_treatment_not_started(user):
+                    counts['patients']['dx-nt'] += 1
+                elif known_treatment_started(user):
+                    counts['patients']['dx-t'] += 1
+                if any(obs.codeable_concept == CC.PCaDIAG
+                       for obs in user.observations):
+                    counts['patients']['meta'] += 1
+        for interv in user.interventions:
+            counts['interventions'][interv.description] += 1
+            if (any(doc.intervention == interv for doc in user.documents)):
+                counts['intervention_reports'][interv.description] += 1
+        for org in user.organizations:
+            counts['organizations'][org.name] += 1
+
+    return render_template('reporting_dashboard.html', counts=counts)
 
 
 @portal.route('/spec')
