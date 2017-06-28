@@ -1561,10 +1561,17 @@
         );
     </script>
 {%- endmacro %}
-{% macro profileStudyID(person, current_user) -%}
+{% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
         <label class="text-muted">{{_("Study ID")}}</label>
-        <input type="text" id="profileStudyId" class="form-control" required {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
+        <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
+        <div class="help-block with-errors"></div>
+    </div>
+{%- endmacro %}
+{% macro profileSiteID(current_user) -%}
+    <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
+        <label class="text-muted">{{_("Site ID")}}</label>
+        <input type="text" id="profileSiteId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
     </div>
 {%- endmacro %}
@@ -1718,8 +1725,9 @@
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
@@ -1727,8 +1735,9 @@
                 <div class="edit-container">
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
-                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(person, current_user)}}{% endif -%}
                     {{profileEmail(person)}}
+                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(current_user)}}{% endif -%}
+                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileSiteID(current_user)}}{% endif -%}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 </div>
@@ -1866,8 +1875,9 @@
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
@@ -1875,8 +1885,9 @@
                 <div class="edit-container">
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
-                    {% if person.has_role('patient') %} {{profileStudyID(person, current_user)}} {% endif %}
                     {{profileEmail(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(current_user)}} {% endif %}
+                    {% if person.has_role('patient') %} {{profileSiteID(current_user)}} {% endif %}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 </div>

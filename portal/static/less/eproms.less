@@ -189,6 +189,9 @@ a.btn {
     display: none;
   }
 }
+#profileSiteIDContainer, #mainDiv.profile .site-id-view {
+  display: none;
+}
 #consentListLoad {
   margin-top: 1em;
 }
@@ -1881,10 +1884,21 @@ div.noOrg-container {
   font-weight: normal;
 }
 
- #profileStudyIDContainer {
+#profileStudyIDContainer {
   margin-bottom: 2em;
   input {
-    width: 30%;
+    width: 300px;
+    max-width: 100%;
+  }
+}
+
+#createProfileForm {
+  #profileStudyIDContainer {
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+  #profileStudyIDContainer input {
+    width: 350px;
     max-width: 100%;
   }
 }
