@@ -1,4 +1,5 @@
 """Recur module"""
+from datetime import datetime, timedelta
 from sqlalchemy import UniqueConstraint
 
 from ..database import db
@@ -10,7 +11,7 @@ class Recur(db.Model):
     NB - an external context defines the initial launch point
     and is NOT part of this structure, such as the date
     a user signed a consent agreement.  (by design, makes testing
-    possible as the start date can easily be adjusted)
+    reasonable as the start date can easily be adjusted)
 
     """
     __tablename__ = 'recurs'
@@ -23,7 +24,28 @@ class Recur(db.Model):
         doc="Days till repeat of the recurrance")
     days_till_termination = db.Column(
         db.Integer, nullable=True,
-        doc="termination of recurrance; days from initial lauch")
+        doc="optional termination of recurrance; days from initial lauch")
+
+    def add_if_not_found(self, commit_immediately=False):
+        """Add self to database, or return existing
+
+        @return: the new or matched Recur
+
+        """
+        query = Recur.query.filter(
+            Recur.days_to_start == self.days_to_start,
+            Recur.days_in_cycle == self.days_in_cycle,
+            Recur.days_in_cycle == self.days_in_cycle)
+
+        if query.count():
+            result = query.one()
+            self.id = result.id
+        else:
+            db.session.add(self)
+            if commit_immediately:
+                db.session.commit()
+        self = db.session.merge(self)
+        return self
 
     @classmethod
     def from_fhir(cls, data):
@@ -31,7 +53,7 @@ class Recur(db.Model):
         for field in (
                 'days_to_start', 'days_in_cycle', 'days_till_termination'):
             setattr(instance, field, data.get(field))
-        return instance
+        return instance.add_if_not_found()
 
     def as_fhir(self):
         d = {}
@@ -39,6 +61,39 @@ class Recur(db.Model):
                 'days_to_start', 'days_in_cycle', 'days_till_termination'):
             d[field] = getattr(self, field, None)
         return d
+
+    def active_interval_start(self, start):
+        """Return datetime for active recurrance start or None
+
+        :param start: The UTC datetime defining external context launch point,
+            such as the date of consent with an organization for questionnaires
+
+        :return: UTC datetime for active recurrance start or None if
+            the recurrance has either expired (beyond days_till_termination) or
+            has yet to begin (prior to days_to_start)
+
+        """
+        now = datetime.utcnow()
+        start_date = start + timedelta(self.days_to_start)
+        termination = (
+            start + timedelta(self.days_till_termination) if
+            self.days_till_termination else None)
+
+        if now < start_date:
+            # Has yet to begin
+            return None
+        if termination and now > termination:
+            # Recurrance terminated
+            return None
+
+        # Still here implies we're in a valid period - find the current
+        # and return its effective start date
+        effective_start = start_date
+        while True:
+            if effective_start + timedelta(self.days_in_cycle) < now:
+                effective_start += timedelta(self.days_in_cycle)
+            else:
+                return effective_start
 
 
 class QuestionnaireBankQuestionnaireRecur(db.Model):
