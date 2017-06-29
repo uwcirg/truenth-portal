@@ -18,7 +18,7 @@ from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
-from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA
+from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.coredata import Coredata
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
@@ -490,10 +490,14 @@ def website_consent_script(patient_id):
     as STAFF member needs to read the terms to the patient
     """
     terms = get_terms(org, ROLE.PATIENT)
+    top_org = patient.first_top_organization()
+    declaration_form = VersionedResource(app_text(WebsiteDeclarationForm_ATMA.
+                                                  name_key(organization=top_org)))
     return render_template(
-        'website_consent_script.html', user=user, terms=terms,
+        'website_consent_script.html', user=user,
+        terms=terms, top_organization=top_org,
         entry_method=entry_method, redirect_url=redirect_url,
-        patient_id=patient_id)
+        declaration_form=declaration_form, patient_id=patient_id)
 
 
 def get_terms(org=None, role=None):

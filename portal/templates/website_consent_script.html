@@ -5,7 +5,7 @@
 		{%- if entry_method == 'paper' %}
 			{{paperWebsiteConsentScript(terms)}}
 		{%- else -%}
-			{{interviewAssistedWebConsentScript(terms)}}
+			{{interviewAssistedWebConsentScript(terms, declaration_form)}}
 		{%- endif -%}
 	</div>
 	<div class="continue-msg-wrapper">
@@ -39,6 +39,13 @@
 	        	$(".continue-msg-wrapper").show();
 	        };
         });
+
+        if ($(".terms-tick-box-text[data-org='{{top_organization.name}}']").length > 0) {
+	        $(".terms-tick-box-text[data-org]").each(function() {
+	        	if ($(this).attr("data-org").toLowerCase() == "{{top_organization.name}}".toLowerCase()) $(this).show();
+	        	else $(this).hide();
+	    	});
+	    } else $($(".terms-tick-box-text[data-org]").get(0)).show();
 
 		$("[data-type='terms']").each(function() {
 			$(this).on("click", function() {

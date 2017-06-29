@@ -80,12 +80,13 @@
     <div id="termsCheckbox">
       <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
           <div class="edit-view">
-          <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text">{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions.") }}</span></div>
+          <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures.") }}</span><span class="terms-tick-box-text" data-org="IRONMAN">{{ _("The subject has read the Website Consent and IRONMAN Registry Study consent and agrees to the processing of their personal information (including their health information) on the terms described in the above consents and Terms and Conditions and a copy of both consents and information provided by the subject has been securely stored in accordance with my local site procedures.") }}</span>
+          </div>
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
     </div>
   {%- endmacro %}
-  {% macro interviewAssistedWebConsentScript(terms) -%}
+  {% macro interviewAssistedWebConsentScript(terms, form) -%}
       <h4 class="tnth-headline hidden-print">{{ _("Website Consent Script - Enter Manually - Interview Assisted") }}</h4>
       <p class="text-muted hidden-print">{{_("For Staff Use Only")}}</p>
       <hr class="hidden-print"/>
@@ -119,32 +120,7 @@
               </div>
               <div class="modal-body">
                 <div id="websiteDeclarationForm">
-                    <h4>{{_("Website declaration form")}}</h4>
-                    <br/>
-                    <p><em>{{_("Person Obtaining Consent must complete a form with the following text. This form must be entered into a central database and be retrievable in case there are any questions raised about the consent given at any time.")}}</em></p>
-                    <br/>
-                    <p><strong>{{_("Please tick the relevant box and complete the declaration below.")}}</strong><p>
-                    <p>{{_("For phone consent:")}}</p>
-                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox terms-tick-box"></i> <span class="terms-tick-box-text"><strong>{{_("I have read this consent form to the subject.")}}</strong></span></p>
-                    <br/>
-                    <p>{{_("For face-to-face consent:")}}</p>
-                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox terms-tick-box"></i> <span class="terms-tick-box-text"><strong>{{_("I have gone through and explained the consent form in the presence of the subject.")}}</strong></span></p>
-                    <br/>
-                    <p>{{_("Declaration:")}}</p>
-                    <p><strong>{{_("An explanation of the TrueNTH website tool was given and questions from the subject were solicited and answered to the subject’s satisfaction. In my judgment, the subject demonstrated comprehension of the information. The subject has provided oral consent to participate in the IRONMAN Registry Study on the terms set out above.")}}</strong></p>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Name and Title")}}
-                    </div>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Date")}}
-                    </div>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Signature of Person Obtaining Consent")}}
-                    </div>
-                    <br/><br/>
+                    {{form["asset"] | safe}}
                 </div>
               </div>
               <div class="modal-footer hidden-print">
@@ -157,20 +133,13 @@
       </div>
       <br/>
       <div id="termsCheckbox" class="hidden-print">
-        <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
+         <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
+         <br/>
+        <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent,stored website consent form" data-core-data-type="subject_website_consent,stored_website_consent_form"  data-url="{{terms['url'] if terms}}">
           <div class="edit-view">
-            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text">{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool ") }}</span>
+            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text">{{ _("I have read the required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
           </div>
-          <div class="display-view text-warning">{{_("Subject has given consent previously.")}}</div>
-        </label>
-        <br/>
-        <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
-        <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
-           <div class="edit-view">
-            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text">{{ _("I have created an electronic copy of this declaration and have stored said copy.") }}</span>
-          </div>
-          <div class="display-view text-warning">{{_("You had previously signed and stored an electronic copy of consent declaration.")}}
-          </div>
+          <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
       </div>
       <script>
