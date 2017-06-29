@@ -156,7 +156,7 @@ def biopsy_set(patient_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -211,7 +211,7 @@ def pca_diag_set(patient_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -266,7 +266,7 @@ def pca_localized_set(patient_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -370,7 +370,7 @@ def clinical_set(patient_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_details
           required:
             - message
           properties:
@@ -445,7 +445,7 @@ def clinical_update(patient_id, observation_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_details
           required:
             - message
           properties:

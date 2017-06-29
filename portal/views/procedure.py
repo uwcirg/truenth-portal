@@ -105,7 +105,7 @@ def post_procedure():
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_success_POST
           required:
             - message
           properties:
@@ -173,7 +173,7 @@ def procedure_delete(procedure_id):
       200:
         description: operation success
         schema:
-          id: response
+          id: response_success_DELETE
           required:
             - message
           properties:
