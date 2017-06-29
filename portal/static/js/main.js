@@ -1650,7 +1650,7 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrgId = item.parentOrgId;
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
-                var state = getState(item);
+                var state = getState(orgsList[_parentOrgId]);
 
                 childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
 

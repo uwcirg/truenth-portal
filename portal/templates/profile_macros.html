@@ -611,6 +611,10 @@
             }).done(function(data) {
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
+
+                  /**** draw state select element first to gather all states
+                        assign orgs to each state in array
+                  ***/
                   entry.forEach(function(item) {
                     var __state = "";
                     if (item.identifier) {
@@ -619,25 +623,40 @@
                                 __state = (region.value).split(":")[1];
                                 if (!states[__state]) {
                                     $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                    if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                    states[__state] = true;
-                                };
-                                if (parseInt(item.id) != 0) {
-                                    var parentId;
-                                    if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                                    else {
-                                        //need to check if it is a parent org and whether it has child org or not
-                                        var c = hasChildrenOrgs(item.id, entry);
-                                        if (!c) parentId = item.id;
-                                    }
-                                    if (parentId) {
-                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>");
-                                    };
-                                };
+                                    $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                    states[__state] = [item.id];
+                                } else (states[__state]).push(item.id);
                             };
                         });
                     };
+                  });
 
+                  /**** draw input element(s) that belongs to each state based on parent organization id ***/
+                  entry.forEach(function(item) {
+                    if (parseInt(item.id) != 0) {
+                        var parentId;
+                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                        else parentId = item.id;
+                        if (parentId) {
+                            var parentState = (function(o) {
+                                var s = "", found = false;
+                                for (var state in states) {
+                                    if (!found) {
+                                        (states[state]).forEach(function(i) {
+                                            if (i == o) {
+                                               s = state;
+                                               found = true;
+                                            };
+                                        });
+                                    };
+                                };
+                                return s;
+                            })(parentId);
+                            if ($("#" + parentState + "_container").length > 0) {
+                                $("#" + parentState + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>");
+                            };
+                        };
+                    };
                   });
 
                   var selectOptions = $("#stateSelector").sortOptions();
