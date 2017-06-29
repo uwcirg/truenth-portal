@@ -57,16 +57,16 @@ def mock_questionnairebanks():
     # Recurring assessments every 3 months up to 24 months, then every
     # 6 months prems alternate with epic26 - start with prems
     initial_recur = Recur(
-        days_to_start=30, days_in_cycle=90, days_till_termination=720)
+        days_to_start=30, days_in_cycle=90,
+        days_till_termination=720)
     initial_recur_prems = Recur(
-        days_to_start=30, days_in_cycle=180, days_till_termination=720)
+        days_to_start=30, days_in_cycle=180,
+        days_till_termination=720)
     initial_recur_epic26 = Recur(
-        days_to_start=60, days_in_cycle=180, days_till_termination=720)
+        days_to_start=60, days_in_cycle=180,
+        days_till_termination=720)
     every_six_thereafter = Recur(
         days_to_start=720, days_in_cycle=180)
-    recur_rows = [
-        initial_recur, initial_recur_prems, initial_recur_epic26,
-        every_six_thereafter]
 
     with SessionScope(db):
         for name in (localized_instruments.union(*(
@@ -76,13 +76,19 @@ def mock_questionnairebanks():
             db.session.add(Questionnaire(name=name))
         db.session.add(localized_org)
         db.session.add(metastatic_org)
-        map(db.session.add, recur_rows)
+        db.session.add(initial_recur)
+        db.session.add(initial_recur_prems)
+        db.session.add(initial_recur_epic26)
+        db.session.add(every_six_thereafter)
         db.session.commit()
     localized_org, metastatic_org = map(
         db.session.merge, (localized_org, metastatic_org))
     localized_org_id = localized_org.id
     metastatic_org_id = metastatic_org.id
-    recur_rows = map(db.session.merge, recur_rows)
+    initial_recur = db.session.merge(initial_recur)
+    initial_recur_prems = db.session.merge(initial_recur_prems)
+    initial_recur_epic26 = db.session.merge(initial_recur_epic26)
+    every_six_thereafter = db.session.merge(every_six_thereafter)
 
     # Localized baseline
     l_qb = QuestionnaireBank(
@@ -324,6 +330,21 @@ class TestAssessmentStatus(TestCase):
         self.assertTrue(a_s.enrolled_in_classification('indefinite'))
         self.assertFalse(a_s.instruments_needing_full_assessment('indefinite'))
         self.assertFalse(a_s.instruments_in_progress('indefinite'))
+
+    def test_recur_due(self):
+
+        # backdate so baseline q's have expired, and we within the first
+        # recurrance window
+        self.bless_with_basics(backdate=timedelta(days=60))
+        self.mark_metastatic()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, "Expired")
+
+        # in the initial window w/ no questionnaires
+        self.assertEquals(
+            a_s.instruments_needing_full_assessment('recurring'),
+            [])
 
     def test_batch_lookup(self):
         self.login()
