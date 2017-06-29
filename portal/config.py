@@ -1,7 +1,6 @@
 """Configuration"""
 import os
 import redis
-from flask_script import Server
 
 
 def best_sql_url():
@@ -34,17 +33,17 @@ class BaseConfig(object):
     # NB: The value of REDIS_URL may change at any point
     REDIS_URL = os.environ.get(
         'REDIS_URL',
-        'redis://localhost:6379'
+        'redis://localhost:6379/0'
     )
 
     ANONYMOUS_USER_ACCOUNT = True
     CELERY_BROKER_URL = os.environ.get(
         'CELERY_BROKER_URL',
-        REDIS_URL + '/0'
+        REDIS_URL
     )
     REQUEST_CACHE_URL = os.environ.get(
         'REQUEST_CACHE_URL',
-        REDIS_URL + '/0'
+        REDIS_URL
     )
     CELERY_IMPORTS = ('portal.tasks', )
     CELERY_RESULT_BACKEND = 'redis'
@@ -54,7 +53,8 @@ class BaseConfig(object):
     LOG_LEVEL = 'DEBUG'
 
     MAIL_USERNAME = 'portal@truenth-demo.cirg.washington.edu'
-    MAIL_DEFAULT_SENDER = '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu>'
+    MAIL_DEFAULT_SENDER = (
+        '"TrueNTH" <noreply@truenth-demo.cirg.washington.edu>')
     CONTACT_SENDTO_EMAIL = MAIL_USERNAME
     ERROR_SENDTO_EMAIL = MAIL_USERNAME
     OAUTH2_PROVIDER_TOKEN_EXPIRES_IN = 4 * 60 * 60  # units: seconds
@@ -76,7 +76,7 @@ class BaseConfig(object):
 
     SESSION_REDIS_URL = os.environ.get(
         'SESSION_REDIS_URL',
-        REDIS_URL + '/0'
+        REDIS_URL
     )
 
     # Todo: create issue @ fengsp/flask-session
@@ -92,7 +92,7 @@ class BaseConfig(object):
     USER_ENABLE_CONFIRM_EMAIL = False  # don't force email conf on new accounts
 
     STAFF_BULK_DATA_ACCESS = True
-    PATIENT_LIST_ADDL_FIELDS = [] # 'status', 'reports'
+    PATIENT_LIST_ADDL_FIELDS = []  # 'status', 'reports'
 
     FB_CONSUMER_KEY = os.environ.get('FB_CONSUMER_KEY', '')
     FB_CONSUMER_SECRET = os.environ.get('FB_CONSUMER_SECRET', '')
@@ -110,10 +110,12 @@ class BaseConfig(object):
     SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET', None)
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', None)
 
+
 class DefaultConfig(BaseConfig):
     """Default configuration"""
     DEBUG = True
     SQLALCHEMY_ECHO = False
+
 
 class TestConfig(BaseConfig):
     """Testing configuration - used by unit tests"""
