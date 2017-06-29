@@ -968,7 +968,10 @@ class User(db.Model, UserMixin):
             pre_existing = [ident for ident in self._identifiers
                             if ident.system not in internal_identifier_systems]
             for identifier in fhir['identifier']:
-                new_id = Identifier.from_fhir(identifier)
+                try:
+                    new_id = Identifier.from_fhir(identifier)
+                except KeyError, e:
+                    abort(400, "{} field not found for identifier".format(e))
                 if new_id.system in internal_identifier_systems:
                     continue
                 new_id = new_id.add_if_not_found()
