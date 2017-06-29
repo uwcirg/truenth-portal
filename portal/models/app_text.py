@@ -158,6 +158,24 @@ class Terms_ATMA(AppTextModelAdapter):
         return "Terms and Conditions URL"
 
 
+class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Website Declaraion Form"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a Website Declaration Form
+
+        :param organization: required
+        :returns: string for AppText.name field
+
+        """
+        if not kwargs.get('organization'):
+            raise ValueError("required 'organization' parameter not defined")
+        else:
+            return "{} website declaration form URL".\
+                    format(kwargs.get('organization').name)
+
+
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 
