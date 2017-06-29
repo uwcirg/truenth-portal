@@ -60,6 +60,9 @@
 		                    var theTerms = {};
 		                    theTerms["agreement_url"] = self.attr("data-url");
 		                    theTerms["type"] = type;
+		                    {% if top_organization %}
+		                    	theTerms["organization_id"] = "{{top_organization.id}}";
+		                    {% endif %}
 		                     // Post terms agreement via API
 		                    tnthAjax.postTermsByUser('{{patient_id}}', theTerms);
 		                });
