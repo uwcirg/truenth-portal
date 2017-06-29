@@ -40,6 +40,8 @@
 	        };
         });
 
+        $(".intro-text").text($(".intro-text").text().replace("[organization]", "{{top_organization.name}}"));
+
         if ($(".terms-tick-box-text[data-org='{{top_organization.name}}']").length > 0) {
 	        $(".terms-tick-box-text[data-org]").each(function() {
 	        	if ($(this).attr("data-org").toLowerCase() == "{{top_organization.name}}".toLowerCase()) $(this).show();
