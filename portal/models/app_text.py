@@ -157,6 +157,7 @@ class Terms_ATMA(AppTextModelAdapter):
                     format(kwargs.get('organization').name, kwargs.get('role'))
         return "Terms and Conditions URL"
 
+
 class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Website Declaraion Form"""
 
