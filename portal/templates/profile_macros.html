@@ -557,19 +557,6 @@
                 $(".clinic-prompt").show();
             };
         };
-        function hasChildrenOrgs(orgId, data) {
-            if (hasValue(orgId) && hasValue(data)) {
-                var parentId, hasChildren = false;
-                data.forEach(function(item) {
-                    if (!hasChildren) {
-                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                        hasChildren = (parentId == orgId);
-                    };
-
-                });
-                return hasChildren;
-            } else return false;
-        }
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
