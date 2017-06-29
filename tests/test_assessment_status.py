@@ -295,3 +295,45 @@ class TestAssessmentStatus(TestCase):
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
         self.assertEquals(a_s.overall_status, "Due")
+
+    def test_boundry_overdue(self):
+        "At days_till_overdue, should still be overdue"
+        self.login()
+        self.bless_with_basics(backdate=timedelta(days=90))
+        self.mark_localized()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, 'Overdue')
+
+    def test_boundry_expired(self):
+        "At days_till_overdue +1, should be expired"
+        self.login()
+        self.bless_with_basics(backdate=timedelta(days=91))
+        self.mark_localized()
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, 'Expired')
+
+    def test_boundry_in_progress(self):
+        self.login()
+        self.bless_with_basics(backdate=timedelta(days=90))
+        self.mark_localized()
+        for instrument in localized_instruments:
+            mock_qr(
+                user_id=TEST_USER_ID, instrument_id=instrument,
+                status='in-progress')
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, 'In Progress')
+
+    def test_boundry_in_progress_expired(self):
+        self.login()
+        self.bless_with_basics(backdate=timedelta(days=91))
+        self.mark_localized()
+        for instrument in localized_instruments:
+            mock_qr(
+                user_id=TEST_USER_ID, instrument_id=instrument,
+                status='in-progress')
+        self.test_user = db.session.merge(self.test_user)
+        a_s = AssessmentStatus(user=self.test_user)
+        self.assertEquals(a_s.overall_status, 'Expired')
