@@ -127,11 +127,14 @@ class QuestionnaireDetails(object):
                               organization_id):
         """Build up internal ordered dict from given values"""
         storage = getattr(self, '_{}_qs'.format(classification))
-        if questionnaire.name not in storage:
+        if questionnaire.name in storage:
             raise ValueError(
-                "questionnaires expected to be unique by classification")
+                "questionnaires expected to be unique by classification, "
+                "{} already defined for {}".format(
+                    questionnaire.name, classification))
 
-        def status_from_recents(recents, days_till_due, days_till_overdue):
+        def status_from_recents(
+                recents, days_till_due, days_till_overdue, start):
             """Returns dict defining available values from recents
 
             Return dict will only define values which make sense.  i.e.
@@ -149,24 +152,48 @@ class QuestionnaireDetails(object):
                 results['status'] = 'In Progress'
                 results['in-progress'] = recents['in-progress']
             today = datetime.utcnow()
-            delta = today - self.consent_date
+            delta = today - start
             if delta < timedelta(days=days_till_due + 1):
                 tmp = {
                     'status': 'Due',
                     'by_date': (
-                        self.consent_date + timedelta(days=days_till_due))
+                        start + timedelta(days=days_till_due))
                    }
                 tmp.update(results)
                 return tmp
             if delta < timedelta(days=days_till_overdue + 1):
                 tmp = {
                     'status': 'Overdue',
-                    'by_date': self.consent_date + timedelta(
+                    'by_date': start + timedelta(
                         days=days_till_overdue)
                    }
                 tmp.update(results)
                 return tmp
             return {'status': 'Expired'}
+
+        def questionnaire_start_date(questionnaire):
+            """Return relative start date for questionnare or None
+
+            Determine if questionnaire qualifies for inclusion, if not, return
+            None.  If it qualifies, return the start date.  Typically this is
+            the consent_date except on recurring questionnaries, where it's
+            the effective start_date for the active recurrance cycle.
+
+            :return: datetime of the questionnaire's start date; None if N/A
+
+            """
+            if len(questionnaire.recurs):
+                for recurrance in questionnaire.recurs:
+                    relative_start = recurrance.active_interval_start(
+                        start=self.consent_date)
+                    if relative_start:
+                        return relative_start
+                return None  # no active recurrance
+            return self.consent_date
+
+        relative_start = questionnaire_start_date(questionnaire)
+        if not relative_start:
+            return
 
         storage[questionnaire.name] = {
             'name': questionnaire.name,
@@ -177,7 +204,8 @@ class QuestionnaireDetails(object):
             status_from_recents(recents=most_recent_survey(
                 self.user, questionnaire.name),
                 days_till_due=questionnaire.days_till_due,
-                days_till_overdue=questionnaire.days_till_overdue))
+                days_till_overdue=questionnaire.days_till_overdue,
+                start=relative_start))
 
 
 class AssessmentStatus(object):
@@ -269,8 +297,8 @@ class AssessmentStatus(object):
         """Return list of questionnaire names needed for classification
 
         NB - if the questionnaire is outside the valid date range, such as in
-        an expired state, it will not be included in the list regardless of
-        its needing assessment status.
+        an expired state or prior to the next recurring cycle, it will not be
+        included in the list regardless of its needing assessment status.
 
         :param classification: set to restrict lookup to a single
             QuestionnaireBank.classification or 'all' to consider all.
