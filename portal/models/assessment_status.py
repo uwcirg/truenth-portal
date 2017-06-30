@@ -153,7 +153,7 @@ class QuestionnaireDetails(object):
                 results['in-progress'] = recents['in-progress']
             today = datetime.utcnow()
             delta = today - start
-            if delta < timedelta(days=days_till_due + 1):
+            if delta < timedelta(days=days_till_due):
                 tmp = {
                     'status': 'Due',
                     'by_date': (
@@ -161,7 +161,7 @@ class QuestionnaireDetails(object):
                    }
                 tmp.update(results)
                 return tmp
-            if delta < timedelta(days=days_till_overdue + 1):
+            if delta < timedelta(days=days_till_overdue):
                 tmp = {
                     'status': 'Overdue',
                     'by_date': start + timedelta(
