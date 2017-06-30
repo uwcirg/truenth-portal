@@ -5518,10 +5518,18 @@ body.modal-open .modal.is-modal-active .modal-dialog {
     border: 2px solid #7C959E;
     outline: none !important;
 }
+.box-modal form input.button--login:focus,
+.box-modal form input.button--login--register:focus,
+.box-modal form input.button--login:active,
+.box-modal form input.button--login--register:active {
+    border: 2px solid #c7c6c0;
+}
 
-.box-modal form input.button--login {
+.box-modal form input.button--login,
+.box-modal form input.button--login--register {
     background-color: #c7c6c0;
     border: 2px solid #c7c6c0;
+    color: #FFF
 }
 
 .box-modal--login {
