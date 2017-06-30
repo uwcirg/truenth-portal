@@ -6,6 +6,7 @@ from .. import tasks
 from ..database import db
 from ..extensions import celery
 
+
 class ScheduledJob(db.Model):
     """ORM class for user document upload data
 
@@ -23,15 +24,13 @@ class ScheduledJob(db.Model):
     def __str__(self):
         return "scheduled_job {0.id} ({0.task}: {0._schedule})".format(self)
 
-
     @property
     def schedule(self):
         return self._schedule
 
-
     @schedule.setter
     def schedule(self, s):
-    # schedule must match cron schedule pattern * * * * * 
+        # schedule must match cron schedule pattern * * * * *
         format = r'([\*\d,-\/]+)\s([\*\d,-\/]+)\s([\*\d,-\/]+)' \
                  r'\s([\*\d,-\/]+)\s([\*\d,-\/]+)$'
         if not s or re.match(format, s):
