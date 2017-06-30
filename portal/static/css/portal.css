@@ -255,6 +255,9 @@ select:not([multiple]) {
   width: 350px;
   max-width: 100%;
 }
+#createProfileForm #profileSiteIDContainer {
+  margin-top: 1.3em;
+}
 #profileSiteId {
   width: 300px;
   max-width: 100%;
