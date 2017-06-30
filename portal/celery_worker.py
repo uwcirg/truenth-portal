@@ -10,14 +10,17 @@ Launch in the same virtual environment via
   $ celery worker -A portal.celery_worker.celery --loglevel=info
 
 """
-from .extensions import celery
-assert celery  # silence pyflake warning
 from .app import create_app
+from .extensions import celery
 from .models.scheduled_job import ScheduledJob
 import tasks
 
+assert celery  # silence pyflake warning
+
 app = create_app()
 app.app_context().push()
+
+
 
 @celery.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):

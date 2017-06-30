@@ -23,7 +23,7 @@ def upgrade():
                     sa.Column('active', sa.Boolean(),
                               server_default='1', nullable=False),
                     sa.PrimaryKeyConstraint('id')
-    )
+                    )
 
 
 def downgrade():
