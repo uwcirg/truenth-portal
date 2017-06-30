@@ -8,6 +8,7 @@
 .coverage
 application.cfg
 site.cfg
+celerybeat-schedule
 env
 lib
 local
