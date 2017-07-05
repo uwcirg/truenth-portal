@@ -190,7 +190,7 @@
              <form action="{{url_for('user.login')}}" method="POST" class="form">
               <input name="email" type="text" placeholder="{{_('Email Address')}}" required>
               <input name="password" type="password" placeholder="{{_('Password')}}" required>
-              <input id="btnLogin" class="button button-large button--teal button--login" type="submit" value="Log In">
+              <input id="btnLogin" class="button button-large button--login" type="submit" value="Log In">
               <br/><br/>
               <a href="{{url_for('user.forgot_password')}}"><span class="box-modal__sub">{{_("Having trouble logging in?")}}</span></a>
             </form>
@@ -215,7 +215,7 @@
         <div class="modal-content box-modal">
           <div class="box-modal__inner"><a class="box-modal__close" data-dismiss="modal" aria-label="Close"></a>
             <h3 class="box-modal__title">{{_("Login")}}</h3>
-            <a href="#" class="button button-large button--teal button--login--register">{{_("Login")}}</a>
+            <a href="#" class="button button-large button--login--register">{{_("Login")}}</a>
             <br/><br/>
             <div class="or">{{_("or")}}</div>
             <div class="box-modal-or__divider"></div>
