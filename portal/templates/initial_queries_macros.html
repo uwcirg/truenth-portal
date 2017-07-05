@@ -64,6 +64,11 @@
        <script>
             $(function () {
                 tnthAjax.getTermsUrl();
+                $(".custom-tou-text .required-link").each(function() {
+                    $(this).on("click", function(e) {
+                      e.stopPropagation();
+                    });
+                });
             });
        </script>
   {%- endmacro %}
