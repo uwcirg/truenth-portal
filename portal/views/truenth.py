@@ -52,7 +52,7 @@ def auditlog_addevent():
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:

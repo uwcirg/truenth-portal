@@ -272,7 +272,7 @@ def delete_user(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_deleted
           required:
             - message
           properties:
@@ -332,7 +332,7 @@ def access_url(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_unique_URL
           required:
             - access_url
           properties:
@@ -549,7 +549,7 @@ def set_user_consents(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -628,7 +628,7 @@ def delete_user_consents(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -1560,7 +1560,7 @@ def upload_user_document(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -1660,7 +1660,7 @@ def trigger_password_reset_email(user_id):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
