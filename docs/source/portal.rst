@@ -6,8 +6,10 @@ Portal
 .. automodule:: portal.audit
     :members:
 
-.. automodule:: portal.celery_worker
-    :members:
+..
+    ignore celery_worker until celery.contrib.sphinx issue fixed
+    .. automodule:: portal.celery_worker
+        :members:
 
 .. automodule:: portal.config
     :members:
