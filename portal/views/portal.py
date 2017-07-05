@@ -929,7 +929,7 @@ def reporting_dashboard():
                     counts['patients']['dx-nt'] += 1
                 elif known_treatment_started(user):
                     counts['patients']['dx-t'] += 1
-                if any((obs.codeable_concept == CC.PCaDIAG
+                if any((obs.codeable_concept == CC.PCaLocalized
                         and not obs.value_quantity.value)
                        for obs in user.observations):
                     counts['patients']['meta'] += 1
