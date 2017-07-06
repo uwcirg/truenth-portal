@@ -12,3 +12,10 @@
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
+{% block document_ready %}
+	{% if request.args.get("disableLinks", "") %}
+	$("document").ready(function() {
+		setTimeout("disableHeaderFooterLinks();", 1000);
+	});
+	{% endif %}
+{% endblock %}
