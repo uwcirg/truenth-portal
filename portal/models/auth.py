@@ -57,6 +57,8 @@ class Client(db.Model):
         primaryjoin="Client.client_id==Intervention.client_id",
         uselist=False, backref='Intervention')
 
+    grants = db.relationship('Grant', cascade='delete')
+
     @property
     def intervention_or_default(self):
         """To use the WTForm classes, always need a live intervention
