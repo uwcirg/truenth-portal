@@ -805,7 +805,7 @@ def robots():
 def contact():
     """main TrueNTH contact page"""
     user = current_user()
-    if (request.method == 'GET') or not recaptcha.verify():
+    if (request.method == 'GET') or (not user and not recaptcha.verify()):
         sendername = user.display_name if user else ''
         email = user.email if user else ''
         gil = current_app.config.get('GIL')

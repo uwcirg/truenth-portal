@@ -33,9 +33,11 @@
         <textarea class="form-control" rows="5" name="body" id="body" data-error="{{ _('Please add a message for TrueNTH') }}" placeholder="{{ _('What is on your mind?') }}" required></textarea>
         <div class="help-block with-errors"></div>
       </div>
+      {% if not user %}
       <div class="field-group">
         {{ recaptcha }}
       </div>
+      {% endif %}
       <div class="form-group">
         <button type="submit" class="btn btn-tnth-primary btn-lg">{{ _("Send") }}</button>
       </div>
