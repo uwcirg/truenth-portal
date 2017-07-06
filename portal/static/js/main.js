@@ -3644,6 +3644,13 @@ function isString (obj) {
   return (Object.prototype.toString.call(obj) === '[object String]');
 };
 
+function disableHeaderFooterLinks() {
+    $("#tnthLogo a, #tnthTopLinks a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
+        e.preventDefault();
+        return false;
+    });
+};
+
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};

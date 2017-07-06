@@ -106,10 +106,10 @@ var configObj = (function() {
         else {
           if (!dataArray) dataArray = CONFIG_REQUIRED_CORE_DATA;
           if (dataArray) {
+            if (dataArray.length == 0) return false;
             var found = false;
             var ma = configMatch.split(",");
             ma.forEach(function(item) {
-              if (dataArray.length == 0) return false;
               dataArray.forEach(function(v) {
                   if (!found && v == item) found = true;
               });
@@ -262,7 +262,7 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
           this.incompleteFields[currentIndex + 1].section.show();
           //console.log("next Index? " + currentIndex + 1);
           //console.log(this.incompleteFields[currentIndex + 1].section)
-          var el = this.incompleteFields[currentIndex + 1].element;
+           var el = this.incompleteFields[currentIndex + 1].element;
            el.fadeIn();
            $('html, body').animate({
               scrollTop: el.offset().top
@@ -483,10 +483,7 @@ function initIncompleteFields() {
             $("#termsReminderModal").modal("show");
           };
         };
-        $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
-            e.preventDefault();
-            return false;
-        });
+        disableHeaderFooterLinks();
       } else {
         $("#topTerms").hide();
         fc.getNext();
@@ -502,6 +499,15 @@ function initIncompleteFields() {
 configObj.initConfig();
 
 $(document).ready(function(){
+  
+     if (typeof sessionStorage != "undefined") {
+        if (!sessionStorage.getItem("visited")) {
+          sessionStorage.setItem("visited", "true");
+        };
+        $(window).on("focus", function() {
+            if (sessionStorage.getItem("visited")) window.location.reload();
+        });
+     };
 
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
@@ -580,7 +586,7 @@ $(document).ready(function(){
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
 
-            if (toCall == "biopsy") {
+           if (toCall == "biopsy") {
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
