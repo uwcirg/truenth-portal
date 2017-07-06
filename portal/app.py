@@ -11,7 +11,7 @@ import redis
 from .audit import configure_audit_log
 from .config import DefaultConfig
 from .database import db
-from .extensions import authomatic
+from .extensions import authomatic, recaptcha
 from .extensions import babel, celery, mail, oauth, session, user_manager
 from .models.app_text import app_text
 from .models.coredata import configure_coredata
@@ -140,6 +140,9 @@ def configure_extensions(app):
 
     # babel - i18n
     babel.init_app(app)
+
+    # recaptcha - form verification
+    recaptcha.init_app(app)
 
 
 def configure_blueprints(app, blueprints):
