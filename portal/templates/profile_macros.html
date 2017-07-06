@@ -854,6 +854,7 @@
             contentType: "application/json; charset=utf-8",
             dataType: 'json'
         }).done(function(data) {
+            
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
@@ -882,12 +883,6 @@
                     undefinedText: '--',
                     columns: [
                         {
-                            field: 'user_id',
-                            title: 'User',
-                            width: '5%',
-                            sortable: true,
-                            searchable: true
-                        }, {
                             field: 'filename',
                             title: 'Filename',
                             searchable: true,
