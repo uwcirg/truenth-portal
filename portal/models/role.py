@@ -28,6 +28,8 @@ class Role(db.Model):
 STATIC_ROLES = IterableUserDict({
     'admin':
         'Administrator privileges, i.e. carte blanche',
+    'analyst':
+        'Grants view permissions for reporting data (does not include PHI)',
     'anon':
         'Anonymous role - exclusive to accounts generated prior to '
         'user authentication',
