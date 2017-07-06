@@ -72,7 +72,7 @@
                   </select>
                 </div>
               </div>
-              {% if not user %}
+              {% if not user and config.RECAPTCHA_SITE_KEY and config.RECAPTCHA_SECRET_KEY %}
               <div class="field-group">
                 {{ recaptcha }}
               </div>
