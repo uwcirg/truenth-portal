@@ -1683,11 +1683,13 @@ def trigger_password_reset_email(user_id):
         user = get_user(user_id)
     if user.deleted:
         abort(400, "deleted user - operation not permitted")
-    if user.email:
+    if user.email and "@" in user.email:
       try:
           user_manager.send_reset_password_email(user.email)
       except ValueError as e:
           abort(400, str(e))
+    else:
+      abort(400, "invalid email address")
     auditable_event("password reset email triggered for user {}".format(
         user_id), user_id=current_user().id, subject_id=user_id,
         context='login')
