@@ -2118,7 +2118,7 @@ var tnthAjax = {
                 $.ajax ({
                     type: "POST",
                     url: '/api/user/' + userId + '/consent',
-                    contentType: "application/json",
+                    contentType: "application/json; charset=utf-8",
                     cache: false,
                     dataType: 'json',
                     async: (sync? false: true),
