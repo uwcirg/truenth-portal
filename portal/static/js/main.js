@@ -713,7 +713,7 @@ var fillContent = {
 
                     if (editable && consentStatus == "active") {
                         /****** modal content doe modifying consent status *******/
-                        modalContent += '<div class="modal fade" id="consent{{index}}Modal" tabindex="-1" role="dialog" aria-labelledby="consent{{index}}ModalLabel">'
+                        modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
                             + '<div class="modal-header">'
@@ -723,16 +723,15 @@ var fillContent = {
                             + '<div class="modal-body" style="padding: 0 2em">'
                             + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_{{index}}" type="radio" modalId="consent{{index}}Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_{{index}}" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_{{index}}" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
+                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
+                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
                             + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
-                        modalContent = modalContent.replace(/\{\{index\}\}/gi, index);
 
                         /**** modal content for editing consent date for test patient ****/
                         consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
@@ -872,18 +871,20 @@ var fillContent = {
                             };
                         };
 
+                        /**** validate hour [0]0 ****/
                         if (hasValue(h)) {
                             if (!(/^([1-9]|0[1-9]|1\d|2[0-3])$/.test(h))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Hour must be in valid format, range 0 to 23.";
                             };
                         };
 
+                        /***** validate minute [0]0 *****/
                         if (hasValue(m)) {
                             if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(m))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Minute must be in valid format, range 0 to 59."
                             };
                         };
-
+                        /***** validate second [0]0 *****/
                         if (hasValue(s)) {
                             if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(s))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
@@ -929,6 +930,7 @@ var fillContent = {
                                 o.testPatient = true;
                                 setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
                                 setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
+                                /**** disable close buttons while processing request ***/
                                 $("#consentListTable button[data-dismiss]").attr("disabled", true);
                 
                                 //serId, params, status, sync, callback)
