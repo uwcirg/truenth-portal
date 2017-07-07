@@ -16,7 +16,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
-from ..extensions import oauth, user_manager
+from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
@@ -805,7 +805,11 @@ def robots():
 def contact():
     """main TrueNTH contact page"""
     user = current_user()
-    if request.method == 'GET':
+    if ((request.method == 'GET') or
+        (not user and
+         current_app.config.get('RECAPTCHA_SITE_KEY', None) and
+         current_app.config.get('RECAPTCHA_SECRET_KEY', None) and
+         not recaptcha.verify())):
         sendername = user.display_name if user else ''
         email = user.email if user else ''
         gil = current_app.config.get('GIL')

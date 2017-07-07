@@ -147,6 +147,10 @@ session = Session()
 from flask_celery import Celery
 celery = Celery()
 
-# Bable is used for i18n
+# Babel is used for i18n
 from flask_babel import Babel
 babel = Babel()
+
+# ReCaptcha is used for form verification
+from flask_recaptcha import ReCaptcha
+recaptcha = ReCaptcha()

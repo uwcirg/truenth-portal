@@ -110,6 +110,10 @@ class BaseConfig(object):
     SMARTLING_USER_SECRET = os.environ.get('SMARTLING_USER_SECRET', None)
     SMARTLING_PROJECT_ID = os.environ.get('SMARTLING_PROJECT_ID', None)
 
+    RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', None)
+    RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', None)
+    RECAPTCHA_ENABLED = bool(RECAPTCHA_SITE_KEY)
+
 
 class DefaultConfig(BaseConfig):
     """Default configuration"""
