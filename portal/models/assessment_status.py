@@ -78,7 +78,9 @@ class QuestionnaireDetails(object):
     def __init__(self, user, consent_date):
         self.user = user
         self.consent_date = consent_date
-        self.qs = OrderedDict()
+        self._baseline_qs = OrderedDict()
+        self._recurring_qs = OrderedDict()
+        self._indefinite_qs = OrderedDict()
         for classification in ('baseline', 'recurring', 'indefinite'):
             for qb in qbs_for_user(user, classification):
                 for questionnaire in qb.questionnaires:
@@ -87,43 +89,52 @@ class QuestionnaireDetails(object):
                         questionnaire=questionnaire,
                         organization_id=qb.organization_id)
 
-    def __getitem__(self, key):
-        """Direct access to questionnaire by name"""
-        return self.qs[key]
+    def lookup(self, questionnaire_name, classification):
+        """Return element (if found) with matching criteria"""
+        if classification == 'all':
+            raise NotImplementedError(
+                "`lookup' not yet supporting `all` classifications")
+        storage = getattr(self, '_{}_qs'.format(classification))
+        if not storage:
+            raise ValueError("unknown classification: {}".format(
+                classification))
+        return storage.get(questionnaire_name)
 
     def all(self):
         """Generator to return all questionnaires"""
-        for q in self.qs.values():
+        for q in (
+                self._baseline_qs.values() +
+                self._recurring_qs.values() +
+                self._indefinite_qs.values()):
             yield q
 
     def baseline(self):
         """Generator to return all baseline questionnaires"""
-        gen = (q for q in self.qs.values()
-               if q['classification'] == 'baseline')
-
-        for q in gen:
+        for q in self._baseline_qs.values():
             yield q
 
     def indefinite(self):
         """Generator to return all indefinite questionnaires"""
-        gen = (
-            q for q in self.qs.values() if q['classification'] == 'indefinite')
-        for q in gen:
+        for q in self._indefinite_qs.values():
             yield q
 
     def recurring(self):
         """Generator to return all recurring questionnaires"""
-        gen = (
-            q for q in self.qs.values() if q['classification'] == 'recurring')
-        for q in gen:
+        for q in self._recurring_qs.values():
             yield q
 
     def _append_questionnaire(self, classification, questionnaire,
                               organization_id):
         """Build up internal ordered dict from given values"""
-        assert questionnaire.name not in self.qs
+        storage = getattr(self, '_{}_qs'.format(classification))
+        if questionnaire.name in storage:
+            raise ValueError(
+                "questionnaires expected to be unique by classification, "
+                "{} already defined for {}".format(
+                    questionnaire.name, classification))
 
-        def status_from_recents(recents, days_till_due, days_till_overdue):
+        def status_from_recents(
+                recents, days_till_due, days_till_overdue, start):
             """Returns dict defining available values from recents
 
             Return dict will only define values which make sense.  i.e.
@@ -141,35 +152,60 @@ class QuestionnaireDetails(object):
                 results['status'] = 'In Progress'
                 results['in-progress'] = recents['in-progress']
             today = datetime.utcnow()
-            delta = today - self.consent_date
-            if delta < timedelta(days=days_till_due + 1):
+            delta = today - start
+            if delta < timedelta(days=days_till_due):
                 tmp = {
                     'status': 'Due',
                     'by_date': (
-                        self.consent_date + timedelta(days=days_till_due))
+                        start + timedelta(days=days_till_due))
                    }
                 tmp.update(results)
                 return tmp
-            if delta < timedelta(days=days_till_overdue + 1):
+            if delta < timedelta(days=days_till_overdue):
                 tmp = {
                     'status': 'Overdue',
-                    'by_date': self.consent_date + timedelta(
+                    'by_date': start + timedelta(
                         days=days_till_overdue)
                    }
                 tmp.update(results)
                 return tmp
             return {'status': 'Expired'}
 
-        self.qs[questionnaire.name] = {
+        def questionnaire_start_date(questionnaire):
+            """Return relative start date for questionnare or None
+
+            Determine if questionnaire qualifies for inclusion, if not, return
+            None.  If it qualifies, return the start date.  Typically this is
+            the consent_date except on recurring questionnaries, where it's
+            the effective start_date for the active recurrance cycle.
+
+            :return: datetime of the questionnaire's start date; None if N/A
+
+            """
+            if len(questionnaire.recurs):
+                for recurrance in questionnaire.recurs:
+                    relative_start = recurrance.active_interval_start(
+                        start=self.consent_date)
+                    if relative_start:
+                        return relative_start
+                return None  # no active recurrance
+            return self.consent_date
+
+        relative_start = questionnaire_start_date(questionnaire)
+        if not relative_start:
+            return
+
+        storage[questionnaire.name] = {
             'name': questionnaire.name,
             'classification': classification,
             'organization_id': organization_id
         }
-        self.qs[questionnaire.name].update(
+        storage[questionnaire.name].update(
             status_from_recents(recents=most_recent_survey(
                 self.user, questionnaire.name),
                 days_till_due=questionnaire.days_till_due,
-                days_till_overdue=questionnaire.days_till_overdue))
+                days_till_overdue=questionnaire.days_till_overdue,
+                start=relative_start))
 
 
 class AssessmentStatus(object):
@@ -261,8 +297,8 @@ class AssessmentStatus(object):
         """Return list of questionnaire names needed for classification
 
         NB - if the questionnaire is outside the valid date range, such as in
-        an expired state, it will not be included in the list regardless of
-        its needing assessment status.
+        an expired state or prior to the next recurring cycle, it will not be
+        included in the list regardless of its needing assessment status.
 
         :param classification: set to restrict lookup to a single
             QuestionnaireBank.classification or 'all' to consider all.
@@ -315,7 +351,9 @@ class AssessmentStatus(object):
             self.instruments_needing_full_assessment(classification)
             or self.instruments_in_progress(classification))
         for i in instruments:
-            due_date = self.questionnaire_data[i].get('by_date')
+            due_date = self.questionnaire_data.lookup(
+                questionnaire_name=i, classification=classification).get(
+                    'by_date')
             if due_date:
                 return due_date
 
