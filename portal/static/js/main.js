@@ -3645,7 +3645,7 @@ function isString (obj) {
 };
 
 function disableHeaderFooterLinks() {
-    $("#tnthLogo a, #tnthTopLinks a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
+    $("#tnthLogo a, #tnthTopLinks a, #tnthNavbarXs a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link").addClass("disabled").on("click", function(e) {
         e.preventDefault();
         return false;
     });
