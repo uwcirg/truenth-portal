@@ -499,15 +499,6 @@ function initIncompleteFields() {
 configObj.initConfig();
 
 $(document).ready(function(){
-  
-     if (typeof sessionStorage != "undefined") {
-        if (!sessionStorage.getItem("visited")) {
-          sessionStorage.setItem("visited", "true");
-        };
-        $(window).on("focus", function() {
-            if (sessionStorage.getItem("visited")) window.location.reload();
-        });
-     };
 
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
