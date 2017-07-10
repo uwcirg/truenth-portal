@@ -276,6 +276,15 @@ def login(provider_name):
         from werkzeug.datastructures import ImmutableMultiDict
         request.args = ImmutableMultiDict()
 
+    prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
+
+    if (not current_app.config.get('{}_CONSUMER_KEY'.format(prv)) or
+            not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
+        current_app.logger.info(
+            "Generating 404 on request for OAuth provider `{}` missing "
+            "configuration".format(provider_name))
+        abort(404)
+
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
     try:
