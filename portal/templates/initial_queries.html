@@ -704,6 +704,7 @@ $(document).ready(function(){
                   theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
                   theTerms["type"] = type;
                   var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+                  /*** if UI for orgs is not present, need to get the user org from backend ***/
                   if (org.length == 0) {
 	                  	$.ajax ({
 			            type: "GET",
