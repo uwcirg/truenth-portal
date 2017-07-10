@@ -24,7 +24,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.auth import providers_list, validate_client_origin
+from ..models.auth import validate_client_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
