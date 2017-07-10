@@ -928,9 +928,8 @@
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
-        var isTestPatient = {%-if person and person.has_role(ROLE.TEST) and person.id != current_user.id-%}true{%-else-%}false{%-endif-%};
+        var isTestPatient = '{{config.get("SYSTEM.TYPE")}}'.toUpperCase() != "PRODUCTION";
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
-
         /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
         function reloadConsentList() {
             var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';

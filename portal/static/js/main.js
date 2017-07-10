@@ -873,24 +873,24 @@ var fillContent = {
 
                         /**** validate hour [0]0 ****/
                         if (hasValue(h)) {
-                            if (!(/^([1-9]|0[1-9]|1\d|2[0-3])$/.test(h))) {
+                            if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Hour must be in valid format, range 0 to 23.";
                             };
                         };
 
                         /***** validate minute [0]0 *****/
                         if (hasValue(m)) {
-                            if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(m))) {
+                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Minute must be in valid format, range 0 to 59."
                             };
                         };
                         /***** validate second [0]0 *****/
                         if (hasValue(s)) {
-                            if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(s))) {
+                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
                             };
                         };
-
+                      
                         if (hasValue(errorMessage)) {
                             $("#consentDateError_" + dataIndex).html(errorMessage);
                         } else $("#consentDateError_" + dataIndex).html("");
@@ -901,12 +901,12 @@ var fillContent = {
                 $("#profileConsentList .btn-submit").each(function() {
                     $(this).on("click", function() {
                         var dataIndex = $.trim($(this).attr("data-index"));
-                        var isValid = !(hasValue($("#consentDateError_" + dataIndex).text()));
+                        var ct = $("#consentDate_" + dataIndex);
+                        var h = $("#consentHour_" + dataIndex).val();
+                        var m = $("#consentMinute_" + dataIndex).val();
+                        var s = $("#consentSecond_" + dataIndex).val();
+                        var isValid = hasValue(ct.val()) && hasValue(h) && hasValue(m) && hasValue(s);
                         if (isValid) {
-                            var ct = $("#consentDate_" + dataIndex);
-                            var h = pad($("#consentHour_" + dataIndex).val());
-                            var m = pad($("#consentMinute_" + dataIndex).val());
-                            var s = pad($("#consentSecond_" + dataIndex).val());
                             var dt = new Date(ct.val());
                             //2017-07-06T22:04:50 format
                             var cDate = dt.getFullYear()
@@ -915,11 +915,11 @@ var fillContent = {
                                         + "-"
                                         + dt.getDate()
                                         + "T"
-                                        + (hasValue(h) ? h : "00")
+                                        + (hasValue(h) ? pad(h) : "00")
                                         + ":"
-                                        + (hasValue(m) ? m : "00")
+                                        + (hasValue(m) ? pad(m) : "00")
                                         + ":"
-                                        + (hasValue(s) ? s : "00");
+                                        + (hasValue(s) ? pad(s) : "00");
 
                             var o = CONSENT_ENUM[ct.attr("data-status")];
                            
@@ -947,7 +947,8 @@ var fillContent = {
                                             + '  }; '
                                             + ' }})', 100); 
                             };
-                        };
+                        } else  $("#consentDateError_" + dataIndex).text("You must enter a valid date/time");
+                    
                     });
                 });
             };
