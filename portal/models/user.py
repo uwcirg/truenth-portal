@@ -972,6 +972,8 @@ class User(db.Model, UserMixin):
                     new_id = Identifier.from_fhir(identifier)
                 except KeyError, e:
                     abort(400, "{} field not found for identifier".format(e))
+                except TypeError, e:
+                    abort(400, "invalid format for identifier {}".format(e))
                 if new_id.system in internal_identifier_systems:
                     continue
                 new_id = new_id.add_if_not_found()
