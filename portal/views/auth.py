@@ -6,7 +6,7 @@ import hmac
 import json
 import requests
 from authomatic.adapters import WerkzeugAdapter
-from authomatic.exceptions import CancellationError
+from authomatic.exceptions import CancellationError, ConfigError
 from flask import Blueprint, jsonify, redirect, current_app, make_response
 from flask import render_template, request, session, abort, url_for
 from flask_login import logout_user
@@ -278,7 +278,14 @@ def login(provider_name):
 
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
-    result = authomatic.authomatic.login(adapter, provider_name)
+    try:
+        result = authomatic.authomatic.login(adapter, provider_name)
+    except ConfigError:
+        # Raised for random requests for non-configured hosts.  Treat as 404
+        current_app.logger.info(
+            "Generating 404 on request for OAuth provider `{}` missing "
+            "configuration".format(provider_name))
+        abort(404)
 
     if current_user():
         if current_user().deleted:
