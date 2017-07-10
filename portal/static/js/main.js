@@ -106,131 +106,6 @@ var loader = function(show) {
     };
 };
 
-function convertToLocalTime(dateString) {
-    var convertedDate = "";
-    //assuming dateString is UTC date/time
-    if (hasValue(dateString)) {
-        var d = new Date(dateString);
-        var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
-        var offset = d.getTimezoneOffset() / 60;
-        var hours = d.getHours();
-        newDate.setHours(hours - offset);
-        var options = {
-            year: 'numeric', day: 'numeric', month: 'short',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
-        };
-        convertedDate = newDate.toLocaleString(options);
-    };
-    return convertedDate;
-};
-
-function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
-    //firefox does not support Intl API
-    //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
-
-    if (!dateString) return "";
-    else {
-        var errorMessage = "";
-        if (!hasValue(timeZone)) timeZone = "UTC";
-        if (!hasValue(locale))  locale = "en-us";
-        $(".timezone-error").html("");
-        $(".timezone-warning").html("");
-        //locale needs to be in this format - us-en
-        //month: 'numeric', day: 'numeric',
-        locale = locale.replace("_", "-").toLowerCase();
-        var options = {
-            year: 'numeric', day: 'numeric', month: 'short',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
-        };
-        options.timeZone =  timeZone;
-        //older browsers don't support this
-        var convertedDate = dateString;
-        try {
-            if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
-                convertedDate = new Date(dateString).toLocaleString(locale, options);
-                if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
-            } else {
-                if (timeZone != "UTC") {
-                    convertedDate = convertToLocalTime(dateString);
-                    $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
-                    $(".gmt").each(function() { $(this).hide()});
-                };
-            }
-        } catch(e) {
-            errorMessage = "Error occurred when converting timezone: " + e.message;
-        };
-        if (hasValue(errorMessage)) {
-            $(".timezone-error").each(function() {
-                $(this).addClass("text-danger").html(errorMessage);
-            });
-        };
-        return convertedDate.replace(/\,/g, "");
-    };
-};
-
-function getUserTimeZone(userId) {
-    var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
-    var userTimeZone = "";
-    if (selectVal == "") {
-        if (userId) {
-            $.ajax ({
-                type: "GET",
-                url: '/api/demographics/'+userId,
-                async: false
-            }).done(function(data) {
-                if (data) {
-                    data.extension.forEach(
-                        function(item, index) {
-                            if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
-                                userTimeZone = item.timezone;
-                            };
-                        });
-                };
-
-            }).fail(function() {
-                userTimeZone = "UTC";
-            });
-        };
-    } else {
-        userTimeZone = selectVal;
-    };
-
-    return hasValue(userTimeZone) ? userTimeZone : "UTC";
-};
-
-function getUserLocale(userId) {
-  var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-  var locale = "";
-
-  if (!localeSelect) {
-        if (userId) {
-            $.ajax ({
-                    type: "GET",
-                    url: '/api/demographics/'+userId,
-                    cache: false,
-                    async: false
-            }).done(function(data) {
-                if (data && data.communication) {
-                    data.communication.forEach(
-                        function(item, index) {
-                            if (item.language) {
-                                locale = item["language"]["coding"][0].code;
-                                //console.log("locale: " + locale)
-                            };
-                    });
-                };
-
-            }).fail(function() {
-                locale = "en-us";
-            });
-        };
-   } else locale = localeSelect;
-
-   //console.log("locale? " + locale)
-   return locale ? locale : "en-us";
-};
 
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
@@ -867,18 +742,31 @@ var fillContent = {
                             + '<h5 class="modal-title">Consent Date Editor</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent date for this agreement to: </h4>'
+                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+                            + '<p style="margin-bottom: 0.6em">Modify the consent date <span class="text-muted">(GMT 24-hour format)</span> for this agreement to: </p>'
                             + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
-                            + '<div id="consentDateContainer_' + index + '" style="font-size:0.95em; margin-left:1em">'
-                            + '<input type="text" style="width:150px; max-width: 100%; display:inline-block" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11"/><span class="text-muted">&nbsp; example: 1 Jan, 2017</span>'
-                            + '</div><div id="consentDateError_' + index + '" class="error-message"></div><br/><br/>'
+                            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
+                            + '<div class="row">'
+                            + '<div class="col-md-3 col-sm-3">'
+                            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div></div>'
+                            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
+                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">Submit</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
-
-
+                        
                     };
 
                     if (showInitialConsentTerms) content += getTOUTableHTML();
@@ -955,31 +843,109 @@ var fillContent = {
                 $(".consent-date-modal").each(function() {
                     $(this).on("shown.bs.modal", function() {
                         $(this).find(".consent-date").focus();
+                        $(this).addClass("active");
+                        $(this).find("input").each(function() {
+                            $(this).val("");
+                        });
+                        $(this).find(".set-consent-error").html("");
+                    });
+                    $(this).on("hidden.bs.modal", function() {
+                        $(this).removeClass("active");
                     });
                 });
-                $(".consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-                $(".consent-date").each(function() {
+                $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
                     $(this).on("change", function() {
-                        var isValid = tnthDates.isValidDefaultDateFormat($(this).val(), $("#consentDateError_" + $(this).attr("data-index")));
-                        if (!isValid) {
-                            $(this).datepicker("hide");
-                        } else {
-                            $(this).datepicker("hide");
-                            var dt = new Date($(this).val());
-                            var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
-                            var o = CONSENT_ENUM[$(this).attr("data-status")];
+                        var dataIndex = $.trim($(this).attr("data-index"));
+                        var d = $("#consentDate_" + dataIndex);
+                        var h = $("#consentHour_" + dataIndex).val();
+                        var m = $("#consentMinute_" + dataIndex).val();
+                        var s = $("#consentSecond_" + dataIndex).val();
+                        var errorMessage = "";
+
+                        if (hasValue(d.val())) {
+                            var isValid = tnthDates.isValidDefaultDateFormat(d.val());
+                            if (!isValid) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Date must in the valid format."
+                                d.datepicker("hide");
+                            };
+                        };
+
+                        /**** validate hour [0]0 ****/
+                        if (hasValue(h)) {
+                            if (!(/^([1-9]|0[1-9]|1\d|2[0-3])$/.test(h))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Hour must be in valid format, range 0 to 23.";
+                            };
+                        };
+
+                        /***** validate minute [0]0 *****/
+                        if (hasValue(m)) {
+                            if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(m))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Minute must be in valid format, range 0 to 59."
+                            };
+                        };
+                        /***** validate second [0]0 *****/
+                        if (hasValue(s)) {
+                            if (!(/^(0[1-9]|[1-9]|[1-5]\d)$/.test(s))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
+                            };
+                        };
+
+                        if (hasValue(errorMessage)) {
+                            $("#consentDateError_" + dataIndex).html(errorMessage);
+                        } else $("#consentDateError_" + dataIndex).html("");
+
+                    });
+                });
+                
+                $("#profileConsentList .btn-submit").each(function() {
+                    $(this).on("click", function() {
+                        var dataIndex = $.trim($(this).attr("data-index"));
+                        var isValid = !(hasValue($("#consentDateError_" + dataIndex).text()));
+                        if (isValid) {
+                            var ct = $("#consentDate_" + dataIndex);
+                            var h = pad($("#consentHour_" + dataIndex).val());
+                            var m = pad($("#consentMinute_" + dataIndex).val());
+                            var s = pad($("#consentSecond_" + dataIndex).val());
+                            var dt = new Date(ct.val());
+                            //2017-07-06T22:04:50 format
+                            var cDate = dt.getFullYear()
+                                        + "-"
+                                        + (dt.getMonth()+1)
+                                        + "-"
+                                        + dt.getDate()
+                                        + "T"
+                                        + (hasValue(h) ? h : "00")
+                                        + ":"
+                                        + (hasValue(m) ? m : "00")
+                                        + ":"
+                                        + (hasValue(s) ? s : "00");
+
+                            var o = CONSENT_ENUM[ct.attr("data-status")];
+                           
                             if (o) {
-                                o.org = $(this).attr("data-orgId");
-                                o.agreementUrl = $(this).attr("data-agreementUrl");
+                                o.org = ct.attr("data-orgId");
+                                o.agreementUrl = ct.attr("data-agreementUrl");
                                 o.acceptance_date = cDate;
                                 o.testPatient = true;
-                                setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
-                                setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
+                                setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
+                                setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
+                                /**** disable close buttons while processing request ***/
                                 $("#consentListTable button[data-dismiss]").attr("disabled", true);
-                                setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
-                                if (typeof reloadConsentList != "undefined") reloadConsentList();
-                                else setTimeout("location.reload();", 2000);
-                                $("#consentListTable .modal").modal("hide");
+                
+                                //serId, params, status, sync, callback)
+                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {" 
+                                            + " if (data && data.error) { "
+                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("Error processing data.  Make sure the date is in the correct format."); '
+                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
+                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); })(), 450);'
+                                            + '  $("#consentListTable button[data-dismiss]").attr("disabled", false);'
+                                            + '  } else { '
+                                            + '  $("#consentListTable .modal").modal("hide");'
+                                            + '  if (typeof reloadConsentList != "undefined") reloadConsentList(); '
+                                            + '  else setTimeout("location.reload();", 2000); '
+                                            + '  }; '
+                                            + ' }})', 100); 
                             };
                         };
                     });
@@ -2138,7 +2104,7 @@ var tnthAjax = {
             return false;
         });
     },
-    "setConsent": function(userId, params, status, sync) {
+    "setConsent": function(userId, params, status, sync, callback) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
             if (!consented || params["testPatient"]) {
@@ -2147,7 +2113,8 @@ var tnthAjax = {
                 params["agreement_url"] =  params["agreementUrl"]
                 params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
                 params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
-                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false)
+                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
+
                 $.ajax ({
                     type: "POST",
                     url: '/api/user/' + userId + '/consent',
@@ -2159,10 +2126,12 @@ var tnthAjax = {
                 }).done(function(data) {
                     //console.log("consent updated successfully.");
                     $(".set-consent-error").remove();
+                    if (callback) callback(data);
                 }).fail(function(xhr) {
                     //console.log("request to updated consent failed.");
                     //console.log(xhr.responseText)
-                    if ($(".set-consent-error").length == 0) $(".error-message").append("<div class='set-consent-error'>Server error occurred setting consent status.</div>");
+                    if (callback) callback({"error": xhr.responseText});
+                    if ($(".set-consent-error").length == 0) $(".set-consent-error").append("<div class='set-consent-error'>Server error occurred setting consent status.</div>");
                 });
             };
         };
@@ -3438,11 +3407,6 @@ var tnthDates = {
                minutes = pad(minutes);
                seconds = pad(seconds);
 
-               function pad(n) {
-                    n = parseInt(n);
-                    return (n < 10) ? '0' + n : n;
-               };
-
                switch(format) {
                     case "mm/dd/yyyy":
                         nd = month + "/" + day + "/" + year;
@@ -3451,7 +3415,7 @@ var tnthDates = {
                         nd = month + "-" + day + "-" + year;
                         break;
                     case "mm-dd-yyyy hh:mm:ss":
-                        nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
                         break;
                     case "dd/mm/yyyy":
                         nd = day + "/" + month + "/" + year;
@@ -3473,8 +3437,12 @@ var tnthDates = {
                     case "yyyy-mm-dd hh:mm:ss":
                         nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
                         break;
-                     case "d M y":
-                     default:
+                    case "d M y hh:mm:ss":
+                        nd = this.displayDateString(month, day, year);
+                        nd = nd + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "d M y":
+                    default:
                         //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
                         nd = this.displayDateString(month, day, year);
                         break;
@@ -3482,6 +3450,128 @@ var tnthDates = {
 
            return nd;
         } else return "";
+    },
+    "convertToLocalTime": function (dateString) {
+        var convertedDate = "";
+        //assuming dateString is UTC date/time
+        if (hasValue(dateString)) {
+            var d = new Date(dateString);
+            var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
+            var offset = d.getTimezoneOffset() / 60;
+            var hours = d.getHours();
+            newDate.setHours(hours - offset);
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            convertedDate = newDate.toLocaleString(options);
+        };
+        return convertedDate;
+    },
+    "convertUserDateTimeByLocaleTimeZone": function (dateString, timeZone, locale) {
+        //firefox does not support Intl API
+        //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
+
+        if (!dateString) return "";
+        else {
+            var errorMessage = "";
+            if (!hasValue(timeZone)) timeZone = "UTC";
+            if (!hasValue(locale))  locale = "en-us";
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
+            //locale needs to be in this format - us-en
+            //month: 'numeric', day: 'numeric',
+            locale = locale.replace("_", "-").toLowerCase();
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            options.timeZone =  timeZone;
+            //older browsers don't support this
+            var convertedDate = dateString;
+            try {
+                if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
+                    convertedDate = new Date(dateString).toLocaleString(locale, options);
+                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+                } else {
+                    if (timeZone != "UTC") {
+                        convertedDate = convertToLocalTime(dateString);
+                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                        $(".gmt").each(function() { $(this).hide()});
+                    };
+                }
+            } catch(e) {
+                errorMessage = "Error occurred when converting timezone: " + e.message;
+            };
+            if (hasValue(errorMessage)) {
+                $(".timezone-error").each(function() {
+                    $(this).addClass("text-danger").html(errorMessage);
+                });
+            };
+            return convertedDate.replace(/\,/g, "");
+        };
+    },
+    "getUserTimeZone": function (userId) {
+        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
+        var userTimeZone = "";
+        if (selectVal == "") {
+            if (userId) {
+                $.ajax ({
+                    type: "GET",
+                    url: '/api/demographics/'+userId,
+                    async: false
+                }).done(function(data) {
+                    if (data) {
+                        data.extension.forEach(
+                            function(item, index) {
+                                if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+                                    userTimeZone = item.timezone;
+                                };
+                            });
+                    };
+
+                }).fail(function() {
+                    userTimeZone = "UTC";
+                });
+            };
+        } else {
+            userTimeZone = selectVal;
+        };
+
+        return hasValue(userTimeZone) ? userTimeZone : "UTC";
+    },
+    "getUserLocale": function (userId) {
+      var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
+      var locale = "";
+
+      if (!localeSelect) {
+            if (userId) {
+                $.ajax ({
+                        type: "GET",
+                        url: '/api/demographics/'+userId,
+                        cache: false,
+                        async: false
+                }).done(function(data) {
+                    if (data && data.communication) {
+                        data.communication.forEach(
+                            function(item, index) {
+                                if (item.language) {
+                                    locale = item["language"]["coding"][0].code;
+                                    //console.log("locale: " + locale)
+                                };
+                        });
+                    };
+
+                }).fail(function() {
+                    locale = "en-us";
+                });
+            };
+       } else locale = localeSelect;
+
+       //console.log("locale? " + locale)
+       return locale ? locale : "en-us";
     }
 };
 
@@ -3649,6 +3739,11 @@ function disableHeaderFooterLinks() {
         e.preventDefault();
         return false;
     });
+};
+
+function pad(n) {
+    n = parseInt(n);
+    return (n < 10) ? '0' + n : n;
 };
 
 var __winHeight = $(window).height(), __winWidth = $(window).width();
