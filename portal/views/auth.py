@@ -24,7 +24,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.auth import validate_client_origin
+from ..models.auth import providers_list, validate_client_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
@@ -275,6 +275,16 @@ def login(provider_name):
         # login flow.  Clear out before passing on
         from werkzeug.datastructures import ImmutableMultiDict
         request.args = ImmutableMultiDict()
+
+    if provider_name not in providers_list.enums:
+        abort(400, "invalid provider {}".format(provider_name))
+
+    prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
+
+    if (not current_app.config.get('{}_CONSUMER_KEY'.format(prv)) or
+        not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
+        abort(500, "no configuration found for provider "
+              "{}".format(provider_name))
 
     response = make_response()
     adapter = WerkzeugAdapter(request, response)
