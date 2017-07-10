@@ -276,7 +276,7 @@ def login(provider_name):
         from werkzeug.datastructures import ImmutableMultiDict
         request.args = ImmutableMultiDict()
 
-    if provider_name not in providers_list.enums:
+    if provider_name.lower() not in providers_list.enums:
         abort(400, "invalid provider {}".format(provider_name))
 
     prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
