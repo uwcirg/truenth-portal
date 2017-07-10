@@ -282,7 +282,7 @@ def login(provider_name):
     prv = 'FB' if (provider_name == 'facebook') else provider_name.upper()
 
     if (not current_app.config.get('{}_CONSUMER_KEY'.format(prv)) or
-        not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
+            not current_app.config.get('{}_CONSUMER_SECRET'.format(prv))):
         abort(500, "no configuration found for provider "
               "{}".format(provider_name))
 
