@@ -499,15 +499,6 @@ function initIncompleteFields() {
 configObj.initConfig();
 
 $(document).ready(function(){
-  
-     if (typeof sessionStorage != "undefined") {
-        if (!sessionStorage.getItem("visited")) {
-          sessionStorage.setItem("visited", "true");
-        };
-        $(window).on("focus", function() {
-            if (sessionStorage.getItem("visited")) window.location.reload();
-        });
-     };
 
     var namesChangeEvent = function() {
        if (fc.allFieldsCompleted()) fc.continueToFinish();
@@ -712,7 +703,26 @@ $(document).ready(function(){
                   var theTerms = {};
                   theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
                   theTerms["type"] = type;
-                  var userOrgId = $("#userOrgs input[name='organization']:checked").val();
+                  var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+                  /*** if UI for orgs is not present, need to get the user org from backend ***/
+                  if (org.length == 0) {
+	                  	$.ajax ({
+			            type: "GET",
+			            url: '/api/demographics/{{user.id}}',
+			            async: false
+			            }).done(function(data) {
+			            	if (data && data.careProvider) {
+			            		(data.careProvider).forEach(function(item) {
+			            			userOrgId = item.reference.split("/").pop();
+			            		});
+			            	}
+			            }).fail(function() {
+
+			            });
+		           } else {
+		               userOrgId = org.val();
+		           };
+                  
                   if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
                     var topOrg = OT.getTopLevelParentOrg(userOrgId);
                     if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
