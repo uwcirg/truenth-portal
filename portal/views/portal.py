@@ -888,7 +888,7 @@ def settings():
     return response
 
 
-@portal.route('/settings/<string:config_key>')
+@portal.route('/api/settings/<string:config_key>')
 @oauth.require_oauth()
 def config_settings(config_key):
     key = config_key.upper()
