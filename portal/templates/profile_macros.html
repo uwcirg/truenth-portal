@@ -1725,8 +1725,6 @@
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
-                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
@@ -1735,8 +1733,6 @@
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
                     {{profileEmail(person)}}
-                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(current_user)}}{% endif -%}
-                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileSiteID(current_user)}}{% endif -%}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 </div>
