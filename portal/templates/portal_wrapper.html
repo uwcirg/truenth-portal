@@ -75,7 +75,7 @@
                     {% if user %}
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
-                            <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                            <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and not user.has_role(ROLE.WRITE_ONLY)) %}
                             <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
@@ -125,7 +125,7 @@
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
-                    <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                    <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                     {% if user %}<li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
