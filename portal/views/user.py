@@ -1358,7 +1358,11 @@ def unique_email():
                 user = current_user()
                 user_id = user.id if user else None
         else:
-            user_id = int(user_id)
+            try:
+                user_id = int(user_id)
+            except ValueError:
+                abort(400, 'user_id must be a valid integer')
+
 
         result = match.one()
         if user_id != result.id:
