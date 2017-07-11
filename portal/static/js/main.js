@@ -751,13 +751,13 @@ var fillContent = {
                             + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
                             + '</div>'
                             + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
                             + '</div>'
                             + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
                             + '</div>'
                             + '<div class="col-md-2 col-sm-3">'
-                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
                             + '</div></div>'
                             + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
                             + '</div>'
@@ -845,7 +845,8 @@ var fillContent = {
                         $(this).find(".consent-date").focus();
                         $(this).addClass("active");
                         $(this).find("input").each(function() {
-                            $(this).val("");
+                            if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
+                            else $(this).val("");
                         });
                         $(this).find(".set-consent-error").html("");
                     });
@@ -905,7 +906,7 @@ var fillContent = {
                         var h = $("#consentHour_" + dataIndex).val();
                         var m = $("#consentMinute_" + dataIndex).val();
                         var s = $("#consentSecond_" + dataIndex).val();
-                        var isValid = hasValue(ct.val()) && hasValue(h) && hasValue(m) && hasValue(s);
+                        var isValid = hasValue(ct.val());
                         if (isValid) {
                             var dt = new Date(ct.val());
                             //2017-07-06T22:04:50 format
