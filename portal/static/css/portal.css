@@ -370,6 +370,9 @@ h4.detail-title {
   display: none;
 }
 /***** initial queries page style ****/
+#termsText.agreed {
+  display: block;
+}
 #topTerms .custom-tou,
 #topTerms .custom-tou-text {
   display: none;

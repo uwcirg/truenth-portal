@@ -1096,7 +1096,10 @@ var fillContent = {
                 var self = $(this);
                 var item_found  = 0;
                 arrTypes.forEach(function(type) {
-                    if (typeInTous(type)) item_found++;
+                    if (typeInTous(type)) {
+                        item_found++;
+                        if (type == "subject website consent" || type == "website terms of use") $("#termsText").addClass("agreed");
+                    };
                 });
                 var additional = $(this).find("[data-core-data-subtype]");
                 if (additional.length > 0) {
