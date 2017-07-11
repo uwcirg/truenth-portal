@@ -37,6 +37,8 @@
             </div>
             <br/>
         </div>
+        <div class="get-tou-error error-message"></div>
+        <div class="post-tou-error error-message"></div>
     </div>
     <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
@@ -90,6 +92,8 @@
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
     </div>
+    <div class="get-tou-error error-message"></div>
+    <div class="post-tou-error error-message"></div>
   {%- endmacro %}
   {% macro interviewAssistedWebConsentScript(terms, form) -%}
       <h4 class="tnth-headline hidden-print">{{ _("Website Consent Script - Enter Manually - Interview Assisted") }}</h4>
@@ -148,6 +152,8 @@
           <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
       </div>
+      <div class="get-tou-error error-message"></div>
+      <div class="post-tou-error error-message"></div>
       <script>
         $(function() {
             $(".consent-form-checkbox").each(function() {
@@ -199,6 +205,8 @@
             </label>
           </div>
       </div>
+      <div class="get-roles-error error-message"></div>
+      <div class="put-roles-error error-message"></div>
       <script>$(function () { tnthAjax.getRoles($("#iq_userId").val());});</script>
   {%- endmacro %}
 
@@ -354,6 +362,9 @@
           </div>
         </div>
         <br/>
+        <div class="get-clinical-error error-message"></div>
+        <div class="put-clinical-error error-message"></div>
+        <div class="post-clinical-error error-message"></div>
       </div>
       <script>
         $(function () {
@@ -418,6 +429,7 @@
         </div>
       </div>
       {{consent_fields(consent_agreements)}}
+      <div class="get-orgs-error error-message"></div>
     </div>
     <script>
     function _orgsCallback() {

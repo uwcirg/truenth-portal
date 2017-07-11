@@ -766,7 +766,7 @@ var fillContent = {
                             + '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
-                        
+
                     };
 
                     if (showInitialConsentTerms) content += getTOUTableHTML();
@@ -890,14 +890,14 @@ var fillContent = {
                                 errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
                             };
                         };
-                      
+
                         if (hasValue(errorMessage)) {
                             $("#consentDateError_" + dataIndex).html(errorMessage);
                         } else $("#consentDateError_" + dataIndex).html("");
 
                     });
                 });
-                
+
                 $("#profileConsentList .btn-submit").each(function() {
                     $(this).on("click", function() {
                         var dataIndex = $.trim($(this).attr("data-index"));
@@ -922,7 +922,7 @@ var fillContent = {
                                         + (hasValue(s) ? pad(s) : "00");
 
                             var o = CONSENT_ENUM[ct.attr("data-status")];
-                           
+
                             if (o) {
                                 o.org = ct.attr("data-orgId");
                                 o.agreementUrl = ct.attr("data-agreementUrl");
@@ -932,9 +932,9 @@ var fillContent = {
                                 setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
                                 /**** disable close buttons while processing request ***/
                                 $("#consentListTable button[data-dismiss]").attr("disabled", true);
-                
+
                                 //serId, params, status, sync, callback)
-                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {" 
+                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {"
                                             + " if (data && data.error) { "
                                             + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("Error processing data.  Make sure the date is in the correct format."); '
                                             + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
@@ -945,10 +945,10 @@ var fillContent = {
                                             + '  if (typeof reloadConsentList != "undefined") reloadConsentList(); '
                                             + '  else setTimeout("location.reload();", 2000); '
                                             + '  }; '
-                                            + ' }})', 100); 
+                                            + ' }})', 100);
                             };
                         } else  $("#consentDateError_" + dataIndex).text("You must enter a valid date/time");
-                    
+
                     });
                 });
             };
@@ -2071,7 +2071,7 @@ var tnthAjax = {
             async: sync? false : true
         }).done(function(data) {
             OT.setUserId(userId);
-            $(".get-orgs-error").remove();
+            $(".get-orgs-error").html("");
             OT.populateOrgsList(data.entry);
             if(!noPopulate) {
                 OT.handlePreSelectedClinic();
@@ -2081,8 +2081,10 @@ var tnthAjax = {
             };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           if ($(".get-orgs-error").length == 0) $(".error-message").append("<div class='get-orgs-error'>Server error occurred retrieving organization/clinic information.</div>");
-            loader();
+           var errorMessage = "Server error occurred retrieving organization/clinic information."
+           if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
+           else $(".get-orgs-error").html(errorMessage)
+           loader();
         });
     },
     "getConsent": function(userId, sync) {
@@ -2093,7 +2095,7 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-           $(".get-consent-error").remove();
+           $(".get-consent-error").html("");
            fillContent.consentList(data, userId, null, null);
            loader();
            return true;
@@ -2101,7 +2103,9 @@ var tnthAjax = {
             //console.log("Problem retrieving data from server.");
             fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
             loader();
-            if ($(".get-consent-error").length == 0) $(".error-message").append("<div class='get-consent-error'>Server error occurred retrieving consent information.</div>");
+            var errorMessage = "Server error occurred retrieving consent information.";
+            if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
+            else $(".get-consent-error").html(errorMessage)
             return false;
         });
     },
@@ -2126,13 +2130,15 @@ var tnthAjax = {
                     data: JSON.stringify(params)
                 }).done(function(data) {
                     //console.log("consent updated successfully.");
-                    $(".set-consent-error").remove();
+                    $(".set-consent-error").html("");
                     if (callback) callback(data);
                 }).fail(function(xhr) {
                     //console.log("request to updated consent failed.");
                     //console.log(xhr.responseText)
                     if (callback) callback({"error": xhr.responseText});
-                    if ($(".set-consent-error").length == 0) $(".set-consent-error").append("<div class='set-consent-error'>Server error occurred setting consent status.</div>");
+                    var errorMessage = "Server error occurred setting consent status.";
+                    if ($(".set-consent-error").length == 0) $(".default-error-message-container").append("<div class='set-consent-error error-message'>" + errorMessage + "</div>");
+                    else $(".set-consent-error").html(errorMessage);
                 });
             };
         };
@@ -2152,9 +2158,9 @@ var tnthAjax = {
             //need to remove all other consents associated w un-selected org(s)
             setTimeout("tnthAjax.removeObsoleteConsent();", 100);
             if (typeof reloadConsentList != "undefined") reloadConsentList();
-            $("#consentContainer").find(".error-message").text("");
+            $($("#consentContainer .error-message").get(0)).text("");
         } else {
-            $("#consentContainer").find(".error-message").text("Unable to set default consent agreement");
+            $($("#consentContainer .error-message").get(0)).text("Unable to set default consent agreement");
         }
     },
     deleteConsent: function(userId, params) {
@@ -2184,11 +2190,13 @@ var tnthAjax = {
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
                         //console.log("consent deleted successfully.");
-                        $(".delete-consent-error").remove();
+                        $(".delete-consent-error").html("");
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
-                        if ($(".delete-consent-error").length == 0) $(".error-message").append("<div class='delete-consent-error'>Server error occurred removing consent.</div>");
+                        var errorMessage = "Server error occurred removing consent: " + xhr.responseText;
+                        if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
+                        else $(".delete-consent-error").html(errorMessage)
                     });
                 });
 
@@ -2375,14 +2383,16 @@ var tnthAjax = {
                 fillContent.siteId(data);
                 fillContent.language(data);
             }
-            $(".get-demo-error").remove();
+            $(".get-demo-error").html("");
             loader();
             if (callback) callback();
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
             loader();
             if (callback) callback();
-            if ($(".get-demo-error").length == 0) $(".error-message").append("<div class='get-demo-error'>Server error occurred retrieving demographics information.</div>");
+            var errorMessage = "Server error occurred retrieving demographics information.";
+            if ($(".get-demo-error").length == 0) $(".default-error-message-container").append("<div class='get-demo-error error-message'>" + errorMessage + "</div>");
+            else $(".get-demo-error").html(errorMessage);
         });
     },
     "putDemo": function(userId,toSend,targetField, sync) {
@@ -2397,13 +2407,15 @@ var tnthAjax = {
         }).done(function(data) {
             //console.log("done");
             //console.log(data);
-            $(".put-demo-error").remove();
+            $(".put-demo-error").html("");
             flo.showUpdate(targetField);
             fillViews.demo();
             fillViews.detail();
             fillViews.org();
         }).fail(function() {
-            if ($(".put-demo-error").length == 0) $(".error-message").append("<div class='put-demo-error'>Server error occurred setting demographics information.</div>");
+            var errorMessage = "Server error occurred setting demographics information.";
+            if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
+            else $(".put-demo-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2449,9 +2461,14 @@ var tnthAjax = {
                         fillViews.locale();
                     };
                 });
+                $(".get-locale-error").html("");
             };
 
         }).fail(function() {
+            var errorMessage = "Server error occurred retrieving locale information.";
+            if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
+            else $(".get-locale-error").html(errorMessage);
+            flo.showError(targetField);
         });
     },
     "hasTreatment": function(data) {
@@ -2490,7 +2507,7 @@ var tnthAjax = {
             fillContent.treatment(data);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           $("#userProcedures").html("<span class='text-danger'>Error retrieving data from server</span>");
+           $("#userProcedures").html("<span class='error-message'>Error retrieving data from server</span>");
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
@@ -2564,10 +2581,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
             flo.showUpdate(targetField);
-            $(".get-procs-error").remove();
+            $(".get-procs-error").html("");
         }).fail(function() {
            // console.log("Problem updating procedure on server.");
-            if ($(".get-procs-error").length == 0) $(".error-message").append("<div class='get-procs-error'>Server error occurred saving procedure/treatment information.</div>");
+           var errorMessage = "Server error occurred saving procedure/treatment information.";
+            if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
+            else $(".get-procs-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2580,10 +2599,12 @@ var tnthAjax = {
             async: (sync ? false: true)
         }).done(function(data) {
             flo.showUpdate(targetField);
-            $(".del-procs-error").remove();
+            $(".del-procs-error").html("");
         }).fail(function() {
             // console.log("Problem deleting procedure on server.");
-            if ($(".del-procs-error").length == 0) $(".error-message").append("<div class='del-procs-error'>Server error occurred removing procedure/treatment information.</div>");
+            var errorMessage = "Server error occurred removing procedure/treatment information.";
+            if ($(".del-procs-error").length == 0) $("#userProcuedures").append("<div class='del-procs-error error-message'>" + errorMessage + "</div>");
+            else $(".del-procs-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2604,11 +2625,13 @@ var tnthAjax = {
             cache: false
         }).done(function(data) {
             //self.getRoleList();
-            $(".get-roles-error").remove();
+            $(".get-roles-error").html("");
             fillContent.roles(data,isProfile);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           if ($(".get-roles-error").length == 0) $(".error-message").append("<div class='get-roles-error'>Server error occurred retrieving user role information.</div>");
+           var errorMessage = "Server error occurred retrieving user role information.";
+           if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".get-roles-error").html(errorMessage);
         });
     },
     "putRoles": function(userId,toSend) {
@@ -2619,9 +2642,11 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            $(".put-roles-error").remove();
+            $(".put-roles-error").html("");
         }).fail(function(jhr) {
-           if ($(".put-roles-error").length == 0) $(".error-message").append("<div class='put-roles-error'>Server error occurred setting user role information.</div>");
+            var errorMessage = "Server error occurred setting user role information."
+           if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".put-roles-error").html(errorMessage);
            //console.log(jhr.responseText);
         });
     },
@@ -2633,10 +2658,12 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            $(".delete-roles-error").remove();
+            $(".delete-roles-error").html("");
         }).fail(function() {
            // console.log("Problem updating role on server.");
-           if ($(".delete-roles-error").length == 0) $(".error-message").append("<div class='delete-roles-error'>Server error occurred deleting user role.</div>");
+           var errorMessage = "Server error occurred deleting user role.";
+           if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".delete-roles-error").html(errorMessage);
 
         });
     },
@@ -2645,10 +2672,12 @@ var tnthAjax = {
             type: "GET",
             url: '/api/patient/'+userId+'/clinical'
         }).done(function(data) {
-            $(".get-clinical-error").remove();
+            $(".get-clinical-error").html("");
             fillContent.clinical(data);
         }).fail(function() {
-           if ($(".get-clinical-error").length == 0) $(".error-message").append("<div class='get-clinical-error'>Server error occurred retrieving clinical data.</div>");
+            var errorMessage = "Server error occurred retrieving clinical data."
+           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
+           else $(".get-clinical-error").html(errorMessage);
         });
     },
     "putClinical": function(userId, toCall, toSend, targetField, status) {
@@ -2660,12 +2689,14 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify({value: toSend})
         }).done(function() {
-            $(".put-clinical-error").remove();
+            $(".put-clinical-error").html("");
             flo.showUpdate(targetField);
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".put-clinical-error").length == 0) $(".error-message").append("<div class='put-clinical-error'>Server error occurred updating clinical data.</div>");
+            var errorMessage = "Server error occurred updating clinical data.";
+            if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
+            else $(".put-clinical-error").html(errorMessage);
             flo.showError(targetField);
             fillViews.clinical();
         });
@@ -2736,12 +2767,14 @@ var tnthAjax = {
             cache: false,
             data: JSON.stringify(obsArray)
         }).done(function() {
-            $(".post-biopsy-error").remove();
+            $(".post-clinical-error").html("");
             flo.showUpdate(targetField);
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
+            var errorMessage = "Server error occurred updating clinical data.";
+            if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
+            else $(".post-clinical-error").html(errorMessage);
             flo.showError(targetField);
             fillViews.clinical();
         });
@@ -2752,7 +2785,7 @@ var tnthAjax = {
             url: '/api/tou',
             async: (sync? false: true)
         }).done(function(data) {
-            $(".get-tou-error").remove();
+            $(".get-tou-error").html("");
             if (data.url) {
                 $("#termsURL").attr("data-url", data.url);
                 $("#topTerms .general-tou").each(function() {
@@ -2764,7 +2797,9 @@ var tnthAjax = {
             }
             //fillContent.terms(data);
         }).fail(function() {
-           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou url.</div>");
+           var errorMessage = "Server error occurred retrieving tou url.";
+           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+           else $(".get-tou-error").html(errorMessage);
            if (callback) callback({"error": "Server error"});
         });
     },
@@ -2775,12 +2810,14 @@ var tnthAjax = {
             cache: false,
             async: (sync?false:true)
         }).done(function(data) {
-            $(".get-tou-error").remove();
+            $(".get-tou-error").html("");
             fillContent.terms(data);
             if (callback) callback(data);
         }).fail(function() {
-           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou data.</div>");
-           if (callback) callback({"error": "Server error retrieving tou data."})
+           var errorMessage = "Server error occurred retrieving tou data."
+           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+           else $(".get-tou-error").html(errorMessage);
+           if (callback) callback({"error": errorMessage})
         });
     },
     "postTermsByUser": function(userId, toSend) {
@@ -2793,10 +2830,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function() {
            // console.log('terms stored');
-           $(".post-tou-error").remove();
+           $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
+            var errorMessage = "Server error occurred saving terms of use information.";
+            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+            else $(".post-tou-error").html(errorMessage);
         });
     },
     "postTerms": function(toSend) {
@@ -2808,10 +2847,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function() {
            // console.log('terms stored');
-           $(".post-tou-error").remove();
+           $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
+            var errorMessage = "Server error occurred saving terms of use information.";
+            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+            else $(".post-tou-error").html(errorMessage);
         });
     }
 };
