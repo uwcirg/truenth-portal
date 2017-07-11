@@ -21,6 +21,8 @@
                 {{dobGroup()}}
                 <br/><br/>
                 {{rolesGroup()}}
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
               </div>
             </div>
         </div>
@@ -56,8 +58,8 @@
             <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
             <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
           </div>
-          <div id="iqErrorMessage" class="error-message text-danger"></div>
         </div>
+        <div id="iqErrorMessage" class="default-error-message-container error-message text-danger"></div>
     </form>
   </div>
 {% endblock %}
@@ -722,7 +724,7 @@ $(document).ready(function(){
 		           } else {
 		               userOrgId = org.val();
 		           };
-                  
+
                   if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
                     var topOrg = OT.getTopLevelParentOrg(userOrgId);
                     if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
