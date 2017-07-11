@@ -318,11 +318,11 @@ class TestAssessmentStatus(TestCase):
         # backdate so the baseline q's have expired
         mock_qr(user_id=TEST_USER_ID, instrument_id='epic26',
                 status='in-progress')
-        self.bless_with_basics(backdate=timedelta(days=60))
+        self.bless_with_basics(backdate=timedelta(days=31))
         self.mark_metastatic()
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
-        self.assertEquals(a_s.overall_status, "Expired")
+        self.assertEquals(a_s.overall_status, "Partially Completed")
 
         # with all q's from baseline expired,
         # instruments_needing_full_assessment and insturments_in_progress
@@ -431,4 +431,4 @@ class TestAssessmentStatus(TestCase):
                 status='in-progress')
         self.test_user = db.session.merge(self.test_user)
         a_s = AssessmentStatus(user=self.test_user)
-        self.assertEquals(a_s.overall_status, 'Expired')
+        self.assertEquals(a_s.overall_status, 'Partially Completed')
