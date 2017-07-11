@@ -485,7 +485,7 @@ function initIncompleteFields() {
             $("#termsReminderModal").modal("show");
           };
         };
-        setTimeout("disableHeaderFooterLinks({hideHeaderLinks: true});", 1000);
+        setTimeout("disableHeaderFooterLinks();", 1000);
       } else {
         $("#topTerms").hide();
         fc.getNext();
