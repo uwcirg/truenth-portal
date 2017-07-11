@@ -200,6 +200,9 @@ select:not([multiple]) {
 #profileConsentList .truenth-tou-table-text {
   display: none;
 }
+#profileConsentList tr[data-tou-type='website terms of use'] {
+  display: none;
+}
 #profileSiteIDContainer, #mainDiv.profile .site-id-view {
   display: none;
 }
@@ -430,6 +433,9 @@ div.right-panel {
 #topTerms .terms-checkbox-container {
   margin-left: 2em;
   margin-top: 0.5em;
+}
+#topTerms .terms-checkbox-container i:hover {
+  cursor: pointer;
 }
 .terms-tick-box {
   float: left;
