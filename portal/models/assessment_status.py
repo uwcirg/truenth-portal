@@ -169,7 +169,9 @@ class QuestionnaireDetails(object):
                    }
                 tmp.update(results)
                 return tmp
-            return {'status': 'Expired'}
+            tmp = {'status': 'Expired'}
+            tmp.update(results)
+            return tmp
 
         def questionnaire_start_date(questionnaire):
             """Return relative start date for questionnare or None
@@ -331,7 +333,10 @@ class AssessmentStatus(object):
         results = []
         for data in filter():
             if 'in-progress' in data:
-                results.append(data['name'])
+                # Only counts if there's a `by_date`, otherwise, although this
+                # questionnaire is partially done, it can't be resumed
+                if 'by_date' in data:
+                    results.append(data['name'])
 
         return results
 
@@ -397,7 +402,16 @@ class AssessmentStatus(object):
                         'Expired'):
                     raise ValueError('Unexpected common status {}'.format(
                         status_strings[0]))
+
                 self._overall_status = status_strings[0]
+
+                # Edge case where all are in progress, but no time remains
+                if status_strings[0] == 'In Progress':
+                    due_by = [
+                        d.get('by_date') for d in
+                        self.questionnaire_data.baseline()]
+                    if not any(due_by):
+                        self._overall_status = 'Partially Completed'
             else:
                 if any(('Expired' == status for status in status_strings)):
                     self._overall_status = 'Partially Completed'
