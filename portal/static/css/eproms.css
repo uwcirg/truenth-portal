@@ -412,6 +412,9 @@ div.right-panel {
   margin: auto;
 }
 /***** initial queries page style ****/
+#termsText.agreed {
+  display: none;
+}
 .terms-of-use-intro {
   display: none;
 }
