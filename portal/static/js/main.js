@@ -645,10 +645,10 @@ var fillContent = {
                 //wording is not spec'd out for EPROMs. won't add anything specific until instructed
                 touObj.forEach(function(item) {
                     var org = OT.orgsList[item.organization_id];
-                    touContent += "<tr>";
+                    touContent += "<tr data-tou-type='" + item.type + "'>";
                     touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <span class='text-capitalize'>" + item.type + "</span></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'>" + item.type + "</span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + item.type + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.type + "</a></span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
                 });
                 return touContent;
@@ -3781,7 +3781,10 @@ function isString (obj) {
 };
 
 function disableHeaderFooterLinks() {
-    $("#tnthLogo a, #tnthTopLinks a, #tnthNavbarXs a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link").addClass("disabled").on("click", function(e) {
+    var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
+    links.addClass("disabled");
+    links.prop('onclick',null).off('click');
+    links.on("click", function(e) {
         e.preventDefault();
         return false;
     });

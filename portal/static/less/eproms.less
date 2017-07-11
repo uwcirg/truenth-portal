@@ -188,7 +188,12 @@ a.btn {
   .truenth-tou-table-text {
     display: none;
   }
+
+  tr[data-tou-type='website terms of use'] {
+    display: none;
+  }
 }
+
 #profileSiteIDContainer, #mainDiv.profile .site-id-view {
   display: none;
 }
@@ -491,6 +496,9 @@ div.right-panel {
   .terms-checkbox-container {
     margin-left: 2em;
     margin-top: 0.5em;
+  }
+  .terms-checkbox-container i:hover {
+    cursor: pointer;
   }
 }
 .terms-tick-box {
