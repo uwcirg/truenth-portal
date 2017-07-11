@@ -173,6 +173,7 @@ def next_after_login():
         db.session.commit()
         login_user(invited_user, 'password_authenticated')
         assert (invited_user == current_user())
+        user = current_user()
         assert ('invited_verified_user_id' not in session)
         assert ('login_as_id' not in session)
 
