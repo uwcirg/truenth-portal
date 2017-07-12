@@ -58,6 +58,7 @@ def assert_locale_selector():
     # prevent the default babel locale selector from being used.
     assert get_locale()
 
+
 @portal.before_app_request
 def debug_request_dump():
     if current_app.config.get("DEBUG_DUMP_HEADERS"):
