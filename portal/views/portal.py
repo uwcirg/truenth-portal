@@ -52,6 +52,11 @@ def server_error(e):  # pragma: no cover
 
 
 @portal.before_app_request
+def assert_locale_selector():
+    # Confirm import & use of custom babel localeselector function
+    assert get_locale()
+
+@portal.before_app_request
 def debug_request_dump():
     if current_app.config.get("DEBUG_DUMP_HEADERS"):
         current_app.logger.debug(
