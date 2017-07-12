@@ -626,6 +626,7 @@ var fillContent = {
                         var fType = $.trim(item.type).toLowerCase();
                         if (fType == "subject website consent" || fType == "website terms of use") {
                             item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
                             touObj.push(item);
                         };
                     });
@@ -647,8 +648,8 @@ var fillContent = {
                     var org = OT.orgsList[item.organization_id];
                     touContent += "<tr data-tou-type='" + item.type + "'>";
                     touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
-                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + item.type + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
-                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.type + "</a></span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + item.display_type + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.display_type + "</a></span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
                     touContent += "<td>" + item.accepted + "</td></tr>";
                 });
                 return touContent;
