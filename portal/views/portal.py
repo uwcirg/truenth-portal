@@ -395,7 +395,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
-        assert form.user_id.data
+        if not form.user_id.data:
+            abort(400, "missing user in identity challenge")
         user = get_user(form.user_id.data)
         if not user:
             abort(400, "missing user in identity challenge")
