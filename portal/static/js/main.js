@@ -3769,6 +3769,9 @@ function getSaveLoaderDiv(parentID, containerID) {
     };
 };
 
+function __getLoaderHTML() {
+    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+}
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 };
