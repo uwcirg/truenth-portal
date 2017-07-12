@@ -124,7 +124,7 @@
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} Withdrawn {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
+                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} {{_("Withdrawn")}} {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
                       {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
@@ -212,8 +212,8 @@ $(document).ready(function() {
         $("#_downloadLink")[0].click();
         //$("#dataDownloadModal").modal("hide");
     } else {
-        message = (instruments == "" ? "Please choose at least one instrument.": "");
-        if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+        message = (instruments == "" ? "{{_('Please choose at least one instrument.')}}": "");
+        if (dataType == "") message += (message != "" ? "<br/>": "") + "{{_('Please choose one download type.')}}";
         $("#_downloadMessage").html(message);
     };
   });
