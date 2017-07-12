@@ -159,7 +159,9 @@ var AccountCreationObj = function () {
         _accountArray['roles'] =  [{'name': 'patient'}, {'name': 'write_only'}];
         _accountArray['consents'] = getConsents();
 
+        //reset attempt to 0
         this.attempts = 0;
+        //note, this will call set demographics to update demographics after
         this.__request({'apiUrl': '/api/account', 'requestType': 'POST', 'requestData': JSON.stringify(_accountArray), 'sync': true, 'callback': this.__setDemo});
     };
     this.__setDemo = function(returnedData) {
@@ -245,7 +247,7 @@ var AccountCreationObj = function () {
                 });
             };
 
-            //apiUrl, requestType, requestData, sync
+            //reset retry attempts to 0
             this.attempts = 0;
             self.__request({'apiUrl':'/api/demographics/'+this.userId, 'requestType': 'PUT', 'requestData': JSON.stringify(_demoArray), 'sync': true, 'callback': this.__handleDisplay});
 
