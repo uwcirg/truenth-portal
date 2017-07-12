@@ -53,7 +53,9 @@ def server_error(e):  # pragma: no cover
 
 @portal.before_app_request
 def assert_locale_selector():
-    # Confirm import & use of custom babel localeselector function
+    # Confirm import & use of custom babel localeselector function.
+    # Necessary to import get_locale to bring into the request scope to
+    # prevent the default babel locale selector from being used.
     assert get_locale()
 
 @portal.before_app_request
