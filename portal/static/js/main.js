@@ -626,7 +626,7 @@ var fillContent = {
                         var fType = $.trim(item.type).toLowerCase();
                         if (fType == "subject website consent" || fType == "website terms of use") {
                             item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
-                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));
+                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
                             touObj.push(item);
                         };
                     });
