@@ -1005,6 +1005,11 @@ class User(db.Model, UserMixin):
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
+            if not telecom.email:
+                abort(400, "no valid email address provided")
+            if ((telecom.email != self.email) and
+                    (User.query.filter_by(email=telecom.email).count() > 0)):
+                abort(400, "email address already in use")
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone','mobile')) \
