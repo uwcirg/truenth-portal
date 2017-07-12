@@ -22,6 +22,7 @@ from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.coredata import Coredata
 from ..models.fhir import CC
+from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
