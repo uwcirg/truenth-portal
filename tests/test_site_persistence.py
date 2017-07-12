@@ -22,8 +22,10 @@ from portal.models.organization import Organization
 from portal.models.role import ROLE
 from portal.models.user import get_user
 
-known_good_persistence_file =\
-"https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7/site_persistence_file.json"
+revision = '66cd2c5e392cd499b5cc4f36dff95d8ec45f14c7'
+known_good_persistence_file = (
+    "https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/{}"
+    "/site_persistence_file.json".format(revision))
 
 
 class TestSitePersistence(TestCase):
@@ -41,8 +43,9 @@ class TestSitePersistence(TestCase):
         self.assertTrue(Organization.query.count() > 5)
         npis = []
         for org in Organization.query:
-            npis += [id.value for id in org.identifiers if id.system ==
-                   'http://hl7.org/fhir/sid/us-npi']
+            npis += [
+                id.value for id in org.identifiers if id.system ==
+                'http://hl7.org/fhir/sid/us-npi']
         self.assertTrue('1447420906' in npis)  # UWMC
         self.assertTrue('1164512851' in npis)  # UCSF
 
@@ -60,7 +63,7 @@ class TestSitePersistence(TestCase):
         # Prior to meeting conditions in strategy, user shouldn't have access
         # (provided we turn off public access)
         INTERVENTION.DECISION_SUPPORT_P3P.public_access = False
-        INTERVENTION.SEXUAL_RECOVERY.public_access = False # part of strat.
+        INTERVENTION.SEXUAL_RECOVERY.public_access = False  # part of strat.
         user = self.test_user
         self.assertFalse(
             INTERVENTION.DECISION_SUPPORT_P3P.display_for_user(user).access)
@@ -91,9 +94,10 @@ class TestSitePersistence(TestCase):
         # defauls in add_static_interventions call
         # to what's expected in the persistence file
         self.assertEquals(
-            INTERVENTION.CARE_PLAN.card_html, ('<p>Organization and '
-            'support for the many details of life as a prostate cancer '
-            'survivor</p>'))
+            INTERVENTION.CARE_PLAN.card_html,
+            ('<p>Organization and '
+             'support for the many details of life as a prostate cancer '
+             'survivor</p>'))
         self.assertEquals(
             INTERVENTION.SELF_MANAGEMENT.description, 'Symptom Tracker')
         self.assertEquals(
