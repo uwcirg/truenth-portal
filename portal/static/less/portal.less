@@ -16,17 +16,17 @@
 @headlineSize:    1.25em;
 @subheadSize:     1.20em;
 @lgFontSize:      1.6em;
-@lgHeadlineSize:  1.40em;
-@lgsubheadSize:   1.30em;
+@lgHeadlineSize:  1.30em;
+@lgsubheadSize:   1.20em;
 @smallText:       0.9em;
 @mediumText:      0.95em;
 @smallerText:     0.85em;
 @xsmallText:      0.75em;
 @xxsmallText:     0.70em;
 @btnSize:         0.9em;
-@legendSize:      0.92em;
+@legendSize:      1em;
 @sessionListSize: 0.95em;
-@orgSize:         1em;
+@orgSize:         0.95em;
 @modalButtonSize: 0.8em;
 @modalLabelSize:  0.8em;
 
@@ -48,7 +48,7 @@
 @sectionBorderColor: #bcc2a6;
 @rowBackgroundColor: #8a8e90;
 @tooltipColor: #39464e;
-@navBarBgColor: ##607D8B;
+@navBarBgColor: #607D8B;
 @menuTextColor: #494e37;
 @menuTextHoverColor: #337ab7;
 @menuTitleColor: #5b5e61;
@@ -86,9 +86,8 @@ a:focus {
   outline: none;
 }
 a {
-  background-color: @linkColor;
+  color: @linkColor;
   cursor: pointer;
-  color: #FFF;
 }
 a:hover, a:active {
   color: @linkHover;
@@ -97,6 +96,7 @@ a.disabled {
   opacity: 0.6;
 }
 a.btn {
+  cursor: pointer;
   font-size: @baseFontSize;
   border: none;
 }
@@ -118,7 +118,7 @@ a.btn {
   cursor: pointer;
   border-radius: 0;
   font-size: @btnSize;
-  padding: 0.7em;
+  padding: 0.8em;
   letter-spacing: 2px;
   color: #333f4b;
   background-color: #FFF;
@@ -143,16 +143,16 @@ a.btn {
   transition: all 0.3s ease-in-out 0s;
   -webkit-transition: all 0.3s ease-in-out 0s;
   border-radius: 0;
-  letter-spacing: 2;
+  letter-spacing: 2px;
   &:hover,
   &:focus,
   &.active,
   .open > .dropdown-toggle& {
     color: #fff;
-    background-color: #2a4531;
-    border-color: #1c2f21;
+    background-color: @linkHover;
+    border-color: @linkHover;
   }
-  .glyphicon {
+  & .glyphicon {
     color: #FFF;
   }
 }
@@ -231,7 +231,7 @@ select:not([multiple]) {
   color: @featureBtnColor;
   &:hover, &:active {
     color: @featureBtnHoverColor;
-    background-color: @featureBtnHoverBgColor;
+    background-color: @linkHover;
   }
 }
 
@@ -261,9 +261,13 @@ select:not([multiple]) {
     color: #FFF;
     letter-spacing: 1px;
   }
-  .copyright-container *,
-  .logo-container * {
+  & .copyright-container *,
+  & .logo-container * {
     color: #F5F5F5;
+    margin-bottom: 1em;
+  }
+  & .copyright-container {
+    font-size: @smallText;
   }
   .footer-wrapper {
     margin-left: 25%;
@@ -310,10 +314,6 @@ select:not([multiple]) {
   z-index: 20;
   position: relative;
 }
-#tnthNavWrapper {
-  z-index: 20;
-  position: relative;
-}
 
 /** Spacing for mainNav area so rest of page that doesn't get pushed down if portal_wrapper takes awhile to load **/
 #mainNav {
@@ -322,7 +322,7 @@ select:not([multiple]) {
 
 #stickyMenu {
   position: fixed;
-  top: 16em;
+  top: 14.5em;
   left: 0;
   -webkit-transform: translate(-500px, 0);
   transform: translate(-500px, 0);
@@ -361,13 +361,14 @@ select:not([multiple]) {
     list-style-type:none;
   }
   li {
+    cursor: pointer;
     margin-bottom: 1.2em;
     transform-origin: 0 100%;
     max-width: 130px;
     cursor:pointer;
   }
   li:hover {
-    color: @menuTextHoverColor;
+    color: @linkHover;
     transform: scale(1.05);
   }
 }
@@ -404,8 +405,9 @@ body.open-nav .left-panel {
 }
 div.right-panel {
   position:relative;
-  transition:margin-left ease .5s;
+  transition:margin ease .5s;
   max-width: 991px;
+  margin: auto;
 }
 
 h4.detail-title {
@@ -417,6 +419,13 @@ h4.detail-title {
   padding: 1em;
   margin: 2em 0;
   min-height: 20vh;
+}
+.terms-container {    
+  border-style:ridge;   
+  max-height: 250px;    
+  overflow: auto;   
+  padding: 1em;   
+  background-color:#F5F5F5;   
 }
 #termsText.agreed {
   display: block;
@@ -767,7 +776,7 @@ h4.detail-title {
       display: block;
       margin: -0.4em 0;
       label.org-label {
-        font-size: 1em;
+        font-size: @mediumText;
         display: inline-block;
       }
     }
@@ -833,8 +842,8 @@ h4.detail-title {
     height: 32px;
     &:hover {
       color: #fff;
-      background-color: #2a4531;
-      border-color: #1c2f21;
+      background-color: @linkHover;
+      border-color: @linkHover;
     }
 }
 
@@ -876,7 +885,6 @@ h4.detail-title {
   width:45%;
   min-width:200px;
   max-width:100%;
-  border-radius: 4px;
   background-color: @navBarBgColor;
   color: @bodyBgColor;
   font-size: @smallerText;
@@ -906,11 +914,9 @@ h4.detail-title {
   width: 100%;
   max-width: 100%;
   color: #575F5C;
-  border-top: 1px solid  #E0E6E3;
-  border-bottom: 1px solid  #E0E6E3;
+  border-bottom: 1px solid  #7b7a7a;
   padding: 0.7em 0.2em 0.83em 0.2em;
   vertical-align: center;
-  text-transform: uppercase;
 
   span.index-list {
     display: block;
@@ -946,10 +952,12 @@ h4.detail-title {
     font-family: Arial;
     color: @linkColor;
     font-size: @mediumText;
-    padding: 0.5em 1em;
-    border: solid #ccc 1px;
+    padding: 0.7em 1em;
+    border: solid #7C959E 1px;
     text-decoration: none;
     letter-spacing: 1px;
+    text-transform: uppercase;
+    min-height: 3em;
     &.link:hover {
         color: #fff;
         background-color: #2a4531;
@@ -959,6 +967,7 @@ h4.detail-title {
     a {
       color: #FFF;
       text-decoration: none;
+      transition: background-color 300ms ease-in;
     }
   }
 
@@ -976,12 +985,19 @@ h4.detail-title {
     }
   }
 }
+@media (max-width: 640px) {
+  #indexNavBar span.link {
+    position: relative;
+    top: 0.45em;
+    padding: 0.5em 1em;
+  }
+}
 
 #patientList {
   div.or {
     display: inline-block;
     background-color: #888a8c;
-    margin: 1.3em 1em 1em 1.2em;
+    margin: 1.5em 1em 1em;
   }
 
   #_downloadLink {
@@ -1044,7 +1060,6 @@ h4.detail-title {
   transition: opacity 250ms ease-in;
   &.ready {
     opacity: 1;
-    z-index: 1;
     & + #instrumentListLoad {
       opacity: 0;
       z-index: -1;
@@ -1058,6 +1073,7 @@ h4.detail-title {
   margin: 1.5em;
   opacity: 1;
   transition: opacity 250ms ease-out;
+  z-index: 1;
 }
 #patientsDownloadTypeList {
   margin-top: 0.5em;
@@ -1188,8 +1204,7 @@ h4.detail-title {
   .feature-btn-primary {
     margin-top: 0.5em;
     font-weight: bold;
-    font-size: 1.1em;
-    padding: 0.7em 2.5em;
+    padding: 6px 24px;
   }
 }
 .tnth-splash-bottom {
@@ -1375,9 +1390,8 @@ h4.detail-title {
   /*background-color: rgba(204, 206, 204, 0.25);*/
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%) ;
   padding: 2em 3em 2.5em 3em;
-  border-radius: 8px;
   margin: 0.5em auto;
-  border: 1px solid #7C959E;
+  border: 2px solid #bcc2a6;
   overflow-y: hidden;
   overflow-x: hidden;
   max-width: 100%;
@@ -1397,8 +1411,8 @@ h4.detail-title {
 
 #mainDiv.profile .profile-item-edit-btn {
   position: absolute;
-  top: 2em;
-  right: 2em;
+  top: 2.5em;
+  right: 3em;
   margin-right: 1em;
   z-index: 200;
   height: 2.5em;
@@ -1406,7 +1420,7 @@ h4.detail-title {
   padding: 0 0.7em;
   color: #FFF;
   background: @featureBtnBgColor;
-  border-color: @featureBtnBgColor;
+  border: 1px solid @featureBtnBgColor;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.9em;
@@ -1444,7 +1458,10 @@ h4.detail-title {
   display: block;
 }
 #mainDiv.profile .profile-item-container .view-container td {
-  padding: 0.6em 1em;
+  padding: 0.6em 1.5em 0.6em 0;
+}
+#mainDiv.profile .profile-item-container .view-container tr.study-id-view td {    
+  padding: 0.6em 1em 0 1em;   
 }
 #mainDiv.profile .profile-item-container .view-container td:first-of-type {
   display: inline-block;
@@ -1499,21 +1516,26 @@ h4.detail-title {
   max-width: 100%;
   padding: 1em 0;
 }
+.deceased-date-container {    
+  margin-top:-8px   
+}
 .communication-prompt {
   margin-bottom: 1em;
 }
 #createUserLink {
   max-width: 100%;
   border: 1px solid #bdb9b9;
-  height: 3.2em;
+  height: 3em;
   display: inline-block;
   width: 300px;
   max-width: 100%;
+  color: #FFF;
   background: @featureBtnBgColor;
-  border-color: @featureBtnBgColor;
+  border: 1px solid @featureBtnBgColor;
+  padding: 0.7em 1em 1em 1em;
   &:hover {
-    color: @featureBtnHoverColor;
-    background: @featureBtnColor;
+    color: @baseColor;
+    background: @linkHover;
   }
 }
 .profile-create-item-container {
@@ -1568,6 +1590,7 @@ h4.detail-title {
   }
   #stateSelector {
     width: 20%;
+    min-width: 150px;
     max-width: 200px;
   }
   &.customized input.clinic {
@@ -1622,7 +1645,6 @@ div.main-state-container .noOrg-container {
 }
 
 div.noOrg-container {
-  font-size: @orgSize;
   margin-top: 0.2em;
   input[type="radio"] {
   font-size:0.95em;
@@ -1784,6 +1806,7 @@ div.noOrg-container {
   margin-left: 2em;
 }
 .create-account-container {
+  padding: 3.5em 4em;
   width: 100%;
   max-width: 100%;
   border: solid 2px #F1F1F1;
@@ -2023,28 +2046,28 @@ div.noOrg-container {
 .pagination {
 
   >.active>a {
-    background-color: @btnColor;
-    border-color: @btnColor;
+    background-color: @featureBtnBgColor;
+    border-color: @featureBtnBgColor;
   }
   >.active>a:focus {
     background-color: @btnColor;
     border-color: @btnColor;
   }
   >.active>a:hover{
-    background-color: @btnColor;
-    border-color: @btnColor;
+    background-color: @linkHover;
+    border-color: @linkHover;
   }
   >.active>span{
     background-color: @btnColor;
     border-color: @btnColor;
   }
   >.active>span:focus{
-    background-color: @btnColor;
-    border-color: @btnColor;
+    background-color: @linkHover;
+    border-color: @linkHover;
   }
   >.active>span:hover {
-    background-color: @btnColor;
-    border-color: @btnColor;
+    background-color: @linkHover;
+    border-color: @linkHover;
   }
 }
 
@@ -2067,7 +2090,7 @@ div.noOrg-container {
 .radio input[type=radio] {
   position: relative;
   left: 3px;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 .radio-inline input[type=radio] {
   margin-left: -18px;
@@ -2327,9 +2350,11 @@ div.org-container {
     display: none;
   }
 }
-
+#tnthproc-submit {    
+  height: 2.9em;    
+}
 #eventListtnthproc {
-  margin-left: 0.5em
+  margin-left: 0.5em;
   td {
     padding: 0.15em;
     line-height: 2.3em;
@@ -2408,7 +2433,7 @@ div.timezone-warning.text-warning {
     margin-left: 0 !important;
   }
   #createUserLink {
-    font-size: @mediumText;
+    font-size: @smallText;
   }
 
   #backLink a {
@@ -2621,9 +2646,11 @@ div.timezone-warning.text-warning {
  #indexNavBar span.index-list, #indexContainer {
     display: none;
   }
+  /********
   div.left-panel, a.back, a.open {
     display: block;
   }
+  *****/
 }
 @media (min-width: 991px) {
   #mainNav {
@@ -2642,7 +2669,7 @@ div.timezone-warning.text-warning {
   #patientListOptions,
   #staffListOptions {
     display:flex;
-    flex-direction: column;
+    flex-direction: row;
   }
 
   #patientListOptions,
@@ -2654,7 +2681,7 @@ div.timezone-warning.text-warning {
   }
   #patientList div.or,
   #staffList div.or {
-    margin: 1.5em;
+    margin: 1.3em 1em 1em 1.2em;
   }
 }
 @media (max-width: 991px) {
@@ -2907,27 +2934,12 @@ div.timezone-warning.text-warning {
 }
 @media (max-width: 1243px) {
   body.open-nav .right-panel {
-    margin-left:150px;
-  }
-}
-@media (max-width: 1271px) {
-  div.right-panel {
-    margin-left: 2.5em;
+    margin-left:1450px;
   }
 }
 @media (max-width: 1199px) {
   body.open-nav .right-panel {
-    margin-left:120px;
-  }
-}
-@media (max-width: 1169px) {
-  body.open-nav .right-panel {
-    margin-left:100px;
-  }
-}
-@media (max-width: 1130px) {
-  body.open-nav .right-panel {
-    margin-left:120px;
+    margin-left:110px;
   }
 }
 @media (max-width: 1077px) {
