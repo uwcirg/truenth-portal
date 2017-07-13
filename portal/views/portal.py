@@ -22,6 +22,7 @@ from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.coredata import Coredata
 from ..models.fhir import CC
+from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
@@ -48,6 +49,14 @@ def server_error(e):  # pragma: no cover
     # exception is automatically sent to log by framework
     gil = current_app.config.get('GIL')
     return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
+
+
+@portal.before_app_request
+def assert_locale_selector():
+    # Confirm import & use of custom babel localeselector function.
+    # Necessary to import get_locale to bring into the request scope to
+    # prevent the default babel locale selector from being used.
+    assert get_locale()
 
 
 @portal.before_app_request
