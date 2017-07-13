@@ -11,6 +11,7 @@ from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
+from .portal import check_int
 from datetime import datetime
 
 
@@ -56,6 +57,7 @@ def patients_root():
             # of each, if any
             request_org_list = set(request_org_list.split(","))
             for orgId in request_org_list:
+                check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue
                 org_list.update(OT.here_and_below_id(orgId))
