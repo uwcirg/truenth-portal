@@ -1101,3 +1101,10 @@ def stock_consent(org_name):
             </body>
         </html>""",
         org_name=org_name)
+
+
+def check_int(i):
+    try:
+        int(i)
+    except ValueError, e:
+        abort(400, "invalid input {}".format(e))
