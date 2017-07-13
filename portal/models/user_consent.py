@@ -104,9 +104,11 @@ class UserConsent(db.Model):
         user = 'user_id' in data and User.query.get(data['user_id'])
         if not user:
             raise ValueError("required user_id not found")
-        org = Organization.query.get(data.get('organization_id'))
-        if not org:
+        if not 'organization_id' in data:
             raise ValueError("required organization_id not found")
+        org_id = int(data.get('organization_id'))
+        if not Organization.query.get(org_id):
+            raise ValueError("organization not found for id {}".format(org_id))
         url = data.get('agreement_url')
         try:
             url_validation(url)
@@ -114,7 +116,7 @@ class UserConsent(db.Model):
             raise ValueError("requires a valid agreement_url")
 
         obj = cls(
-            user_id=data['user_id'], organization_id=data['organization_id'],
+            user_id=data['user_id'], organization_id=org_id,
             agreement_url=data['agreement_url'])
 
         if data.get('expires'):
