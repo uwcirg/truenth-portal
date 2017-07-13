@@ -104,7 +104,7 @@ class UserConsent(db.Model):
         user = 'user_id' in data and User.query.get(data['user_id'])
         if not user:
             raise ValueError("required user_id not found")
-        if not 'organization_id' in data:
+        if 'organization_id' not in data:
             raise ValueError("required organization_id not found")
         org_id = int(data.get('organization_id'))
         if not Organization.query.get(org_id):
