@@ -252,18 +252,18 @@ class TestPortal(TestCase):
         self.assert200(rv)
 
         rv2 = self.client.get('/website-consent-script/{}?redirect_url='
-                             '{}'.format(TEST_USER_ID, invalid_url))
+                              '{}'.format(TEST_USER_ID, invalid_url))
         self.assert401(rv2)
 
         # validate redirect of /login/<provider> GET
         rv3 = self.client.get('/login/TESTING?user_id={}&next='
-                             '{}'.format(TEST_USER_ID, client_url),
-                             follow_redirects=True)
+                              '{}'.format(TEST_USER_ID, client_url),
+                              follow_redirects=True)
         self.assert200(rv3)
 
         rv4 = self.client.get('/login/TESTING?user_id={}&next='
-                             '{}'.format(TEST_USER_ID, invalid_url),
-                             follow_redirects=True)
+                              '{}'.format(TEST_USER_ID, invalid_url),
+                              follow_redirects=True)
         self.assert401(rv4)
 
         # validate redirect of /challenge POST
