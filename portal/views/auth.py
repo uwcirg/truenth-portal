@@ -269,6 +269,7 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
+        validate_client_origin(session['next'])
         current_app.logger.debug(
             "store-session['next'] <{}> from login/{}".format(
                 session['next'], provider_name))

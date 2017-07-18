@@ -20,6 +20,7 @@ from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
+from ..models.auth import validate_client_origin
 from ..models.coredata import Coredata
 from ..models.fhir import CC
 from ..models.i18n import get_locale
@@ -496,6 +497,7 @@ def initial_queries():
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
+    validate_client_origin(redirect_url)
     user = current_user()
     patient = get_user(patient_id)
     org = patient.first_top_organization()
