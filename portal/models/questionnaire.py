@@ -17,6 +17,7 @@ class Questionnaire(db.Model):
     @classmethod
     def from_fhir(cls, data):
         instance = cls()
+        assert data['resourceType'] == 'Questionnaire'
         instance.name = data['name']
         return instance
 
@@ -35,6 +36,7 @@ class Questionnaire(db.Model):
         @return: the new or matched Questionnaire
 
         """
+        assert self.name
         existing = Questionnaire.query.filter_by(name=self.name).first()
         if not existing:
             db.session.add(self)
@@ -44,4 +46,3 @@ class Questionnaire(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
-
