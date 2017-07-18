@@ -827,12 +827,17 @@ def contact():
                                email=email, user=user)
 
     sender = request.form.get('email')
+    if not sender or ('@' not in sender):
+        abort(400, "No valid sender email address provided")
     sendername = request.form.get('sendername')
     subject = u"{server} contact request: {subject}".format(
         server=current_app.config['SERVER_NAME'],
         subject=request.form.get('subject'))
+    formbody = request.form.get('body')
+    if not formbody:
+        abort(400, "No contact request body provided")
     body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
-        sendername=sendername, sender=sender, body=request.form.get('body'))
+        sendername=sendername, sender=sender, body=formbody)
     recipients = current_app.config['CONTACT_SENDTO_EMAIL']
 
     user_id = user.id if user else None
