@@ -227,12 +227,6 @@ select:not([multiple]) {
 #mainDiv.profile .logo-container {
   margin: auto;
 }
-/*********
-#mainDiv.profile .footer-wrapper {
-  margin-left: 25%;
-  position: inherit !important;
-}
-********/
 #mainDiv.profile .footer-container.flex {
   clear: both;
   display:flex;
@@ -2736,17 +2730,6 @@ div.timezone-warning.text-warning {
     margin-left: 110px;
   }
 }
-
-/*@media (max-width: 1169px) {
-  body.open-nav .right-panel {
-    margin-left: 100px;
-  }
-}
-@media (max-width: 1130px) {
-  body.open-nav .right-panel {
-    margin-left: 120px;
-  }
-}*/
 @media (max-width: 1077px) {
   body.open-nav .right-panel {
     margin-left: 160px;
