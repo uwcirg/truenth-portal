@@ -248,6 +248,8 @@ def login(provider_name):
         "Unittesting backdoor - see tests.login() for use"
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
+        if request.args.get('next'):
+            validate_client_origin(request.args.get('next'))
         user = current_user()
         login_user(user, 'password_authenticated')
         return next_after_login()

@@ -405,7 +405,8 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
-        validate_local_origin(form.next_url.data)
+        if form.next_url.data:
+            validate_local_origin(form.next_url.data)
         if not form.user_id.data:
             abort(400, "missing user in identity challenge")
         user = get_user(form.user_id.data)
@@ -498,7 +499,8 @@ def initial_queries():
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
-    validate_client_origin(redirect_url)
+    if redirect_url:
+        validate_client_origin(redirect_url)
     user = current_user()
     patient = get_user(patient_id)
     org = patient.first_top_organization()
