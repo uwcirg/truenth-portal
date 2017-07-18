@@ -1307,7 +1307,6 @@
                 };
             {% endif %}
             fillViews.clinical();
-
         };
         $(function () {
             $("#patientQ").show();
@@ -1392,7 +1391,7 @@
 
             //wait for ajax calls to finish?
             //hide rest of the questions if the patient hasn't been diagnosed with prostate cancer
-            setTimeout("checkDiagnosis();", 1000);
+            setTimeout("checkDiagnosis();", 2000);
 
 
         });
@@ -1686,6 +1685,8 @@
                 $("#manualEntryMessageContainer").text("");
                 //check if the user has given web consent here, if not redirect to form
                 var assessment_url = {%if person.assessment_link%}"{{person.assessment_link|safe}}"{%else%}""{%endif%};
+                console.log(assessment_url);
+                return false;
                 if (hasValue(assessment_url)) {
                     var still_needed = false;
                     tnthAjax.getStillNeededCoreData('{{person.id if person}}', true, function(data) {
