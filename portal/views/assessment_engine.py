@@ -17,6 +17,7 @@ from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, genera
 from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
+from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
@@ -1543,6 +1544,8 @@ def batch_assessment_status():
     if not user_ids:
         abort(400, "Requires at least one user_id")
     results = []
+    for uid in user_ids:
+        check_int(uid)
     users = User.query.filter(User.id.in_(user_ids))
     for user in users:
         if not acting_user.check_role('view', user.id):
