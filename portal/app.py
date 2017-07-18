@@ -10,7 +10,7 @@ import redis
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
-from .csrf import csrf
+from .csrf import csrf, csrf_blueprint
 from .database import db
 from .extensions import authomatic, recaptcha
 from .extensions import babel, celery, mail, oauth, session, user_manager
@@ -44,6 +44,7 @@ DEFAULT_BLUEPRINTS = (
     auth,
     coredata_api,
     clinical_api,
+    csrf_blueprint,
     demographics_api,
     fhir_api,
     filters_blueprint,
@@ -93,10 +94,10 @@ def configure_app(app, config):
 
 
 def configure_csrf(app):
-    """Initialize CSRF protection for all views not protected by WTForms
+    """Initialize CSRF protection
 
-    A view may request exclusion from this protection with the @csrf.exempt
-    decorator.
+    See `csrf.csrf_protect()` for implementation.  Not using default
+    as OAuth API use needs exclusion.
 
     """
     csrf.init_app(app)

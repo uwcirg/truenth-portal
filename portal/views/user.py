@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..csrf import csrf
 from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.audit import Audit
