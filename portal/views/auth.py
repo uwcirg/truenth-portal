@@ -24,7 +24,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_client_origin, validate_local_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
@@ -110,6 +110,7 @@ def capture_next_view_function(real_function):
 
         if request.args.get('next'):
             session['next'] = request.args.get('next')
+            validate_local_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
