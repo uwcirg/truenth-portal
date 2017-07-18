@@ -10,6 +10,7 @@ import redis
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
+from .csrf import csrf
 from .database import db
 from .extensions import authomatic, recaptcha
 from .extensions import babel, celery, mail, oauth, session, user_manager
@@ -68,6 +69,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     app = Flask(app_name, template_folder='templates',
                 instance_relative_config=True)
     configure_app(app, config)
+    configure_csrf(app)
     configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
@@ -88,6 +90,16 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+
+
+def configure_csrf(app):
+    """Initialize CSRF protection for all views not protected by WTForms
+
+    A view may request exclusion from this protection with the @csrf.exempt
+    decorator.
+
+    """
+    csrf.init_app(app)
 
 
 def configure_jinja(app):
