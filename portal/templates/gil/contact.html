@@ -34,6 +34,7 @@
             <p class="module__body">{{_("Use this form to get in touch with TrueNTH USA.")}}</p>
             <form id="contactForm" class="module__form" action="" method="post">
               <input type="hidden" name="sendername" id="sendername" value="" />
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <div class="field-group field-group__half">
                 <div class="field field__text">
                   <label>{{_("First Name")}}</label>
