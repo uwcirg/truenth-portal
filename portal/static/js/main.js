@@ -1608,11 +1608,15 @@ OrgTool.prototype.populateUI = function() {
     for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
-                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
+                if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
+                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                    parentOrgsCt++;
+                };
             } else {
-                container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
+                if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
+                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
                     orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
             };
         };
         // Fill in each child clinic
@@ -1623,6 +1627,8 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
+
+                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
 
                 childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
 
@@ -1916,15 +1922,34 @@ OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
 OrgTool.prototype.getHereBelowOrgs = function() {
   var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
   var here_below_orgs = [];
-  userOrgs.forEach(function(orgId) {
-      here_below_orgs.push(orgId);
-      var co = mainOrgsList[orgId];
-      var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
-      if (cOrgs && cOrgs.length > 0) {
-        here_below_orgs = here_below_orgs.concat(cOrgs);
-      };
-  });
+  if (!userOrgs) {
+    var selectedOrg = this.getSelectedOrg();
+   if (selectedOrg.length > 0) userOrgs = [selectedOrg.val()];
+  };
+  if (userOrgs) {
+      userOrgs.forEach(function(orgId) {
+          here_below_orgs.push(orgId);
+          var co = mainOrgsList[orgId];
+          var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+          if (cOrgs && cOrgs.length > 0) {
+            here_below_orgs = here_below_orgs.concat(cOrgs);
+          };
+      });
+  };
   return here_below_orgs;
+};
+OrgTool.prototype.morphPatientOrgs = function() {
+    var checkedOrgs = {};
+    var orgs = $("#userOrgs input[name='organization']");
+    orgs.each(function() {
+        if ($(this).prop("checked")) {
+            checkedOrgs[$(this).val()] = true;
+        };
+        $(this).attr("type", "radio");
+        if (checkedOrgs[$(this).val()]) {
+            $(this).prop("checked", true);
+        };
+    });
 };
 var OT = new OrgTool();
 
