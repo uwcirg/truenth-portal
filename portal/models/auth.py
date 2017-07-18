@@ -369,8 +369,6 @@ def validate_local_origin(origin):
     po = urlparse(origin)
     if po.netloc and po.netloc == current_app.config.get("SERVER_NAME"):
         return True
-    if po.scheme and po.scheme == 'localhost':
-        return True
     if not po.scheme and not po.netloc and po.path:
         return True
 

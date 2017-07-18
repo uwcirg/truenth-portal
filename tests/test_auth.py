@@ -183,7 +183,7 @@ class TestAuth(TestCase):
     def test_origin_validation(self):
         client = self.add_client()
         client_url = client._redirect_uris
-        local_url = "{}/home?test".format(self.app.config.get('SERVER_NAME'))
+        local_url = "http://{}/home?test".format(self.app.config.get('SERVER_NAME'))
         invalid_url = 'http://invalid.org'
 
         self.assertTrue(validate_client_origin(client_url))
