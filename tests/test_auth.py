@@ -2,9 +2,11 @@
 import datetime
 from tests import TestCase, TEST_USER_ID
 from flask_webtest import SessionScope
+from werkzeug.exceptions import Unauthorized
 
 from portal.extensions import db
 from portal.models.auth import Client, Token, create_service_token
+from portal.models.auth import validate_client_origin, validate_local_origin
 from portal.models.intervention import INTERVENTION
 from portal.models.role import ROLE
 from portal.models.user import add_authomatic_user, add_role
@@ -177,3 +179,15 @@ class TestAuth(TestCase):
         """Call for token_status w/o token should return 401"""
         rv = self.client.get("/oauth/token-status")
         self.assert401(rv)
+
+    def test_origin_validation(self):
+        client = self.add_client()
+        client_url = client._redirect_uris
+        local_url = "{}/home?test".format(self.app.config.get('SERVER_NAME'))
+        invalid_url = 'http://invalid.org'
+
+        self.assertTrue(validate_client_origin(client_url))
+        self.assertTrue(validate_local_origin(local_url))
+
+        self.assertRaises(Unauthorized, validate_client_origin, invalid_url)
+        self.assertRaises(Unauthorized, validate_local_origin, invalid_url)
