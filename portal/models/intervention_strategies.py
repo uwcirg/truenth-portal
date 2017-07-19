@@ -447,7 +447,8 @@ def update_card_html_on_completion():
                             </div>
                             """.format(
                                       thank_you=thank_you_block(name=user.display_name,
-                                                                registry=assessment_status.organization.name),
+                                                                registry=\
+                                                                assessment_status.organization.name),
                                       logout=logout_label)
             else:
                 message = _(
