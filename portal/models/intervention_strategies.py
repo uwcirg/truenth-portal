@@ -445,10 +445,11 @@ def update_card_html_on_completion():
                             <div class="button-container portal-header-logout-container">
                                 <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
                             </div>
-                            """.format(thank_you=thank_you_block(
-                                        name=user.display_name,
-                                        registry=assessment_status.organization.name), 
-                                        logout=logout_label)
+                            """.format(
+                                      thank_you=thank_you_block(
+                                      name=user.display_name,
+                                      registry=assessment_status.organization.name),
+                                      logout=logout_label)
             else:
                 message = _(
                     "The assessment is no longer available.\n"
