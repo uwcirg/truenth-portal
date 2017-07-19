@@ -12,7 +12,7 @@ from ..models.user import current_user
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
 
 
-@truenth_api.route("/ping", methods=('POST',))
+@truenth_api.route("/ping", methods=('OPTIONS', 'POST'))
 @crossdomain()
 def ping():
     """POST request prolong session by reseting cookie timeout"""
