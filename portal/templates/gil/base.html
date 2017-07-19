@@ -169,6 +169,7 @@
             <br/>
             <p class="box-modal__copy">{{_("Do you have an access code?")}}</p>
             <form action="/go" method="post">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <input type="text" id="shortcut_alias" name="shortcut_alias" placeholder="{{_('Enter Access Code')}}" required autocomplete="off"/>
               <div id="access_code_info" class="box-modal__copy text-left tnth-hide"></div>
               <div id="access_code_error" class="tnth-hide"></div>

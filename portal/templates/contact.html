@@ -9,6 +9,7 @@
   <div class="col-md-7">
 
     <form id="profileForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="form-group">
         <label for="sendername">{{ _("Name") }}</label>
         <input type="text" class="form-control" name="sendername"
