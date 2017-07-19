@@ -30,6 +30,10 @@ def csrf_protect():
     if request.path.startswith('/oauth/'):
         return
 
+    # Backdoor for testing
+    if current_app.config.get('TESTING') == True:
+        return
+
     # Look for legit OAuth requests, and exclude these from csrf protection
     if request.headers and request.headers.get('Authorization'):
         # 'Authorization' will have bearer on oauth, but we don't yet know
