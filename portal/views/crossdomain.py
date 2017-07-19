@@ -6,9 +6,11 @@ from functools import update_wrapper
 from ..models.auth import validate_client_origin
 
 
-def crossdomain(origin=None, methods=None,
-                headers=('Authorization', 'X-Requested-With'),
-                max_age=21600, automatic_options=True):
+def crossdomain(
+        origin=None,
+        methods=None,
+        headers=('Authorization', 'X-Requested-With', 'X-CSRFToken'),
+        max_age=21600, automatic_options=True):
     """Decorator to add specified crossdomain headers to response
 
     :param origin: '*' to allow all origins, otherwise a string with
