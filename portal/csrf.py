@@ -1,4 +1,4 @@
-from flask import abort, Blueprint, request
+from flask import abort, current_app, Blueprint, request
 from flask_wtf.csrf import CSRFProtect
 
 from .models.user import current_user
@@ -21,6 +21,14 @@ def csrf_protect():
     protection should be included.
 
     """
+    # Only protect the configured verbs
+    if request.method not in current_app.config['WTF_CSRF_METHODS']:
+        return
+
+    # Don't get in the way of the initial oauth dance.
+    if request.path.startswith('/oauth/'):
+        return
+
     # Look for legit OAuth requests, and exclude these from csrf protection
     if request.headers and request.headers.get('Authorization'):
         # 'Authorization' will have bearer on oauth, but we don't yet know
@@ -34,6 +42,9 @@ def csrf_protect():
             # a chance, we should never see a current user (unless one is tied
             # to a local login session).
             if current_user():
+                current_app.logger.error(
+                    "Local access and OAuth appear mixed {} {}".format(
+                        request.method, request.path))
                 abort (401, "Local access and OAuth can not be mixed")
             return
 

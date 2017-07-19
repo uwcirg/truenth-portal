@@ -20,6 +20,7 @@ from werkzeug.security import gen_salt
 from validators import url as url_validation
 
 from ..audit import auditable_event
+from ..csrf import csrf
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
@@ -37,6 +38,7 @@ auth = Blueprint('auth', __name__)
 
 
 @auth.route('/deauthorized', methods=('POST',))
+@csrf.exempt
 def deauthorized():
     """Callback URL configured on facebook when user deauthorizes
 
@@ -912,6 +914,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
+@csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
 
@@ -941,6 +944,7 @@ def oauth_errors():
 
 
 @auth.route('/oauth/token', methods=('GET', 'POST'))
+@csrf.exempt
 @oauth.token_handler
 def access_token():
     """Exchange authorization code for access token
@@ -1024,6 +1028,7 @@ def access_token():
 
 
 @auth.route('/oauth/authorize', methods=('GET', 'POST'))
+@csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
     """Authorize the client to access TrueNTH resources
