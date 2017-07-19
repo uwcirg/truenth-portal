@@ -8,6 +8,7 @@ csrf = CSRFProtect()
 
 csrf_blueprint = Blueprint('csrf_blueprint', __name__)
 
+
 @csrf_blueprint.before_app_request
 def csrf_protect():
     """ Protect views from Cross Site Resource Forgery (CSRF)
@@ -45,7 +46,7 @@ def csrf_protect():
                 current_app.logger.error(
                     "Local access and OAuth appear mixed {} {}".format(
                         request.method, request.path))
-                abort (401, "Local access and OAuth can not be mixed")
+                abort(401, "Local access and OAuth can not be mixed")
             return
 
     csrf.protect()
