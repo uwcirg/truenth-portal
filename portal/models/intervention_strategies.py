@@ -449,6 +449,7 @@ def update_card_html_on_completion():
                                         name=user.display_name,
                                         registry=assessment_status.organization.name), 
                                         logout=logout_label)
+            else:
                 message = _(
                     "The assessment is no longer available.\n"
                     "A research staff member will contact you for assistance.")
