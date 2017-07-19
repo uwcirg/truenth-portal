@@ -241,7 +241,7 @@ def update_card_html_on_completion():
                   </div>
                 </div>""".format(
                     greeting=greeting, confirm=confirm, reminder=reminder,
-                    logout = logout)
+                    logout=logout)
 
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
