@@ -226,6 +226,7 @@ def update_card_html_on_completion():
             reminder = _(
                 "You will be notified when the next "
                 "questionnaire is ready to complete.")
+            logout = _("Log out")
             return """
                 <div class="portal-header-container">
                   <h2 class="portal-header">{greeting}</h2>
@@ -234,8 +235,13 @@ def update_card_html_on_completion():
                   <div class="button-callout">
                     <figure id="portalScrollArrow"></figure>
                   </div>
+                  <br/><br/>
+                  <div class="button-container portal-header-logout-container">
+                    <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
+                  </div>
                 </div>""".format(
-                    greeting=greeting, confirm=confirm, reminder=reminder)
+                    greeting=greeting, confirm=confirm, reminder=reminder,
+                    logout = logout)
 
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
@@ -440,16 +446,9 @@ def update_card_html_on_completion():
             # here, they should see the thank you text.
             if assessment_status.enrolled_in_classification('indefinite'):
                 logout_label = _("Log Out")
-                card_html = """
-                            {thank_you}
-                            <div class="button-container portal-header-logout-container">
-                                <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
-                            </div>
-                            """.format(
-                                      thank_you=thank_you_block(name=user.display_name,
-                                                                registry=\
-                                                                assessment_status.organization.name),
-                                      logout=logout_label)
+                card_html = thank_you_block(
+                    name=user.display_name,
+                    registry=assessment_status.organization.name)
             else:
                 message = _(
                     "The assessment is no longer available.\n"
