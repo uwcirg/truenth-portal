@@ -445,7 +445,6 @@ def update_card_html_on_completion():
             # If the user was enrolled in indefinite work and lands
             # here, they should see the thank you text.
             if assessment_status.enrolled_in_classification('indefinite'):
-                logout_label = _("Log Out")
                 card_html = thank_you_block(
                     name=user.display_name,
                     registry=assessment_status.organization.name)
