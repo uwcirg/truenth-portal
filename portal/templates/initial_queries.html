@@ -9,6 +9,7 @@
   {{tou(terms)}}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if user and user.email %}
             <input type="hidden" name="email" id="email" value="{{user.email}}" />
         {% endif %}

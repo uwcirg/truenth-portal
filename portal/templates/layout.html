@@ -121,6 +121,10 @@ if (LOGIN_AS_PATIENT) {
     };
   });
 };
+var __CRSF_TOKEN = "{{csrf_token()}}";
+var __CRSF_TOKEN_HEADER = {
+    "X-CSRFToken": __CRSF_TOKEN
+};
 {% block document_ready -%}
 $(document).ready(function(){
    $('[data-toggle="popover"]').popover();

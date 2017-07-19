@@ -1954,6 +1954,15 @@ OrgTool.prototype.morphPatientOrgs = function() {
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "beforeSend": function() {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
+                }
+            }
+        });
+    },
     "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following:
         //:subject_id: User on which action is being attempted
@@ -2918,18 +2927,15 @@ function newHttpRequest(url,callBack, noCache)
     xmlhttp.send();
 };
 
-$.ajaxSetup({
-    timeout: 2000,
-    retryAfter:3000
-});
 var attempts = 0;
 
-funcWrapper = function(param) {
+funcWrapper = function() {
     attempts++;
     $.ajax({
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
+        timeout: 5000,
         cache: (getIEVersion() ? false : true)
     }, 'html')
     .done(function(data) {
@@ -2939,11 +2945,12 @@ funcWrapper = function(param) {
     .fail(function(jqXHR, textStatus, errorThrown) {
       //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
         if (attempts < 3) {
-            setTimeout ( function(){ funcWrapper( param ) }, $.ajaxSetup().retryAfter );
+            setTimeout ( function(){ funcWrapper( ) }, 3000 );
         } else loader();
     })
     .always(function() {
         loader();
+        attempts = 0;
     });
 };
 
@@ -2965,6 +2972,7 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     //setTimeout('LRKeyEvent();', 1500);
+    tnthAjax.beforeSend();
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({

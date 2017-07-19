@@ -20,6 +20,8 @@ user_manager = UserManager(db_adapter)
 from functools import wraps
 from flask import abort, request
 from flask_oauthlib.provider import OAuth2Provider
+
+from .csrf import csrf
 from .models.login import login_user
 from .models.user import current_user
 
@@ -50,6 +52,7 @@ class OAuthOrAlternateAuth(OAuth2Provider):
             see: http://stackoverflow.com/questions/308999/what-does-functools-wraps-do
 
             """
+            @csrf.exempt
             @wraps(eff)
             def decorated(*args, **kwargs):  # pragma: no cover
                 """decorate the 'eff' function"""
