@@ -531,21 +531,21 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div id="userOrgs" class="customized">
-           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
            <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
-           <div class="state-selector-container"><select id="stateSelector" class="form-control"></select></div>
+           <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
            <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-               <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
-               <div class="main-state-container">
-                    <div class="noOrg-container" style="display: none">
-                        <label>
-                            <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
-                            <span>{{ _("None of the Above") }}</span>
-                        </label>
-                    </div>
+               <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+               <div class="main-state-container selector-show">
                </div>
            </div>
-           <div id="userOrgsInfo" class="text-muted">{{_("No clinic found in selected clinic.")}}</div>
+            <div class="noOrg-container" style="display: none">
+                <label>
+                    <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
+                    <span>{{ _("None of the Above") }}</span>
+                </label>
+            </div>
+           <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
            <div id="defaultConsentContainer"></div>
            {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
@@ -580,12 +580,6 @@
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
-                            {% if person %}
-                                var checkedItem = container.find("input[name='organization']:checked");
-                                if (checkedItem.length > 0) {
-                                   checkedItem.trigger("click");
-                                };
-                            {% endif %}
                         } else {
                             $(".state-container, .clinic-prompt, .noOrg-container").hide();
                             $("#userOrgsInfo").show();
@@ -652,22 +646,31 @@
                   });
 
                   var selectOptions = $("#stateSelector").sortOptions();
-                  $("#stateSelector").empty().append(selectOptions)
-                  .append("<option value='none'>Other</option>")
-                  .prepend("<option value='' selected>Select</option>")
-                  .val("");
-                  $(".state-container, .clinic-prompt").hide();
-                  setTimeout("OT.handlePreSelectedClinic();", 200);
-                  //case of pre-selected clinic, need to check if any clinic has prechecked
-                  setTimeout("handleCheckedItem();", 500);
+                  if (selectOptions.length > 0) {
+                      $("#stateSelector").empty().append(selectOptions)
+                      .append("<option value='none'>Other</option>")
+                      .prepend("<option value='' selected>Select</option>")
+                      .val("");
+                      $(".state-container, .clinic-prompt").hide();
+                      setTimeout("OT.handlePreSelectedClinic();", 200);
+                      //case of pre-selected clinic, need to check if any clinic has prechecked
+                      setTimeout("handleCheckedItem();", 500);
 
-                  OT.populateOrgsList(entry);
-                  $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).val() != 0) OT.getDefaultModal(this);
-                  });
+                      OT.populateOrgsList(entry);
+                      $("#userOrgs input[name='organization']").each(function() {
+                        if ($(this).val() != 0) OT.getDefaultModal(this);
+                      });
 
-                  {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                  OT.handleEvent();
+                      {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                      OT.handleEvent();
+                    } else { // if no states found, then need to draw the orgs UI
+                        $("#userOrgs .selector-show").hide();
+                        setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
+                            OT.filterOrgs(OT.getHereBelowOrgs());
+                            OT.morphPatientOrgs();
+                            $(".noOrg-container, .noOrg-container *").show();
+                        }); }, 500);
+                    };
 
                   if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
                 };
@@ -716,17 +719,7 @@
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-                var userOrgs = $("#userOrgs input[name='organization']");
-                var checkedOrgs = {};
-                userOrgs.each(function() {
-                    if ($(this).prop("checked")) {
-                        checkedOrgs[$(this).val()] = true;
-                    };
-                    $(this).attr("type", "radio");
-                    if (checkedOrgs[$(this).val()]) {
-                        $(this).prop("checked", true);
-                    };
-                });
+               OT.morphPatientOrgs();
             {%- endif -%}
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
@@ -1979,7 +1972,7 @@
     {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
