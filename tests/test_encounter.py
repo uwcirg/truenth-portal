@@ -83,3 +83,24 @@ class TestEncounter(TestCase):
             self.test_user.current_encounter.auth_method,
             'staff_authenticated')
         self.assertTrue(self.test_user._email.startswith(INVITE_PREFIX))
+
+    def test_login_as(self):
+        self.bless_with_basics()
+        self.promote_user(role_name=ROLE.STAFF)
+        self.test_user = db.session.merge(self.test_user)
+        consented_org = self.test_user.valid_consents[0].organization_id
+        staff_user = self.add_user(username='staff@example.com')
+        staff_user.organizations.append(Organization.query.get(consented_org))
+        self.promote_user(user=staff_user, role_name=ROLE.ADMIN)
+        self.promote_user(user=staff_user, role_name=ROLE.STAFF)
+        staff_user = db.session.merge(staff_user)
+        self.login(user_id=staff_user.id)
+        self.assertTrue(staff_user.current_encounter)
+
+        # Switch to test_user using login_as, test the encounter
+        self.test_user = db.session.merge(self.test_user)
+        rv = self.client.get('/login-as/{}'.format(TEST_USER_ID))
+        # should return 401 as test user isn't a patient or partner
+        self.assertEquals(401, rv.status_code)
+        self.assertFalse(self.test_user.current_encounter)
+        self.assertTrue(staff_user.current_encounter)

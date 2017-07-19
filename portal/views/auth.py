@@ -405,13 +405,20 @@ def login_as(user_id, auth_method='staff_authenticated'):
     """
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
+    target_user = get_user(user_id)
+
+    # Guard against abuse
+    if not (target_user.has_role(role_name=ROLE.PATIENT) or
+            target_user.has_role(role_name=ROLE.PARTNER)):
+        abort(401, 'not authorized to assume identity of requested user')
+
     auditable_event("assuming identity of user {}".format(user_id),
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
 
     logout(prevent_redirect=True, reason="forced from login_as")
     session['login_as_id'] = user_id
-    target_user = get_user(user_id)
+
     if target_user.has_role(role_name=ROLE.WRITE_ONLY):
         target_user.mask_email()  # necessary in case registration is attempted
     login_user(target_user, auth_method)
