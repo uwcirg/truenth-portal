@@ -580,12 +580,6 @@
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
-                            {% if person %}
-                                var checkedItem = container.find("input[name='organization']:checked");
-                                if (checkedItem.length > 0) {
-                                   checkedItem.trigger("click");
-                                };
-                            {% endif %}
                         } else {
                             $(".state-container, .clinic-prompt, .noOrg-container").hide();
                             $("#userOrgsInfo").show();
