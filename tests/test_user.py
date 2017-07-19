@@ -1008,6 +1008,22 @@ class TestUser(TestCase):
 
         self.assertEquals(rv.status_code, 200)
 
+    def test_bogus_user_contensent(self):
+        # example bogus data from msk testing
+        data = {
+            u'agreement_url':
+            u'https://stg-lr7.us.truenth.org/c/portal/truenth/asset?editorUrl=true&version=1.6&groupId=20147&uuid=09bb5690-d49b-a10e-5339-e677353e694f',
+            u'user_id': u'{}'.format(TEST_USER_ID),
+            u'include_in_reports': True,
+            u'send_reminders': False,
+            u'organization_id': u'%22',
+            u'staff_editable': True,
+            u'org': u'22110'}
+        self.login()
+        rv = self.client.post(
+            '/api/user/{}/consent'.format(TEST_USER_ID), data=json.dumps(data),
+            content_type='application/json')
+        self.assert400(rv)
 
     def test_locale_inheritance(self):
         # prepopuate database with matching locale
