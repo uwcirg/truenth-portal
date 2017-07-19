@@ -353,6 +353,29 @@ def validate_client_origin(origin):
     abort(401, "Failed to validate origin %s" % origin)
 
 
+def validate_local_origin(origin):
+    """Validate that the origin is the local server
+
+    Origin should either match the server name, or be a relative path.
+
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't
+      find a match.
+
+    """
+    if not origin:
+        current_app.logger.warning("Can't validate missing origin")
+        abort(401, "Can't validate missing origin")
+
+    po = urlparse(origin)
+    if po.netloc and po.netloc == current_app.config.get("SERVER_NAME"):
+        return True
+    if not po.scheme and not po.netloc and po.path:
+        return True
+
+    current_app.logger.warning("Failed to validate origin: %s", origin)
+    abort(401, "Failed to validate origin %s" % origin)
+
+
 class Mock(object):
     pass
 
