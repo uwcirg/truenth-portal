@@ -31,7 +31,7 @@ def csrf_protect():
         return
 
     # Backdoor for testing
-    if current_app.config.get('TESTING') == True:
+    if current_app.config.get('TESTING') is True:
         return
 
     # Look for legit OAuth requests, and exclude these from csrf protection
