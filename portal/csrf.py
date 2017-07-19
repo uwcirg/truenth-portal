@@ -35,17 +35,20 @@ def csrf_protect():
         return
 
     # Look for legit OAuth requests, and exclude these from csrf protection
-    if request.headers and request.headers.get('Authorization'):
-        # 'Authorization' will have bearer on oauth, but we don't yet know
-        # if it's valid.  That will be handled in time with the OAuth
-        # decorators on the respecive views.  Confirm we don't ALSO have what
-        # looks like a valid local cookie auth, as they shouldn't ever both
-        # be present.
+    if request.headers.get('Authorization'):
+        # 'Authorization' will contain a Bearer token on OAuth requests.
+        # Although we don't yet know if it's valid, that will be handled in
+        # time with the OAuth decorators on the respecive views.
+
+        # Confirm we don't ALSO have what looks like a valid local cookie auth,
+        # as they shouldn't ever both be present.  Both might indicate a fake
+        # OAuth token attempt to thwart this csrf protection.
 
         if request.headers['Authorization'].startswith('Bearer '):
             # As this function is called before the OAuth decorator has had
             # a chance, we should never see a current user (unless one is tied
-            # to a local login session).
+            # to a local login session).  We will however get a valid user back
+            # for a local user / cookie auth.
             if current_user():
                 current_app.logger.error(
                     "Local access and OAuth appear mixed {} {}".format(
