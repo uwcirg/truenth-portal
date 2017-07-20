@@ -549,7 +549,10 @@ class OrgTree(object):
 
     def here_and_below_id(self, organization_id):
         """Given org at arbitrary level, return list at and below"""
-        arb = self.find(organization_id)
+        try:
+            arb = self.find(organization_id)
+        except ValueError:
+            return []
 
         def fetch_nodes(node):
             stack = [node]
