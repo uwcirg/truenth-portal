@@ -106,9 +106,10 @@ class TestCase(Base):
         """Prep db with a test client for test user"""
         self.promote_user(role_name=ROLE.APPLICATION_DEVELOPER)
         client_id = 'test_client'
-        client = Client(client_id=client_id,
-                _redirect_uris='http://localhost',
-                client_secret='tc_secret', user_id=TEST_USER_ID)
+        client = Client(
+            client_id=client_id,
+            _redirect_uris='http://{}'.format(self.app.config['SERVER_NAME']),
+            client_secret='tc_secret', user_id=TEST_USER_ID)
         with SessionScope(db):
             db.session.add(client)
             db.session.commit()
