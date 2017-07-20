@@ -387,6 +387,9 @@ div.right-panel {
   padding: 1em;
   background-color:#F5F5F5;
 }
+#termsContainer.website-consent-script #termsText {
+  padding: 1em 2.5em 2.5em 2.5em;
+}
 #termsText {
   padding: 0 1em;
 }
