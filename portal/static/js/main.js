@@ -3050,7 +3050,7 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 
