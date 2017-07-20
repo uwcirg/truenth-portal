@@ -226,6 +226,7 @@ def update_card_html_on_completion():
             reminder = _(
                 "You will be notified when the next "
                 "questionnaire is ready to complete.")
+            logout = _("Log out")
             return """
                 <div class="portal-header-container">
                   <h2 class="portal-header">{greeting}</h2>
@@ -234,8 +235,13 @@ def update_card_html_on_completion():
                   <div class="button-callout">
                     <figure id="portalScrollArrow"></figure>
                   </div>
+                  <br/><br/>
+                  <div class="button-container portal-header-logout-container">
+                    <a class="btn-lg btn-tnth-primary" href="/logout">{logout}</a>
+                  </div>
                 </div>""".format(
-                    greeting=greeting, confirm=confirm, reminder=reminder)
+                    greeting=greeting, confirm=confirm, reminder=reminder,
+                    logout=logout)
 
         def intro_html(assessment_status):
             """Generates appropriate HTML for the intro paragraph"""
