@@ -80,8 +80,8 @@
     <p class="text-muted">{{_("For Staff Use Only")}}</p>
     <hr/>
     <br/>
-    <div class="well">
-        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
+    <div>
+        <div id="termsText" class="well">{{ terms['asset']|safe if terms}}</div>
     </div>
     <br/>
     <div id="termsCheckbox">
@@ -110,8 +110,8 @@
         <p>{{_("Read consent [exactly as written]")}}</p>
       </div>
       <br class="hidden-print"/>
-      <div class="well hidden-print">
-        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
+      <div class="hidden-print">
+        <div class="well" id="termsText">{{ terms['asset']|safe if terms}}</div>
       </div>
       <div>
         <p class="hidden-print">{{_("Do you have any questions?")}}</p>

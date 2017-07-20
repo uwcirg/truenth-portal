@@ -500,7 +500,9 @@ def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
     if redirect_url:
-        validate_client_origin(redirect_url)
+        #redirect url here is the patient's assessment link
+        # /api/present-assessment
+        validate_local_origin(redirect_url)
     user = current_user()
     patient = get_user(patient_id)
     org = patient.first_top_organization()

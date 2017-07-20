@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block main %}
 	{%- from "initial_queries_macros.html" import paperWebsiteConsentScript, interviewAssistedWebConsentScript -%}
-	<div id="termsContainer">
+	<div id="termsContainer" class="website-consent-script">
 		{%- if entry_method == 'paper' %}
 			{{paperWebsiteConsentScript(terms)}}
 		{%- else -%}
