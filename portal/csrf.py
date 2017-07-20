@@ -36,7 +36,7 @@ class CSRFProtectPortal(CSRFProtect):
         # Add to super class' exempt list
         super(CSRFProtectPortal, self).exempt(view)
 
-        if isinstance(view, str):
+        if isinstance(view, basestring):
             view_location = view
         else:
             view_location = '%s.%s' % (view.__module__, view.__name__)
