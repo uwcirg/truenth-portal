@@ -3,10 +3,47 @@ from flask_wtf.csrf import CSRFProtect
 
 from .models.user import current_user
 
-csrf = CSRFProtect()
-
-
 csrf_blueprint = Blueprint('csrf_blueprint', __name__)
+
+
+class CSRFProtectPortal(CSRFProtect):
+    """Specialize CSRFProtect to handle OAuth exclusions"""
+
+    def __init__(self, app=None):
+        """Add our own exemption set for the extended needs"""
+        self._portal_exempt_views = set()
+        super(CSRFProtectPortal, self).__init__(app)
+
+    def portal_exempt(self, view):
+        """Mark a view to be excluded from *all* CSRF protection.
+
+        To prevent any csrf protection on a view, this method will add the view
+        to both the superclass' exempt list and the local one.
+
+        To preserve checks for non OAuth use of a view, use the `@csrf.exempt`
+        decorator.  This is the far more typical use.  There should be a strong
+        case for defending why a view requires full portal exemption from csrf
+        protection.
+
+        ::
+
+            @app.route('/some-view', methods=['POST'])
+            @csrf.portal_exempt
+            def some_view():
+                ...
+
+        """
+        # Add to super class' exempt list
+        super(CSRFProtectPortal, self).exempt(view)
+
+        if isinstance(view, basestring):
+            view_location = view
+        else:
+            view_location = '%s.%s' % (view.__module__, view.__name__)
+
+        # Also preserve in portal_exempt list
+        self._portal_exempt_views.add(view_location)
+        return view
 
 
 @csrf_blueprint.before_app_request
@@ -34,6 +71,13 @@ def csrf_protect():
     if current_app.config.get('TESTING') is True:
         return
 
+    # exclude any named by portal_exclude decorator
+    view = current_app.view_functions.get(request.endpoint)
+    if view:
+        dest = '%s.%s' % (view.__module__, view.__name__)
+        if dest in csrf._portal_exempt_views:
+            return
+
     # Look for legit OAuth requests, and exclude these from csrf protection
     if request.headers.get('Authorization'):
         # 'Authorization' will contain a Bearer token on OAuth requests.
@@ -58,3 +102,6 @@ def csrf_protect():
 
     csrf.protect()
     return
+
+
+csrf = CSRFProtectPortal()

@@ -5,6 +5,7 @@ from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
 from ..extensions import oauth
+from ..csrf import csrf
 from .crossdomain import crossdomain
 from ..models.auth import validate_client_origin
 from ..models.user import current_user
@@ -13,6 +14,7 @@ truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
 
 
 @truenth_api.route("/ping", methods=('OPTIONS', 'POST'))
+@csrf.portal_exempt
 @crossdomain()
 def ping():
     """POST request prolong session by reseting cookie timeout"""
