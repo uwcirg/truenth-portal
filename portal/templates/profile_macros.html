@@ -858,6 +858,8 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
+                    item["filename"] = escapeHtml(item["filename"]);
+                    item["document_type"] = escapeHtml(item["document_type"]);
                     item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
@@ -988,6 +990,7 @@
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
                         item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
+                        item["comment"] = escapeHtml(item["comment"]);
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 

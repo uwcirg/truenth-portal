@@ -3832,6 +3832,19 @@ function pad(n) {
     return (n < 10) ? '0' + n : n;
 };
 
+function escapeHtml(text) {
+    'use strict';
+    if (text == null || text.length == 0){
+        return text;
+    }
+    return text.replace(/[\"&'\/<>]/g, function (a) {
+        return {
+            '"': '&quot;', '&': '&amp;', "'": '&#39;',
+            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
+        }[a];
+    });
+}
+
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){
     var viewport = {};
