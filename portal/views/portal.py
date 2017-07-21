@@ -18,7 +18,7 @@ from .crossdomain import crossdomain
 from ..database import db
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
-from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
+from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA, StaffRegistrationEmail_ATMA
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.auth import validate_client_origin, validate_local_origin
 from ..models.coredata import Coredata
@@ -800,6 +800,27 @@ def about():
         about_tnth_editorUrl=about_tnth.editor_url,
         about_mo_editorUrl=about_mo.editor_url,
         user=current_user())
+
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
+@oauth.require_oauth()
+@portal.route('/staff-registration-email/<int:user_id>')
+def staff_registration_email(user_id):
+    """Staff Registration Email Content"""
+    if user_id:
+        user = get_user(user_id)
+    else:
+        user = current_user()
+
+    org = user.first_top_organization()
+
+    try:
+        item = VersionedResource(app_text(StaffRegistrationEmail_ATMA.
+                                          name_key(organization=org)))
+    except UndefinedAppText:
+        #return no content and 204 no content status
+        return ('', 204)
+
+    return make_response(item.asset)
 
 @portal.route('/explore')
 def explore():
