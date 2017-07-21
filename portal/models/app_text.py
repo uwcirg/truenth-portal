@@ -175,6 +175,7 @@ class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
             return "{} website declaration form URL".\
                     format(kwargs.get('organization').name)
 
+
 class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
     """AppTextModelAdapter for Website Declaraion Form"""
 
