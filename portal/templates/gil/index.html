@@ -1,6 +1,6 @@
 {% extends "gil/base.html" %}
 {% block title %}Truenth Home{% endblock %}
-{% block head %} {{super()}}{% endblock %}
+{% block head %} {{super()}} <script src="{{url_for('static', filename='js/kiosk_functions.js')}}"></script>{% endblock %}
 {% block main %}
     <main class="main">
       {{ super() }}
@@ -133,13 +133,18 @@
             $("body").attr("class", "page-home");
             setSelectedNavItem($(".side-nav-items__item--home"));
             {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
-            if (typeof sessionStorage != "undefined") {
+
+            var sessionStorageDefined = (typeof sessionStorage != "undefined");
+            if (sessionStorageDefined) {
               try {
                 sessionStorage.clear();
               } catch(e) {
 
               };
             };
+
+            window.kp_Browser_clearCookies();
+
         });
     </script>
   {% endblock %}
