@@ -382,7 +382,7 @@
                     logoutUrl: '{{PORTAL}}/logout',
                     timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
                     modalShown: false,
-                    intervalMonitor: false, 
+                    intervalMonitor: false,
                     onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
               });
               window.sessMon = sessMon;
@@ -547,12 +547,6 @@
 
             //see gil.js to call loader onclick event of each nav.link
             setTimeout("__loader(false);", 0);
-
-            (function () {
-              if (/kpp/i.test(String(navigator.userAgent))) {
-                window.kp_Browser_clearCookies();
-              };
-            })();
 
           });
 
