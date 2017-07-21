@@ -403,7 +403,7 @@
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     {% endif %}
 {%- endmacro %}
-{% macro profileRegistrationEmail(person) -%}
+{% macro profileStaffRegistrationEmail(person) -%}
     {%- if person -%}
     <div id="sendRegistrationEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -460,22 +460,60 @@
             })();
             return_url = getAccessUrl();
             if (hasValue(return_url)) {
-                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
-                subject = "{%trans%}Registration invite from {%endtrans%}{%trans%}" + clinicName + "{%endtrans%}";
-            };
-            if (body != '') {
                 $.ajax ({
-                    type: 'POST',
-                    url: "{{url_for('portal.invite')}}",
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                    data: {'subject': subject, 'recipients': email, 'body': body}
+                    type: "GET",
+                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                    cache: false,
+                    async: false
                 }).done(function(data) {
-                    $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
-                }).fail(function() {
-                    $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                    if (hasValue(data)) {
+                        body = data;
+                        var fname = "";
+                        var lname = "";
+                        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+                            fname = $("#firstname").val();
+                            lname = $("#lastname").val();
+                        } else {
+                            $.ajax ({
+                                type: "GET",
+                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
+                                async: false,
+                                cache: false
+                            }).done(function(data) {
+                                if (data && data.name) {
+                                    fname = data.name.given;
+                                    lname = data.name.family;
+                                };
+                            }).fail(function() {
+                            });
+                        };
+                        body = body.replace(/\(firstname\)/i, fname)
+                                   .replace(/\(lastname\)/i, lname)
+                                   .replace(/\(registrationlink\)/gi, return_url)
+
+                    };
+                }).fail(function(xhr) {
                 });
+
+                //provide default body content if no body content was returned from ajax call
+                if (!hasValue(body)) {
+                    body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                };
+
+                subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
+
+            $.ajax ({
+                type: 'POST',
+                url: "{{url_for('portal.invite')}}",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: {'subject': subject, 'recipients': email, 'body': body}
+            }).done(function(data) {
+                $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
+            }).fail(function() {
+                $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+            });
         });
      });</script>
     {%- endif -%}
@@ -1966,7 +2004,7 @@
                             {{resetPassword(person)}}
                         </div>
                         {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
-                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileRegistrationEmail(person)}}</div>
+                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileStaffRegistrationEmail(person)}}</div>
                         {%- endif -%}
                     </div>
                 </div>
