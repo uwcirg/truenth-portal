@@ -19,7 +19,7 @@ from ..database import db
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
-                              StaffRegistrationEmail_ATMA)
+                               StaffRegistrationEmail_ATMA)
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.auth import validate_client_origin, validate_local_origin
 from ..models.coredata import Coredata
