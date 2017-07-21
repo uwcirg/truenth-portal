@@ -39,8 +39,9 @@
         {{ recaptcha }}
       </div>
       {% endif %}
+      <div class="post-contact-response response-message"></div>
       <div class="form-group">
-        <button type="submit" class="btn btn-tnth-primary btn-lg">{{ _("Send") }}</button>
+        <button id="submitButton" class="btn btn-tnth-primary btn-lg">{{ _("Submit") }}</button>
       </div>
     </form>
 
@@ -52,7 +53,40 @@
   $(document).ready(function(){
     $('#profileForm').validator({
       disable: false
-    })
+    });
+    $("#submitButton").on("click", function() {
+        if ($("#sendername").val() != "" && $("#body").val() != "" && $("#email").val() != "") {
+            $("#submitButton").hide();
+            $('.post-contact-response').html('{{ _("Sending contact request...") }}');
+            var formData = {};
+            $("#profileForm").find("input, select, textarea").each(function() {
+                  console.log($(this).attr("name") + " " + ($(this).val() || $(this).text()))
+                  formData[$(this).attr("name")] = $(this).val() || $(this).text();
+            });
+            console.dir(formData)
+
+           $.ajax({
+                data: formData,
+                type: 'POST',
+                url: '/contact',
+                dataType: 'json',
+                success: function(response) {
+                    var msgid = response['msgid']
+                    document.location = '/contact/' + String(msgid)
+                },
+                error: function(response) {
+                    var msg = $('<div></div>').html(response.responseText);
+                    var error = $('p', msg).text()
+                    $('.post-contact-response').html(error);
+                    $("#submitButton").show();
+                }
+            });
+            return false;
+        } else {
+            msg = '{{ _("Please confirm all fields are filled") }}'
+            $('.post-contact-response').html(msg);
+        };
+    });
   })
 </script>
 {% block footer %}

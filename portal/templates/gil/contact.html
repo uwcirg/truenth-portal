@@ -78,6 +78,7 @@
                 {{ recaptcha }}
               </div>
               {% endif %}
+              <div class="post-contact-response response-message"></div>
               <div class="field-group">
                 <div class="button-wrap button-wrap--centered"><a id="submitButton" class="icon-box__button icon-box__button--main"><span>{{_("Submit")}}<figure></figure></span></a></div>
               </div>
@@ -99,9 +100,37 @@
         });
         $("#submitButton").on("click", function() {
             if ($("#sendername").val() != "" && $("#body").val() != "" && $("#email").val() != "") {
-                $("#contactForm").submit();
+                $("#submitButton").hide();
+                $('.post-contact-response').html('{{ _("Sending contact request...") }}');
+                var formData = {};
+                $("#contactForm").find("input, select, textarea").each(function() {
+                      console.log($(this).attr("name") + " " + ($(this).val() || $(this).text()))
+                      formData[$(this).attr("name")] = $(this).val() || $(this).text();
+                });
+                console.dir(formData)
+
+               $.ajax({
+                    data: formData,
+                    type: 'POST',
+                    url: '/contact',
+                    dataType: 'json',
+                    success: function(response) {
+                        var msgid = response['msgid']
+                        document.location = '/contact/' + String(msgid)
+                    },
+                    error: function(response) {
+                        var msg = $('<div></div>').html(response.responseText);
+                        var error = $('p', msg).text()
+                        $('.post-contact-response').html(error);
+                        $("#submitButton").show();
+                    }
+                });
+                return false;
+            } else {
+                msg = '{{ _("Please confirm all fields are filled") }}'
+                $('.post-contact-response').html(msg);
             };
-        })
+        });
         setSelectedNavItem($(".side-nav-items__item--contact"));
       });
   </script>
