@@ -462,7 +462,7 @@
             if (hasValue(return_url)) {
                 $.ajax ({
                     type: "GET",
-                    url: "/staff-registration-email/{{person.id}}",
+                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
                     cache: false,
                     async: false
                 }).done(function(data) {
@@ -476,7 +476,7 @@
                         } else {
                             $.ajax ({
                                 type: "GET",
-                                url: '/api/demographics/{{person.id}}',
+                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
                                 async: false,
                                 cache: false
                             }).done(function(data) {

@@ -177,7 +177,7 @@ class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
 
 
 class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for Website Declaraion Form"""
+    """AppTextModelAdapter for Staff Registration Email Content"""
 
     @staticmethod
     def name_key(**kwargs):
