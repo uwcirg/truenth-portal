@@ -549,7 +549,7 @@ module.exports = OrgTool = (function() {
       var self = this;
        $.ajax ({
             type: "GET",
-            url: "/gil-shortcut-alias-validation/" + $("#shortcut_alias").val(),
+            url: "/gil-shortcut-alias-validation/" + ($("#shortcut_alias").val()).toLowerCase(),
             async: sync? false : true
         }).done(function(data) {
           if (callback) callback(data);
@@ -1020,7 +1020,7 @@ function handleAccessCode() {
     $("#access_code_info").show();
     $("#accessCodeLink").addClass("icon-box__button--disabled");
     IO.setInterventionSession();
-    setTimeout('location.replace("/go/" + $("#shortcut_alias").val());', 4000);
+    setTimeout(function() { location.replace("/go/" + ($("#shortcut_alias").val()).toLowerCase());}, 4000);
   } else {
     if ($("#access_code_error").text() != "") $("#access_code_error").show();
   };
