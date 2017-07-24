@@ -413,10 +413,7 @@ def update_card_html_on_completion():
             card_html = """
             <div class="container">
               {intro}
-              <div class="button-container portal-header-logout-container">
-                <a class="btn-lg btn-tnth-primary" href="/logout">Log Out</a>
-              </div>
-              <div class="portal-main portal-flex-container">
+              <div class="portal-main portal-flex-container portal-completed-container">
                 <div class="portal-description">
                   <h4 class="portal-description-title">{header}</h4>
                   <div class="portal-description-body">

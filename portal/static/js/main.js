@@ -2507,7 +2507,6 @@ var tnthAjax = {
             var errorMessage = "Server error occurred retrieving locale information.";
             if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
             else $(".get-locale-error").html(errorMessage);
-            flo.showError(targetField);
         });
     },
     "hasTreatment": function(data) {
