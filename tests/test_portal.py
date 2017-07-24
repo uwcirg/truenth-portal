@@ -248,7 +248,7 @@ class TestPortal(TestCase):
 
         # validate redirect of /website-consent-script GET
         rv = self.client.get('/website-consent-script/{}?redirect_url='
-                             '{}'.format(TEST_USER_ID, client_url))
+                             '{}'.format(TEST_USER_ID, local_url))
         self.assert200(rv)
 
         rv2 = self.client.get('/website-consent-script/{}?redirect_url='
