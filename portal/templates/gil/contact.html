@@ -78,9 +78,9 @@
                 {{ recaptcha }}
               </div>
               {% endif %}
-              <div class="post-contact-response response-message"></div>
-              <div class="field-group">
-                <div class="button-wrap button-wrap--centered"><a id="submitButton" class="icon-box__button icon-box__button--main"><span>{{_("Submit")}}<figure></figure></span></a></div>
+              <div class="post-contact-response response-message error-message"></div>
+              <div class="field-group contact-buttons-group">
+                <div class="button-wrap button-wrap--centered"><div class="contact-loading-indicator loading-message-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div><a id="submitButton" class="icon-box__button icon-box__button--main"><span>{{_("Submit")}}<figure></figure></span></a></div>
               </div>
             </form>
           </div>
@@ -91,6 +91,7 @@
 {% block document_ready %}
   <script>
       $(document).ready(function(){
+
         $("#first-name, #last-name").each(function() {
             $(this).on("blur", function() {
                 var name = $("#first-name").val();
@@ -98,38 +99,46 @@
                 $("#sendername").val(name.trim());
             });
         });
-        $("#submitButton").on("click", function() {
-            if ($("#sendername").val() != "" && $("#body").val() != "" && $("#email").val() != "") {
-                $("#submitButton").hide();
-                $('.post-contact-response').html('{{ _("Sending contact request...") }}');
-                var formData = {};
-                $("#contactForm").find("input, select, textarea").each(function() {
-                      console.log($(this).attr("name") + " " + ($(this).val() || $(this).text()))
-                      formData[$(this).attr("name")] = $(this).val() || $(this).text();
-                });
-                console.dir(formData)
+        $("#submitButton").on("click", function(e) {
+            e.preventDefault();
+            var formData = {};
+            $("#contactForm").find("input, select, textarea").each(function() {
+                formData[$(this).attr("name")] = $(this).val() || $(this).text();
+            });
 
-               $.ajax({
-                    data: formData,
-                    type: 'POST',
-                    url: '/contact',
-                    dataType: 'json',
-                    success: function(response) {
-                        var msgid = response['msgid']
-                        document.location = '/contact/' + String(msgid)
-                    },
-                    error: function(response) {
-                        var msg = $('<div></div>').html(response.responseText);
-                        var error = $('p', msg).text()
-                        $('.post-contact-response').html(error);
-                        $("#submitButton").show();
-                    }
-                });
-                return false;
-            } else {
-                msg = '{{ _("Please confirm all fields are filled") }}'
-                $('.post-contact-response').html(msg);
-            };
+            if (hasValue(formData.sendername) && hasValue(formData.body) && hasValue(formData.email)) {
+
+              var self = $(this), loadingIndicator = $(".contact-loading-indicator");
+
+              self.hide();
+              loadingIndicator.show();
+
+              $.ajax({
+                  data: formData,
+                  type: 'POST',
+                  url: '/contact',
+                  dataType: 'json',
+                  success: function(response) {
+                      var msgid = response['msgid'];
+                      $('#contactForm .post-contact-response').html("");
+                      setTimeout(function() {
+                        self.show();
+                        loadingIndicator.hide();
+                        document.location = '/contact/' + String(msgid);
+                      }, 1000);
+
+                  },
+                  error: function(response) {
+                      var msg = $('<div></div>').html(response.responseText);
+                      var error = $('p', msg).text()
+                      $('#contactForm .post-contact-response').html(error);
+                      self.show();
+                      loadingIndicator.hide();
+                  }
+              });
+          } else {
+              $('#contactForm .post-contact-response').html('{{ _("Please confirm all fields are filled.") }}');
+          };
         });
         setSelectedNavItem($(".side-nav-items__item--contact"));
       });
