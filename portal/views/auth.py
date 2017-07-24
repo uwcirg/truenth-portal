@@ -575,7 +575,7 @@ class ClientEditForm(FlaskForm):
     def validate_callback_url(form, field):
         origins = form.application_origins.data.split()
         og_uris = ['{uri.scheme}://{uri.netloc}'.format(uri=urlparse(url))
-                       for url in origins]
+                   for url in origins]
         if field.data:
             cb_uri = urlparse(field.data)
             if '{uri.scheme}://{uri.netloc}'.format(uri=cb_uri) not in og_uris:
