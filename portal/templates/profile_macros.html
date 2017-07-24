@@ -14,7 +14,7 @@
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -54,15 +54,18 @@
                 var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
-                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-                        if (isValid) {
-                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                        } else {
-                            $("#birthday").val("");
-                            return false;
+                    if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {
+                        if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
+                            var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                            if (isValid) {
+                                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                                $("#errorbirthday").html("");
+                            } else {
+                                $("#birthday").val("");
+                                return false;
+                            };
                         };
-                    };
+                    } else return false;
                 });
             });
         });
@@ -98,13 +101,13 @@
     <div class="row profile-section name-section">
         <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
+                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>

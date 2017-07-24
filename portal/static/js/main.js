@@ -1142,6 +1142,12 @@ var assembleContent = {
 
 
         var bdFieldVal = $("input[name=birthDate]").val();
+
+        if (! hasValue(bdFieldVal)) {
+            var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+            if (hasValue(y) && hasValue(m) && hasValue(d)) bdFieldVal = y + "-" + m + "-" + d;
+        };
+
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
         if ($("#userOrgs input[name='organization']").length > 0) {
@@ -1352,7 +1358,6 @@ var assembleContent = {
             };
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
-           //console.log("demoArray", demoArray);
         };
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
 
@@ -1407,7 +1412,6 @@ var assembleContent = {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
-        //console.log(demoArray)
         tnthAjax.putDemo(userId, demoArray);
     },
     "coreData": function(userId) {
@@ -3049,7 +3053,7 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 
