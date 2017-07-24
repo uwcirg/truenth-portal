@@ -16,8 +16,9 @@ from ..system_uri import SUPPORTED_OAUTH_PROVIDERS, TRUENTH_IDENTITY_SYSTEM
 from ..tasks import post_request
 from .user import current_user
 
-providers_list = ENUM(*SUPPORTED_OAUTH_PROVIDERS,
-        name='providers', create_type=False)
+providers_list = ENUM(
+    *SUPPORTED_OAUTH_PROVIDERS, name='providers', create_type=False)
+
 
 class AuthProvider(db.Model):
     __tablename__ = 'auth_providers'
@@ -51,9 +52,12 @@ class Client(db.Model):
     _default_scopes = db.Column(db.Text)
     callback_url = db.Column(db.Text)
 
-    intervention = db.relationship('Intervention',
+    intervention = db.relationship(
+        'Intervention',
         primaryjoin="Client.client_id==Intervention.client_id",
         uselist=False, backref='Intervention')
+
+    grants = db.relationship('Grant', cascade='delete')
 
     @property
     def intervention_or_default(self):
@@ -136,14 +140,15 @@ class Client(db.Model):
         data['algorithm'] = 'HMAC-SHA256'
         data['issued_at'] = int(time.time())
         payload = base64.urlsafe_b64encode(json.dumps(data))
-        sig = hmac.new(str(self.client_secret), msg=payload,
+        sig = hmac.new(
+            str(self.client_secret), msg=payload,
             digestmod=hashlib.sha256).digest()
         encoded_sig = base64.urlsafe_b64encode(sig)
 
-        formdata = {'signed_request': "{0}.{1}".format(encoded_sig,
-            payload)}
-        current_app.logger.debug("POSTing event to %s",
-                self.callback_url)
+        formdata = {
+            'signed_request': "{0}.{1}".format(encoded_sig, payload)}
+        current_app.logger.debug(
+            "POSTing event to %s", self.callback_url)
 
         # Use celery asynchronous task 'post_request'
         kwargs = {'url': self.callback_url, 'data': formdata}
@@ -162,7 +167,8 @@ class Client(db.Model):
                                 r.relationship.name == RELATIONSHIP.SPONSOR]
         if (sponsor_relationship):
             assert len(sponsor_relationship) == 1
-            return Token.query.filter_by(client_id=self.client_id,
+            return Token.query.filter_by(
+                client_id=self.client_id,
                 user_id=sponsor_relationship[0].other_user_id).first()
         return None
 
@@ -262,6 +268,7 @@ class Token(db.Model):
             return self._scopes.split()
         return []
 
+
 @oauth.clientgetter
 def load_client(client_id):
     return Client.query.filter_by(client_id=client_id).first()
@@ -312,8 +319,8 @@ def save_token(token, request, *args, **kwargs):
 
     tok = Token(
         access_token=token['access_token'],
-        refresh_token=token['refresh_token'] if 'refresh_token' in token else
-            None,
+        refresh_token=(
+            token['refresh_token'] if 'refresh_token' in token else None),
         token_type=token['token_type'],
         _scopes=token['scope'],
         expires=expires,
@@ -331,7 +338,8 @@ def validate_client_origin(origin):
     For CORS, limit the requesting origin to the list we know about,
     namely any origins belonging to our OAuth clients.
 
-    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't find a match.
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't
+      find a match.
 
     """
     if not origin:
@@ -345,8 +353,32 @@ def validate_client_origin(origin):
     abort(401, "Failed to validate origin %s" % origin)
 
 
+def validate_local_origin(origin):
+    """Validate that the origin is the local server
+
+    Origin should either match the server name, or be a relative path.
+
+    :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't
+      find a match.
+
+    """
+    if not origin:
+        current_app.logger.warning("Can't validate missing origin")
+        abort(401, "Can't validate missing origin")
+
+    po = urlparse(origin)
+    if po.netloc and po.netloc == current_app.config.get("SERVER_NAME"):
+        return True
+    if not po.scheme and not po.netloc and po.path:
+        return True
+
+    current_app.logger.warning("Failed to validate origin: %s", origin)
+    abort(401, "Failed to validate origin %s" % origin)
+
+
 class Mock(object):
     pass
+
 
 def create_service_token(client, user):
     """Generate and return a bearer token for service calls
@@ -360,7 +392,7 @@ def create_service_token(client, user):
     """
     # TODO: bring this test back after debugging.  user.roles is not
     # defined in production
-    #if len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE:
+    # if len(user.roles) > 1 or user.roles[0].name != ROLE.SERVICE:
     #    raise ValueError("only service users can create service tokens")
 
     # Hacking a backdoor into the OAuth protocol to generate a valid token
@@ -371,7 +403,7 @@ def create_service_token(client, user):
     fake_request.state, fake_request.extra_credentials = None, None
     fake_request.client = client
     fake_request.user = user
-    fake_request.scopes = ['email',]
+    fake_request.scopes = ['email']
 
     request_validator = Mock()
     request_validator.save_bearer_token = save_token

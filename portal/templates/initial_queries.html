@@ -9,6 +9,7 @@
   {{tou(terms)}}
   <div id="aboutForm" class="tnth-hide">
      <form class="form tnth-form to-validate" id="queriesForm" action='initial-queries' method='POST'>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         {% if user and user.email %}
             <input type="hidden" name="email" id="email" value="{{user.email}}" />
         {% endif %}
@@ -21,6 +22,8 @@
                 {{dobGroup()}}
                 <br/><br/>
                 {{rolesGroup()}}
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
               </div>
             </div>
         </div>
@@ -56,8 +59,8 @@
             <button id="next" type="button" class="btn btn-lg btn-tnth-primary" disabled>{{_("Next")}}</button>
             <button id="updateProfile" type="submit" class="btn btn-lg btn-tnth-primary" disabled>{{ _("Continue to TrueNTH") }}</button>
           </div>
-          <div id="iqErrorMessage" class="error-message text-danger"></div>
         </div>
+        <div id="iqErrorMessage" class="default-error-message-container error-message text-danger"></div>
     </form>
   </div>
 {% endblock %}
@@ -87,8 +90,6 @@
 var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{%else%}false{%endif%};
 // Check if there's a session variable for associated clinic
 var preselectClinic = "{{session.get('associate_clinic_id', '')}}";
-var TERMS_URL = {%-if terms and terms.url-%}"{{ terms.url|safe}}"{%-else-%}""{%-endif-%};
-
 var fc, mainSections = {}, _isChecked = false, rolesGroupClickEvent, patientQClickEvent, userOrgChangeEvent;
 
 /**** object for obtaining required core data ****/
@@ -108,10 +109,10 @@ var configObj = (function() {
         else {
           if (!dataArray) dataArray = CONFIG_REQUIRED_CORE_DATA;
           if (dataArray) {
+            if (dataArray.length == 0) return false;
             var found = false;
             var ma = configMatch.split(",");
             ma.forEach(function(item) {
-              if (dataArray.length == 0) return false;
               dataArray.forEach(function(v) {
                   if (!found && v == item) found = true;
               });
@@ -264,7 +265,7 @@ FieldsChecker.prototype.getNextField = function(currentIndex, field) {
           this.incompleteFields[currentIndex + 1].section.show();
           //console.log("next Index? " + currentIndex + 1);
           //console.log(this.incompleteFields[currentIndex + 1].section)
-          var el = this.incompleteFields[currentIndex + 1].element;
+           var el = this.incompleteFields[currentIndex + 1].element;
            el.fadeIn();
            $('html, body').animate({
               scrollTop: el.offset().top
@@ -334,7 +335,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                          if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
                     });
                     if (!_isAgreed) isComplete = false;
-                
+
                     break;
                 };
                 if (hasValue(field.attr("data-require-validate"))) isComplete = false;
@@ -391,9 +392,11 @@ FieldsChecker.prototype.continueToNext = function(sectionId) {
   $("div.reg-complete-container").fadeOut();
   $("#next").show().removeAttr("disabled");
   if (!$("#next").isOnScreen()) {
-    $('html, body').animate({
-      scrollTop: $('#next').offset().top
-    }, 1000);
+    setTimeout(function() {
+        $('html, body').animate({
+          scrollTop: $('#next').offset().top
+        }, 1500);
+    }(), 500);
   };
   $("#updateProfile").attr("disabled", true).removeClass("open");
 };
@@ -483,10 +486,7 @@ function initIncompleteFields() {
             $("#termsReminderModal").modal("show");
           };
         };
-        $("#tnthLogo a, a[href]").not("a[href*='logout']").not("a.required-link").addClass("disabled").on("click", function(e) {
-            e.preventDefault();
-            return false;
-        });
+        setTimeout("disableHeaderFooterLinks();", 1000);
       } else {
         $("#topTerms").hide();
         fc.getNext();
@@ -517,21 +517,8 @@ $(document).ready(function(){
        var y = $("#year");
        if (d.val() != "" && m.val() != "" && y.val() != "") {
           if (this.validity.valid) {
-              var today = new Date();
-              // Check to see if this is a real date
-              var iy = parseInt(y.val()), im = parseInt(m.val()), iid=parseInt(d.val());
-              var date = new Date(iy,im-1,iid);
-              var errorMsg = "";
-
-              if (date.getFullYear() == iy && (date.getMonth() + 1) == im && date.getDate() == iid) {
-                  if (iy < 1900) errorMsg = "Year must be after 1900";
-                  // Only allow if birthdate is before today
-                  if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                      errorMsg = "The date must not be in the future.";
-                  };
-              } else errorMsg = "Invalid Date. Please enter a valid date.";
-
-              if (errorMsg == "") {
+              var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+              if (isValid) {
                   $("#birthday").val(y.val()+"-"+m.val()+"-"+d.val());
                   $("#errorbirthday").text("").hide();
                   assembleContent.demo($("#iq_userId").val());
@@ -542,7 +529,6 @@ $(document).ready(function(){
                   };
               } else {
                   fc.stopContinue("demographicsContainer");
-                  $("#errorbirthday").text(errorMsg).show();
               };
           } else fc.stopContinue("demographicsContainer");
       } else fc.stopContinue("demographicsContainer");
@@ -585,7 +571,7 @@ $(document).ready(function(){
     var patientQClickEvent = function(){
           var thisItem = $(this);
           var toCall = thisItem.attr("name") || thisItem.attr("data-name");
-       
+
           // Get value from div - either true or false
           var toSend = (toCall == "biopsy" ? ($("#patientQ input[name='biopsy']:checked").val()) : thisItem.val());
           //NOTE: treatment is updated on the onclick event of the treatment question iteself, see initial queries macro for detail
@@ -594,13 +580,13 @@ $(document).ready(function(){
           };
           if (toSend == "true" || toCall ==  "pca_localized") {
 
-            if (toCall == "biopsy") {
+           if (toCall == "biopsy") {
                 $("#biopsyDate").attr("skipped", "false");
                 if ($("#biopsyDate").val() == "") return true;
                 else {
-                  $("#biopsyDate").datepicker("hide");
-                  var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
-                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": biopsyDate});
+                  //$("#biopsyDate").datepicker("hide");
+                  //var biopsyDate = tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy");
+                  tnthAjax.postClinical({{user.id}}, toCall, toSend, "", false, {"issuedDate": $("#biopsyDate").val()});
                 };
             };
 
@@ -692,23 +678,7 @@ $(document).ready(function(){
       };
     };
 
-    $("#defaultConsentContainer .modal").each(function() {
-        $(this).on("hidden.bs.modal", function() {
-          if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
-            $("#userOrgs input[name='organization']").each(function() {
-                $(this).removeAttr("data-require-validate");
-            });
-            if (fc.allFieldsCompleted()) {
-              fc.continueToFinish();
-            } else {
-              if (fc.sectionCompleted("orgsContainer")) fc.continueToNext("orgsContainer");
-              else fc.stopContinue("orgsContainer");
-            };
-          };
-        });
-    });
-
-    $("#consentContainer .modal").each(function() {
+    $("#consentContainer .modal, #defaultConsentContainer .modal").each(function() {
         $(this).on("hidden.bs.modal", function() {
             if ($(this).find("input[name='toConsent']:checked").length > 0) {
               $("#userOrgs input[name='organization']").each(function() {
@@ -736,7 +706,31 @@ $(document).ready(function(){
                   var theTerms = {};
                   theTerms["agreement_url"] = hasValue(self.attr("data-url")) ? self.attr("data-url") : $("#termsURL").data().url;
                   theTerms["type"] = type;
-                   // Post terms agreement via API
+                  var org = $("#userOrgs input[name='organization']:checked"), userOrgId = "";
+                  /*** if UI for orgs is not present, need to get the user org from backend ***/
+                  if (org.length == 0) {
+	                  	$.ajax ({
+			            type: "GET",
+			            url: '/api/demographics/{{user.id}}',
+			            async: false
+			            }).done(function(data) {
+			            	if (data && data.careProvider) {
+			            		(data.careProvider).forEach(function(item) {
+			            			userOrgId = item.reference.split("/").pop();
+			            		});
+			            	}
+			            }).fail(function() {
+
+			            });
+		           } else {
+		               userOrgId = org.val();
+		           };
+
+                  if (hasValue(userOrgId) && parseInt(userOrgId) != 0) {
+                    var topOrg = OT.getTopLevelParentOrg(userOrgId);
+                    if (hasValue(topOrg)) theTerms["organization_id"] = topOrg;
+                  };
+                  // Post terms agreement via API
                   tnthAjax.postTerms(theTerms);
               });
           };
@@ -780,29 +774,25 @@ $(document).ready(function(){
           config: "name,dob,role",
           subsections:{
           "nameGroup": {
-                          config: "name",
                           fields: [$("#firstname"), $("#lastname")],
                           event: namesChangeEvent
                        }
           ,
           "rolesGroup": {
-                          config: "role",
                           fields: [$("input[name='user_type']")],
                           event: rolesGroupClickEvent
                         }
           ,
           "bdGroup": {
-                        config: "dob",
                         fields: [$("#month"), $("#date"), $("#year")],
                         event: bdChangeEvent
                      }
           }},
       'clinicalContainer': {
           display: "your clinical profile",
-          config: "clinical",
+          config: "clinical,localized",
           subsections:
           {"patientQ": {
-                        config: "clinical",
                         fields: [$("input[name='biopsy']"), $("#biopsyDate"), $("input[name='pca_diag']"), $("input[name='pca_localized']"), $("input[name='tx']")],
                         event: patientQClickEvent
                         }
@@ -813,7 +803,6 @@ $(document).ready(function(){
           required: hasValue(preselectClinic) ? true: false,
           subsections:
           {"clinics": {
-                        config: "org",
                         fields: [$("#userOrgs input[name='organization']")],
                         event: userOrgChangeEvent
                       }

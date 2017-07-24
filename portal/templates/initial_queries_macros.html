@@ -18,24 +18,27 @@
                <div class="terms-checkbox-container">
                <!-- note these checkboxes are selectively hidden using css, as some are applicable only in Truenth and some only applicable in Eproms-->
                 <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent" data-url="{{terms['url'] if terms}}">
-                  <i class="fa fa-square-o fa-lg" class="edit-view"></i> <span class="edit-view">{{ _("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.") }}</span>
+                  <i class="fa fa-square-o fa-lg terms-tick-box" class="edit-view"></i> <span class="edit-view"><span class="terms-tick-box-text">{{ _("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.") }}</span></span>
                   <div class="display-view text-warning tnth-hide">{{_("You have previously provided your consent to the website during a visit at your treating site. If you would like a copy of this please contact your study contact.")}}<br/></div>
                 </label>
                 <br/>
                 <label class="general-tou" data-agree="false" data-type="terms" data-tou-type="website terms of use" data-core-data-type="website_terms_of_use" data-url="{{terms['url'] if terms}}">
-                    <i class="fa fa-square-o fa-lg"></i>&nbsp;<span class="default-tou-text">{{_("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.")}}</span>
-                    {% trans privacy_url=url_for('portal.privacy'), terms_url=url_for('portal.terms_and_conditions') %}
-                    <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}" target="_blank" class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}" target="_blank" class="required-link">terms</a></span>
+                    <i class="fa fa-square-o fa-lg terms-tick-box"></i><span class="default-tou-text terms-tick-box-text">{{_("I have read the information notice above and consent and agree to the processing of my personal information (including my health information) on the terms described in this Consent and Terms and Conditions.")}}</span>
+                    &nbsp;&nbsp;
+                    {% trans privacy_url=url_for('portal.privacy', disableLinks="true"), terms_url=url_for('portal.terms_and_conditions', disableLinks="true") %}
+                    <span class="custom-tou-text">I have read the website <a href="{{privacy_url}}"  class="required-link" data-core-data-subtype="privacy_policy" data-tou-type="privacy policy">privacy policy</a> and <a href="{{terms_url}}"  class="required-link">terms</a></span>
                     {% endtrans %}
                 </label>
                 <br/>
                 <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
-                  <i class="fa fa-square-o fa-lg"></i> <span>{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
+                  <i class="fa fa-square-o fa-lg terms-tick-box"></i> <span class="terms-tick-box-text">{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
                 </label>
               </div>
             </div>
             <br/>
         </div>
+        <div class="get-tou-error error-message"></div>
+        <div class="post-tou-error error-message"></div>
     </div>
     <div class="modal fade" id="termsReminderModal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
@@ -63,6 +66,11 @@
        <script>
             $(function () {
                 tnthAjax.getTermsUrl();
+                $(".custom-tou-text .required-link").each(function() {
+                    $(this).on("click", function(e) {
+                      e.stopPropagation();
+                    });
+                });
             });
        </script>
   {%- endmacro %}
@@ -72,33 +80,28 @@
     <p class="text-muted">{{_("For Staff Use Only")}}</p>
     <hr/>
     <br/>
-    <div class="well">
-        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
-    </div>
     <div>
-      <p>{{_("Do you have any questions?")}}</p>
-      <p>{{_("Do you agree to participate in the TrueNTH website tool and consent to the processing of your personal information (including your health information) on the terms I have just read to you?")}}</p>
-      <ul>
-        <li>{{_("If yes, document oral consent below. [NOTE: This consent must absolutely be read out to them in advance of gathering any personal information. The patient must say ‘yes, I agree’, a ‘mmmm’, ‘yep’, ‘ok’ or anything equally as casual will not be satisfactory.]")}}</li>
-        <li>{{_("If no, thank them for their time.")}}</li>
-      </ul>
+        <div id="termsText" class="well">{{ terms['asset']|safe if terms}}</div>
     </div>
     <br/>
     <div id="termsCheckbox">
       <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
           <div class="edit-view">
-          <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions.") }}</span></div>
+          <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("The patient has read the Website Consent and consent and agree to the processing of their personal information (including their health information) on the terms described in this Consent and Terms and Conditions and a copy of this consent and information provided by the patient has been securely stored in accordance with my local site procedures.") }}</span><span class="terms-tick-box-text" data-org="IRONMAN">{{ _("The subject has read the Website Consent and IRONMAN Registry Study consent and agrees to the processing of their personal information (including their health information) on the terms described in the above consents and Terms and Conditions and a copy of both consents and information provided by the subject has been securely stored in accordance with my local site procedures.") }}</span>
+          </div>
           <div class="display-view text-warning">Subject has given consent previously.</div>
       </label>
     </div>
+    <div class="get-tou-error error-message"></div>
+    <div class="post-tou-error error-message"></div>
   {%- endmacro %}
-  {% macro interviewAssistedWebConsentScript(terms) -%}
+  {% macro interviewAssistedWebConsentScript(terms, form) -%}
       <h4 class="tnth-headline hidden-print">{{ _("Website Consent Script - Enter Manually - Interview Assisted") }}</h4>
       <p class="text-muted hidden-print">{{_("For Staff Use Only")}}</p>
       <hr class="hidden-print"/>
       <br class="hidden-print"/>
       <div class="hidden-print">
-        <p>{{_("We are inviting you to use the TrueNTH website tool because you have agreed to participate in the IRONMAN Registry study.")}}</p>
+        <p class="intro-text">{{_("We are inviting you to use the TrueNTH website tool because you have agreed to participate in the [organization] Registry study.")}}</p>
         <p>{{_("The information you provide will be used in a global study and will benefit patients in the future with better treatment and care options.  Does this sound like something you’d be willing to participate in?")}}</p>
         <ul>
             <li>{{_("If yes, continue to read below text and Consent.")}}</li>
@@ -107,8 +110,8 @@
         <p>{{_("Read consent [exactly as written]")}}</p>
       </div>
       <br class="hidden-print"/>
-      <div class="well hidden-print">
-        <div id="termsText">{{ terms['asset']|safe if terms}}</div>
+      <div class="hidden-print">
+        <div class="well" id="termsText">{{ terms['asset']|safe if terms}}</div>
       </div>
       <div>
         <p class="hidden-print">{{_("Do you have any questions?")}}</p>
@@ -126,32 +129,7 @@
               </div>
               <div class="modal-body">
                 <div id="websiteDeclarationForm">
-                    <h4>{{_("Website declaration form")}}</h4>
-                    <br/>
-                    <p><em>{{_("Person Obtaining Consent must complete a form with the following text. This form must be entered into a central database and be retrievable in case there are any questions raised about the consent given at any time.")}}</em></p>
-                    <br/>
-                    <p><strong>{{_("Please tick the relevant box and complete the declaration below.")}}</strong><p>
-                    <p>{{_("For phone consent:")}}</p>
-                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox"></i> <strong>{{_("I have read this consent form to the subject.")}}</strong></p>
-                    <br/>
-                    <p>{{_("For face-to-face consent:")}}</p>
-                    <p><i class="fa fa-square-o fa-lg consent-form-checkbox"></i> <strong>{{_("I have gone through and explained the consent form in the presence of the subject.")}}</strong></p>
-                    <br/>
-                    <p>{{_("Declaration:")}}</p>
-                    <p><strong>{{_("An explanation of the TrueNTH website tool was given and questions from the subject were solicited and answered to the subject’s satisfaction. In my judgment, the subject demonstrated comprehension of the information. The subject has provided oral consent to participate in the IRONMAN Registry Study on the terms set out above.")}}</strong></p>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Name and Title")}}
-                    </div>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Date")}}
-                    </div>
-                    <br/><br/>
-                    <div class="box-consent-container">
-                    {{_("Signature of Person Obtaining Consent")}}
-                    </div>
-                    <br/><br/>
+                    {{form["asset"] | safe}}
                 </div>
               </div>
               <div class="modal-footer hidden-print">
@@ -164,22 +142,18 @@
       </div>
       <br/>
       <div id="termsCheckbox" class="hidden-print">
-        <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent" data-core-data-type="subject_website_consent"  data-url="{{terms['url'] if terms}}">
+         <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
+         <br/>
+        <label class="custom-tou" data-agree="false" data-type="terms" data-tou-type="subject website consent,stored website consent form" data-core-data-type="subject_website_consent,stored_website_consent_form"  data-url="{{terms['url'] if terms}}">
           <div class="edit-view">
-            <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool ") }}</span>
+            <i class="fa fa-square-o fa-lg terms-tick-box"></i>&nbsp;&nbsp;<span class="terms-tick-box-text" data-org="CRV">{{ _("I have read the required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
+            <span class="terms-tick-box-text" data-org="IRONMAN">{{ _("I have read and/or gone through required information to the subject and have completed the required consent to the use of the TrueNTH website tool and have created an electronic copy of this declaration and have stored said copy.") }}</span>
           </div>
-          <div class="display-view text-warning">{{_("Subject has given consent previously.")}}</div>
-        </label>
-        <br/>
-        <h4><a data-toggle="modal" data-target="#websiteDeclarationFormModal" class="link form-link">View/print website declaration form</a></h4>
-        <label class="custom-tou tnth-hide" data-agree="false" data-type="terms" data-tou-type="stored website consent form" data-core-data-type="stored_website_consent_form" data-url="{{terms['url'] if terms}}">
-           <div class="edit-view">
-            <i class="fa fa-square-o fa-lg"></i>&nbsp;&nbsp;<span>{{ _("I have created an electronic copy of this declaration and have stored said copy.") }}</span>
-          </div>
-          <div class="display-view text-warning">{{_("You had previously signed and stored an electronic copy of consent declaration.")}}
-          </div>
+          <div class="display-view text-warning">{{_("Subject has given consent previously and you had previously signed and stored an electronic copy of consent declaration..")}}</div>
         </label>
       </div>
+      <div class="get-tou-error error-message"></div>
+      <div class="post-tou-error error-message"></div>
       <script>
         $(function() {
             $(".consent-form-checkbox").each(function() {
@@ -231,6 +205,8 @@
             </label>
           </div>
       </div>
+      <div class="get-roles-error error-message"></div>
+      <div class="put-roles-error error-message"></div>
       <script>$(function () { tnthAjax.getRoles($("#iq_userId").val());});</script>
   {%- endmacro %}
 
@@ -284,7 +260,33 @@
             </div>
             <div id="biopsyDateContainer" class="indent form-group">
             	<label for="biopsyDate">{{_("Biopsy Date")}}:</label>
-            	<input id="biopsyDate" type="text" data-name="biopsy" class="form-control" placeholder="d M yyyy" maxlength="11">
+            	<input id="biopsyDate" type="hidden" data-name="biopsy" class="form-control" value="">
+              <div class="row">
+                <div class="col-md-3 col-xs-4">
+                  <input class="form-control biopsy-date-element init-queries-field" id="biopsy_day" name="biopsy_day" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The biopsy day field is required and must be valid format')}}" required />
+                </div>
+                <div class="col-md-3 col-xs-6">
+                  <select data-type="select" class="form-control biopsy-date-element init-queries-field" id="biopsy_month" name="biopsy_month" data-error="{{_('A biopsy month must be selected')}}" required>
+                    <option value="">{{ _("Month") }}...</option>
+                    <option value="01">{{ _("January") }}</option>
+                    <option value="02">{{ _("February") }}</option>
+                    <option value="03">{{ _("March") }}</option>
+                    <option value="04">{{ _("April") }}</option>
+                    <option value="05">{{ _("May") }}</option>
+                    <option value="06">{{ _("June") }}</option>
+                    <option value="07">{{ _("July") }}</option>
+                    <option value="08">{{ _("August") }}</option>
+                    <option value="09">{{ _("September") }}</option>
+                    <option value="10">{{ _("October") }}</option>
+                    <option value="11">{{ _("November") }}</option>
+                    <option value="12">{{ _("December") }}</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                  <input class="form-control biopsy-element init-queries-field" id="biopsy_year" name="biopsy_year" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="{{_('The biopsy year is required and must be in valid format')}}" required />
+                </div>
+              </div>
+              <div class="help-block with-errors"></div>
             	<div id="biopsyDateError" class="error-message post-biopsy-error"></div>
             </div>
             <div class="radio biopsy-option">
@@ -360,43 +362,52 @@
           </div>
         </div>
         <br/>
+        <div class="get-clinical-error error-message"></div>
+        <div class="put-clinical-error error-message"></div>
+        <div class="post-clinical-error error-message"></div>
       </div>
       <script>
-        function checkBiopsyDate(val) {
-           var isValid = tnthDates.isValidDefaultDateFormat(val, $("#biopsyDateError"));
-           if (isValid) {
-              $("#biopsy_yes").trigger("click");
-              return true;
-           } else {
-              $("#biopsyDate").datepicker("hide");
-              return false;
-           };
-        };
         $(function () {
           tnthAjax.getClinical($("#iq_userId").val());
           tnthAjax.getTreatment($("#iq_userId").val());
-          var today = new Date();
-          $("#biopsyDate").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-          $("#biopsyDate").on("keydown", function() {
-            $("#biopsyDateError").text("");
-            $(this).datepicker("hide");
-          });
           $("input[name='biopsy']").each(function() {
           	$(this).on("click", function(e) {
               e.stopPropagation();
           		if ($(this).val() == "true") {
           			$("#biopsyDateContainer").show();
-                $("#biopsyDate").focus();
+                $("#biopsy_day").focus();
           		} else {
           			$("#biopsyDate").val("");
+                $("#biopsy_day").val("");
+                $("#biopsy_month").val("");
+                $("#biopsy_year").val("");
                 $("#biopsyDateError").text("");
           			$("#biopsyDateContainer").hide();
           		};
           	});
           });
-          $("#biopsyDate").on("change", function() {
-              return checkBiopsyDate($(this).val());
+          $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+              $(this).on("change", function() {
+                  var d = $("#biopsy_day");
+                  var m = $("#biopsy_month");
+                  var y = $("#biopsy_year");
+                  if (d.val() != "" && m.val() != "" && y.val() != "") {
+                      if (this.validity.valid) {
+                          var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "biopsyDateError");
+                          if (isValid) {
+                            $("#biopsyDate").val(y.val()+"-"+m.val()+"-"+d.val());
+                            $("#biopsyDateError").text("").hide();
+                            $("#biopsy_yes").trigger("click");
+                            //success
+                          } else {
+                             //fail
+                            $("#biopsyDate").val("");
+                          };
+                      };
+                  };
+              });
           });
+
           $("input[name='tx']").each(function() {
                $(this).on("click", function() {
                   if ($(this).val() == "true") {
@@ -418,6 +429,7 @@
         </div>
       </div>
       {{consent_fields(consent_agreements)}}
+      <div class="get-orgs-error error-message"></div>
     </div>
     <script>
     function _orgsCallback() {

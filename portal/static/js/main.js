@@ -106,131 +106,6 @@ var loader = function(show) {
     };
 };
 
-function convertToLocalTime(dateString) {
-    var convertedDate = "";
-    //assuming dateString is UTC date/time
-    if (hasValue(dateString)) {
-        var d = new Date(dateString);
-        var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
-        var offset = d.getTimezoneOffset() / 60;
-        var hours = d.getHours();
-        newDate.setHours(hours - offset);
-        var options = {
-            year: 'numeric', day: 'numeric', month: 'short',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
-        };
-        convertedDate = newDate.toLocaleString(options);
-    };
-    return convertedDate;
-};
-
-function convertUserDateTimeByLocaleTimeZone(dateString, timeZone, locale) {
-    //firefox does not support Intl API
-    //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
-
-    if (!dateString) return "";
-    else {
-        var errorMessage = "";
-        if (!hasValue(timeZone)) timeZone = "UTC";
-        if (!hasValue(locale))  locale = "en-us";
-        $(".timezone-error").html("");
-        $(".timezone-warning").html("");
-        //locale needs to be in this format - us-en
-        //month: 'numeric', day: 'numeric',
-        locale = locale.replace("_", "-").toLowerCase();
-        var options = {
-            year: 'numeric', day: 'numeric', month: 'short',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
-        };
-        options.timeZone =  timeZone;
-        //older browsers don't support this
-        var convertedDate = dateString;
-        try {
-            if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
-                convertedDate = new Date(dateString).toLocaleString(locale, options);
-                if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
-            } else {
-                if (timeZone != "UTC") {
-                    convertedDate = convertToLocalTime(dateString);
-                    $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
-                    $(".gmt").each(function() { $(this).hide()});
-                };
-            }
-        } catch(e) {
-            errorMessage = "Error occurred when converting timezone: " + e.message;
-        };
-        if (hasValue(errorMessage)) {
-            $(".timezone-error").each(function() {
-                $(this).addClass("text-danger").html(errorMessage);
-            });
-        };
-        return convertedDate.replace(/\,/g, "");
-    };
-};
-
-function getUserTimeZone(userId) {
-    var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
-    var userTimeZone = "";
-    if (selectVal == "") {
-        if (userId) {
-            $.ajax ({
-                type: "GET",
-                url: '/api/demographics/'+userId,
-                async: false
-            }).done(function(data) {
-                if (data) {
-                    data.extension.forEach(
-                        function(item, index) {
-                            if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
-                                userTimeZone = item.timezone;
-                            };
-                        });
-                };
-
-            }).fail(function() {
-                userTimeZone = "UTC";
-            });
-        };
-    } else {
-        userTimeZone = selectVal;
-    };
-
-    return hasValue(userTimeZone) ? userTimeZone : "UTC";
-};
-
-function getUserLocale(userId) {
-  var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
-  var locale = "";
-
-  if (!localeSelect) {
-        if (userId) {
-            $.ajax ({
-                    type: "GET",
-                    url: '/api/demographics/'+userId,
-                    cache: false,
-                    async: false
-            }).done(function(data) {
-                if (data && data.communication) {
-                    data.communication.forEach(
-                        function(item, index) {
-                            if (item.language) {
-                                locale = item["language"]["coding"][0].code;
-                                //console.log("locale: " + locale)
-                            };
-                    });
-                };
-
-            }).fail(function() {
-                locale = "en-us";
-            });
-        };
-   } else locale = localeSelect;
-
-   //console.log("locale? " + locale)
-   return locale ? locale : "en-us";
-};
 
 var SNOMED_SYS_URL = "http://snomed.info/sct", CLINICAL_SYS_URL = "http://us.truenth.org/clinical-codes";
 var CANCER_TREATMENT_CODE = "118877007", NONE_TREATMENT_CODE = "999";
@@ -250,6 +125,11 @@ var CONSENT_ENUM = {
         "include_in_reports": false,
         "send_reminders": false
     }
+};
+var SYSTEM_IDENTIFIER_ENUM = {
+    "external_study_id" : "http://us.truenth.org/identity-codes/external-study-id",
+    "external_site_id" : "http://us.truenth.org/identity-codes/external-site-id",
+    "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
 };
 
 var fillViews = {
@@ -275,6 +155,7 @@ var fillViews = {
         this.name();
         this.dob();
         this.studyId();
+        this.siteId();
         this.phone();
         this.altPhone();
         this.email();
@@ -324,6 +205,13 @@ var fillViews = {
             var content = $("#profileStudyId").val();
             if (hasValue(content)) $("#study_id_view").text(content);
             else $("#study_id_view").html("<p class='text-muted'>Not provided</p>");
+        };
+    },
+    "siteId": function() {
+        if (!$("#profileSiteIDContainer").hasClass("has-error")) {
+            var content = $("#profileSiteId").val();
+            if (hasValue(content)) $("#site_id_view").text(content);
+            else $("#site_id_view").html("<p class='text-muted'>Not provided</p>");
         };
     },
     "detail": function() {
@@ -385,9 +273,11 @@ var fillViews = {
             var a = $("#patBiopsy input[name='biopsy']:checked").val();
             var biopsyDate = $("#biopsyDate").val();
             if (a == "true" && hasValue(biopsyDate)) {
-                //note, biopsy date is formatted as mm/dd/yyyy
-                var cDate = new Date(biopsyDate);
-                displayDate = tnthDates.displayDateString(cDate.getMonth()+1, cDate.getDate(), cDate.getFullYear())
+                var displayDate = "";
+                if (hasValue($.trim($("#biopsy_month option:selected").val()+$("#biopsy_year").val()+$("#biopsy_day").val()))) {
+                    displayDate = tnthDates.displayDateString($("#biopsy_month option:selected").val(), $("#biopsy_day").val(), $("#biopsy_year").val());
+                };
+                if (!hasValue(displayDate)) displayDate = "Not provided";
                 content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
                 content += "&nbsp;&nbsp;" + displayDate;
             } else content = $("#patBiopsy input[name='biopsy']:checked").closest("label").text();
@@ -471,8 +361,12 @@ var fillContent = {
                         if (clinicalValue == "true") {
                             if (hasValue(val.content.issued)) {
                                 var issuedDate = "";
-                                //d M y format
-                                $("#biopsyDate").val(tnthDates.formatDateString(val.content.issued));
+                                var dString = tnthDates.formatDateString(val.content.issued, "iso-short");
+                                var dArray = dString.split("-");
+                                $("#biopsyDate").val(dString);
+                                $("#biopsy_year").val(dArray[0]);
+                                $("#biopsy_month").val(dArray[1]);
+                                $("#biopsy_day").val(dArray[2]);
                                 $("#biopsyDateContainer").show();
                                 $("#biopsyDate").removeAttr("skipped");
                             };
@@ -541,7 +435,7 @@ var fillContent = {
         this.race(data);
         this.indigenous(data);
         this.orgs(data);
-        tnthAjax.getOptionalCoreData($("#fillOrgs").attr("userId"), false, $(".profile-item-container[data-sections='detail']"));
+        tnthAjax.getOptionalCoreData(OT.getUserId(), false, $(".profile-item-container[data-sections='detail']"));
     },
     "name": function(data){
         if (data && data.name) {
@@ -678,14 +572,25 @@ var fillContent = {
     "subjectId": function(data) {
         if (data.identifier) {
             (data.identifier).forEach(function(item) {
-                if (item.system == "http://us.truenth.org/identity-codes/external-study-id") {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_study_id"]) {
                     if (hasValue(item.value)) $("#profileStudyId").val(item.value);
                 };
             });
         };
         fillViews.studyId();
     },
+    "siteId": function(data) {
+        if (data.identifier) {
+            (data.identifier).forEach(function(item) {
+                if (item.system == SYSTEM_IDENTIFIER_ENUM["external_site_id"]) {
+                    if (hasValue(item.value)) $("#profileSiteId").val(item.value);
+                };
+            });
+        };
+        fillViews.siteId();
+    },
     "consentList" : function(data, userId, errorMessage, errorCode) {
+        /**** CONSENT_WITH_TOP_LEVEL_ORG variable is set in template. see profile_macros.html for details ****/
         var ctop = (typeof CONSENT_WITH_TOP_LEVEL_ORG != "undefined") && CONSENT_WITH_TOP_LEVEL_ORG;
         var content = "";
         if (data && data["consent_agreements"] && data["consent_agreements"].length > 0) {
@@ -697,19 +602,70 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
-            content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>";
-            ['Organization', 'Consent Status', '<span class="agreement">Agreement</span>', 'Consented Date <span class="gmt">(GMT)</span>'].forEach(function (title, index) {
+            content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive table-striped' style='width: 100%; max-width:100%'>";
+            /********* Note that column headings are different between TrueNTH and EPROMs.
+                 Use css class to hide/show headings accordingly
+                 please see portal.css (for Truenth) and eproms.css (for EPROMs) for detail
+             ********/
+            var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
+                                '<span class="agreement">Agreement</span>',
+                                '<span class="eproms-consent-date-header">Consented Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+            headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
 
             var hasContent = false;
+            var touObj = [];
+
+            //for EPROMS, there is also subject website consent, which are consent terms presented to patient at initial queries,
+            //and also website terms of use
+            // WILL NEED TO CLARIFY
+            tnthAjax.getTerms(userId, false, true, function(data) {
+                if (data && data.tous) {
+                    (data.tous).forEach(function(item) {
+                        var fType = $.trim(item.type).toLowerCase();
+                        if (fType == "subject website consent" || fType == "website terms of use") {
+                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                            item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
+                            touObj.push(item);
+                        };
+                    });
+                };
+            });
+
+            //NEED TO CHECK THAT USER HAS ACTUALLY CONSENTED TO TERMS of USE
+            var showInitialConsentTerms = (touObj.length > 0);
+            var getTOUTableHTML = function(includeHeader) {
+                var touContent = "";
+                if (includeHeader) {
+                    headerArray.forEach(function(title) {
+                        touContent += "<th class='consentlist-header'>" + title + "</th>";
+                    });
+                };
+                //Note: Truenth and Eproms have different text content for each column.  Using css classes to hide/show appropriate content
+                //wording is not spec'd out for EPROMs. won't add anything specific until instructed
+                touObj.forEach(function(item) {
+                    var org = OT.orgsList[item.organization_id];
+                    touContent += "<tr data-tou-type='" + item.type + "'>";
+                    touContent += "<td><span class='eproms-tou-table-text'>" + (org && hasValue(org.name) ? org.name : "--") + "</span><span class='truenth-tou-table-text'>TrueNTH USA</span></td>";
+                    touContent += "<td><span class='text-success small-text eproms-tou-table-text'>Agreed to <a href='" + item.agreement_url + "' target='_blank'><span class='text-capitalize'>" + item.display_type + "</span></a></span><span class='text-success small-text truenth-tou-table-text'>Agreed to terms</span></td>";
+                    touContent += "<td><span class='eproms-tou-table-text text-capitalize'><a href='" + item.agreement_url + "' target='_blank'>" + item.display_type + "</a></span><span class='truenth-tou-table-text'>TrueNTH USA Terms of Use</span> <span class='agreement'>&nbsp;<a href='" + item.agreement_url + "' target='_blank'><em>View</em></a></span></td>";
+                    touContent += "<td>" + item.accepted + "</td></tr>";
+                });
+                return touContent;
+            };
 
             dataArray.forEach(function(item, index) {
                 if (item.deleted) return true;
                 if (!(existingOrgs[item.organization_id]) && !(/null/.test(item.agreement_url))) {
+                    if (!OT.initialized) tnthAjax.getOrgs(userId, false, true, null);
                     hasContent = true;
                     var orgName = "";
                     var orgId = item.organization_id;
+                    /*****
+                        consent with top level org config value is only set in Truenth, we need to get the top level org name(s) for each consent
+                        for displaying purpose in EPROMs
+                            ******/
                     if (!ctop) {
                         try {
                             var topOrgID = OT.getTopLevelParentOrg(orgId);
@@ -728,7 +684,6 @@ var fillContent = {
                     var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
-                    //if (isDefault) editable = false;
 
                     switch(consentStatus) {
                         case "deleted":
@@ -758,6 +713,7 @@ var fillContent = {
                     var modalContent = "", consentDateModalContent = "";
 
                     if (editable && consentStatus == "active") {
+                        /****** modal content doe modifying consent status *******/
                         modalContent += '<div class="modal fade" id="consent' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consent' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -777,6 +733,8 @@ var fillContent = {
                             + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
+
+                        /**** modal content for editing consent date for test patient ****/
                         consentDateModalContent += '<div class="modal fade consent-date-modal" id="consentDate' + index + 'Modal" tabindex="-1" role="dialog" aria-labelledby="consentDate' + index + 'ModalLabel">'
                             + '<div class="modal-dialog" role="document">'
                             + '<div class="modal-content">'
@@ -785,25 +743,34 @@ var fillContent = {
                             + '<h5 class="modal-title">Consent Date Editor</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4 style="margin-bottom: 1em">Modify the consent date for this agreement to: </h4>'
+                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
+                            + '<p style="margin-bottom: 0.6em">Modify the consent date <span class="text-muted">(GMT 24-hour format)</span> for this agreement to: </p>'
                             + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
-                            + '<div id="consentDateContainer_' + index + '" style="font-size:0.95em; margin-left:1em">'
-                            + '<input type="text" style="width:150px; max-width: 100%; display:inline-block" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11"/><span class="text-muted">&nbsp; example: 1 Jan, 2017</span>'
-                            + '</div><div id="consentDateError_' + index + '" class="error-message"></div><br/><br/>'
+                            + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
+                            + '<div class="row">'
+                            + '<div class="col-md-3 col-sm-3">'
+                            + '<input type="text" id="consentDate_' + index + '" class="form-control consent-date" data-index="' + index + '" data-status="' + cflag + '" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" placeholder="d M yyyy" maxlength="11" style="margin: 0.5em 0"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentHour_' + index + '" maxlength="2" placeholder="hh" data-index="' + index + '" class="form-control consent-hour" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentMinute_' + index + '" maxlength="2" placeholder="mm" data-index="' + index + '" class="form-control consent-minute" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div>'
+                            + '<div class="col-md-2 col-sm-3">'
+                            + '<input type="text" id="consentSecond_' + index + '" maxlength="2" placeholder="ss" data-index="' + index + '" class="form-control consent-second" data-default-value="00" style="width: 60px; margin: 0.5em 0;"/>'
+                            + '</div></div>'
+                            + '</div><div id="consentDateError_' + index + '" class="set-consent-error error-message"></div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
-                            + '<button type="button" class="btn btn-default" data-dismiss="modal" style="font-size:0.9em">Close</button>'
+                            + '<button type="button" class="btn btn-default btn-submit" data-index="' + index + '">Submit</button>'
+                            + '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
                             + '</div>'
                             + '</div></div></div>';
 
-
                     };
 
-                    if (ctop && (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL))) {
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "<td>" + signedDate + "</td></tr>";
-                    };
+                    if (showInitialConsentTerms) content += getTOUTableHTML();
 
                     content += "<tr>";
 
@@ -849,15 +816,11 @@ var fillContent = {
                      if ($(this).attr("show") == "true") $(this).addClass("show");
                  });
             } else {
-                if (ctop) {
-                    if (typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                if (showInitialConsentTerms) {
                         content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                        content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                        content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                        content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                        content += "</tr>";
+                        content += getTOUTableHTML(true);
+                        content += "</table>"
                         $("#profileConsentList").html(content);
-                    } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
                 } else  $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
 
@@ -881,33 +844,113 @@ var fillContent = {
                 $(".consent-date-modal").each(function() {
                     $(this).on("shown.bs.modal", function() {
                         $(this).find(".consent-date").focus();
+                        $(this).addClass("active");
+                        $(this).find("input").each(function() {
+                            if (hasValue($(this).attr("data-default-value"))) $(this).val($(this).attr("data-default-value"));
+                            else $(this).val("");
+                        });
+                        $(this).find(".set-consent-error").html("");
+                    });
+                    $(this).on("hidden.bs.modal", function() {
+                        $(this).removeClass("active");
                     });
                 });
-                $(".consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
-                $(".consent-date").each(function() {
+                $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
                     $(this).on("change", function() {
-                        var isValid = tnthDates.isValidDefaultDateFormat($(this).val(), $("#consentDateError_" + $(this).attr("data-index")));
-                        if (!isValid) {
-                            $(this).datepicker("hide");
-                        } else {
-                            $(this).datepicker("hide");
-                            var dt = new Date($(this).val());
-                            var cDate = (dt.getMonth()+1) + "/" + dt.getDate() + "/" + dt.getFullYear();
-                            var o = CONSENT_ENUM[$(this).attr("data-status")];
-                            if (o) {
-                                o.org = $(this).attr("data-orgId");
-                                o.agreementUrl = $(this).attr("data-agreementUrl");
-                                o.acceptance_date = cDate;
-                                o.testPatient = true;
-                                setTimeout('$("#consentDateContainer_' + $(this).attr("data-index") + '").hide();', 200);
-                                setTimeout('$("#consentDateLoader_' + $(this).attr("data-index") + '").show();', 450);
-                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
-                                setTimeout("tnthAjax.setConsent(" + $(this).attr("data-userId") + "," + JSON.stringify(o) + ",'" + $(this).val() + "');", 100);
-                                if (typeof reloadConsentList != "undefined") reloadConsentList();
-                                else setTimeout("location.reload();", 2000);
-                                $("#consentListTable .modal").modal("hide");
+                        var dataIndex = $.trim($(this).attr("data-index"));
+                        var d = $("#consentDate_" + dataIndex);
+                        var h = $("#consentHour_" + dataIndex).val();
+                        var m = $("#consentMinute_" + dataIndex).val();
+                        var s = $("#consentSecond_" + dataIndex).val();
+                        var errorMessage = "";
+
+                        if (hasValue(d.val())) {
+                            var isValid = tnthDates.isValidDefaultDateFormat(d.val());
+                            if (!isValid) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Date must in the valid format."
+                                d.datepicker("hide");
                             };
                         };
+
+                        /**** validate hour [0]0 ****/
+                        if (hasValue(h)) {
+                            if (!(/^([1-9]|0[0-9]|1\d|2[0-3])$/.test(h))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Hour must be in valid format, range 0 to 23.";
+                            };
+                        };
+
+                        /***** validate minute [0]0 *****/
+                        if (hasValue(m)) {
+                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(m))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Minute must be in valid format, range 0 to 59."
+                            };
+                        };
+                        /***** validate second [0]0 *****/
+                        if (hasValue(s)) {
+                            if (!(/^(0[0-9]|[1-9]|[1-5]\d)$/.test(s))) {
+                                errorMessage += (hasValue(errorMessage)?"<br/>":"") + "Second must be in valid format, range 0 to 59."
+                            };
+                        };
+
+                        if (hasValue(errorMessage)) {
+                            $("#consentDateError_" + dataIndex).html(errorMessage);
+                        } else $("#consentDateError_" + dataIndex).html("");
+
+                    });
+                });
+
+                $("#profileConsentList .btn-submit").each(function() {
+                    $(this).on("click", function() {
+                        var dataIndex = $.trim($(this).attr("data-index"));
+                        var ct = $("#consentDate_" + dataIndex);
+                        var h = $("#consentHour_" + dataIndex).val();
+                        var m = $("#consentMinute_" + dataIndex).val();
+                        var s = $("#consentSecond_" + dataIndex).val();
+                        var isValid = hasValue(ct.val());
+                        if (isValid) {
+                            var dt = new Date(ct.val());
+                            //2017-07-06T22:04:50 format
+                            var cDate = dt.getFullYear()
+                                        + "-"
+                                        + (dt.getMonth()+1)
+                                        + "-"
+                                        + dt.getDate()
+                                        + "T"
+                                        + (hasValue(h) ? pad(h) : "00")
+                                        + ":"
+                                        + (hasValue(m) ? pad(m) : "00")
+                                        + ":"
+                                        + (hasValue(s) ? pad(s) : "00");
+
+                            var o = CONSENT_ENUM[ct.attr("data-status")];
+
+                            if (o) {
+                                o.org = ct.attr("data-orgId");
+                                o.agreementUrl = ct.attr("data-agreementUrl");
+                                o.acceptance_date = cDate;
+                                o.testPatient = true;
+                                setTimeout((function() { $("#consentDateContainer_" + dataIndex).hide(); })(), 200);
+                                setTimeout((function() { $("#consentDateLoader_" + dataIndex).show(); })(), 450);
+                                /**** disable close buttons while processing request ***/
+                                $("#consentListTable button[data-dismiss]").attr("disabled", true);
+
+                                //serId, params, status, sync, callback)
+                                setTimeout("tnthAjax.setConsent(" + ct.attr("data-userId") + "," + JSON.stringify(o) + ",'" + ct.attr("data-status") + "', true, function(data) { if (data) {"
+                                            + " if (data && data.error) { "
+                                            + '  $("#profileConsentList .consent-date-modal.active").find(".set-consent-error").text("Error processing data.  Make sure the date is in the correct format."); '
+                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".consent-date-container").show(); })(), 200);'
+                                            + '  setTimeout((function() { $("#profileConsentList .consent-date-modal.active").find(".loading-message-indicator").hide(); })(), 450);'
+                                            + '  $("#consentListTable button[data-dismiss]").attr("disabled", false);'
+                                            + '  } else { '
+                                            + '  $("#consentListTable .modal").modal("hide");'
+                                            + '  if (typeof reloadConsentList != "undefined") reloadConsentList(); '
+                                            + '  else setTimeout("location.reload();", 2000); '
+                                            + '  }; '
+                                            + ' }})', 100);
+                            };
+                        } else  $("#consentDateError_" + dataIndex).text("You must enter a valid date/time");
+
                     });
                 });
             };
@@ -919,12 +962,10 @@ var fillContent = {
                 var msg = " You do not have permission to edit this patient record.";
                 $("#profileConsentList").html("<p class='text-danger'>" + msg + "</p>");
             } else {
-                if (ctop && typeof TERMS_URL != "undefined" && hasValue(TERMS_URL)) {
+                if (showInitialConsentTerms) {
                     content = "<table id='consentListTable' class='table-bordered table-hover table-condensed table-responsive' style='width: 100%; max-width:100%'>"
-                    content += "<th class='consentlist-header'>Organization</th><th class='consentlist-header'>Consent Status</th><th class='consentlist-header'><span class='agreement'>Agreement</span></th>";
-                    content += "<tr><td>TrueNTH USA</td><td><span class='text-success small-text'>Agreed to terms</span></td>";
-                    content += "<td>TrueNTH USA Terms of Use <span class='agreement'>&nbsp;<a href='" + TERMS_URL + "' target='_blank'><em>View</em></a></span></td>";
-                    content += "</tr>";
+                    content += getTOUTableHTML(true);
+                    content += "</table>";
                     $("#profileConsentList").html(content);
                 } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
             };
@@ -1057,7 +1098,10 @@ var fillContent = {
                 var self = $(this);
                 var item_found  = 0;
                 arrTypes.forEach(function(type) {
-                    if (typeInTous(type)) item_found++;
+                    if (typeInTous(type)) {
+                        item_found++;
+                        if (type == "subject website consent" || type == "website terms of use") $("#termsText").addClass("agreed");
+                    };
                 });
                 var additional = $(this).find("[data-core-data-subtype]");
                 if (additional.length > 0) {
@@ -1225,15 +1269,17 @@ var assembleContent = {
                 };
             };
 
-
             var studyId = $("#profileStudyId").val();
+            var siteId = $("#profileSiteId").val();
             var states = [];
+
             $("#userOrgs input[name='organization']").each(function() {
                 if ($(this).is(":checked")) {
                     if (hasValue($(this).attr("state")) && parseInt($(this).val()) != 0) states.push($(this).attr("state"));
                 };
             });
-            if (hasValue(studyId) || states.length > 0) {
+
+            if (hasValue(studyId) || hasValue(siteId) || states.length > 0) {
                 var identifiers = null;
                 //get current identifier(s)
                 $.ajax ({
@@ -1244,8 +1290,9 @@ var assembleContent = {
                     if (data && data.identifier) {
                         identifiers = [];
                         (data.identifier).forEach(function(identifier) {
-                            if (identifier.system != "http://us.truenth.org/identity-codes/external-study-id" &&
-                                identifier.system != "http://us.truenth.org/identity-codes/practice-region") identifiers.push(identifier);
+                            if (identifier.system != SYSTEM_IDENTIFIER_ENUM["external_study_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["external_site_id"] &&
+                                identifier.system != SYSTEM_IDENTIFIER_ENUM["practice_region"]) identifiers.push(identifier);
                         });
                     };
                 }).fail(function() {
@@ -1255,7 +1302,7 @@ var assembleContent = {
                 if (hasValue(studyId)) {
                     studyId = $.trim(studyId);
                     var studyIdObj = {
-                        system: "http://us.truenth.org/identity-codes/external-study-id",
+                        system: SYSTEM_IDENTIFIER_ENUM["external_study_id"],
                         use: "secondary",
                         value: studyId
                     };
@@ -1267,10 +1314,25 @@ var assembleContent = {
                     };
                 };
 
+                if (hasValue(siteId)) {
+                    siteId = $.trim(siteId);
+                    var siteIdObj = {
+                        system: SYSTEM_IDENTIFIER_ENUM["external_site_id"],
+                        use: "secondary",
+                        value: siteId
+                    };
+
+                    if (identifiers) {
+                        identifiers.push(siteIdObj);
+                    } else {
+                        identifiers = [siteIdObj];
+                    };
+                };
+
                 if (states.length > 0) {
                     states.forEach(function(state) {
                         identifiers.push({
-                            system: "http://us.truenth.org/identity-codes/practice-region",
+                            system: SYSTEM_IDENTIFIER_ENUM["practice_region"],
                             use: "secondary",
                             value: "state:" + state
                         });
@@ -1393,7 +1455,14 @@ var OrgObj = function(orgId, orgName, parentOrg) {
 var OrgTool = function() {
     this.TOP_LEVEL_ORGS = [];
     this.orgsList = {};
+    this.initialized = false;
 };
+OrgTool.prototype.setUserId = function(userId) {
+    $("#fillOrgs").attr("userId", userId);
+};
+OrgTool.prototype.getUserId = function() {
+    return $("#fillOrgs").attr("userId");
+}
 OrgTool.prototype.inArray = function( n, array) {
   if (n && array && Array.isArray(array)) {
     var found = false;
@@ -1511,6 +1580,7 @@ OrgTool.prototype.populateOrgsList = function(items) {
         };
         if (item.extension) orgsList[item.id].extension = item.extension;
         if (hasValue(item.language)) orgsList[item.id].language = item.language;
+        if (item.identifier) orgsList[item.id].identifier = item.identifier;
     });
     items.forEach(function(item) {
         if (item.partOf) {
@@ -1518,18 +1588,35 @@ OrgTool.prototype.populateOrgsList = function(items) {
             if (orgsList[item.id]) orgsList[item.id].parentOrgId = parentId;
         };
     });
+    this.initialized = true;
     return orgsList;
 };
 OrgTool.prototype.populateUI = function() {
     var parentOrgsCt = 0, topLevelOrgs = this.getTopLevelOrgs(), container = $("#fillOrgs"), orgsList = this.orgsList;
+    var getState = function(item) {
+                    var s = "", found = false;
+                    if (item.identifier) {
+                        (item.identifier).forEach(function(i) {
+                            if (!found && (i.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && i.value)) {
+                                s = (i.value).split(":")[1];
+                                found = true;
+                            };
+                        });
+                    };
+                    return s;
+                };
     for (org in orgsList) {
         if (orgsList[org].isTopLevel) {
             if (orgsList[org].children.length > 0) {
-                container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' value='"+orgsList[org].id+"' />");
-                parentOrgsCt++;
+                if ($("#userOrgs legend[orgId='" + org + "']").length == 0 ) {
+                    container.append("<legend orgId='" + org + "'>"+orgsList[org].name+"</legend><input class='tnth-hide' type='checkbox' name='organization' parent_org=\"true\" org_name=\"" + orgsList[org].name + "\" id='" + orgsList[org].id + "_org' state='" + getState(orgsList[org]) + "' value='"+orgsList[org].id+"' />");
+                    parentOrgsCt++;
+                };
             } else {
-                container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" value="'+
+                if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
+                    container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
                     orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                };
             };
         };
         // Fill in each child clinic
@@ -1539,18 +1626,22 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrgId = item.parentOrgId;
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
+                var state = getState(orgsList[_parentOrgId]);
+
+                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
+
                 childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
 
                 if (orgsList[item.id].children.length > 0) {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                     item.name +
                     '</label>';
 
                  } else {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
-                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" value="'+
+                    '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
                     item.name +
                     '</label>';
@@ -1582,10 +1673,10 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 '<p>I consent to sharing information with the <span class="consent-clinic-name">' + orgName + '.</span></p>' +
                 '<div id="' + orgId + 'defaultConsentAgreementRadioList" class="profile-radio-list">' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_yes" data-org="' + orgId + '" value="yes"/>Yes</label>' +
                 '<br/>' +
                 '<label class="radio-inline">' +
-                '<input type="radio" name="defaultToConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
+                '<input type="radio" name="toConsent" id="' + orgId + '_consent_no" data-org="' + orgId + '"  value="no"/>No</label>' +
                 '</div>' +
                 '<div id="' + orgId + '_consentAgreementMessage" class="error-message"></div>' +
                 '</div>' +
@@ -1596,12 +1687,12 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 '</div></div></div></div>';
             if ($("#defaultConsentContainer").length == 0) $("body").append("<div id='defaultConsentContainer'></div>");
             $("#defaultConsentContainer").append(s);
-            $("#" + orgId + "_defaultConsentModal input[name='defaultToConsent']").each(function() {
+            $("#" + orgId + "_defaultConsentModal input[name='toConsent']").each(function() {
                 $(this).on("click", function(e) {
                     e.stopPropagation();
                     var orgId = $(this).attr("data-org");
-                    var userId = $("#fillOrgs").attr("userId");
-                    $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true).hide();
+                    var userId = OT.getUserId();
+                    $("#" + orgId + "_defaultConsentModal button.btn-consent-close, #" + orgId + "_defaultConsentModal button[data-dismiss]").attr("disabled", true);
                     $("#" + orgId + "_loader").show();
                     if ($(this).val() == "yes") {
                         setTimeout("tnthAjax.setDefaultConsent(" + userId + "," +  orgId + ");", 100);
@@ -1619,17 +1710,17 @@ OrgTool.prototype.getDefaultModal = function(o) {
                 setTimeout("location.reload();", 10);
              });
              $("#" + orgId + "_defaultConsentModal").on("hidden.bs.modal", function() {
-                if ($(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                if ($(this).find("input[name='toConsent']:checked").length > 0) {
                     $("#userOrgs input[name='organization']").each(function() {
                         $(this).removeAttr("data-require-validate");
                     });
-                    var userId = $("#fillOrgs").attr("userId");
+                    var userId = OT.getUserId();
                     assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                 };
              }).on("shown.bs.modal", function() {
                 $(this).find("button.btn-consent-close, button[data-dismiss]").attr("disabled", false).show();
                 $(this).find(".loading-message-indicator").hide();
-                $(this).find("input[name='defaultToConsent']").each(function(){
+                $(this).find("input[name='toConsent']").each(function(){
                     $(this).prop("checked", false);
                 });
              });
@@ -1642,14 +1733,13 @@ OrgTool.prototype.handlePreSelectedClinic = function() {
         if (ob.length > 0) {
             ob.prop("checked", true);
             var parentOrg = this.getElementParentOrg(this.getSelectedOrg());
-            var userId = $("#fillOrgs").attr("userId");
+            var userId = this.getUserId();
             if (!tnthAjax.hasConsent(userId, parentOrg)) {
                 var __modal = OT.getConsentModal();
                 if (__modal) {
                     ob.attr("data-require-validate", "true");
                      __modal.on("hidden.bs.modal", function() {
-                        if ($(this).find("input[name='toConsent']:checked").length > 0 ||
-                            $(this).find("input[name='defaultToConsent']:checked").length > 0) {
+                        if ($(this).find("input[name='toConsent']:checked").length > 0) {
                               $("#userOrgs input[name='organization']").each(function() {
                                 $(this).removeAttr("data-require-validate");
                               });
@@ -1692,7 +1782,7 @@ OrgTool.prototype.handleEvent = function() {
     $("#userOrgs input[name='organization']").each(function() {
         $(this).attr("data-save-container-id", "userOrgs");
         $(this).on("click", function(e) {
-            var userId = $("#fillOrgs").attr("userId");
+            var userId = OT.getUserId();
             var parentOrg = OT.getElementParentOrg(this);
             if ($(this).prop("checked")){
                 if ($(this).attr("id") !== "noOrgs") {
@@ -1832,19 +1922,47 @@ OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
 OrgTool.prototype.getHereBelowOrgs = function() {
   var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
   var here_below_orgs = [];
-  userOrgs.forEach(function(orgId) {
-      here_below_orgs.push(orgId);
-      var co = mainOrgsList[orgId];
-      var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
-      if (cOrgs && cOrgs.length > 0) {
-        here_below_orgs = here_below_orgs.concat(cOrgs);
-      };
-  });
+  if (!userOrgs) {
+    var selectedOrg = this.getSelectedOrg();
+   if (selectedOrg.length > 0) userOrgs = [selectedOrg.val()];
+  };
+  if (userOrgs) {
+      userOrgs.forEach(function(orgId) {
+          here_below_orgs.push(orgId);
+          var co = mainOrgsList[orgId];
+          var cOrgs = self.getChildOrgs((co && co.children ? co.children : null));
+          if (cOrgs && cOrgs.length > 0) {
+            here_below_orgs = here_below_orgs.concat(cOrgs);
+          };
+      });
+  };
   return here_below_orgs;
+};
+OrgTool.prototype.morphPatientOrgs = function() {
+    var checkedOrgs = {};
+    var orgs = $("#userOrgs input[name='organization']");
+    orgs.each(function() {
+        if ($(this).prop("checked")) {
+            checkedOrgs[$(this).val()] = true;
+        };
+        $(this).attr("type", "radio");
+        if (checkedOrgs[$(this).val()]) {
+            $(this).prop("checked", true);
+        };
+    });
 };
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "beforeSend": function() {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
+                }
+            }
+        });
+    },
     "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following:
         //:subject_id: User on which action is being attempted
@@ -1885,9 +2003,10 @@ var tnthAjax = {
                             };
                         });
                     });
-                    if (item == "localized") __localizedFound = true; 
+                    if (item == "localized") __localizedFound = true;
                 });
-                if (!__localizedFound) $("#patMeta").remove(); 
+                if (!__localizedFound) $("#patMeta").remove();
+                else $("#patientQ").show();
             } else {
                 if (callback) {
                     callback({"error": "no data returned"});
@@ -1990,8 +2109,8 @@ var tnthAjax = {
             url: '/api/organization',
             async: sync? false : true
         }).done(function(data) {
-            $("#fillOrgs").attr("userId", userId);
-            $(".get-orgs-error").remove();
+            OT.setUserId(userId);
+            $(".get-orgs-error").html("");
             OT.populateOrgsList(data.entry);
             if(!noPopulate) {
                 OT.handlePreSelectedClinic();
@@ -2001,8 +2120,10 @@ var tnthAjax = {
             };
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           if ($(".get-orgs-error").length == 0) $(".error-message").append("<div class='get-orgs-error'>Server error occurred retrieving organization/clinic information.</div>");
-            loader();
+           var errorMessage = "Server error occurred retrieving organization/clinic information."
+           if ($(".get-orgs-error").length == 0) $(".default-error-message-container").append("<div class='get-orgs-error error-message'>" + errorMessage + "</div>");
+           else $(".get-orgs-error").html(errorMessage)
+           loader();
         });
     },
     "getConsent": function(userId, sync) {
@@ -2013,18 +2134,7 @@ var tnthAjax = {
             cache: false,
             async: (sync ? false : true)
         }).done(function(data) {
-            $(".get-consent-error").remove();
-            if (data.consent_agreements) {
-                var d = data["consent_agreements"];
-                d.forEach(function(item) {
-                    var orgId = item.organization_id;
-                    //console.log("org Id: " + orgId);
-                    var orgName = $("#" + orgId + "_org").attr("org_name");
-                    if ($("#" + orgId + "_consent").length > 0) {
-                        $("#" + orgId + "_consent").attr("checked", true);
-                    };
-                });
-            };
+           $(".get-consent-error").html("");
            fillContent.consentList(data, userId, null, null);
            loader();
            return true;
@@ -2032,11 +2142,13 @@ var tnthAjax = {
             //console.log("Problem retrieving data from server.");
             fillContent.consentList(null, userId, "Problem retrieving data from server.<br/>Error Status Code: " + xhr.status + (xhr.status == 401 ? "<br/>Permission denied to access patient record": ""), xhr.status);
             loader();
-            if ($(".get-consent-error").length == 0) $(".error-message").append("<div class='get-consent-error'>Server error occurred retrieving consent information.</div>");
+            var errorMessage = "Server error occurred retrieving consent information.";
+            if ($(".get-consent-error").length == 0) $(".default-error-message-container").append("<div class='get-consent-error error-message'>" + errorMessage + "</div>");
+            else $(".get-consent-error").html(errorMessage)
             return false;
         });
     },
-    "setConsent": function(userId, params, status, sync) {
+    "setConsent": function(userId, params, status, sync, callback) {
         if (userId && params) {
             var consented = this.hasConsent(userId, params["org"], status);
             if (!consented || params["testPatient"]) {
@@ -2045,7 +2157,8 @@ var tnthAjax = {
                 params["agreement_url"] =  params["agreementUrl"]
                 params["staff_editable"] = (hasValue(params["staff_editable"])? params["staff_editable"] : false);
                 params["include_in_reports"] =  (hasValue(params["include_in_reports"]) ? params["include_in_reports"] : false);
-                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false)
+                params["send_reminders"] = (hasValue(params["send_reminders"]) ? params["send_reminders"] : false);
+
                 $.ajax ({
                     type: "POST",
                     url: '/api/user/' + userId + '/consent',
@@ -2056,11 +2169,15 @@ var tnthAjax = {
                     data: JSON.stringify(params)
                 }).done(function(data) {
                     //console.log("consent updated successfully.");
-                    $(".set-consent-error").remove();
+                    $(".set-consent-error").html("");
+                    if (callback) callback(data);
                 }).fail(function(xhr) {
                     //console.log("request to updated consent failed.");
                     //console.log(xhr.responseText)
-                    if ($(".set-consent-error").length == 0) $(".error-message").append("<div class='set-consent-error'>Server error occurred setting consent status.</div>");
+                    if (callback) callback({"error": xhr.responseText});
+                    var errorMessage = "Server error occurred setting consent status.";
+                    if ($(".set-consent-error").length == 0) $(".default-error-message-container").append("<div class='set-consent-error error-message'>" + errorMessage + "</div>");
+                    else $(".set-consent-error").html(errorMessage);
                 });
             };
         };
@@ -2080,9 +2197,9 @@ var tnthAjax = {
             //need to remove all other consents associated w un-selected org(s)
             setTimeout("tnthAjax.removeObsoleteConsent();", 100);
             if (typeof reloadConsentList != "undefined") reloadConsentList();
-            $("#consentContainer").find(".error-message").text("");
+            $($("#consentContainer .error-message").get(0)).text("");
         } else {
-            $("#consentContainer").find(".error-message").text("Unable to set default consent agreement");
+            $($("#consentContainer .error-message").get(0)).text("Unable to set default consent agreement");
         }
     },
     deleteConsent: function(userId, params) {
@@ -2112,11 +2229,13 @@ var tnthAjax = {
                         data: JSON.stringify({"organization_id": parseInt(orgId)})
                     }).done(function(data) {
                         //console.log("consent deleted successfully.");
-                        $(".delete-consent-error").remove();
+                        $(".delete-consent-error").html("");
                     }).fail(function(xhr) {
                         //console.log("request to delete consent failed.");
                         //console.log(xhr.responseText)
-                        if ($(".delete-consent-error").length == 0) $(".error-message").append("<div class='delete-consent-error'>Server error occurred removing consent.</div>");
+                        var errorMessage = "Server error occurred removing consent: " + xhr.responseText;
+                        if ($(".delete-consent-error").length == 0) $(".default-error-message-container").append("<div class='delete-consent-error error-message'>" + errorMessage + "</div>");
+                        else $(".delete-consent-error").html(errorMessage)
                     });
                 });
 
@@ -2300,16 +2419,19 @@ var tnthAjax = {
                 fillContent.demo(data);
                 fillContent.timezone(data);
                 fillContent.subjectId(data);
+                fillContent.siteId(data);
                 fillContent.language(data);
             }
-            $(".get-demo-error").remove();
+            $(".get-demo-error").html("");
             loader();
             if (callback) callback();
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
             loader();
             if (callback) callback();
-            if ($(".get-demo-error").length == 0) $(".error-message").append("<div class='get-demo-error'>Server error occurred retrieving demographics information.</div>");
+            var errorMessage = "Server error occurred retrieving demographics information.";
+            if ($(".get-demo-error").length == 0) $(".default-error-message-container").append("<div class='get-demo-error error-message'>" + errorMessage + "</div>");
+            else $(".get-demo-error").html(errorMessage);
         });
     },
     "putDemo": function(userId,toSend,targetField, sync) {
@@ -2324,13 +2446,15 @@ var tnthAjax = {
         }).done(function(data) {
             //console.log("done");
             //console.log(data);
-            $(".put-demo-error").remove();
+            $(".put-demo-error").html("");
             flo.showUpdate(targetField);
             fillViews.demo();
             fillViews.detail();
             fillViews.org();
         }).fail(function() {
-            if ($(".put-demo-error").length == 0) $(".error-message").append("<div class='put-demo-error'>Server error occurred setting demographics information.</div>");
+            var errorMessage = "Server error occurred setting demographics information.";
+            if ($(".put-demo-error").length == 0) $(".default-error-message-container").append("<div class='put-demo-error error-message'>" + errorMessage + "</div>");
+            else $(".put-demo-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2376,9 +2500,13 @@ var tnthAjax = {
                         fillViews.locale();
                     };
                 });
+                $(".get-locale-error").html("");
             };
 
         }).fail(function() {
+            var errorMessage = "Server error occurred retrieving locale information.";
+            if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
+            else $(".get-locale-error").html(errorMessage);
         });
     },
     "hasTreatment": function(data) {
@@ -2417,7 +2545,7 @@ var tnthAjax = {
             fillContent.treatment(data);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           $("#userProcedures").html("<span class='text-danger'>Error retrieving data from server</span>");
+           $("#userProcedures").html("<span class='error-message'>Error retrieving data from server</span>");
         });
     },
     "postTreatment": function(userId, started, treatmentDate, targetField) {
@@ -2491,10 +2619,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function(data) {
             flo.showUpdate(targetField);
-            $(".get-procs-error").remove();
+            $(".get-procs-error").html("");
         }).fail(function() {
            // console.log("Problem updating procedure on server.");
-            if ($(".get-procs-error").length == 0) $(".error-message").append("<div class='get-procs-error'>Server error occurred saving procedure/treatment information.</div>");
+           var errorMessage = "Server error occurred saving procedure/treatment information.";
+            if ($(".get-procs-error").length == 0) $("#userProcuedures").append("<div class='get-procs-error error-message'>" + errorMessage + "</div>");
+            else $(".get-procs-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2507,10 +2637,12 @@ var tnthAjax = {
             async: (sync ? false: true)
         }).done(function(data) {
             flo.showUpdate(targetField);
-            $(".del-procs-error").remove();
+            $(".del-procs-error").html("");
         }).fail(function() {
             // console.log("Problem deleting procedure on server.");
-            if ($(".del-procs-error").length == 0) $(".error-message").append("<div class='del-procs-error'>Server error occurred removing procedure/treatment information.</div>");
+            var errorMessage = "Server error occurred removing procedure/treatment information.";
+            if ($(".del-procs-error").length == 0) $("#userProcuedures").append("<div class='del-procs-error error-message'>" + errorMessage + "</div>");
+            else $(".del-procs-error").html(errorMessage);
             flo.showError(targetField);
         });
     },
@@ -2531,11 +2663,13 @@ var tnthAjax = {
             cache: false
         }).done(function(data) {
             //self.getRoleList();
-            $(".get-roles-error").remove();
+            $(".get-roles-error").html("");
             fillContent.roles(data,isProfile);
         }).fail(function() {
            // console.log("Problem retrieving data from server.");
-           if ($(".get-roles-error").length == 0) $(".error-message").append("<div class='get-roles-error'>Server error occurred retrieving user role information.</div>");
+           var errorMessage = "Server error occurred retrieving user role information.";
+           if ($(".get-roles-error").length == 0) $(".default-error-message-container").append("<div class='get-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".get-roles-error").html(errorMessage);
         });
     },
     "putRoles": function(userId,toSend) {
@@ -2546,9 +2680,11 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            $(".put-roles-error").remove();
+            $(".put-roles-error").html("");
         }).fail(function(jhr) {
-           if ($(".put-roles-error").length == 0) $(".error-message").append("<div class='put-roles-error'>Server error occurred setting user role information.</div>");
+            var errorMessage = "Server error occurred setting user role information."
+           if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".put-roles-error").html(errorMessage);
            //console.log(jhr.responseText);
         });
     },
@@ -2560,10 +2696,12 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
-            $(".delete-roles-error").remove();
+            $(".delete-roles-error").html("");
         }).fail(function() {
            // console.log("Problem updating role on server.");
-           if ($(".delete-roles-error").length == 0) $(".error-message").append("<div class='delete-roles-error'>Server error occurred deleting user role.</div>");
+           var errorMessage = "Server error occurred deleting user role.";
+           if ($(".delete-roles-error").length == 0) $(".default-error-message-container").append("<div class='delete-roles-error error-message'>" + errorMessage + "</div>");
+           else $(".delete-roles-error").html(errorMessage);
 
         });
     },
@@ -2572,10 +2710,12 @@ var tnthAjax = {
             type: "GET",
             url: '/api/patient/'+userId+'/clinical'
         }).done(function(data) {
-            $(".get-clinical-error").remove();
+            $(".get-clinical-error").html("");
             fillContent.clinical(data);
         }).fail(function() {
-           if ($(".get-clinical-error").length == 0) $(".error-message").append("<div class='get-clinical-error'>Server error occurred retrieving clinical data.</div>");
+            var errorMessage = "Server error occurred retrieving clinical data."
+           if ($(".get-clinical-error").length == 0) $(".default-error-message-container").append("<div class='get-clinical-error error-message'>" + errorMessage + "</div>");
+           else $(".get-clinical-error").html(errorMessage);
         });
     },
     "putClinical": function(userId, toCall, toSend, targetField, status) {
@@ -2587,12 +2727,14 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify({value: toSend})
         }).done(function() {
-            $(".put-clinical-error").remove();
+            $(".put-clinical-error").html("");
             flo.showUpdate(targetField);
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".put-clinical-error").length == 0) $(".error-message").append("<div class='put-clinical-error'>Server error occurred updating clinical data.</div>");
+            var errorMessage = "Server error occurred updating clinical data.";
+            if ($(".put-clinical-error").length == 0) $(".default-error-message-container").append("<div class='put-clinical-error error-message'>" + errorMessage + "</div>");
+            else $(".put-clinical-error").html(errorMessage);
             flo.showError(targetField);
             fillViews.clinical();
         });
@@ -2638,6 +2780,7 @@ var tnthAjax = {
                 code = "141";
                 display = "PCa localized diagnosis";
         };
+        if (!hasValue(code)) return false;
         var system = CLINICAL_SYS_URL;
         var method = "POST";
         var url = '/api/patient/'+userId+'/clinical';
@@ -2662,31 +2805,40 @@ var tnthAjax = {
             cache: false,
             data: JSON.stringify(obsArray)
         }).done(function() {
-            $(".post-biopsy-error").remove();
+            $(".post-clinical-error").html("");
             flo.showUpdate(targetField);
             fillViews.clinical();
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-biopsy-error").length == 0) $(".error-message").append("<div class='post-biopsy-error'>Server error occurred updating clinical data.</div>");
+            var errorMessage = "Server error occurred updating clinical data.";
+            if ($(".post-clinical-error").length == 0) $(".default-error-message-container").append("<div class='post-clinical-error error-message'>" + errorMessage + "</div>");
+            else $(".post-clinical-error").html(errorMessage);
             flo.showError(targetField);
             fillViews.clinical();
         });
     },
-    "getTermsUrl": function() {
+    "getTermsUrl": function(sync, callback) {
         $.ajax ({
             type: "GET",
-            url: '/api/tou'
+            url: '/api/tou',
+            async: (sync? false: true)
         }).done(function(data) {
-            $(".get-tou-error").remove();
+            $(".get-tou-error").html("");
             if (data.url) {
                 $("#termsURL").attr("data-url", data.url);
                 $("#topTerms .general-tou").each(function() {
                     $(this).attr("data-url", data.url);
                 });
-            };
+                if (callback) callback({"url": data.url});
+            } else {
+                if (callback) callback({"error": "no url returned"});
+            }
             //fillContent.terms(data);
         }).fail(function() {
-           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou url.</div>");
+           var errorMessage = "Server error occurred retrieving tou url.";
+           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+           else $(".get-tou-error").html(errorMessage);
+           if (callback) callback({"error": "Server error"});
         });
     },
     "getTerms": function(userId, type, sync, callback) {
@@ -2696,12 +2848,14 @@ var tnthAjax = {
             cache: false,
             async: (sync?false:true)
         }).done(function(data) {
-            $(".get-tou-error").remove();
+            $(".get-tou-error").html("");
             fillContent.terms(data);
             if (callback) callback(data);
         }).fail(function() {
-           if ($(".get-tou-error").length == 0) $(".error-message").append("<div class='get-tou-error'>Server error occurred retrieving tou data.</div>");
-           if (callback) callback({"error": "Server error retrieving tou data."})
+           var errorMessage = "Server error occurred retrieving tou data."
+           if ($(".get-tou-error").length == 0) $(".default-error-message-container").append("<div class='get-tou-error error-message'>" + errorMessage + "</div>");
+           else $(".get-tou-error").html(errorMessage);
+           if (callback) callback({"error": errorMessage})
         });
     },
     "postTermsByUser": function(userId, toSend) {
@@ -2714,10 +2868,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function() {
            // console.log('terms stored');
-           $(".post-tou-error").remove();
+           $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
+            var errorMessage = "Server error occurred saving terms of use information.";
+            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+            else $(".post-tou-error").html(errorMessage);
         });
     },
     "postTerms": function(toSend) {
@@ -2729,10 +2885,12 @@ var tnthAjax = {
             data: JSON.stringify(toSend)
         }).done(function() {
            // console.log('terms stored');
-           $(".post-tou-error").remove();
+           $(".post-tou-error").html("");
         }).fail(function() {
             //alert("There was a problem saving your answers. Please try again.");
-            if ($(".post-tou-error").length == 0) $(".error-message").append("<div class='post-tou-error'>Server error occurred saving terms of use information.</div>");
+            var errorMessage = "Server error occurred saving terms of use information.";
+            if ($(".post-tou-error").length == 0) $(".default-error-message-container").append("<div class='post-tou-error error-message'>" + errorMessage + "</div>");
+            else $(".post-tou-error").html(errorMessage);
         });
     }
 };
@@ -2768,18 +2926,15 @@ function newHttpRequest(url,callBack, noCache)
     xmlhttp.send();
 };
 
-$.ajaxSetup({
-    timeout: 2000,
-    retryAfter:3000
-});
 var attempts = 0;
 
-funcWrapper = function(param) {
+funcWrapper = function() {
     attempts++;
     $.ajax({
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
+        timeout: 5000,
         cache: (getIEVersion() ? false : true)
     }, 'html')
     .done(function(data) {
@@ -2789,11 +2944,12 @@ funcWrapper = function(param) {
     .fail(function(jqXHR, textStatus, errorThrown) {
       //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
         if (attempts < 3) {
-            setTimeout ( function(){ funcWrapper( param ) }, $.ajaxSetup().retryAfter );
+            setTimeout ( function(){ funcWrapper( ) }, 3000 );
         } else loader();
     })
     .always(function() {
         loader();
+        attempts = 0;
     });
 };
 
@@ -2815,6 +2971,7 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     //setTimeout('LRKeyEvent();', 1500);
+    tnthAjax.beforeSend();
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
@@ -2892,39 +3049,41 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 
 var tnthDates = {
-    /** validateBirthDate  check whether the date is a sensible date.
+    /** validateDateInputFields  check whether the date is a sensible date in month, day and year fields.
+     ** params: month, day and year values and error field ID
      ** NOTE this can replace the custom validation check; hook this up to the onchange/blur event of birthday field
      ** work better in conjunction with HTML5 native validation check on the field e.g. required, pattern match  ***/
-    "validateBirthDate": function(m, d, y) {
+    "validateDateInputFields": function(m, d, y, errorFieldId) {
         if (hasValue(m) && hasValue(d) && hasValue(y)) {
 
             var m = parseInt(m);
             var d = parseInt(d);
             var y = parseInt(y);
+            var errorField = $("#" + errorFieldId);
 
             if (!(isNaN(m)) && !(isNaN(d)) && !(isNaN(y))) {
                 var today = new Date();
                 // Check to see if this is a real date
                 var date = new Date(y,m-1,d);
                 if (!(date.getFullYear() == y && (date.getMonth() + 1) == m && date.getDate() == d)) {
-                    $("#errorbirthday").html("Invalid date. Please try again.").show();
+                    errorField.html("Invalid date. Please try again.").show();
                     return false;
                 }
                 else if (date.setHours(0,0,0,0) >= today.setHours(0,0,0,0)) {
-                    $("#errorbirthday").html("Birthday must not be in the future. Please try again.").show();
+                    errorField.html("Date must not be in the future. Please try again.").show();
                     return false; //shouldn't be in the future
                 }
                 else if (y < 1900) {
-                    $("#errorbirthday").html("Date must not be before 1900. Please try again.").show();
+                    errorField.html("Date must not be before 1900. Please try again.").show();
                     return false;
                 };
 
-                $("#errorbirthday").html("").hide();
+                errorField.html("").hide();
 
                 return true;
 
@@ -3327,11 +3486,6 @@ var tnthDates = {
                minutes = pad(minutes);
                seconds = pad(seconds);
 
-               function pad(n) {
-                    n = parseInt(n);
-                    return (n < 10) ? '0' + n : n;
-               };
-
                switch(format) {
                     case "mm/dd/yyyy":
                         nd = month + "/" + day + "/" + year;
@@ -3340,7 +3494,7 @@ var tnthDates = {
                         nd = month + "-" + day + "-" + year;
                         break;
                     case "mm-dd-yyyy hh:mm:ss":
-                        nd = month + "/" + day + "/" + year + " " + hours + ":" + minutes + ":" + seconds;
+                        nd = month + "-" + day + "-" + year + " " + hours + ":" + minutes + ":" + seconds;
                         break;
                     case "dd/mm/yyyy":
                         nd = day + "/" + month + "/" + year;
@@ -3362,8 +3516,12 @@ var tnthDates = {
                     case "yyyy-mm-dd hh:mm:ss":
                         nd = year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
                         break;
-                     case "d M y":
-                     default:
+                    case "d M y hh:mm:ss":
+                        nd = this.displayDateString(month, day, year);
+                        nd = nd + " " + hours + ":" + minutes + ":" + seconds;
+                        break;
+                    case "d M y":
+                    default:
                         //console.log("dateString: " + dateString + " month: " + month + " day: " + day + " year: " + year)
                         nd = this.displayDateString(month, day, year);
                         break;
@@ -3371,6 +3529,128 @@ var tnthDates = {
 
            return nd;
         } else return "";
+    },
+    "convertToLocalTime": function (dateString) {
+        var convertedDate = "";
+        //assuming dateString is UTC date/time
+        if (hasValue(dateString)) {
+            var d = new Date(dateString);
+            var newDate = new Date(d.getTime()+d.getTimezoneOffset()*60*1000);
+            var offset = d.getTimezoneOffset() / 60;
+            var hours = d.getHours();
+            newDate.setHours(hours - offset);
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            convertedDate = newDate.toLocaleString(options);
+        };
+        return convertedDate;
+    },
+    "convertUserDateTimeByLocaleTimeZone": function (dateString, timeZone, locale) {
+        //firefox does not support Intl API
+        //if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) return dateString;
+
+        if (!dateString) return "";
+        else {
+            var errorMessage = "";
+            if (!hasValue(timeZone)) timeZone = "UTC";
+            if (!hasValue(locale))  locale = "en-us";
+            $(".timezone-error").html("");
+            $(".timezone-warning").html("");
+            //locale needs to be in this format - us-en
+            //month: 'numeric', day: 'numeric',
+            locale = locale.replace("_", "-").toLowerCase();
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            options.timeZone =  timeZone;
+            //older browsers don't support this
+            var convertedDate = dateString;
+            try {
+                if(/chrom(e|ium)/.test(navigator.userAgent.toLowerCase())){ //works in chrome
+                    convertedDate = new Date(dateString).toLocaleString(locale, options);
+                    if (timeZone != "UTC") $(".gmt").each(function() { $(this).hide()});
+                } else {
+                    if (timeZone != "UTC") {
+                        convertedDate = convertToLocalTime(dateString);
+                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                        $(".gmt").each(function() { $(this).hide()});
+                    };
+                }
+            } catch(e) {
+                errorMessage = "Error occurred when converting timezone: " + e.message;
+            };
+            if (hasValue(errorMessage)) {
+                $(".timezone-error").each(function() {
+                    $(this).addClass("text-danger").html(errorMessage);
+                });
+            };
+            return convertedDate.replace(/\,/g, "");
+        };
+    },
+    "getUserTimeZone": function (userId) {
+        var selectVal = $("#profileTimeZone").length > 0 ? $("#profileTimeZone option:selected").val() : "";
+        var userTimeZone = "";
+        if (selectVal == "") {
+            if (userId) {
+                $.ajax ({
+                    type: "GET",
+                    url: '/api/demographics/'+userId,
+                    async: false
+                }).done(function(data) {
+                    if (data) {
+                        data.extension.forEach(
+                            function(item, index) {
+                                if (item.url === "http://hl7.org/fhir/StructureDefinition/user-timezone") {
+                                    userTimeZone = item.timezone;
+                                };
+                            });
+                    };
+
+                }).fail(function() {
+                    userTimeZone = "UTC";
+                });
+            };
+        } else {
+            userTimeZone = selectVal;
+        };
+
+        return hasValue(userTimeZone) ? userTimeZone : "UTC";
+    },
+    "getUserLocale": function (userId) {
+      var localeSelect = $("#locale").length > 0 ? $("#locale option:selected").val() : "";
+      var locale = "";
+
+      if (!localeSelect) {
+            if (userId) {
+                $.ajax ({
+                        type: "GET",
+                        url: '/api/demographics/'+userId,
+                        cache: false,
+                        async: false
+                }).done(function(data) {
+                    if (data && data.communication) {
+                        data.communication.forEach(
+                            function(item, index) {
+                                if (item.language) {
+                                    locale = item["language"]["coding"][0].code;
+                                    //console.log("locale: " + locale)
+                                };
+                        });
+                    };
+
+                }).fail(function() {
+                    locale = "en-us";
+                });
+            };
+       } else locale = localeSelect;
+
+       //console.log("locale? " + locale)
+       return locale ? locale : "en-us";
     }
 };
 
@@ -3521,6 +3801,9 @@ function getSaveLoaderDiv(parentID, containerID) {
     };
 };
 
+function __getLoaderHTML() {
+    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+}
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 };
@@ -3532,6 +3815,34 @@ function hasValue(val) {
 function isString (obj) {
   return (Object.prototype.toString.call(obj) === '[object String]');
 };
+
+function disableHeaderFooterLinks() {
+    var links = $("#tnthNavWrapper a, #homeFooter a").not("a[href*='logout']").not("a.required-link").not("a.home-link");
+    links.addClass("disabled");
+    links.prop('onclick',null).off('click');
+    links.on("click", function(e) {
+        e.preventDefault();
+        return false;
+    });
+};
+
+function pad(n) {
+    n = parseInt(n);
+    return (n < 10) ? '0' + n : n;
+};
+
+function escapeHtml(text) {
+    'use strict';
+    if (text == null || text.length == 0){
+        return text;
+    }
+    return text.replace(/[\"&'\/<>]/g, function (a) {
+        return {
+            '"': '&quot;', '&': '&amp;', "'": '&#39;',
+            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
+        }[a];
+    });
+}
 
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){

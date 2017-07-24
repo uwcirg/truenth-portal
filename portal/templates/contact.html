@@ -4,11 +4,12 @@
 {{ back_btn(PORTAL, _('Home')) }}
 
 <h3 class="tnth-headline">{{ _("Contact TrueNTH") }}</h3>
-<p>{{ _("You can use form below or write the TrueNTH team directly at") }} <a href="mailto:us.truenth.org+contact@gmail.com">us.truenth.org+contact@gmail.com</a>.</p>
+<p>{{ _("Use this form to get in touch with TrueNTH") }}</p>
 <div class="row">
   <div class="col-md-7">
 
     <form id="profileForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="form-group">
         <label for="sendername">{{ _("Name") }}</label>
         <input type="text" class="form-control" name="sendername"
@@ -33,6 +34,11 @@
         <textarea class="form-control" rows="5" name="body" id="body" data-error="{{ _('Please add a message for TrueNTH') }}" placeholder="{{ _('What is on your mind?') }}" required></textarea>
         <div class="help-block with-errors"></div>
       </div>
+      {% if not user and config.RECAPTCHA_SITE_KEY and config.RECAPTCHA_SECRET_KEY %}
+      <div class="field-group">
+        {{ recaptcha }}
+      </div>
+      {% endif %}
       <div class="form-group">
         <button type="submit" class="btn btn-tnth-primary btn-lg">{{ _("Send") }}</button>
       </div>

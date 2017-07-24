@@ -1,5 +1,5 @@
 {% extends "gil/base.html" %}
-{% block title %}Contact Truenth{% endblock %}
+{% block title %}{{_("Contact")}} {{super()}}{% endblock %}
 {% block head %}{{super()}}{% endblock %}
 {% block main %}
     <main class="main">
@@ -11,7 +11,7 @@
                 <figure></figure><span>{{_("Menu")}}</span>
             </a>
           </div>
-          <a class="logo" href="{{PORTAL}}/"></a>
+          <a class="logo" href="/"></a>
           {% if not user %}
             <div class="header__meta"><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-login">{{_("Log In")}}</a><a href="#" class="menu button button--small button--white" data-toggle="modal" data-target="#modal-register">{{_("Join Us")}}</a></div>
           {% endif %}
@@ -19,8 +19,8 @@
       {% endblock %}
       <div class="page-intro page-intro--dark page-intro--contact" style="background-image: url({{url_for('static', filename='img/Contact-Background.jpg') }})">
         <div class="page-intro__content">
-          <h1 class="page-intro__main">Contact Us</h1>
-          <p class="page-intro__sub">Please connect with us, ask questions, share your story, and make suggestions for how we can do better.</p>
+          <h1 class="page-intro__main">{{_("Contact Us")}}</h1>
+          <p class="page-intro__sub">{{_("Please connect with us, ask questions, share your story, and make suggestions for how we can do better.")}}</p>
           <div class="button-callout">
             <figure class="js-scroll-down" data-target=".page-intro"></figure>
           </div>
@@ -29,51 +29,57 @@
       <div class="module-wrap module-wrap--theme-brown">
         <div class="module">
           <div class="contact-form-wrap">
-            <div class="accent-heading">Objective N<em>o</em>1: TrueNTH Community</div>
-            <h3 class="module__heading">Contact Form</h3>
-            <p class="module__body">Use this form to get in touch with TrueNTH USA.</p>
+            <div class="accent-heading">{% trans %}Objective N<em>o</em>1: TrueNTH Community{% endtrans %}</div>
+            <h3 class="module__heading">{{_("Contact Form")}}</h3>
+            <p class="module__body">{{_("Use this form to get in touch with TrueNTH USA.")}}</p>
             <form id="contactForm" class="module__form" action="" method="post">
               <input type="hidden" name="sendername" id="sendername" value="" />
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <div class="field-group field-group__half">
                 <div class="field field__text">
-                  <label>First Name</label>
-                  <input class="field__input input-first-name" type="text" placeholder="First Name" id="first-name" name="first-name"/>
+                  <label>{{_("First Name")}}</label>
+                  <input class="field__input input-first-name" type="text" placeholder="{{_('First Name')}}" id="first-name" name="first-name"/>
                 </div>
                 <div class="field field__text">
-                  <label>Last Name</label>
-                  <input class="field__input input-last-name" type="text" placeholder="Last Name" id="last-name" name="last-name"/>
-                </div>
-              </div>
-              <div class="field-group">
-                <div class="field field__text">
-                  <label>Your Email</label>
-                  <input class="field__input input-email" type="email" placeholder="Email Address" id="email" name="email"/>
+                  <label>{{_("Last Name")}}</label>
+                  <input class="field__input input-last-name" type="text" placeholder="{{_('Last Name')}}" id="last-name" name="last-name"/>
                 </div>
               </div>
               <div class="field-group">
                 <div class="field field__text">
-                  <label>Subject</label>
-                  <input class="field__input input-email" type="text" placeholder="Subject" id="subject" name="subject"/>
+                  <label>{{_("Your Email")}}</label>
+                  <input class="field__input input-email" type="email" placeholder="{{_('Email Address')}}" id="email" name="email"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field field__text">
+                  <label>{{_("Subject")}}</label>
+                  <input class="field__input input-email" type="text" placeholder="{{_('Subject')}}" id="subject" name="subject"/>
                 </div>
               </div>
               <div class="field-group">
                 <div class="field field__textarea">
-                  <label class="field__label">Message</label>
+                  <label class="field__label">{{_("Message")}}</label>
                   <textarea class="field__textarea" id="body" name="body"></textarea>
                 </div>
               </div>
               <div class="field-group">
                 <div class="field field__select">
-                  <label class="field__label">About You</label>
+                  <label class="field__label">{{_("About You")}}</label>
                   <select id="about" name="about" class="field__select">
-                    <option value="">Select</option>
-                    <option value="I've been diagnosed with prostate cancer">I've been diagnosed with prostate cancer</option>
-                    <option value="I want to learn more about prostate cancer">I want to learn more about prostate cancer</option>
+                    <option value="">{{_("Select")}}</option>
+                    <option value="I've been diagnosed with prostate cancer">{{_("I've been diagnosed with prostate cancer")}}</option>
+                    <option value="I want to learn more about prostate cancer">{{_("I want to learn more about prostate cancer")}}</option>
                   </select>
                 </div>
               </div>
+              {% if not user and config.RECAPTCHA_SITE_KEY and config.RECAPTCHA_SECRET_KEY %}
               <div class="field-group">
-                <div class="button-wrap button-wrap--centered"><a id="submitButton" class="icon-box__button icon-box__button--main"><span>Submit<figure></figure></span></a></div>
+                {{ recaptcha }}
+              </div>
+              {% endif %}
+              <div class="field-group">
+                <div class="button-wrap button-wrap--centered"><a id="submitButton" class="icon-box__button icon-box__button--main"><span>{{_("Submit")}}<figure></figure></span></a></div>
               </div>
             </form>
           </div>

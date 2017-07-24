@@ -13,7 +13,7 @@
             };
             return null;
     };
-    var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain",cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
+    var sessionMonitor=function(a){"use strict";function b(a){a&&a.stopPropagation();var b=new Date,c=b-j;a&&a.target&&"stay-logged-in"==a.target.id?(j=b,d(),a=null,i.ping()):c>i.minPingInterval&&(j=b,d(),i.ping())}function c(){d(),i.ping()}function d(){var a=i.sessionLifetime-i.timeBeforeWarning;window.clearTimeout(f),window.clearTimeout(g),f=window.setTimeout(i.onwarning,a),g=window.setTimeout(e,i.sessionLifetime)}function e(){$.when(i.onbeforetimeout()).always(i.ontimeout)}var f,g,h={sessionLifetime:36e5,timeBeforeWarning:6e5,minPingInterval:6e4,activityEvents:"mouseup",pingUrl:window.location.protocol+"//"+window.location.host+"/api/ping",logoutUrl:"/logout",timeoutUrl:"/logout?timeout=1",ping:function(){$.ajax({type:"POST",contentType:"text/plain", cache:false,url:i.pingUrl,crossDomain:!0})},logout:function(){window.location.href=i.logoutUrl},onwarning:function(){var a=Math.round(i.timeBeforeWarning/60/1e3),b=$('<div id="jqsm-warning">Your session will expire in '+a+' minutes. <button id="jqsm-stay-logged-in">Stay Logged In</button><button id="jqsm-log-out">Log Out</button></div>');$("body").children("div#jqsm-warning").length||$("body").prepend(b),$("div#jqsm-warning").show(),$("button#stay-logged-in").on("click",function(a){a&&a.stopPropagation(),i.extendsess(a)}).on("click",function(){b.hide()}),$("button#jqsm-log-out").on("click",i.logout)},onbeforetimeout:function(){},ontimeout:function(){window.location.href=i.timeoutUrl}},i={},j=new Date;return $.extend(i,h,a,{extendsess:b}),$(document).on(i.activityEvents,b),c(),i};
 
     var truenth_authenticated = {% if user %} true;{% else %} false;{% endif %}
     // Set default sessionLifetime from Flask config
@@ -75,7 +75,7 @@
                     {% if user %}
                         {% if enable_links %}
                         <ul class="tnth-dropdown-menu" style="list-style-type:none">
-                            <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                            <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                             {% if 'login_as_id' in session or (user and not user.has_role(ROLE.WRITE_ONLY)) %}
                             <li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>
                             {% endif %}
@@ -91,13 +91,16 @@
                             <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
                             <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
                             {% endif %}
+                            {% if user and (user.has_role(ROLE.ADMIN) or user.has_role(ROLE.ANALYST)) %}
+                            <li><a href="{{PORTAL}}/reporting">{{ _("Reporting Dashboard") }}</a></li>
+                            {% endif %}
                             <li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>
                         </ul>
                         {% endif %}
                          <button id="tnthUserBtn" type="button" class="tnth-nav-btn tnth-white tnth-dropdown-toggle" data-toggle="tnth-dropdown">
                             {% if enable_links %}&nbsp;&nbsp; {{ _("MENU") }} <i class="fa fa-bars"></i>{% endif %}
-                            <img src="{{movember_profile}}" width="50" height="50" />
-                             <em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}
+                            <img class="profile-img" src="{{movember_profile}}" width="50" height="50" />
+                            <span class="welcome-text"><em>{{ _("Welcome") }}</em>{% if user.display_name != "Anonymous" %}, {{ user.display_name }}{% endif %}</span>
                             {% if config.DEBUG_TIMEOUTS %}({{ expires_in }} seconds remaining){% endif %}
                          </button>
                             {% elif login_url %}<ul class="tnth-dropdown-menu" role="menu"><li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li></ul>
@@ -114,13 +117,15 @@
                 {% if enable_links %}<a id="tnthLogoXs" href="{{PORTAL}}" title="{{ _('Return to TrueNTH home') }}">{% endif %}
                 <img src="{{PORTAL}}{{url_for('static',filename='img/logo_wordmark_topnav.png')}}" />
                 {% if enable_links %}</a>{% endif %}
-                {% if branded_logos %}<img src={{ branded_logos[1] }}></img>{% endif %}
+                <div class="tnth-navbarXs-img-container">
+                    {% if branded_logos %}<img src={{ branded_logos[1] }}></img>{% endif %}
+                </div>
             </div>
             {% if enable_links %}
             <div id="tnthNavbarXs">
                 <ul class="tnth-navbar-xs" style="list-style-type:none">
                     {% if login_url %}<li><a href="{{ login_url }}">{{ _("Log In to TrueNTH") }}</a></li>{% endif %}
-                    <li><a href="{{PORTAL}}">{{ _("TrueNTH Home") }}</a></li>
+                    <li><a href="{{PORTAL}}" class="home-link">{{ _("TrueNTH Home") }}</a></li>
                     {% if user %}<li><a href="{{PORTAL}}/profile">{{ _("My TrueNTH Profile") }}</a></li>{% endif %}
                     <li><a href="{{PORTAL}}/about">{{ _("About TrueNTH") }}</a></li>
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
@@ -156,7 +161,7 @@ $(document).ready(function(){
             logoutUrl: '{{PORTAL}}/logout',
             timeoutUrl: '{{PORTAL}}/logout?timed_out=1',
             modalShown: false,
-            intervalMonitor: false, 
+            intervalMonitor: false,
             onwarning: function() {$("#session-warning-modal").modal("show"); if (sessMon.modalShown) sessMon.intervalMonitor = setInterval(function(){ sessMon.ontimeout() }, 2 * 60 * 1000);}
       });
       window.sessMon = sessMon;

@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block main %}
 	{%- from "initial_queries_macros.html" import paperWebsiteConsentScript, interviewAssistedWebConsentScript -%}
-	<div id="termsContainer">
+	<div id="termsContainer" class="website-consent-script">
 		{%- if entry_method == 'paper' %}
 			{{paperWebsiteConsentScript(terms)}}
 		{%- else -%}
-			{{interviewAssistedWebConsentScript(terms)}}
+			{{interviewAssistedWebConsentScript(terms, declaration_form)}}
 		{%- endif -%}
 	</div>
 	<div class="continue-msg-wrapper">
@@ -40,6 +40,15 @@
 	        };
         });
 
+        $(".intro-text").text($(".intro-text").text().replace("[organization]", "{{top_organization.name}}"));
+
+        if ($(".terms-tick-box-text[data-org='{{top_organization.name}}']").length > 0) {
+	        $(".terms-tick-box-text[data-org]").each(function() {
+	        	if ($(this).attr("data-org").toLowerCase() == "{{top_organization.name}}".toLowerCase()) $(this).show();
+	        	else $(this).hide();
+	    	});
+	    } else $($(".terms-tick-box-text[data-org]").get(0)).show();
+
 		$("[data-type='terms']").each(function() {
 			$(this).on("click", function() {
 				if ($(this).attr("data-agree") == "false") {
@@ -51,6 +60,9 @@
 		                    var theTerms = {};
 		                    theTerms["agreement_url"] = self.attr("data-url");
 		                    theTerms["type"] = type;
+		                    {% if top_organization %}
+		                    	theTerms["organization_id"] = "{{top_organization.id}}";
+		                    {% endif %}
 		                     // Post terms agreement via API
 		                    tnthAjax.postTermsByUser('{{patient_id}}', theTerms);
 		                });

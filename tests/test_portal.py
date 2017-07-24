@@ -9,8 +9,9 @@ import urllib
 
 from portal.extensions import db
 from portal.models.intervention import INTERVENTION, UserIntervention
+from portal.models.organization import Organization
 from portal.models.role import ROLE
-from portal.models.user import User
+from portal.models.user import get_user, User
 from portal.models.message import EmailMessage
 from tests import TestCase, TEST_USER_ID
 
@@ -217,3 +218,59 @@ class TestPortal(TestCase):
         rv = self.client.get('/report-error?{}'.format(
             urllib.urlencode(params)))
         self.assert200(rv)
+
+    def test_configuration_settings(self):
+        self.login()
+        lr_group = self.app.config['LR_GROUP']
+        rv = self.client.get('/api/settings/lr_group')
+        self.assert200(rv)
+        self.assertEquals(rv.json.get('LR_GROUP'), lr_group)
+        rv2 = self.client.get('/api/settings/bad_value')
+        self.assertEquals(rv2.status_code, 400)
+
+    def test_redirect_validation(self):
+        self.promote_user(role_name=ROLE.ADMIN)
+        self.promote_user(role_name=ROLE.STAFF)
+
+        org = Organization(name='test org')
+        user = get_user(TEST_USER_ID)
+        with SessionScope(db):
+            db.session.add(org)
+            user.organizations.append(org)
+            db.session.commit()
+
+        self.login()
+
+        client = self.add_client()
+        client_url = client._redirect_uris
+        local_url = "http://{}/home?test".format(self.app.config.get('SERVER_NAME'))
+        invalid_url = 'http://invalid.org'
+
+        # validate redirect of /website-consent-script GET
+        rv = self.client.get('/website-consent-script/{}?redirect_url='
+                             '{}'.format(TEST_USER_ID, local_url))
+        self.assert200(rv)
+
+        rv2 = self.client.get('/website-consent-script/{}?redirect_url='
+                              '{}'.format(TEST_USER_ID, invalid_url))
+        self.assert401(rv2)
+
+        # validate redirect of /login/<provider> GET
+        rv3 = self.client.get('/login/TESTING?user_id={}&next='
+                              '{}'.format(TEST_USER_ID, client_url),
+                              follow_redirects=True)
+        self.assert200(rv3)
+
+        rv4 = self.client.get('/login/TESTING?user_id={}&next='
+                              '{}'.format(TEST_USER_ID, invalid_url),
+                              follow_redirects=True)
+        self.assert401(rv4)
+
+        # validate redirect of /challenge POST
+        formdata = {'user_id': TEST_USER_ID, 'next_url': local_url}
+        rv5 = self.client.post('/challenge', data=formdata)
+        self.assert200(rv5)
+
+        formdata['next_url'] = invalid_url
+        rv6 = self.client.post('/challenge', data=formdata)
+        self.assert401(rv6)

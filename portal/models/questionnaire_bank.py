@@ -4,6 +4,7 @@ from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
 from .questionnaire import Questionnaire
+from .recur import Recur
 from .reference import Reference
 
 
@@ -37,8 +38,7 @@ class QuestionnaireBank(db.Model):
     @classmethod
     def from_json(cls, data):
         instance = cls()
-        instance.update_from_json(data)
-        return instance
+        return instance.update_from_json(data)
 
     def update_from_json(self, data):
         self.name = data['name']
@@ -49,16 +49,20 @@ class QuestionnaireBank(db.Model):
         self = self.add_if_not_found(commit_immediately=True)
         qs_named = set()
         for q in data['questionnaires']:
-            questionnaire = QuestionnaireBankQuestionnaire.from_fhir(
+            questionnaire = QuestionnaireBankQuestionnaire.from_json(
                 q)
             questionnaire.questionnaire_bank_id = self.id
             questionnaire = questionnaire.add_if_not_found(True)
+            if questionnaire not in self.questionnaires:
+                self.questionnaires.append(questionnaire)
             qs_named.add(questionnaire)
 
         # remove any stale
         for unwanted in set(self.questionnaires) - qs_named:
             self.questionnaires.remove(unwanted)
             db.session.delete(unwanted)
+
+        return self
 
     def as_json(self):
         d = {}
@@ -67,7 +71,7 @@ class QuestionnaireBank(db.Model):
         d['classification'] = self.classification
         d['organization'] = Reference.organization(
             self.organization_id).as_fhir()
-        d['questionnaires'] = [q.as_fhir() for q in self.questionnaires]
+        d['questionnaires'] = [q.as_json() for q in self.questionnaires]
         return d
 
     def add_if_not_found(self, commit_immediately=False):
@@ -78,6 +82,7 @@ class QuestionnaireBank(db.Model):
         @return: the new or matched QuestionnaireBank
 
         """
+        assert self.name
         existing = QuestionnaireBank.query.filter_by(
             name=self.name).first()
         if not existing:
@@ -102,8 +107,10 @@ class QuestionnaireBankQuestionnaire(db.Model):
     days_till_overdue = db.Column(db.Integer, nullable=False)
     rank = db.Column(db.Integer, nullable=False)
 
-    questionnaire = db.relationship('Questionnaire')
+    questionnaire = db.relationship(Questionnaire)
     questionnaire_bank = db.relationship('QuestionnaireBank')
+    recurs = db.relationship(
+        Recur, secondary='questionnaire_bank_questionnaire_recurs')
 
     __table_args__ = (
         UniqueConstraint(
@@ -125,7 +132,7 @@ class QuestionnaireBankQuestionnaire(db.Model):
         return self.questionnaire.name
 
     @classmethod
-    def from_fhir(cls, data):
+    def from_json(cls, data):
         """Instantiate from persisted form
 
         NB - the questionnaire_bank_id is NOT expected, as it's defined
@@ -137,14 +144,16 @@ class QuestionnaireBankQuestionnaire(db.Model):
         instance.days_till_due = data['days_till_due']
         instance.days_till_overdue = data['days_till_overdue']
         instance.rank = data['rank']
+        for r in data.get('recurs', []):
+            instance.recurs.append(Recur.from_json(r).add_if_not_found())
         return instance
 
-    def as_fhir(self):
+    def as_json(self):
         d = {}
         d['questionnaire'] = Reference.questionnaire(self.name).as_fhir()
         for k in ('rank', 'days_till_due', 'days_till_overdue'):
-            if getattr(self, k, None):
-                d[k] = getattr(self, k)
+            d[k] = getattr(self, k)
+        d['recurs'] = [r.as_json() for r in self.recurs]
         return d
 
     def add_if_not_found(self, commit_immediately=False):

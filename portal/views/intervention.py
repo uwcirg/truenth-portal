@@ -90,7 +90,7 @@ def user_intervention_get(intervention_name, user_id):
               description:
                 Custom HTML for display in patient list for care staff,
                 as seen on the /patients view, specific to the referenced
-                user..
+                user
       401:
         description:
           if missing valid OAuth SERVICE token or the service user owning
@@ -117,7 +117,7 @@ def user_intervention_get(intervention_name, user_id):
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required(ROLE.SERVICE)
 def user_intervention_set(intervention_name):
-    """Update user access to the named intervention
+    """Update user settings on the named intervention
 
     Submit a JSON doc with the user_id and other fields to set.  Keep
     in mind the PUT defines the whole resource for the user_id on the
@@ -189,7 +189,7 @@ def user_intervention_set(intervention_name):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -356,7 +356,7 @@ def intervention_communicate(intervention_name):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_sent
           required:
             - message
           properties:

@@ -176,30 +176,6 @@ select:not([multiple]) {
   color: #FFF;
   background-color: #576e76;
 }
-.button--LR,
-.button--LR.data-show,
-#profileConsentList .button--LR{
-   opacity: 0;
-   width: 160px;
-   margin: 2em 0;
-}
-#profileConsentList .button--LR {
-  margin: 0 0.5em;
-  display: inline-block;
-}
-.button--LR.data-show,
-#profileConsentList .button--LR[data-show='true'] {
-    opacity: 1;
-}
-.button--LR.data-show,
-#profileConsentList .button--LR[data-show='false'] {
-    opacity: 0;
-}
-.consent-date-modal.fade {
-    -webkit-transition: opacity .7s ease-out !important;
-    -o-transition: opacity .7s ease-out !important;
-    transition: opacity .7s ease-out !important;
-}
 #fullSizeBox a[href*="register"] {
   display: none;
 }
@@ -404,6 +380,25 @@ div.right-panel {
   margin: auto;
 }
 /***** initial queries page style ****/
+.terms-container {
+  border-style:ridge;
+  max-height: 250px;
+  overflow: auto;
+  padding: 1em;
+  background-color:#F5F5F5;
+}
+#termsContainer.website-consent-script #termsText {
+  padding: 1em 2.5em 2.5em 2.5em;
+}
+#termsText {
+  padding: 0 1em;
+}
+#termsText.agreed {
+  display: none;
+}
+#agreeLabel {
+  margin-left: 2em;
+}
 .terms-of-use-intro {
   display: none;
 }
@@ -419,6 +414,19 @@ div.right-panel {
 #topTerms .terms-checkbox-container {
   margin-left: 2em;
   margin-top: 0.5em;
+}
+#topTerms .terms-checkbox-container i:hover {
+  cursor: pointer;
+}
+.terms-tick-box {
+  float: left;
+  width: 2%;
+  margin: 0.3em 0.5em 0 0;
+}
+.terms-tick-box-text {
+  float: left;
+  width: 94.5%;
+  max-width: 100%;
 }
 #termsCheckbox {
   width: 1000px;
@@ -459,9 +467,43 @@ div.right-panel {
 #aboutForm .reg-complete-container {
   width: 350px;
   max-width: 100%;
-  margin: 1em 0;
+  margin: 1em auto;
   padding: 0.5em 0;
+  text-align: center;
   display: none;
+}
+#aboutForm #buttonsContainer {
+  width: 350px;
+  margin: 1em auto;
+  position: relative;
+  text-align: center;
+}
+#aboutForm #next {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+  position: absolute;
+  left: 0;
+  top: 0;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 1em;
+}
+#aboutForm #updateProfile {
+  opacity: 0;
+  transition: opacity 200ms ease-in;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  padding: 1em;
+}
+#aboutForm #next:disabled {
+  opacity: 0.6;
+}
+#aboutForm #next.open, #aboutForm #updateProfile.open {
+  opacity: 1;
+}
+#aboutForm #next span {
+  margin-left: 0.3em;
+  margin-right: 0.3em;
 }
 #aboutForm .iq-container {
   font-family: "akzidenz_grotesk_medium", Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -541,37 +583,6 @@ div.right-panel {
 }
 #aboutForm .bd-optional {
   display: none;
-}
-#aboutForm #buttonsContainer {
-  width: 150px;
-  margin: 1em 0;
-  position: relative;
-}
-#aboutForm #next, #aboutForm #updateProfile {
-  opacity: 0;
-  transition: opacity 200ms ease-in;
-  position: absolute;
-  left: 0;
-  top: 0;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  padding: 1em;
-}
-#aboutForm #next {
-  opacity: 1;
-  width: 110px;
-  max-width: 100%;
-  margin-left: 0.2em;
-}
-#aboutForm #next:disabled {
-  opacity: 0.6;
-}
-#aboutForm #next.open, #aboutForm #updateProfile.open {
-  opacity: 1;
-}
-#aboutForm #next span {
-  margin-left: 0.3em;
-  margin-right: 0.3em;
 }
 #aboutForm .iq-container .heading {
   position: absolute;
@@ -700,6 +711,9 @@ div.right-panel {
 #adminTable div.card-view {
   display: flex;
 }
+#adminTable .truenth-id-label {
+  display: none;
+}
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
@@ -784,7 +798,7 @@ div.right-panel {
 }
 #accessCodeWrapper .disabled {
   background-color: #999;
-  opacity: 0.65;
+  opacity: 0.6;
 }
 #shortcut_alias {
   width: 140px;
@@ -975,18 +989,12 @@ div.right-panel {
   transition: opacity 250ms ease-out;
   z-index: 1;
 }
+#patientsInstrumentList label,
+#patientsDownloadTypeList label {
+  font-size: 0.8em;
+}
 #patientsDownloadTypeList {
   margin-top: 0.5em;
-}
-.orglist-download-container {
-  display: inline-block;
-}
-.orglist-download-container div {
-  margin-left: 0.2em;
-  margin-bottom: 0.5em;
-}
-.orglist-download-container a {
-  color: #57675B;
 }
 .smaller-text {
   font-size: 0.85em;
@@ -1236,8 +1244,10 @@ div.right-panel {
   justify-content: space-around;
   flex-wrap: wrap;
   position: relative;
- /* background: #43484d;*/
   padding-bottom: 1em;
+}
+.portal-completed-container {
+  margin-top: -4em;
 }
 .portal-description {
   background: #43484d;
@@ -1417,7 +1427,7 @@ div.right-panel {
 .profile-item-container {
   background-color: #EFF5F3;
   background-image: linear-gradient(to top, #e8e8e8 0%, #f5f5f5 100%);
-  padding: 2em 3em 3.5em 3em;
+  padding: 2em 3em 2.5em 3em;
   margin: 0.5em auto;
   border: 2px solid #bcc2a6;
   overflow-y: hidden;
@@ -1609,6 +1619,9 @@ div.right-panel {
   font-size: 0.95em;
   margin-top: 0.2em;
 }
+.noOrg-container label {
+  font-weight: normal;
+}
 input.clinic {
   margin-top: 6px;
 }
@@ -1625,6 +1638,16 @@ div.noOrg-container span {
   margin-left: 5px;
   position: relative;
   top: 1px;
+}
+.orglist-download-container {
+  display: inline-block;
+}
+.orglist-download-container div {
+  margin-left: 0.2em;
+  margin-bottom: 0.5em;
+}
+.orglist-download-container a {
+  color: #57675B;
 }
 #createProfileForm .title {
   margin-top: 5%;
@@ -1720,7 +1743,15 @@ div.noOrg-container span {
   margin-bottom: 2em;
 }
 #profileStudyIDContainer input {
-  width: 30%;
+  width: 300px;
+  max-width: 100%;
+}
+#createProfileForm #profileStudyIDContainer {
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+#createProfileForm #profileStudyIDContainer input {
+  width: 350px;
   max-width: 100%;
 }
 #userSessionReportDetailTable {
@@ -1780,19 +1811,6 @@ table.profile-audit-log TH,
 #userAssessementReport table {
   word-break: break-all;
   font-size: 0.94em;
-}
-.terms-container {
-  border-style:ridge;
-  max-height: 250px;
-  overflow: auto;
-  padding: 1em;
-  background-color:#F5F5F5;
-}
-#termsText {
-  padding: 0 1em;
-}
-#agreeLabel {
-  margin-left: 2em;
 }
 .profile-header {
   display: inline-block;
@@ -2066,14 +2084,6 @@ table.profile-audit-log TH,
 .radio-inline input[type=radio] {
   margin-left: -18px;
 }
-div.biopsy-option:last-of-type{
-  margin-top: 1px;
-}
-#biopsyDate {
-  width: 150px;
-  max-width: 100%;
-  display: inline-block;
-}
 .modal-dialog {
   border-radius: 0;
 }
@@ -2103,10 +2113,6 @@ div.biopsy-option:last-of-type{
 }
 .modal label {
   font-size: 1em;
-}
-#patientsInstrumentList label,
-#patientsDownloadTypeList label {
-  font-size: 0.8em;
 }
 .modal button,
 .modal a.btn {
@@ -2166,6 +2172,17 @@ sub.pointer:hover {
 .tooltip.left .tooltip-arrow {
   border-left-color: #575a4d;
 }
+div.biopsy-option:last-of-type{
+  margin-top: 1px;
+}
+#biopsyDate {
+  width: 150px;
+  max-width: 100%;
+  display: inline-block;
+}
+#biopsyDateContainer {
+  min-height: 4.5em;
+}
 #consentContainer .fade {
   transition: opacity .45s ease-out;
 }
@@ -2215,9 +2232,6 @@ sub.pointer:hover {
   padding-left: 0.6em;
   padding-right: 0.6em;
 }
-#profileConsentList .consentlist-cell {
-  background-color: #fbf9f9;
-}
 #consentListLoad {
   margin-top: 1em;
 }
@@ -2226,6 +2240,41 @@ sub.pointer:hover {
   color: #7d826e;
   font-size: 0.9em;
   font-weight: bold;
+}
+.button--LR,
+.button--LR.data-show,
+#profileConsentList .button--LR{
+   opacity: 0;
+   width: 160px;
+   margin: 2em 0;
+}
+#profileConsentList .button--LR {
+  margin: 0 0.5em;
+  display: inline-block;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show='true'] {
+    opacity: 1;
+}
+.button--LR.data-show,
+#profileConsentList .button--LR[data-show='false'] {
+    opacity: 0;
+}
+#profileConsentList .truenth-consent-status-header,
+#profileConsentList .truenth-consent-date-header,
+#profileConsentList .truenth-tou-table-text {
+  display: none;
+}
+#profileConsentList tr[data-tou-type='website terms of use'] {
+  display: none;
+}
+.consent-date-modal.fade {
+    -webkit-transition: opacity .7s ease-out !important;
+    -o-transition: opacity .7s ease-out !important;
+    transition: opacity .7s ease-out !important;
+}
+#profileSiteIDContainer, #mainDiv.profile .site-id-view {
+  display: none;
 }
 #identityVerificationContainer {
   padding: 2em 1.5em;
@@ -2258,6 +2307,7 @@ div.org-container legend {
 }
 div.org-container label.org-label {
   margin: 0.2em 0;
+  font-weight: normal;
 }
 div.org-container .text-muter {
   margin-bottom: 4px;

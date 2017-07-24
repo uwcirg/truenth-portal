@@ -10,7 +10,9 @@ from ..date_tools import as_fhir, FHIR_datetime
 from .lazy import lazyprop
 from .organization import OrgTree
 from .reference import Reference
-from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM, TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
+from ..system_uri import TRUENTH_CLINICAL_CODE_SYSTEM
+from ..system_uri import TRUENTH_ENCOUNTER_CODE_SYSTEM, TRUENTH_VALUESET
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from ..system_uri import NHHD_291036
 from ..views.fhir import valueset_nhhd_291036
 
@@ -640,7 +642,7 @@ def generate_qnr_csv(qnr_bundle):
             # Todo: correctly pick external study of interest
             'study_id': get_identifier(
                 qnr['subject']['identifier'],
-                system='http://us.truenth.org/identity-codes/external-study-id'
+                system=TRUENTH_EXTERNAL_STUDY_SYSTEM
             ),
             'authored': qnr['authored'],
             'instrument': qnr['questionnaire']['reference'].split('/')[-1],

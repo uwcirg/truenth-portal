@@ -55,7 +55,7 @@
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
                     if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateBirthDate(m.val(), d.val(), y.val() );
+                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
                         if (isValid) {
                             $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
                         } else {
@@ -81,6 +81,8 @@
           {%- endif -%}
         </select>
         <input type="hidden" id="sys_default_locale" value="{{config.get('DEFAULT_LOCALE')}}" />
+        <div class="get-demo-error get-locale-error error-message"></div>
+        <div class="put-demo-error error-message"></div>
      </div>
      <script>$(function () {
         $('#locale').on('change', function() {
@@ -144,7 +146,7 @@
                     '<label>{{ _("Indigenous Status") }}</label>' +'<div class="profile-radio-list">';
                     as.forEach(function(o) {
                         html += '<div>' +
-                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>' + o.display + '</label></div>';
+                                '<input type="radio" name="indigenous" value="' + o.code + '"><label>{%trans%}' + o.display + '{%endtrans%}</label></div>';
                     });
                     html += "</div></div>";
                     $("#userIndigenousStatusContainer").html(html);
@@ -290,7 +292,7 @@
                 $("#profileEmailErrorMessage").text("");
                 console.log(url);
             }).fail(function() {
-                $("#profileEmailErrorMessage").text("failed request to get email invite url");
+                $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url.{%endtrans%}");
             });
             return url;
         };
@@ -323,7 +325,7 @@
                 var clinicName = (function() {
                     var cn = "";
                     if (selectedOrg.length > 0 ) cn = selectedOrg.closest("label").text();
-                    if (!hasValue(cn)) cn = "your clinic";
+                    if (!hasValue(cn)) cn = "{%trans%}your clinic{%endtrans%}";
                     return cn;
                 })();
                 var parentName = (function() {
@@ -354,7 +356,7 @@
                         }).fail(function() {
                         });
                     };
-                    var txt = "Hello";
+                    var txt = "{%trans%}Hello{%endtrans%}";
                     if (hasValue(fname)) txt += " " + fname;
                     if (hasValue(lname)) txt += " " + lname;
                     return txt;
@@ -388,10 +390,10 @@
                         $('#profileEmailMessage').text(selectedOption.text() + ' email sent to ' + email);
                     }).fail(function() {
                         console.log('failed request');
-                        $('#profileEmailMessage').text('Unable to send email.');
+                        $('#profileEmailMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                     });
                 };
-            } else $('#profileEmailMessage').text('You must select a email type.');
+            } else $('#profileEmailMessage').text('{%trans%}You must select a email type.{%endtrans%}');
         });
      });</script>
     {%- endif -%}
@@ -401,7 +403,7 @@
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     {% endif %}
 {%- endmacro %}
-{% macro profileRegistrationEmail(person) -%}
+{% macro profileStaffRegistrationEmail(person) -%}
     {%- if person -%}
     <div id="sendRegistrationEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -430,7 +432,7 @@
                 $("#profileEmailErrorMessage").text("");
                 console.log(url);
             }).fail(function() {
-                $("#profileEmailErrorMessage").text("failed request to get email invite url");
+                $("#profileEmailErrorMessage").text("{%trans%}failed request to get email invite url{%endtrans%}");
             });
             return url;
         };
@@ -453,27 +455,65 @@
                         };
                     });
                 };
-                var cn = parentName ? parentName: "your clinic";
+                var cn = parentName ? parentName: "{%trans%}your clinic{%endtrans%}";
                 return cn;
             })();
             return_url = getAccessUrl();
             if (hasValue(return_url)) {
-                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
-                subject = "{%trans%}Registration invite from {%endtrans%}{%trans%}" + clinicName + "{%endtrans%}";
-            };
-            if (body != '') {
                 $.ajax ({
-                    type: 'POST',
-                    url: "{{url_for('portal.invite')}}",
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                    data: {'subject': subject, 'recipients': email, 'body': body}
+                    type: "GET",
+                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                    cache: false,
+                    async: false
                 }).done(function(data) {
-                    $('#profileEmailMessage').text('{%trans%}invite email sent to ' + email + "{%endtrans%}");
-                }).fail(function() {
-                    $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                    if (hasValue(data)) {
+                        body = data;
+                        var fname = "";
+                        var lname = "";
+                        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+                            fname = $("#firstname").val();
+                            lname = $("#lastname").val();
+                        } else {
+                            $.ajax ({
+                                type: "GET",
+                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
+                                async: false,
+                                cache: false
+                            }).done(function(data) {
+                                if (data && data.name) {
+                                    fname = data.name.given;
+                                    lname = data.name.family;
+                                };
+                            }).fail(function() {
+                            });
+                        };
+                        body = body.replace(/\(firstname\)/i, fname)
+                                   .replace(/\(lastname\)/i, lname)
+                                   .replace(/\(registrationlink\)/gi, return_url)
+
+                    };
+                }).fail(function(xhr) {
                 });
+
+                //provide default body content if no body content was returned from ajax call
+                if (!hasValue(body)) {
+                    body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                };
+
+                subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
+
+            $.ajax ({
+                type: 'POST',
+                url: "{{url_for('portal.invite')}}",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: {'subject': subject, 'recipients': email, 'body': body}
+            }).done(function(data) {
+                $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
+            }).fail(function() {
+                $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+            });
         });
      });</script>
     {%- endif -%}
@@ -511,13 +551,13 @@
                     url: '/api/user/' + {{person.id}} + '/password_reset',
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8'
                 }).done(function(data) {
-                    $('#passwordResetMessage').text('Password reset email sent to ' + email);
+                    $('#passwordResetMessage').text('{%trans%}Password reset email sent to {%endtrans%}' + email);
                 }).fail(function() {
                     console.log('failed request');
-                    $('#passwordResetMessage').text('Unable to send email.');
+                    $('#passwordResetMessage').text('{%trans%}Unable to send email.{%endtrans%}');
                 });
             } else {
-                $('#passwordResetMessage').text('No email address found for user');
+                $('#passwordResetMessage').text('{%trans%}No email address found for user{%endtrans%}');
             };
         });
     });
@@ -529,25 +569,28 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div id="userOrgs" class="customized">
-           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
            <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
-           <div class="state-selector-container"><select id="stateSelector" class="form-control"></select></div>
+           <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
            <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-               <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
-               <div class="main-state-container">
-                    <div class="noOrg-container" style="display: none">
-                        <label>
-                            <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
-                            <span>{{ _("None of the Above") }}</span>
-                        </label>
-                    </div>
+               <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+               <div class="main-state-container selector-show">
                </div>
            </div>
-           <div id="userOrgsInfo" class="text-muted">No clinic found in selected clinic.</div>
+            <div class="noOrg-container" style="display: none">
+                <label>
+                    <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
+                    <span>{{ _("None of the Above") }}</span>
+                </label>
+            </div>
+           <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
            <div id="defaultConsentContainer"></div>
            {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
     </div>
+    <div class="get-orgs-error error-message"></div>
+    <div class="get-demo-error error-message"></div>
+    <div class="put-demo-error error-message"></div>
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         function handleCheckedItem() {
@@ -557,19 +600,6 @@
                 $(".clinic-prompt").show();
             };
         };
-        function hasChildrenOrgs(orgId, data) {
-            if (hasValue(orgId) && hasValue(data)) {
-                var parentId, hasChildren = false;
-                data.forEach(function(item) {
-                    if (!hasChildren) {
-                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                        hasChildren = (parentId == orgId);
-                    };
-
-                });
-                return hasChildren;
-            } else return false;
-        }
         $(function () {
             $("#stateSelector").on("change", function() {
                 var selectedState = $(this).find("option:selected"), container = $("#" + selectedState.val() + "_container");
@@ -588,12 +618,6 @@
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
-                            {% if person %}
-                                var checkedItem = container.find("input[name='organization']:checked");
-                                if (checkedItem.length > 0) {
-                                   checkedItem.trigger("click");
-                                };
-                            {% endif %}
                         } else {
                             $(".state-container, .clinic-prompt, .noOrg-container").hide();
                             $("#userOrgsInfo").show();
@@ -611,54 +635,82 @@
             }).done(function(data) {
                 if (data && data.entry) {
                   var entry = data.entry, states = {};
+
+                  /**** draw state select element first to gather all states
+                        assign orgs to each state in array
+                  ***/
                   entry.forEach(function(item) {
                     var __state = "";
                     if (item.identifier) {
                         (item.identifier).forEach(function(region) {
-                            if (region.system === "http://us.truenth.org/identity-codes/practice-region" && region.value) {
+                            if (region.system === SYSTEM_IDENTIFIER_ENUM["practice_region"] && region.value) {
                                 __state = (region.value).split(":")[1];
                                 if (!states[__state]) {
                                     $("#stateSelector").append("<option value='" + __state + "'>" + stateDict[__state] + "</option>");
-                                    if ($("#" + __state + "_container").length == 0) $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
-                                    states[__state] = true;
-                                };
-                                if (parseInt(item.id) != 0) {
-                                    var parentId;
-                                    if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
-                                    else {
-                                        //need to check if it is a parent org and whether it has child org or not
-                                        var c = hasChildrenOrgs(item.id, entry);
-                                        if (!c) parentId = item.id;
-                                    }
-                                    if (parentId) {
-                                        $("#" + __state + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + __state + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>" + item.name + "</label></div>");
-                                    };
-                                };
+                                    $("#userOrgs .main-state-container").prepend("<div id='" + __state + "_container' state='" + __state + "' class='state-container'></div>");
+                                    states[__state] = [item.id];
+                                } else (states[__state]).push(item.id);
                             };
                         });
                     };
+                  });
 
+                  /**** draw input element(s) that belongs to each state based on parent organization id ***/
+                  entry.forEach(function(item) {
+                    if (parseInt(item.id) != 0) {
+                        var parentId;
+                        if (item.partOf) parentId = (item.partOf.reference).split("/")[2];
+                        else parentId = item.id;
+                        if (parentId) {
+                            var parentState = (function(o) {
+                                var s = "", found = false;
+                                for (var state in states) {
+                                    if (!found) {
+                                        (states[state]).forEach(function(i) {
+                                            if (i == o) {
+                                               s = state;
+                                               found = true;
+                                            };
+                                        });
+                                    };
+                                };
+                                return s;
+                            })(parentId);
+                            if ($("#" + parentState + "_container").length > 0) {
+                                $("#" + parentState + "_container").append("<div class='radio'><label><input class='clinic' type='radio' id='" + item.id + "_org' value='" + item.id + "' state='" + parentState + "' name='organization' data-parent-name='" + item.name + "' data-parent-id='" + parentId + "'>{%trans%}" + item.name + "{%endtrans%}</label></div>");
+                            };
+                        };
+                    };
                   });
 
                   var selectOptions = $("#stateSelector").sortOptions();
-                  $("#stateSelector").empty().append(selectOptions)
-                  .append("<option value='none'>Other</option>")
-                  .prepend("<option value='' selected>Select</option>")
-                  .val("");
-                  $(".state-container, .clinic-prompt").hide();
-                  setTimeout("OT.handlePreSelectedClinic();", 200);
-                  //case of pre-selected clinic, need to check if any clinic has prechecked
-                  setTimeout("handleCheckedItem();", 500);
+                  if (selectOptions.length > 0) {
+                      $("#stateSelector").empty().append(selectOptions)
+                      .append("<option value='none'>Other</option>")
+                      .prepend("<option value='' selected>Select</option>")
+                      .val("");
+                      $(".state-container, .clinic-prompt").hide();
+                      setTimeout("OT.handlePreSelectedClinic();", 200);
+                      //case of pre-selected clinic, need to check if any clinic has prechecked
+                      setTimeout("handleCheckedItem();", 500);
 
-                  OT.populateOrgsList(entry);
-                  $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).val() != 0) OT.getDefaultModal(this);
-                  });
+                      OT.populateOrgsList(entry);
+                      $("#userOrgs input[name='organization']").each(function() {
+                        if ($(this).val() != 0) OT.getDefaultModal(this);
+                      });
 
-                  {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                  OT.handleEvent();
+                      {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                      OT.handleEvent();
+                    } else { // if no states found, then need to draw the orgs UI
+                        $("#userOrgs .selector-show").hide();
+                        setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
+                            OT.filterOrgs(OT.getHereBelowOrgs());
+                            OT.morphPatientOrgs();
+                            $(".noOrg-container, .noOrg-container *").show();
+                        }); }, 500);
+                    };
 
-                  {% if consent_agreements %}if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
+                  if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
                 };
 
             }).fail(function() {
@@ -684,6 +736,9 @@
             <div class="help-block with-errors"></div>
         </div>
     </div>
+    <div class="get-orgs-error error-message"></div>
+    <div class="get-demo-error error-message"></div>
+    <div class="put-demo-error error-message"></div>
     <script>
         var CONSENT_WITH_TOP_LEVEL_ORG = {% if config.CONSENT_WITH_TOP_LEVEL_ORG %}true{% else %}false{% endif %};
         var ORG_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
@@ -702,22 +757,12 @@
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-                var userOrgs = $("#userOrgs input[name='organization']");
-                var checkedOrgs = {};
-                userOrgs.each(function() {
-                    if ($(this).prop("checked")) {
-                        checkedOrgs[$(this).val()] = true;
-                    };
-                    $(this).attr("type", "radio");
-                    if (checkedOrgs[$(this).val()]) {
-                        $(this).prop("checked", true);
-                    };
-                });
+               OT.morphPatientOrgs();
             {%- endif -%}
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
-            {% if consent_agreements %}setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);{% endif %}
+            setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
         };
     </script>
 {%- endmacro %}
@@ -731,22 +776,25 @@
                     <h4 class="modal-title">{{ _("Consent to share information") }}</h4>
                     </div>
                     <div class="modal-body">
-                    <h4>Terms</h4>
-                    <div class="terms-container">{{consent_agreement.asset|safe}}</div>
-                    <br/>
-                    <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
-                    <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
-                      <label class="radio-inline">
-                          <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
-                          {{ _("Yes") }}
-                      </label>
-                      <br/>
-                      <label class="radio-inline">
-                          <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
-                          {{ _("No") }}
-                      </label>
-                    </div>
-                    <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
+                        <div class="terms-wrapper">
+                            <h4>Terms</h4>
+                            <div class="terms-container">{{consent_agreement.asset|safe}}</div>
+                        </div>
+                        <input type="hidden" class="agreement-url" value="{{consent_agreement.url|safe}}" />
+                        <br/>
+                        <p>{{_("I consent to sharing information with the ")}}<span class="consent-clinic-name">{{consent_agreement.organization_name}}.</span></p>
+                        <div id="{{org}}_consentAgreementRadioList" class="profile-radio-list">
+                          <label class="radio-inline">
+                              <input type="radio" name="toConsent" id="{{org}}_consent_yes" data-org="{{org}}" value="yes"/>
+                              {{ _("Yes") }}
+                          </label>
+                          <br/>
+                          <label class="radio-inline">
+                              <input type="radio" name="toConsent" id="{{org}}_consent_no" data-org="{{org}}"  value="no"/>
+                              {{ _("No") }}
+                          </label>
+                        </div>
+                        <div id="{{org}}_consentAgreementMessage" class="error-message"></div>
                      </div>
                      <br/>
                      <div class="modal-footer" >
@@ -756,6 +804,14 @@
                 </div>
             </div>
         </div>
+        <script>
+            $(function() {
+                (function() {
+                    var agreement_url = "{{consent_agreement.url}}";
+                    if (/stock\-org\-consent/.test(agreement_url)) $(".terms-wrapper").hide();
+                })();
+            });
+        </script>
     {%- endif -%}
 {%- endmacro %}
 {% macro consent(person, consent_agreements, current_user, includeModal) -%}
@@ -769,14 +825,14 @@
                    {%- endif -%}
                 {%- endfor -%}
             {%- endif -%}
-            <div class="error-message"></div>
+            <div class="get-consent-error error-message"></div>
         </div>
         <script>
             $(function() {
                 $("#consentContainer input[name='toConsent']").each(function() {
                     $(this).on("click", function(e) {
                         e.stopPropagation();
-                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true).hide();
+                        $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", true);
                         var orgId = $(this).attr("data-org");
                         $("#" + orgId + "_loader").show();
                         if ($(this).val() == "yes") {
@@ -806,12 +862,14 @@
                             assembleContent.demo(userId ,true, $("#userOrgs input[name='organization']:checked"), true);
                         };
                     });
-                    $(this).on("shown.bs.modal", function() {
+                    $(this).on("show.bs.modal", function() {
                         $("#consentContainer .loading-message-indicator").hide();
                         $("#consentContainer button.btn-consent-close, #consentContainer button[data-dismiss]").attr("disabled", false).show();
                         $("#consentContainer input[name='toConsent']").each(function(){
                             $(this).prop("checked", false);
                         });
+                        var agreement_url = $(this).find(".agreement-url").val();
+                        if (/stock\-org\-consent/.test(agreement_url)) $(".terms-container").hide();
                     });
                 });
             });
@@ -838,6 +896,8 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
+                    item["filename"] = escapeHtml(item["filename"]);
+                    item["document_type"] = escapeHtml(item["document_type"]);
                     item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
@@ -863,12 +923,6 @@
                     undefinedText: '--',
                     columns: [
                         {
-                            field: 'user_id',
-                            title: 'User',
-                            width: '5%',
-                            sortable: true,
-                            searchable: true
-                        }, {
                             field: 'filename',
                             title: 'Filename',
                             searchable: true,
@@ -899,26 +953,28 @@
                     ]
                 } );
             } else {
-                $("#patientReportErrorMessage").text("No patient report found.").removeClass("error-message");
+                $("#patientReportErrorMessage").text("{%trans%}No reports available.{%endtrans%}").removeClass("error-message");
             }
 
         }).fail(function() {
             $("#profilePatientReportTable").closest("div.profile-item-container").hide();
-            $("#patientReportErrorMessage").text("Problem retrieving patient reports from server.").addClass("error-message");
+            $("#patientReportErrorMessage").text("{%trans%}Problem retrieving reports from server.{%endtrans%}").addClass("error-message");
         });
      });</script>
 {%- endmacro %}
 
-{% macro profileConsent(person, current_user, terms) -%}
+{% macro profileConsent(person, current_user) -%}
     {% if person %}
-    <div id="profileConsentList"></div>
+    <div id="profileConsentList">{{_("No information available.")}}</div>
+    <div class="get-consent-error error-message"></div>
+    <div class="set-consent-error error-message"></div>
+    <div class="delete-consent-error error-message"></div>
     <script>
         var CONSENT_EDIT_PERMISSIBLE_ROLES = {% if config.CONSENT_EDIT_PERMISSIBLE_ROLES %}{{ config.CONSENT_EDIT_PERMISSIBLE_ROLES|safe }}{% else %}false{% endif %};
         var consentEditable = {% if (current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or current_user.has_role(ROLE.ADMIN) %}true{% else %}false{% endif %};
-        var isTestPatient = {%-if person and person.has_role(ROLE.TEST) and person.id != current_user.id-%}true{%-else-%}false{%-endif-%};
+        var isTestPatient = {% if current_user and not current_user.has_role(ROLE.PATIENT) %}'{{config.get("SYSTEM.TYPE")}}'.toUpperCase() != "PRODUCTION"{% else %}false{% endif %};
         var _isAdmin = {%if current_user.has_role(ROLE.ADMIN) %}true{%else%}false{%endif%};
-
-        /**** this function is used when this section becomes editable ****/
+        /**** this function is used when this section becomes editable, note: this is called after the user has edited the consent list; this will refresh the list ****/
         function reloadConsentList() {
             var eventLoading = '<div id="consentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>';
             $("#profileConsentList").animate({opacity: 0}, function() {
@@ -951,7 +1007,7 @@
             if (obj) {
                 var f = $(obj).parent().find('.second');
                 f.toggleClass('hide');
-                $(obj).text($(obj).text() ==='More...' ? 'Less...': 'More...');
+                $(obj).text($(obj).text() ==='{%trans%}More...{%endtrans%}' ? '{%trans%}Less{%endtrans%}...': '{%trans%}More{%endtrans%}...');
             }
         };
         $(function () {
@@ -972,10 +1028,11 @@
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
                         item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
+                        item["comment"] = escapeHtml(item["comment"]);
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
-                        item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>More...</sub>") : item["comment"];
+                        item["comment"] = c.length > len ? (c.substring(0, len+1) + "<span class='second hide'>" + c.substr(len+1) + "</span><br/><sub onclick='_showText(this)' class='pointer text-muted'>{%trans%}More{%endtrans%}}...</sub>") : item["comment"];
                         fData.push(item);
                     });
 
@@ -1011,7 +1068,7 @@
                                 sortable: true
                             }, {
                                 field: 'lastUpdated',
-                                title: "{%trans%}Date/Time <span class='gmt'> (GMT), Y-M-D</span>{%endtrans%}",
+                                title: "{%trans%}Date/Time{%endtrans %} <span class='gmt'> {%trans%}(GMT), Y-M-D{%endtrans%}</span>",
                                 sortable: true,
                                 searchable: true,
                                 /******
@@ -1030,12 +1087,12 @@
                         ]
                     } );
                 } else {
-                    $("#profileAuditLogErrorMessage").text("No audit log item found.");
+                    $("#profileAuditLogErrorMessage").text("{%trans%}No audit log item found.{%endtrans%}");
                 }
 
 
             }).fail(function() {
-                $("#profileAuditLogErrorMessage").text("Problem retrieving audit log from server.");
+                $("#profileAuditLogErrorMessage").text("{%trans%}Problem retrieving audit log from server.{%endtrans%}");
             });
          });</script>
      {% endif %}
@@ -1047,6 +1104,9 @@
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
         <div class="form-group" id="rolesGroup" data-loader-container="true"></div>
+        <div class="get-roles-error error-message"></div>
+        <div class="put-roles-error error-message"></div>
+        <div class="delete-roles-error error-message"></div>
     {% endif %}
     {% if person %}
     <script>
@@ -1101,12 +1161,12 @@
                         $("#gmtText").show();
                         if (instrumentId) {
                             var reportLink = '/patients/sessionReport/' + sessionUserId + '/' + instrumentId + "/" + authoredDate;
-                            sessionListHTML += '<tr title="Click to view report"  ' +
+                            sessionListHTML += '<tr title="{%trans%}Click to view report{%endtrans%}"  ' +
                                                 (index % 2 != 0 ? 'class="odd"': 'class="even"') + '>' +
                                                 [entry['questionnaire']['display'],
                                                  entry['status'],
                                                  tnthDates.formatDateString(entry['authored'], "iso")].map(function(o) {
-                                                    return  '<td><a href="' + reportLink + '">' + o + '</a></td>'
+                                                    return  '<td><a href="' + reportLink + '">{%trans%}' + o + '{%endtrans%}</a></td>'
                                                  }).join('') +
                                                  '</tr>';
                         };
@@ -1116,13 +1176,13 @@
 
                 } else {
                     $("#userSessionListTable").hide();
-                    $("#userSessionsListContainer").prepend("<span class='text-muted'>No questionnaire data found.</span>");
+                    $("#userSessionsListContainer").prepend("<span class='text-muted'>{%trans%}No questionnaire data found.{%endtrans%}</span>");
                 };
 
             }).fail(function() {
                 console.log("Problem retrieving session data from server.");
                 $("#userSessionListTable").hide();
-                $("#profileSessionListError").html("Problem retrieving session data from server.");
+                $("#profileSessionListError").html("{%trans%}Problem retrieving session data from server.{%endtrans%}");
             });
 
     });
@@ -1159,12 +1219,12 @@
                         });
 
                         if (!entry) entry = entries[0];
-                        var reportHTML = '<caption><hr/><span class="profile-item-title">' +
+                        var reportHTML = '<caption><hr/><span class="profile-item-title">{%trans%}' +
                                         entries[0]['questionnaire']['display'] +
-                                        '</span><br/><span class="text-muted smaller-text">Last Updated - ' +
+                                        '{%endtrans%}</span><br/><span class="text-muted smaller-text">{%trans%}Last Updated{%endtrans%} - ' +
                                         tnthDates.formatDateString(sessionAuthoredDate, "iso") +
-                                         " <span class='gmt'>(GMT, Y-M-D)</span>" + '</span><hr/></caption>';
-                        reportHTML += '<tr><TH>Question</TH><TH>Response</TH></tr>';
+                                         " <span class='gmt'>{%trans%}(GMT, Y-M-D){%endtrans%}</span>" + '</span><hr/></caption>';
+                        reportHTML += '<tr><TH>{%trans%}Question{%endtrans%}</TH><TH>{%trans%}Response{%endtrans%}</TH></tr>';
                         entry['group']['question'].forEach(function(entry) {
                             var q = entry['text'] ? entry['text'] : '', a = '', qcNeeded = true;
                             if (hasValue(q)) {
@@ -1178,7 +1238,7 @@
                                 });
                             };
                             if (!hasValue(q)) q = entry['linkId'];
-                            reportHTML += '<tr><td>' + (hasValue(q)? q: "--") + '</td><td>' + (String(a) !== 'undefined' ? a : '--') + '</td></tr>';
+                            reportHTML += '<tr><td>{%trans%}' + (hasValue(q)? q: "--") + '{%endtrans%}</td><td>{%trans%}' + (String(a) !== 'undefined' ? a : '--') + '{%endtrans%}</td></tr>';
                         });
                         $("#userSessionReportDetailTable").append(reportHTML);
 
@@ -1186,7 +1246,6 @@
                     //console.log(data);
 
                 }).fail(function(xhr) {
-                    console.log("Problem retrieving session data from server.");
                     $(".report-error-message").show();
                     $(".report-error-message").append("<br/>" + xhr.responseText);
 
@@ -1261,6 +1320,9 @@
                 <div id="patientQContainer" class="edit-container">
                     {{patientQGroup(current_user)}}
                 </div>
+                <div class="get-clinical-error error-message"></div>
+                <div class="put-clinical-error error-message"></div>
+                <div class="post-clinical-error error-message"></div>
             </div>
         </div>
     </div>
@@ -1291,7 +1353,10 @@
                 $("#patientQ input[type='radio']").each(function() {
                     $(this).attr("disabled", "disabled");
                 });
-                $("#biopsyDate").attr("disabled", true);
+                //$("#biopsyDate").attr("disabled", true);
+                $("#biopsy_day, #biopsy_month, #biopsy_year").each(function() {
+                    $(this).attr("disabled", true);
+                });
             {% endif %}
 
             {% if person %}
@@ -1306,8 +1371,8 @@
                         if (toCall == "biopsy") {
                             if ($("#biopsyDate").val() == "") return true;
                             else {
-                              $("#biopsyDate").datepicker("hide").blur();
-                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": tnthDates.formatDateString($("#biopsyDate").val(), "mm/dd/yyyy")});
+                              //$("#biopsyDate").datepicker("hide").blur();
+                              tnthAjax.postClinical({{person.id}}, toCall, toSend, "", $(this), {"issuedDate": $("#biopsyDate").val()});
                             };
                         };
                         thisItem.parents(".pat-q").nextAll().fadeIn();
@@ -1390,30 +1455,30 @@
         <label>Time Zone</label>
         <select class="form-control" id="profileTimeZone" data-save-container-id="profileTimeZoneGroup">
             <option value="UTC">-- Select --</option>
-            <option value="America/Denver">America/Denver</option>
-            <option value="America/Los_Angeles">America/Los Angeles</option>
-            <option value="America/Indianapolis">America/Indianapolis</option>
-            <option value="America/New_York">America/New York</option>
-            <option value="Australia/Adelaide">Australia/Adelaide</option>
-            <option value="Australia/Brisbane">Australia/Brisbane</option>
-            <option value="Australia/Broken_Hill">Australia/Broken_Hill</option>
-            <option value="Australia/Canberra">Australia/Canberra</option>
-            <option value="Australia/Currie">Australia/Currie</option>
-            <option value="Australia/Darwin">Australia/Darwin</option>
-            <option value="Australia/Eucla">Australia/Eucla</option>
-            <option value="Australia/Hobart">Australia/Hobart</option>
-            <option value="Australia/Lindeman">Australia/Lindeman</option>
-            <option value="Australia/Lord_Howe">Australia/Lord_Howe</option>
-            <option value="Australia/Melbourne">Australia/Melbourne</option>
-            <option value="Australia/North">Australia/North</option>
-            <option value="Australia/Perth">Australia/Perth</option>
-            <option value="Australia/Queensland">Australia/Queensland</option>
-            <option value="Australia/South">Australia/South</option>
-            <option value="Australia/Sydney">Australia/Sydney</option>
-            <option value="Australia/Tasmania">Australia/Tasmania</option>
-            <option value="Australia/Victoria">Australia/Victoria</option>
-            <option value="Australia/West">Australia/West</option>
-            <option value="Australia/Yancowinna">Australia/Yancowinna</option>
+            <option value="America/Denver">{{_("America/Denver")}}</option>
+            <option value="America/Los_Angeles">{{_("America/Los Angeles")}}</option>
+            <option value="America/Indianapolis">{{_("America/Indianapolis")}}</option>
+            <option value="America/New_York">{{_("America/New York")}}</option>
+            <option value="Australia/Adelaide">{{_("Australia/Adelaide")}}</option>
+            <option value="Australia/Brisbane">{{_("Australia/Brisbane")}}</option>
+            <option value="Australia/Broken_Hill">{{_("Australia/Broken_Hill")}}</option>
+            <option value="Australia/Canberra">{{_("Australia/Canberra")}}</option>
+            <option value="Australia/Currie">{{_("Australia/Currie")}}</option>
+            <option value="Australia/Darwin">{{_("Australia/Darwin")}}</option>
+            <option value="Australia/Eucla">{{_("Australia/Eucla")}}</option>
+            <option value="Australia/Hobart">{{_("Australia/Hobart")}}</option>
+            <option value="Australia/Lindeman">{{_("Australia/Lindeman")}}</option>
+            <option value="Australia/Lord_Howe">{{_("Australia/Lord_Howe")}}</option>
+            <option value="Australia/Melbourne">{{_("Australia/Melbourne")}}</option>
+            <option value="Australia/North">{{_("Australia/North")}}</option>
+            <option value="Australia/Perth">{{_("Australia/Perth")}}</option>
+            <option value="Australia/Queensland">{{_("Australia/Queensland")}}</option>
+            <option value="Australia/South">{{_("Australia/South")}}</option>
+            <option value="Australia/Sydney">{{_("Australia/Sydney")}}</option>
+            <option value="Australia/Tasmania">{{_("Australia/Tasmania")}}</option>
+            <option value="Australia/Victoria">{{_("Australia/Victoria")}}</option>
+            <option value="Australia/West">{{_("Australia/West")}}</option>
+            <option value="Australia/Yancowinna">{{_("Australia/Yancowinna")}}</option>
         </select>
     </div>
     <div class="timezone-warning"></div>
@@ -1488,7 +1553,8 @@
                         </div>
                     </div>
                 </div>
-                <div id="errorDeathDate" class="error-message"></div>
+                <div id="errorDeathDate" class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
             </div>
         </div>
     </div>
@@ -1526,9 +1592,9 @@
                                     if (iy < 1900) errorMsg = "Year must be after 1900";
                                     // Only allow if birthdate is before today
                                     if (date.setHours(0,0,0,0) > today.setHours(0,0,0,0)) {
-                                        errorMsg = "The date must not be in the future.";
+                                        errorMsg = "{%trans%}The date must not be in the future.{%endtrans%}";
                                     };
-                                } else errorMsg = "Invalid Date. Please enter a valid date.";
+                                } else errorMsg = "{%trans%}Invalid Date. Please enter a valid date.{%endtrans%}";
 
                                 if (errorMsg == "") {
                                     $("#deathDate").val(y.val()+"-"+m.val()+"-"+d.val());
@@ -1546,10 +1612,17 @@
         );
     </script>
 {%- endmacro %}
-{% macro profileStudyID(person) -%}
+{% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">Study ID</label>
-        <input type="text" id="profileStudyId" class="form-control" required/>
+        <label class="text-muted">{{_("Study ID")}}</label>
+        <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
+        <div class="help-block with-errors"></div>
+    </div>
+{%- endmacro %}
+{% macro profileSiteID(current_user) -%}
+    <div id="profileSiteIDContainer" class="form-group" data-loader-container="true">
+        <label class="text-muted">{{_("Site ID")}}</label>
+        <input type="text" id="profileSiteId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
     </div>
 {%- endmacro %}
@@ -1574,6 +1647,7 @@
                  <div class="profile-item-container custom-container-item">
                     <h4 id="customEnterManuallyLoc" class="profile-item-title index-item">{{_("Enter manually")}}</h4><br/>
                     <div class="custom-container-content enter-manual-container text-muted">{{_("Enter questionnaire responses on patient's behalf. Helpful if responses have been completed on paper.")}}</div><br/>
+                    <div id="enterManualInfoContainer" class="text-info"></div>
                     <a class="btn btn-tnth-primary custom-btn" id="assessmentLink" data-toggle="modal" data-target="#manualEntryModal">{{_("Enter manually")}}</a>
                     <div class="modal fade" id="manualEntryModal" tabindex="-1" role="dialog" aria-labelledby="assessmentLink">
                           <div class="modal-dialog" role="document">
@@ -1658,10 +1732,10 @@
                     $("#manualEntryLoader").show();
                     setTimeout(function() { window.location = winLocation;}, 100);
                 } else {
-                    $("#manualEntryMessageContainer").html("The user does not have a valid assessment link.");
+                    $("#manualEntryMessageContainer").html("{%trans%}The user does not have a valid assessment link.{%endtrans%}");
                 };
             } else {
-                $("#manualEntryMessageContainer").html("You must select a method.");
+                $("#manualEntryMessageContainer").html("{%trans%}You must select a method.{%endtrans%}");
             };
           });
 
@@ -1670,7 +1744,7 @@
           });
 
         {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
-            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("All available questionnaires have been completed.");
+            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
         {%- endif -%}
     });</script>
 {%- endmacro %}
@@ -1678,22 +1752,22 @@
   <div class="row">
         <div class="col-md-12 col-xs-12">
             <div class="profile-item-container">
-                <h4 id="interventionsLoc" class="profile-item-title index-item">Interventions</h4>
+                <h4 id="interventionsLoc" class="profile-item-title index-item">{{_("Interventions")}}</h4>
                     {% if user_interventions %}
-                        {% if user_interventions.length != 0 %}<p class="text-muted">Patient is participating in the following intervention(s): </p>{% endif %}
+                        {% if user_interventions.length != 0 %}<p class="text-muted">{{_("Patient is participating in the following intervention(s): ")}}</p>{% endif %}
                         {% for intervention in user_interventions %}
                             <div class="capitalize">{{intervention.name | replace("_", " ")}}</div>
                         {% endfor %}
-                        {% if user_interventions.length == 0 %}<div class="text-muted">None</div>{% endif %}
+                        {% if user_interventions.length == 0 %}<div class="text-muted">{{_("None")}}</div>{% endif %}
                     {% else %}
-                        <div class="text-muted">None</div>
+                        <div class="text-muted">{{_("None")}}</div>
                     {% endif %}
                 </div>
             </div>
     </div>
 {%- endmacro %}
 
-{% macro user_profile(person, current_user, consent_agreements, user_interventions, terms) -%}
+{% macro user_profile(person, current_user, consent_agreements, user_interventions) -%}
      <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="profile-item-container editable" data-sections="demo">
@@ -1702,7 +1776,6 @@
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        {% if person and person.has_role(ROLE.PATIENT) %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
@@ -1711,11 +1784,12 @@
                 <div class="edit-container">
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
-                    {%- if person and person.has_role(ROLE.PATIENT) %}{{profileStudyID(person)}}{% endif -%}
                     {{profileEmail(person)}}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 </div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
             </div>
         </div>
     </div>
@@ -1739,6 +1813,8 @@
                         {{profileIndigenous(person)|show_macro('indigenous')}}
                     </div>
                     <div class="no-data-container"></div>
+                    <div class="get-demo-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
                 </div>
             </div>
         </div>
@@ -1750,9 +1826,19 @@
                 </div>
             </div>
         </div>
+        {%- if person and person.has_role(ROLE.PATIENT) %}
+            <div class="row">
+                <div class="col-md-12 col-xs-12">
+                    <div class="profile-item-container">
+                        <h4 id="patientReportsLoc" class="profile-item-title index-item">{{ _("My Reports") }}</h4>
+                        {{patientReports(person)}}
+                    </div>
+                </div>
+            </div>
+        {%- endif %}
         {{profileClinicalQuestions(person, current_user) | show_macro('clinical_questions')}}
         {{profileProcedures(person, current_user) | show_macro('procedures')}}
-       {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
+        {%-if person.has_role(ROLE.PATIENT) and ROLE.PATIENT in config.CONSENT_EDIT_PERMISSIBLE_ROLES-%}
             <div class="row">
                 <div class="col-md-12 col-xs-12">
                     <div class="profile-item-container editable" data-sections="org">
@@ -1775,7 +1861,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{{_("My Agreement")}}</h4>
-                    {{profileConsent(person, current_user, terms)}}
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>
@@ -1798,6 +1884,8 @@
                         <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
                         <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
                     </table>
+                    <div class="get-demo-error get-locale-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
                 </div>
                 <div class="edit-container flex">
                     {{profileLocale(person)|show_macro('language')}}
@@ -1818,7 +1906,7 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions, terms) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
@@ -1840,20 +1928,25 @@
                    <table>
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
                    </table>
+
                 </div>
                 <div class="edit-container">
                     {{profileName(person)}}
                     {{profileBirthDate(person)}}
-                    {% if person.has_role('patient') %} {{profileStudyID(person)}} {% endif %}
                     {{profileEmail(person)}}
+                    {% if person.has_role('patient') %} {{profileStudyID(current_user)}} {% endif %}
+                    {% if person.has_role('patient') %} {{profileSiteID(current_user)}} {% endif %}
                     {{profilePhone(person)}}
                     {{profileAltPhone(person)}}
                 </div>
+                <div class="get-demo-error error-message"></div>
+                <div class="put-demo-error error-message"></div>
             </div>
         </div>
     </div>
@@ -1877,6 +1970,8 @@
                         {{profileIndigenous(person)|show_macro('indigenous')}}
                     </div>
                     <div class="no-data-container"></div>
+                    <div class="get-demo-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
                 </div>
             </div>
         </div>
@@ -1909,7 +2004,7 @@
                             {{resetPassword(person)}}
                         </div>
                         {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
-                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileRegistrationEmail(person)}}</div>
+                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileStaffRegistrationEmail(person)}}</div>
                         {%- endif -%}
                     </div>
                 </div>
@@ -1918,7 +2013,7 @@
     {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>
@@ -1929,7 +2024,7 @@
             <div class="col-md-12 col-xs-12">
                 <div class="profile-item-container">
                     <h4 id="consentHistoryLoc" class="profile-item-title index-item">{% if config.CONSENT_WITH_TOP_LEVEL_ORG %}{{_("Agreement to Share Clinical Information")}} {%else%}{{ _("Consent History") }} {%endif%}</h4>
-                    {{profileConsent(person, current_user, terms)}}
+                    {{profileConsent(person, current_user)}}
                 </div>
             </div>
         </div>
@@ -1984,6 +2079,8 @@
                         <tr class="locale-view"><td class="text-muted">{{_("Language")}}</td><td><div id="locale_view"></div></td></tr>
                         <tr class="timezone-view"><td class="text-muted">{{_("Time Zone")}}</td><td><div id="timezone_view"></div></td></tr>
                     </table>
+                    <div class="get-demo-error get-locale-error error-message"></div>
+                    <div class="put-demo-error error-message"></div>
                 </div>
                 <div class="edit-container flex">
                     {{profileLocale(person)|show_macro('language')}}

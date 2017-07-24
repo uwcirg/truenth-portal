@@ -138,7 +138,7 @@ class SitePersistence(object):
 
         # Add Questionnaires
         for q in Questionnaire.query.all():
-            d['entry'].append(q.as_json())
+            d['entry'].append(q.as_fhir())
 
         # Add QuestionnaireBanks
         for qb in QuestionnaireBank.query.all():
@@ -279,12 +279,13 @@ class SitePersistence(object):
         # Delete any orgs not named
         if not keep_unmentioned:
             query = Organization.query.filter(
-                ~Organization.id.in_(orgs_seen))
+                ~Organization.id.in_(orgs_seen)) if orgs_seen else []
             for org in query:
                 current_app.logger.info(
                     "Deleting organization not mentioned in "
                     "site_persistence: {}".format(org))
-            query.delete(synchronize_session=False)
+            if query:
+                query.delete(synchronize_session=False)
 
         # Questionnaires:
         qs_seen = []
@@ -295,12 +296,13 @@ class SitePersistence(object):
         # Delete any Questionnaires not named
         if not keep_unmentioned:
             query = Questionnaire.query.filter(
-                ~Questionnaire.name.in_(qs_seen))
+                ~Questionnaire.name.in_(qs_seen)) if qs_seen else []
             for q in query:
                 current_app.logger.info(
                     "Deleting Questionnaire not mentioned in "
                     "site_persistence: {}".format(q))
-            query.delete(synchronize_session=False)
+            if query:
+                query.delete(synchronize_session=False)
         # commit Questionnaires as referenced by QuestionnaireBanks
         db.session.commit()
 
@@ -313,12 +315,13 @@ class SitePersistence(object):
         # Delete any QuestionnaireBanks not named
         if not keep_unmentioned:
             query = QuestionnaireBank.query.filter(
-                ~QuestionnaireBank.name.in_(qbs_seen))
+                ~QuestionnaireBank.name.in_(qbs_seen)) if qbs_seen else []
             for qb in query:
                 current_app.logger.info(
                     "Deleting QuestionnaireBank not mentioned in "
                     "site_persistence: {}".format(qb))
-            query.delete(synchronize_session=False)
+            if query:
+                query.delete(synchronize_session=False)
 
         # Intervention details
         interventions_seen = []
@@ -330,8 +333,10 @@ class SitePersistence(object):
 
         # Delete any interventions not named
         if not keep_unmentioned:
-            for intervention in Intervention.query.filter(
-                ~Intervention.name.in_(interventions_seen)):
+            query = Intervention.query.filter(
+                ~Intervention.name.in_(interventions_seen)
+            ) if interventions_seen else []
+            for intervention in query:
                 if not exclude_interventions:
                     current_app.logger.info(
                         "Deleting Intervention not mentioned in "
@@ -352,8 +357,10 @@ class SitePersistence(object):
 
         # Delete any strategies not named
         if not keep_unmentioned:
-            for strategy in AccessStrategy.query.filter(
-                ~AccessStrategy.id.in_(strategies_seen)):
+            query = AccessStrategy.query.filter(
+                ~AccessStrategy.id.in_(strategies_seen)
+            ) if strategies_seen else []
+            for strategy in query:
                 current_app.logger.info(
                     "Deleting AccessStrategy not mentioned in "
                     "site_persistence: {}".format(strategy))
@@ -367,8 +374,9 @@ class SitePersistence(object):
 
         # Delete any AppTexts not named
         if not keep_unmentioned:
-            for apptext in AppText.query.filter(
-                ~AppText.name.in_(apptext_seen)):
+            query = AppText.query.filter(
+                ~AppText.name.in_(apptext_seen)) if apptext_seen else []
+            for apptext in query:
                 current_app.logger.info(
                     "Deleting AppText not mentioned in "
                     "site_persistence: {}".format(repr(apptext)))

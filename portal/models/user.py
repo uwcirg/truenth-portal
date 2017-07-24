@@ -29,7 +29,9 @@ from .organization import Organization, OrgTree
 import reference
 from .relationship import Relationship, RELATIONSHIP
 from .role import Role, ROLE
-from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME, TRUENTH_PROVIDER_SYSTEMS
+from ..system_uri import TRUENTH_ID, TRUENTH_USERNAME
+from ..system_uri import TRUENTH_PROVIDER_SYSTEMS
+from ..system_uri import TRUENTH_EXTERNAL_STUDY_SYSTEM
 from ..system_uri import TRUENTH_EXTENSTION_NHHD_291036
 from .telecom import ContactPoint, Telecom
 
@@ -494,8 +496,8 @@ class User(db.Model, UserMixin):
         values will be joined by ', '
 
         """
-        ext_ids = self._identifiers.filter_by(system='http://us.truenth.org/' \
-                                    'identity-codes/external-study-id')
+        ext_ids = self._identifiers.filter_by(
+            system=TRUENTH_EXTERNAL_STUDY_SYSTEM)
         if ext_ids.count():
             return ', '.join([ext_id.value for ext_id in ext_ids])
 
@@ -966,7 +968,12 @@ class User(db.Model, UserMixin):
             pre_existing = [ident for ident in self._identifiers
                             if ident.system not in internal_identifier_systems]
             for identifier in fhir['identifier']:
-                new_id = Identifier.from_fhir(identifier)
+                try:
+                    new_id = Identifier.from_fhir(identifier)
+                except KeyError, e:
+                    abort(400, "{} field not found for identifier".format(e))
+                except TypeError, e:
+                    abort(400, "invalid format for identifier {}".format(e))
                 if new_id.system in internal_identifier_systems:
                     continue
                 new_id = new_id.add_if_not_found()
@@ -998,6 +1005,11 @@ class User(db.Model, UserMixin):
             self.gender = fhir['gender'].lower()
         if 'telecom' in fhir:
             telecom = Telecom.from_fhir(fhir['telecom'])
+            if not telecom.email:
+                abort(400, "no valid email address provided")
+            if ((telecom.email != self.email) and
+                    (User.query.filter_by(email=telecom.email).count() > 0)):
+                abort(400, "email address already in use")
             self.email = telecom.email
             telecom_cps = telecom.cp_dict()
             self.phone = telecom_cps.get(('phone','mobile')) \

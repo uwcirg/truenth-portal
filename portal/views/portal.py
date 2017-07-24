@@ -1,4 +1,5 @@
 """Portal view functions (i.e. not part of the API or auth)"""
+from collections import defaultdict
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
@@ -15,19 +16,25 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
-from ..extensions import oauth, user_manager
+from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
-from ..models.app_text import AboutATMA, InitialConsent_ATMA, PrivacyATMA
-from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA
+from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
+                               StaffRegistrationEmail_ATMA)
+from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
+from ..models.auth import validate_client_origin, validate_local_origin
 from ..models.coredata import Coredata
+from ..models.fhir import CC
+from ..models.i18n import get_locale
 from ..models.identifier import Identifier
 from ..models.intervention import Intervention
 from ..models.message import EmailMessage
 from ..models.organization import Organization, OrganizationIdentifier, OrgTree, UserOrganization
+from ..models.procedure_codes import known_treatment_started
+from ..models.procedure_codes import known_treatment_not_started
 from ..models.role import Role, ROLE, ALL_BUT_WRITE_ONLY
 from ..models.user import current_user, get_user, User, UserRoles
 from ..system_uri import SHORTCUT_ALIAS
-from ..tasks import add, post_request
+from ..tasks import add, info, post_request
 from jinja2 import TemplateNotFound
 
 
@@ -44,6 +51,14 @@ def server_error(e):  # pragma: no cover
     # exception is automatically sent to log by framework
     gil = current_app.config.get('GIL')
     return render_template('500.html' if not gil else '/gil/500.html', no_nav="true", user=current_user()), 500
+
+
+@portal.before_app_request
+def assert_locale_selector():
+    # Confirm import & use of custom babel localeselector function.
+    # Necessary to import get_locale to bring into the request scope to
+    # prevent the default babel locale selector from being used.
+    assert get_locale()
 
 
 @portal.before_app_request
@@ -391,7 +406,10 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
 
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
-        assert form.user_id.data
+        if form.next_url.data:
+            validate_local_origin(form.next_url.data)
+        if not form.user_id.data:
+            abort(400, "missing user in identity challenge")
         user = get_user(form.user_id.data)
         if not user:
             abort(400, "missing user in identity challenge")
@@ -482,13 +500,28 @@ def initial_queries():
 def website_consent_script(patient_id):
     entry_method = request.args.get('entry_method', None)
     redirect_url = request.args.get('redirect_url', None)
+    if redirect_url:
+        """
+        redirect url here is the patient's assessment link
+        /api/present-assessment, so validate against local origin
+        """
+        validate_local_origin(redirect_url)
     user = current_user()
-    org = user.first_top_organization()
-    terms = get_terms(org)
+    patient = get_user(patient_id)
+    org = patient.first_top_organization()
+    """
+    NOTE, we are getting PATIENT's website consent terms here
+    as STAFF member needs to read the terms to the patient
+    """
+    terms = get_terms(org, ROLE.PATIENT)
+    top_org = patient.first_top_organization()
+    declaration_form = VersionedResource(app_text(WebsiteDeclarationForm_ATMA.
+                                                  name_key(organization=top_org)))
     return render_template(
-        'website_consent_script.html', user=user, terms=terms,
+        'website_consent_script.html', user=user,
+        terms=terms, top_organization=top_org,
         entry_method=entry_method, redirect_url=redirect_url,
-        patient_id=patient_id)
+        declaration_form=declaration_form, patient_id=patient_id)
 
 
 def get_terms(org=None, role=None):
@@ -769,6 +802,28 @@ def about():
         about_mo_editorUrl=about_mo.editor_url,
         user=current_user())
 
+
+@roles_required([ROLE.ADMIN, ROLE.STAFF_ADMIN])
+@oauth.require_oauth()
+@portal.route('/staff-registration-email/<int:user_id>')
+def staff_registration_email(user_id):
+    """Staff Registration Email Content"""
+    if user_id:
+        user = get_user(user_id)
+    else:
+        user = current_user()
+
+    org = user.first_top_organization()
+
+    try:
+        item = VersionedResource(app_text(StaffRegistrationEmail_ATMA.
+                                          name_key(organization=org)))
+    except UndefinedAppText:
+        """return no content and 204 no content status"""
+        return ('', 204)
+
+    return make_response(item.asset)
+
 @portal.route('/explore')
 def explore():
     user = current_user()
@@ -792,7 +847,11 @@ def robots():
 def contact():
     """main TrueNTH contact page"""
     user = current_user()
-    if request.method == 'GET':
+    if ((request.method == 'GET') or
+        (not user and
+         current_app.config.get('RECAPTCHA_SITE_KEY', None) and
+         current_app.config.get('RECAPTCHA_SECRET_KEY', None) and
+         not recaptcha.verify())):
         sendername = user.display_name if user else ''
         email = user.email if user else ''
         gil = current_app.config.get('GIL')
@@ -800,12 +859,17 @@ def contact():
                                email=email, user=user)
 
     sender = request.form.get('email')
+    if not sender or ('@' not in sender):
+        abort(400, "No valid sender email address provided")
     sendername = request.form.get('sendername')
     subject = u"{server} contact request: {subject}".format(
         server=current_app.config['SERVER_NAME'],
         subject=request.form.get('subject'))
+    formbody = request.form.get('body')
+    if not formbody:
+        abort(400, "No contact request body provided")
     body = u"From: {sendername}<br />Email: {sender}<br /><br />{body}".format(
-        sendername=sendername, sender=sender, body=request.form.get('body'))
+        sendername=sendername, sender=sender, body=formbody)
     recipients = current_app.config['CONTACT_SENDTO_EMAIL']
 
     user_id = user.id if user else None
@@ -869,6 +933,69 @@ def settings():
         wide_container="true"))
     response.set_cookie('SS_TIMEOUT', str(form.timeout.data), max_age=max_age)
     return response
+
+
+@portal.route('/api/settings/<string:config_key>')
+@oauth.require_oauth()
+def config_settings(config_key):
+    key = config_key.upper()
+    available = ['LR_ORIGIN', 'LR_GROUP']
+    if key in available:
+        return jsonify({key: current_app.config.get(key)})
+    else:
+        abort(400, "Configuration key '{}' not available".format(key))
+
+
+@portal.route('/reporting')
+@roles_required([ROLE.ADMIN, ROLE.ANALYST])
+@oauth.require_oauth()
+def reporting_dashboard():
+    """Executive Reporting Dashboard
+
+    Only accessible to Admins, or those with the Analyst role (no PHI access).
+
+    Usage: graphs showing user registrations and logins per day;
+           filterable by date and/or by intervention
+
+    User Stats: counts of users by role, intervention, etc.
+
+    Institution Stats: counts of users per org
+
+    Analytics: Usage stats from piwik (time on site, geographic usage,
+               referral sources for new visitors, etc)
+
+    """
+    counts = {}
+    counts['roles'] = defaultdict(int)
+    counts['patients'] = defaultdict(int)
+    counts['interventions'] = defaultdict(int)
+    counts['intervention_reports'] = defaultdict(int)
+    counts['organizations'] = defaultdict(int)
+
+    for user in User.query.filter_by(active=True):
+        for role in user.roles:
+            counts['roles'][role.name] += 1
+            if role.name == 'patient':
+                if not any((obs.codeable_concept == CC.BIOPSY
+                            and obs.value_quantity.value)
+                           for obs in user.observations):
+                    counts['patients']['pre-dx'] += 1
+                elif known_treatment_not_started(user):
+                    counts['patients']['dx-nt'] += 1
+                elif known_treatment_started(user):
+                    counts['patients']['dx-t'] += 1
+                if any((obs.codeable_concept == CC.PCaLocalized
+                        and not obs.value_quantity.value)
+                       for obs in user.observations):
+                    counts['patients']['meta'] += 1
+        for interv in user.interventions:
+            counts['interventions'][interv.description] += 1
+            if (any(doc.intervention == interv for doc in user.documents)):
+                counts['intervention_reports'][interv.description] += 1
+        for org in user.organizations:
+            counts['organizations'][org.name] += 1
+
+    return render_template('reporting_dashboard.html', counts=counts)
 
 
 @portal.route('/spec')
@@ -968,6 +1095,17 @@ def celery_test(x=16, y=16):
     return jsonify(result=result, task_id=task_id, result_url=result_url)
 
 
+@portal.route("/celery-info")
+def celery_info():
+    res = info.apply_async(())
+    context = {"id": res.task_id}
+    task_id = "{}".format(context['id'])
+    result_url = url_for('.celery_result', task_id=task_id)
+    if request.args.get('redirect-to-result', None):
+        return redirect(result_url)
+    return jsonify(task_id=task_id, result_url=result_url)
+
+
 @portal.route("/celery-result/<task_id>")
 def celery_result(task_id):
     retval = add.AsyncResult(task_id).get(timeout=1.0)
@@ -1000,3 +1138,10 @@ def stock_consent(org_name):
             </body>
         </html>""",
         org_name=org_name)
+
+
+def check_int(i):
+    try:
+        return int(i)
+    except ValueError, e:
+        abort(400, "invalid input '{}' - must be an integer".format(i))

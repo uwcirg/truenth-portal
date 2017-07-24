@@ -11,6 +11,7 @@ from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
+from .portal import check_int
 from datetime import datetime
 
 
@@ -56,6 +57,7 @@ def patients_root():
             # of each, if any
             request_org_list = set(request_org_list.split(","))
             for orgId in request_org_list:
+                check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue
                 org_list.update(OT.here_and_below_id(orgId))
@@ -167,12 +169,10 @@ def patient_profile(patient_id):
             patient.assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
                 None)
-    terms = VersionedResource(app_text(InitialConsent_ATMA.name_key()))
 
     return render_template(
         'profile.html', user=patient,
         current_user=user,
         providerPerspective="true",
         consent_agreements=consent_agreements,
-        user_interventions=user_interventions,
-        terms=terms)
+        user_interventions=user_interventions)

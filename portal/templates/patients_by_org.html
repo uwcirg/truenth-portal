@@ -62,7 +62,7 @@
         {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
             <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Filter list by site &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
+              {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
             </button>
             <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
               <div class="form-group smaller-text" id="userOrgs">
@@ -93,7 +93,8 @@
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
-                  <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field">{{ _("ID") }}</th>
+                  <!-- NOTE TrueNTH has requested its unique ID label, therefore use CSS class to hide/show label appropriately here, please see portal.css and eproms.css for details -->
+                  <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field"><span class="truenth-id-label">{{_("TrueNTH ID")}}</span><span class="eproms-id-label">{{ _("ID") }}</span></th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
@@ -123,7 +124,7 @@
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} Withdrawn {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
+                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} {{_("Withdrawn")}} {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
                       {% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
                         <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
@@ -211,8 +212,8 @@ $(document).ready(function() {
         $("#_downloadLink")[0].click();
         //$("#dataDownloadModal").modal("hide");
     } else {
-        message = (instruments == "" ? "Please choose at least one instrument.": "");
-        if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+        message = (instruments == "" ? "{{_('Please choose at least one instrument.')}}": "");
+        if (dataType == "") message += (message != "" ? "<br/>": "") + "{{_('Please choose one download type.')}}";
         $("#_downloadMessage").html(message);
     };
   });

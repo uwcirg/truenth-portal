@@ -131,7 +131,7 @@ def add_group():
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
@@ -206,7 +206,7 @@ def edit_group(group_name):
       200:
         description: successful operation
         schema:
-          id: response
+          id: response_ok
           required:
             - message
           properties:
