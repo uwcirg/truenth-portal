@@ -133,13 +133,42 @@
             $("body").attr("class", "page-home");
             setSelectedNavItem($(".side-nav-items__item--home"));
             {% if init_login_modal %} $("#modal-login-register").modal("show");{%endif%}
-            if (typeof sessionStorage != "undefined") {
+
+            var sessionStorageDefined = (typeof sessionStorage != "undefined");
+            if (sessionStorageDefined) {
               try {
                 sessionStorage.clear();
               } catch(e) {
 
               };
             };
+
+            (function () {
+              function urlCallback() {
+                  if (sessionStorageDefined) sessionStorage.setItem("kppLoaded", true);
+                  setTimeout(function() { clearCookie();}, 500);
+              };
+
+              function clearCookie() {
+                window.kp_Browser_clearCookies();
+              };
+
+              function kppInit() {
+                var loaded = sessionStorageDefined && sessionStorage.getItem("kppLoaded");
+                var isKpp = /kpp/i.test(String(navigator.userAgent));
+                if (!loaded && isKpp) {
+                   var s = document.createElement('script');
+                   s.setAttribute('src', 'http://www.kioskproapp.com/api/new/kiosk_functions.js');
+                   s.onload = urlCallback();
+                   document.getElementsByTagName("head")[0].appendChild(s);
+                } else {
+                  if (isKpp) clearCookie();
+                };
+              };
+
+              kppInit();
+
+            })();
         });
     </script>
   {% endblock %}
