@@ -865,6 +865,10 @@ def contact():
     subject = u"{server} contact request: {subject}".format(
         server=current_app.config['SERVER_NAME'],
         subject=request.form.get('subject'))
+    if len(sendername) > 255:
+        abort(400, "Sender name max character length exceeded")
+    if len(subject) > 255:
+        abort(400, "Subject max character length exceeded")
     formbody = request.form.get('body')
     if not formbody:
         abort(400, "No contact request body provided")
