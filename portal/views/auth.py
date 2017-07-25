@@ -573,6 +573,7 @@ class ClientEditForm(FlaskForm):
                 raise validators.ValidationError("Invalid URL")
 
     def validate_callback_url(form, field):
+        """Custom validation to confirm callback_url is in redirect_urls"""
         origins = form.application_origins.data.split()
         og_uris = ['{uri.scheme}://{uri.netloc}'.format(uri=urlparse(url))
                    for url in origins]

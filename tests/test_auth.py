@@ -77,6 +77,17 @@ class TestAuth(TestCase):
         client = Client.query.get('test_client')
         self.assertEquals(client.callback_url, test_url)
 
+        invalid_url = "http://invalid.org"
+        rv2 = self.client.post('/client/{0}'.format(client.client_id),
+                data=dict(callback_url=invalid_url,
+                          application_origins=origins,
+                          application_role=INTERVENTION.DEFAULT.name))
+        # 200 response, because page is reloaded with validation errors
+        self.assert200(rv2)
+
+        client = Client.query.get('test_client')
+        self.assertNotEquals(client.callback_url, invalid_url)
+
     def test_unicode_name(self):
         """Test insertion of unicode name via add_authomatic_user"""
         # Bug with unicode characters in a google user's name
