@@ -66,12 +66,12 @@ class TestAuth(TestCase):
         """Test editing a client application"""
         client = self.add_client()
         test_url = 'http://tryme.com'
-        origins =  "{} {}".format(client.application_origins, test_url)
+        origins = "{} {}".format(client.application_origins, test_url)
         self.login()
         rv = self.client.post('/client/{0}'.format(client.client_id),
                 data=dict(callback_url=test_url,
-                         application_origins=origins,
-                         application_role=INTERVENTION.DEFAULT.name))
+                          application_origins=origins,
+                          application_role=INTERVENTION.DEFAULT.name))
         self.assertEquals(302, rv.status_code)
 
         client = Client.query.get('test_client')
