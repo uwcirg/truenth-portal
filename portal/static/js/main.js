@@ -567,6 +567,7 @@ var fillContent = {
                 };
             };
         });
+        OT.drawStudyIDLabel();
         fillViews.org();
     },
     "subjectId": function(data) {
@@ -1824,6 +1825,8 @@ OrgTool.prototype.handleEvent = function() {
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
+            OT.drawStudyIDLabel();
+
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
                     assembleContent.demo(userId,true, $(this), true);
@@ -1954,6 +1957,46 @@ OrgTool.prototype.morphPatientOrgs = function() {
             $(this).prop("checked", true);
         };
     });
+};
+OrgTool.prototype.drawStudyIDLabel = function(arrParents, isTableHeader) {
+
+    /******** specific study ID label based on parent org *******/
+    /******** see story:  https://www.pivotaltracker.com/story/show/149439247 ******/
+    var self = this;
+
+    if (!arrParents) {
+        arrParents = [];
+        var selectedOrgs = self.getSelectedOrg();
+        selectedOrgs.each(function() {
+            var parentOrg = self.getTopLevelParentOrg($(this).val());
+            if (hasValue(parentOrg)) arrParents.push(parentOrg);
+        });
+    };
+
+    $(".custom-study-id-label").remove();
+
+    if (arrParents.length == 1) {
+        arrParents.forEach(function(parentOrg) {
+            if ($(".custom-study-id-label[data-org-id='" + parentOrg + "']").length == 0) {
+                var orgName = self.orgsList[parentOrg].name;
+                if (hasValue(orgName)) {
+                    var content = "<span class='custom-study-id-label' data-org-id='" + parentOrg + "'>" + $.trim(orgName + " Subject ID") + "</span>";
+                    if (isTableHeader) {
+                        $("th.profile-study-id-label .th-inner").prepend(content);
+                    } else {
+                        $(".profile-study-id-label").each(function() {
+                            $(this).prepend(content);
+                        });
+                    };
+                };
+            };
+        });
+        //if no custom study id label is drawn, then show default label
+        if ($(".custom-study-id-label").length == 0)  $(".default-study-id-label").show();
+
+    } else {
+        $(".default-study-id-label").show();
+    };
 };
 var OT = new OrgTool();
 

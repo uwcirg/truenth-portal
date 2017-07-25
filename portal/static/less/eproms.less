@@ -762,6 +762,7 @@ div.right-panel {
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+  
   div.card-view {
     display: flex;
   }
@@ -774,9 +775,9 @@ div.right-panel {
     letter-spacing: 0.1px;
     border-bottom: 1px solid #dad8d8;
   }
-  .truenth-id-label {
-    display: none;
-  }
+}
+.truenth-id-label {
+  display: none;
 }
 #adminTableToolbar {
   div.orglist-selector {
@@ -1803,10 +1804,24 @@ div.noOrg-container {
   #profileStudyIDContainer {
     margin-top: 2em;
     margin-bottom: 1em;
+    input {
+      width: 350px;
+      max-width: 100%;
+    }
   }
-  #profileStudyIDContainer input {
-    width: 350px;
-    max-width: 100%;
+  span.custom-study-id-label {
+    display: none;
+  }
+  span.default-study-id-label {
+    display: block;
+  }
+  span.custom-study-id-label[data-org-id='20000'] {
+    display: block;
+  }
+
+  span.custom-study-id-label[data-org-id='20000'] + .default-study-id-label,
+  span.custom-study-id-label[data-org-id='20000'] + .custom-study-id-label{
+    display: none;
   }
   #studyId {
     width:350px;
