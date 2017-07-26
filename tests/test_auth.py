@@ -65,15 +65,30 @@ class TestAuth(TestCase):
     def test_client_edit(self):
         """Test editing a client application"""
         client = self.add_client()
+        test_url = 'http://tryme.com'
+        origins = "{} {}".format(client.application_origins, test_url)
         self.login()
         rv = self.client.post('/client/{0}'.format(client.client_id),
-                data=dict(callback_url='http://tryme.com',
-                         application_origins=client.application_origins,
-                         application_role=INTERVENTION.DEFAULT.name))
+                data=dict(callback_url=test_url,
+                          application_origins=origins,
+                          application_role=INTERVENTION.DEFAULT.name))
         self.assertEquals(302, rv.status_code)
 
         client = Client.query.get('test_client')
-        self.assertEquals(client.callback_url, 'http://tryme.com')
+        self.assertEquals(client.callback_url, test_url)
+
+        invalid_url = "http://invalid.org"
+        rv2 = self.client.post('/client/{0}'.format(client.client_id),
+                data=dict(callback_url=invalid_url,
+                          application_origins=origins,
+                          application_role=INTERVENTION.DEFAULT.name))
+        # 200 response, because page is reloaded with validation errors
+        self.assert200(rv2)
+        error_text = 'URL host must match a provided Application Origin URL'
+        self.assertTrue(error_text in rv2.data)
+
+        client = Client.query.get('test_client')
+        self.assertNotEquals(client.callback_url, invalid_url)
 
     def test_unicode_name(self):
         """Test insertion of unicode name via add_authomatic_user"""
