@@ -1564,7 +1564,6 @@ def batch_assessment_status():
 @assessment_engine_api.route(
     '/patient/<int:patient_id>/assessment-status'
 )
-
 @oauth.require_oauth()
 def patient_assessment_status(patient_id):
     """Return to the assessment status for a given patient
