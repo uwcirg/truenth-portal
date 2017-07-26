@@ -1559,3 +1559,42 @@ def batch_assessment_status():
         results.append({'user_id': user.id, 'consents': details})
 
     return jsonify(status=results)
+
+
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment-status'
+)
+@roles_required([ROLE.STAFF, ROLE.STAFF_ADMIN, ROLE.INTERVENTION_STAFF, ROLE.ADMIN])
+@oauth.require_oauth()
+def patient_assessment_status(patient_id):
+    """Return to the assessment status for a given patient
+
+    ---
+    operationId: patient_assessment_status
+    tags:
+      - Assessment Engine
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: return current overall assessment status of given patient      
+      400:
+        description: if patient id is invalid
+
+    """
+    patient = get_user(patient_id)
+    if patient:
+        assessment_status = AssessmentStatus(user=patient)
+        assessment_overall_status = (
+                assessment_status.overall_status if assessment_status else
+                None)
+        return jsonify(assessment_status=assessment_overall_status)
+    else:
+        abort(400, "invalid patient id")
