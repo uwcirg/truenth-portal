@@ -1583,7 +1583,7 @@ def patient_assessment_status(patient_id):
       - application/json
     responses:
       200:
-        description: return current overall assessment status of given patient      
+        description: return current overall assessment status of given patient
       400:
         description: if patient id is invalid
       401:
