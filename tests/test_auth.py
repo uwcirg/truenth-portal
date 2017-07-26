@@ -84,6 +84,8 @@ class TestAuth(TestCase):
                           application_role=INTERVENTION.DEFAULT.name))
         # 200 response, because page is reloaded with validation errors
         self.assert200(rv2)
+        error_text = 'URL host must match a provided Application Origin URL'
+        self.assertTrue(error_text in rv2.data)
 
         client = Client.query.get('test_client')
         self.assertNotEquals(client.callback_url, invalid_url)
