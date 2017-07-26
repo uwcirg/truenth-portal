@@ -9,7 +9,7 @@ from ..extensions import oauth
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
 from ..models.audit import Audit
 from ..models.user import current_user, get_user
-from ..models.tou import ToU
+from ..models.tou import ToU, tou_types
 
 
 tou_api = Blueprint('tou_api', __name__, url_prefix='/api')
@@ -283,6 +283,8 @@ def accept_tou(user_id=None):
         user_id=user.id, subject_id=user.id,
         comment="ToU accepted", context='tou')
     tou_type = request.json.get('type') or 'website terms of use'
+    if tou_type not in tou_types.enums:
+        abort(400, "invalid tou type")
     organization_id = request.json.get('organization_id')
     tou = ToU(audit=audit, agreement_url=request.json['agreement_url'],
               type=tou_type, organization_id=organization_id)
