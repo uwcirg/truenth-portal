@@ -171,4 +171,3 @@ def patient_profile(patient_id):
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)
-
