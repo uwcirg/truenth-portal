@@ -1586,10 +1586,15 @@ def patient_assessment_status(patient_id):
         description: return current overall assessment status of given patient      
       400:
         description: if patient id is invalid
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
 
     """
     patient = get_user(patient_id)
     if patient:
+        current_user().check_role(permission='view', other_id=patient_id)
         assessment_status = AssessmentStatus(user=patient)
         assessment_overall_status = (
                 assessment_status.overall_status if assessment_status else
