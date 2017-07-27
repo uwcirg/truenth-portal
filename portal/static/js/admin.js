@@ -106,14 +106,15 @@ AdminTool.prototype.getData = function(userString, callback) {
                         });
         self.ajaxRequests.push(ajaxRequest);
 };
-AdminTool.prototype.loadData = function(list, callback) {
+AdminTool.prototype.loadData = function(list, callback, timeout) {
     var self = this;
     self.requestsCounter = list.length;
     $("#admin-table-error-message").text("");
     this.setLoadingMessageVis("show");
+    if (!timeout) timeout = 100;
     list.forEach(function(us) {
         try {
-          setTimeout(function() { self.getData(us, function() { if (callback) callback.call(self); }); }, 100);
+          setTimeout(function() { self.getData(us, function() { if (callback) callback.call(self); }); }, timeout);
         } catch(ex) {
           //console.log("Error request: " + ex.message);
           self.fadeLoader();
@@ -165,18 +166,18 @@ AdminTool.prototype.abortRequests = function(callback) {
       AT.ajaxRequests.forEach(function(request, index, array) {
           console.log("WTF??")
           try {
-            request.abort();
+            if (request.readyState != 4) request.abort();
           } catch(e) {
           };
           if (index == array.length -1) {
-            setTimeout(function() { if (callback) callback(); }, 100);
+            setTimeout(function() { if (callback) callback(); loader(true); }, 100);
             $("#admin-table-error-message").text("");
           };
       });
     } else {
       if (callback) callback();
     };
-    //setTimeout(function() { $("#admin-table-error-message").text("");}, 100);
+
 };
 AdminTool.prototype.getUserIdArray = function(_userIds) {
   var us = "", ct = 0, arrUsers = [];
