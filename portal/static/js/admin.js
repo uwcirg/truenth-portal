@@ -164,7 +164,6 @@ AdminTool.prototype.abortRequests = function(callback) {
    //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
    if (AT.ajaxRequests.length > 0) {
       AT.ajaxRequests.forEach(function(request, index, array) {
-          console.log("WTF??")
           try {
             if (request.readyState != 4) request.abort();
           } catch(e) {
