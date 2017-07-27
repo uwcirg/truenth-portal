@@ -1047,6 +1047,9 @@ def access_token():
               description: The authorized scopes.
 
     """
+    for field in request.form:
+        if '\0' in request.form[field]:
+            abort(400, "invalid {} string".format(field))
     return None
 
 
