@@ -173,9 +173,9 @@ $(document).ready(function() {
     {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
     //client side update of assessment status, for performance
     setTimeout("AT.updateData();", 0);
+  {% else %}
+    AT.fadeLoader();
   {% endif %}
-
-  //AT.fadeLoader();
 
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
