@@ -8,7 +8,7 @@
 <div class="row">
   <div class="col-md-7">
 
-    <form id="profileForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
+    <form id="contactForm" action="" method="post" class="tnth-form" data-toggle="validator" role="form">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <div class="form-group">
         <label for="sendername">{{ _("Name") }}</label>
@@ -39,8 +39,10 @@
         {{ recaptcha }}
       </div>
       {% endif %}
+      <div class="post-contact-response response-message error-message"></div>
       <div class="form-group">
-        <button type="submit" class="btn btn-tnth-primary btn-lg">{{ _("Send") }}</button>
+        <div class="contact-loading-indicator loading-message-indicator tnth-hide"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+        <button id="submitButton" class="btn btn-tnth-primary btn-lg">{{ _("Submit") }}</button>
       </div>
     </form>
 
@@ -52,7 +54,49 @@
   $(document).ready(function(){
     $('#profileForm').validator({
       disable: false
-    })
+    });
+    $("#submitButton").on("click", function(e) {
+        e.preventDefault();
+
+        var formData = {};
+        $("#contactForm").find("input, select, textarea").each(function() {
+            formData[$(this).attr("name")] = $(this).val() || $(this).text();
+        });
+
+        if (hasValue(formData.sendername) && hasValue(formData.body) && hasValue(formData.email)) {
+
+          var self = $(this), loadingIndicator = $(".contact-loading-indicator");
+
+          self.hide();
+          loadingIndicator.show();
+
+          $.ajax({
+              data: formData,
+              type: 'POST',
+              url: '/contact',
+              dataType: 'json',
+              success: function(response) {
+                  var msgid = response['msgid'];
+                  $('#contactForm .post-contact-response').html("");
+                  setTimeout(function() {
+                    self.show();
+                    loadingIndicator.hide();
+                    document.location = '/contact/' + String(msgid);
+                  }, 1000);
+
+              },
+              error: function(response) {
+                  var msg = $('<div></div>').html(response.responseText);
+                  var error = $('p', msg).text()
+                  $('#contactForm .post-contact-response').html(error);
+                  self.show();
+                  loadingIndicator.hide();
+              }
+          });
+      } else {
+          $('#contactForm .post-contact-response').html('{{ _("Please confirm all fields are filled.") }}');
+      };
+    });
   })
 </script>
 {% block footer %}

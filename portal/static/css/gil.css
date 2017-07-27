@@ -7704,6 +7704,22 @@ a.home--modal-link {
 .button--LR.show {
     opacity: 1;
 }
+.error-message {
+    color: #a94442;
+}
+.post-contact-response {
+    width: 300px;
+    max-width: 100%;
+    margin: 2em auto !important;
+    font-size: 1.3em;
+    color: #b7afaf;
+}
+.contact-buttons-group {
+    position relative;
+}
+.contact-buttons-group .loading-message-indicator {
+    margin-top: 1em;
+}
 @media (min-width: 1200px) {
     .home--item-container {
         width: 542px;
