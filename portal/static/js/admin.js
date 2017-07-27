@@ -165,7 +165,7 @@ AdminTool.prototype.abortRequests = function(callback) {
       AT.ajaxRequests.forEach(function(request, index, array) {
           console.log("WTF??")
           try {
-            request.abort();
+            if (request.readyState != 4) request.abort();
           } catch(e) {
           };
           if (index == array.length -1) {
