@@ -9,6 +9,7 @@
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <a href="" id="_downloadLink" target="_blank"></a>
+    <div id="patientListLoadingMessage" class="text-muted smaller-text tnth-hide text-left"> updating patient list...</div>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
       <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
@@ -160,30 +161,21 @@ var org_list = {};
 {% endif %}
 
 var AT = new AdminTool({{user.id}});
+var __patients_list = [];
 
 $(document).ready(function() {
 
-  /*****************
-  //client side update of data
-  //keep this here, in case we need to bring this back
-  //$("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
-  //    AT.updateData();
-  // });
-  //$("#adminTable").on("page-change.bs.table", function() {
-  //    if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //$("#adminTable").on("toggle.bs.table", function() {
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //setTimeout("AT.updateData();", 0);
-  ******************/
+  $("#adminTable").on("page-change.bs.table", function() {
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+  });
 
-  AT.fadeLoader();
+  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+    {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
+    //client side update of assessment status, for performance
+    setTimeout("AT.updateData();", 0);
+  {% endif %}
+
+  //AT.fadeLoader();
 
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
@@ -195,6 +187,8 @@ $(document).ready(function() {
   });
 
   $("input[data-field='id']:checkbox").hide();
+
+  $("#patientListLoadingMessage").prepend(__getLoaderHTML());
 
   {% if config.HIDE_TRUENTH_ID_FIELD %}
     (function() {
