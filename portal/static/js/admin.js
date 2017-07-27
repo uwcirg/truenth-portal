@@ -105,21 +105,25 @@ AdminTool.prototype.getData = function(userString, callback) {
         self.setLoadingMessageVis("hide");
     });
 };
-AdminTool.prototype.updateData = function() {
-  var arrUsers = this.getUserIdArray();
-  var self = this;
-  if (arrUsers.length > 0) {
-    self.requestsCounter = arrUsers.length;
-    $("#admin-table-error-message").text("");
-    loader(true);
-    arrUsers.forEach(function(us, index, array) {
+AdminTool.prototype.loadData = function(list, callback) {
+    var self = this;
+    self.requestsCounter = list.length;
+    list.forEach(function(us) {
         try {
-          setTimeout(function() { self.getData(us, function() { this.getRestData(); }); }, 0);
+          setTimeout(function() { self.getData(us, function() { callback.call(self); }); }, 0);
         } catch(ex) {
           //console.log("Error request: " + ex.message);
           self.fadeLoader();
         };
     });
+};
+AdminTool.prototype.updateData = function() {
+  var arrUsers = this.getUserIdArray();
+  var self = this;
+  if (arrUsers.length > 0) {
+    $("#admin-table-error-message").text("");
+    loader(true);
+    self.loadData(arrUsers, this.getRestData);
   } else {
     self.fadeLoader();
   };
@@ -134,20 +138,13 @@ AdminTool.prototype.updateData = function() {
 AdminTool.prototype.getRestData = function() {
    if (__patients_list.length > 0) {
     var self = this;
-    //don't need to load data for id whose data has been updated
+    //get rest of patients, don't need to load data for id whose data has been updated
     __patients_list = __patients_list.filter(function(id) {
       return !this.inArray(id, this.initUserList)
     }, self);
     var arrList = this.getUserIdArray(__patients_list);
     this.setLoadingMessageVis("show");
-    self.requestsCounter = arrList.length;
-    arrList.forEach(function(us, index, array) {
-        setTimeout(function() {
-          self.getData(us, function() {
-            this.setLoadingMessageVis("hide");
-          });
-        }, 0);
-    });
+    self.loadData(this.getUserIdArray(__patients_list), function() { this.setLoadingMessageVis("hide");});
   };
 }
 AdminTool.prototype.getInitUserList = function() {
