@@ -1756,8 +1756,19 @@
               if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
           });
 
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
-            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+        {%- if person -%}
+            $.ajax ({
+                type: "GET",
+                url: '/api/patient/{{person.id}}/assessment-status',
+                cache: false
+            }).done(function(data) {
+                if (data && (data.assessment_status).toUpperCase() == "COMPLETED") {
+                    $("#assessmentLink").attr("disabled", true); 
+                    $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+                };
+            }).fail(function() {
+               // console.log("Problem retrieving data from server.");
+            });
         {%- endif -%}
     });</script>
 {%- endmacro %}

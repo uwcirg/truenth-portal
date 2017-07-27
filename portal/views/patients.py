@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, render_template, request, current_app
+from flask import abort, Blueprint, jsonify, render_template, request, current_app
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -165,11 +165,6 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
-            assessment_status = AssessmentStatus(user=patient)
-            patient.assessment_overall_status = (
-                assessment_status.overall_status if assessment_status else
-                None)
-
     return render_template(
         'profile.html', user=patient,
         current_user=user,
