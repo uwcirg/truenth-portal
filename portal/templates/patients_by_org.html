@@ -9,7 +9,6 @@
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <a href="" id="_downloadLink" target="_blank"></a>
-    <div id="patientListLoadingMessage" class="text-muted smaller-text tnth-hide text-left"> updating patient list...</div>
     <hr/>
   {% if config.STAFF_BULK_DATA_ACCESS %}
       <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
@@ -125,10 +124,9 @@
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} {{_("Withdrawn")}} {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
+                        <td><span class="field-loading-indicator text-muted smaller-text"><i class="fa fa-spinner fa-spin"></i> loading ...</span></td>
                       {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
@@ -173,6 +171,17 @@ $(document).ready(function() {
     {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
     //client side update of assessment status, for performance
     setTimeout("AT.updateData();", 0);
+    $(document).delegate("#adminTable td", "click", function(e) {
+        e.stopPropagation();
+        //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
+        if (AT.ajaxRequests.length > 0) {
+          AT.ajaxRequests.forEach(function(request, index, array) {
+              request.abort();
+              if (index == array.length -1) $(e.target).trigger('click.bs.rowlink');
+          });
+        } else $(e.target).trigger('click.bs.rowlink');
+        setTimeout(function() { $("#admin-table-error-message").text("");}, 100);
+    });
   {% else %}
     AT.fadeLoader();
   {% endif %}
@@ -187,8 +196,6 @@ $(document).ready(function() {
   });
 
   $("input[data-field='id']:checkbox").hide();
-
-  $("#patientListLoadingMessage").prepend(__getLoaderHTML());
 
   {% if config.HIDE_TRUENTH_ID_FIELD %}
     (function() {
