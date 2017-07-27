@@ -171,16 +171,17 @@ $(document).ready(function() {
     {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
     //client side update of assessment status, for performance
     setTimeout("AT.updateData();", 0);
-    $(document).delegate("#adminTable td", "click", function(e) {
+    $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
         e.stopPropagation();
-        //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
-        if (AT.ajaxRequests.length > 0) {
-          AT.ajaxRequests.forEach(function(request, index, array) {
-              request.abort();
-              if (index == array.length -1) $(e.target).trigger('click.bs.rowlink');
-          });
-        } else $(e.target).trigger('click.bs.rowlink');
-        setTimeout(function() { $("#admin-table-error-message").text("");}, 100);
+        AT.abortRequests(function() {
+          $(e.target).trigger('click.bs.rowlink');
+        });
+    });
+    $(document).delegate("#createUserLink", "click touchstart", function(e) {
+        e.stopPropagation();
+        AT.abortRequests(function() {
+          window.location = $("#createUserLink").attr("href");
+        });
     });
   {% else %}
     AT.fadeLoader();

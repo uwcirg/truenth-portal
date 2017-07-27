@@ -158,7 +158,26 @@ AdminTool.prototype.getInitUserList = function() {
    });
    this.initUserList = _userIds;
    return _userIds;
-}
+};
+AdminTool.prototype.abortRequests = function(callback) {
+   //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
+   if (AT.ajaxRequests.length > 0) {
+      AT.ajaxRequests.forEach(function(request, index, array) {
+          console.log("WTF??")
+          try {
+            request.abort();
+          } catch(e) {
+          };
+          if (index == array.length -1) {
+            setTimeout(function() { if (callback) callback(); }, 100);
+            $("#admin-table-error-message").text("");
+          };
+      });
+    } else {
+      if (callback) callback();
+    };
+    //setTimeout(function() { $("#admin-table-error-message").text("");}, 100);
+};
 AdminTool.prototype.getUserIdArray = function(_userIds) {
   var us = "", ct = 0, arrUsers = [];
   if (!_userIds) {
@@ -250,15 +269,17 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
             if ((AT.getHereBelowOrgs()).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
             $(this).on("click touchstart", function(e) {
                 e.stopPropagation();
+                AT.abortRequests();
                 var orgsList = [];
                 $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).is(":checked")) orgsList.push($(this).val());
+                   if ($(this).is(":checked")) orgsList.push($(this).val());
                 });
-                if (orgsList.length > 0) {
+               if (orgsList.length > 0) {
                   location.replace("/patients/?org_list=" + orgsList.join(","));
-                } else location.replace("/patients");
+               } else location.replace("/patients");
             });
         });
+    
         if (ofields.length > 0) {
           $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
