@@ -124,10 +124,9 @@
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} {{_("Withdrawn")}} {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
+                        <td><span class="field-loading-indicator text-muted smaller-text"><i class="fa fa-spinner fa-spin"></i> loading ...</span></td>
                       {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
@@ -160,30 +159,33 @@ var org_list = {};
 {% endif %}
 
 var AT = new AdminTool({{user.id}});
+var __patients_list = [];
 
 $(document).ready(function() {
 
-  /*****************
-  //client side update of data
-  //keep this here, in case we need to bring this back
-  //$("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
-  //    AT.updateData();
-  // });
-  //$("#adminTable").on("page-change.bs.table", function() {
-  //    if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //$("#adminTable").on("toggle.bs.table", function() {
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //setTimeout("AT.updateData();", 0);
-  ******************/
+  $("#adminTable").on("page-change.bs.table", function() {
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+  });
 
-  AT.fadeLoader();
+  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+    {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
+    //client side update of assessment status, for performance
+    setTimeout("AT.updateData();", 0);
+    $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
+        e.stopPropagation();
+        AT.abortRequests(function() {
+          $(e.target).trigger('click.bs.rowlink');
+        });
+    });
+    $(document).delegate("#createUserLink", "click touchstart", function(e) {
+        e.stopPropagation();
+        AT.abortRequests(function() {
+          window.location = $("#createUserLink").attr("href");
+        });
+    });
+  {% else %}
+    AT.fadeLoader();
+  {% endif %}
 
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
