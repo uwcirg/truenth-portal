@@ -7,6 +7,7 @@ function AdminTool (userId) {
   this.userOrgs = [];
   this.initUserList = [];
   this.ajaxRequests = [];
+  this.ajaxAborted = false;
   OrgTool.call(this);
 };
 
@@ -33,6 +34,7 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
 };
 AdminTool.prototype.getData = function(userString, callback) {
     var self = this;
+    if (self.ajaxAborted) return false;
     var ajaxRequest = $.ajax ({
                               type: "GET",
                               url: '/api/consent-assessment-status',
@@ -96,7 +98,7 @@ AdminTool.prototype.getData = function(userString, callback) {
                             if(self.requestsCounter == 0) {
                               self.requestsCounter = 0;
                               self.fadeLoader();
-                              if (callback) callback.call(self);
+                              if (callback) setTimeout(function() { callback.call(self);}, 100);
                             };
                         }).fail(function(xhr) {
                             //console.log("request failed.");
@@ -112,11 +114,10 @@ AdminTool.prototype.loadData = function(list, callback, timeout) {
     $("#admin-table-error-message").text("");
     this.setLoadingMessageVis("show");
     if (!timeout) timeout = 100;
-    list.forEach(function(us) {
-        try {
-          setTimeout(function() { self.getData(us, function() { if (callback) callback.call(self); }); }, timeout);
+    list.forEach(function(us, index) {
+       try {
+          setTimeout(function() { self.getData(us, function() { if (callback) callback.call(self); }); }, timeout*(index+1));
         } catch(ex) {
-          //console.log("Error request: " + ex.message);
           self.fadeLoader();
         };
     });
@@ -145,7 +146,6 @@ AdminTool.prototype.getRestData = function() {
     __patients_list = __patients_list.filter(function(id) {
       return !this.inArray(id, this.initUserList)
     }, self);
-    var arrList = this.getUserIdArray(__patients_list);
     self.loadData(this.getUserIdArray(__patients_list), function() { this.setLoadingMessageVis("hide");});
   };
 }
@@ -161,16 +161,33 @@ AdminTool.prototype.getInitUserList = function() {
    return _userIds;
 };
 AdminTool.prototype.abortRequests = function(callback) {
+    var self = this;
    //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
-   if (AT.ajaxRequests.length > 0) {
-      AT.ajaxRequests.forEach(function(request, index, array) {
+   if (self.ajaxRequests.length > 0) {
+      self.ajaxAborted = true;
+      self.ajaxRequests.forEach(function(request, index, array) {
           try {
-            if (request.readyState != 4) request.abort();
+            if (request.readyState != 4) {
+                request.abort();
+            }
           } catch(e) {
           };
-          if (index == array.length -1) {
-            setTimeout(function() { if (callback) callback(); loader(true); }, 100);
-            $("#admin-table-error-message").text("");
+          if (index == array.length - 1) {
+            /*
+             * polling to see of all requests are aborted
+             */
+            var intervalId = setInterval(function() {
+                var done = true;
+                AT.ajaxRequests.forEach(function(q) {
+                  if (!q.readyState == 4) done = false;
+                });
+                if (done) {
+                  $("#admin-table-error-message").text("");
+                  if (callback) setTimeout(function() { callback();}, 100);
+                  setTimeout(function() { DELAY_LOADING=true;loader(true);}, 300);
+                  clearInterval(intervalId);
+                }
+            }, 1);
           };
       });
     } else {
@@ -187,7 +204,7 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
      if (index == (_userIds.length - 1)) {
        arrUsers.push(us);
-     } else if (ct >= 15) {
+     } else if (ct >= 10) {
         arrUsers.push(us);
         us = "";
         ct = 0;
@@ -279,7 +296,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
                } else location.replace("/patients");
             });
         });
-    
+
         if (ofields.length > 0) {
           $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {
