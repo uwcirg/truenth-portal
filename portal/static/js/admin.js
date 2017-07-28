@@ -32,9 +32,12 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
       break;
   };
 };
-AdminTool.prototype.getData = function(userString, callback) {
+var __index =0;
+AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
     if (self.ajaxAborted) return false;
+    var userString = requests.shift();
+    if (!hasValue(userString)) return false;
     var ajaxRequest = $.ajax ({
                               type: "GET",
                               url: '/api/consent-assessment-status',
@@ -90,16 +93,19 @@ AdminTool.prototype.getData = function(userString, callback) {
 
                               if (arrData.length > 0) {
                                   arrData.forEach(function(d) {
-                                    $("#adminTable").bootstrapTable('updateByUniqueId', { id: d.id, row: d.data});
+                                    setTimeout(function() { $("#adminTable").bootstrapTable('updateByUniqueId', { id: d.id, row: d.data}); }, (__index++)*150);
                                   });
                               };
                             };
-                            self.requestsCounter -= 1;
-                            if(self.requestsCounter == 0) {
-                              self.requestsCounter = 0;
+                            if (requests.length > 0) {
+                              self.getData(requests, callback);
+                            }
+                            else {
                               self.fadeLoader();
-                              if (callback) setTimeout(function() { callback.call(self);}, 100);
-                            };
+                              __index = 0;
+                              if (callback) setTimeout(function() { callback.call(self);}, 300);
+                              setTimeout(function() { $("#adminTable tr[data-uniqueid]").show(); }, 300);
+                            }
                         }).fail(function(xhr) {
                             //console.log("request failed.");
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
@@ -107,20 +113,14 @@ AdminTool.prototype.getData = function(userString, callback) {
                             self.setLoadingMessageVis("hide");
                         });
         self.ajaxRequests.push(ajaxRequest);
+        return ajaxRequest;
 };
 AdminTool.prototype.loadData = function(list, callback, timeout) {
     var self = this;
-    self.requestsCounter = list.length;
     $("#admin-table-error-message").text("");
     this.setLoadingMessageVis("show");
     if (!timeout) timeout = 100;
-    list.forEach(function(us, index) {
-       try {
-          setTimeout(function() { self.getData(us, function() { if (callback) callback.call(self); }); }, timeout*(index+1));
-        } catch(ex) {
-          self.fadeLoader();
-        };
-    });
+    self.getData(list, function() { if (callback) callback.call(self); });
 };
 AdminTool.prototype.updateData = function() {
   var arrUsers = this.getUserIdArray();
@@ -200,11 +200,13 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
   if (!_userIds) {
      _userIds = this.getInitUserList();
   };
+  var max_ct = Math.max(__patients_list.length/10, 25);
+
   for (var index = 0; index < _userIds.length; index++, ct++) {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
      if (index == (_userIds.length - 1)) {
        arrUsers.push(us);
-     } else if (ct >= 10) {
+     } else if (ct >= max_ct) {
         arrUsers.push(us);
         us = "";
         ct = 0;
