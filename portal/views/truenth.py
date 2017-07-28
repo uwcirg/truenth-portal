@@ -7,7 +7,7 @@ from ..audit import auditable_event
 from ..extensions import oauth
 from ..csrf import csrf
 from .crossdomain import crossdomain
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.user import current_user
 
 truenth_api = Blueprint('truenth_api', __name__, url_prefix='/api')
@@ -135,7 +135,7 @@ def portal_wrapper_html():
     login_url = request.args.get('login_url')
     if login_url and not user:
         try:
-            validate_client_origin(login_url)
+            validate_origin(login_url)
         except Unauthorized:
             current_app.logger.warning(
                 "invalid origin on login_url `%s` from referer `%s`",

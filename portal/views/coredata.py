@@ -5,7 +5,7 @@ from urlparse import parse_qsl, urlparse
 from werkzeug.exceptions import Unauthorized
 
 from ..extensions import oauth
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.user import current_user, get_user
 
@@ -171,7 +171,7 @@ def acquire():
     # Require and maintain a valid return address
     return_address = request.args.get('next')
     try:
-        validate_client_origin(return_address)
+        validate_origin(return_address)
     except Unauthorized:
         current_app.logger.warning("Unauthorized return address %s",
                                    return_address)

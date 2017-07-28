@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
 
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 
 
 def crossdomain(
@@ -58,7 +58,7 @@ def crossdomain(
         if 'Origin' in request.headers:
             use_origin = request.headers['Origin']
         if use_origin:
-            validate_client_origin(use_origin)
+            validate_origin(use_origin)
         return use_origin
 
     def get_max_age():

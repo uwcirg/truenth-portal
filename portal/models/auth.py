@@ -332,7 +332,7 @@ def save_token(token, request, *args, **kwargs):
     return tok
 
 
-def validate_client_origin(origin):
+def validate_origin(origin):
     """Validate the origin is one we recognize
 
     For CORS, limit the requesting origin to the list we know about,
