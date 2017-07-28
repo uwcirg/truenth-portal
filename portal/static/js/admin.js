@@ -98,7 +98,7 @@ AdminTool.prototype.getData = function(requests, callback) {
                               };
                             };
                             if (requests.length > 0) {
-                              setTimeout(function() { self.getData(requests, callback); }, (__index++)*10);
+                              self.getData(requests, callback);
                             }
                             else {
                               self.fadeLoader();
