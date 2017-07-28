@@ -12,7 +12,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
@@ -1424,7 +1424,7 @@ def present_assessment(instruments=None):
         next_url = request.args.get('next')
 
         # Validate next URL the same way CORS requests are
-        validate_client_origin(next_url)
+        validate_origin(next_url)
 
         current_app.logger.debug('storing session[assessment_return]: %s',
                                  next_url)

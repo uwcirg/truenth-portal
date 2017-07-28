@@ -22,7 +22,7 @@ from ..models.app_text import app_text, AppText, VersionedResource, UndefinedApp
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
                                StaffRegistrationEmail_ATMA)
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
-from ..models.auth import validate_client_origin, validate_local_origin
+from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.fhir import CC
 from ..models.i18n import get_locale
@@ -408,7 +408,7 @@ def challenge_identity(user_id=None, next_url=None, merging_accounts=False):
     if request.method == 'POST':
         form = ChallengeIdForm(request.form)
         if form.next_url.data:
-            validate_local_origin(form.next_url.data)
+            validate_origin(form.next_url.data)
         if not form.user_id.data:
             abort(400, "missing user in identity challenge")
         user = get_user(form.user_id.data)
@@ -506,7 +506,7 @@ def website_consent_script(patient_id):
         redirect url here is the patient's assessment link
         /api/present-assessment, so validate against local origin
         """
-        validate_local_origin(redirect_url)
+        validate_origin(redirect_url)
     user = current_user()
     patient = get_user(patient_id)
     org = patient.first_top_organization()
