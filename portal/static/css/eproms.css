@@ -479,7 +479,7 @@ div.right-panel {
   text-align: center;
 }
 #aboutForm #next {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 200ms ease-in;
   position: absolute;
   left: 0;
