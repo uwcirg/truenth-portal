@@ -844,7 +844,7 @@ def robots():
     if current_app.config["SYSTEM_TYPE"].lower() == "production":
         return "User-agent: * \nAllow: /"
     return "User-agent: * \nDisallow: /"
-    
+
 
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():
