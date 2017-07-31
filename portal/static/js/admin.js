@@ -8,6 +8,7 @@ function AdminTool (userId) {
   this.initUserList = [];
   this.ajaxRequests = [];
   this.ajaxAborted = false;
+  this.arrData = {};
   OrgTool.call(this);
 };
 
@@ -32,7 +33,6 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
       break;
   };
 };
-var __index =0;
 AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
     if (self.ajaxAborted) return false;
@@ -48,7 +48,6 @@ AdminTool.prototype.getData = function(requests, callback) {
                               dataType: 'json'
                           }).done(function(data) {
                                 if (data.status) {
-                                  var arrData = [];
                                   data.status.forEach(function(status) {
                                       var c = status.consents;
                                       var a = "", s = "", prevItem = {};
@@ -83,29 +82,22 @@ AdminTool.prototype.getData = function(requests, callback) {
                                             };
                                         });
                                     };
-                                    arrData.push({
-                                      "id": status.user_id,
-                                      "data": {
-                                      "status": a
-                                      }
-                                    });
+                                    if (hasValue(status.user_id)) {
+                                      var rowData = $("#adminTable").bootstrapTable('getRowByUniqueId', status.user_id);
+                                      rowData = rowData || {};
+                                      rowData["status"] = a;
+                                      self.arrData[status.user_id] = { id: status.user_id, row: rowData};
+                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]);
+                                    };
                               });
-
-                              if (arrData.length > 0) {
-                                  arrData.forEach(function(d) {
-                                    setTimeout(function() { $("#adminTable").bootstrapTable('updateByUniqueId', { id: d.id, row: d.data}); }, (__index++)*150);
-                                  });
-                              };
                             };
                             if (requests.length > 0) {
                               self.getData(requests, callback);
                             }
                             else {
                               self.fadeLoader();
-                              __index = 0;
-                              if (callback) setTimeout(function() { callback.call(self);}, 300);
-                              setTimeout(function() { $("#adminTable tr[data-uniqueid]").show(); }, 300);
-                            }
+                              if (callback) setTimeout(function() { callback.call(self);}, 150);
+                            };
                         }).fail(function(xhr) {
                             //console.log("request failed.");
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
@@ -200,7 +192,7 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
   if (!_userIds) {
      _userIds = this.getInitUserList();
   };
-  var max_ct = Math.max(__patients_list.length/10, 25);
+  var max_ct = Math.max(__patients_list.length/15, 10);
 
   for (var index = 0; index < _userIds.length; index++, ct++) {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
@@ -359,5 +351,4 @@ __setOrgsMenuHeight = function(padding) {
 __clearFilterButtons = function() {
   $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
 };
-
 
