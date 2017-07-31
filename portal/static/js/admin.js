@@ -83,9 +83,15 @@ AdminTool.prototype.getData = function(requests, callback) {
                                         });
                                     };
                                     if (hasValue(status.user_id)) {
+                                      /*
+                                       * NOTE, need to get the row data here
+                                       * data for all the fields are required for the method, updateByUniqueId
+                                       */
                                       var rowData = $("#adminTable").bootstrapTable('getRowByUniqueId', status.user_id);
                                       rowData = rowData || {};
+                                      /* update row data with updated assessment status */
                                       rowData["status"] = a;
+                                      /* persist data here, help with debugging */
                                       self.arrData[status.user_id] = { id: status.user_id, row: rowData};
                                       $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]);
                                     };
