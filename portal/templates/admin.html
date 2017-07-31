@@ -20,15 +20,17 @@
                data-page-list="[25,50,100,ALL]"
                data-toolbar="#adminTableToolbar"
                data-show-toggle="true"
+               data-show-export="true"
+               data-filter-control="true"
                data-show-columns="true">
             <thead>
             <tr>
                 <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("ID") }}</th>
-                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter">{{ _("Username") }}</th>
-                <th data-field="firstname" data-sortable="true">{{ _("First Name") }}</th>
-                <th data-field="lastname" data-sortable="true">{{ _("Last Name") }}</th>
-                <th data-field="email" data-sortable="true">{{ _("Email") }}</th>
-                <th data-field="roles" data-sortable="true">{{ _("Roles") }}</th>
+                <th data-field="username" data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-filter-control="input">{{ _("Username") }}</th>
+                <th data-field="firstname" data-sortable="true" data-filter-control="input">{{ _("First Name") }}</th>
+                <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
+                <th data-field="email" data-sortable="true" data-filter-control="input">{{ _("Email") }}</th>
+                <th data-field="roles" data-sortable="true" data-filter-control="input">{{ _("Roles") }}</th>
                 <th class="text-center"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
             </tr>
             </thead>
