@@ -132,7 +132,7 @@ var SYSTEM_IDENTIFIER_ENUM = {
     "practice_region" : "http://us.truenth.org/identity-codes/practice-region"
 };
 
-var __NOT_PROVIDED_TEXT = "";
+var __NOT_PROVIDED_TEXT = "not provided";
 
 var fillViews = {
     "org": function() {
@@ -2032,7 +2032,7 @@ var tnthAjax = {
         var params = {};
         params.subject_id = hasValue(userId)? userId : 0;
         params.page_url = hasValue(page_url) ? page_url: window.location.href;
-        params.message = hasValue(message) ? message: "Not provided";
+        params.message = hasValue(message) ? message: i18next.t("Not provided");
 
         $.ajax ({
             type: "GET",
@@ -3036,7 +3036,9 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     //setTimeout('LRKeyEvent();', 1500);
-    __i18next.init();
+    __i18next.init(function() {
+        __NOT_PROVIDED_TEXT = i18next.t("Not provided");
+    });
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({

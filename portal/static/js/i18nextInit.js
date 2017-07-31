@@ -1,6 +1,6 @@
 /*** wrapper object to initalize i18next ***/
 var __i18next = (function() {
-    function init() {
+    function init(callback) {
             if (typeof window.localStorage  != "undefined") {
                 if (window.localStorage.getItem("i18nextLng")) window.localStorage.removeItem("i18nextLng");
             };
@@ -22,15 +22,12 @@ var __i18next = (function() {
 
                      }
                   }, function(err, t) {
-                    // init set content
-                    //common constants that can be used else where
-                    __NOT_PROVIDED_TEXT = i18next.t("Not provided");
-
+                    if (callback) callback();
                   });
     };
 
     return {
-        init: function() { init(); }
+        init: function(callback) { init(callback); }
     };
 }
 )();
