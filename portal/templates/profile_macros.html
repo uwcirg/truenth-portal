@@ -14,7 +14,7 @@
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -54,15 +54,18 @@
                 var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
-                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-                        if (isValid) {
-                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                        } else {
-                            $("#birthday").val("");
-                            return false;
+                    if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {
+                        if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
+                            var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                            if (isValid) {
+                                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                                $("#errorbirthday").html("");
+                            } else {
+                                $("#birthday").val("");
+                                return false;
+                            };
                         };
-                    };
+                    } else return false;
                 });
             });
         });
@@ -98,13 +101,13 @@
     <div class="row profile-section name-section">
         <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
+                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
@@ -1614,7 +1617,7 @@
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Study ID")}}</label>
+        <label id="profileStudyIDLabel" class="text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study ID")}}</span></label>
         <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
     </div>
@@ -1743,8 +1746,19 @@
               if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
           });
 
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
-            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+        {%- if person -%}
+            $.ajax ({
+                type: "GET",
+                url: '/api/patient/{{person.id}}/assessment-status',
+                cache: false
+            }).done(function(data) {
+                if (data && (data.assessment_status).toUpperCase() == "COMPLETED") {
+                    $("#assessmentLink").attr("disabled", true); 
+                    $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+                };
+            }).fail(function() {
+               // console.log("Problem retrieving data from server.");
+            });
         {%- endif -%}
     });</script>
 {%- endmacro %}
@@ -1929,7 +1943,7 @@
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr id="studyIDViewRow" class="study-id-view"><td class="study-id-view-label text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study Id")}}</span></td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>

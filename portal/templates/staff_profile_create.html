@@ -150,6 +150,12 @@ $(document).ready(function(){
     $('#createProfileForm').validator().on('submit', function (e) {
           if (e.isDefaultPrevented()) {
                 // handle the invalid form...
+                $("input[type='text'], select").each(function() {
+                    if (!hasValue($(this).val())) {
+                        //this should display error message associated with empty field
+                        $(this).trigger("change");
+                    };
+                });
                 $("#errorMsg").fadeIn("slow");
                 return false;
           } else {

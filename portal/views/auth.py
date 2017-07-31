@@ -17,6 +17,7 @@ from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
+from urlparse import urlparse
 from validators import url as url_validation
 
 from ..audit import auditable_event
@@ -571,6 +572,17 @@ class ClientEditForm(FlaskForm):
             if not url_validation(url, require_tld=False):
                 raise validators.ValidationError("Invalid URL")
 
+    def validate_callback_url(form, field):
+        """Custom validation to confirm callback_url is in redirect_urls"""
+        origins = form.application_origins.data.split()
+        og_uris = ['{uri.scheme}://{uri.netloc}'.format(uri=urlparse(url))
+                   for url in origins]
+        if field.data:
+            cb_uri = urlparse(field.data)
+            if '{uri.scheme}://{uri.netloc}'.format(uri=cb_uri) not in og_uris:
+                raise validators.ValidationError(
+                    "URL host must match a provided Application Origin URL")
+
 
 @auth.route('/client', methods=('GET', 'POST'))
 @roles_required(ROLE.APPLICATION_DEVELOPER)
@@ -1035,6 +1047,9 @@ def access_token():
               description: The authorized scopes.
 
     """
+    for field in request.form:
+        if '\0' in request.form[field]:
+            abort(400, "invalid {} string".format(field))
     return None
 
 

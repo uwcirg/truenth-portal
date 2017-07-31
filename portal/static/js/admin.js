@@ -5,6 +5,9 @@ function AdminTool (userId) {
   this.requestsCounter = 0;
   this.userId = userId;
   this.userOrgs = [];
+  this.initUserList = [];
+  this.ajaxRequests = [];
+  this.ajaxAborted = false;
   OrgTool.call(this);
 };
 
@@ -17,143 +20,193 @@ AdminTool.prototype = Object.create(OrgTool.prototype);
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
   setTimeout('$("#loadingIndicator").fadeOut();', 300);
+  this.setLoadingMessageVis("hide");
 };
-AdminTool.prototype.getData = function(userString) {
+AdminTool.prototype.setLoadingMessageVis = function(vis) {
+  switch(vis) {
+    case "hide":
+      $("#adminTable .field-loading-indicator").fadeOut();
+      break;
+    case "show":
+      $("#adminTable .field-loading-indicator").fadeIn();
+      break;
+  };
+};
+var __index =0;
+AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
-    $.ajax ({
-        type: "GET",
-        url: '/api/consent-assessment-status',
-        contentType: "application/json; charset=utf-8",
-        data: userString,
-        cache: false,
-        timeout: 20000,
-        dataType: 'json'
-    }).done(function(data) {
-       // console.log(data);
-        if (data.status) {
-          var arrData = [];
-          data.status.forEach(function(status) {
-              var c = status.consents;
-              var a = "", s = "", prevItem = {};
-              if (c) {
-              c.forEach(function(item) {
-                  if (!item.consent.deleted && (!prevItem.consent_signed || (prevItem.assessment_status != item.assessment_status)
-                      || (String(prevItem.consent_signed).substring(0, 10) != String(item.consent.signed).substring(0, 10)))) {
-                      if (!(/null/.test(item.consent.agreement_url))) {
-                        var cl = "";
-                        var sd = tnthDates.formatDateString(item.consent.signed);
-                        var status = item.assessment_status;
-                        if (!item.consent.send_reminders) status = "withdrawn";
-                        switch(String(status).toLowerCase()) {
-                            case "completed":
-                              cl = "text-success";
-                              break;
-                            case "withdrawn":
-                              cl = "text-muted";
-                              break;
-                            case "due":
-                              cl = "text-warning";
-                              break;
-                            case "overdue":
-                              cl = "text-danger";
-                              break;
-                        };
-                        a += (a != "" ? "<br/>" : "") + "<span class='" + cl  + " small-text' style='text-transform: capitalize'>" + status + "</span>";
-                        s += (s != "" ? "<br/>" : "") + sd;
-                        prevItem.assessment_status = item.assessment_status;
-                        prevItem.consent_signed = item.consent.signed;
-                      };
-                    };
-                });
-            };
-              //console.log("user id: " + status.user_id)
-              arrData.push({
-                "id": status.user_id,
-                "data": {
-                "status": a,
-                "consentdate": s
-                }
-              });
-          });
+    if (self.ajaxAborted) return false;
+    var userString = requests.shift();
+    if (!hasValue(userString)) return false;
+    var ajaxRequest = $.ajax ({
+                              type: "GET",
+                              url: '/api/consent-assessment-status',
+                              contentType: "application/json; charset=utf-8",
+                              data: userString,
+                              cache: false,
+                              timeout: 25000,
+                              dataType: 'json'
+                          }).done(function(data) {
+                                if (data.status) {
+                                  var arrData = [];
+                                  data.status.forEach(function(status) {
+                                      var c = status.consents;
+                                      var a = "", s = "", prevItem = {};
+                                      if (c) {
+                                      c.forEach(function(item) {
+                                          if (!item.consent.deleted && (!prevItem.consent_signed || (prevItem.assessment_status != item.assessment_status)
+                                              || (String(prevItem.consent_signed).substring(0, 10) != String(item.consent.signed).substring(0, 10)))) {
+                                              if (!(/null/.test(item.consent.agreement_url))) {
+                                                var cl = "";
+                                                var sd = tnthDates.formatDateString(item.consent.signed);
+                                                var status = item.assessment_status;
+                                                if (!item.consent.send_reminders) status = "withdrawn";
+                                                switch(String(status).toLowerCase()) {
+                                                    case "completed":
+                                                      cl = "text-success";
+                                                      break;
+                                                    case "withdrawn":
+                                                      cl = "text-muted";
+                                                      break;
+                                                    case "due":
+                                                      cl = "text-warning";
+                                                      break;
+                                                    case "overdue":
+                                                      cl = "text-danger";
+                                                      break;
+                                                };
+                                                a += (a != "" ? "<br/>" : "") + "<span class='" + cl  + " small-text' style='text-transform: capitalize'>" + status + "</span>";
+                                                s += (s != "" ? "<br/>" : "") + sd;
+                                                prevItem.assessment_status = item.assessment_status;
+                                                prevItem.consent_signed = item.consent.signed;
+                                              };
+                                            };
+                                        });
+                                    };
+                                    arrData.push({
+                                      "id": status.user_id,
+                                      "data": {
+                                      "status": a
+                                      }
+                                    });
+                              });
 
-          if (arrData.length > 0) {
-            //console.log(arrData)
-            arrData.forEach(function(d) {
-               var row = $("#id_row_" + d.id);
-               if (row.length > 0) {
-                  var rindex = row.attr("data-index");
-                  var statusField = row.children(".status-field");
-                  var cdField = row.children(".consentdate-field");
-                 //console.log("status: " + statusField.length + " cdField: " + cdField.length);
-                 if (d.data.status) statusField.html(d.data.status);
-                  var cdField = row.children(".consentdate-field");
-                  if (hasValue(d.data.consentdate)) {
-                    if (cdField.find(".formatted-consent-date").length == 0) cdField.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
-                    else cdField.find(".formatted-consent-date").text(d.data.consentdate);
-                  };
-
-                 //card view
-                 var cvf = row.find(".card-view");
-                 cvf.each(function() {
-                    var ctf = $(this).find(".title");
-                    var ctv = $(this).find(".value");
-                    if ((/consent date/gi).test(ctf.text())) {
-                       if (hasValue(d.data.consentdate)) {
-                          if (ctv.find(".formatted-consent-date").length == 0) ctv.prepend("<span class='formatted-consent-date small-text'>" + d.data.consentdate + "</span>");
-                          else ctv.find(".formatted-consent-date").text(d.data.consentdate);
-                       };
-                    };
-                 });
-
-               };
-            });
-
-          };
-        };
-        //console.log("consent updated successfully.");
-        self.requestsCounter -= 1;
-        if(self.requestsCounter == 0) {
-          self.fadeLoader();
-        };
-    }).fail(function(xhr) {
-        //console.log("request failed.");
-        $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
-        self.fadeLoader();
-    });
+                              if (arrData.length > 0) {
+                                  arrData.forEach(function(d) {
+                                    setTimeout(function() { $("#adminTable").bootstrapTable('updateByUniqueId', { id: d.id, row: d.data}); }, (__index++)*150);
+                                  });
+                              };
+                            };
+                            if (requests.length > 0) {
+                              self.getData(requests, callback);
+                            }
+                            else {
+                              self.fadeLoader();
+                              __index = 0;
+                              if (callback) setTimeout(function() { callback.call(self);}, 300);
+                              setTimeout(function() { $("#adminTable tr[data-uniqueid]").show(); }, 300);
+                            }
+                        }).fail(function(xhr) {
+                            //console.log("request failed.");
+                            $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
+                            self.fadeLoader();
+                            self.setLoadingMessageVis("hide");
+                        });
+        self.ajaxRequests.push(ajaxRequest);
+        return ajaxRequest;
+};
+AdminTool.prototype.loadData = function(list, callback, timeout) {
+    var self = this;
+    $("#admin-table-error-message").text("");
+    this.setLoadingMessageVis("show");
+    if (!timeout) timeout = 100;
+    self.getData(list, function() { if (callback) callback.call(self); });
 };
 AdminTool.prototype.updateData = function() {
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
-    self.requestsCounter = arrUsers.length;
-    $("#admin-table-error-message").text("");
     loader(true);
-    arrUsers.forEach(function(us) {
-        try {
-         self.getData(us);
-        } catch(ex) {
-          //console.log("Error request: " + ex.message);
-          self.fadeLoader();
-        };
-    });
+    self.loadData(arrUsers, this.getRestData);
   } else {
     self.fadeLoader();
   };
 };
-AdminTool.prototype.getUserIdArray = function() {
-  var us = "", _userIds = [], ct = 0, arrUsers = [];
 
-  $("#adminTable tr[data-uniqueid]").each(function() {
-      var id = $(this).attr("data-uniqueid");
-      if (!isNaN(id)) {
-        _userIds.push(id);
-      };
-  });
+/*
+ *
+ *  load the rest of data asynchronously
+ *
+ */
+
+AdminTool.prototype.getRestData = function() {
+   if (__patients_list.length > 0) {
+    var self = this;
+    //get rest of patients, don't need to load data for id whose data has been updated
+    __patients_list = __patients_list.filter(function(id) {
+      return !this.inArray(id, this.initUserList)
+    }, self);
+    self.loadData(this.getUserIdArray(__patients_list), function() { this.setLoadingMessageVis("hide");});
+  };
+}
+AdminTool.prototype.getInitUserList = function() {
+   var _userIds = [];
+   $("#adminTable tr[data-uniqueid]").each(function() {
+        var id = $(this).attr("data-uniqueid");
+        if (!isNaN(id)) {
+          _userIds.push(id);
+        };
+   });
+   this.initUserList = _userIds;
+   return _userIds;
+};
+AdminTool.prototype.abortRequests = function(callback) {
+    var self = this;
+   //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
+   if (self.ajaxRequests.length > 0) {
+      self.ajaxAborted = true;
+      self.ajaxRequests.forEach(function(request, index, array) {
+          try {
+            if (request.readyState != 4) {
+                request.abort();
+            }
+          } catch(e) {
+          };
+          if (index == array.length - 1) {
+            /*
+             * polling to see of all requests are aborted
+             */
+            var intervalId = setInterval(function() {
+                var done = true;
+                AT.ajaxRequests.forEach(function(q) {
+                  if (!q.readyState == 4) done = false;
+                });
+                if (done) {
+                  $("#admin-table-error-message").text("");
+                  if (callback) setTimeout(function() { callback();}, 100);
+                  setTimeout(function() { DELAY_LOADING=true;loader(true);}, 300);
+                  clearInterval(intervalId);
+                }
+            }, 1);
+          };
+      });
+    } else {
+      if (callback) callback();
+    };
+
+};
+AdminTool.prototype.getUserIdArray = function(_userIds) {
+  var us = "", ct = 0, arrUsers = [];
+  if (!_userIds) {
+     _userIds = this.getInitUserList();
+  };
+  var max_ct = Math.max(__patients_list.length/10, 25);
+
   for (var index = 0; index < _userIds.length; index++, ct++) {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
      if (index == (_userIds.length - 1)) {
        arrUsers.push(us);
-     } else if (ct >= 10) {
+     } else if (ct >= max_ct) {
         arrUsers.push(us);
         us = "";
         ct = 0;
@@ -203,6 +256,11 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
             var hbOrgs = self.getHereBelowOrgs();
 	          self.filterOrgs(hbOrgs);
         };
+
+        if ($("#adminTable .study-id-field").length > 0) {
+          AT.drawStudyIDLabel(AT.getUserTopLevelParentOrgs(AT.getUserOrgs()), true);
+        };
+
         $("#dataDownloadModal").on('shown.bs.modal', function () {
               var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
               if (parentOrgList && parentOrgList.length > 0) {
@@ -230,15 +288,17 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
             if ((AT.getHereBelowOrgs()).length == 1 || (iterated && request_org_list && request_org_list[$(this).val()])) $(this).prop("checked", true);
             $(this).on("click touchstart", function(e) {
                 e.stopPropagation();
+                AT.abortRequests();
                 var orgsList = [];
                 $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).is(":checked")) orgsList.push($(this).val());
+                   if ($(this).is(":checked")) orgsList.push($(this).val());
                 });
-                if (orgsList.length > 0) {
+               if (orgsList.length > 0) {
                   location.replace("/patients/?org_list=" + orgsList.join(","));
-                } else location.replace("/patients");
+               } else location.replace("/patients");
             });
         });
+
         if (ofields.length > 0) {
           $("#org-menu").append("<hr><div id='orglist-footer-container'><label><input type='checkbox' id='orglist-selectall-ckbox'>&nbsp;<span class='text-muted'>Select All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-clearall-ckbox'>&nbsp;<span class='text-muted'>Clear All</span></label>&nbsp;&nbsp;&nbsp;<label><input type='checkbox' id='orglist-close-ckbox'>&nbsp;<span class='text-muted'>Close</span></label></div>");
           $("#orglist-selectall-ckbox").on("click touchstart", function(e) {

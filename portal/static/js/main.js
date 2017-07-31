@@ -567,6 +567,7 @@ var fillContent = {
                 };
             };
         });
+        OT.drawStudyIDLabel();
         fillViews.org();
     },
     "subjectId": function(data) {
@@ -1142,6 +1143,12 @@ var assembleContent = {
 
 
         var bdFieldVal = $("input[name=birthDate]").val();
+
+        if (! hasValue(bdFieldVal)) {
+            var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+            if (hasValue(y) && hasValue(m) && hasValue(d)) bdFieldVal = y + "-" + m + "-" + d;
+        };
+
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
         if ($("#userOrgs input[name='organization']").length > 0) {
@@ -1352,7 +1359,6 @@ var assembleContent = {
             };
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
-           //console.log("demoArray", demoArray);
         };
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
 
@@ -1407,7 +1413,6 @@ var assembleContent = {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
-        //console.log(demoArray)
         tnthAjax.putDemo(userId, demoArray);
     },
     "coreData": function(userId) {
@@ -1820,6 +1825,8 @@ OrgTool.prototype.handleEvent = function() {
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
+            OT.drawStudyIDLabel();
+
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
                     assembleContent.demo(userId,true, $(this), true);
@@ -1950,6 +1957,46 @@ OrgTool.prototype.morphPatientOrgs = function() {
             $(this).prop("checked", true);
         };
     });
+};
+OrgTool.prototype.drawStudyIDLabel = function(arrParents, isTableHeader) {
+
+    /******** specific study ID label based on parent org *******/
+    /******** see story:  https://www.pivotaltracker.com/story/show/149439247 ******/
+    var self = this;
+
+    if (!arrParents) {
+        arrParents = [];
+        var selectedOrgs = self.getSelectedOrg();
+        selectedOrgs.each(function() {
+            var parentOrg = self.getTopLevelParentOrg($(this).val());
+            if (hasValue(parentOrg)) arrParents.push(parentOrg);
+        });
+    };
+
+    $(".custom-study-id-label").remove();
+
+    if (arrParents.length == 1) {
+        arrParents.forEach(function(parentOrg) {
+            if ($(".custom-study-id-label[data-org-id='" + parentOrg + "']").length == 0) {
+                var orgName = self.orgsList[parentOrg].name;
+                if (hasValue(orgName)) {
+                    var content = "<span class='custom-study-id-label' data-org-id='" + parentOrg + "'>" + $.trim(orgName + " Subject ID") + "</span>";
+                    if (isTableHeader) {
+                        $("th.profile-study-id-label .th-inner").prepend(content);
+                    } else {
+                        $(".profile-study-id-label").each(function() {
+                            $(this).prepend(content);
+                        });
+                    };
+                };
+            };
+        });
+        //if no custom study id label is drawn, then show default label
+        if ($(".custom-study-id-label").length == 0)  $(".default-study-id-label").show();
+
+    } else {
+        $(".default-study-id-label").show();
+    };
 };
 var OT = new OrgTool();
 
@@ -3049,7 +3096,7 @@ $(document).ready(function() {
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 

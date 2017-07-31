@@ -3,6 +3,7 @@ from collections import defaultdict
 from flask import current_app, Blueprint, jsonify, render_template, flash
 from flask import abort, make_response, redirect, request, session, url_for
 from flask import render_template_string
+from flask_babel import gettext as _
 from flask_user import roles_required
 from flask_swagger import swagger
 from flask_wtf import FlaskForm
@@ -847,17 +848,18 @@ def robots():
 def contact():
     """main TrueNTH contact page"""
     user = current_user()
-    if ((request.method == 'GET') or
-        (not user and
-         current_app.config.get('RECAPTCHA_SITE_KEY', None) and
-         current_app.config.get('RECAPTCHA_SECRET_KEY', None) and
-         not recaptcha.verify())):
+    if request.method == 'GET':
         sendername = user.display_name if user else ''
         email = user.email if user else ''
         gil = current_app.config.get('GIL')
         return render_template('contact.html' if not gil else 'gil/contact.html', sendername=sendername,
                                email=email, user=user)
 
+    if (not user and
+            current_app.config.get('RECAPTCHA_SITE_KEY', None) and
+            current_app.config.get('RECAPTCHA_SECRET_KEY', None) and
+            not recaptcha.verify()):
+        abort(400, "Recaptcha verification failed")
     sender = request.form.get('email')
     if not sender or ('@' not in sender):
         abort(400, "No valid sender email address provided")
@@ -865,6 +867,10 @@ def contact():
     subject = u"{server} contact request: {subject}".format(
         server=current_app.config['SERVER_NAME'],
         subject=request.form.get('subject'))
+    if len(sendername) > 255:
+        abort(400, "Sender name max character length exceeded")
+    if len(subject) > 255:
+        abort(400, "Subject max character length exceeded")
     formbody = request.form.get('body')
     if not formbody:
         abort(400, "No contact request body provided")
@@ -878,7 +884,7 @@ def contact():
     email.send_message()
     db.session.add(email)
     db.session.commit()
-    return redirect(url_for('.contact_sent', message_id=email.id))
+    return jsonify(msgid=email.id)
 
 @portal.route('/contact/<int:message_id>')
 def contact_sent(message_id):
