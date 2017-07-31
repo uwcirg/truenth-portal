@@ -23,6 +23,7 @@ var __i18next = (function() {
                      }
                   }, function(err, t) {
                     // init set content
+                    //common constants that can be used else where
                     __NOT_PROVIDED_TEXT = i18next.t("Not provided");
 
                   });
