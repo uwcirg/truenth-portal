@@ -26,6 +26,12 @@ class Recur(db.Model):
         db.Integer, nullable=True,
         doc="optional termination of recurrance; days from initial lauch")
 
+    __table_args__ = (
+        UniqueConstraint(
+            days_to_start, days_in_cycle, days_till_termination,
+            name='_unique_recur'),
+    )
+
     def add_if_not_found(self, commit_immediately=False):
         """Add self to database, or return existing
 
@@ -48,18 +54,19 @@ class Recur(db.Model):
         return self
 
     @classmethod
-    def from_fhir(cls, data):
+    def from_json(cls, data):
         instance = cls()
         for field in (
                 'days_to_start', 'days_in_cycle', 'days_till_termination'):
             setattr(instance, field, data.get(field))
         return instance.add_if_not_found()
 
-    def as_fhir(self):
+    def as_json(self):
         d = {}
         for field in (
                 'days_to_start', 'days_in_cycle', 'days_till_termination'):
-            d[field] = getattr(self, field, None)
+            if getattr(self, field):
+                d[field] = getattr(self, field)
         return d
 
     def active_interval_start(self, start):

@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Unauthorized
 
 from ..audit import auditable_event
+from ..csrf import csrf
 from ..database import db
 from ..extensions import oauth, user_manager
 from ..models.audit import Audit
@@ -20,6 +21,7 @@ from ..models.user import current_user, get_user, permanently_delete_user
 from ..models.user import User, UserRelationship
 from ..models.user_consent import UserConsent
 from ..models.user_document import UserDocument
+from .portal import check_int
 
 user_api = Blueprint('user_api', __name__, url_prefix='/api')
 
@@ -1361,10 +1363,7 @@ def unique_email():
                 user = current_user()
                 user_id = user.id if user else None
         else:
-            try:
-                user_id = int(user_id)
-            except ValueError:
-                abort(400, 'user_id must be a valid integer')
+            user_id = check_int(user_id)
 
         result = match.one()
         if user_id != result.id:

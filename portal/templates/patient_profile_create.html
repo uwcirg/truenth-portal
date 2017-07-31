@@ -57,6 +57,13 @@
                                 OT.filterOrgs(leafOrgs);
                             };
 
+                            //user.first_top_organization()
+                            {% if user.first_top_organization() %}
+                            if ($("#profileStudyIDContainer").is(":visible")) {
+                                OT.drawStudyIDLabel([{{user.first_top_organization().id}}]);
+                            };
+                            {% endif %}
+
                              var userOrgs = $("#userOrgs input[name='organization']");
                              userOrgs.each(function() {
                                 $(this).attr("type", "radio");
@@ -138,7 +145,7 @@ var AccountCreationObj = function () {
             if (self.attempts < self.max_attempts) {
                 setTimeout ( function() { self.__request( self.params ) } , $.ajaxSetup().retryAfter );
             } else {
-                errorMessage = 'Error processing request: ' + params.apiUrl;
+                errorMessage = '{{_("Error processing request:")}} ' + params.apiUrl;
                 errorMessage += ";  response status code: " + (parseInt(xhr.status) == 0 ? "request timed out/network error": xhr.status);
 
                 $("#error_response_text").html($.trim(xhr.responseText));
@@ -271,7 +278,7 @@ var AccountCreationObj = function () {
         } else {
             self.__handleError(err);
         };
-        
+
     };
     this.__handleError = function(errorMessage) {
         if (hasValue(errorMessage)) $('#serviceErrorMsg').html('<small>[Processing error] ' + errorMessage + '</small>').fadeIn();
@@ -286,7 +293,7 @@ var AccountCreationObj = function () {
     };
     this.__clear = function() {
         $("input.form-control, select.form-control").each(
-            function() { 
+            function() {
                 $(this).val("");
         });
     };
@@ -338,10 +345,10 @@ var aco = new AccountCreationObj();
 
 $(document).ready(function(){
 
- 
+
     $("#createProfileForm .back-button-container").prepend(__getLoaderHTML());
     $("#createProfileForm .save-button-container").prepend(__getLoaderHTML());
-   
+
     $("#createProfileForm .btn-tnth-back").on("click", function(e) {
         e.preventDefault();
         $(this).prev(".loading-message-indicator").show();
@@ -398,7 +405,7 @@ $(document).ready(function(){
                setHelpText("userOrgs", "{{_('An organization must be selected.')}}", true);
             } else setHelpText("userOrgs", "", false);
 
-           
+
             $("#createProfileForm .help-block.with-errors").each(function() {
                 if (!hasError) { if ($(this).text() != "") hasError = true };
             });
@@ -418,7 +425,7 @@ $(document).ready(function(){
 
             aco.__handleButton("hide");
             setTimeout("aco.__setAccount();", 0);
-                
+
         };
     });
 

@@ -1,0 +1,296 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: i18next-conv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"POT-Creation-Date: 2017-07-31T22:23:09.635Z\n"
+"PO-Revision-Date: 2017-07-31T22:23:09.635Z\n"
+
+msgid "Error occurred updating user organization."
+msgstr ""
+
+msgid "Decision Support"
+msgstr ""
+
+msgid "Symptom Tracker"
+msgstr ""
+
+msgid "Edit in Liferay"
+msgstr ""
+
+msgid "No affiliated clinic"
+msgstr ""
+
+msgid "No clinic selected"
+msgstr ""
+
+msgid "Consent Status"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Agreement"
+msgstr ""
+
+msgid "Consent Date"
+msgstr ""
+
+msgid "Regiatration Date"
+msgstr ""
+
+msgid "GMT"
+msgstr ""
+
+msgid "Agreed to terms"
+msgstr ""
+
+msgid "TrueNTH USA Terms of Use"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "deleted on"
+msgstr ""
+
+msgid "expired"
+msgstr ""
+
+msgid "Consented"
+msgstr ""
+
+msgid "Consented / Enrolled"
+msgstr ""
+
+msgid "Suspend Data Collection and Report Historic Data"
+msgstr ""
+
+msgid "Purged/Removed"
+msgstr ""
+
+msgid "Consent Status Editor"
+msgstr ""
+
+msgid "Modify the consent status for this user to:"
+msgstr ""
+
+msgid "Purged/remove consent(s) associated with this organization"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Consent Date Editor"
+msgstr ""
+
+msgid "Modify the consent date"
+msgstr ""
+
+msgid "(GMT 24-hour format)"
+msgstr ""
+
+msgid "for this agreement to:"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "No Consent Record Found"
+msgstr ""
+
+msgid "Date must in the valid format."
+msgstr ""
+
+msgid "Hour must be in valid format, range 0 to 23."
+msgstr ""
+
+msgid "Minute must be in valid format, range 0 to 59."
+msgstr ""
+
+msgid "Second must be in valid format, range 0 to 59."
+msgstr ""
+
+msgid "Error processing data.  Make sure the date is in the correct format."
+msgstr ""
+
+msgid "You must enter a valid date/time"
+msgstr ""
+
+msgid "No consent found for this user."
+msgstr ""
+
+msgid "You do not have permission to edit this patient record."
+msgstr ""
+
+msgid "You haven't entered any management option yet."
+msgstr ""
+
+msgid "you"
+msgstr ""
+
+msgid "Are you sure you want to delete this treatment?"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "this patient"
+msgstr ""
+
+msgid "staff member"
+msgstr ""
+
+msgid "data entered by "
+msgstr ""
+
+msgid " on "
+msgstr ""
+
+msgid "Added"
+msgstr ""
+
+msgid ""
+"You must agree to the terms and conditions by checking the provided "
+"checkboxes."
+msgstr ""
+
+msgid "Consent to share information"
+msgstr ""
+
+msgid "I consent to sharing information with the "
+msgstr ""
+
+msgid "Cannot ununcheck.  A staff member must be associated with an organization"
+msgstr ""
+
+msgid "no data returned"
+msgstr ""
+
+msgid "unable to get needed core data"
+msgstr ""
+
+msgid "unable to get required core data"
+msgstr ""
+
+msgid "No information available"
+msgstr ""
+
+msgid "no data found"
+msgstr ""
+
+msgid "User Id is required"
+msgstr ""
+
+msgid "No data found"
+msgstr ""
+
+msgid "Unable to retrieve portal footer html"
+msgstr ""
+
+msgid "Server error occurred retrieving organization/clinic information."
+msgstr ""
+
+msgid "Problem retrieving data from server."
+msgstr ""
+
+msgid "Error Status Code: "
+msgstr ""
+
+msgid "Permission denied to access patient record"
+msgstr ""
+
+msgid "Server error occurred retrieving consent information."
+msgstr ""
+
+msgid "Server error occurred setting consent status."
+msgstr ""
+
+msgid "Unable to set default consent agreement"
+msgstr ""
+
+msgid "Server error occurred removing consent: "
+msgstr ""
+
+msgid "Server error occurred retrieving demographics information."
+msgstr ""
+
+msgid "Server error occurred setting demographics information."
+msgstr ""
+
+msgid "Server error occurred retrieving locale information."
+msgstr ""
+
+msgid "Error retrieving data from server"
+msgstr ""
+
+msgid "Server error occurred saving procedure/treatment information."
+msgstr ""
+
+msgid "Server error occurred removing procedure/treatment information."
+msgstr ""
+
+msgid "Server error occurred retrieving user role information."
+msgstr ""
+
+msgid "Server error occurred setting user role information."
+msgstr ""
+
+msgid "Server error occurred deleting user role."
+msgstr ""
+
+msgid "Server error occurred retrieving clinical data."
+msgstr ""
+
+msgid "Server error occurred updating clinical data."
+msgstr ""
+
+msgid "Server error occurred retrieving tou url."
+msgstr ""
+
+msgid "Server error occurred retrieving tou data."
+msgstr ""
+
+msgid "Server error occurred saving terms of use information."
+msgstr ""
+
+msgid "All fields must be complete."
+msgstr ""
+
+msgid "Please enter a valid date."
+msgstr ""
+
+msgid "Please enter a valid month."
+msgstr ""
+
+msgid "Please enter a valid year."
+msgstr ""
+
+msgid "This e-mail address is already in use. Please enter a different address."
+msgstr ""
+
+msgid "Sorry, this isn't a valid date. Please try again."
+msgstr ""
+
+msgid "This isn't a valid e-mail address, please double-check."
+msgstr ""
+
+msgid "Invalid date. Please try again."
+msgstr ""
+
+msgid "Date must not be in the future. Please try again."
+msgstr ""
+
+msgid "Date must not be before 1900. Please try again."
+msgstr ""
+
+msgid "Error occurred when converting timezone: "
+msgstr ""

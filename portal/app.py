@@ -10,6 +10,7 @@ import redis
 
 from .audit import configure_audit_log
 from .config import DefaultConfig
+from .csrf import csrf, csrf_blueprint
 from .database import db
 from .extensions import authomatic, recaptcha
 from .extensions import babel, celery, mail, oauth, session, user_manager
@@ -43,6 +44,7 @@ DEFAULT_BLUEPRINTS = (
     auth,
     coredata_api,
     clinical_api,
+    csrf_blueprint,
     demographics_api,
     fhir_api,
     filters_blueprint,
@@ -68,6 +70,7 @@ def create_app(config=None, app_name=None, blueprints=None):
     app = Flask(app_name, template_folder='templates',
                 instance_relative_config=True)
     configure_app(app, config)
+    configure_csrf(app)
     configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
@@ -88,6 +91,16 @@ def configure_app(app, config):
 
     if config:
         app.config.from_object(config)
+
+
+def configure_csrf(app):
+    """Initialize CSRF protection
+
+    See `csrf.csrf_protect()` for implementation.  Not using default
+    as OAuth API use needs exclusion.
+
+    """
+    csrf.init_app(app)
 
 
 def configure_jinja(app):

@@ -12,11 +12,12 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
 from ..models.assessment_status import AssessmentStatus
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
 from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
+from .portal import check_int
 
 assessment_engine_api = Blueprint('assessment_engine_api', __name__,
                                   url_prefix='/api')
@@ -1423,7 +1424,7 @@ def present_assessment(instruments=None):
         next_url = request.args.get('next')
 
         # Validate next URL the same way CORS requests are
-        validate_client_origin(next_url)
+        validate_origin(next_url)
 
         current_app.logger.debug('storing session[assessment_return]: %s',
                                  next_url)
@@ -1543,6 +1544,8 @@ def batch_assessment_status():
     if not user_ids:
         abort(400, "Requires at least one user_id")
     results = []
+    for uid in user_ids:
+        check_int(uid)
     users = User.query.filter(User.id.in_(user_ids))
     for user in users:
         if not acting_user.check_role('view', user.id):
@@ -1556,3 +1559,46 @@ def batch_assessment_status():
         results.append({'user_id': user.id, 'consents': details})
 
     return jsonify(status=results)
+
+
+@assessment_engine_api.route(
+    '/patient/<int:patient_id>/assessment-status'
+)
+@oauth.require_oauth()
+def patient_assessment_status(patient_id):
+    """Return to the assessment status for a given patient
+
+    ---
+    operationId: patient_assessment_status
+    tags:
+      - Assessment Engine
+    parameters:
+      - name: patient_id
+        in: path
+        description: TrueNTH patient ID
+        required: true
+        type: integer
+        format: int64
+    produces:
+      - application/json
+    responses:
+      200:
+        description: return current overall assessment status of given patient
+      400:
+        description: if patient id is invalid
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    patient = get_user(patient_id)
+    if patient:
+        current_user().check_role(permission='view', other_id=patient_id)
+        assessment_status = AssessmentStatus(user=patient)
+        assessment_overall_status = (
+                assessment_status.overall_status if assessment_status else
+                None)
+        return jsonify(assessment_status=assessment_overall_status)
+    else:
+        abort(400, "invalid patient id")

@@ -176,6 +176,24 @@ class WebsiteDeclarationForm_ATMA(AppTextModelAdapter):
                     format(kwargs.get('organization').name)
 
 
+class StaffRegistrationEmail_ATMA(AppTextModelAdapter):
+    """AppTextModelAdapter for Staff Registration Email Content"""
+
+    @staticmethod
+    def name_key(**kwargs):
+        """Generate AppText name key for a Website Declaration Form
+
+        :param organization: required
+        :returns: string for AppText.name field
+
+        """
+        if not kwargs.get('organization'):
+            raise ValueError("required 'organization' parameter not defined")
+        else:
+            return "{} staff registraion email URL".\
+                    format(kwargs.get('organization').name)
+
+
 class AboutATMA(AppTextModelAdapter):
     """AppTextModelAdapter for `About` - namely the URL"""
 

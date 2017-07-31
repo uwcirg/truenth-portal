@@ -1,5 +1,5 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, render_template, request, current_app
+from flask import abort, Blueprint, jsonify, render_template, request, current_app
 from flask_user import roles_required
 from sqlalchemy import and_
 
@@ -11,6 +11,7 @@ from ..models.role import Role, ROLE
 from ..models.user import User, current_user, get_user, UserRoles
 from ..models.user_consent import UserConsent
 from ..models.app_text import app_text, InitialConsent_ATMA, VersionedResource
+from .portal import check_int
 from datetime import datetime
 
 
@@ -56,6 +57,7 @@ def patients_root():
             # of each, if any
             request_org_list = set(request_org_list.split(","))
             for orgId in request_org_list:
+                check_int(orgId)
                 if orgId == 0:  # None of the above doesn't count
                     continue
                 org_list.update(OT.here_and_below_id(orgId))
@@ -95,24 +97,8 @@ def patients_root():
                      UserIntervention.intervention_id.in_(ui_list)))
         patients = patients.union(ui_patients)
 
-    #get assessment status only if it is needed as specified by config
-    patients_list = None
-    if 'status' in current_app.config.get('PATIENT_LIST_ADDL_FIELDS'):
-        patients_list = []
-        for patient in patients:
-            assessment_status = AssessmentStatus(user=patient)
-            try:
-                patient.assessment_status = (
-                    assessment_status.overall_status if assessment_status else
-                    None)
-            except ValueError:
-                patient.assessment_status = None
-                current_app.logger.debug("Error retrieving assessment status for patient {}".format(str(patient.id)))
-
-            patients_list.append(patient)
-
     return render_template(
-        'patients_by_org.html', patients_list=patients_list if patients_list else patients.all(),
+        'patients_by_org.html', patients_list=patients.all(),
         user=user, org_list=org_list,
         wide_container="true")
 
@@ -163,11 +149,6 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
-            assessment_status = AssessmentStatus(user=patient)
-            patient.assessment_overall_status = (
-                assessment_status.overall_status if assessment_status else
-                None)
-
     return render_template(
         'profile.html', user=patient,
         current_user=user,

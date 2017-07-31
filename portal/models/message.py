@@ -34,7 +34,7 @@ class EmailMessage(db.Model):
         message = Message(subject=self.subject,
                 sender=current_app.config['DEFAULT_MAIL_SENDER'],
                 recipients=self.recipients.split())
-        message.html = fill(self.body, width=240)
+        message.html = fill(self.body, width=280)
         mail.send(message)
 
     def __str__(self):

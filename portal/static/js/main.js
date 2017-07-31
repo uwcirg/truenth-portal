@@ -569,6 +569,7 @@ var fillContent = {
                 };
             };
         });
+        OT.drawStudyIDLabel();
         fillViews.org();
     },
     "subjectId": function(data) {
@@ -1154,6 +1155,12 @@ var assembleContent = {
 
 
         var bdFieldVal = $("input[name=birthDate]").val();
+
+        if (! hasValue(bdFieldVal)) {
+            var y = $("#year").val(), m = $("#month").val(), d = $("#date").val();
+            if (hasValue(y) && hasValue(m) && hasValue(d)) bdFieldVal = y + "-" + m + "-" + d;
+        };
+
         if (bdFieldVal != "") demoArray["birthDate"] = bdFieldVal;
 
         if ($("#userOrgs input[name='organization']").length > 0) {
@@ -1364,7 +1371,6 @@ var assembleContent = {
             };
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
-           //console.log("demoArray", demoArray);
         };
         tnthAjax.putDemo(userId,demoArray, targetField, sync);
 
@@ -1419,7 +1425,6 @@ var assembleContent = {
         var demoArray = {};
         demoArray["resourceType"] = "Patient";
         demoArray["careProvider"] = orgIDs;
-        //console.log(demoArray)
         tnthAjax.putDemo(userId, demoArray);
     },
     "coreData": function(userId) {
@@ -1639,8 +1644,8 @@ OrgTool.prototype.populateUI = function() {
                 var _parentOrg = orgsList[_parentOrgId];
                 var _isTopLevel = _parentOrg ? _parentOrg.isTopLevel : false;
                 var state = getState(orgsList[_parentOrgId]);
-                //NOTE!!
-                //organization items are dynamically generated..do we use interpolations here?
+                if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
+
                 if ($("#userOrgs input[name='organization'][value='" + item.id + "']").length > 0) return true;
 
                 childClinic = '<div id="' + item.id + '_container" ' + (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") +' class="indent org-container">'
@@ -1649,14 +1654,14 @@ OrgTool.prototype.populateUI = function() {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org"  state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    item.name +
+                    i18next.t("" + item.name) +
                     '</label>';
 
                  } else {
                     childClinic += '<label id="org-label-' + item.id + '" class="org-label">' +
                     '<input class="clinic" type="checkbox" name="organization" id="' +  item.id + '_org" state="' + state + '" value="'+
                     item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/>'+
-                    item.name +
+                    i18next.t("" + item.name) +
                     '</label>';
                 };
 
@@ -1833,6 +1838,8 @@ OrgTool.prototype.handleEvent = function() {
 
             $("#userOrgs .help-block").removeClass("error-message").text("");
 
+            OT.drawStudyIDLabel();
+
             if ($(this).attr("id") !== "noOrgs" && $("#fillOrgs").attr("patient_view")) {
                 if (tnthAjax.hasConsent(userId, parentOrg)) {
                     assembleContent.demo(userId,true, $(this), true);
@@ -1964,9 +1971,59 @@ OrgTool.prototype.morphPatientOrgs = function() {
         };
     });
 };
+OrgTool.prototype.drawStudyIDLabel = function(arrParents, isTableHeader) {
+
+    /******** specific study ID label based on parent org *******/
+    /******** see story:  https://www.pivotaltracker.com/story/show/149439247 ******/
+    var self = this;
+
+    if (!arrParents) {
+        arrParents = [];
+        var selectedOrgs = self.getSelectedOrg();
+        selectedOrgs.each(function() {
+            var parentOrg = self.getTopLevelParentOrg($(this).val());
+            if (hasValue(parentOrg)) arrParents.push(parentOrg);
+        });
+    };
+
+    $(".custom-study-id-label").remove();
+
+    if (arrParents.length == 1) {
+        arrParents.forEach(function(parentOrg) {
+            if ($(".custom-study-id-label[data-org-id='" + parentOrg + "']").length == 0) {
+                var orgName = self.orgsList[parentOrg].name;
+                if (hasValue(orgName)) {
+                    var content = "<span class='custom-study-id-label' data-org-id='" + parentOrg + "'>" + $.trim(orgName + " Subject ID") + "</span>";
+                    if (isTableHeader) {
+                        $("th.profile-study-id-label .th-inner").prepend(content);
+                    } else {
+                        $(".profile-study-id-label").each(function() {
+                            $(this).prepend(content);
+                        });
+                    };
+                };
+            };
+        });
+        //if no custom study id label is drawn, then show default label
+        if ($(".custom-study-id-label").length == 0)  $(".default-study-id-label").show();
+
+    } else {
+        $(".default-study-id-label").show();
+    };
+};
+
 var OT = new OrgTool();
 
 var tnthAjax = {
+    "beforeSend": function() {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", __CRSF_TOKEN);
+                }
+            }
+        });
+    },
     "reportError": function(userId, page_url, message, sync) {
         //params need to contain the following:
         //:subject_id: User on which action is being attempted
@@ -2511,7 +2568,6 @@ var tnthAjax = {
             var errorMessage = i18next.t("Server error occurred retrieving locale information.");
             if ($(".get-locale-error").length == 0) $(".default-error-message-container").append("<div class='get-locale-error error-message'>" + errorMessage + "</div>");
             else $(".get-locale-error").html(errorMessage);
-            flo.showError(targetField);
         });
     },
     "hasTreatment": function(data) {
@@ -2931,18 +2987,15 @@ function newHttpRequest(url,callBack, noCache)
     xmlhttp.send();
 };
 
-$.ajaxSetup({
-    timeout: 2000,
-    retryAfter:3000
-});
 var attempts = 0;
 
-funcWrapper = function(param) {
+funcWrapper = function() {
     attempts++;
     $.ajax({
         url: PORTAL_NAV_PAGE,
         type:'GET',
         contentType:'text/plain',
+        timeout: 5000,
         cache: (getIEVersion() ? false : true)
     }, 'html')
     .done(function(data) {
@@ -2952,47 +3005,14 @@ funcWrapper = function(param) {
     .fail(function(jqXHR, textStatus, errorThrown) {
       //  console.log("Error loading nav elements from " + PORTAL_HOSTNAME);
         if (attempts < 3) {
-            setTimeout ( function(){ funcWrapper( param ) }, $.ajaxSetup().retryAfter );
+            setTimeout ( function(){ funcWrapper( ) }, 3000 );
         } else loader();
     })
     .always(function() {
         loader();
+        attempts = 0;
     });
 };
-/*** wrapper object to initalize i18next ***/
-var __i18next = (function() {
-    function init() {
-            if (typeof window.localStorage  != "undefined") {
-                if (window.localStorage.getItem("i18nextLng")) window.localStorage.removeItem("i18nextLng");
-            };
-            i18next.use(i18nextXHRBackend)
-                    .use(i18nextBrowserLanguageDetector)
-                    .init({
-                    fallbackLng: 'en-US',
-                    //saveMissing: true,
-                   // lng: 'en-US',
-                    debug: true,
-                    ns: ['translation'],
-                    defaultNS: 'translation',
-                    initImmediate: false,
-                    load: 'currentOnly', //this reads language code in en-US, en-AU format
-                    returnEmptyString: false,
-                    backend: {
-                       // load from static file
-                       loadPath: '/static/files/locales/{{lng}}/{{ns}}.json'
-
-                     }
-                  }, function(err, t) {
-                    // init set content
-                    __NOT_PROVIDED_TEXT = i18next.t("Not provided")
-                  });
-    };
-
-    return {
-        init: function() { init(); }
-    };
-}
-)();
 
 // $.ajaxSetup({
 //     headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -3012,12 +3032,11 @@ $(document).ready(function() {
         };
     } else loader();
 
-    __i18next.init();
-
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
 
     //setTimeout('LRKeyEvent();', 1500);
+    __i18next.init();
 
     // To validate a form, add class to <form> and validate by ID.
     $('form.to-validate').validator({
@@ -3623,7 +3642,7 @@ var tnthDates = {
                 } else {
                     if (timeZone != "UTC") {
                         convertedDate = convertToLocalTime(dateString);
-                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser.<br/>All date/time fields are converted to local time zone instead.");
+                        $(".timezone-warning").addClass("text-warning").html("Date/time zone conversion is not supported in current browser. All date/time fields are converted to local time zone instead.");
                         $(".gmt").each(function() { $(this).hide()});
                     };
                 }
@@ -3876,6 +3895,19 @@ function pad(n) {
     n = parseInt(n);
     return (n < 10) ? '0' + n : n;
 };
+
+function escapeHtml(text) {
+    'use strict';
+    if (text == null || text.length == 0){
+        return text;
+    }
+    return text.replace(/[\"&'\/<>]/g, function (a) {
+        return {
+            '"': '&quot;', '&': '&amp;', "'": '&#39;',
+            '/': '&#47;',  '<': '&lt;',  '>': '&gt;'
+        }[a];
+    });
+}
 
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){

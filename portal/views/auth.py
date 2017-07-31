@@ -17,14 +17,16 @@ from wtforms import BooleanField, FormField, HiddenField, SelectField
 from wtforms import validators, TextField
 from werkzeug.exceptions import Unauthorized
 from werkzeug.security import gen_salt
+from urlparse import urlparse
 from validators import url as url_validation
 
 from ..audit import auditable_event
+from ..csrf import csrf
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
@@ -37,6 +39,7 @@ auth = Blueprint('auth', __name__)
 
 
 @auth.route('/deauthorized', methods=('POST',))
+@csrf.exempt
 def deauthorized():
     """Callback URL configured on facebook when user deauthorizes
 
@@ -110,6 +113,7 @@ def capture_next_view_function(real_function):
 
         if request.args.get('next'):
             session['next'] = request.args.get('next')
+            validate_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
@@ -247,6 +251,8 @@ def login(provider_name):
         "Unittesting backdoor - see tests.login() for use"
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
+        if request.args.get('next'):
+            validate_origin(request.args.get('next'))
         user = current_user()
         login_user(user, 'password_authenticated')
         return next_after_login()
@@ -269,6 +275,7 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
+        validate_origin(session['next'])
         current_app.logger.debug(
             "store-session['next'] <{}> from login/{}".format(
                 session['next'], provider_name))
@@ -401,13 +408,20 @@ def login_as(user_id, auth_method='staff_authenticated'):
     """
     # said business rules enforced by check_role()
     current_user().check_role('edit', user_id)
+    target_user = get_user(user_id)
+
+    # Guard against abuse
+    if not (target_user.has_role(role_name=ROLE.PATIENT) or
+            target_user.has_role(role_name=ROLE.PARTNER)):
+        abort(401, 'not authorized to assume identity of requested user')
+
     auditable_event("assuming identity of user {}".format(user_id),
                     user_id=current_user().id, subject_id=user_id,
                     context='authentication')
 
     logout(prevent_redirect=True, reason="forced from login_as")
     session['login_as_id'] = user_id
-    target_user = get_user(user_id)
+
     if target_user.has_role(role_name=ROLE.WRITE_ONLY):
         target_user.mask_email()  # necessary in case registration is attempted
     login_user(target_user, auth_method)
@@ -509,7 +523,7 @@ class InterventionEditForm(FlaskForm):
         """Custom validation to allow null and known origins only"""
         if len(field.data.strip()):
             try:
-                validate_client_origin(field.data)
+                validate_origin(field.data)
             except Unauthorized:
                 raise validators.ValidationError(
                     "Invalid URL (unknown origin)")
@@ -557,6 +571,17 @@ class ClientEditForm(FlaskForm):
         for url in origins:
             if not url_validation(url, require_tld=False):
                 raise validators.ValidationError("Invalid URL")
+
+    def validate_callback_url(form, field):
+        """Custom validation to confirm callback_url is in redirect_urls"""
+        origins = form.application_origins.data.split()
+        og_uris = ['{uri.scheme}://{uri.netloc}'.format(uri=urlparse(url))
+                   for url in origins]
+        if field.data:
+            cb_uri = urlparse(field.data)
+            if '{uri.scheme}://{uri.netloc}'.format(uri=cb_uri) not in og_uris:
+                raise validators.ValidationError(
+                    "URL host must match a provided Application Origin URL")
 
 
 @auth.route('/client', methods=('GET', 'POST'))
@@ -912,6 +937,7 @@ def token_status():
 
 
 @auth.route('/oauth/errors', methods=('GET', 'POST'))
+@csrf.exempt
 def oauth_errors():
     """Redirect target for oauth errors
 
@@ -941,6 +967,7 @@ def oauth_errors():
 
 
 @auth.route('/oauth/token', methods=('GET', 'POST'))
+@csrf.exempt
 @oauth.token_handler
 def access_token():
     """Exchange authorization code for access token
@@ -1020,10 +1047,14 @@ def access_token():
               description: The authorized scopes.
 
     """
+    for field in request.form:
+        if '\0' in request.form[field]:
+            abort(400, "invalid {} string".format(field))
     return None
 
 
 @auth.route('/oauth/authorize', methods=('GET', 'POST'))
+@csrf.exempt
 @oauth.authorize_handler
 def authorize(*args, **kwargs):
     """Authorize the client to access TrueNTH resources

@@ -93,8 +93,8 @@
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
-                  <!-- NOTE TrueNTH has requested its unique ID label, therefore use CSS class to hide/show label appropriately here, please see portal.css and eproms.css for details -->
-                  <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field"><span class="truenth-id-label">{{_("TrueNTH ID")}}</span><span class="eproms-id-label">{{ _("ID") }}</span></th>
+                  <!-- need to hide the ID column specifically for EPROMs -->
+                  <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
@@ -103,7 +103,7 @@
                   <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field">{{ _("Phone (Other)") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field profile-study-id-label"><span class="default-study-id-label">{{ _("Study ID") }}</span></th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -124,10 +124,9 @@
                         </td>
                       {% endif %}
                       {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%- if patient.valid_consents and not patient.valid_consents[0].send_reminders -%} {{_("Withdrawn")}} {%-else-%}{{patient.assessment_status if patient.assessment_status}}{%-endif-%}</td>
+                        <td><span class="field-loading-indicator text-muted smaller-text"><i class="fa fa-spinner fa-spin"></i> loading ...</span></td>
                       {% endif %}
-                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
+                      {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
                         {%-for consent in patient.valid_consents -%}
@@ -160,31 +159,34 @@ var org_list = {};
 {% endif %}
 
 var AT = new AdminTool({{user.id}});
+var __patients_list = [];
 
 $(document).ready(function() {
 
-  /*****************
-  //client side update of data
-  //keep this here, in case we need to bring this back
-  //$("#adminTable").on("sort.bs.table reset-view.bs.table", function(e, fieldname) {
-  //    AT.updateData();
-  // });
-  //$("#adminTable").on("page-change.bs.table", function() {
-  //    if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},1000);
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //$("#adminTable").on("toggle.bs.table", function() {
-  //    if ($(this).find(".card-view").length > 0) {
-  //      AT.updateData();
-  //    }
-  //});
-  //setTimeout("AT.updateData();", 0);
-  ******************/
+  $("#adminTable").on("page-change.bs.table", function() {
+      if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
+  });
 
-   AT.fadeLoader();
-  
+  {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
+    {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
+    //client side update of assessment status, for performance
+    setTimeout("AT.updateData();", 400);
+    $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
+        e.stopPropagation();
+        AT.abortRequests(function() {
+          $(e.target).trigger('click.bs.rowlink');
+        });
+    });
+    $(document).delegate("#createUserLink", "click touchstart", function(e) {
+        e.stopPropagation();
+        AT.abortRequests(function() {
+          window.location = $("#createUserLink").attr("href");
+        });
+    });
+  {% else %}
+    AT.fadeLoader();
+  {% endif %}
+
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");
@@ -193,7 +195,26 @@ $(document).ready(function() {
         return rowInfo;
     }
   });
+
   $("input[data-field='id']:checkbox").hide();
+
+  {% if config.HIDE_TRUENTH_ID_FIELD %}
+    (function() {
+      function checkBoxVis(o) {
+          if (o.is(":checked")) $("#adminTable .id-field").show();
+          else $("#adminTable .id-field").hide();
+      };
+
+      var __idCheckbox = $("#patientList .columns .dropdown-menu").find("input[data-field='userid']");
+
+      __idCheckbox.prop("checked", false);
+      __idCheckbox.on("click", function() { checkBoxVis($(this)) });
+
+      $("#adminTable").on("sort.bs.table reset-view.bs.table page-change.bs.table", function() { checkBoxVis(__idCheckbox) });
+      $("#adminTable .id-field").hide();
+
+    })();
+  {% endif %}
 
   $(document).delegate("#patientsDownloadButton", "click", function(event){
     var instruments = "", dataType = "";

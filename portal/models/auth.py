@@ -332,11 +332,11 @@ def save_token(token, request, *args, **kwargs):
     return tok
 
 
-def validate_client_origin(origin):
+def validate_origin(origin):
     """Validate the origin is one we recognize
 
     For CORS, limit the requesting origin to the list we know about,
-    namely any origins belonging to our OAuth clients.
+    namely any origins belonging to our OAuth clients, or the local server
 
     :raises :py:exc:`werkzeug.exceptions.Unauthorized`: if we don't
       find a match.
@@ -346,9 +346,16 @@ def validate_client_origin(origin):
         current_app.logger.warning("Can't validate missing origin")
         abort(401, "Can't validate missing origin")
 
+    po = urlparse(origin)
+    if po.netloc and po.netloc == current_app.config.get("SERVER_NAME"):
+        return True
+    if not po.scheme and not po.netloc and po.path:
+        return True
+
     for client in Client.query.all():
         if client.validate_redirect_uri(origin):
             return True
+
     current_app.logger.warning("Failed to validate origin: %s", origin)
     abort(401, "Failed to validate origin %s" % origin)
 

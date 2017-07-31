@@ -14,7 +14,7 @@
         <label class="profile-birthdate-label">{{ _("Birth Date") }}</label>
         <div class="flex">
             <div class="flex-item" id="bdDateContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="date" name="birthdayDate" placeholder="DD" type="text" pattern="(\d)?\d" maxlength="2" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
             <div class="flex-item" id="bdMonthContainer" data-loader-container="true">
                 <select class="form-control bd-element" name="birthdayMonth" id="month" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required>
@@ -34,7 +34,7 @@
                 </select>
             </div>
             <div class="flex-item" id="bdYearContainer" data-loader-container="true">
-                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" required />
+                <input class="form-control bd-element" id="year" name="birthdayYear" placeholder="YYYY" pattern = "(19|20)\d{2}" type="text" maxlength="4" data-error="{{_('Birth date must be valid and in the required format.')}}" data-error-field="errorbirthday" autocomplete="off" required />
             </div>
         </div>
         <div class="help-block with-errors"></div>
@@ -54,15 +54,18 @@
                 var triggerEvent = field.attr("type") == "text" ? "blur" : "change";
                 field.on(triggerEvent, function() {
                     var y = $("#year"), m = $("#month"), d = $("#date");
-                    if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
-                        var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
-                        if (isValid) {
-                            $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
-                        } else {
-                            $("#birthday").val("");
-                            return false;
+                    if (hasValue(y.val()) && hasValue(m.val()) && hasValue(d.val())) {
+                        if (y.get(0).validity.valid && m.get(0).validity.valid && d.get(0).validity.valid) {
+                            var isValid = tnthDates.validateDateInputFields(m.val(), d.val(), y.val(), "errorbirthday");
+                            if (isValid) {
+                                $("#birthday").val(y.val() + "-" + m.val() + "-" + d.val());
+                                $("#errorbirthday").html("");
+                            } else {
+                                $("#birthday").val("");
+                                return false;
+                            };
                         };
-                    };
+                    } else return false;
                 });
             });
         });
@@ -98,13 +101,13 @@
     <div class="row profile-section name-section">
         <div id="firstNameContainer" class="col-lg-4 col-md-5 col-sm-6 col-xs-12 first-name-container" data-loader-container="true">
             <div id="firstNameGroup" class="form-group float-input-label">
-                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text" />
+                <input {{"autofocus" if isFocus}} required="required" data-error="{{ _('First name is required') }}" class="form-control float-text" id="firstname" name="firstname" placeholder="{{ _('First Name') }}" value="{{ person.first_name if person and person.first_name }}" type="text"  autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
         <div id="lastNameContainer" class="col-lg-5 col-md-6 col-sm-6 col-xs-12 last-name-container" data-loader-container="true">
             <div id="lastNameGroup" class="form-group float-input-label">
-                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" />
+                <input required="required" data-error="{{ _('Last name is required') }}" class="form-control float-text" id="lastname" name="lastname" placeholder="{{ _('Last Name') }}" value="{{ person.last_name if person and person.last_name }}" type="text" autocomplete="off"/>
                 <div class="help-block with-errors"></div>
             </div>
         </div>
@@ -403,7 +406,7 @@
         <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
     {% endif %}
 {%- endmacro %}
-{% macro profileRegistrationEmail(person) -%}
+{% macro profileStaffRegistrationEmail(person) -%}
     {%- if person -%}
     <div id="sendRegistrationEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -460,22 +463,60 @@
             })();
             return_url = getAccessUrl();
             if (hasValue(return_url)) {
-                body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
-                body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
-                subject = "{%trans%}Registration invite from {%endtrans%}{%trans%}" + clinicName + "{%endtrans%}";
-            };
-            if (body != '') {
                 $.ajax ({
-                    type: 'POST',
-                    url: "{{url_for('portal.invite')}}",
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                    data: {'subject': subject, 'recipients': email, 'body': body}
+                    type: "GET",
+                    url: "{{url_for('portal.staff_registration_email', user_id=person.id)}}",
+                    cache: false,
+                    async: false
                 }).done(function(data) {
-                    $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
-                }).fail(function() {
-                    $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+                    if (hasValue(data)) {
+                        body = data;
+                        var fname = "";
+                        var lname = "";
+                        if (!$("#firstNameGroup").hasClass("has-error") && !$("#lastNameGroup").hasClass("has-error")) {
+                            fname = $("#firstname").val();
+                            lname = $("#lastname").val();
+                        } else {
+                            $.ajax ({
+                                type: "GET",
+                                url: '{{url_for("demographics_api.demographics", patient_id=person.id)}}',
+                                async: false,
+                                cache: false
+                            }).done(function(data) {
+                                if (data && data.name) {
+                                    fname = data.name.given;
+                                    lname = data.name.family;
+                                };
+                            }).fail(function() {
+                            });
+                        };
+                        body = body.replace(/\(firstname\)/i, fname)
+                                   .replace(/\(lastname\)/i, lname)
+                                   .replace(/\(registrationlink\)/gi, return_url)
+
+                    };
+                }).fail(function(xhr) {
                 });
+
+                //provide default body content if no body content was returned from ajax call
+                if (!hasValue(body)) {
+                    body = "{%trans%}<p>Hello, this is an invitation to complete your registration.</p>{%endtrans%}";
+                    body += "<a href='" + decodeURIComponent(return_url) + "'>{%trans%}Verify your account to complete registration{%endtrans%}</a>";
+                };
+
+                subject = "{%trans%}Registration invite from {%endtrans%} " + clinicName;
             };
+
+            $.ajax ({
+                type: 'POST',
+                url: "{{url_for('portal.invite')}}",
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                data: {'subject': subject, 'recipients': email, 'body': body}
+            }).done(function(data) {
+                $('#profileEmailMessage').text('{%trans%}invite email sent to {%endtrans%}' + email);
+            }).fail(function() {
+                $('#profileEmailErrorMessage').text('{%trans%}Unable to send email.{%endtrans%}');
+            });
         });
      });</script>
     {%- endif -%}
@@ -531,21 +572,21 @@
     <div id="userOrgs_view" class="view-container"></div>
     <div class="edit-container">
         <div id="userOrgs" class="customized">
-           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}">
+           <input type="hidden" id="stock_consent_url" value="{{ url_for('portal.stock_consent', org_name='placeholder', _external=True)}}" />
            <p class="prompt text-muted">{{ _("In what state ")}}{% if current_user and current_user.has_role(ROLE.STAFF)%}{{_("is the patient ")}}{%else%}{{_("are you ")}}{% endif %}{{_("currently receiving prostate cancer care?") }}</p>
-           <div class="state-selector-container"><select id="stateSelector" class="form-control"></select></div>
+           <div class="state-selector-container selector-show"><select id="stateSelector" class="form-control"></select></div>
            <div id="fillOrgs" userId="{{person.id if person}}" class="orgs-by-state" {%if person and person.has_role(ROLE.PATIENT) and person.id == current_user.id %}patient_view="true"{%endif%}>
-               <p class="clinic-prompt prompt">{{ _("What is your main clinic for prostate cancer care?")}}</p>
-               <div class="main-state-container">
-                    <div class="noOrg-container" style="display: none">
-                        <label>
-                            <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
-                            <span>{{ _("None of the Above") }}</span>
-                        </label>
-                    </div>
+               <p class="clinic-prompt prompt selector-show">{{ _("What is your main clinic for prostate cancer care?")}}</p>
+               <div class="main-state-container selector-show">
                </div>
            </div>
-           <div id="userOrgsInfo" class="text-muted">{{_("No clinic found in selected clinic.")}}</div>
+            <div class="noOrg-container" style="display: none">
+                <label>
+                    <input id="noOrgs" class="clinic" type="radio" name="organization" value="0" />
+                    <span>{{ _("None of the Above") }}</span>
+                </label>
+            </div>
+           <div id="userOrgsInfo" class="text-muted selector-show">{{_("No clinic found in selected state.")}}</div>
            <div id="defaultConsentContainer"></div>
            {% if consent_agreements %}{{consent(person, consent_agreements, current_user, True)}}{% endif %}
         </div>
@@ -580,12 +621,6 @@
                             $(".noOrg-container").show();
                             $("#noOrgs").prop("checked", false);
                             container.show();
-                            {% if person %}
-                                var checkedItem = container.find("input[name='organization']:checked");
-                                if (checkedItem.length > 0) {
-                                   checkedItem.trigger("click");
-                                };
-                            {% endif %}
                         } else {
                             $(".state-container, .clinic-prompt, .noOrg-container").hide();
                             $("#userOrgsInfo").show();
@@ -652,22 +687,31 @@
                   });
 
                   var selectOptions = $("#stateSelector").sortOptions();
-                  $("#stateSelector").empty().append(selectOptions)
-                  .append("<option value='none'>Other</option>")
-                  .prepend("<option value='' selected>Select</option>")
-                  .val("");
-                  $(".state-container, .clinic-prompt").hide();
-                  setTimeout("OT.handlePreSelectedClinic();", 200);
-                  //case of pre-selected clinic, need to check if any clinic has prechecked
-                  setTimeout("handleCheckedItem();", 500);
+                  if (selectOptions.length > 0) {
+                      $("#stateSelector").empty().append(selectOptions)
+                      .append("<option value='none'>Other</option>")
+                      .prepend("<option value='' selected>Select</option>")
+                      .val("");
+                      $(".state-container, .clinic-prompt").hide();
+                      setTimeout("OT.handlePreSelectedClinic();", 200);
+                      //case of pre-selected clinic, need to check if any clinic has prechecked
+                      setTimeout("handleCheckedItem();", 500);
 
-                  OT.populateOrgsList(entry);
-                  $("#userOrgs input[name='organization']").each(function() {
-                    if ($(this).val() != 0) OT.getDefaultModal(this);
-                  });
+                      OT.populateOrgsList(entry);
+                      $("#userOrgs input[name='organization']").each(function() {
+                        if ($(this).val() != 0) OT.getDefaultModal(this);
+                      });
 
-                  {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
-                  OT.handleEvent();
+                      {% if person %} tnthAjax.getDemo({{person.id}}); {% endif %}
+                      OT.handleEvent();
+                    } else { // if no states found, then need to draw the orgs UI
+                        $("#userOrgs .selector-show").hide();
+                        setTimeout(function() { tnthAjax.getOrgs({{ person.id if person }}, false, false, function() {
+                            OT.filterOrgs(OT.getHereBelowOrgs());
+                            OT.morphPatientOrgs();
+                            $(".noOrg-container, .noOrg-container *").show();
+                        }); }, 500);
+                    };
 
                   if ($("#mainDiv.profile").length > 0) setTimeout('tnthAjax.getConsent({{ person.id if person }}, true);', 500);
                 };
@@ -716,17 +760,7 @@
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
-                var userOrgs = $("#userOrgs input[name='organization']");
-                var checkedOrgs = {};
-                userOrgs.each(function() {
-                    if ($(this).prop("checked")) {
-                        checkedOrgs[$(this).val()] = true;
-                    };
-                    $(this).attr("type", "radio");
-                    if (checkedOrgs[$(this).val()]) {
-                        $(this).prop("checked", true);
-                    };
-                });
+               OT.morphPatientOrgs();
             {%- endif -%}
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
@@ -865,6 +899,8 @@
             if (data["user_documents"] && data["user_documents"].length > 0 ) {
                 var fData = [];
                 data["user_documents"].forEach(function(item) {
+                    item["filename"] = escapeHtml(item["filename"]);
+                    item["document_type"] = escapeHtml(item["document_type"]);
                     item["uploaded_at"] = tnthDates.formatDateString(item["uploaded_at"], "iso");
                     item["actions"] = '<a title="Download" href="' + '/api/user/' + String(item["user_id"]) + '/user_documents/' + String(item["id"]) + '"><i class="fa fa-arrow-down"></i></a>';
                     fData.push(item);
@@ -995,6 +1031,7 @@
                         if (m) item["by"] = m[0]
                         else item["by"] = "-";
                         item["lastUpdated"] = tnthDates.formatDateString(item["lastUpdated"], "iso");
+                        item["comment"] = escapeHtml(item["comment"]);
                         var c = String(item["comment"]);
                         var len = ((ww < 650) ? 20 : (ww < 800? 40 : 80));
 
@@ -1579,7 +1616,7 @@
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label class="text-muted">{{_("Study ID")}}</label>
+        <label id="profileStudyIDLabel" class="text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study ID")}}</span></label>
         <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
     </div>
@@ -1710,8 +1747,19 @@
               if ($(this).is(":checked")) $("#manualEntryMessageContainer").text("");
           });
 
-        {%- if person and person.assessment_overall_status and person.assessment_overall_status == "Completed" -%}
-            $("#assessmentLink").attr("disabled", true); $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+        {%- if person -%}
+            $.ajax ({
+                type: "GET",
+                url: '/api/patient/{{person.id}}/assessment-status',
+                cache: false
+            }).done(function(data) {
+                if (data && (data.assessment_status).toUpperCase() == "COMPLETED") {
+                    $("#assessmentLink").attr("disabled", true); 
+                    $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
+                };
+            }).fail(function() {
+               // console.log("Problem retrieving data from server.");
+            });
         {%- endif -%}
     });</script>
 {%- endmacro %}
@@ -1896,7 +1944,7 @@
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr id="studyIDViewRow" class="study-id-view"><td class="study-id-view-label text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study Id")}}</span></td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
@@ -1971,7 +2019,7 @@
                             {{resetPassword(person)}}
                         </div>
                         {%- if person and person.has_role(ROLE.WRITE_ONLY) -%}
-                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileRegistrationEmail(person)}}</div>
+                            <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to user")}}</p>{{profileStaffRegistrationEmail(person)}}</div>
                         {%- endif -%}
                     </div>
                 </div>
@@ -1980,7 +2028,7 @@
     {%- endif -%}
     <div class="row">
         <div class="col-md-12 col-xs-12">
-            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (person and (not person.has_role(ROLE.PATIENT)) and current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
+            <div class="profile-item-container {% if (current_user and current_user.has_role(ROLE.STAFF) and ROLE.STAFF in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or (current_user and current_user.has_role(ROLE.ADMIN)) or (person and person.has_role(ROLE.STAFF) and current_user and current_user.has_role(ROLE.STAFF_ADMIN))%}editable{% endif %}" data-sections="org">
                 <h4 id="orgsLoc" class="profile-item-title index-item">{{ _("Clinic") }}</h4>
                 {{profileOrg(person,None,consent_agreements, current_user)}}
             </div>

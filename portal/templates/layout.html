@@ -22,10 +22,12 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.6.1/js/bootstrap-datepicker.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.js"></script>
-    <script src="https://unpkg.com/i18next/i18next.js"></script>
+    <!-- <script src="https://unpkg.com/i18next/i18next.js"></script>
     <script src="https://unpkg.com/i18next-xhr-backend/i18nextXHRBackend.js"></script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector/i18nextBrowserLanguageDetector.js"></script> -->
     <script src="{{ url_for('static', filename='js/bootstrap.rowlink.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18next.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/i18nextInit.js') }}"></script>
 </head>
 {# sets container to full-width #}
 {%- set splashView = false -%}
@@ -123,6 +125,10 @@ if (LOGIN_AS_PATIENT) {
       window.history.forward(1);
     };
   });
+};
+var __CRSF_TOKEN = "{{csrf_token()}}";
+var __CRSF_TOKEN_HEADER = {
+    "X-CSRFToken": __CRSF_TOKEN
 };
 {% block document_ready -%}
 $(document).ready(function(){

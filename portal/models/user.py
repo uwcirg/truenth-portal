@@ -1,4 +1,5 @@
 """User model """
+from cgi import escape
 from datetime import datetime
 from dateutil import parser
 from flask import abort, current_app
@@ -335,9 +336,10 @@ class User(db.Model, UserMixin):
     @property
     def display_name(self):
         if self.first_name and self.last_name:
-            return ' '.join((self.first_name, self.last_name))
+            name = ' '.join((self.first_name, self.last_name))
         else:
-            return self.username
+            name = self.username
+        return escape(name)
 
     @property
     def current_encounter(self):
