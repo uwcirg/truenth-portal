@@ -238,7 +238,7 @@ AdminTool.prototype.getUserOrgs = function() {
   if (this.userOrgs.length == 0) this.setUserOrgs(this.userId);
   return this.userOrgs;
 };
-AdminTool.prototype.initOrgsList = function(request_org_list) {
+AdminTool.prototype.initOrgsList = function(request_org_list, origin) {
     //set user orgs
     var self = this;
     self.setUserOrgs();
@@ -294,8 +294,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
                    if ($(this).is(":checked")) orgsList.push($(this).val());
                 });
                if (orgsList.length > 0) {
-                  location.replace("/patients/?org_list=" + orgsList.join(","));
-               } else location.replace("/patients");
+                  location.replace("/" + origin + "/?org_list=" + orgsList.join(","));
+               } else location.replace("/" + origin);
             });
         });
 
@@ -311,7 +311,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
                   };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
-              location.replace("/patients/?org_list=" + orgsList.join(","));
+              location.replace("/" + origin + "/?org_list=" + orgsList.join(","));
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();
