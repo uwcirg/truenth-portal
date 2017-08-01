@@ -52,6 +52,7 @@ setup_kwargs = dict(
         "Flask",
         "Flask-Babel",
         "Flask-Celery-Helper",
+        "Flask-Dogpile-Cache",
         "Flask-Migrate",
         "Flask-OAuthlib",
         "Flask-Recaptcha",
