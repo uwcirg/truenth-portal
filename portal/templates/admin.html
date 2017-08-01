@@ -8,7 +8,19 @@
     <p id="profileIntro">{{ _("Select any user to view details or make changes.") }}</p>
 
     <div class="admin-table table-responsive smaller-text">
-        <div id="adminTableToolbar" class="admin-toolbar"><span id="tableCount"></span></div>
+        <div id="adminTableToolbar" class="admin-toolbar">
+            <div id="orglistSelector" class="dropdown btn-group orglist-selector">
+                <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
+                </button>
+                <div id="org-menu" class="dropdown-menu" aria-labelledby="orglist-dropdown">
+                    <div class="form-group smaller-text" id="userOrgs">
+                        <div id="fillOrgs" class="smaller-text"></div>
+                    </div>
+                </div>
+            </div>
+            <span id="tableCount"></span>
+        </div>
         <table id="adminTable"
                class="table table-striped table-hover table-condensed"
                data-toggle="table"

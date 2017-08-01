@@ -621,7 +621,8 @@ def admin():
 
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users, wide_container="true", user=current_user())
+    return render_template('admin.html', users=users, wide_container="true",
+                           org_list=org_list, user=current_user())
 
 
 @portal.route('/staff-profile-create')
