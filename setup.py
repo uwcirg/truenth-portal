@@ -7,7 +7,8 @@ to install:
     python setup.py install
 
 """
-import datetime, os
+import datetime
+import os
 from setuptools import setup, find_packages
 
 project = "portal"
@@ -38,9 +39,8 @@ setup_kwargs = dict(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Topic :: Scientific/Engineering :: Medical Science Apps",
     ),
-    license = "BSD",
-    platforms = "any",
-
+    license="BSD",
+    platforms="any",
     include_package_data=True,
     zip_safe=False,
     packages=find_packages(),
@@ -76,7 +76,7 @@ setup_kwargs = dict(
         "sphinx_rtd_theme",
         "validators",
     ],
-    extras_require = {
+    extras_require={
         "dev": (
             "coverage",
             "nose",
@@ -106,7 +106,8 @@ else:
         version_kwargs = {"version": "0+ng"+build_version}
 
     else:
-        version_kwargs = dict(version='0+d'+datetime.date.today().strftime('%Y%m%d'))
+        version_kwargs = dict(
+            version='0+d'+datetime.date.today().strftime('%Y%m%d'))
 
 setup_kwargs.update(version_kwargs)
 setup(**setup_kwargs)
