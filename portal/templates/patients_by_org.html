@@ -159,7 +159,6 @@ var org_list = {};
 {% endif %}
 
 var AT = new AdminTool({{user.id}});
-var __patients_list = [];
 
 $(document).ready(function() {
 
@@ -168,9 +167,8 @@ $(document).ready(function() {
   });
 
   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-    {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
     //client side update of assessment status, for performance
-    setTimeout("AT.updateData();", 400);
+    setTimeout(function() { AT.updateData();}, 100);
     $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
         e.stopPropagation();
         AT.abortRequests(function() {
