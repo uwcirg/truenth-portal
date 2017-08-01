@@ -196,24 +196,6 @@ $(document).ready(function() {
 
   $("input[data-field='id']:checkbox").hide();
 
-  {% if config.HIDE_TRUENTH_ID_FIELD %}
-    (function() {
-      function checkBoxVis(o) {
-          if (o.is(":checked")) $("#adminTable .id-field").show();
-          else $("#adminTable .id-field").hide();
-      };
-
-      var __idCheckbox = $("#patientList .columns .dropdown-menu").find("input[data-field='userid']");
-
-      __idCheckbox.prop("checked", false);
-      __idCheckbox.on("click", function() { checkBoxVis($(this)) });
-
-      $("#adminTable").on("sort.bs.table reset-view.bs.table page-change.bs.table", function() { checkBoxVis(__idCheckbox) });
-      $("#adminTable .id-field").hide();
-
-    })();
-  {% endif %}
-
   $(document).delegate("#patientsDownloadButton", "click", function(event){
     var instruments = "", dataType = "";
     $("input[name='instrument'").each(function() {
