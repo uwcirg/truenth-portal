@@ -838,11 +838,13 @@ def explore():
 def share_story():
     return redirect(url_for('static', filename='files/LivedExperienceVideo.pdf'))
 
+
 @portal.route('/robots.txt')
 def robots():
     if current_app.config["SYSTEM_TYPE"].lower() == "production":
         return "User-agent: * \nAllow: /"
     return "User-agent: * \nDisallow: /"
+
 
 @portal.route('/contact', methods=('GET', 'POST'))
 def contact():

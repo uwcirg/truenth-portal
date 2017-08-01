@@ -634,7 +634,7 @@ module.exports = OrgTool = (function() {
           }).done(function(data) {
               if (callback) callback(errorMessage);
           }).fail(function() {
-              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + "Error occurred updating user organization.";
+              errorMessage += (hasValue(errorMessage) ? "<br/>":"") + i18next.t("Error occurred updating user organization.");
               if (callback) callback(errorMessage);
           });
         } else {
@@ -774,14 +774,14 @@ module.exports = OrgTool = (function() {
                         childClinic += '<label class="org-label ' + (orgsList[item.parentOrgId].isTopLevel ? "text-muted": "text-muter") + '">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        item.name +
+                        i18next.t("" + item.name) +
                         '</span></label>';
 
                      } else {
                         childClinic += '<label class="org-label">' +
                         '<input class="clinic" type="radio" name="organization" id="' +  item.id + '_org" value="'+
                         item.id +'"  ' +  (_isTopLevel ? (' data-parent-id="'+_parentOrgId+'"  data-parent-name="' + _parentOrg.name + '" ') : "") + '/><span>'+
-                        item.name +
+                        i18next.t("" + item.name) +
                         '</span></label>';
                     };
 
@@ -843,7 +843,7 @@ module.exports = OrgTool = (function() {
           };
         };
       } else {
-        $("#modal-org-error").html(errorMessage);
+        $("#modal-org-error").html(i18next.t("" + errorMessage));
       };
     };
   };
@@ -879,7 +879,8 @@ module.exports = OrgTool = (function() {
                   (data.interventions).forEach(function(item) {
                       var d = item.description;
                       var b = item.link_url;
-                      var n = item.name.replace(/\_/g, " ")
+                      var n = item.name.replace(/\_/g, " ");
+                          n = i18next.t("" + n);
                       var disabled = item.link_url == "disabled";
                       var dm = /decision\s?support/gi;
                       var sm = /symptom\s?tracker/gi;
@@ -889,7 +890,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                               var ditem = $("#intervention_item_decisionsupport");
                               if (ditem.length == 0) { //only draw this when there isn't already one
-                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Decision Support</a></li>');
+                                $(".side-nav-items__item--dashboard").after('<li id="intervention_item_decisionsupport" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Decision Support") + '</a></li>');
                               };
 
                               found_decision_support = true;
@@ -912,7 +913,7 @@ module.exports = OrgTool = (function() {
                           if (!disabled) {
                             var sitem = $("#intervention_item_symptomtracker");
                             if (sitem.length == 0) { //only draw this when there isn't already one
-                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">Symptom Tracker</a></li>');
+                              $(".side-nav-items__item--dashboard").after('<li id="intervention_item_symptomtracker" class="side-nav-items__item side-nav-items__item--has-icon side-nav-items__item--accentuated"><a href="' + b + '" class="capitalize intervention-link">' + i18next.t("Symptom Tracker") + '</a></li>');
                             };
 
                             found_symptom_tracker = true;
@@ -1041,7 +1042,7 @@ function appendLREditContainer(target, url, show) {
     if (!hasValue(url)) return false;
     if (!target) target = $(document);
     target.append('<div>' +
-                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">Edit in Liferay</a>' +
+                '<a href="' + url + '" target="_blank" class="menu button button--small button--teal button--LR">' + i18next.t("Edit in Liferay") + '</a>' +
                 '</div>'
                 );
     if (show) $(".button--LR").addClass("show");

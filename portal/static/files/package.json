@@ -1,0 +1,25 @@
+/*
+ * SAMPLE package.json file for local node.js project with required dependencies to run i18next tools
+ *
+ */
+
+{
+  "name": "i8next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Amy",
+  "license": "ISC",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-i18next": "^0.1.0",
+    "gulp": "^3.9.1",
+    "i18next-conv": "^4.0.3",
+    "i18next-parser": "^0.12.0",
+    "i18next-scanner": "^1.8.0"
+  }
+}
