@@ -159,7 +159,6 @@ var org_list = {};
 {% endif %}
 
 var AT = new AdminTool({{user.id}});
-var __patients_list = [];
 
 $(document).ready(function() {
 
@@ -168,9 +167,8 @@ $(document).ready(function() {
   });
 
   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-    {%for patient in patients_list-%}__patients_list.push({{patient.id}});{%-endfor%}
     //client side update of assessment status, for performance
-    setTimeout("AT.updateData();", 400);
+    setTimeout(function() { AT.updateData();}, 100);
     $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
         e.stopPropagation();
         AT.abortRequests(function() {
@@ -197,24 +195,6 @@ $(document).ready(function() {
   });
 
   $("input[data-field='id']:checkbox").hide();
-
-  {% if config.HIDE_TRUENTH_ID_FIELD %}
-    (function() {
-      function checkBoxVis(o) {
-          if (o.is(":checked")) $("#adminTable .id-field").show();
-          else $("#adminTable .id-field").hide();
-      };
-
-      var __idCheckbox = $("#patientList .columns .dropdown-menu").find("input[data-field='userid']");
-
-      __idCheckbox.prop("checked", false);
-      __idCheckbox.on("click", function() { checkBoxVis($(this)) });
-
-      $("#adminTable").on("sort.bs.table reset-view.bs.table page-change.bs.table", function() { checkBoxVis(__idCheckbox) });
-      $("#adminTable .id-field").hide();
-
-    })();
-  {% endif %}
 
   $(document).delegate("#patientsDownloadButton", "click", function(event){
     var instruments = "", dataType = "";

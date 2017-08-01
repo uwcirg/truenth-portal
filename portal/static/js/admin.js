@@ -5,9 +5,10 @@ function AdminTool (userId) {
   this.requestsCounter = 0;
   this.userId = userId;
   this.userOrgs = [];
-  this.initUserList = [];
   this.ajaxRequests = [];
   this.ajaxAborted = false;
+  this.arrData = {};
+  this.patientsIdList = [];
   OrgTool.call(this);
 };
 
@@ -19,7 +20,7 @@ function AdminTool (userId) {
 AdminTool.prototype = Object.create(OrgTool.prototype);
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
-  setTimeout('$("#loadingIndicator").fadeOut();', 300);
+  $("#loadingIndicator").hide() ;
   this.setLoadingMessageVis("hide");
 };
 AdminTool.prototype.setLoadingMessageVis = function(vis) {
@@ -32,12 +33,26 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
       break;
   };
 };
-var __index =0;
+AdminTool.prototype.getPatientsIdList = function() {
+  var self = this;
+  if (self.patientsIdList.length == 0) {
+    var all = $("#adminTable").bootstrapTable("getData");
+    all.forEach(function(o) {
+      self.patientsIdList.push(o.id);
+    });
+  };
+  return self.patientsIdList;
+};
 AdminTool.prototype.getData = function(requests, callback) {
     var self = this;
     if (self.ajaxAborted) return false;
     var userString = requests.shift();
     if (!hasValue(userString)) return false;
+    /*
+     *  load the data sequentially
+     *  Note, NO concurrent ajax calls here, 
+     *  one request will wait after the previous one has finished
+     */
     var ajaxRequest = $.ajax ({
                               type: "GET",
                               url: '/api/consent-assessment-status',
@@ -83,12 +98,20 @@ AdminTool.prototype.getData = function(requests, callback) {
                                             };
                                         });
                                     };
-                                    arrData.push({
-                                      "id": status.user_id,
-                                      "data": {
-                                      "status": a
-                                      }
-                                    });
+                                    if (hasValue(status.user_id)) {
+                                      /*
+                                       * NOTE, need to get the row data here
+                                       * data for all the fields are required for the method, updateByUniqueId
+                                       */
+                                      var rowData = $("#adminTable").bootstrapTable('getRowByUniqueId', status.user_id);
+                                      rowData = rowData || {};
+                                      /* update row data with updated assessment status */
+                                      rowData["status"] = a;
+                                      /* persist data here, help with debugging */
+                                      self.arrData[status.user_id] = { id: status.user_id, row: rowData};
+                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]); 
+        
+                                    };
                               });
 
                               if (arrData.length > 0) {
@@ -99,18 +122,15 @@ AdminTool.prototype.getData = function(requests, callback) {
                             };
                             if (requests.length > 0) {
                               self.getData(requests, callback);
+                              setTimeout(function() { self.fadeLoader(); }, 500);
                             }
                             else {
-                              self.fadeLoader();
-                              __index = 0;
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
-                              setTimeout(function() { $("#adminTable tr[data-uniqueid]").show(); }, 300);
-                            }
+                            };
                         }).fail(function(xhr) {
                             //console.log("request failed.");
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
                             self.fadeLoader();
-                            self.setLoadingMessageVis("hide");
                         });
         self.ajaxRequests.push(ajaxRequest);
         return ajaxRequest;
@@ -123,43 +143,18 @@ AdminTool.prototype.loadData = function(list, callback, timeout) {
     self.getData(list, function() { if (callback) callback.call(self); });
 };
 AdminTool.prototype.updateData = function() {
+  /**** compile patients list Id *****/
+  this.getPatientsIdList();
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
-    loader(true);
-    self.loadData(arrUsers, this.getRestData);
+    //loader(true);
+    self.loadData(arrUsers);
   } else {
     self.fadeLoader();
   };
 };
 
-/*
- *
- *  load the rest of data asynchronously
- *
- */
-
-AdminTool.prototype.getRestData = function() {
-   if (__patients_list.length > 0) {
-    var self = this;
-    //get rest of patients, don't need to load data for id whose data has been updated
-    __patients_list = __patients_list.filter(function(id) {
-      return !this.inArray(id, this.initUserList)
-    }, self);
-    self.loadData(this.getUserIdArray(__patients_list), function() { this.setLoadingMessageVis("hide");});
-  };
-}
-AdminTool.prototype.getInitUserList = function() {
-   var _userIds = [];
-   $("#adminTable tr[data-uniqueid]").each(function() {
-        var id = $(this).attr("data-uniqueid");
-        if (!isNaN(id)) {
-          _userIds.push(id);
-        };
-   });
-   this.initUserList = _userIds;
-   return _userIds;
-};
 AdminTool.prototype.abortRequests = function(callback) {
     var self = this;
    //NEED TO ABORT THE AJAX REQUESTS OTHERWICH CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
@@ -173,21 +168,9 @@ AdminTool.prototype.abortRequests = function(callback) {
           } catch(e) {
           };
           if (index == array.length - 1) {
-            /*
-             * polling to see of all requests are aborted
-             */
-            var intervalId = setInterval(function() {
-                var done = true;
-                AT.ajaxRequests.forEach(function(q) {
-                  if (!q.readyState == 4) done = false;
-                });
-                if (done) {
-                  $("#admin-table-error-message").text("");
+            $("#admin-table-error-message").text("");
                   if (callback) setTimeout(function() { callback();}, 100);
                   setTimeout(function() { DELAY_LOADING=true;loader(true);}, 300);
-                  clearInterval(intervalId);
-                }
-            }, 1);
           };
       });
     } else {
@@ -198,9 +181,9 @@ AdminTool.prototype.abortRequests = function(callback) {
 AdminTool.prototype.getUserIdArray = function(_userIds) {
   var us = "", ct = 0, arrUsers = [];
   if (!_userIds) {
-     _userIds = this.getInitUserList();
+     _userIds = this.getPatientsIdList();
   };
-  var max_ct = Math.max(__patients_list.length/10, 25);
+  var max_ct = Math.max(_userIds.length/10, 10);
 
   for (var index = 0; index < _userIds.length; index++, ct++) {
      us += (us != ""?"&":"") + "user_id=" + _userIds[index];
