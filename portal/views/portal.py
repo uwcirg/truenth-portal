@@ -611,8 +611,8 @@ def admin():
             org_list.update(OrgTree().here_and_below_id(orgId))
 
         users = User.query.join(UserOrganization).filter(
-                    and_(User.deleted == None,
-                         UserOrganization.user_id==User.id,
+                    and_(User.deleted is None,
+                         UserOrganization.user_id == User.id,
                          UserOrganization.organization_id != 0,
                          UserOrganization.organization_id.in_(org_list)))
     else:
