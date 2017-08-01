@@ -339,7 +339,7 @@ class User(db.Model, UserMixin):
             name = ' '.join((self.first_name, self.last_name))
         else:
             name = self.username
-        return escape(name)
+        return escape(name) if name else None
 
     @property
     def current_encounter(self):
