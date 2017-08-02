@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from flask import current_app
 
-from ..dogpile import hourly_cache
+from ..dogpile import dogpile_cache
 from .fhir import QuestionnaireResponse
 from .organization import Organization, OrgTree
 from .questionnaire_bank import QuestionnaireBank
@@ -423,7 +423,7 @@ class AssessmentStatus(object):
             return self._overall_status
 
 
-@hourly_cache.cache_on_arguments()
+@dogpile_cache.region('hourly')
 def overall_assessment_status(user_id, consent_id=None):
     """Cachable interface for expensive assessment status lookup
 

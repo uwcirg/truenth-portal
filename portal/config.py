@@ -49,6 +49,8 @@ class BaseConfig(object):
     CELERY_RESULT_BACKEND = 'redis'
     DEBUG = False
     DEFAULT_MAIL_SENDER = 'dontreply@truenth-demo.cirg.washington.edu'
+    DOGPILE_CACHE_BACKEND = 'dogpile.cache.redis'
+    DOGPILE_CACHE_REGIONS = [('hourly', 3600)]
     LOG_FOLDER = os.environ.get('LOG_FOLDER', None)
     LOG_LEVEL = 'DEBUG'
 
