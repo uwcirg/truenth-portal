@@ -11,7 +11,7 @@ from ..audit import auditable_event
 from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import oauth
-from ..models.assessment_status import AssessmentStatus
+from ..models.assessment_status import AssessmentStatus, overall_assessment_status
 from ..models.auth import validate_client_origin
 from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
@@ -1303,6 +1303,14 @@ def assessment_add(patient_id):
                     user_id=current_user().id, subject_id=patient_id,
                     context='assessment')
     response.update({'message': 'questionnaire response saved successfully'})
+
+    def invalidate_assessment_status_cache(user):
+        """Invalidate the assessment status cache values for this user"""
+        overall_assessment_status.invalidate(user.id)
+        for consent in user.all_consents:
+            overall_assessment_status.invalidate(user.id, consent.id)
+
+    invalidate_assessment_status_cache(patient)
     return jsonify(response)
 
 
@@ -1552,10 +1560,11 @@ def batch_assessment_status():
             continue
         details = []
         for consent in user.all_consents:
-            a_s = AssessmentStatus(user=user, consent=consent)
+            assessment_status = overall_assessment_status(
+                user.id, consent.id)
             details.append(
                 {'consent': consent.as_json(),
-                 'assessment_status': a_s.overall_status})
+                 'assessment_status': assessment_status})
         results.append({'user_id': user.id, 'consents': details})
 
     return jsonify(status=results)
