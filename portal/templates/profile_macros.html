@@ -2397,9 +2397,9 @@
             var self = this;
             if (!hasValue(err)) {
                 $('#confirmMsg').fadeIn();
+                self.__handleButton();
                 setTimeout(function() { $('#confirmMsg').fadeOut(); }, 800);
                 setTimeout(function() { self.__redirect(self.userId); }, 1000);
-                setTimeout(function() { self.__handleButton(); }, 1500);
                 self.__clear();
             } else {
                 self.__handleError(err);
