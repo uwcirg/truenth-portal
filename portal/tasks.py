@@ -7,11 +7,13 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
+from datetime import datetime
 from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
 from .extensions import celery
+from .models.scheduled_job import update_runtime
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
 #   celery worker -A portal.celery_worker.celery --loglevel=debug
@@ -64,3 +66,9 @@ def post_request(self, url, data, timeout=10, retries=3):
                     url, exc))
     except Exception as exc:
         logger.error("Unexpected exception on {} : {}".format(url, exc))
+
+
+@celery.task
+def test(job_id=None):
+    update_runtime(job_id)
+    return "Running test task..."
