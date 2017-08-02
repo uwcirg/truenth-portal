@@ -3,9 +3,12 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from flask import current_app
 
+from ..dogpile import hourly_cache
 from .fhir import QuestionnaireResponse
 from .organization import Organization, OrgTree
 from .questionnaire_bank import QuestionnaireBank
+from .user import User
+from .user_consent import UserConsent
 
 
 def most_recent_survey(user, instrument_id=None):
@@ -418,3 +421,18 @@ class AssessmentStatus(object):
                 else:
                     self._overall_status = 'In Progress'
             return self._overall_status
+
+
+@hourly_cache.cache_on_arguments()
+def overall_assessment_status(user_id, consent_id=None):
+    """Cachable interface for expensive assessment status lookup
+
+    The following code is only run on a cache miss.
+
+    """
+    user = User.query.get(user_id)
+    consent = UserConsent.query.get(consent_id) if consent_id else None
+    current_app.logger.debug("CACHE MISS: {} {} {}".format(
+        __name__, user_id, consent_id))
+    a_s = AssessmentStatus(user, consent)
+    return a_s.overall_status
