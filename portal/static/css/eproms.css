@@ -479,7 +479,7 @@ div.right-panel {
   text-align: center;
 }
 #aboutForm #next {
-  opacity: 0;
+  opacity: 1;
   transition: opacity 200ms ease-in;
   position: absolute;
   left: 0;
@@ -1845,12 +1845,11 @@ table.profile-audit-log TH,
 }
 .error-message,
 .report-error-message {
-  padding: 0.5em;
-  border-radius: 4px;
   text-align: left;
   color: #a94442;
 }
 .report-error-message {
+  padding: 0.5em;
   color: #a94442;
   background-color: #f5f5f5;
   margin-left: 8px;

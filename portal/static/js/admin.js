@@ -200,6 +200,7 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
 };
 AdminTool.prototype.setUserOrgs = function() {
   var self = this;
+  if (!hasValue(this.userId)) return false;
   $.ajax ({
           type: "GET",
           url: '/api/demographics/'+this.userId,
@@ -221,7 +222,7 @@ AdminTool.prototype.getUserOrgs = function() {
   if (this.userOrgs.length == 0) this.setUserOrgs(this.userId);
   return this.userOrgs;
 };
-AdminTool.prototype.initOrgsList = function(request_org_list) {
+AdminTool.prototype.initOrgsList = function(request_org_list, context) {
     //set user orgs
     var self = this;
     self.setUserOrgs();
@@ -277,8 +278,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
                    if ($(this).is(":checked")) orgsList.push($(this).val());
                 });
                if (orgsList.length > 0) {
-                  location.replace("/patients/?org_list=" + orgsList.join(","));
-               } else location.replace("/patients");
+                  location.replace("/" + context + "?org_list=" + orgsList.join(","));
+               } else location.replace("/" + context);
             });
         });
 
@@ -294,7 +295,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list) {
                   };
               });
               $("#orglist-clearall-ckbox").prop("checked", false);
-              location.replace("/patients/?org_list=" + orgsList.join(","));
+              location.replace("/" + context + "?org_list=" + orgsList.join(","));
           });
           $("#orglist-clearall-ckbox").on("click touchstart", function(e) {
               e.stopPropagation();

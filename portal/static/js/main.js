@@ -1497,6 +1497,7 @@ OrgTool.prototype.getOrgsList = function() {
 };
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
+    if (leafOrgs.length == 0) return false;
     var self = this;
 
     $("input[name='organization']").each(function() {
@@ -3089,14 +3090,21 @@ $(document).ready(function() {
                     });
                 }
                 return emailReg.test(emailVal);
+            }, 
+            htmltags: function($el) {
+                var invalid = containHtmlTags($el.val());
+                if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
+                else $("#error" + $el.attr("id")).html("");
+                return !invalid;
             }
         },
         errors: {
+            htmltags: "Please remove invalid characters and try again.",
             birthday: "Sorry, this isn't a valid date. Please try again.",
             customemail: "This isn't a valid e-mail address, please double-check."
         },
         disable: false
-    }).off('input.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
+    }).off('input.bs.validator change.bs.validator'); // Only check on blur (turn off input)   to turn off change - change.bs.validator
 
 });
 
@@ -3773,6 +3781,7 @@ var tnthTables = {
 
 
 var FieldLoaderHelper = function () {
+    this.delayDuration = 600;
     this.showLoader = function(targetField) {
         if(targetField && targetField.length > 0) {
            $("#" + targetField.attr("data-save-container-id") + "_load").css("opacity", 1);
@@ -3780,22 +3789,40 @@ var FieldLoaderHelper = function () {
     };
 
     this.showUpdate = function(targetField) {
+        targetField = targetField || $(targetField);
+        var __timeout = this.delayDuration;
         if(targetField && targetField.length > 0) {
-             $("#" + targetField.attr("data-save-container-id") + "_error").text("").css("opacity", 0);
-             $("#"+ targetField.attr("data-save-container-id") + "_success").text("success");
-            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_success").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_success").css("opacity", 0);', 2000);
+            setTimeout(function() { (function(targetField) {
+                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
+                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
+                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
+                errorField.text("").css("opacity", 0);
+                successField.text("success");
+                loadingField.animate({"opacity": 0}, __timeout, function() {
+                    successField.animate({"opacity": 1}, __timeout, function() {
+                        setTimeout(function() { successField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
+                });
+             });
+            })(targetField); }, __timeout);
         };
     };
 
     this.showError = function(targetField) {
+        targetField = targetField || $(targetField);
+        var __timeout = this.delayDuration;
         if(targetField && targetField.length > 0) {
-            $("#" + targetField.attr("data-save-container-id") + "_error").html("Unable to update. System/Server Error.");
-            $("#" + targetField.attr("data-save-container-id") + "_success").text("").css("opacity", 0);
-            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_load").css("opacity", 0);', 600);
-            setTimeout('$("#'+ targetField.attr("data-save-container-id") + '_error").css("opacity", 1);', 900);
-            setTimeout('$("#' + targetField.attr("data-save-container-id") + '_error").css("opacity", 0);', 5000);
+            setTimeout(function() { (function(targetField) {
+                var errorField = $("#" + targetField.attr("data-save-container-id") + "_error");
+                var successField = $("#"+ targetField.attr("data-save-container-id") + "_success");
+                var loadingField = $("#" + targetField.attr("data-save-container-id") + "_load");
+                errorField.text("Unable to update. System/Server Error.");
+                successField.text("").css("opacity", 0);
+                loadingField.animate({"opacity": 0}, __timeout, function() {
+                    errorField.animate({"opacity": 1}, __timeout, function() {
+                        setTimeout(function() { errorField.animate({"opacity": 0}, __timeout*2); }, __timeout*2);
+                });
+             });
+            })(targetField); }, __timeout);
         };
     };
 
@@ -3890,6 +3917,10 @@ function escapeHtml(text) {
         }[a];
     });
 }
+function containHtmlTags(text) {
+    if (!hasValue(text)) return false;
+    return /[<>]/.test(text);
+};
 
 var __winHeight = $(window).height(), __winWidth = $(window).width();
 $.fn.isOnScreen = function(){

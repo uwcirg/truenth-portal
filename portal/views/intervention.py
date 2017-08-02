@@ -9,7 +9,7 @@ from werkzeug.exceptions import Unauthorized
 from ..audit import auditable_event
 from ..database import db
 from ..extensions import oauth
-from ..models.auth import validate_client_origin
+from ..models.auth import validate_origin
 from ..models.group import Group, UserGroup
 from ..models.intervention import access_types, INTERVENTION, UserIntervention
 from ..models.intervention_strategies import AccessStrategy
@@ -228,7 +228,7 @@ def user_intervention_set(intervention_name):
     link = request.json.get('link_url')
     if link:
         try:
-            validate_client_origin(link)
+            validate_origin(link)
         except Unauthorized:
             abort(400, "link_url ill formed or origin not recognized")
         ui.link_url = link

@@ -26,7 +26,7 @@ from ..database import db
 from ..date_tools import FHIR_datetime
 from ..extensions import authomatic, oauth
 from ..models.auth import AuthProvider, Client, Token, create_service_token
-from ..models.auth import validate_client_origin, validate_local_origin
+from ..models.auth import validate_origin
 from ..models.coredata import Coredata
 from ..models.encounter import finish_encounter
 from ..models.intervention import INTERVENTION, STATIC_INTERVENTIONS
@@ -113,7 +113,7 @@ def capture_next_view_function(real_function):
 
         if request.args.get('next'):
             session['next'] = request.args.get('next')
-            validate_local_origin(session['next'])
+            validate_origin(session['next'])
             current_app.logger.debug(
                 "store-session['next']: <{}> before {}()".format(
                     session['next'], real_function.func_name))
@@ -252,7 +252,7 @@ def login(provider_name):
         assert int(user_id) < 10  # allowed for test users only!
         session['id'] = user_id
         if request.args.get('next'):
-            validate_client_origin(request.args.get('next'))
+            validate_origin(request.args.get('next'))
         user = current_user()
         login_user(user, 'password_authenticated')
         return next_after_login()
@@ -275,7 +275,7 @@ def login(provider_name):
 
     if request.args.get('next'):
         session['next'] = request.args.get('next')
-        validate_client_origin(session['next'])
+        validate_origin(session['next'])
         current_app.logger.debug(
             "store-session['next'] <{}> from login/{}".format(
                 session['next'], provider_name))
@@ -523,7 +523,7 @@ class InterventionEditForm(FlaskForm):
         """Custom validation to allow null and known origins only"""
         if len(field.data.strip()):
             try:
-                validate_client_origin(field.data)
+                validate_origin(field.data)
             except Unauthorized:
                 raise validators.ValidationError(
                     "Invalid URL (unknown origin)")
