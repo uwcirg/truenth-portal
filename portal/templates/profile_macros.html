@@ -2251,6 +2251,10 @@
 
         this.__request = function(params) {
             if (!params) return false;
+            if (!hasValue(params.apiUrl)) {
+                if (params.callback) (params.callback).call(self, {"error": "API url is required."});
+                return false;
+            };
             var errorMessage = "";
             var self = this;
             self.attempts++;
@@ -2386,14 +2390,13 @@
                    this.__handleError(returnedData.error);
                    this.__handleButton();
                 };
-                $("#updateProfile").attr("disabled", false);
             };
         };
         this.__handleDisplay = function(responseObj) {
             var err = responseObj && responseObj.error ? responseObj.error: null;
             var self = this;
             if (!hasValue(err)) {
-                 $('#confirmMsg').fadeIn();
+                $('#confirmMsg').fadeIn();
                 setTimeout(function() { $('#confirmMsg').fadeOut(); }, 800);
                 setTimeout(function() { self.__redirect(self.userId); }, 1000);
                 setTimeout(function() { self.__handleButton(); }, 1500);
