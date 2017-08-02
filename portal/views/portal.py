@@ -595,10 +595,34 @@ def home():
 def admin():
     """user admin view function"""
     # can't do list comprehension in template - prepopulate a 'rolelist'
-    users = User.query.filter_by(deleted=None).all()
+
+    request_org_list = request.args.get('org_list', None)
+
+    if request_org_list:
+        org_list = set()
+
+        # for selected filtered orgs, we also need to get the children
+        # of each, if any
+        request_org_list = set(request_org_list.split(","))
+        for orgId in request_org_list:
+            check_int(orgId)
+            if orgId == 0:  # None of the above doesn't count
+                continue
+            org_list.update(OrgTree().here_and_below_id(orgId))
+
+        users = User.query.join(UserOrganization).filter(
+                    and_(User.deleted_id == None,
+                         UserOrganization.user_id == User.id,
+                         UserOrganization.organization_id != 0,
+                         UserOrganization.organization_id.in_(org_list)))
+    else:
+        org_list = Organization.query.all()
+        users = User.query.filter_by(deleted=None).all()
+
     for u in users:
         u.rolelist = ', '.join([r.name for r in u.roles])
-    return render_template('admin.html', users=users, wide_container="true", user=current_user())
+    return render_template('admin.html', users=users, wide_container="true",
+                           org_list=list(org_list), user=current_user())
 
 
 @portal.route('/staff-profile-create')
