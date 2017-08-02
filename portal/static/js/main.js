@@ -1497,6 +1497,7 @@ OrgTool.prototype.getOrgsList = function() {
 };
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
+    if (leafOrgs.length == 0) return false;
     var self = this;
 
     $("input[name='organization']").each(function() {

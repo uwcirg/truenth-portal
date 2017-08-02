@@ -43,6 +43,7 @@
                 <th data-field="lastname" data-sortable="true" data-filter-control="input">{{ _("Last Name") }}</th>
                 <th data-field="email" data-sortable="true" data-filter-control="input">{{ _("Email") }}</th>
                 <th data-field="roles" data-sortable="true" data-filter-control="input">{{ _("Roles") }}</th>
+                <th data-field="sites" data-sortable="true" data-filter-control="input">{{_("Sites")}}</th>
                 <th class="text-center"><em>{{ _("Delete") }}</em> {{ _("User") }}</span></th>
             </tr>
             </thead>
@@ -55,15 +56,15 @@
                 <td>{{ user.last_name if user.last_name }}</td>
                 <td>{{ user.email if user.email }}</td>
                 <td>{{ user.rolelist }}</td>
+                <td>{% for org in user.organizations | sort(attribute='id') %}<span class="smaller-text">{{org.name}}</span><br/>{% endfor %}</td>
                 <td class="text-center">{% if not user.has_role(ROLE.ADMIN) and (not user.has_role(ROLE.STAFF))%}<button onclick="deleteUser(event, {{user.id}})" type="button" class="btn btn-default"><em>Delete</em></button>{% else %}-{% endif %}</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-
 </div>
-
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {% block footer %}
 {% from "flask_user/_macros.html" import footer %}
@@ -106,4 +107,16 @@ function deleteUser(event, userId) {
         };
     };
 };
+
+var org_list = {};
+{% if org_list %}
+  {% for org in org_list %}
+      org_list["{{org}}"] = true;
+  {% endfor %}
+{% endif %}
+var AT = new AdminTool();
+$(document).ready(function() {
+  AT.initOrgsList(org_list, 'admin');
+  setTimeout(function() { AT.fadeLoader(); }, 500);
+});
 {% endblock %}

@@ -217,6 +217,7 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
 };
 AdminTool.prototype.setUserOrgs = function() {
   var self = this;
+  if (!hasValue(this.userId)) return false;
   $.ajax ({
           type: "GET",
           url: '/api/demographics/'+this.userId,
