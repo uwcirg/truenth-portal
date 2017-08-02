@@ -12,6 +12,7 @@ from .audit import configure_audit_log
 from .config import DefaultConfig
 from .csrf import csrf, csrf_blueprint
 from .database import db
+from .dogpile import dogpile_cache
 from .extensions import authomatic, recaptcha
 from .extensions import babel, celery, mail, oauth, session, user_manager
 from .models.app_text import app_text
@@ -71,6 +72,7 @@ def create_app(config=None, app_name=None, blueprints=None):
                 instance_relative_config=True)
     configure_app(app, config)
     configure_csrf(app)
+    configure_dogpile(app)
     configure_jinja(app)
     configure_error_handlers(app)
     configure_extensions(app)
@@ -101,6 +103,18 @@ def configure_csrf(app):
 
     """
     csrf.init_app(app)
+
+
+def configure_dogpile(app):
+    """Initialize dogpile cache with config values"""
+
+    # Bootstrap challenges with config values dependent on other
+    # configuration values, which may be set in different
+    # order depending on environment.
+
+    # Regardless of configuration location, this should now be set.
+    app.config['DOGPILE_CACHE_URLS'] = app.config['REDIS_URL']
+    dogpile_cache.init_app(app)
 
 
 def configure_jinja(app):
