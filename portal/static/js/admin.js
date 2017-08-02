@@ -20,7 +20,7 @@ function AdminTool (userId) {
 AdminTool.prototype = Object.create(OrgTool.prototype);
 AdminTool.prototype.fadeLoader = function() {
   DELAY_LOADING = false;
-  setTimeout(function() { $("#loadingIndicator").fadeOut(); }, 300);
+  setTimeout(function() { $("#loadingIndicator").fadeOut(); }, 1000);
   this.setLoadingMessageVis("hide");
 };
 AdminTool.prototype.setLoadingMessageVis = function(vis) {
