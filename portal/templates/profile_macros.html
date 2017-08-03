@@ -1764,7 +1764,7 @@
                 cache: false
             }).done(function(data) {
                 if (data && (data.assessment_status).toUpperCase() == "COMPLETED") {
-                    $("#assessmentLink").attr("disabled", true); 
+                    $("#assessmentLink").attr("disabled", true);
                     $("#enterManualInfoContainer").text("{%trans%}All available questionnaires have been completed.{%endtrans%}");
                 };
             }).fail(function() {
@@ -2241,7 +2241,7 @@
         this.attempts = 0;
         this.max_attempts = 3;
         this.params = null;
-        this.roles = roles ? roles : [{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}];
+        this.roles = roles;
         this.userId = "None created";
 
         $.ajaxSetup({
@@ -2292,7 +2292,7 @@
 
             var _accountArray = {};
             _accountArray['organizations'] = orgIDs;
-            _accountArray['roles'] =  this.roles;
+            if (this.roles) _accountArray['roles'] =  this.roles;
             _accountArray['consents'] = getConsents();
 
             //note, this will call put/demographics to update demographics after
@@ -2415,9 +2415,11 @@
         this.__redirect = function() {
             if (this.userId) {
                 var isPatient = false;
-                this.roles.forEach(function(role) {
-                    if (!isPatient && role.name.toLowerCase() == "patient") isPatient = true;
-                });
+                if (this.roles) {
+                    this.roles.forEach(function(role) {
+                        if (!isPatient && role.name.toLowerCase() == "patient") isPatient = true;
+                    });
+                };
                 if (isPatient) {
                     $("#redirectLink").attr('href', '/patients/patient_profile/' + this.userId);
                 } else $("#redirectLink").attr('href', '/profile/' + this.userId);
@@ -2565,7 +2567,7 @@
                 // everything looks good!
                 e.preventDefault();
 
-                aco.__handleButton("hide");    
+                aco.__handleButton("hide");
                 setTimeout("aco.__setAccount();", 0);
 
             };

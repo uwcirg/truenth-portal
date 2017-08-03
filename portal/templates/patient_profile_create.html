@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {%- from "flask_user/_macros.html" import back_btn, footer -%}
 {% block main %}
-{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn -%}
+{%- from "profile_macros.html" import profileName, profileBirthDate, profileEmail, profilePhone, profileAltPhone, profileStudyID, profileSiteID, profileSaveBtn, accountCreationScript -%}
 {%- from "initial_queries_macros.html" import consent_fields -%}
 <br/>
 <form id="createProfileForm" class="form tnth-form to-validate">
@@ -104,12 +104,11 @@
     {%- endif -%}
 </form>
 <a id="redirectLink" href="">&nbsp;</a>
-{%- from "profile_macros.html" import accountCreationScript -%}
 {{accountCreationScript()}}
 {% endblock %}
 {% block footer %}
 {{footer(user=user)}}
 {% endblock %}
 {% block document_ready %}
-    var aco = new AccountCreationObj();
+    var aco = new AccountCreationObj([{'name': '{{ROLE.PATIENT}}'}, {'name': '{{ROLE.WRITE_ONLY}}'}]);
 {% endblock %}
