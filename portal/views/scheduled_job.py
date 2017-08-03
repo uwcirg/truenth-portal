@@ -12,6 +12,7 @@ from ..models.scheduled_job import ScheduledJob
 
 scheduled_job_api = Blueprint('scheduled_job_api', __name__)
 
+
 @scheduled_job_api.route('/scheduled_jobs')
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()

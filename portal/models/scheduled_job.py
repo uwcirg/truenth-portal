@@ -50,6 +50,7 @@ class ScheduledJob(db.Model):
                        day_of_week=svals[4]
                       )
 
+
 def update_runtime(job_id, runtime=None):
     if job_id:
         runtime = runtime or datetime.now()
