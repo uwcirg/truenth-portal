@@ -148,7 +148,6 @@ $(document).ready(function(){
     });
 
     if (!(_isTouchDevice())) {
-
       $('span[data-toggle="tooltip"]').tooltip();
     };
 
@@ -195,10 +194,6 @@ $(document).ready(function(){
     //if (__leftPanel.is(":visible")) $("a.open").trigger("click");
      ***********************************************************/
 
-
-    //in profile email is validated and updated after ajax call to check unique email
-    $("#email").attr("data-update-on-validated", "true").attr("data-user-id", '{{user.id}}');
-
     $(".profile-item-container.editable").each(function() {
         $(this).prepend('<button class="btn profile-item-edit-btn"></button>');
     });
@@ -219,8 +214,6 @@ $(document).ready(function(){
           };
         });
     });
-
-    $("#btnProfileSendEmail").blur();
 
 });
 {% endblock %}

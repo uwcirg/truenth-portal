@@ -41,13 +41,9 @@ function xhr_function(){
 function embed_page(data){
     $("#mainNav")
         // Embed data returned by AJAX call into container element
-        .html(data).promise().done(function() {
-            //for firefox? need to figure out why it doesn't show the content if not deling this call??
-            if(navigator.userAgent.toLowerCase().indexOf('firefox') > -1){
-                setTimeout("loader();", 300);
-                //console.log("in firefox")
-            } else setTimeout("loader();", 0);
-
+        .html(data);
+        setTimeout(function() {
+            loader();
             $("#tnthTopLinks li a, #tnthNavbarXs li a").each(function() {
                 $(this).on("click", function(e) {
                     e.preventDefault();
@@ -55,8 +51,7 @@ function embed_page(data){
                     window.location = $(this).attr("href");
                 });
             });
-
-        });
+        }, 500)
 }
 
 function showMain() {
@@ -71,22 +66,6 @@ function showMain() {
 
 }
 
-function showWrapper(hasLoader) {
-    var cssProp = {"visibility":"visible", "display": "block"};
-    //adding this for firefox fix
-    if (!$("#tnthNavWrapper").is(":visible") || navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-        if (hasLoader) {
-            $("#tnthNavWrapper").css(cssProp).promise().done(function() {
-                //delay removal of loading div to prevent FOUC
-                if (!DELAY_LOADING) {
-                    setTimeout('$("#loadingIndicator").fadeOut();', 1000);
-                };
-            });
-
-        } else $("#tnthNavWrapper").css(cssProp);
-    };
-};
-
 // Loading indicator that appears in UI on page loads and when saving
 var loader = function(show) {
     //landing page
@@ -99,9 +78,9 @@ var loader = function(show) {
     if (show) {
         $("#loadingIndicator").show();
     } else {
-        setTimeout("showMain();", 1000);
+        setTimeout("showMain();", 500);
         if (!DELAY_LOADING) {
-            setTimeout('$("#loadingIndicator").fadeOut();', 1500);
+            setTimeout('$("#loadingIndicator").fadeOut();', 1000);
         };
     };
 };
@@ -2697,8 +2676,7 @@ var tnthAjax = {
     "getRoleList": function() {
         $.ajax({
             type: "GET",
-            url: "/api/roles",
-            async: false
+            url: "/api/roles"
         }).done(function(data) {
             fillContent.roleList(data);
         });
