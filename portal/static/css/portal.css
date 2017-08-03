@@ -679,11 +679,16 @@ span.custom-study-id-label {
 #adminTable td.reports-field div {
   display: inline-block;
   margin: 0.3em auto;
+  white-space: nowrap;
+}
+#adminTable td.reports-field div.staff-html {
+  margin-top: 0.5em;
+  margin-bottom: 0.8em;
 }
 #adminTable td.reports-field a {
   width: 4em;
   max-width: 100%;
-  padding: 0.7em;
+  padding: 0.5em;
   color: #fff;
   background-color: #7C959E;
   border-color: #7C959E;
@@ -692,6 +697,7 @@ span.custom-study-id-label {
   border-radius: 0;
   letter-spacing: 2px;
   margin: 0 0.2em;
+  white-space: nowrap;
 }
 #adminTable .eproms-id-label {
   display: none;
