@@ -3716,7 +3716,7 @@ var tnthDates = {
 
 var tnthTables = {
     /***
-     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * Quick way to sort when text is wrapped in an <a href> or other tag
      * @param a,b - the two items to compare
      * @returns 1,-1 or 0 for sorting
      */
@@ -3731,7 +3731,7 @@ var tnthTables = {
         return  bb - aa;
     },
     /***
-     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * Quick way to sort when text is wrapped in an <a href> or other tag
      * NOTE for text that is NOT number
      * @param a,b - the two items to compare
      * @returns 1,-1 or 0 for sorting
