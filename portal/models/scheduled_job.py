@@ -51,10 +51,11 @@ class ScheduledJob(db.Model):
                       )
 
 def update_runtime(job_id, runtime=None):
-    runtime = runtime or datetime.now()
-    sj = ScheduledJob.query.get(job_id)
-    if sj:
-        sj.last_runtime = runtime
-        db.session.add(sj)
-        db.session.commit()
-        return db.session.merge(sj)
+    if job_id:
+        runtime = runtime or datetime.now()
+        sj = ScheduledJob.query.get(job_id)
+        if sj:
+            sj.last_runtime = runtime
+            db.session.add(sj)
+            db.session.commit()
+            return db.session.merge(sj)
