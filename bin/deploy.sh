@@ -16,11 +16,14 @@ update_repo(){
     fi
     branch_name=$(git symbolic-ref -q HEAD)
 
+    git fetch origin
+    git fetch --tags
+
     if [[ "$BRANCH" != "$(git symbolic-ref -q HEAD)" ]]; then
         git checkout $BRANCH
     fi
 
-    git fetch --tags
+
     git pull origin $BRANCH
 }
 
