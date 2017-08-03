@@ -71,4 +71,4 @@ def post_request(self, url, data, timeout=10, retries=3):
 @celery.task
 def test(job_id=None):
     update_runtime(job_id)
-    return "Running test task..."
+    return "Test task complete."

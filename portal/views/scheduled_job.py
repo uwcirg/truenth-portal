@@ -5,7 +5,7 @@ from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..database import db
-from ..extensions import oauth
+from ..extensions import celery, oauth
 from ..models.role import ROLE
 from ..models.scheduled_job import ScheduledJob
 
@@ -23,4 +23,9 @@ def jobs_list():
 
     """
     jobs = ScheduledJob.query.filter(ScheduledJob.name != "__test_celery__").all()
-    return render_template('scheduled_jobs_list.html', jobs=jobs)
+    tasks = []
+    for task in celery.tasks.keys():
+        path = task.split('.')
+        if path[0] == 'portal':
+            tasks.append(path[-1])
+    return render_template('scheduled_jobs_list.html', jobs=jobs, tasks=tasks)
