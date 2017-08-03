@@ -106,6 +106,7 @@ class BaseConfig(object):
     FILE_UPLOAD_DIR = 'uploads'
     LR_ORIGIN = 'https://stg-lr7.us.truenth.org'
     LR_GROUP = 20139
+    LR_FOLDER_ST = 32149
 
     SYSTEM_TYPE = 'development'
 
