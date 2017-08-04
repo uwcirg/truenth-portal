@@ -57,13 +57,6 @@
                                 OT.filterOrgs(leafOrgs);
                             };
 
-                            //user.first_top_organization()
-                            {% if user.first_top_organization() %}
-                            if ($("#profileStudyIDContainer").is(":visible")) {
-                                OT.drawStudyIDLabel([{{user.first_top_organization().id}}]);
-                            };
-                            {% endif %}
-
                              var userOrgs = $("#userOrgs input[name='organization']");
                              userOrgs.each(function() {
                                 $(this).attr("type", "radio");

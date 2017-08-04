@@ -93,8 +93,8 @@
           <thead>
               <tr>
                   <th data-field="id" data-visible="false" data-card-visible="false" data-sortable="false" data-class="tnth-hide">
-                  <!-- need to hide the ID column specifically for EPROMs -->
-                  <th data-field="userid" data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field" data-width="1%">{{_("TrueNTH ID")}}</th>
+                  <!-- NOTE TrueNTH has requested its unique ID label, therefore use CSS class to hide/show label appropriately here, please see portal.css and eproms.css for details -->
+                  <th data-field="userid"  data-sortable="true" data-sorter="tnthTables.stripLinksSorter" data-class="id-field"><span class="truenth-id-label">{{_("TrueNTH ID")}}</span><span class="eproms-id-label">{{ _("ID") }}</span></th>
                   <th data-field="username" data-sortable="true" data-visible="false">{{ _("Username") }}</th>
                   <th data-field="firstname" data-sortable="true" data-class="firstname-field">{{ _("First Name") }}</th>
                   <th data-field="lastname" data-sortable="true" data-class="lastname-field">{{ _("Last Name") }}</th>
@@ -103,7 +103,7 @@
                   <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field">{{ _("Phone (Other)") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field profile-study-id-label"><span class="default-study-id-label">{{ _("Study ID") }}</span></th>{% endif %}
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
                   <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
@@ -193,7 +193,6 @@ $(document).ready(function() {
         return rowInfo;
     }
   });
-
   $("input[data-field='id']:checkbox").hide();
 
   $(document).delegate("#patientsDownloadButton", "click", function(event){

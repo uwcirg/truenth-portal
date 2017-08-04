@@ -655,8 +655,7 @@ h4.detail-title {
 }
 #profileStudyIDContainer,
 #studyIdContainer,
-.study-id-view,
-span.custom-study-id-label {
+.study-id-view {
   display: none;
 }
 
