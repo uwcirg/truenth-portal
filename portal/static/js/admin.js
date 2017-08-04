@@ -133,15 +133,6 @@ AdminTool.prototype.getData = function(requests, callback) {
         self.ajaxRequests.push(ajaxRequest);
         return ajaxRequest;
 };
-AdminTool.prototype.loadData = function(list, callback) {
-    var self = this;
-    $("#admin-table-error-message").text("");
-    if (list && list.length > 0) {
-      self.getData(list, function() { if (callback) callback.call(self); });
-    } else {
-      if (callback) callback.call(self);
-    };
-};
 AdminTool.prototype.updateData = function() {
   /* compile user IDs array from patients list ID */
   var arrUsers = this.getUserIdArray();
@@ -150,7 +141,6 @@ AdminTool.prototype.updateData = function() {
      self.getData(arrUsers);
   };
 };
-
 AdminTool.prototype.abortRequests = function(callback) {
     var self = this;
    //NEED TO ABORT THE AJAX REQUESTS OTHERWISE CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP

@@ -712,7 +712,7 @@ div.right-panel {
   display: flex;
 }
 #adminTable .organization-field {
-  min-width: 150px;
+  min-width: 130px;
 }
 .truenth-id-label {
    display: none;
