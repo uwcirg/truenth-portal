@@ -50,7 +50,7 @@ AdminTool.prototype.getData = function(requests, callback) {
     if (!hasValue(userString)) return false;
     /*
      *  load the data sequentially
-     *  Note, NO concurrent ajax calls here, 
+     *  Note, NO concurrent ajax calls here,
      *  one request will wait after the previous one has finished
      */
     var ajaxRequest = $.ajax ({
@@ -109,8 +109,8 @@ AdminTool.prototype.getData = function(requests, callback) {
                                       rowData["status"] = a;
                                       /* persist data here, help with debugging */
                                       self.arrData[status.user_id] = { id: status.user_id, row: rowData};
-                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]); 
-        
+                                      $("#adminTable").bootstrapTable('updateByUniqueId', self.arrData[status.user_id]);
+
                                     };
                               });
 
@@ -122,7 +122,7 @@ AdminTool.prototype.getData = function(requests, callback) {
                             };
                             if (requests.length > 0) {
                               self.getData(requests, callback);
-                              setTimeout(function() { self.fadeLoader(); }, 500);
+                              self.fadeLoader();
                             }
                             else {
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
@@ -136,11 +136,10 @@ AdminTool.prototype.getData = function(requests, callback) {
         self.ajaxRequests.push(ajaxRequest);
         return ajaxRequest;
 };
-AdminTool.prototype.loadData = function(list, callback, timeout) {
+AdminTool.prototype.loadData = function(list, callback) {
     var self = this;
     $("#admin-table-error-message").text("");
     this.setLoadingMessageVis("show");
-    if (!timeout) timeout = 100;
     self.getData(list, function() { if (callback) callback.call(self); });
 };
 AdminTool.prototype.updateData = function() {
@@ -149,7 +148,6 @@ AdminTool.prototype.updateData = function() {
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
-    //loader(true);
     self.loadData(arrUsers);
   } else {
     self.fadeLoader();
@@ -170,8 +168,9 @@ AdminTool.prototype.abortRequests = function(callback) {
           };
           if (index == array.length - 1) {
             $("#admin-table-error-message").text("");
-                  if (callback) setTimeout(function() { callback();}, 100);
-                  setTimeout(function() { DELAY_LOADING=true;loader(true);}, 300);
+            if (callback) {
+                setTimeout(function() { callback();}, 100);
+            };
           };
       });
     } else {
@@ -200,6 +199,7 @@ AdminTool.prototype.getUserIdArray = function(_userIds) {
   return arrUsers;
 };
 AdminTool.prototype.setUserOrgs = function() {
+  if (!hasValue(this.userId)) return false;
   var self = this;
   if (!hasValue(this.userId)) return false;
   $.ajax ({

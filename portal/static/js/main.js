@@ -3090,7 +3090,7 @@ $(document).ready(function() {
                     });
                 }
                 return emailReg.test(emailVal);
-            }, 
+            },
             htmltags: function($el) {
                 var invalid = containHtmlTags($el.val());
                 if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
@@ -3716,7 +3716,7 @@ var tnthDates = {
 
 var tnthTables = {
     /***
-     * Quick way to sort when text is wrapper in an <a href> or other tag
+     * Quick way to sort when text is wrapped in an <a href> or other tag
      * @param a,b - the two items to compare
      * @returns 1,-1 or 0 for sorting
      */
@@ -3729,6 +3729,19 @@ var tnthTables = {
         //if (aa < bb) return -1;
         //return 0;
         return  bb - aa;
+    },
+    /***
+     * Quick way to sort when text is wrapped in an <a href> or other tag
+     * NOTE for text that is NOT number
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksTextSorter": function(a,b) {
+        var aa = $(a).text();
+        var bb = $(b).text();
+        if(aa < bb) return -1;
+        if(aa > bb) return 1;
+        return 0;
     }
 };
 
