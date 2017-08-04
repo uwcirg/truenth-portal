@@ -333,6 +333,9 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
 
     if (noPatientData) $("#patientListExportDataContainer").hide();
 
+    /*
+     * private functions used only within the context of the class
+     */
     __setOrgsMenuHeight = function(padding) {
       if (!padding) padding = 100;
       var h = parseInt($("#fillOrgs").height());
