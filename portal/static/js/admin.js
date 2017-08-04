@@ -126,6 +126,7 @@ AdminTool.prototype.getData = function(requests, callback) {
                             }
                             else {
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
+                              setTimeout(function() { self.fadeLoader(); }, 500);
                             };
                         }).fail(function(xhr) {
                             //console.log("request failed.");
