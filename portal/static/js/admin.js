@@ -328,7 +328,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
 
     //orglist-dropdown
     $('#orglist-dropdown').on('click touchstart', function () {
-        setTimeout('__setOrgsMenuHeight(100); __clearFilterButtons();', 10);
+        setTimeout('AT.__setOrgsMenuHeight(100); AT.__clearFilterButtons();', 10);
     });
 
     if (noPatientData) $("#patientListExportDataContainer").hide();
@@ -336,7 +336,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
     /*
      * private functions used only within the context of the class
      */
-    __setOrgsMenuHeight = function(padding) {
+    this.__setOrgsMenuHeight = function(padding) {
       if (!padding) padding = 100;
       var h = parseInt($("#fillOrgs").height());
       if (!isNaN(h) && h > 0) {
@@ -346,7 +346,7 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         };
       };
     };
-    __clearFilterButtons = function() {
+    this.__clearFilterButtons = function() {
       $("#orglist-close-ckbox, #orglist-clearall-ckbox, #orglist-selectall-ckbox").prop("checked", false);
     };
 };
