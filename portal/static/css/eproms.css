@@ -711,7 +711,7 @@ div.right-panel {
 #adminTable div.card-view {
   display: flex;
 }
-.truenth-id-label {
+#adminTable .truenth-id-label {
   display: none;
 }
 #adminTableToolbar div.orglist-selector {
@@ -1746,21 +1746,6 @@ div.noOrg-container span {
   width: 300px;
   max-width: 100%;
 }
-span.custom-study-id-label {
-  display: none;
-}
-span.default-study-id-label {
-  display: block;
-}
-span.custom-study-id-label[data-org-id='20000'] {
-  display: block;
-}
-
-span.custom-study-id-label[data-org-id='20000'] + .default-study-id-label,
-span.custom-study-id-label[data-org-id='20000'] + .custom-study-id-label{
-  display: none;
-}
-
 #createProfileForm #profileStudyIDContainer {
   margin-top: 2em;
   margin-bottom: 1em;

@@ -241,11 +241,6 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
             var hbOrgs = self.getHereBelowOrgs();
 	          self.filterOrgs(hbOrgs);
         };
-
-        if ($("#adminTable .study-id-field").length > 0) {
-          AT.drawStudyIDLabel(AT.getUserTopLevelParentOrgs(AT.getUserOrgs()), true);
-        };
-
         $("#dataDownloadModal").on('shown.bs.modal', function () {
               var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
               if (parentOrgList && parentOrgList.length > 0) {

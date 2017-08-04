@@ -1623,8 +1623,8 @@
 {%- endmacro %}
 {% macro profileStudyID(current_user) -%}
     <div id="profileStudyIDContainer" class="form-group" data-loader-container="true">
-        <label id="profileStudyIDLabel" class="text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study ID")}}</span></label>
-        <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %} data-htmltags="true" data-error-field="errorprofileStudyId"/>
+        <label class="text-muted">{{_("Study ID")}}</label>
+        <input type="text" id="profileStudyId" class="form-control" {%if current_user and current_user.has_role(ROLE.PATIENT) %}disabled{% endif %}/>
         <div class="help-block with-errors"></div>
         <div id="errorprofileStudyId" class="error-message"></div>
     </div>
@@ -1951,7 +1951,7 @@
                         <tr><td class="text-muted">{{_("Name")}}</td><td><div id="name_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Date of Birth")}}</td><td><div id="dob_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Email")}}</td><td><div id="email_view"></div></td></tr>
-                        {% if person.has_role('patient') %}<tr id="studyIDViewRow" class="study-id-view"><td class="study-id-view-label text-muted profile-study-id-label"><span class="default-study-id-label">{{_("Study Id")}}</span></td><td><div id="study_id_view"></div></td></tr>{% endif %}
+                        {% if person.has_role('patient') %}<tr class="study-id-view"><td class="text-muted">{{_("Study Id")}}</td><td><div id="study_id_view"></div></td></tr>{% endif %}
                         {% if person.has_role('patient') %}<tr class="site-id-view"><td class="text-muted">{{_("Site Id")}}</td><td><div id="site_id_view"></div></td></tr>{% endif %}
                         <tr><td class="text-muted">{{_("Cell")}}</td><td><div id="phone_view"></div></td></tr>
                         <tr><td class="text-muted">{{_("Phone (Other)")}}</td><td><div id="alt_phone_view"></div></td></tr>
