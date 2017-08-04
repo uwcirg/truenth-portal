@@ -143,10 +143,11 @@ AdminTool.prototype.loadData = function(list, callback) {
     };
 };
 AdminTool.prototype.updateData = function() {
+  /* compile user IDs array from patients list ID */
   var arrUsers = this.getUserIdArray();
   var self = this;
   if (arrUsers.length > 0) {
-    self.loadData(arrUsers);
+     self.getData(arrUsers);
   };
 };
 
