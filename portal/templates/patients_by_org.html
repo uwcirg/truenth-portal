@@ -123,9 +123,7 @@
                         <td class="rowlink-skip text-center reports-field">{%-if patient.staff_html() -%}<div class="staff-html">{{ patient.staff_html() | safe }}</div>{%-endif-%}{% for doc in patient.documents.distinct('intervention_id').filter_by(document_type='PatientReport') | sort(attribute='intervention_id') %}{% if doc.intervention %}<div><a  class="btn btn-tnth-primary" href="{{ url_for('patients.patient_profile', patient_id=patient.id) + '#patientReportsLoc'}}">{% if doc.intervention.description == 'Symptom Tracker' %}{{ 'ST' }}{% else %}{{ 'DS' }}{% endif %}</a></div>{% endif %}{% endfor %}
                         </td>
                       {% endif %}
-                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}
-                        <td><span class="field-loading-indicator text-muted smaller-text"><i class="fa fa-spinner fa-spin"></i> loading ...</span></td>
-                      {% endif %}
+                      {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<td></td>{% endif %}
                       {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<td>{%if patient.external_study_id%}{{ patient.external_study_id }}{%endif%}</td>
                       {% endif %}
                       <td>{%- if patient.valid_consents -%}
@@ -151,17 +149,13 @@
 {% endblock %}
 {% block document_ready %}
 
-var org_list = {};
-{% if org_list %}
-  {% for org in org_list %}
-      org_list[{{org}}] = true;
-  {% endfor %}
-{% endif %}
-
 var AT = new AdminTool({{user.id}});
 
 $(document).ready(function() {
 
+  /*
+   *  scroll to the top of page on each page change
+   */
   $("#adminTable").on("page-change.bs.table", function() {
       if (!$("#patientList .tnth-headline").isOnScreen()) $('html, body').animate({scrollTop : $(".fixed-table-toolbar").offset().top},2000);
   });
@@ -172,19 +166,29 @@ $(document).ready(function() {
     $(document).delegate("#adminTable tr[data-uniqueid] td", "click touchstart", function(e) {
         e.stopPropagation();
         AT.abortRequests(function() {
-          $(e.target).trigger('click.bs.rowlink');
+          if (e.target && !$(e.target).hasClass("rowlink-skip")) {
+            $(e.target).trigger('click.bs.rowlink');
+            setTimeout(function() { loader(true);}, 300);
+          };
         });
     });
     $(document).delegate("#createUserLink", "click touchstart", function(e) {
         e.stopPropagation();
         AT.abortRequests(function() {
           window.location = $("#createUserLink").attr("href");
+          setTimeout(function() { loader(true);}, 300);
         });
     });
-  {% else %}
-    AT.fadeLoader();
   {% endif %}
 
+  /*
+   * fade loading spinner on page load
+   */
+  AT.fadeLoader();
+
+  /*
+   * initializing bootstrapTable
+   */
   $(".tnth-admin-table").bootstrapTable({
     formatShowingRows: function (pageFrom, pageTo, totalRows) {
         var thisId = $(this).attr("tableId");
@@ -193,8 +197,15 @@ $(document).ready(function() {
         return rowInfo;
     }
   });
+
+  /*
+   *  hide checkbox for hidden id field from side menu
+   */
   $("input[data-field='id']:checkbox").hide();
 
+  /*
+   * attach on click even to submit button in the download modal
+   */
   $(document).delegate("#patientsDownloadButton", "click", function(event){
     var instruments = "", dataType = "";
     $("input[name='instrument'").each(function() {
@@ -210,7 +221,6 @@ $(document).ready(function() {
         $("#_downloadMessage").text("");
         $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
         $("#_downloadLink")[0].click();
-        //$("#dataDownloadModal").modal("hide");
     } else {
         message = (instruments == "" ? "{{_('Please choose at least one instrument.')}}": "");
         if (dataType == "") message += (message != "" ? "<br/>": "") + "{{_('Please choose one download type.')}}";
@@ -218,9 +228,22 @@ $(document).ready(function() {
     };
   });
 
+  /*
+   * attach event to each checkbox in the download instruments modal
+   */
   $("input[name='instrument'], input[name='downloadType']").on("click", function() {
       if ($(this).is(":checked")) $("#_downloadMessage").text("");
   });
+
+  /*
+   * variable passed into orgs dropdown to check selected org(s)
+   */
+  var org_list = {};
+  {% if org_list %}
+    {% for org in org_list %}
+        org_list[{{org}}] = true;
+    {% endfor %}
+  {% endif %}
 
   AT.initOrgsList(org_list, 'patients');
 

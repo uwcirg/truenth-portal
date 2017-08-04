@@ -1497,6 +1497,7 @@ OrgTool.prototype.getOrgsList = function() {
 OrgTool.prototype.filterOrgs = function(leafOrgs) {
     if (!leafOrgs) return false;
     if (leafOrgs.length == 0) return false;
+
     var self = this;
 
     $("input[name='organization']").each(function() {
@@ -1661,6 +1662,7 @@ OrgTool.prototype.populateUI = function() {
         };
         if (parentOrgsCt > 0 && orgsList[org].isTopLevel) container.append("<span class='divider'>&nbsp;</span>");
     };
+    if (!hasValue(container.text())) container.html("No organizations available");
 };
 OrgTool.prototype.getDefaultModal = function(o) {
         if (!o) return false;
@@ -1924,12 +1926,17 @@ OrgTool.prototype.getChildOrgs = function(orgs, orgList) {
       return this.getChildOrgs(childOrgs, orgList);
     };
 };
-OrgTool.prototype.getHereBelowOrgs = function() {
-  var userOrgs = this.userOrgs, mainOrgsList = this.getOrgsList(), self = this;
+OrgTool.prototype.getHereBelowOrgs = function(userOrgs) {
+  var mainOrgsList = this.getOrgsList(), self = this;
   var here_below_orgs = [];
   if (!userOrgs) {
-    var selectedOrg = this.getSelectedOrg();
-   if (selectedOrg.length > 0) userOrgs = [selectedOrg.val()];
+   var selectedOrg = this.getSelectedOrg();
+   if (selectedOrg.length > 0) {
+        userOrgs = [];
+        selectedOrg.each(function() {
+            userOrgs.push($(this).val());
+        });
+   };
   };
   if (userOrgs) {
       userOrgs.forEach(function(orgId) {
@@ -3047,7 +3054,7 @@ $(document).ready(function() {
                     });
                 }
                 return emailReg.test(emailVal);
-            }, 
+            },
             htmltags: function($el) {
                 var invalid = containHtmlTags($el.val());
                 if (invalid) $("#error" + $el.attr("id")).html("Invalid characters in text.");
