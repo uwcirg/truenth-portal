@@ -252,7 +252,6 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
 
         $("#dataDownloadModal").on('shown.bs.modal', function () {
               var parentOrgList = self.getUserTopLevelParentOrgs(self.getUserOrgs());
-              console.dir(parentOrgList)
               if (parentOrgList && parentOrgList.length > 0) {
                  var instrumentList = self.getInstrumentList();
                  var instrumentItems = [];
