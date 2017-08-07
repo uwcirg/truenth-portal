@@ -762,6 +762,12 @@ div.right-panel {
 #adminTable {
   min-height: 280px;
   transition: all 0.5s ease-in;
+  .organization-field {
+    min-width: 130px;
+  }
+  .truenth-id-label {
+     display: none;
+  }
   div.card-view {
     display: flex;
   }
@@ -778,6 +784,9 @@ div.right-panel {
     display: none;
   }
 }
+.truenth-id-label {
+   display: none;
+ }
 #adminTableToolbar {
   div.orglist-selector {
     display: inline-block;
@@ -2010,6 +2019,7 @@ div.noOrg-container {
   z-index: 99999;
   color: #444;
   margin: auto;
+  background: transparent;
 }
 #loadingIndicator:before {
   content: ' ';

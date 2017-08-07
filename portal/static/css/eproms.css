@@ -711,8 +711,11 @@ div.right-panel {
 #adminTable div.card-view {
   display: flex;
 }
-#adminTable .truenth-id-label {
-  display: none;
+#adminTable .organization-field {
+  min-width: 130px;
+}
+.truenth-id-label {
+   display: none;
 }
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
@@ -1862,6 +1865,7 @@ table.profile-audit-log TH,
   z-index: 99999;
   color: #444;
   margin: auto;
+  background: transparent;
 }
 #loadingIndicator:before {
   content: ' ';

@@ -1746,6 +1746,7 @@ table.profile-audit-log TH,
   z-index: 99999;
   color: #444;
   margin: auto;
+  background: transparent;
 }
 #loadingIndicator:before {
   content: ' ';
