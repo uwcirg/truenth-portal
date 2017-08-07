@@ -10,7 +10,7 @@ Background
 
 Docker is an open-source project that automates the deployment of applications inside software containers. Docker defines specifications and provides tools that can be used to automate building and deploying software containers.
 
-Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Dockerfiles define image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
+Dockerfiles declaratively define how to build a Docker :term:`image` that is subsequently run as a :term:`container`, any number of times. Configuration in Dockerfiles is primarily driven by image build-time arguments (ARG) and environmental variables (ENV) that may be overridden.
 
 Containers
 ==========
