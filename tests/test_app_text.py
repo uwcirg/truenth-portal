@@ -78,7 +78,7 @@ class TestAppText(TestCase):
         # self.asset should still work (and equal the error text)
         self.assertEquals(result.asset, sample_error)
 
-    def test_unversioned_resource(self):
+    def test_asset_variable_replacement(self):
         test_user = User.query.get(TEST_USER_ID)
 
         test_url = "https://notarealwebsitebeepboop.com"
