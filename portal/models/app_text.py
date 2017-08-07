@@ -10,6 +10,7 @@ SitePersistence mechanism, and looked up in a template using the
 from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
+from re import finditer
 import requests
 from requests.exceptions import MissingSchema
 from urllib import urlencode
@@ -233,7 +234,7 @@ class PrivacyATMA(AppTextModelAdapter):
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
-    def __init__(self, url, asset=None):
+    def __init__(self, url, asset=None, variables={}):
         """Initialize based on requested URL
 
         Attempts to fetch asset and mock a versioned URL
@@ -249,6 +250,7 @@ class UnversionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables
         if asset:
             self._asset = asset
         else:
@@ -273,14 +275,14 @@ class UnversionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            return format_asset_attributes(self._asset, self.variables)
         return self.error_msg
 
 
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    def __init__(self, url):
+    def __init__(self, url, variables={}):
         """Initialize based on requested URL
 
         Attempts to fetch the asset, permanent version of URL and link
@@ -300,6 +302,7 @@ class VersionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables
         try:
             response = requests.get(url)
             self._asset = response.json().get('asset')
@@ -332,7 +335,7 @@ class VersionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            return format_asset_attributes(self._asset, self.variables)
         return self.error_msg
 
     def _permanent_url(self, generic_url, version):
@@ -416,3 +419,14 @@ def app_text(name, *args):
         raise ValueError(
             "AppText with name '{}' defines more parameters "
             "than provided: `{}`".format(name, *args))
+
+
+def format_asset_attributes(asset, variables):
+    asset_out = ""
+    x = 0
+    for match in finditer(r"\${[^}]+}", asset):
+        attr = variables.get(match.group(0)[2:-1], '')
+        asset_out += asset[x:match.start()] + str(attr)
+        x = match.end()
+    asset_out += asset[x:]
+    return asset_out

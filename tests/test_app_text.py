@@ -4,7 +4,9 @@ from flask_webtest import SessionScope
 
 from portal.extensions import db
 from portal.models.app_text import AppText, app_text, VersionedResource
-from tests import TestCase
+from portal.models.app_text import UnversionedResource
+from portal.models.user import User
+from tests import TestCase, TEST_USER_ID
 
 
 from urlparse import urlparse, parse_qsl
@@ -75,3 +77,17 @@ class TestAppText(TestCase):
         self.assertEquals(result.url, sample_url)
         # self.asset should still work (and equal the error text)
         self.assertEquals(result.asset, sample_error)
+
+    def test_unversioned_resource(self):
+        test_user = User.query.get(TEST_USER_ID)
+
+        test_url = "https://notarealwebsitebeepboop.com"
+        test_asset = "Hello ${firstname} ${lastname}! Your user ID is ${id}"
+        test_vars = {"firstname": test_user.first_name,
+                     "lastname": test_user.last_name,
+                     "id": TEST_USER_ID}
+        resource = UnversionedResource(test_url,
+                                       asset=test_asset,
+                                       variables=test_vars)
+        rf_id = int(resource.asset.split()[-1])
+        self.assertEquals(rf_id, TEST_USER_ID)
