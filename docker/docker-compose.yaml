@@ -2,7 +2,10 @@
 version: '2.1'
 services:
   web:
-    image: "uwcirg-docker-${BINTRAY_DOCKER_REPO:-portal}.bintray.io/${IMAGE_NAME:-portal_web}:latest"
+    env_file:
+      - portal.env
+    # Todo: fix tagging of "latest" and "stable" on TravisCI
+    image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:e4bef52c7eb0c9e647397808f59afa3a60a8473f"
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -11,7 +14,6 @@ services:
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     environment:
-      - SERVER_NAME=${SERVER_NAME:-localhost}
       - PERSISTENCE_FILE=${PERSISTENCE_FILE:-https://raw.githubusercontent.com/uwcirg/TrueNTH-USA-site-config/develop/site_persistence_file.json}
       # compose-specific overrides
       - SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI:-postgresql://postgres:@db/postgres}
