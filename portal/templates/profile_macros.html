@@ -258,6 +258,11 @@
             if ($(this).val() != "") $("#profileEmailSelect").attr("disabled", false);
             else $("#profileEmailSelect").val("").attr("disabled", true);
         });
+        //in profile email is validated and updated after ajax call to check unique email
+        {% if person %}
+            $("#email").attr("data-update-on-validated", "true").attr("data-user-id", '{{person.id}}');
+        {% endif %}
+        $("#btnProfileSendEmail").blur();
     });</script>
 {%- endmacro %}
 
@@ -758,9 +763,7 @@
         });
 
         function _handleOrgs() {
-
             if (leafOrgs) OT.filterOrgs(leafOrgs);
-
             {%- if ((person.has_role(ROLE.PATIENT) or current_user.has_role(ROLE.PATIENT)) and 'patient' in config.CONSENT_EDIT_PERMISSIBLE_ROLES) or
                 ((person.has_role(ROLE.PATIENT) and current_user.has_role(ROLE.STAFF)) and 'staff' in config.CONSENT_EDIT_PERMISSIBLE_ROLES)
              -%}
@@ -769,7 +772,7 @@
             {%- if (person and (person.has_role(ROLE.STAFF) or person.has_role(ROLE.STAFF_ADMIN))) -%}
                 $("#userOrgs .noOrg-container").hide();
             {%- endif -%}
-            setTimeout(function() { tnthAjax.getConsent({{ person.id if person }}, true);}, 500);
+            setTimeout(function() { tnthAjax.getConsent({{ person.id if person }});}, 500);
         };
     </script>
 {%- endmacro %}
