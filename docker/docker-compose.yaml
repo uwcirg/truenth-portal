@@ -2,7 +2,8 @@
 version: '2.1'
 services:
   web:
-    image: "uwcirg-docker-${BINTRAY_DOCKER_REPO:-portal}.bintray.io/${IMAGE_NAME:-portal_web}:latest"
+    # Todo: fix tagging of "latest" and "stable" on TravisCI
+    image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:e4bef52c7eb0c9e647397808f59afa3a60a8473f"
     build:
       context: ..
       dockerfile: docker/Dockerfile
