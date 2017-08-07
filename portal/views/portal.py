@@ -1003,6 +1003,8 @@ def reporting_dashboard():
     counts['organizations'] = defaultdict(int)
 
     for user in User.query.filter_by(active=True):
+        if ROLE.TEST in [r.name for r in user.roles]:
+            continue
         for role in user.roles:
             counts['roles'][role.name] += 1
             if role.name == 'patient':
