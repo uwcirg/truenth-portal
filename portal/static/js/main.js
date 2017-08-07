@@ -290,7 +290,7 @@ var fillViews = {
     "timezone": function() {
         if ($("#profileTimeZone").length > 0) {
             var content = $("#profileTimeZone").find("option:selected").val();
-            if (hasValue(content)) $("#timezone_view").text(content);
+            if (hasValue(content)) $("#timezone_view").text(content.replace(/\_/g, " "));
             else $("#timezone_view").html("<p class='text-muted'>No information provided</p>");
         } else $(".timezone-view").hide();
     },
@@ -581,6 +581,7 @@ var fillContent = {
             var isAdmin = typeof _isAdmin != "undefined" && _isAdmin ? true: false;
             var editable = (typeof consentEditable != "undefined" && consentEditable == true) ? true : false;
             var consentDateEditable = editable && (typeof isTestPatient != "undefined" && isTestPatient);
+            var userTimeZone = tnthDates.getUserTimeZone(userId);
             content = "<table id='consentListTable' class='table-bordered table-condensed table-responsive table-striped' style='width: 100%; max-width:100%'>";
             /********* Note that column headings are different between TrueNTH and EPROMs.
                  Use css class to hide/show headings accordingly
@@ -604,7 +605,7 @@ var fillContent = {
                     (data.tous).forEach(function(item) {
                         var fType = $.trim(item.type).toLowerCase();
                         if (fType == "subject website consent" || fType == "website terms of use") {
-                            item.accepted = tnthDates.formatDateString(item.accepted); //format to accepted format D m y
+                            item.accepted = tnthDates.convertDateByTimeZone(item.accepted, userTimeZone); //format to accepted format D m y
                             item.display_type = $.trim((item.type).toLowerCase().replace('subject', ''));  //for displaying consent type, note: this will remove text 'subject' from being displayed
                             touObj.push(item);
                         };
@@ -660,7 +661,7 @@ var fillContent = {
                     var deleteDate = item.deleted ? item.deleted["lastUpdated"]: "";
                     var sDisplay = "", cflag = "";
                     var se = item.staff_editable, sr = item.send_reminders, ir = item.include_in_reports, cflag = "";
-                    var signedDate = tnthDates.formatDateString(item.signed);
+                    var signedDate = tnthDates.convertDateByTimeZone(item.signed, userTimeZone)
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
 
@@ -722,8 +723,8 @@ var fillContent = {
                             + '<h5 class="modal-title">Consent Date Editor</h5>'
                             + '</div>'
                             + '<div class="modal-body" style="padding: 0 2em">'
-                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.formatDateString(item.signed, "d M y hh:mm:ss") + '</span></h4>'
-                            + '<p style="margin-bottom: 0.6em">Modify the consent date <span class="text-muted">(GMT 24-hour format)</span> for this agreement to: </p>'
+                            + '<br/><h4>Current consent date: <span class="text-success">' + tnthDates.convertDateByTimeZone(item.signed, userTimeZone, "d M y hh:mm:ss") + '</span></h4>'
+                            + '<p style="margin-bottom: 0.6em">Modify the consent date <span class="text-muted">(24-hour format)</span> for this agreement to: </p>'
                             + '<br/><div id="consentDateLoader_' + index + '" class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>'
                             + '<div id="consentDateContainer_' + index + '" class="form-group consent-date-container">'
                             + '<div class="row">'
@@ -834,6 +835,13 @@ var fillContent = {
                         $(this).removeClass("active");
                     });
                 });
+
+                if (!hasValue($(".timezone-error").text()) && userTimeZone != "UTC") {
+                    $("#profileConsentList .gmt").hide();
+                } else {
+                    if (userTimeZone == "UTC") $("#profileConsentList .gmt").show();
+                };
+
                 $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
                 $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
                     $(this).on("change", function() {
@@ -3445,6 +3453,10 @@ var tnthDates = {
     "getGivenDate":function(y, m, d) {
         return ""+y+m+d;
     },
+    "isSystemDate": function(dateString) {
+        if (!hasValue(dateString)) return false;
+        else return /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/.test(dateString);
+    },
     /*
      * NB
      * For dateString in ISO-8601 format date as returned from server
@@ -3452,11 +3464,10 @@ var tnthDates = {
 
     "formatDateString": function(dateString, format) {
         if (dateString) {
-               var iosDateTest = /^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/
                var d = new Date(dateString);
                var ap, day, month, year, hours, minutes, seconds, nd;
                if (!this.isDateObj(d)) return "";
-               if (iosDateTest.test(dateString)) {
+               if (this.isSystemDate(dateString)) {
                    //IOS date, no need to convert again to date object, just parse it as is
                    //issue when passing it into Date object, the output date is inconsistent across from browsers
                    var dArray = $.trim($.trim(dateString).replace(/[\.TZ:\-]/gi, " ")).split(" ");
@@ -3606,10 +3617,12 @@ var tnthDates = {
                                     userTimeZone = item.timezone;
                                 };
                             });
+                        $(".timezone-error").html("");
                     };
 
                 }).fail(function() {
                     userTimeZone = "UTC";
+                    $(".timezone-error").html("Unable to retrieve user time zone.")
                 });
             };
         } else {
@@ -3648,6 +3661,55 @@ var tnthDates = {
 
        //console.log("locale? " + locale)
        return locale ? locale : "en-us";
+    },
+    /***** this function only works in Chrome for now, but save it here for later user when browsers have full support for Intl ****/
+    "convertDateByLocaleTimeZone": function (dateString, timeZone, locale) {
+        if (!dateString) return "";
+        else {
+            if (!locale)  locale = "en-us";
+            //locale needs to be in this format - us-en
+            //month: 'numeric', day: 'numeric',
+            locale = locale.replace("_", "-").toLowerCase();
+            var options = {
+                year: 'numeric', day: 'numeric', month: 'short',
+                hour: 'numeric', minute: 'numeric', second: 'numeric',
+                hour12: false
+            };
+            if (hasValue(timeZone) && timeZone.toUpperCase() != "UTC") options.timeZone =  timeZone;
+            //older browsers don't support this
+            if (window.Intl && typeof Intl != "undefined") {
+                var convertedDate = new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
+                return convertedDate.replace(/\,/g, "");
+            } else return dateString; //return dateString without conversion
+        };
+    },
+    /* convert system date (in iso format) based on timeZone
+     * parameters:  dateString: required, string Type, in iso format
+     *              time zone:  optional user time zone
+     *              format:  optional date/time format
+     */
+    "convertDateByTimeZone": function(dateString, timeZone, format) {
+        if (!dateString) return "";
+        else {
+            if (!format) format = "d M y";
+            if (timeZone && timeZone.toUpperCase() != "UTC") {
+                try {
+                    var d = moment.utc(dateString);
+                    var cDate = d.tz(timeZone).format();
+                } catch(e) {
+                    $(".timezone-error").text("Error converting date/time by time zone: " + e.message);
+                    //no conversion occurred, just return date in accepted format
+                    return this.formatDateString(dateString, format);
+                }
+                return this.formatDateString(cDate, format);
+
+            } else {
+                //return formatted dateString
+                return this.formatDateString(dateString, format);
+
+            };
+
+        };
     }
 };
 

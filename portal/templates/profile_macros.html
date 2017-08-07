@@ -1476,14 +1476,14 @@
             <option value="America/New_York">{{_("America/New York")}}</option>
             <option value="Australia/Adelaide">{{_("Australia/Adelaide")}}</option>
             <option value="Australia/Brisbane">{{_("Australia/Brisbane")}}</option>
-            <option value="Australia/Broken_Hill">{{_("Australia/Broken_Hill")}}</option>
+            <option value="Australia/Broken_Hill">{{_("Australia/Broken Hill")}}</option>
             <option value="Australia/Canberra">{{_("Australia/Canberra")}}</option>
             <option value="Australia/Currie">{{_("Australia/Currie")}}</option>
             <option value="Australia/Darwin">{{_("Australia/Darwin")}}</option>
             <option value="Australia/Eucla">{{_("Australia/Eucla")}}</option>
             <option value="Australia/Hobart">{{_("Australia/Hobart")}}</option>
             <option value="Australia/Lindeman">{{_("Australia/Lindeman")}}</option>
-            <option value="Australia/Lord_Howe">{{_("Australia/Lord_Howe")}}</option>
+            <option value="Australia/Lord_Howe">{{_("Australia/Lord Howe")}}</option>
             <option value="Australia/Melbourne">{{_("Australia/Melbourne")}}</option>
             <option value="Australia/North">{{_("Australia/North")}}</option>
             <option value="Australia/Perth">{{_("Australia/Perth")}}</option>
@@ -1497,7 +1497,7 @@
         </select>
     </div>
     <div class="timezone-warning"></div>
-    <div class="timezone-error"></div>
+    <div class="timezone-error put-demo-error error-message"></div>
     <script>
     {% if person %}
     $(function() {
@@ -1507,6 +1507,16 @@
             $(".timezone-warning").html("");
             assembleContent.demo({{ person.id }},true, $(this), true);
             fillViews.timezone();
+        });
+        $("#profileTimeZone").on("change", function() {
+            setTimeout(function() { 
+                    if (!hasValue($(".timezone-error").text())) {
+                        window.location.reload(true);
+                    };
+
+                }, 
+                1000);
+            
         });
     });
     {% endif %}
