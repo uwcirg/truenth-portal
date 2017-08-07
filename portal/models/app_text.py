@@ -234,7 +234,7 @@ class PrivacyATMA(AppTextModelAdapter):
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
-    def __init__(self, url, asset=None, variables={}):
+    def __init__(self, url, asset=None, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch asset and mock a versioned URL
@@ -250,7 +250,7 @@ class UnversionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
-        self.variables = variables
+        self.variables = variables or {}
         if asset:
             self._asset = asset
         else:
@@ -282,7 +282,7 @@ class UnversionedResource(object):
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    def __init__(self, url, variables={}):
+    def __init__(self, url, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch the asset, permanent version of URL and link
@@ -302,7 +302,7 @@ class VersionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
-        self.variables = variables
+        self.variables = variables or {}
         try:
             response = requests.get(url)
             self._asset = response.json().get('asset')
