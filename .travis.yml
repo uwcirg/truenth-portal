@@ -80,10 +80,13 @@ after_success:
   # Only run build steps in corresponding tox env
   - if [[ "$TOXENV" != "build" ]]; then travis_terminate 0;fi
 
-  # Set docker tag based on branch
+  # Set primary docker tag (TAG) based on branch, or current tag
+  # Precedence: current git tag, current branch (with develop and master mapped to latest and stable respectively)
   - declare -A TAGS=(["develop"]="latest" ["master"]="stable");
     export TAG=${TAGS["${TRAVIS_BRANCH}"]:-${TRAVIS_BRANCH//\//_}}
   - export TAG=${TRAVIS_TAG:-${TAG}}
+
+  # List of tags to apply to docker image
   # TravisCI doesn't support Bash arrays
   # See https://github.com/travis-ci/travis-ci/issues/3149
   - export DOCKER_TAGS="$TAG $SHORT_HASH $TRAVIS_COMMIT $TRAVIS_BUILD_NUMBER"
