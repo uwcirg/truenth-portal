@@ -2637,12 +2637,15 @@ var tnthAjax = {
             flo.showError(targetField);
         });
     },
-    "getRoleList": function() {
+    "getRoleList": function(callback) {
         $.ajax({
             type: "GET",
             url: "/api/roles"
         }).done(function(data) {
             fillContent.roleList(data);
+            if (callback) callback();
+        }).fail(function() {
+            $(".get-roles-error").html("Server error occurred retrieving roles information.");
         });
     },
     "getRoles": function(userId,isProfile) {
@@ -2662,7 +2665,8 @@ var tnthAjax = {
            else $(".get-roles-error").html(errorMessage);
         });
     },
-    "putRoles": function(userId,toSend) {
+    "putRoles": function(userId,toSend, targetField) {
+        flo.showLoader(targetField);
         $.ajax ({
             type: "PUT",
             url: '/api/user/'+userId+'/roles',
@@ -2670,8 +2674,10 @@ var tnthAjax = {
             dataType: 'json',
             data: JSON.stringify(toSend)
         }).done(function(data) {
+            flo.showUpdate(targetField);
             $(".put-roles-error").html("");
         }).fail(function(jhr) {
+            flo.showError(targetField);
             var errorMessage = "Server error occurred setting user role information."
            if ($(".put-roles-error").length == 0) $(".default-error-message-container").append("<div class='put-roles-error error-message'>" + errorMessage + "</div>");
            else $(".put-roles-error").html(errorMessage);

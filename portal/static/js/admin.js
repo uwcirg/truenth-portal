@@ -245,6 +245,8 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
         if (!noPatientData) {
             var hbOrgs = self.getHereBelowOrgs(self.getUserOrgs());
 	          self.filterOrgs(hbOrgs);
+        } else {
+          $("div.fixed-table-toolbar").hide();
         };
 
         /* attach orgs related events to UI components */
