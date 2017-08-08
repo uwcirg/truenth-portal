@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block main %}
+
+
+
+    <h1 class="tnth-headline">{{ _("Scheduled Jobs") }}</h1>
+
+    <h4>{{ _("Current Jobs") }}</h4>
+    {% if jobs %}
+    <ul>
+        {% for job in jobs %}
+            <li>
+                <b>{{ job.name }}</b>
+
+                <br />{{ _("Task") }}: {{ job.task }}
+                <br />{{ _("Schedule") }}: {{ job.schedule }}
+                <br />{{ _("Active") }}: {{ job.active }}
+                <br />{{ _("Last Runtime") }}: {{ job.last_runtime }}
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>{{ _("No jobs found.") }}</p>
+    {% endif %}
+
+    <h4>{{ _("Available Tasks") }}</h4>
+    {% if tasks %}
+    <ul>
+        {% for task in tasks %}
+            <li>{{ task }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>{{ _("No tasks found.") }}</p>
+    {% endif %}
+
+
+{% endblock %}
