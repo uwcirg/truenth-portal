@@ -82,7 +82,7 @@ class TestAppText(TestCase):
         test_user = User.query.get(TEST_USER_ID)
 
         test_url = "https://notarealwebsitebeepboop.com"
-        test_asset = "Hello ${firstname} ${lastname}! Your user ID is ${id}"
+        test_asset = "Hello {firstname} {lastname}! Your user ID is {id}"
         test_vars = {"firstname": test_user.first_name,
                      "lastname": test_user.last_name,
                      "id": TEST_USER_ID}
@@ -91,3 +91,10 @@ class TestAppText(TestCase):
                                        variables=test_vars)
         rf_id = int(resource.asset.split()[-1])
         self.assertEquals(rf_id, TEST_USER_ID)
+
+        invalid_asset = "Not a real {variable}!"
+        resource = UnversionedResource(test_url,
+                                       asset=invalid_asset,
+                                       variables=test_vars)
+        error_key = resource.asset.split()[-1]
+        self.assertEquals(error_key, "'variable'")

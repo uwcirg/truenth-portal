@@ -422,11 +422,7 @@ def app_text(name, *args):
 
 
 def format_asset_attributes(asset, variables):
-    asset_out = ""
-    x = 0
-    for match in finditer(r"\${[^}]+}", asset):
-        attr = variables.get(match.group(0)[2:-1], '')
-        asset_out += asset[x:match.start()] + str(attr)
-        x = match.end()
-    asset_out += asset[x:]
-    return asset_out
+    try:
+        return asset.format(**variables)
+    except KeyError, e:
+        return "Missing asset variable {}".format(e)
