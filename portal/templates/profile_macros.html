@@ -1118,7 +1118,8 @@
         <h4 class="text-muted">{% if person and person.username %}{{ _("for") + " " + person.username }} {% endif %}</h4>
         <p class="small-text text-muted">{{ _("Editable by admins only.") }}</p>
         <!-- roles are populated in main.js -->
-        <div class="form-group" id="rolesGroup" data-loader-container="true"></div>
+        <div class="form-group" id="rolesGroup"></div>
+        <div id="rolesLoadingContainer" data-save-container-id="rolesLoadingContainer" data-loader-container="true"></div>
         <div class="get-roles-error error-message"></div>
         <div class="put-roles-error error-message"></div>
         <div class="delete-roles-error error-message"></div>
@@ -1126,17 +1127,17 @@
     {% if person %}
     <script>
     $(function () {
-        tnthAjax.getRoleList();
-        tnthAjax.getRoles({{ person.id }}, true);
-        $("#rolesGroup input[name='user_type']").each(function() {
-            $(this).on("click", function() {
-                var roles = $("#rolesGroup input:checkbox:checked").map(function(){
-                    return { name: $(this).val() };
-                }).get();
-                var toSend = {"roles": roles};
-                //console.log('update role: ' + toSend);
-                tnthAjax.putRoles({{person.id}},toSend);
-             });
+        tnthAjax.getRoleList(function() {
+            tnthAjax.getRoles({{ person.id }}, true);
+            $("#rolesGroup input[name='user_type']").each(function() {
+                $(this).on("click", function() {
+                    var roles = $("#rolesGroup input:checkbox:checked").map(function(){
+                        return { name: $(this).val() };
+                    }).get();
+                    var toSend = {"roles": roles};
+                    tnthAjax.putRoles({{person.id}},toSend, $("#rolesLoadingContainer"));
+                 });
+            });
         });
     });
     </script>
