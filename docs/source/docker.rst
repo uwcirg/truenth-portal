@@ -94,6 +94,11 @@ If you would like to build a Shared Services container against a topic branch on
     docker-compose -f docker/docker-compose.yaml build web
     docker-compose -f docker/docker-compose.yaml up
 
+PostgreSQL Access
+-----------------
+To interact with the database image started via the ``docker-compose`` instructions above, use ``docker exec`` such as::
+
+    docker exec -it docker_db_1 /usr/lib/postgresql/9.6/bin/psql -U postgres
 
 Continuous Delivery
 ===================
@@ -128,3 +133,20 @@ Most if not all values needed to build and deploy Shared Services are available 
 
     job
         A discrete unit of work that is part of a build. All jobs part of a build must pass for the build to pass (unless a job is set as an `allowed failure <https://docs.travis-ci.com/user/customizing-the-build#rows-that-are-allowed-to-fail>`_).
+
+Getting Started
+===============
+Install `docker-compose` as per environment.  For example, from a debian system::
+
+    sudo usermod -aG docker $USER # add user to docker group
+    sudo pip install docker_compose
+
+Copy and edit the default environment file (from the project root)::
+
+    cp docker/portal.env.default docker/portal.env
+    # update SERVER_NAME to include port if not binding with 80/443
+    # SERVER_NAME=localhost:8080
+
+Build and run the generated images::
+
+    docker-compose -f docker/docker-compose.yaml up
