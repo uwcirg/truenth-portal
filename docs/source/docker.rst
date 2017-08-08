@@ -56,7 +56,7 @@ The portal Docker image can be built using Debian packages from a remote Debian 
 Remote Debian Repo
 ~~~~~~~~~~~~~~~~~~
 
-To build an image of the portal (portal_web) with defaults::
+To build an image of the portal (``portal_web``) with defaults::
 
     # Build the image
     docker build --file docker/Dockerfile --tag "portal_web:latest" .
@@ -82,7 +82,7 @@ Docker-compose (through docker-compose.yaml) defines the relationship (exposed p
 
 Docker-compose offers a higher-level interface to build and run containers together but may be supplanted by Docker stacks in the future.
 
-As it stands Docker Compose lacks a way to build the prerequisite Debian package before building the portal_web container and will use the default Debian repository unless packages are placed in the artifact directory beforehand.
+As it stands Docker Compose lacks a way to build the prerequisite Debian package before building the ``portal_web`` container and will use the default Debian repository unless packages are placed in the artifact directory beforehand.
 
 To download and start the set of containers that comprise Shared Services issue the following command::
 
