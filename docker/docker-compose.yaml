@@ -7,11 +7,6 @@ services:
     entrypoint: '/bin/bash -c "source /opt/venvs/portal/bin/activate && env && flask sync && gunicorn --timeout 90 --keep-alive 75 --bind 0.0.0.0:8008  manage:app"'
     # Todo: fix tagging of "latest" and "stable" on TravisCI
     image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:e4bef52c7eb0c9e647397808f59afa3a60a8473f"
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-      args:
-        - debian_repo="${DEBIAN_REPO:-http://dl.bintray.com/v1/content/uwcirg/${BINTRAY_DEB_REPO:-true_nth}}"
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
     env_file:
