@@ -151,7 +151,7 @@ AdminTool.prototype.abortRequests = function(callback, showLoader) {
           try {
             if (parseInt(request.readyState) != 4) {
                 /*
-                 * aborting the request here quite immediately, instead of waiting for the
+                 * aborting the request here to quit immediately, instead of waiting for the
                  * maximum timeout specified
                  */
                 request.timeout = 100;
