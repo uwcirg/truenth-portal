@@ -215,6 +215,7 @@ after_deploy:
       docker tag "$IMAGE_NAME:$TAG" "registry.heroku.com/$HEROKU_APP/web";
       docker push "registry.heroku.com/$HEROKU_APP/web" &
     fi
+  - docker images --digests --all
 
   # Wait for background jobs to finish (if they haven't already)
   - wait
