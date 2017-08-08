@@ -275,7 +275,12 @@ class UnversionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return format_asset_attributes(self._asset, self.variables)
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
 
@@ -335,7 +340,12 @@ class VersionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return format_asset_attributes(self._asset, self.variables)
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
     def _permanent_url(self, generic_url, version):
@@ -419,10 +429,3 @@ def app_text(name, *args):
         raise ValueError(
             "AppText with name '{}' defines more parameters "
             "than provided: `{}`".format(name, *args))
-
-
-def format_asset_attributes(asset, variables):
-    try:
-        return asset.format(**variables)
-    except KeyError, e:
-        return "Missing asset variable {}".format(e)
