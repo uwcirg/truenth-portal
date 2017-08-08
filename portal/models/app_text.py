@@ -10,6 +10,7 @@ SitePersistence mechanism, and looked up in a template using the
 from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
+from re import finditer
 import requests
 from requests.exceptions import MissingSchema
 from urllib import urlencode
@@ -233,7 +234,7 @@ class PrivacyATMA(AppTextModelAdapter):
 
 class UnversionedResource(object):
     "Like VersionedResource for non versioned URLs (typically local)"
-    def __init__(self, url, asset=None):
+    def __init__(self, url, asset=None, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch asset and mock a versioned URL
@@ -249,6 +250,7 @@ class UnversionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables or {}
         if asset:
             self._asset = asset
         else:
@@ -273,14 +275,19 @@ class UnversionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
 
 class VersionedResource(object):
     """Helper to manage versioned resource URLs (typically on Liferay)"""
 
-    def __init__(self, url):
+    def __init__(self, url, variables=None):
         """Initialize based on requested URL
 
         Attempts to fetch the asset, permanent version of URL and link
@@ -300,6 +307,7 @@ class VersionedResource(object):
         """
         self._asset, self.error_msg, self.editor_url = None, None, None
         self.url = url
+        self.variables = variables or {}
         try:
             response = requests.get(url)
             self._asset = response.json().get('asset')
@@ -332,7 +340,12 @@ class VersionedResource(object):
     def asset(self):
         """Return asset if available else error message"""
         if self._asset:
-            return self._asset
+            try:
+                return self._asset.format(**self.variables)
+            except KeyError, e:
+                self.error_msg = "Missing asset variable {}".format(e)
+                current_app.logger.error(self.error_msg +
+                                         ": {}".format(self.url))
         return self.error_msg
 
     def _permanent_url(self, generic_url, version):
