@@ -88,6 +88,10 @@ To download and start the set of containers that comprise Shared Services issue 
 
     docker-compose -f docker/docker-compose.yaml up
 
+By default, the ``portal_web`` image with the ``latest`` tag is downloaded and used. To use another tag, set the ``IMAGE_TAG`` environmental variable::
+
+    IMAGE_TAG='stable' docker-compose -f docker/docker-compose.yaml up
+
 If you would like to build a Shared Services container against a topic branch on Github, follow the instructions in `Building a Debian Package`_, and run the following docker-compose commands::
 
     # Build the "web" service locally instead of downloading from a docker registry
