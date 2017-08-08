@@ -168,16 +168,14 @@ $(document).ready(function() {
         AT.abortRequests(function() {
           if (e.target && !$(e.target).hasClass("rowlink-skip")) {
             $(e.target).trigger('click.bs.rowlink');
-            setTimeout(function() { loader(true);}, 300);
           };
-        });
+        }, true);
     });
     $(document).delegate("#createUserLink", "click touchstart", function(e) {
         e.stopPropagation();
         AT.abortRequests(function() {
           window.location = $("#createUserLink").attr("href");
-          setTimeout(function() { loader(true);}, 300);
-        });
+        }, true);
     });
   {% endif %}
 

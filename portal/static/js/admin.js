@@ -67,7 +67,7 @@ AdminTool.prototype.getData = function(requests, callback) {
                               contentType: "application/json; charset=utf-8",
                               data: userString,
                               cache: false,
-                              timeout: 25000,
+                              timeout: 3000,
                               dataType: 'json'
                           }).done(function(data) {
                                 if (data && data.status) {
@@ -141,25 +141,34 @@ AdminTool.prototype.updateData = function() {
      self.getData(arrUsers);
   };
 };
-AdminTool.prototype.abortRequests = function(callback) {
+AdminTool.prototype.abortRequests = function(callback, showLoader) {
     var self = this;
    //NEED TO ABORT THE AJAX REQUESTS OTHERWISE CLICK EVENT IS DELAYED DUE TO NETWORK TIE-UP
    if (self.ajaxRequests.length > 0) {
       self.ajaxAborted = true;
       self.ajaxRequests.forEach(function(request, index, array) {
+
           try {
-            if (request.readyState != 4) {
+            if (parseInt(request.readyState) != 4) {
+                /*
+                 * aborting the request here quite immediately, instead of waiting for the
+                 * maximum timeout specified
+                 */
+                request.timeout = 100;
                 request.abort();
             }
           } catch(e) {
           };
           if (index == array.length - 1) {
             $("#admin-table-error-message").text("");
-            if (callback) setTimeout(function() { callback();}, 100);
+            if (callback) {
+              setTimeout(function() { callback();}, 100);
+              if (showLoader) loader(true)
+            };
           };
       });
     } else {
-      if (callback) callback();
+      if (callback) setTimeout(function() { callback();}, 100);
     };
 
 };
