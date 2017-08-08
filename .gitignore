@@ -16,6 +16,7 @@ man
 pip-selfcheck.json
 log
 portal/test_uploads
+docker/portal.env
 
 .idea
 .settings/
