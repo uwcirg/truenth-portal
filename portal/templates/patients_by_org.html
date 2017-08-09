@@ -57,7 +57,7 @@
   {% endif %}
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
-        {% if config.STAFF_BULK_DATA_ACCESS %}
+        {% if config.STAFF_BULK_DATA_ACCESS and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.RESEARCHER)) %}
           <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
         {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
