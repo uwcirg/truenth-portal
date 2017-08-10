@@ -3,6 +3,7 @@
 <h4 class="tnth-headline">Research Dashboard</h4>
 <br/>
 <hr/>
+<a href="" id="_downloadLink" target="_blank"></a>
 <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -57,7 +58,7 @@
 $(document).ready(function() {
 
   /*
-   * attach on click even to submit button in the download modal
+   * attach on click event to submit button in the download modal
    */
   $(document).delegate("#patientsDownloadButton", "click", function(event){
     var instruments = "", dataType = "";
