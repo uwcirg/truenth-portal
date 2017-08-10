@@ -93,7 +93,9 @@ def smartling_upload():
     # update .pot file with db values
     upsert_to_template_file()
     current_app.logger.debug("messages.pot file updated with db strings")
-    upload_pot_file(pot_fpath)
+
+    if current_app.config.get("SMARTLING_USER_SECRET"):
+        upload_pot_file(pot_fpath)
 
 
 def upload_pot_file(fpath):
