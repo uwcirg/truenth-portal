@@ -17,6 +17,7 @@ from .auth import next_after_login, logout
 from ..audit import auditable_event
 from .crossdomain import crossdomain
 from ..database import db
+from ..dogpile import dogpile_cache
 from ..extensions import oauth, recaptcha, user_manager
 from ..models.app_text import app_text, AppText, VersionedResource, UndefinedAppText
 from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
@@ -995,6 +996,17 @@ def reporting_dashboard():
                referral sources for new visitors, etc)
 
     """
+    return render_template('reporting_dashboard.html',
+                           counts=get_reporting_counts())
+
+
+@dogpile_cache.region('hourly')
+def get_reporting_counts():
+    """Cachable interface for expensive data lookups
+
+    The following code is only run on a cache miss.
+
+    """
     counts = {}
     counts['roles'] = defaultdict(int)
     counts['patients'] = defaultdict(int)
@@ -1027,7 +1039,7 @@ def reporting_dashboard():
         for org in user.organizations:
             counts['organizations'][org.name] += 1
 
-    return render_template('reporting_dashboard.html', counts=counts)
+    return counts
 
 
 @portal.route('/spec')
