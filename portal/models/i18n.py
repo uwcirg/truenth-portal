@@ -108,8 +108,8 @@ def smartling_upload():
     check_call((
         'pybabel', 'extract',
         '--no-wrap',
-        '-F', config_fpath,
-        '-o', pot_fpath,
+        '--mapping-file', config_fpath,
+        '--output-file', pot_fpath,
         current_app.root_path,
     ))
     current_app.logger.debug("messages.pot file generated")
