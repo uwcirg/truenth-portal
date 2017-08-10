@@ -69,7 +69,6 @@ class TestScheduledJob(TestCase):
         resp = self.client.get('/api/scheduled_jobs/999')
         self.assert400(resp)
 
-
     def test_job_delete(self):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
