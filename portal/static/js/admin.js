@@ -32,6 +32,17 @@ AdminTool.prototype.setLoadingMessageVis = function(vis) {
       break;
   };
 };
+AdminTool.prototype.setStatusLoadingVis = function(vis) {
+  switch(vis) {
+    case "hide":
+      $("#adminTable th.status-field .loading-message-indicator").fadeOut();
+      $("#adminTable .bootstrap-table-filter-control-status").css("opacity", 1);
+      break;
+    case "show":
+      $("#adminTable th.status-field .loading-message-indicator").fadeIn();
+      break;
+  };
+};
 AdminTool.prototype.getPatientsIdList = function() {
   var self = this;
   if (self.patientsIdList.length == 0) {
@@ -67,7 +78,10 @@ AdminTool.prototype.getData = function(requests, callback) {
                               contentType: "application/json; charset=utf-8",
                               data: userString,
                               cache: false,
-                              timeout: 3000,
+                              timeout: 5000,
+                              beforeSend: function() {
+                                self.setStatusLoadingVis("show");
+                              },
                               dataType: 'json'
                           }).done(function(data) {
                                 if (data && data.status) {
@@ -126,8 +140,10 @@ AdminTool.prototype.getData = function(requests, callback) {
                             }
                             else {
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
+                              self.setStatusLoadingVis("hide");
                             };
                         }).fail(function(xhr) {
+                            self.setStatusLoadingVis("hide");
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
                         });
         self.ajaxRequests.push(ajaxRequest);
