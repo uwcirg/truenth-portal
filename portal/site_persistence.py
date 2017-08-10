@@ -18,6 +18,7 @@ from models.intervention_strategies import AccessStrategy
 from models.organization import Organization
 from models.questionnaire import Questionnaire
 from models.questionnaire_bank import QuestionnaireBank
+from models.scheduled_job import ScheduledJob
 
 
 class SitePersistence(object):
@@ -148,6 +149,10 @@ class SitePersistence(object):
         app_strings = AppText.query.all()
         for app_string in app_strings:
             d['entry'].append(app_string.as_json())
+
+        # Add scheduled job info
+        for job in ScheduledJob.query.all():
+            d['entry'].append(job.as_json())
 
         # Add site.cfg
         config_data = read_site_cfg()
@@ -381,6 +386,24 @@ class SitePersistence(object):
                     "Deleting AppText not mentioned in "
                     "site_persistence: {}".format(repr(apptext)))
                 db.session.delete(apptext)
+
+        # ScheduledJobs shouldn't be order dependent, now is good.
+        jobs_seen = []
+        for j in objs_by_type['ScheduledJob']:
+            job = ScheduledJob.from_json(j)
+            db.session.add(job)
+            jobs_seen.append(j['name'])
+
+        # Delete any ScheduledJobs not named
+        if not keep_unmentioned:
+            jobs_seen.append("__test_celery__")
+            query = ScheduledJob.query.filter(
+                ~ScheduledJob.name.in_(jobs_seen)) if jobs_seen else []
+            for job in query:
+                current_app.logger.info(
+                    "Deleting ScheduledJob not mentioned in "
+                    "site_persistence: {}".format(str(job)))
+                db.session.delete(job)
 
         # Config isn't order dependent, now is good.
         assert len(objs_by_type[SITE_CFG]) < 2
