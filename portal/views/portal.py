@@ -977,6 +977,18 @@ def config_settings(config_key):
         abort(400, "Configuration key '{}' not available".format(key))
 
 
+@portal.route('/research')
+@roles_required([ROLE.RESEARCHER])
+@oauth.require_oauth()
+def research_dashboard():
+    """Research Dashboard
+
+    Only accessible to those with the Researcher role.
+
+    """
+    return render_template('research.html')
+
+
 @portal.route('/reporting')
 @roles_required([ROLE.ADMIN, ROLE.ANALYST])
 @oauth.require_oauth()
