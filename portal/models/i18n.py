@@ -112,6 +112,8 @@ def smartling_upload():
         'pybabel', 'extract',
         '--no-wrap',
         '--mapping-file', config_fpath,
+        '--project', current_app.config.metadata.name,
+        '--version', current_app.config.metadata.version,
         '--output-file', pot_fpath,
         current_app.root_path,
     ))
