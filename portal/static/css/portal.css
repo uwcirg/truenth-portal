@@ -150,6 +150,9 @@ a.btn {
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
    color:    #999;
 }
+#consentDateEditContainer {
+  display: none;
+}
 .form-control {
   font-size: 16px;
   height: 40px;
