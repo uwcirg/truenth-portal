@@ -3,6 +3,7 @@
 <h4 class="tnth-headline">Research Dashboard</h4>
 <br/>
 <hr/>
+{% if config.STAFF_BULK_DATA_ACCESS %}
 <a href="" id="_downloadLink" target="_blank"></a>
 <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -48,6 +49,7 @@
     </div>
 </div>
 <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
+{% endif %}
 <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 {% endblock %}
 {%- from "flask_user/_macros.html" import footer -%}
