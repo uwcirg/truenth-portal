@@ -103,8 +103,8 @@
                   <th data-field="altPhone" data-sortable="true" data-visible="false" data-width="10%" data-class="altPhone-field">{{ _("Phone (Other)") }}</th>
                   {% if 'reports' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="staff_html" data-sortable="true" data-class="reports-field text-center">{{ _("Reports") }}</th>{% endif %}
                   {% if 'status' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="status" data-sortable="true" data-card-visible="false" data-searchable="true" data-width="5%" data-class="status-field">{{ _("Questionnaire Status") }}</th>{% endif %}
-                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field">{{ _("Study ID") }}</th>{% endif %}
-                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center">{{_("Consent Date (GMT)")}}</th>
+                  {% if 'study_id' in config.PATIENT_LIST_ADDL_FIELDS %}<th data-field="study_id" data-sortable="true" data-searchable="true" data-class="study-id-field profile-study-id-label"><span class="default-study-id-label">{{ _("Study ID") }}</span></th>{% endif %}
+                  <th data-field="consentdate" data-sortable="true" data-card-visible="false" data-searchable="true" data-class="consentdate-field text-center" data-width="5%">{{ app_text('consent date label') }} {{_("(GMT)")}}</th>
                   <th data-field="organization" data-sortable="true" data-class="organization-field">{{ _("Site(s)") }}</th>
               </tr>
           </thead>
