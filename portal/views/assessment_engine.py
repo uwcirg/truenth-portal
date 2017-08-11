@@ -1693,6 +1693,12 @@ def get_questionnaire(name):
     operationId: get_questionnaire
     tags:
       - Assessment Engine
+    parameters:
+      - name: name
+        in: path
+        description: Questionnaire name
+        required: true
+        type: string
     produces:
       - application/json
     responses:
