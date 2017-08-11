@@ -3456,8 +3456,11 @@ var tnthDates = {
         var givenDate = this.getGivenDate(y, m, d);
         return ( givenDate == convertedDate);
     },
-    "getDateObj": function(y, m, d) {
-        return new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+    /*
+     * method does not check for valid numbers, will return NaN if conversion failed
+     */
+    "getDateObj": function(y, m, d, h, mi, s) {
+        return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
     },
     "getConvertedDate": function(dateObj) {
         if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();
