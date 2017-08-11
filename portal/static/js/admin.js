@@ -81,6 +81,10 @@ AdminTool.prototype.getData = function(requests, callback) {
                               timeout: 5000,
                               beforeSend: function() {
                                 self.setStatusLoadingVis("show");
+                                /* 
+                                 * disable export functionality while status is being populated
+                                 */
+                                $("div.export button").attr("disabled", true);
                               },
                               dataType: 'json'
                           }).done(function(data) {
@@ -141,9 +145,11 @@ AdminTool.prototype.getData = function(requests, callback) {
                             else {
                               if (callback) setTimeout(function() { callback.call(self);}, 300);
                               self.setStatusLoadingVis("hide");
+                              $("div.export button").attr("disabled", false);
                             };
                         }).fail(function(xhr) {
                             self.setStatusLoadingVis("hide");
+                            $("div.export button").attr("disabled", false);
                             $("#admin-table-error-message").text("Server error occurred updating row data.  Server error code: " + xhr.status);
                         });
         self.ajaxRequests.push(ajaxRequest);
