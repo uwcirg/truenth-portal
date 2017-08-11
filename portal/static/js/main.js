@@ -835,6 +835,9 @@ var fillContent = {
                     });
                 });
                 $("#profileConsentList .consent-date").datepicker({"format": "d M yyyy", "forceParse": false, "endDate": today, "autoclose": true});
+                $("#profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
+                    __convertToNumericField($(this));
+                });
                 $("#profileConsentList .consent-date, #profileConsentList .consent-hour, #profileConsentList .consent-minute, #profileConsentList .consent-second").each(function() {
                     $(this).on("change", function() {
                         var dataIndex = $.trim($(this).attr("data-index"));
@@ -1079,7 +1082,6 @@ var fillContent = {
                 arrTypes.forEach(function(type) {
                     if (typeInTous(type)) {
                         item_found++;
-                        if (type == "subject website consent" || type == "website terms of use") $("#termsText").addClass("agreed");
                     };
                 });
                 var additional = $(this).find("[data-core-data-subtype]");
@@ -1100,9 +1102,14 @@ var fillContent = {
                     };
                 };
             });
-            //});
         };
-        if ($("#termsCheckbox [data-type='terms'][data-agree='false']:visible").length > 1) $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
+        setTimeout(function() {
+            var agreedCheckboxes = $("#termsCheckbox [data-type='terms'][data-agree='false']:visible");
+            if (agreedCheckboxes.length > 1) {
+                $("#termsReminderCheckboxText").text("You must agree to the terms and conditions by checking the provided checkboxes.");
+            };
+            if (agreedCheckboxes.length == 0) $("#termsText").addClass("agreed");
+        }, 2000);
     }
 };
 
@@ -1985,12 +1992,14 @@ var tnthAjax = {
             if (data && data.still_needed) {
                 if (callback) callback(data.still_needed);
                 var __localizedFound = false;
+                if ((data.still_needed).length > 0) $("#termsText").show();
                 (data.still_needed).forEach(function(item) {
                     $("#termsCheckbox [data-type='terms']").each(function() {
                         var dataTypes = ($(this).attr("data-core-data-type")).split(","), self = $(this);
                         dataTypes.forEach(function(type) {
-                            if (type == item) {
+                            if ($.trim(type) == $.trim(item)) {
                                 self.show().removeClass("tnth-hide");
+                                self.attr("data-required", "true");
                             };
                         });
                     });
@@ -3829,7 +3838,13 @@ function __getLoaderHTML() {
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 };
-
+function __convertToNumericField(field) {
+    if (field) {
+        if (_isTouchDevice()) field.each(function() {
+            $(this).prop("type", "tel");
+        })
+    }
+}
 function hasValue(val) {
     return val != null && val != "" && val != "undefined";
 };

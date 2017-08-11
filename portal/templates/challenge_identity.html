@@ -113,6 +113,11 @@ $(document).ready(function() {
         $(this).val($.trim($(this).val()));
     });
 
+    /*
+     * display keyboard for numeric fields on mobile devices
+     */
+     __convertToNumericField($("#date, #year"));
+
     $('#challengeForm').validator().on('submit', function (e) {
           if (!e.isDefaultPrevented()) {
                 if ($("#year").val() != "" && $("#month").val() != "" && $("#date").val() != "") {
