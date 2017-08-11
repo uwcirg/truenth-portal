@@ -3679,6 +3679,19 @@ var tnthTables = {
         return  bb - aa;
     },
     /***
+     * Quick way to sort when text is wrapped in an <a href> or other tag
+     * NOTE for text that is NOT number
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksTextSorter": function(a,b) {
+        var aa = $(a).text();
+        var bb = $(b).text();
+        if(aa < bb) return -1;
+        if(aa > bb) return 1;
+        return 0;
+    },
+    /***
      * sorting date string,
      * @param a,b - the two items to compare - note, this assumes that the parameters
      * are in valid date format e.g. 3 August 2017
