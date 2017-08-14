@@ -1003,7 +1003,7 @@ def reporting_dashboard():
 
 @dogpile_cache.region('hourly')
 def get_reporting_counts():
-    """Cachable interface for expensive data lookups
+    """Cachable interface for expensive reporting data queries
 
     The following code is only run on a cache miss.
 
@@ -1039,8 +1039,11 @@ def get_reporting_counts():
             counts['interventions'][interv.description] += 1
             if (any(doc.intervention == interv for doc in user.documents)):
                 counts['intervention_reports'][interv.description] += 1
-        for org in user.organizations:
-            counts['organizations'][org.name] += 1
+        if not user.organizations:
+            counts['organizations']['Unspecified'] += 1
+        else:
+            for org in user.organizations:
+                counts['organizations'][org.name] += 1
         counts['registrations'].append(user.registered)
 
     for enc in Encounter.query.filter_by(auth_method='password_authenticated',
