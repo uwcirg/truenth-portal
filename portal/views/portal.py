@@ -25,6 +25,7 @@ from ..models.app_text import (AboutATMA, InitialConsent_ATMA, PrivacyATMA,
 from ..models.app_text import Terms_ATMA, WebsiteConsentTermsByOrg_ATMA, WebsiteDeclarationForm_ATMA
 from ..models.auth import validate_origin
 from ..models.coredata import Coredata
+from ..models.encounter import Encounter
 from ..models.fhir import CC
 from ..models.i18n import get_locale
 from ..models.identifier import Identifier
@@ -996,7 +997,7 @@ def reporting_dashboard():
                referral sources for new visitors, etc)
 
     """
-    return render_template('reporting_dashboard.html',
+    return render_template('reporting_dashboard.html', now=datetime.utcnow(),
                            counts=get_reporting_counts())
 
 
@@ -1013,6 +1014,8 @@ def get_reporting_counts():
     counts['interventions'] = defaultdict(int)
     counts['intervention_reports'] = defaultdict(int)
     counts['organizations'] = defaultdict(int)
+    counts['registrations'] = []
+    counts['encounters'] = {'all': [], 'interventions': defaultdict(list)}
 
     for user in User.query.filter_by(active=True):
         if ROLE.TEST in [r.name for r in user.roles]:
@@ -1038,6 +1041,15 @@ def get_reporting_counts():
                 counts['intervention_reports'][interv.description] += 1
         for org in user.organizations:
             counts['organizations'][org.name] += 1
+        counts['registrations'].append(user.registered)
+
+    for enc in Encounter.query.filter_by(auth_method='password_authenticated',
+                                         status='finished'):
+        st = enc.start_time
+        counts['encounters']['all'].append(st)
+        user = get_user(enc.user_id)
+        for interv in user.interventions:
+            counts['encounters']['interventions'][interv.description].append(st)
 
     return counts
 

@@ -4,6 +4,40 @@
 
     <h3 class="tnth-headline">{{ _("Reporting Dashboard") }}</h3>
 
+    <h2 class="tnth-headline">{{ _("Usage Statistics") }}</h2>
+    <div>
+        <table id="usageStatsTable"
+               class="table table-striped table-hover table-condensed"
+               data-show-columns="true">
+            <thead>
+            <tr>
+                <th>{{ _("Intervention") }}</th>
+                <th>{{ _("Logins today") }}</th>
+                <th>{{ _("Logins this month") }}</th>
+                <th>{{ _("Logins this year") }}</th>
+                <th>{{ _("Logins (total)") }}</th>
+            </tr>
+            </thead>
+            <tbody data-link="row" class="rowlink">
+            <tr>
+                <td>{{ _("All") }}</td>
+                <td>{{ counts['encounters']['all'] | selectattr("day", "equalto", now.day) | list | length }}</td>
+                <td>{{ counts['encounters']['all'] | selectattr("month", "equalto", now.month) | list | length }}</td>
+                <td>{{ counts['encounters']['all'] | selectattr("year", "equalto", now.year) | list | length }}</td>
+                <td>{{ counts['encounters']['all'] | length }}</td>
+            </tr>
+            {% for k,v in counts['encounters']['interventions'].items() %}
+                <td>{{ k }}</td>
+                <td>{{ v | selectattr("day", "equalto", now.day) | list | length }}</td>
+                <td>{{ v | selectattr("month", "equalto", now.month) | list | length }}</td>
+                <td>{{ v | selectattr("year", "equalto", now.year) | list | length }}</td>
+                <td>{{ v | length }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br/>
     <h2 class="tnth-headline">{{ _("User Statistics") }}</h2>
     <div id="userStatsContainer">
         <table id="userRoleStatsTable"
