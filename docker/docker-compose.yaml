@@ -2,9 +2,6 @@
 version: '2.1'
 services:
   web:
-    # Workaround to gunicorn sync workers bug
-    # https://github.com/benoitc/gunicorn/issues/1194
-    entrypoint: '/bin/bash -c "source /opt/venvs/portal/bin/activate && env && flask sync && gunicorn --timeout 90 --keep-alive 75 --bind 0.0.0.0:8008  manage:app"'
     image: "uwcirg-portal-docker.jfrog.io/${IMAGE_NAME:-portal_web}:${IMAGE_TAG:-latest}"
     ports:
       - "${EXTERNAL_PORT:-8080}:${PORT:-8008}"
