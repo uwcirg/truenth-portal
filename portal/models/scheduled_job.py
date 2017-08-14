@@ -16,7 +16,7 @@ class ScheduledJob(db.Model):
     """
     __tablename__ = 'scheduled_jobs'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text, nullable=False, unique=True)
     task = db.Column(db.Text, nullable=False)
     args = db.Column(db.Text, nullable=True)
     kwargs = db.Column(db.JSON, nullable=True)
@@ -25,7 +25,7 @@ class ScheduledJob(db.Model):
     last_runtime = db.Column(db.DateTime, nullable=True)
 
     def __str__(self):
-        return "scheduled_job {0.id} ({0.task}: {0._schedule})".format(self)
+        return "scheduled_job {0.name} ({0.task}: {0._schedule})".format(self)
 
     @property
     def schedule(self):
@@ -39,6 +39,37 @@ class ScheduledJob(db.Model):
         if not sc or not re.match(format, sc):
             raise Exception("schedule must be in valid cron format")
         self._schedule = sc
+
+    @classmethod
+    def from_json(cls, data):
+        if 'name' not in data:
+            raise ValueError("missing required name field")
+        job = ScheduledJob.query.filter_by(name=data['name']).first()
+        if not job:
+            job = cls()
+            job.name = data['name']
+        for attr in ('task', 'schedule'):
+            if data.get(attr):
+                setattr(job, attr, data[attr])
+            elif not getattr(job, attr, None):
+                raise ValueError("missing required {} value".format(attr))
+        for attr in ('args', 'kwargs', 'active'):
+            if data.get(attr, None) is not None:
+                setattr(job, attr, data[attr])
+        return job
+
+    def as_json(self):
+        d = {}
+        d['id'] = self.id
+        d['resourceType'] = 'ScheduledJob'
+        d['name'] = self.name
+        d['task'] = self.task
+        d['args'] = self.args
+        d['kwargs'] = self.kwargs
+        d['schedule'] = self.schedule
+        d['active'] = self.active
+        d['last_runtime'] = self.last_runtime
+        return d
 
     def crontab_schedule(self):
         svals = self.schedule.split()
