@@ -364,7 +364,6 @@ AdminTool.prototype.handleDownloadModal = function() {
       */
     $("#dataDownloadModal").on('shown.bs.modal', function () {
           var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
-          console.dir(parentOrgList)
           if (parentOrgList && parentOrgList.length > 0) {
              var instrumentList = self.getInstrumentList();
              var instrumentItems = [];
