@@ -1,4 +1,5 @@
 """Questionnaire Bank module"""
+from flask import url_for
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
@@ -107,7 +108,7 @@ class QuestionnaireBank(db.Model):
         if limit_to_ids:
             query = query.filter(QuestionnaireBank.id.in_(limit_to_ids))
 
-        objs = [q.as_fhir() for q in query]
+        objs = [q.as_json() for q in query]
 
         bundle = {
             'resourceType':'Bundle',

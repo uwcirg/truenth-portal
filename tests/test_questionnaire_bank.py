@@ -144,11 +144,11 @@ class TestQuestionnaireBank(TestCase):
         crv, epic26, eproms_add, comorb = map(
             db.session.merge, (crv, epic26, eproms_add, comorb))
 
-        resp = self.client.get('/api/questionnaires')
+        resp = self.client.get('/api/questionnaire')
         self.assert200(resp)
-        self.assertEquals(len(resp.json['questionnaires']), 3)
+        self.assertEquals(len(resp.json['entry']), 3)
 
-        resp = self.client.get('/api/questionnaires/{}'.format('epic26'))
+        resp = self.client.get('/api/questionnaire/{}'.format('epic26'))
         self.assert200(resp)
         self.assertEquals(resp.json['questionnaire']['name'], 'epic26')
 
@@ -166,7 +166,6 @@ class TestQuestionnaireBank(TestCase):
             db.session.add(bank)
             db.session.commit()
 
-        resp = self.client.get('/api/questionnaire_banks')
+        resp = self.client.get('/api/questionnaire_bank')
         self.assert200(resp)
-        qb = resp.json['questionnaire_banks'][0]
-        self.assertEquals(len(qb['questionnaires']), 3)
+        self.assertEquals(len(resp.json['entry'][0]['questionnaires']), 3)

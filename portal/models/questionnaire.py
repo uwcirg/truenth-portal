@@ -1,4 +1,5 @@
 """Questionnaire module"""
+from flask import url_for
 from sqlalchemy.dialects.postgresql import JSONB
 
 from ..database import db

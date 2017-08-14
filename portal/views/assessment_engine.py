@@ -1680,7 +1680,7 @@ def questionnaire_list():
           to view requested patient
 
     """
-    bundle = QuestionnaireBank.generate_bundle()
+    bundle = Questionnaire.generate_bundle()
     return jsonify(bundle)
 
 
