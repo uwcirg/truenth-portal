@@ -64,15 +64,15 @@ class Questionnaire(db.Model):
         objs = [q.as_fhir() for q in query]
 
         bundle = {
-            'resourceType':'Bundle',
-            'updated':FHIR_datetime.now(),
-            'total':len(objs),
+            'resourceType': 'Bundle',
+            'updated': FHIR_datetime.now(),
+            'total': len(objs),
             'type': 'searchset',
             'link': {
-                'rel':'self',
-                'href':url_for('assessment_engine_api.questionnaire_list',
+                'rel': 'self',
+                'href': url_for('assessment_engine_api.questionnaire_list',
                                _external=True),
             },
-            'entry':objs,
+            'entry': objs,
         }
         return bundle
