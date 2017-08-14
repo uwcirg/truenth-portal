@@ -101,6 +101,10 @@ var configObj = (function() {
         {%- if user.has_role(ROLE.PATIENT) or user.has_role(ROLE.STAFF)-%}
         tnthAjax.getStillNeededCoreData({{user.id}}, true, this.setConfig);
         {%- else -%}
+        /*
+         * need to make this call to hide/show terms checkboxes as needed
+         */
+        tnthAjax.getStillNeededCoreData({{user.id}}, true);
         CONFIG_REQUIRED_CORE_DATA = CONFIG_DEFAULT_CORE_DATA;
         {%- endif -%}
       },
@@ -332,7 +336,7 @@ FieldsChecker.prototype.sectionCompleted = function(sectionId) {
                 case 'terms':
                     var _isAgreed = true;
                     field.each(function() {
-                         if ($(this).is(":visible") && !($(this).attr("data-agree") == "true")) _isAgreed = false;
+                        if (hasValue($(this).attr("data-required")) && !($(this).attr("data-agree") == "true")) _isAgreed = false;
                     });
                     if (!_isAgreed) isComplete = false;
 
@@ -471,7 +475,6 @@ function initIncompleteFields() {
 
     //if term of use form not present - need to show the form
     if ($("#topTerms").length == 0)  {
-        $("#topTerms").hide();
         $("#aboutForm").fadeIn();
         fc.getNext();
         if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
@@ -479,7 +482,7 @@ function initIncompleteFields() {
         };
     } else {
       if (!fc.sectionCompleted("topTerms")) {
-        $("#topTerms").removeClass("hide-terms").fadeIn();
+        $("#topTerms").removeClass("hide-terms").show();
         if (window.performance) {
           if (performance.navigation.type == 1) {
             //page has been reloaded;
@@ -488,7 +491,6 @@ function initIncompleteFields() {
         };
         setTimeout("disableHeaderFooterLinks();", 1000);
       } else {
-        $("#topTerms").hide();
         fc.getNext();
         $("#aboutForm").fadeIn();
         if ($("#aboutForm").length == 0 || fc.allFieldsCompleted()) {
@@ -764,7 +766,7 @@ $(document).ready(function(){
           config: "website_terms_of_use,subject_website_consent,privacy_policy",
           subsections: {
             "termsCheckbox": {
-                fields: [$("[data-type='terms']:visible")],
+                fields: [$("[data-type='terms'][data-required='true']")],
                 event: termsEvent
             }
         }

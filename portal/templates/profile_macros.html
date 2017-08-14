@@ -71,6 +71,7 @@
                     } else return false;
                 });
             });
+           __convertToNumericField($("#date, #year"));
         });
      </script>
 {%- endmacro %}
@@ -1577,6 +1578,7 @@
     <script>
         $(document).ready(
             function() {
+                __convertToNumericField($("#deathDay, #deathYear"));
                 getSaveLoaderDiv("profileForm", "boolDeathGroup");
                 $("#boolDeath").on("change", function() {
                     if (!($(this).is(":checked"))) {
@@ -2229,6 +2231,7 @@
         var currentUserId = {{ current_user.id if current_user}};
         $(document).ready(function(){
             tnthAjax.getProc({{ person.id if person}}, false);
+            __convertToNumericField($("#procYear, #procDay"));
         });
     </script>
 {%- endmacro %}
