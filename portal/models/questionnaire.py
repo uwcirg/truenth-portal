@@ -71,7 +71,7 @@ class Questionnaire(db.Model):
             'link': {
                 'rel': 'self',
                 'href': url_for('assessment_engine_api.questionnaire_list',
-                               _external=True),
+                                _external=True),
             },
             'entry': objs,
         }
