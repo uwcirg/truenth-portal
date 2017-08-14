@@ -7,7 +7,7 @@ the flask background tasks to run.
 
 Launch in the same virtual environment via
 
-  $ celery worker -A portal.celery_worker.celery --loglevel=info
+  $ celery worker -A portal.celery_worker.celery -B --loglevel=info
 
 """
 from .app import create_app
@@ -28,10 +28,10 @@ def setup_periodic_tasks(sender, **kwargs):
     # create test task if non-existent
     if not ScheduledJob.query.filter_by(name="__test_celery__").first():
         test_job = ScheduledJob(name="__test_celery__", task="test",
-                                schedule="0 * * * *", active=True)
+                                schedule="* * * * *", active=True,
+                                kwargs={"job_id": None})
         db.session.add(test_job)
         db.session.commit()
-        test_job = db.session.merge(test_job)
 
     # add all tasks to Celery
     for job in ScheduledJob.query.filter_by(active=True):
@@ -39,7 +39,8 @@ def setup_periodic_tasks(sender, **kwargs):
         if task:
             args_in = job.args.split(',') if job.args else []
             kwargs_in = job.kwargs or {}
+            if "job_id" in kwargs_in:
+                kwargs_in["job_id"] = job.id
             sender.add_periodic_task(job.crontab_schedule(),
                                      task.s(*args_in,
-                                            job_id=job.id,
                                             **kwargs_in))
