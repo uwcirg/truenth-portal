@@ -576,6 +576,8 @@ def home():
     # All checks passed - present appropriate view for user role
     if user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF):
         return redirect(url_for('patients.patients_root'))
+    if user.has_role(ROLE.RESEARCHER):
+        return redirect(url_for('.research_dashboard'))
 
     interventions =\
             Intervention.query.order_by(Intervention.display_rank).all()
@@ -975,6 +977,18 @@ def config_settings(config_key):
         return jsonify({key: current_app.config.get(key)})
     else:
         abort(400, "Configuration key '{}' not available".format(key))
+
+
+@portal.route('/research')
+@roles_required([ROLE.RESEARCHER])
+@oauth.require_oauth()
+def research_dashboard():
+    """Research Dashboard
+
+    Only accessible to those with the Researcher role.
+
+    """
+    return render_template('research.html', user=current_user())
 
 
 @portal.route('/reporting')

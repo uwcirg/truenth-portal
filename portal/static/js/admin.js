@@ -271,34 +271,9 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
           $("div.fixed-table-toolbar").hide();
         };
 
-        /* attach orgs related events to UI components */
-
-        $("#dataDownloadModal").on('shown.bs.modal', function () {
-              var parentOrgList = self.getUserTopLevelParentOrgs(self.getUserOrgs());
-              if (parentOrgList && parentOrgList.length > 0) {
-                 var instrumentList = self.getInstrumentList();
-                 var instrumentItems = [];
-                 parentOrgList.forEach(function(o) {
-                    var il = instrumentList[o];
-                    if (il) {
-                      il.forEach(function(n) {
-                        instrumentItems.push(n);
-                      });
-                    };
-                 });
-                 if (instrumentItems.length > 0) {
-                    $(".instrument-container").hide();
-                    instrumentItems.forEach(function(item) {
-                      $("#" + item + "_container").show();
-                    });
-                 };
-              };
-              $("#patientsInstrumentList").addClass("ready");
-        });
-
         var ofields = $("#userOrgs input[name='organization']");
         if (ofields.length > 0) {
-
+          /* attach orgs related events to UI components */
           ofields.each(function() {
             if ((self.getHereBelowOrgs(self.getUserOrgs())).length == 1 ||
                 (iterated && request_org_list && request_org_list[$(this).val()])) {
@@ -380,6 +355,67 @@ AdminTool.prototype.getInstrumentList = function() {
     '20000': ['eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems', 'irondemog']
   };
 };
+
+AdminTool.prototype.handleDownloadModal = function() {
+
+    var self = this;
+     /* 
+      *populate instruments list based on user's parent org
+      */
+    $("#dataDownloadModal").on('shown.bs.modal', function () {
+          var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
+          if (parentOrgList && parentOrgList.length > 0) {
+             var instrumentList = self.getInstrumentList();
+             var instrumentItems = [];
+             parentOrgList.forEach(function(o) {
+                var il = instrumentList[o];
+                if (il) {
+                  il.forEach(function(n) {
+                    instrumentItems.push(n);
+                  });
+                };
+             });
+             if (instrumentItems.length > 0) {
+                $(".instrument-container").hide();
+                instrumentItems.forEach(function(item) {
+                  $("#" + item + "_container").show();
+                });
+             };
+          };
+          $("#patientsInstrumentList").addClass("ready");
+    });
+    /*
+     * attach on click event to submit button in the download modal
+     */
+    $(document).delegate("#patientsDownloadButton", "click", function(event){
+      var instruments = "", dataType = "";
+      $("input[name='instrument'").each(function() {
+          if ($(this).is(":checked")) {
+            instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
+          };
+      });
+      $("input[name='downloadType']").each(function() {
+          if ($(this).is(":checked")) dataType = $(this).val();
+      });
+      if (instruments != "" && dataType != "") {
+          //alert(instruments)
+          $("#_downloadMessage").text("");
+          $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
+          $("#_downloadLink")[0].click();
+      } else {
+          message = (instruments == "" ? "Please choose at least one instrument.": "");
+          if (dataType == "") message += (message != "" ? "<br/>": "") + "Please choose one download type.";
+          $("#_downloadMessage").html(message);
+      };
+    });
+
+    /*
+     * attach event to each checkbox in the download instruments modal
+     */
+    $("input[name='instrument'], input[name='downloadType']").on("click", function() {
+        if ($(this).is(":checked")) $("#_downloadMessage").text("");
+    });
+}
 
 
 

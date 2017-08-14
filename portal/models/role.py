@@ -50,6 +50,8 @@ STATIC_ROLES = IterableUserDict({
     'promote_without_identity_challenge':
         'Users with "write_only" may be promoted without the standard '
         'identity challenge if they are also have this role',
+    'researcher':
+        'Gives user access to the Research page',
     'staff':
         'Health care provider or staff at a TrueNTH-collaborating clinic',
     'staff_admin':

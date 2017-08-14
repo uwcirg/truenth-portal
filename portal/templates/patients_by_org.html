@@ -8,58 +8,9 @@
       <div class="or">or</div>
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
-    <a href="" id="_downloadLink" target="_blank"></a>
     <hr/>
-  {% if config.STAFF_BULK_DATA_ACCESS %}
-      <div class="modal fade" id="dataDownloadModal" tabindex="-1" role="dialog">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                {{ _("Export questionnaire data") }}
-              </div>
-              <div class="modal-body">
-                  <div class="form-group">
-                    <label class="text-muted">{{ _("Instrument(s) to export data from:")}}</label>
-                    <div id="patientsInstrumentListWrapper">
-                      <div id="patientsInstrumentList" class="profile-radio-list">
-                        {% for instrument_code in config["INSTRUMENTS"] | sort() %}
-                        <div class="checkbox instrument-container" id="{{instrument_code}}_container"><label><input type="checkbox" name="instrument" value="{{ instrument_code }}">{{ instrument_code | replace("_", " ") | upper }}</label>
-                        </div>
-                        {% endfor %}
-                      </div>
-                      <div id="instrumentListLoad"><i class="fa fa-spinner fa-spin fa-2x loading-message"></i></div>
-                    </div>
-                    </div>
-                  <div class="form-group">
-                    <label class="text-muted">{{ _("Data type:")}}</label>
-                    <div id="patientsDownloadTypeList" class="profile-radio-list">
-                      <label class="radio-inline">
-                          <input type="radio" name="downloadType" id="csv" value="csv" checked/>
-                          {{ _("CSV") }}
-                      </label>
-                      <label class="radio-inline">
-                          <input type="radio" name="downloadType" id="_json" value="json"/>
-                          {{ _("JSON") }}
-                      </label>
-                    </div>
-                  </div>
-                  <div id="_downloadMessage"></div>
-                  <br/>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-default" id="patientsDownloadButton">{{ _("Export") }}</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">{{ _("Close") }}</button>
-              </div>
-            </div>
-          </div>
-      </div>
-  {% endif %}
   <div class="admin-table table-responsive smaller-text">
       <div id="adminTableToolbar" class="admin-toolbar">
-        {% if config.STAFF_BULK_DATA_ACCESS %}
-          <div id="patientListExportDataContainer" class="btn btn-lg"><a href="#" id="patientAssessmentDownload"  data-toggle="modal" data-target="#dataDownloadModal">{{ _("Export questionnaire data") }} &nbsp;<span class="glyphicon glyphicon-save"></span></a></div>
-        {% endif %}
          <div id="orglistSelector" class="dropdown btn-group orglist-selector">
             <button id="orglist-dropdown" class="btn btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{_("Filter list by site")}} &nbsp;<span class="glyphicon glyphicon-menu-down text-muted"></span><span class="glyphicon glyphicon-menu-up text-muted tnth-hide"></span>
@@ -219,38 +170,6 @@ $(document).ready(function() {
    *  hide checkbox for hidden id field from side menu
    */
   $("input[data-field='id']:checkbox").hide();
-
-  /*
-   * attach on click event to submit button in the download modal
-   */
-  $(document).delegate("#patientsDownloadButton", "click", function(event){
-    var instruments = "", dataType = "";
-    $("input[name='instrument'").each(function() {
-        if ($(this).is(":checked")) {
-          instruments += (instruments != "" ? "&": "") + "instrument_id="+$(this).val();
-        };
-    });
-    $("input[name='downloadType']").each(function() {
-        if ($(this).is(":checked")) dataType = $(this).val();
-    });
-    if (instruments != "" && dataType != "") {
-        //alert(instruments)
-        $("#_downloadMessage").text("");
-        $("#_downloadLink").attr("href", "/api/patient/assessment?" + instruments + "&format=" + dataType);
-        $("#_downloadLink")[0].click();
-    } else {
-        message = (instruments == "" ? "{{_('Please choose at least one instrument.')}}": "");
-        if (dataType == "") message += (message != "" ? "<br/>": "") + "{{_('Please choose one download type.')}}";
-        $("#_downloadMessage").html(message);
-    };
-  });
-
-  /*
-   * attach event to each checkbox in the download instruments modal
-   */
-  $("input[name='instrument'], input[name='downloadType']").on("click", function() {
-      if ($(this).is(":checked")) $("#_downloadMessage").text("");
-  });
 
   /*
    * variable passed into orgs dropdown to check selected org(s)
