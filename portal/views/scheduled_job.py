@@ -69,7 +69,7 @@ def get_job(job_id):
 def delete_job(job_id):
     job = ScheduledJob.query.get(job_id)
     if not job:
-        abort(400, 'job ID not found')
+        abort(404, 'job ID not found')
     db.session.delete(job)
     db.session.commit()
     msg = "scheduled job id {} deleted".format(job_id)

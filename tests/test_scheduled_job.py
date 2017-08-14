@@ -67,7 +67,7 @@ class TestScheduledJob(TestCase):
         self.assertEquals(resp.json['task'], 'info')
 
         resp = self.client.get('/api/scheduled_jobs/999')
-        self.assert400(resp)
+        self.assert404(resp)
 
     def test_job_delete(self):
         self.promote_user(role_name=ROLE.ADMIN)
@@ -83,4 +83,4 @@ class TestScheduledJob(TestCase):
         self.assertFalse(ScheduledJob.query.all())
 
         resp = self.client.delete('/api/scheduled_jobs/999')
-        self.assert400(resp)
+        self.assert404(resp)
