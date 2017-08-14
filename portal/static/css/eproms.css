@@ -714,6 +714,26 @@ div.right-panel {
 #adminTable .organization-field {
   min-width: 130px;
 }
+#adminTable div.filterControl select,
+#adminTable div.filterControl input
+{
+  font-weight: normal;
+  min-height: 2.5em;
+}
+#adminTable th.status-field {
+  position: relative;
+}
+#adminTable th.status-field .loading-message-indicator {
+  position: absolute;
+  top: 50%;
+  left: 2%;
+  display: none;
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+#adminTable .bootstrap-table-filter-control-status {
+  opacity: 0;
+}
 .truenth-id-label {
    display: none;
 }

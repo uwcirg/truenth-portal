@@ -3677,6 +3677,52 @@ var tnthTables = {
         //if (aa < bb) return -1;
         //return 0;
         return  bb - aa;
+    },
+    /***
+     * Quick way to sort when text is wrapped in an <a href> or other tag
+     * NOTE for text that is NOT number
+     * @param a,b - the two items to compare
+     * @returns 1,-1 or 0 for sorting
+     */
+    "stripLinksTextSorter": function(a,b) {
+        var aa = $(a).text();
+        var bb = $(b).text();
+        if(aa < bb) return -1;
+        if(aa > bb) return 1;
+        return 0;
+    },
+    /***
+     * sorting date string,
+     * @param a,b - the two items to compare - note, this assumes that the parameters
+     * are in valid date format e.g. 3 August 2017
+     * @returns 1,-1 or 0 for sorting
+     */
+    "dateSorter": function(a,b) {
+        if (!hasValue(a)) a = 0;
+        if (!hasValue(b)) b = 0;
+        /*
+         * make sure the string passed in does not have line break element
+         * if so it is a possible mult-line text, split it up and use
+         * the first item in the resulting array
+         */
+        var regex = /<br\s*[\/]?>/gi;
+        a = a.replace(regex, "\n");
+        b = b.replace(regex, "\n");
+        var ar = a.split("\n");
+        if (ar.length > 0) a = ar[0];
+        var br = b.split("\n");
+        if (br.length > 0) b = br[0];
+        /* note getTime return returns the numeric value
+         * corresponding to the time for the specified date according to universal time
+         * therefore, can be used for sorting
+         */
+        var a_d = (new Date(a)).getTime();
+        var b_d = (new Date(b)).getTime();
+
+        if (isNaN(a_d)) a_d = 0;
+        if (isNaN(b_d)) b_d = 0;
+
+        return  b_d - a_d;
     }
 };
 
@@ -3823,8 +3869,8 @@ function getSaveLoaderDiv(parentID, containerID) {
     };
 };
 
-function __getLoaderHTML() {
-    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+function __getLoaderHTML(message) {
+    return '<div class="loading-message-indicator"><i class="fa fa-spinner fa-spin fa-2x"></i>' + (hasValue(message)?"&nbsp;"+message:"") + '</div>';
 }
 function _isTouchDevice(){
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);

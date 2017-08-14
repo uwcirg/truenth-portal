@@ -701,6 +701,21 @@ h4.detail-title {
 #adminTable .eproms-id-label {
   display: none;
 }
+#adminTable div.filterControl select,
+#adminTable div.filterControl input
+{
+  font-weight: normal;
+  min-height: 2.5em;
+}
+#adminTable th.status-field {
+  position: relative;
+}
+#adminTable th.status-field .loading-message-indicator {
+  display: none;
+}
+#adminTable .bootstrap-table-filter-control-status {
+  opacity: 0;
+}
 #adminTableToolbar div.orglist-selector {
   display: inline-block;
 }
