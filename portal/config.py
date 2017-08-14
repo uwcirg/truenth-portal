@@ -12,8 +12,6 @@ def best_sql_url():
                 PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
-    elif 'SQLALCHEMY_DATABASE_URI' in env:
-        return env.get('SQLALCHEMY_DATABASE_URI')
     else:
         return env.get(
             'DATABASE_URL',
