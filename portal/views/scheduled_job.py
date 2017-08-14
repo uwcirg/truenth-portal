@@ -59,7 +59,7 @@ def create_job():
 def get_job(job_id):
     job = ScheduledJob.query.get(job_id)
     if not job:
-        abort(400, 'job ID not found')
+        abort(404, 'job ID not found')
     return jsonify(job.as_json())
 
 
