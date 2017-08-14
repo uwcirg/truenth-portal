@@ -10,12 +10,16 @@ usage() {
 Usage:
     $cmdname [-b] [-h]
     -h     Show this help message
+    -b     Backup current database before attempting update
 USAGE
     exit 1
 }
 
 while getopts "bh" option; do
     case "${option}" in
+        b)
+            BACKUP=true
+            ;;
         h)
             usage
             ;;
@@ -37,6 +41,13 @@ export GIT_DIR="${GIT_WORK_TREE}/.git"
 # Set default docker-compose file if COMPOSE_FILE environmental variable not set
 export COMPOSE_FILE=${COMPOSE_FILE:-"${GIT_WORK_TREE}/docker/docker-compose.yaml"}
 
+if [ $BACKUP ]; then
+    web_image_id="$(docker-compose images -q web)"
+    dump_filename="psql_dump-$(date --iso-8601=seconds)-${web_image_id}.gzip"
+
+    echo "Backing up current database..."
+    docker-compose exec --user postgres db pg_dump --format c postgres > "/tmp/${dump_filename}.pgdump"
+fi
 
 docker-compose pull
 docker-compose up -d
