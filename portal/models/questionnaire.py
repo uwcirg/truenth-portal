@@ -2,6 +2,7 @@
 from sqlalchemy.dialects.postgresql import JSONB
 
 from ..database import db
+from ..date_tools import FHIR_datetime
 
 
 class Questionnaire(db.Model):
@@ -46,3 +47,31 @@ class Questionnaire(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
+
+    @classmethod
+    def generate_bundle(cls, limit_to_ids=None):
+        """Generate a FHIR bundle of existing questionnaires ordered by ID
+
+        If limit_to_ids is defined, only return the matching set, otherwise
+        all questionnaires found.
+
+        """
+        query = Questionnaire.query.order_by(Questionnaire.id)
+        if limit_to_ids:
+            query = query.filter(Questionnaire.id.in_(limit_to_ids))
+
+        objs = [q.as_fhir() for q in query]
+
+        bundle = {
+            'resourceType':'Bundle',
+            'updated':FHIR_datetime.now(),
+            'total':len(objs),
+            'type': 'searchset',
+            'link': {
+                'rel':'self',
+                'href':url_for('assessment_engine_api.questionnaire_list',
+                               _external=True),
+            },
+            'entry':objs,
+        }
+        return bundle

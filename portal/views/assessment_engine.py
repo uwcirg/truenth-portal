@@ -1636,13 +1636,13 @@ def patient_assessment_status(patient_id):
         abort(400, "invalid patient id")
 
 
-@assessment_engine_api.route('/questionnaire_banks')
+@assessment_engine_api.route('/questionnaire_bank')
 @oauth.require_oauth()
-def get_questionnaire_bank_list():
-    """Return the list of QuestionnaireBanks
+def questionnaire_bank_list():
+    """Obtain a bundle (list) of all QuestionnaireBanks
 
     ---
-    operationId: get_questionnaire_bank_list
+    operationId: questionnaire_bank_list
     tags:
       - Assessment Engine
     produces:
@@ -1656,17 +1656,17 @@ def get_questionnaire_bank_list():
           to view requested patient
 
     """
-    qbs = QuestionnaireBank.query.all()
-    return jsonify(questionnaire_banks=[qb.as_json() for qb in qbs])
+    bundle = QuestionnaireBank.generate_bundle()
+    return jsonify(bundle)
 
 
-@assessment_engine_api.route('/questionnaires')
+@assessment_engine_api.route('/questionnaire')
 @oauth.require_oauth()
-def get_questionnaire_list():
-    """Return the list of Questionnaires
+def questionnaire_list():
+    """Obtain a bundle (list) of all Questionnaires
 
     ---
-    operationId: get_questionnaire_list
+    operationId: questionnaire_list
     tags:
       - Assessment Engine
     produces:
@@ -1680,14 +1680,14 @@ def get_questionnaire_list():
           to view requested patient
 
     """
-    qs = Questionnaire.query.all()
-    return jsonify(questionnaires=[q.as_fhir() for q in qs])
+    bundle = QuestionnaireBank.generate_bundle()
+    return jsonify(bundle)
 
 
-@assessment_engine_api.route('/questionnaires/<string:name>')
+@assessment_engine_api.route('/questionnaire/<string:name>')
 @oauth.require_oauth()
 def get_questionnaire(name):
-    """Return the list of QuestionnaireBanks
+    """Return the specified Questionnaire
 
     ---
     operationId: get_questionnaire
