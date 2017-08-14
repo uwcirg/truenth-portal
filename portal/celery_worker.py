@@ -28,7 +28,7 @@ def setup_periodic_tasks(sender, **kwargs):
     # create test task if non-existent
     if not ScheduledJob.query.filter_by(name="__test_celery__").first():
         test_job = ScheduledJob(name="__test_celery__", task="test",
-                                schedule="* * * * *", active=True,
+                                schedule="0 * * * *", active=True,
                                 kwargs={"job_id": None})
         db.session.add(test_job)
         db.session.commit()
