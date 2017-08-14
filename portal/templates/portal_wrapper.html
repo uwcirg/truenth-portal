@@ -134,7 +134,11 @@
                     {% if user and user.has_role(ROLE.APPLICATION_DEVELOPER) %}<li><a href="{{PORTAL}}/clients">{{ _("Client Applications") }}</a></li>{% endif %}
                     {% if user and (user.has_role(ROLE.STAFF) or user.has_role(ROLE.INTERVENTION_STAFF)) %}<li><a href="{{PORTAL}}/patients/">{{ _("Patients") }}</a></li>{% endif %}
                     {% if user and user.has_role(ROLE.STAFF_ADMIN) %}<li><a href="{{PORTAL}}/staff">{{ _("Staff List") }}</a></li>{% endif %}
-                    {% if user and user.has_role(ROLE.ADMIN) %}<li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>{% endif %}
+                    {% if user and user.has_role(ROLE.ADMIN) %}
+                    <li><a href="{{PORTAL}}/admin">{{ _("User Administration") }}</a></li>
+                    <li><a href="{{PORTAL}}/settings">{{ _("Settings") }}</a></li>
+                    {% endif %}
+                    {% if user and (user.has_role(ROLE.ADMIN) or user.has_role(ROLE.ANALYST)) %}<li><a href="{{PORTAL}}/reporting">{{ _("Reporting Dashboard") }}</a></li>{% endif %}
                     {% if user %}<li><a href="{{PORTAL}}/logout">{{ _("Log Out of TrueNTH") }}</a></li>{% endif %}
                 </ul>
             </div>
