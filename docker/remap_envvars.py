@@ -12,14 +12,13 @@ def get_db_url():
     Datica: DATABASE_1_URL
     Heroku: DATABASE_URL
     """
-    candidate_db_envvars = [
+    candidate_db_envvars = (
         value for name, value in environ.items()
         if 'DATABASE' in name and value
-    ]
+    )
 
     # Return None if no candidates found
-    candidate_db_envvars += [None, ]
-    return candidate_db_envvars[0]
+    return next(candidate_db_envvars, None)
 
 
 def main():
