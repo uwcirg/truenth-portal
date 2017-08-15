@@ -18,7 +18,7 @@ const translationPOTSource = path.join(__dirname, './translations/js/src/transla
 /*
  * extracting text from js into json file for translation
  */
-gulp.task('i18next-extraction', function() {
+gulp.task('i18next-extraction', ['minifyi18nextScripts'], function() {
     return gulp.src(['static/**/*.{js,html}'])
         .pipe(scanner({
             lngs: ['en'], // supported languages
@@ -43,35 +43,19 @@ gulp.task('i18next-extraction', function() {
  * convert json to pot for translator's consumption - definition file
  * convert po file returned from translator to json file for consumption by frontend
  */
-gulp.task('i18nextConversions', ['minifyi18nextScripts', 'i18next-extraction'], function() {
+gulp.task('i18nextConversions', ['i18next-extraction'], function() {
     
     const options = {/* you options here */}
 
     function save(target) {
       return result => {
-        fs.openSync(target, 'w+', function(err, fd) {
-            if (err) console.log("error open: " + target);
-            else {
-              fs.writeFileSync(target, result);
-              fs.close(fd, function(err) {
-                if (err) console.log("error closing file: " + target + " : " + err);
-              });
-            };
-        });
+        fs.writeFileSync(target, result);
       };
     }
    /*
     *converting json to pot to be sent to translator
     */
-    fs.open(translationJsonSource, 'w+', function(err, fd) {
-      if (err) console.log("Error open file: " + translationJsonSource);
-      else {
-        i18nextConv.i18nextToPot('en', fs.readFileSync(translationJsonSource), options).then(save(translationPOTSource));
-        fs.close(fd, function(err) {
-          console.log("Error closing file: " +  translationJsonSource + " : " + err);
-        });
-      };
-    });
+    i18nextConv.i18nextToPot('en', fs.readFileSync(translationJsonSource), options).then(save(translationPOTSource));
 
     /*
      * converting po to json files
@@ -85,14 +69,14 @@ gulp.task('i18nextConversions', ['minifyi18nextScripts', 'i18next-extraction'], 
      const en_us_dir = path.join(__dirname,'./static/files/locales/en-US');
      const en_au_dir = path.join(__dirname,'./static/files/locales/en-AU');
 
-     // mkdirp(en_us_dir, function(err) {
-     //    if (err) console.err("error occurred creating locales en-US directory: " + err);
-     //    else console.log("en-US directory created");
-     // });
-     // mkdirp(en_au_dir, function(err) {
-     //    if (err) console.err("error occurred creating locales en-AU directory: " + err);
-     //    else console.log("en-AU directory created");
-     // });
+     mkdirp(en_us_dir, function(err) {
+        if (err) console.err("error occurred creating locales en-US directory: " + err);
+        else console.log("en-US directory created");
+     });
+     mkdirp(en_au_dir, function(err) {
+        if (err) console.err("error occurred creating locales en-AU directory: " + err);
+        else console.log("en-AU directory created");
+     });
      /*
       * translating po file to json for en-US locale
       */
