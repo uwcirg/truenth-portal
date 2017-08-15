@@ -14,8 +14,10 @@ env:
     - TOXENV=py27
   global:
     - FLASK_APP="$(readlink -f manage.py)"
-    - SQLALCHEMY_DATABASE_TEST_URI='postgresql://postgres:@localhost/portal_unit_tests'
-    - SQLALCHEMY_DATABASE_URI='postgresql://postgres:@localhost/portal_unit_tests'
+    - PGUSER='postgres'
+    - PGPASSWORD=''
+    - PGHOST='localhost'
+    - PGDATABASE='portal_unit_tests'
     - PACKAGE_NAME=${PACKAGE_NAME:-true_nth_usa_portal}
     - IMAGE_NAME=${IMAGE_NAME:-portal_web}
     - DEB_REPO=${DEB_REPO:-portal-deb}
@@ -52,6 +54,8 @@ before_install:
   - IFS=/ read GH_USERNAME GH_REPO <<< "$TRAVIS_REPO_SLUG"
   - export GH_USERNAME GH_REPO
   - export SHORT_HASH=${TRAVIS_COMMIT:0:7}
+  # Reuse PG* env vars - each TravisCI job gets its own DB
+  - export SQLALCHEMY_DATABASE_TEST_URI="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}"
 
   # Only deploy from develop and master branches, and not previously configured
   - if [[ ! -v DEPLOY && ("$TRAVIS_BRANCH" = "master" || "$TRAVIS_BRANCH" = "develop") ]]; then
@@ -66,7 +70,10 @@ before_install:
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
 
-  - psql --command 'create database portal_unit_tests owner postgres;' --username postgres
+  - createdb
+      --owner "$PGUSER"
+      --username "$PGUSER"
+    "$PGDATABASE"
 
   - pip install --upgrade pip setuptools
   - export PORTAL_VERSION="$(python setup.py --version)"
