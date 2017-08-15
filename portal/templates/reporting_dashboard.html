@@ -11,23 +11,30 @@
                data-show-columns="true">
             <thead>
             <tr>
-                <th>{{ _("Intervention") }}</th>
-                <th>{{ _("Logins today") }}</th>
-                <th>{{ _("Logins this month") }}</th>
-                <th>{{ _("Logins this year") }}</th>
-                <th>{{ _("Logins (total)") }}</th>
+                <th/>
+                <th>{{ _("Today") }}</th>
+                <th>{{ _("This Month") }}</th>
+                <th>{{ _("This Year") }}</th>
+                <th>{{ _("All Time") }}</th>
             </tr>
             </thead>
             <tbody data-link="row" class="rowlink">
             <tr>
-                <td>{{ _("All") }}</td>
+                <td>{{ _("Registrations") }}</td>
+                <td>{{ counts['registrations'] | selectattr("day", "equalto", now.day) | list | length }}</td>
+                <td>{{ counts['registrations'] | selectattr("month", "equalto", now.month) | list | length }}</td>
+                <td>{{ counts['registrations'] | selectattr("year", "equalto", now.year) | list | length }}</td>
+                <td>{{ counts['registrations'] | length }}</td>
+            </tr>
+            <tr>
+                <td>{{ _("Logins") }}</td>
                 <td>{{ counts['encounters']['all'] | selectattr("day", "equalto", now.day) | list | length }}</td>
                 <td>{{ counts['encounters']['all'] | selectattr("month", "equalto", now.month) | list | length }}</td>
                 <td>{{ counts['encounters']['all'] | selectattr("year", "equalto", now.year) | list | length }}</td>
                 <td>{{ counts['encounters']['all'] | length }}</td>
             </tr>
             {% for k,v in counts['encounters']['interventions'].items() %}
-                <td>{{ k }}</td>
+                <td><div class="indent">{{ k }}</div></td>
                 <td>{{ v | selectattr("day", "equalto", now.day) | list | length }}</td>
                 <td>{{ v | selectattr("month", "equalto", now.month) | list | length }}</td>
                 <td>{{ v | selectattr("year", "equalto", now.year) | list | length }}</td>
