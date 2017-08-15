@@ -12,11 +12,6 @@ def best_sql_url():
                 PGUSER=env.get('PGUSER'), PGPASSWORD=env.get('PGPASSWORD'),
                 PGHOST=env.get('PGHOST', 'localhost'),
                 PGDATABASE=env.get('PGDATABASE')))
-    else:
-        return env.get(
-            'DATABASE_URL',
-            'postgresql://test_user:4tests_only@localhost/portal_unit_tests'
-        )
 
 
 class BaseConfig(object):
