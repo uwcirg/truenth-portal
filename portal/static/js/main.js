@@ -588,7 +588,7 @@ var fillContent = {
              ********/
             var headerArray = ['Organization', '<span class="eproms-consent-status-header">Consent Status</span><span class="truenth-consent-status-header">Status</span>',
                                 '<span class="agreement">Agreement</span>',
-                                '<span class="eproms-consent-date-header">Consented Date</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
+                                '<span class="eproms-consent-date-header">' + (typeof CONSENT_DATE_LABEL != "undefined" ? CONSENT_DATE_LABEL : "Consent Date") + '</span><span class="truenth-consent-date-header">Registration Date</span> <span class="gmt">(GMT)</span>'];
             headerArray.forEach(function (title, index) {
                 if (title != "n/a") content += "<TH class='consentlist-header'>" + title + "</TH>";
             });
@@ -663,6 +663,12 @@ var fillContent = {
                     var signedDate = tnthDates.formatDateString(item.signed);
                     var editorUrlEl = $("#" + orgId + "_editor_url");
                     var isDefault = /stock\-org\-consent/.test(item.agreement_url);
+                    var consentLabels = {
+                        "default": "Consented",
+                        "consented": "Consented / Enrolled",
+                        "widthdrawn": "Withdrawn - Suspend Data Collection and Report Historic Data",
+                        "purged": "Purged / Removed"
+                    };
 
                     switch(consentStatus) {
                         case "deleted":
@@ -673,18 +679,18 @@ var fillContent = {
                             break;
                         case "active":
                             if (se && sr && ir) {
-                                    if (isDefault) sDisplay = "<span class='text-success small-text'>Consented</span>";
-                                    else sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                    if (isDefault) sDisplay = "<span class='text-success small-text'>" + consentLabels["default"] + "</span>";
+                                    else sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                     cflag = "consented";
                             } else if (se && ir && !sr) {
-                                    sDisplay = "<span class='text-warning small-text'>Suspend Data Collection and Report Historic Data</span>";
+                                    sDisplay = "<span class='text-warning small-text'>" + consentLabels["widthdrawn"] + "</span>";
                                     cflag = "suspended";
                             } else if (!se && !ir && !sr) {
-                                    sDisplay = "<span class='text-danger small-text'>Purged/Removed</span>";
+                                    sDisplay = "<span class='text-danger small-text'>" + consentLabels["purged"] + "</span>";
                                     cflag = "purged";
                             } else {
                                 //backward compatible?
-                                sDisplay = "<span class='text-success small-text'>Consented / Enrolled</span>";
+                                sDisplay = "<span class='text-success small-text'>" + consentLabels["consented"] + "</span>";
                                 cflag = "consented";
                             };
                             break;
@@ -703,9 +709,9 @@ var fillContent = {
                             + '<div class="modal-body" style="padding: 0 2em">'
                             + '<br/><h4 style="margin-bottom: 1em">Modify the consent status for this user to: </h4>'
                             + '<div style="font-size:0.95em; margin-left:1em">'
-                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>Consented / Enrolled</input></label></div>'
-                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>Suspend Data Collection and Report Historic Data</input></label></div>'
-                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>Purged/remove consent(s) associated with this organization</input></label></div>') : "")
+                            + '<div class="radio"><label><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="consented" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "consented"?"checked": "") + '>' + consentLabels["consented"] + '</input></label></div>'
+                            + '<div class="radio"><label class="text-warning"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="suspended" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' +  (cflag == "suspended"?"checked": "") + '>' + consentLabels["widthdrawn"] + '</input></label></div>'
+                            + (isAdmin ? ('<div class="radio"><label class="text-danger"><input class="radio_consent_input" name="radio_consent_' + index + '" type="radio" modalId="consent' + index + 'Modal" value="purged" data-orgId="' + item.organization_id + '" data-agreementUrl="' + String(item.agreement_url).trim() + '" data-userId="' + userId + '" ' + (cflag == "purged"?"checked": "") +'>' + consentLabels["purged"] + '</input></label></div>') : "")
                             + '</div><br/><br/>'
                             + '</div>'
                             + '<div class="modal-footer">'
@@ -3450,8 +3456,11 @@ var tnthDates = {
         var givenDate = this.getGivenDate(y, m, d);
         return ( givenDate == convertedDate);
     },
-    "getDateObj": function(y, m, d) {
-        return new Date(y,parseInt(m)-1,d);
+    /*
+     * method does not check for valid numbers, will return NaN if conversion failed
+     */
+    "getDateObj": function(y, m, d, h, mi, s) {
+        return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
     },
     "getConvertedDate": function(dateObj) {
         if (dateObj && this.isDateObj(dateObj)) return ""+dateObj.getFullYear() + (dateObj.getMonth()+1) + dateObj.getDate();

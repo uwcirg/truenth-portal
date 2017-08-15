@@ -719,6 +719,7 @@ div.right-panel {
   background-image: linear-gradient(to bottom, #FFF, rgba(232, 233, 234, 0.9));
   letter-spacing: 0.1px;
   border-bottom: 1px solid #dad8d8;
+  font-size: 0.93em;
 }
 #adminTable div.card-view {
   display: flex;
@@ -1731,6 +1732,9 @@ div.noOrg-container span {
   top: -1px;
   left: 1px;
 }
+#createProfileForm .btn-tnth-back {
+  background: none;
+}
 #emailInfoText {
   display: none;
 }
@@ -2255,6 +2259,9 @@ div.biopsy-option:last-of-type{
   margin-right: 8px;
   position: relative;
   top: -2px;
+}
+#consentDateEditContainer {
+  margin-top: 2.5em;
 }
 #profileConsentList {
   font-size: 0.95em;

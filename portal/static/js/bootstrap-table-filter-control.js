@@ -98,6 +98,8 @@
     var setCursorPosition = function (el, index) {
         /*
          * caused cursor to jump in IE
+         * see open issue:  https://github.com/wenzhixin/bootstrap-table/issues/3078
+         * cursor jumped to the last filter input field on mouseup
          */
         // if ($.fn.bootstrapTable.utils.isIEBrowser()) {
         //     if(el.setSelectionRange !== undefined) {
