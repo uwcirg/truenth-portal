@@ -2454,8 +2454,9 @@ div.timezone-warning.text-warning {
     top: 1px;
     left: -1px;
   }
-  #aboutForm {
-    overflow: hidden;
+  #aboutForm .iq-container .tnth-headline:first-of-type{
+    margin-left: 0.3em;
+    margin-right: 0.3em;
   }
 }
 @media (max-width: 730px) {
@@ -2563,6 +2564,9 @@ div.timezone-warning.text-warning {
   }
   .one-side {
     height: 23em;
+  }
+  #aboutForm .bd-element {
+    margin-bottom: 1em;
   }
 }
 /*NOTE, the placement, overriding the previous media query match for this class*/
