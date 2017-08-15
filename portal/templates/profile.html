@@ -127,7 +127,8 @@ $(document).ready(function(){
           targetFields.each(function() {
               if ($(this).attr("type") == "hidden") return false;
               $(this).attr("data-save-container-id", attachId);
-              var triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
+              var triggerEvent = $(this).attr("data-trigger-event");
+              if (!hasValue(triggerEvent)) triggerEvent = $(this).attr("type") == "text" ? "blur" : "change";
               $(this).on(triggerEvent, function(e) {
                 e.stopPropagation();
                 var valid = this.validity ? this.validity.valid : true;

@@ -219,10 +219,10 @@
             <label>{{ _("Birth Date") }} <span class="bd-optional text-muted">{{_("(optional)")}}</span></label>
             <div class="row">
               <div class="col-md-4 col-xs-8">
-                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The birth day field is required and must be valid format')}}" required />
+                <input class="form-control bd-element init-queries-field" id="date" name="birthdayDate" placeholder="DD" type="text" maxlength="2" pattern="\d[\d]?" data-error="{{_('The birth day field is required and must be valid format')}}"  data-trigger-event="change" required />
               </div>
               <div class="col-md-4 col-xs-8">
-                <select data-type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="{{_('A birth month must be selected')}}" required>
+                <select data-type="select" class="form-control bd-element init-queries-field" name="birthdayMonth" id="month" data-error="{{_('A birth month must be selected')}}" data-trigger-event="change" required>
                   <option value="">{{ _("Month") }}...</option>
                   <option value="01">{{ _("January") }}</option>
                   <option value="02">{{ _("February") }}</option>
@@ -239,7 +239,7 @@
                 </select>
               </div>
               <div class="col-md-4 col-xs-8">
-                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-error="{{_('The birth year is required and must be in valid format')}}" required />
+                <input class="form-control bd-element init-queries-field" id="year" name="birthdayYear" placeholder="YYYY" type="text" maxlength="4" pattern = "(19|20)\d{2}" data-trigger-event="change" data-error="{{_('The birth year is required and must be in valid format')}}" required />
               </div>
             </div>
             <div class="help-block with-errors" style="margin-top: 1em; padding-left: 1em"></div>
