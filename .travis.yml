@@ -69,7 +69,10 @@ before_install:
   # setuptools_scm module needs the git history since the last master branch to correctly calculate the number of revisions since then (ie devNNN in 16.12.8.3.dev274+ngd08a23c)
   - git fetch --unshallow
 
-  - psql --command 'create database portal_unit_tests owner postgres;' --username postgres --dbname template1
+  - psql
+    --command 'create database portal_unit_tests owner postgres;'
+    --username postgres
+    --dbname template1
 
   - pip install --upgrade pip setuptools
   - export PORTAL_VERSION="$(python setup.py --version)"
