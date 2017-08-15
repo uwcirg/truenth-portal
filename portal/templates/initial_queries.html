@@ -437,7 +437,8 @@ function initIncompleteFields() {
     var fe = field.element;
     fe.each(function() {
         var f = $(this);
-        var triggerEvent = ($(f).attr("type") == "text" ? "blur" : "click");
+        var triggerEvent = $(f).attr("data-trigger-event");
+        if (!hasValue(triggerEvent)) triggerEvent = ($(f).attr("type") == "text" ? "blur" : "click");
         if (f.get(0).nodeName.toLowerCase() == "select") triggerEvent = "change";
         var customEvent = fc.mainSections[field.sectionId].subsections[field.subsectionId].event;
 
