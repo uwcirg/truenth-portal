@@ -1046,8 +1046,7 @@ def get_reporting_counts():
                 counts['organizations'][org.name] += 1
         counts['registrations'].append(user.registered)
 
-    for enc in Encounter.query.filter_by(auth_method='password_authenticated',
-                                         status='finished'):
+    for enc in Encounter.query.filter_by(auth_method='password_authenticated'):
         st = enc.start_time
         counts['encounters']['all'].append(st)
         user = get_user(enc.user_id)
