@@ -129,3 +129,43 @@ class TestQuestionnaireBank(TestCase):
         # confirm rank sticks
         self.assertEquals(results[0]['name'], 'epic26')
         self.assertEquals(results[2]['name'], 'comorb')
+
+    def test_questionnaire_gets(self):
+        crv = Organization(name='CRV')
+        epic26 = Questionnaire(name='epic26')
+        eproms_add = Questionnaire(name='eproms_add')
+        comorb = Questionnaire(name='comorb')
+        with SessionScope(db):
+            db.session.add(crv)
+            db.session.add(epic26)
+            db.session.add(eproms_add)
+            db.session.add(comorb)
+            db.session.commit()
+        crv, epic26, eproms_add, comorb = map(
+            db.session.merge, (crv, epic26, eproms_add, comorb))
+
+        resp = self.client.get('/api/questionnaire')
+        self.assert200(resp)
+        self.assertEquals(len(resp.json['entry']), 3)
+
+        resp = self.client.get('/api/questionnaire/{}'.format('epic26'))
+        self.assert200(resp)
+        self.assertEquals(resp.json['questionnaire']['name'], 'epic26')
+
+        bank = QuestionnaireBank(name='CRV', organization_id=crv.id)
+        for rank, q in enumerate((epic26, eproms_add, comorb)):
+            qbq = QuestionnaireBankQuestionnaire(
+                questionnaire_id=q.id,
+                days_till_due=7,
+                days_till_overdue=90,
+                rank=rank)
+            bank.questionnaires.append(qbq)
+
+        self.test_user.organizations.append(crv)
+        with SessionScope(db):
+            db.session.add(bank)
+            db.session.commit()
+
+        resp = self.client.get('/api/questionnaire_bank')
+        self.assert200(resp)
+        self.assertEquals(len(resp.json['entry'][0]['questionnaires']), 3)

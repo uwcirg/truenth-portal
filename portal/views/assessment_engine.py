@@ -16,6 +16,8 @@ from ..models.assessment_status import AssessmentStatus, overall_assessment_stat
 from ..models.auth import validate_origin
 from ..models.fhir import QuestionnaireResponse, EC, aggregate_responses, generate_qnr_csv
 from ..models.intervention import INTERVENTION
+from ..models.questionnaire import Questionnaire
+from ..models.questionnaire_bank import QuestionnaireBank
 from ..models.role import ROLE
 from ..models.user import current_user, get_user, User
 from .portal import check_int
@@ -1632,3 +1634,87 @@ def patient_assessment_status(patient_id):
         return jsonify(assessment_status=assessment_overall_status)
     else:
         abort(400, "invalid patient id")
+
+
+@assessment_engine_api.route('/questionnaire_bank')
+@oauth.require_oauth()
+def questionnaire_bank_list():
+    """Obtain a bundle (list) of all QuestionnaireBanks
+
+    ---
+    operationId: questionnaire_bank_list
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    responses:
+      200:
+        description: return current list of questionnaire banks
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    bundle = QuestionnaireBank.generate_bundle()
+    return jsonify(bundle)
+
+
+@assessment_engine_api.route('/questionnaire')
+@oauth.require_oauth()
+def questionnaire_list():
+    """Obtain a bundle (list) of all Questionnaires
+
+    ---
+    operationId: questionnaire_list
+    tags:
+      - Assessment Engine
+    produces:
+      - application/json
+    responses:
+      200:
+        description: return current list of questionnaires
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    bundle = Questionnaire.generate_bundle()
+    return jsonify(bundle)
+
+
+@assessment_engine_api.route('/questionnaire/<string:name>')
+@oauth.require_oauth()
+def get_questionnaire(name):
+    """Return the specified Questionnaire
+
+    ---
+    operationId: get_questionnaire
+    tags:
+      - Assessment Engine
+    parameters:
+      - name: name
+        in: path
+        description: Questionnaire name
+        required: true
+        type: string
+    produces:
+      - application/json
+    responses:
+      200:
+        description: return specified questionnaire
+      400:
+        description: missing or invalid questionnaire name
+      401:
+        description:
+          if missing valid OAuth token or logged-in user lacks permission
+          to view requested patient
+
+    """
+    try:
+        name = str(name)
+    except ValueError, e:
+        abort(400, "invalid input '{}' - must be a valid string".format(name))
+    q = Questionnaire.query.filter_by(name=name).first()
+    return jsonify(questionnaire=q.as_fhir())

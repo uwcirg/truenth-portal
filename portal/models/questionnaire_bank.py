@@ -1,8 +1,10 @@
 """Questionnaire Bank module"""
+from flask import url_for
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
 from ..database import db
+from ..date_tools import FHIR_datetime
 from .questionnaire import Questionnaire
 from .recur import Recur
 from .reference import Reference
@@ -93,6 +95,34 @@ class QuestionnaireBank(db.Model):
             self.id = existing.id
         self = db.session.merge(self)
         return self
+
+    @classmethod
+    def generate_bundle(cls, limit_to_ids=None):
+        """Generate a FHIR bundle of existing questionnaire banks ordered by ID
+
+        If limit_to_ids is defined, only return the matching set, otherwise
+        all questionnaire banks found.
+
+        """
+        query = QuestionnaireBank.query.order_by(QuestionnaireBank.id)
+        if limit_to_ids:
+            query = query.filter(QuestionnaireBank.id.in_(limit_to_ids))
+
+        objs = [q.as_json() for q in query]
+
+        bundle = {
+            'resourceType': 'Bundle',
+            'updated': FHIR_datetime.now(),
+            'total': len(objs),
+            'type': 'searchset',
+            'link': {
+                'rel': 'self',
+                'href': url_for('assessment_engine_api.questionnaire_bank_list',
+                                _external=True),
+            },
+            'entry': objs,
+        }
+        return bundle
 
 
 class QuestionnaireBankQuestionnaire(db.Model):
