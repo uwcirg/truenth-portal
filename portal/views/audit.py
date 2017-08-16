@@ -12,7 +12,7 @@ from ..models.role import ROLE
 audit_api = Blueprint('audit_api', __name__, url_prefix='/api')
 
 @audit_api.route('/user/<int:user_id>/audit')
-@roles_required([ROLE.ADMIN, ROLE.STAFF])
+@roles_required([ROLE.ADMIN, ROLE.STAFF, ROLE.INTERVENTION_STAFF])
 @oauth.require_oauth()
 def get_audit(user_id):
     """Access audit info for given user
