@@ -2852,6 +2852,51 @@ var tnthAjax = {
            if (callback) callback({"error": "Server error"});
         });
     },
+    /*
+     *  return instruments list by organization(s)
+     */
+    "getInstrumentsList": function(sync, callback) {
+        $.ajax({
+            type: "GET",
+            url: "api/questionnaire_bank",
+            async: (sync?false:true)
+        }).done(function(data){
+            if (data && data.entry) {
+                if ((data.entry).length === 0) {
+                    if (callback) callback({"error": "no data returned"});
+                } else {
+                    var qList = {};
+                    (data.entry).forEach(function(item) {
+                        if (item.organization) {
+                            var orgID = (item.organization.reference).split("/")[2];
+                            /*
+                             * don't assign orgID to object if it was already present
+                             */
+                            if (!qList[orgID]) qList[orgID] = [];
+                            if (item.questionnaires) {
+                                (item.questionnaires).forEach(function(q) {
+                                    /*
+                                     * add instrument name to instruments array for the org
+                                     * will not add if it is already in the array
+                                     * NOTE: inArray returns -1 if the item is NOT in the array
+                                     */
+                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
+                                        qList[orgID].push(q.questionnaire.display);
+                                    };
+                                });
+                            };
+                        };
+                    });
+                    if (callback) callback(qList);
+                };
+            } else {
+                if (callback) callback({"error": "no data returned"});
+            };
+
+        }).fail(function() {
+            if (callback) callback({"error": "error retrieving instruments list"});
+        });
+    },
     "getTerms": function(userId, type, sync, callback) {
         $.ajax ({
             type: "GET",
