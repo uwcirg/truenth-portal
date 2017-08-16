@@ -6,6 +6,9 @@
 
     <h2 class="tnth-headline">{{ _("Usage Statistics") }}</h2>
     <div>
+        <p>{{ _("Registrations are collected from the User.registration timestamps of all Users without the Test Role") }}</p>
+        <p>{{ _("Logins are collected from the start_time timestamps of Encounters whose auth_method='password_authenticated'") }}</p>
+        <p>{{ _("Intervention Logins are filtered based on the login Encounter's User's User.interventions") }}</p>
         <table id="usageStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -47,6 +50,12 @@
     <br/>
     <h2 class="tnth-headline">{{ _("User Statistics") }}</h2>
     <div id="userStatsContainer">
+        <p>{{ _("User stats are collected from all Users without the Test Role") }}</p>
+        <p>{{ _("Role counts are tallied from User.roles (e.g. a User with both the Patient and Staff Roles, would add 1 to both Roles' counts)") }}</p>
+        <p><i>{{ _("No Diagnosis") }}</i>: {{ _("Users whose User.observations does not contain any Observations where the Observation.codeable_concept=CC.BIOPSY and the Observation.value_quantity.value=True") }}</p>
+        <p><i>{{ _("Diagnosis, No Treatment") }}</i>: {{ _("Users where known_treatment_not_started(User)=True") }}</p>
+        <p><i>{{ _("Diagnosis and Treatment") }}</i>: {{ _("Users where known_treatment_started(User)=True") }}</p>
+        <p><i>{{ _("Metastasis") }}</i>: {{ _("Users whose User.observations contains any Observations where the Observation.codeable_concept=CC.PCaLocalized and the Observation.value_quantity.value!=True") }}</p>
         <table id="userRoleStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -86,6 +95,9 @@
                 <td>{{ counts['roles']['staff'] }}</td>
             </tr>
         </table>
+        <p>{{ _("Intervention counts are tallied from User.interventions (e.g. a User with both the 'Care Plan' and 'Symptom Tracker' interventions, would add 1 to both Interventions' counts)") }}</p>
+        <p>{{ _("Completed Reports are tallied for each User that has <i>any number</i> of PatientReports for that Intervention (e.g. whether a User has 1 or 100 PatientReports for 'Symptom Tracker', that User only adds 1 to that Intervention's Completed Reports tally)") }}</p>
+        <p>{{ _("Completed Reports are only shown for an Intervention if the report count is above 0") }}</p>
         <table id="userIntervStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
@@ -113,6 +125,9 @@
     <br/>
     <h2 class="tnth-headline">{{ _("Institution Statistics") }}</h2>
     <div>
+        <p>{{ _("Organization counts are collected from the User.organizations of all Users without the Test Role") }}</p>
+        <p>{{ _("'None of the above' refers to Users who specifically selected the 'None of the above' organization option") }}</p>
+        <p>{{ _("'Unspecified' refers to Users who have not yet been assigned to <i>any</i> Organization option (including 'None of the above')") }}</p>
         <table id="orgStatsTable"
                class="table table-striped table-hover table-condensed"
                data-show-columns="true">
