@@ -1,8 +1,7 @@
 """Views for Scheduled Jobs"""
 from flask import abort, jsonify, Blueprint, request
-from flask import render_template, session, url_for
+from flask import render_template
 from flask_user import roles_required
-from sqlalchemy import and_
 
 from ..audit import auditable_event
 from ..database import db
@@ -25,7 +24,8 @@ def jobs_list():
     TODO: Add new jobs, modify & inactivate existing jobs
 
     """
-    jobs = ScheduledJob.query.filter(ScheduledJob.name != "__test_celery__").all()
+    jobs = ScheduledJob.query.filter(
+        ScheduledJob.name != "__test_celery__").all()
     tasks = []
     for task in celery.tasks.keys():
         path = task.split('.')
@@ -34,7 +34,7 @@ def jobs_list():
     return render_template('scheduled_jobs_list.html', jobs=jobs, tasks=tasks)
 
 
-@scheduled_job_api.route('/api/scheduled_jobs', methods=('POST',))
+@scheduled_job_api.route('/api/scheduled_job', methods=('POST',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def create_job():
@@ -53,7 +53,7 @@ def create_job():
     return jsonify(job.as_json())
 
 
-@scheduled_job_api.route('/api/scheduled_jobs/<int:job_id>')
+@scheduled_job_api.route('/api/scheduled_job/<int:job_id>')
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def get_job(job_id):
@@ -63,7 +63,8 @@ def get_job(job_id):
     return jsonify(job.as_json())
 
 
-@scheduled_job_api.route('/api/scheduled_jobs/<int:job_id>', methods=('DELETE',))
+@scheduled_job_api.route(
+    '/api/scheduled_job/<int:job_id>', methods=('DELETE',))
 @roles_required(ROLE.ADMIN)
 @oauth.require_oauth()
 def delete_job(job_id):
