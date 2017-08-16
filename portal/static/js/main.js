@@ -964,7 +964,7 @@ var fillContent = {
                     content += getTOUTableHTML(true);
                     content += "</table>";
                     $("#profileConsentList").html(content);
-                } else $("#profileConsentList").html("<span class='text-muted'>No Consent Record Found</span>");
+                } else $("#profileConsentList").html("<span class='text-muted'>" + i18next.t("No Consent Record Found")+ "</span>");
             };
         };
         $("#profileConsentList").animate({opacity: 1});
@@ -3053,7 +3053,7 @@ $(document).ready(function() {
     setTimeout('$("#homeFooter").show();', 100);
 
     //setTimeout('LRKeyEvent();', 1500);
-    __i18next.init(function() {
+    __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true}, function() {
         __NOT_PROVIDED_TEXT = i18next.t("Not provided");
     });
 
