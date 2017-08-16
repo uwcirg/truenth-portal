@@ -2861,30 +2861,34 @@ var tnthAjax = {
             url: "api/questionnaire_bank",
             async: (sync?false:true)
         }).done(function(data){
-            var qList = {};
             if (data && data.entry) {
-                (data.entry).forEach(function(item) {
-                    if (item.organization) {
-                        var orgID = (item.organization.reference).split("/")[2];
-                        /*
-                         * don't assign orgID to object if it was already present
-                         */
-                        if (!qList[orgID]) qList[orgID] = [];
-                        if (item.questionnaires) {
-                            (item.questionnaires).forEach(function(q) {
-                                /*
-                                 * add instrument name to instruments array for the org
-                                 * will not add if it is already in the array
-                                 * NOTE: inArray returns -1 if the item is NOT in the array
-                                 */
-                                if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
-                                    qList[orgID].push(q.questionnaire.display);
-                                };
-                            });
+                if ((data.entry).length === 0) {
+                    if (callback) callback({"error": "no data returned"});
+                } else {
+                    var qList = {};
+                    (data.entry).forEach(function(item) {
+                        if (item.organization) {
+                            var orgID = (item.organization.reference).split("/")[2];
+                            /*
+                             * don't assign orgID to object if it was already present
+                             */
+                            if (!qList[orgID]) qList[orgID] = [];
+                            if (item.questionnaires) {
+                                (item.questionnaires).forEach(function(q) {
+                                    /*
+                                     * add instrument name to instruments array for the org
+                                     * will not add if it is already in the array
+                                     * NOTE: inArray returns -1 if the item is NOT in the array
+                                     */
+                                    if ($.inArray(q.questionnaire.display, qList[orgID]) == -1){
+                                        qList[orgID].push(q.questionnaire.display);
+                                    };
+                                });
+                            };
                         };
-                    };
-                });
-                if (callback) callback(qList);
+                    });
+                    if (callback) callback(qList);
+                };
             } else {
                 if (callback) callback({"error": "no data returned"});
             };
