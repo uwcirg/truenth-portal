@@ -81,7 +81,7 @@ AdminTool.prototype.getData = function(requests, callback) {
                               timeout: 5000,
                               beforeSend: function() {
                                 self.setStatusLoadingVis("show");
-                                /* 
+                                /*
                                  * disable export functionality while status is being populated
                                  */
                                 $("div.export button").attr("disabled", true);
@@ -348,24 +348,26 @@ AdminTool.prototype.initOrgsList = function(request_org_list, context) {
     };
 };
 AdminTool.prototype.getInstrumentList = function() {
-  return {
-    //CRV
-    '10000': ['epic26', 'eproms_add', 'comorb'],
-    //IRONMAN
-    '20000': ['eortc', 'ironmisc', 'factfpsi', 'epic26', 'prems', 'irondemog']
-  };
+  var iList;
+  tnthAjax.getInstrumentsList(true, function(data) {
+    if (data && !data.error) {
+      iList = data;
+    };
+  });
+  return iList ? iList : false;
 };
 
 AdminTool.prototype.handleDownloadModal = function() {
 
     var self = this;
-     /* 
+     /*
       *populate instruments list based on user's parent org
       */
     $("#dataDownloadModal").on('shown.bs.modal', function () {
+        var instrumentList = self.getInstrumentList();
+        if (instrumentList) {
           var parentOrgList = AT.getUserTopLevelParentOrgs(AT.getUserOrgs());
           if (parentOrgList && parentOrgList.length > 0) {
-             var instrumentList = self.getInstrumentList();
              var instrumentItems = [];
              parentOrgList.forEach(function(o) {
                 var il = instrumentList[o];
@@ -382,7 +384,8 @@ AdminTool.prototype.handleDownloadModal = function() {
                 });
              };
           };
-          $("#patientsInstrumentList").addClass("ready");
+        };
+        $("#patientsInstrumentList").addClass("ready");
     });
     /*
      * attach on click event to submit button in the download modal
