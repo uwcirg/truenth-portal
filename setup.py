@@ -44,7 +44,10 @@ setup_kwargs = dict(
     include_package_data=True,
     zip_safe=False,
     packages=find_packages(),
-    scripts=["manage.py"],
+    scripts=[
+        "manage.py",
+        os.path.join('docker', 'remap_envvars.py'),
+    ],
     install_requires=[
         "Authomatic",
         "celery",
