@@ -49,6 +49,7 @@ EXPOSE ${PORT}
 
 CMD \
     . ${PROJECT_DIR}/bin/activate && \
+    eval $(${PROJECT_DIR}/docker/remap_envvars.py) && \
     env && \
     flask sync && \
     gunicorn \
