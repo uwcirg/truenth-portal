@@ -1,22 +1,21 @@
-"""Unit test module for terms of use logic"""
+"""Unit test module for scheduled jobs logic"""
 import json
 
-from portal.extensions import db
-from portal.extensions import celery
+from portal.extensions import db, celery
 from portal.models.role import ROLE
 from portal.models.scheduled_job import ScheduledJob
-from portal.tasks import test, info
-from tests import TestCase, TEST_USER_ID
+from portal.tasks import test
+from tests import TestCase
 
 assert celery
 
 
 class TestScheduledJob(TestCase):
-    """Terms Of Use tests"""
+    """Scheduled Job tests"""
 
     def test_schedule(self):
         schedule = "45 * * * *"
-        sj = ScheduledJob(name="test", task="info",
+        sj = ScheduledJob(name="test", task="test",
                           schedule=schedule, active=True)
         sjc = sj.crontab_schedule()
         self.assertTrue(45 in sjc.minute)
@@ -35,11 +34,11 @@ class TestScheduledJob(TestCase):
 
         data = {
                 "name": "testjob",
-                "task": "info",
+                "task": "test",
                 "schedule": "* * * * *",
                }
         resp = self.client.post(
-            '/api/scheduled_jobs',
+            '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
         self.assert200(resp)
@@ -47,7 +46,7 @@ class TestScheduledJob(TestCase):
 
         data['schedule'] = "0 0 0 0 0"
         resp = self.client.post(
-            '/api/scheduled_jobs',
+            '/api/scheduled_job',
             content_type='application/json',
             data=json.dumps(data))
         self.assert200(resp)
@@ -57,30 +56,30 @@ class TestScheduledJob(TestCase):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
-        job = ScheduledJob(name="testjob", task="info", schedule="0 0 * * *")
+        job = ScheduledJob(name="testjob", task="test", schedule="0 0 * * *")
         db.session.add(job)
         db.session.commit()
         job = db.session.merge(job)
 
-        resp = self.client.get('/api/scheduled_jobs/{}'.format(job.id))
+        resp = self.client.get('/api/scheduled_job/{}'.format(job.id))
         self.assert200(resp)
-        self.assertEquals(resp.json['task'], 'info')
+        self.assertEquals(resp.json['task'], 'test')
 
-        resp = self.client.get('/api/scheduled_jobs/999')
+        resp = self.client.get('/api/scheduled_job/999')
         self.assert404(resp)
 
     def test_job_delete(self):
         self.promote_user(role_name=ROLE.ADMIN)
         self.login()
 
-        job = ScheduledJob(name="testjob", task="info", schedule="0 0 * * *")
+        job = ScheduledJob(name="testjob", task="test", schedule="0 0 * * *")
         db.session.add(job)
         db.session.commit()
         job = db.session.merge(job)
 
-        resp = self.client.delete('/api/scheduled_jobs/{}'.format(job.id))
+        resp = self.client.delete('/api/scheduled_job/{}'.format(job.id))
         self.assert200(resp)
         self.assertFalse(ScheduledJob.query.all())
 
-        resp = self.client.delete('/api/scheduled_jobs/999')
+        resp = self.client.delete('/api/scheduled_job/999')
         self.assert404(resp)
