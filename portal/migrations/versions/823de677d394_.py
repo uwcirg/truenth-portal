@@ -29,7 +29,7 @@ def create_missing_encounters(table_name):
         user_col = 'user_id'
 
     for obj_id, user_id in session.execute("SELECT id, {} FROM {} where "
-                        "encounter_id IS NULL".format(user_col, table_name)):
+                                           "encounter_id IS NULL".format(user_col, table_name)):
         enc = Encounter(
             status='finished', auth_method='staff_authenticated',
             start_time=datetime(2000, 01, 01, 01, 01, 01), user_id=user_id)
@@ -45,12 +45,12 @@ def remove_generated_encounters(table_name):
     session = Session(bind=bind)
 
     for obj_id, enc_id in session.execute("SELECT {table_name}.id, "
-                        "encounters.id FROM {table_name} JOIN encounters ON "
-                        "{table_name}.encounter_id = encounters.id WHERE "
-                        "encounters.status = 'finished' AND "
-                        "encounters.auth_method = 'staff_authenticated' AND "
-                        "encounters.start_time = '2000-01-01 01:01:01'".format(
-                              table_name=table_name)):
+                                          "encounters.id FROM {table_name} JOIN encounters ON "
+                                          "{table_name}.encounter_id = encounters.id WHERE "
+                                          "encounters.status = 'finished' AND "
+                                          "encounters.auth_method = 'staff_authenticated' AND "
+                                          "encounters.start_time = '2000-01-01 01:01:01'".format(
+                                              table_name=table_name)):
         session.execute('UPDATE {} SET encounter_id = NULL WHERE id = {}'
                         ''.format(table_name, obj_id))
         session.execute('DELETE FROM encounters WHERE id = {}'.format(enc_id))
@@ -61,10 +61,10 @@ def update_questionnaire_subjects():
     session = Session(bind=bind)
 
     for ques_id, user_id in session.execute(
-                        "SELECT questionnaire_responses.id, encounters.user_id"
-                        " FROM questionnaire_responses JOIN encounters ON "
-                        "questionnaire_responses.encounter_id = encounters.id "
-                        "WHERE questionnaire_responses.subject_id IS NULL"):
+        "SELECT questionnaire_responses.id, encounters.user_id"
+        " FROM questionnaire_responses JOIN encounters ON "
+        "questionnaire_responses.encounter_id = encounters.id "
+            "WHERE questionnaire_responses.subject_id IS NULL"):
 
         session.execute('UPDATE questionnaire_responses SET subject_id = {} '
                         'WHERE id = {}'.format(user_id, ques_id))

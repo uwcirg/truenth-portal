@@ -13,11 +13,13 @@ down_revision = '4f7e2f9ff54e'
 from alembic import op
 import sqlalchemy as sa
 
+
 def upgrade():
     op.rename_table('user', 'users')
     op.rename_table('client', 'clients')
     op.rename_table('grant', 'grants')
     op.rename_table('token', 'tokens')
+
 
 def downgrade():
     op.rename_table('users', 'user')
