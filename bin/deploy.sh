@@ -81,7 +81,7 @@ echo "Synchronizing database"
 flask sync
 
 echo "Updating package metadata"
-python setup.py egg_info
+python setup.py egg_info --quiet
 
 # Restart apache if application is served by apache
 if [[ "${GIT_WORK_TREE}" == "/srv/www/"* ]]; then
