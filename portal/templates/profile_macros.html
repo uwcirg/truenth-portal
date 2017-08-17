@@ -1048,7 +1048,7 @@
 </div>
 {%- endmacro %}
 {% macro profileAuditLog(person, current_user) -%}
-    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF)) %}
+    {% if (person and current_user) and (current_user.has_role(ROLE.ADMIN) or current_user.has_role(ROLE.STAFF) or current_user.has_role(ROLE.INTERVENTION_STAFF)) %}
         <input type="hidden" id="audit_user_id" value="{{person.id}}"/>
         <div id="auditTableToolBar"></div>
         <table id="profileAuditLogTable" class="smaller-text"></table>
