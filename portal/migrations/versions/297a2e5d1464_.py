@@ -18,8 +18,9 @@ def upgrade():
     op.drop_constraint(u'_questionnaire_bank_questionnaire_rank',
                        'questionnaire_bank_questionnaires', type_='unique')
     op.create_unique_constraint(
-        '_questionnaire_bank_questionnaire_rank', 'questionnaire_bank_questionnaires', [
-            'questionnaire_bank_id', 'rank'])
+        '_questionnaire_bank_questionnaire_rank',
+        'questionnaire_bank_questionnaires',
+        ['questionnaire_bank_id', 'rank'])
     # ### end Alembic commands ###
 
 
@@ -28,6 +29,6 @@ def downgrade():
     op.drop_constraint('_questionnaire_bank_questionnaire_rank',
                        'questionnaire_bank_questionnaires', type_='unique')
     op.create_unique_constraint(
-        u'_questionnaire_bank_questionnaire_rank', 'questionnaire_bank_questionnaires', [
-            'questionnaire_id', 'rank'])
+        u'_questionnaire_bank_questionnaire_rank',
+        'questionnaire_bank_questionnaires', ['questionnaire_id', 'rank'])
     # ### end Alembic commands ###
