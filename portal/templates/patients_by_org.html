@@ -4,8 +4,10 @@
     <h4 class="tnth-headline">Patient List</h4>
     <br/>
     <div id="patientListOptions">
+      {%- if user.has_role(ROLE.STAFF) -%}
       <a href="{{ url_for('patients.patient_profile_create') }}" id="createUserLink" class="btn btn-default">{{ _("Create a patient record") }}</a>
       <div class="or">or</div>
+      {%- endif -%}
       <span class="profile-item-title">{{ _("Select a patient below to view or update details.") }}</span>
     </div>
     <hr/>
