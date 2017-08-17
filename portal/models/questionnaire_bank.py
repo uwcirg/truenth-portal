@@ -117,8 +117,9 @@ class QuestionnaireBank(db.Model):
             'type': 'searchset',
             'link': {
                 'rel': 'self',
-                'href': url_for('assessment_engine_api.questionnaire_bank_list',
-                                _external=True),
+                'href': url_for(
+                    'assessment_engine_api.questionnaire_bank_list',
+                    _external=True),
             },
             'entry': objs,
         }

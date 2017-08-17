@@ -12,6 +12,7 @@ import tempfile
 from app import SITE_CFG
 from database import db
 from models.app_text import AppText
+from models.communication_request import CommunicationRequest
 from models.fhir import FHIR_datetime
 from models.intervention import Intervention, INTERVENTION
 from models.intervention_strategies import AccessStrategy
@@ -150,6 +151,11 @@ class SitePersistence(object):
         for app_string in app_strings:
             d['entry'].append(app_string.as_json())
 
+        # Add communication requests
+        crs = CommunicationRequest.query.all()
+        for cr in crs:
+            d['entry'].append(cr.as_fhir())
+
         # Add scheduled job info
         for job in ScheduledJob.query.all():
             d['entry'].append(job.as_json())
@@ -270,6 +276,23 @@ class SitePersistence(object):
                     if intervention in db.session:
                         db.session.expunge(intervention)
 
+        def update_communication_request(cr_fhir):
+            cr = CommunicationRequest.from_fhir(cr_fhir)
+            existing = CommunicationRequest.query.get(
+                cr.id) if cr.id else None
+            if existing:
+                details = StringIO()
+                if not dict_match(cr_fhir, existing.as_fhir(), details):
+                    self._log("CommunicationRequest {id} collision on "
+                              "import.  {details}".format(
+                                  id=existing.id,
+                                  details=details.getvalue()))
+                    db.session.delete(existing)
+                    db.session.add(cr)
+            else:
+                self._log("{} not found, importing".format(cr))
+                db.session.add(cr)
+
         # Orgs first:
         max_org_id = 0
         orgs_seen = []
@@ -371,6 +394,22 @@ class SitePersistence(object):
                     "site_persistence: {}".format(strategy))
                 db.session.delete(strategy)
 
+        # CommunicationRequest depends on QuestionnaireBanks
+        crs_seen = []
+        for cr in objs_by_type['CommunicationRequest']:
+            update_communication_request(cr)
+            crs_seen.append(cr['id'])
+
+        if not keep_unmentioned:
+            query = CommunicationRequest.query.filter(
+               ~CommunicationRequest.id.in_(crs_seen)
+            ) if crs_seen else []
+            for cr in query:
+                current_app.logger.info(
+                    "Deleting CommunicationRequest not mentioned in "
+                    "site_persistence: {}".format(cr))
+                db.session.delete(cr)
+
         # App Text shouldn't be order dependent, now is good.
         apptext_seen = []
         for a in objs_by_type['AppText']:
@@ -440,6 +479,7 @@ def read_site_cfg():
     d = {"resourceType": SITE_CFG,
          "results": results}
     return d
+
 
 def write_site_cfg(data):
     cfg_file = os.path.join(current_app.instance_path, SITE_CFG)

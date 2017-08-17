@@ -10,7 +10,6 @@ SitePersistence mechanism, and looked up in a template using the
 from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
-from re import finditer
 import requests
 from requests.exceptions import MissingSchema
 from urllib import urlencode
@@ -39,12 +38,12 @@ class AppText(db.Model):
     def __str__(self):
         if self.custom_text:
             return self.custom_text
-        return self.text
+        return self.name
 
     def __unicode__(self):
         if self.custom_text:
             return self.custom_text
-        return self.text
+        return self.name
 
     @classmethod
     def from_json(cls, data):
@@ -104,7 +103,7 @@ class ConsentByOrg_ATMA(AppTextModelAdapter):
 class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
     @staticmethod
     def name_key(**kwargs):
-        """Generate AppText name key for website consent terms presented at initial queries
+        """Generate AppText name key for website consent terms
 
         :param organization: for which the consent agreement applies
         :param role: for specific role selections, but only if
@@ -122,8 +121,9 @@ class WebsiteConsentTermsByOrg_ATMA(AppTextModelAdapter):
                 organization.name, role)
         return "{} organization website consent URL".format(organization.name)
 
+
 class InitialConsent_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for Initial Consent Terms as presented at initial queries - namely the URL"""
+    """AppTextModelAdapter for Initial Consent Terms"""
 
     @staticmethod
     def name_key(**kwargs):
@@ -137,8 +137,9 @@ class InitialConsent_ATMA(AppTextModelAdapter):
         """
         return "Initial Consent Terms URL"
 
+
 class Terms_ATMA(AppTextModelAdapter):
-    """AppTextModelAdapter for New Terms Of Use agreements, used for /terms"""
+    """AppTextModelAdapter for Terms Of Use agreements, used for /terms"""
 
     @staticmethod
     def name_key(**kwargs):
@@ -228,7 +229,8 @@ class PrivacyATMA(AppTextModelAdapter):
         elif kwargs.get('role') and not kwargs.get('organization'):
             raise ValueError("'organization' parameter not defined")
         elif kwargs.get('organization') and kwargs.get('role'):
-            return "{} {} privacy URL".format(kwargs.get('organization').name, kwargs.get('role'))
+            return "{} {} privacy URL".format(
+                kwargs.get('organization').name, kwargs.get('role'))
         return "Privacy URL"
 
 
@@ -311,7 +313,7 @@ class VersionedResource(object):
         try:
             response = requests.get(url)
             self._asset = response.json().get('asset')
-            self.url =  self._permanent_url(
+            self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
         except MissingSchema:
@@ -334,7 +336,6 @@ class VersionedResource(object):
 
         if self.error_msg:
             current_app.logger.error(self.error_msg + ": {}".format(url))
-
 
     @property
     def asset(self):
