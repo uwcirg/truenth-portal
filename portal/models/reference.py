@@ -18,6 +18,14 @@ class MultipleReference(Exception):
 
 class Reference(object):
 
+    def __repr__(self):
+        result = ['Reference(']
+        for attr in self.__dict__:
+            if not attr.startswith('_'):
+                result.append('{}={}'.format(attr, getattr(self, attr)))
+        result.append(')')
+        return ''.join(result)
+
     @classmethod
     def organization(cls, organization_id):
         """Create a reference object from a known organization id"""
@@ -37,6 +45,13 @@ class Reference(object):
         """Create a reference object from a known questionnaire name"""
         instance = cls()
         instance.questionnaire_name = questionnaire_name
+        return instance
+
+    @classmethod
+    def questionnaire_bank(cls, questionnaire_bank_name):
+        """Create a reference object from a known questionnaire bank"""
+        instance = cls()
+        instance.questionnaire_bank_name = questionnaire_bank_name
         return instance
 
     @classmethod
@@ -140,5 +155,9 @@ class Reference(object):
         if hasattr(self, 'questionnaire_name'):
             ref = "api/questionnaire/{}".format(self.questionnaire_name)
             display = self.questionnaire_name
+        if hasattr(self, 'questionnaire_bank_name'):
+            ref = "api/questionnaire_bank/{}".format(
+                self.questionnaire_bank_name)
+            display = self.questionnaire_bank_name
 
         return {"reference": ref, "display": display}
