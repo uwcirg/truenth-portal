@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 usage() {
     echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
