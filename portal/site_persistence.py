@@ -154,7 +154,7 @@ class SitePersistence(object):
         # Add communication requests
         crs = CommunicationRequest.query.all()
         for cr in crs:
-            d['entry'].append(crs.as_fhir())
+            d['entry'].append(cr.as_fhir())
 
         # Add scheduled job info
         for job in ScheduledJob.query.all():
@@ -290,8 +290,7 @@ class SitePersistence(object):
                     db.session.delete(existing)
                     db.session.add(cr)
             else:
-                self._log("CommunicationRequest {} not found, "
-                          "importing".format(cr.id))
+                self._log("{} not found, importing".format(cr))
                 db.session.add(cr)
 
         # Orgs first:
