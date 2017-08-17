@@ -1061,7 +1061,7 @@ var fillContent = {
     },
     "roleList": function(data) {
         data.roles.forEach(function(role) {
-            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();}) + "</label></div>");
+            $("#rolesGroup").append("<div class='checkbox'><label><input type='checkbox' name='user_type' value='" + role.name + "' data-save-container-id='rolesGroup'>" + (role.name.replace(/\_/g, " ").replace(/\b[a-z]/g,function(f){return f.toUpperCase();})) + "</label></div>");
         });
     },
     "roles": function(data,isProfile) {
@@ -1624,7 +1624,7 @@ OrgTool.prototype.populateUI = function() {
             } else {
                 if ($("#userOrgs label[id='org-label-"+ org + "']").length == 0) {
                     container.append('<label id="org-label-' + org + '" class="org-label"><input class="clinic" type="checkbox" name="organization" parent_org="true" id="' +  orgsList[org].id + '_org" state="' +  getState(orgsList[org]) + '" value="'+
-                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + orgsList[org].name + '</label>');
+                    orgsList[org].id +'"  data-parent-id="'+ orgsList[org].id +'"  data-parent-name="' + orgsList[org].name + '"/>' + i18next.t("" + orgsList[org].name) + '</label>');
                 };
             };
         };
@@ -3051,6 +3051,8 @@ $(document).ready(function() {
 
     // Reveal footer after load to avoid any flashes will above content loads
     setTimeout('$("#homeFooter").show();', 100);
+
+    tnthAjax.beforeSend();
 
     //setTimeout('LRKeyEvent();', 1500);
     __i18next.init({"debug": __ENV.toUpperCase() == "PRODUCTION"? false: true}, function() {
