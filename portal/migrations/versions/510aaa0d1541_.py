@@ -121,12 +121,21 @@ def downgrade():
     op.alter_column(u'user_relationships', 'other_user_id',
                     existing_type=sa.INTEGER(),
                     nullable=True)
-    op.add_column(u'user_races', sa.Column('codeable_concept_id',
-                                           sa.INTEGER(), autoincrement=False, nullable=True))
+    op.add_column(
+        u'user_races',
+        sa.Column(
+            'codeable_concept_id',
+            sa.INTEGER(),
+            autoincrement=False,
+            nullable=True))
     op.drop_constraint('user_races_codings_id_fkey',
                        'user_races', type_='foreignkey')
-    op.create_foreign_key(u'user_races_codeable_concept_id_fkey',
-                          'user_races', 'codeable_concepts', ['codeable_concept_id'], ['id'])
+    op.create_foreign_key(
+        u'user_races_codeable_concept_id_fkey',
+        'user_races',
+        'codeable_concepts',
+        ['codeable_concept_id'],
+        ['id'])
     op.drop_constraint('_race_user_coding', 'user_races', type_='unique')
     op.alter_column(u'user_races', 'user_id',
                     existing_type=sa.INTEGER(),
@@ -140,12 +149,21 @@ def downgrade():
     op.alter_column(u'user_observations', 'observation_id',
                     existing_type=sa.INTEGER(),
                     nullable=True)
-    op.add_column(u'user_ethnicities', sa.Column(
-        'codeable_concept_id', sa.INTEGER(), autoincrement=False, nullable=True))
+    op.add_column(
+        u'user_ethnicities',
+        sa.Column(
+            'codeable_concept_id',
+            sa.INTEGER(),
+            autoincrement=False,
+            nullable=True))
     op.drop_constraint('user_ethnicities_codings_id_fkey',
                        'user_ethnicities', type_='foreignkey')
-    op.create_foreign_key(u'user_ethnicities_codeable_concept_id_fkey',
-                          'user_ethnicities', 'codeable_concepts', ['codeable_concept_id'], ['id'])
+    op.create_foreign_key(
+        u'user_ethnicities_codeable_concept_id_fkey',
+        'user_ethnicities',
+        'codeable_concepts',
+        ['codeable_concept_id'],
+        ['id'])
     op.drop_constraint('_ethnicity_user_coding',
                        'user_ethnicities', type_='unique')
     op.alter_column(u'user_ethnicities', 'user_id',

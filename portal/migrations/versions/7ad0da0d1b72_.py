@@ -24,19 +24,33 @@ def upgrade():
                               sa.Integer(), nullable=True),
                     sa.PrimaryKeyConstraint('id')
                     )
-    op.create_table('questionnaire_bank_questionnaire_recurs',
-                    sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('questionnaire_bank_questionnaire_id',
-                              sa.Integer(), nullable=False),
-                    sa.Column('recur_id', sa.Integer(), nullable=False),
-                    sa.ForeignKeyConstraint(['questionnaire_bank_questionnaire_id'], [
-                        'questionnaire_bank_questionnaires.id'], ondelete='CASCADE'),
-                    sa.ForeignKeyConstraint(
-                        ['recur_id'], ['recurs.id'], ondelete='CASCADE'),
-                    sa.PrimaryKeyConstraint('id'),
-                    sa.UniqueConstraint('questionnaire_bank_questionnaire_id',
-                                        'recur_id', name='_questionnaire_bank_questionnaire_recure')
-                    )
+    op.create_table(
+        'questionnaire_bank_questionnaire_recurs',
+        sa.Column(
+            'id',
+            sa.Integer(),
+            nullable=False),
+        sa.Column(
+            'questionnaire_bank_questionnaire_id',
+            sa.Integer(),
+            nullable=False),
+        sa.Column(
+            'recur_id',
+            sa.Integer(),
+            nullable=False),
+        sa.ForeignKeyConstraint(
+            ['questionnaire_bank_questionnaire_id'],
+            ['questionnaire_bank_questionnaires.id'],
+            ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(
+            ['recur_id'],
+            ['recurs.id'],
+            ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint(
+            'questionnaire_bank_questionnaire_id',
+            'recur_id',
+            name='_questionnaire_bank_questionnaire_recure'))
     # ### end Alembic commands ###
 
 

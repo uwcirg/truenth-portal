@@ -70,9 +70,9 @@ def upgrade():
         if audit.comment:
             # if comment references changed user, use that as subject_id
             audit_comment_list = audit.comment.lower().split()
-            if ("user" in audit_comment_list
-                and len(audit_comment_list) > audit_comment_list.index("user")
-                    + 1):
+            if ("user" in audit_comment_list and
+                len(audit_comment_list) > audit_comment_list.index("user") +
+                    1):
                 subj_id = audit_comment_list[audit_comment_list.index(
                     "user") + 1]
                 if subj_id.isdigit() and session.query(User).filter_by(id=subj_id).first():

@@ -22,12 +22,20 @@ def upgrade():
                           'procedures', 'encounters', ['encounter_id'], ['id'])
     op.add_column('questionnaire_responses', sa.Column(
         'encounter_id', sa.Integer(), nullable=True))
-    op.create_foreign_key('qr_encounter_id_fk', 'questionnaire_responses', 'encounters', [
-                          'encounter_id'], ['id'])
+    op.create_foreign_key(
+        'qr_encounter_id_fk',
+        'questionnaire_responses',
+        'encounters',
+        ['encounter_id'],
+        ['id'])
     op.add_column('user_observations', sa.Column(
         'encounter_id', sa.Integer(), nullable=True))
-    op.create_foreign_key('user_observation_encounter_id_fk',
-                          'user_observations', 'encounters', ['encounter_id'], ['id'])
+    op.create_foreign_key(
+        'user_observation_encounter_id_fk',
+        'user_observations',
+        'encounters',
+        ['encounter_id'],
+        ['id'])
     # ### end Alembic commands ###
 
 
