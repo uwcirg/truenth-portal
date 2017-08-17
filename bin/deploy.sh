@@ -1,8 +1,15 @@
 #!/bin/bash -e
 
+cmdname=$(basename $0)
+
 usage() {
-    echo "$0 - Simple script to make deployments of fresh code a one command operation" >&2
-    echo "Usage: $0 [-b <branch>] [-p <path>]" >&2
+    cat << USAGE >&2
+Simple script to make deployments of fresh code a one-command operation"
+Usage:
+    $cmdname [-b <branch>] [-p <path>]
+    -b     Remote branch to checkout (default: develop)
+    -p     Path to repository (default: current working directory)
+USAGE
     exit 1
 }
 
