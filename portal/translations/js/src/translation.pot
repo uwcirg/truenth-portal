@@ -5,8 +5,20 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2017-08-15T00:29:44.335Z\n"
-"PO-Revision-Date: 2017-08-15T00:29:44.335Z\n"
+"POT-Creation-Date: 2017-08-17T16:56:34.397Z\n"
+"PO-Revision-Date: 2017-08-17T16:56:34.397Z\n"
+
+msgid "Error occurred updating user organization."
+msgstr ""
+
+msgid "Decision Support"
+msgstr ""
+
+msgid "Symptom Tracker"
+msgstr ""
+
+msgid "Edit in Liferay"
+msgstr ""
 
 msgid "No affiliated clinic"
 msgstr ""
@@ -160,6 +172,9 @@ msgstr ""
 msgid "Cannot ununcheck.  A staff member must be associated with an organization"
 msgstr ""
 
+msgid "Not provided"
+msgstr ""
+
 msgid "no data returned"
 msgstr ""
 
@@ -226,6 +241,9 @@ msgstr ""
 msgid "Server error occurred removing procedure/treatment information."
 msgstr ""
 
+msgid "Server error occurred retrieving roles information."
+msgstr ""
+
 msgid "Server error occurred retrieving user role information."
 msgstr ""
 
@@ -248,9 +266,6 @@ msgid "Server error occurred retrieving tou data."
 msgstr ""
 
 msgid "Server error occurred saving terms of use information."
-msgstr ""
-
-msgid "Not provided"
 msgstr ""
 
 msgid "All fields must be complete."

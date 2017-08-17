@@ -19,13 +19,15 @@ var __i18next = (function() {
                     initImmediate: options.initImmediate ? options.initImmediate : false,
                     load: 'currentOnly', //this reads language code in en-US, en-AU format
                     returnEmptyString: false,
+                    saveMissing: true,
+                    missingKeyHandler: function(lng, ns, key, fallbackValue) {
+                        if (options.missingKeyHandler) options.missingKeyHandler(lng, ns, key, fallbackValue);
+                    },
                     backend: {
                        // load from static file
                        loadPath: source
-
                      }
                   }, function(err, t) {
-                    i18next.t('i18n');
                     if (callback) callback();
                   });
     };
