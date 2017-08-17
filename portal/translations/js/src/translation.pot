@@ -53,31 +53,28 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-msgid "deleted on"
-msgstr ""
-
-msgid "expired"
-msgstr ""
-
 msgid "Consented"
 msgstr ""
 
 msgid "Consented / Enrolled"
 msgstr ""
 
-msgid "Suspend Data Collection and Report Historic Data"
+msgid "Withdrawn - Suspend Data Collection and Report Historic Data"
 msgstr ""
 
-msgid "Purged/Removed"
+msgid "Purged / Removed"
+msgstr ""
+
+msgid "deleted on"
+msgstr ""
+
+msgid "expired"
 msgstr ""
 
 msgid "Consent Status Editor"
 msgstr ""
 
 msgid "Modify the consent status for this user to:"
-msgstr ""
-
-msgid "Purged/remove consent(s) associated with this organization"
 msgstr ""
 
 msgid "Close"
