@@ -21,8 +21,11 @@ def upgrade():
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('a_use', postgresql.ENUM(
                         'home', 'work', 'temp', 'old', name='address_use'), nullable=True),
-                    sa.Column('a_type', postgresql.ENUM('postal', 'physical',
-                                                        'both', name='address_type'), nullable=True),
+                    sa.Column(
+                        'a_type',
+                        postgresql.ENUM('postal', 'physical','both', name='address_type'),
+                        nullable=True
+                    ),
                     sa.Column('line1', sa.Text(), nullable=True),
                     sa.Column('line2', sa.Text(), nullable=True),
                     sa.Column('line3', sa.Text(), nullable=True),
