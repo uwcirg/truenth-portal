@@ -27,20 +27,20 @@
                     {%- if providerPerspective == 'true' -%}
                         {{ _("Patient Profile") }} -
                         {%- if user.first_name and user.last_name -%}
-                          &nbsp;{{user.first_name}} {{user.last_name}}
+                          &nbsp;{% trans first_name=user.first_name, last_name=user.last_name%}{{first_name}} {{last_name}}{% endtrans %}
                         {%- elif user.first_name -%}
-                          &nbsp;{{user.first_name}}
+                          &nbsp;{% trans first_name=user.first_name%}{{first_name}}{% endtrans %}
                         {%- elif user.last_name -%}
-                          &nbsp;{{user.last_name}}
+                          &nbsp;{% trans last_name=user.last_name%}{{last_name}}{% endtrans %}
                         {%- elif user.email -%}
-                          &nbsp;{{ user.email }}
+                          &nbsp;{% trans user_email=user.email %}{{ user_email }}{% endtrans %}
                         {%- else -%}
                           &nbsp;#{{ user.id}}
                         {%-endif-%}
                     {%- else -%}
                         {%- if current_user.id != user.id -%}
                             {%- if user.email -%}
-                            {{ _("Profile for") }} {{ user.email }}
+                            {% trans user_email=user.email %}Profile for {{ user_email }}{% endtrans %}
                             {%- else -%}
                             {{ _("Profile for") }} #{{user.id}}
                             {%- endif -%}
