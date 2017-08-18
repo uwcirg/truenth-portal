@@ -1355,6 +1355,7 @@ h4.detail-title {
 .profile-item-container .view-container {
   display: none;
   max-width: 100%;
+  word-break: break-word;
 }
 #mainDiv.profile .profile-item-container.edit .profile-item-edit-btn::before {
   content: "DONE";
@@ -2297,9 +2298,6 @@ div.timezone-warning.text-warning {
   div.right-panel {
     margin-left: 0 !important;
   }
-  #createUserLink{
-    font-size: 0.9em;
-  }
   #backLink a {
     position: relative;
     top: -1px;
@@ -2329,7 +2327,7 @@ div.timezone-warning.text-warning {
     padding: 2em;
     max-width: 100%;
   }
-  #mainDiv.profile .profile-item-title {
+  #mainDiv.profile .profile-item-container .profile-item-title {
     max-width: 150px;
   }
   .fixed-table-pagination {
@@ -2399,6 +2397,9 @@ div.timezone-warning.text-warning {
   #indexNavBar {
     width: 100%;
     max-width: 100%;
+  }
+  #mainDiv.profile .profile-item-container .view-container {
+   padding-bottom: 1em;
   }
   #profileForm #firstname {
     width: 100%;

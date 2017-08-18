@@ -22,19 +22,37 @@
       <div class="right-panel">
           <div class="flex">
             <div id="profileHeader" class="profile-header">
-              {%- if user and user.username -%}
-                {%- if providerPerspective == 'true' -%}
-                    <h4 class="tnth-headline">{{ _("Patient Profile") }} <span class="profile-item-title">&nbsp;#{{ user.id}} - {{ user.username }}</span></h4>
-                {%- elif current_user.id != user.id -%}
-                    <h4 class="tnth-headline">{{ _("Profile for") }} {{ user.username }}</h4>
-                {%- else -%}
-                     <h4 class="tnth-headline">{{ _("My TrueNTH Profile") }}</h4>
-                {%- endif -%}
-              {%- else -%}
-                 <h4 class="tnth-headline">{{ _("TrueNTH Profile") }}</h4>
-              {%- endif -%}
-            </div>
-            {%- if user and user.image_url %}{{profileImage(user)}}{% endif -%}
+               <h4 class="tnth-headline">
+                {%- if user -%}
+                    {%- if providerPerspective == 'true' -%}
+                        {{ _("Patient Profile") }} -
+                        {%- if user.first_name and user.last_name -%}
+                          &nbsp;{{user.first_name}} {{user.last_name}}
+                        {%- elif user.first_name -%}
+                          &nbsp;{{user.first_name}}
+                        {%- elif user.last_name -%}
+                          &nbsp;{{user.last_name}}
+                        {%- elif user.email -%}
+                          &nbsp;{{ user.email }}
+                        {%- else -%}
+                          &nbsp;#{{ user.id}}
+                        {%-endif-%}
+                    {%- else -%}
+                        {%- if current_user.id != user.id -%}
+                            {%- if user.email -%}
+                            {{ _("Profile for") }} {{ user.email }}
+                            {%- else -%}
+                            {{ _("Profile for") }} #{{user.id}}
+                            {%- endif -%}
+                        {%- else -%}
+                            {{ _("My TrueNTH Profile") }}
+                        {%- endif -%}
+                    {%- endif -%}
+                 {%- else -%}
+                    {{ _("TrueNTH Profile") }}
+                 {%- endif -%}
+                </h4>
+              </div>
          </div>
           {%- if (current_user.has_role(ROLE.STAFF) and user.has_role(ROLE.PATIENT) and (current_user.id != user.id)) -%}
             <nav id="indexNavBar">

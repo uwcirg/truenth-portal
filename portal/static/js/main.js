@@ -1347,7 +1347,10 @@ var assembleContent = {
             var emailVal = $("input[name=email]").val();
             if ($.trim(emailVal) != "") {
                 demoArray["telecom"].push({ "system": "email", "value": $.trim(emailVal) });
-            };
+            } else {
+                //'__no_email__'
+                demoArray["telecom"].push({ "system": "email", "value": "__no_email__" });
+            }
             demoArray["telecom"].push({ "system": "phone", "use": "mobile", "value": $.trim($("input[name=phone]").val()) });
             demoArray["telecom"].push({ "system": "phone", "use": "home", "value": $.trim($("input[name=altPhone]").val()) });
         };
