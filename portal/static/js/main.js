@@ -3465,7 +3465,6 @@ var tnthDates = {
         var dArray = $.trim(date).split(" ");
         if (dArray.length < 3) return false;
         var day = dArray[0], month = dArray[1], year = dArray[2];
-        //console.log("day: " + day + " month: " + month + " year: " + year)
         if (day.length < 1) return false;
         if (month.length < 3) return false;
         if (year.length < 4) return false;
@@ -3505,6 +3504,9 @@ var tnthDates = {
      * method does not check for valid numbers, will return NaN if conversion failed
      */
     "getDateObj": function(y, m, d, h, mi, s) {
+        if (!h) h = 0;
+        if (!mi) mi = 0;
+        if (!s) s = 0;
         return new Date(parseInt(y),parseInt(m)-1,parseInt(d), parseInt(h), parseInt(mi), parseInt(s));
     },
     "getConvertedDate": function(dateObj) {
