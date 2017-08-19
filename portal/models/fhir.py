@@ -595,14 +595,14 @@ def generate_qnr_csv(qnr_bundle):
             'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
         ):
             return 'enter manually - paper'
-        if row_data.get('subject_id') == row_data.get('author_id'):
+        if row_data.get('truenth_subject_id') == row_data.get('author_id'):
             return 'online'
         else:
             return 'enter manually - interview assisted'
 
     def author_role(row_data, qnr_data):
         if (
-            row_data.get('subject_id') == row_data.get('author_id') or
+            row_data.get('truenth_subject_id') == row_data.get('author_id') or
             (
                 'type' in qnr_data['encounter'] and
                 'paper' in (c.get('code') for c in qnr_data['encounter']['type'])
@@ -617,7 +617,7 @@ def generate_qnr_csv(qnr_bundle):
         'status',
         'study_id',
         'site_name',
-        'subject_id',
+        'truenth_subject_id',
         'author_id',
         'author_role',
         'entry_method',
@@ -633,7 +633,7 @@ def generate_qnr_csv(qnr_bundle):
         row_data = {
             'identifier': qnr['identifier']['value'],
             'status': qnr['status'],
-            'subject_id': get_identifier(
+            'truenth_subject_id': get_identifier(
                 qnr['subject']['identifier'],
                 use='official'
             ),
