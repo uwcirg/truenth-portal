@@ -652,23 +652,29 @@ def generate_qnr_csv(qnr_bundle):
             'author_role': author_role(row_data, qnr),
         })
         for question in qnr['group']['question']:
-            row_data.update({'question_code': question['linkId']})
+            row_data.update({
+                'question_code': question['linkId'],
+                'answer_code': None,
+                'answer': None,
+            })
 
-            answers = consolidate_answer_pairs(question['answer'])
+            answers = consolidate_answer_pairs(question['answer']) or ({},)
+
             for answer in answers:
-                # Use first value of answer (most are single-entry dicts)
-                answer_data = {'answer': answer.values()[0]}
+                if answer:
+                    # Use first value of answer (most are single-entry dicts)
+                    answer_data = {'answer': answer.values()[0]}
 
-                # ...unless nested code (ie valueCode)
-                if answer.keys()[0] == 'valueCoding':
-                    answer_data.update({
-                        'answer_code': answer['valueCoding']['code'],
+                    # ...unless nested code (ie valueCode)
+                    if answer.keys()[0] == 'valueCoding':
+                        answer_data.update({
+                            'answer_code': answer['valueCoding']['code'],
 
-                        # Add suplementary text added earlier
-                        # 'answer': answer['valueCoding'].get('text'),
-                        'answer': None,
-                    })
-                row_data.update(answer_data)
+                            # Add suplementary text added earlier
+                            # 'answer': answer['valueCoding'].get('text'),
+                            'answer': None,
+                        })
+                    row_data.update(answer_data)
 
                 row = []
                 for column_name in columns:
