@@ -2,8 +2,10 @@
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from .communication import Communication
 from ..database import db
 from .identifier import Identifier
+from .message import EmailMessage
 from .reference import Reference
 
 
@@ -118,3 +120,78 @@ class CommunicationRequestIdentifier(db.Model):
     __table_args__ = (UniqueConstraint(
         'communication_request_id', 'identifier_id',
         name='_communication_request_identifier'),)
+
+
+def trigger_communications():
+    """Lookup and trigger any outstanding communications"""
+
+    def completed_communication(user_id, communication_request_id):
+        "Return a matching completed communication, if found"
+        # if this request has been sent, move on
+        sent = Communication.query.filter(
+            Communication.user_id == user_id
+        ).filter(
+            Communication.communication_request_id == communication_request_id
+        ).filter(
+            Communication.status == 'completed').first()
+        return sent
+
+    def pending_questionnaire_bank(user_id, questionnaire_bank):
+        """Return True if oustanding work in valid time remains
+
+        Users may have completed all the related questionnaires, or they may
+        have failed to do so prior to valid time allowed for each.
+
+        :returns: True IFF there is remaining work for the user to complete at
+        this time
+
+        """
+        # Waiting on refactor of assessment status to take a QB
+        raise NotImplementedError("finish me")
+
+    def generate_communication(user, communication_request):
+        # Fabricate an email_message and send
+
+        communication = Communication(
+            user_id=user.id,
+            status='preparation',
+            communication_request_id=communication_request.id)
+        db.session.add(communication)
+        subject = communication_request.subject
+        body = communication_request.body
+        recipients = user.email
+
+        email = EmailMessage(
+            subject=subject, body=body,
+            recipients=recipients, sender=user.email,
+            user_id=user.id)
+        db.session.add(email)
+        email.send_message()
+        communication.message = email
+        communication.status = 'completed'
+        db.session.commit()
+
+    for request in CommunicationRequest.query.filter(
+            CommunicationRequest.status == 'active'):
+        # Complex task, to determine if a communication
+        # should be sent.  We only send if the user qualifies,
+        # namely the user hasn't already been sent a matching
+        # communication and hasn't fulfilled the point of the
+        # communication (such as having completed a questionnaire
+        # for which this communication is reminding them to do)
+
+        for user in request.questionnaire_bank.eligible_users():
+            # Continue if matching messages already sent
+            if completed_communication(
+                    user_id=user.id,
+                    communication_request_id=request.id):
+                continue
+
+            # Confirm reason for message remains
+            if pending_questionnaire_bank(
+                    user=user,
+                    questionnaire_bank=request.questionnaire_bank):
+
+                generate_communication(
+                    user=user,
+                    communication_request=request)
