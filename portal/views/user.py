@@ -72,7 +72,7 @@ def me():
 @user_api.route('/account', methods=('POST',))
 @oauth.require_oauth()  # for service token access, oauth must come first
 @roles_required([ROLE.APPLICATION_DEVELOPER, ROLE.ADMIN, ROLE.SERVICE,
-                 ROLE.STAFF])
+                 ROLE.STAFF, ROLE.STAFF_ADMIN])
 def account():
     """Create a user account
 
