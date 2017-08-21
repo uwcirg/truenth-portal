@@ -1533,6 +1533,7 @@ div.right-panel {
 .profile-item-container .view-container {
   display: none;
   max-width: 100%;
+  word-break: break-word;
 }
 #mainDiv.profile .profile-item-container .view-container {
   display: block;
@@ -2475,11 +2476,6 @@ div.timezone-warning.text-warning {
   .tnth-subhead {
     font-size: 1em;
   }
-  #createUserLink,
-  .btn,
-  .btn-tnth-primary  {
-    font-size: 0.95em;
-  }
   /**************
   #indexNavBar {
     display: block;
@@ -2507,11 +2503,11 @@ div.timezone-warning.text-warning {
     padding: 1em;
     max-width: 100%;
   }
-  #mainDiv.profile .profile-item-title {
+  #mainDiv.profile .profile-item-container .profile-item-title {
     max-width: 150px;
   }
-  .fixed-table-pagination {
-    font-size: 0.9em;
+  #mainDiv.profile .profile-item-container .view-container {
+    padding-bottom: 1em;
   }
   #userSessionsList,
   #fillOrgs legend {
