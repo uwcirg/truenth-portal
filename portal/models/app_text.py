@@ -422,8 +422,8 @@ class MailResource(object):
         self.variables = variables or {}
         try:
             response = requests.get(url)
-            self._subject = response.json().get('subject')
-            self._body = response.json().get('body')
+            self._subject = str(response.json().get('subject'))
+            self._body = str(response.json().get('body'))
             self.url = self._permanent_url(
                 generic_url=url, version=response.json().get('version'))
             self.editor_url = response.json().get('editorUrl')
@@ -469,7 +469,7 @@ class MailResource(object):
         if self._body:
             try:
                 formatted = self._body.format(**self.variables)
-                return repr(formatted.encode("utf-8"))
+                return formatted.encode('string-escape')
             except KeyError, e:
                 self.error_msg = "Missing body variable {}".format(e)
                 current_app.logger.error(self.error_msg +

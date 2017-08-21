@@ -103,6 +103,6 @@ class TestAppText(TestCase):
         testvars = {"testkey": "testval"}
         tmr = MailResource(None,variables=testvars)
         self.assertEquals(tmr.subject, "TESTING")
-        self.assertEquals(tmr.body, "'[TESTING - fake response]'")
+        self.assertEquals(tmr.body, "[TESTING - fake response]")
         tmr._body = "Replace this: {testkey}"
-        self.assertEquals(tmr.body.split()[2], "testval'")
+        self.assertEquals(tmr.body.split()[2], "testval")
