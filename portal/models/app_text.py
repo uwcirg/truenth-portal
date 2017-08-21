@@ -11,7 +11,7 @@ from abc import ABCMeta, abstractmethod
 from flask import current_app
 from flask_babel import gettext
 import requests
-from requests.exceptions import MissingSchema
+from requests.exceptions import MissingSchema, ConnectionError
 from urllib import urlencode
 from urlparse import parse_qsl, urlparse
 
@@ -281,7 +281,7 @@ class UnversionedResource(object):
                 else:
                     self.error_msg = (
                         "Could not retrieve remote content - Invalid URL")
-            except:
+            except ConnectionError:
                 self.error_msg = (
                     "Could not retrieve remove content - Server could not be "
                     "reached")
@@ -345,7 +345,7 @@ class VersionedResource(object):
                 self.error_msg = (
                     "Could not retrieve remote content - " "{} {}".format(
                         response.status_code, response.reason))
-        except:
+        except ConnectionError:
             self.error_msg = (
                 "Could not retrieve remove content - Server could not be "
                 "reached")
@@ -442,7 +442,7 @@ class MailResource(object):
                 self.error_msg = (
                     "Could not retrieve remote content - " "{} {}".format(
                         response.status_code, response.reason))
-        except:
+        except ConnectionError:
             self.error_msg = (
                 "Could not retrieve remove content - Server could not be "
                 "reached")
