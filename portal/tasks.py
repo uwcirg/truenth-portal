@@ -7,12 +7,18 @@ NB: a celery worker must be started for these to ever return.  See
 `celery_worker.py`
 
 """
+from sqlalchemy import and_
 from datetime import datetime
 from flask import current_app
 from requests import Request, Session
 from requests.exceptions import RequestException
 from celery.utils.log import get_task_logger
+
+from .dogpile import dogpile_cache
 from .extensions import celery
+from .models.assessment_status import overall_assessment_status
+from .models.role import Role, ROLE
+from .models.user import User, UserRoles
 from .models.scheduled_job import update_runtime
 
 # To debug, stop the celeryd running out of /etc/init, start in console:
@@ -72,3 +78,36 @@ def post_request(self, url, data, timeout=10, retries=3):
 def test(job_id=None):
     update_runtime(job_id)
     return "Test task complete."
+
+
+@celery.task
+def cache_assessment_status(job_id=None):
+    """Populate assessment status cache
+
+    Assessment status is an expensive lookup - cached for an hour
+    at a time.  This task is responsible for renewing the potenailly
+    stale cache.  Expected to be called as a scheduled job.
+
+    """
+    before = datetime.now()
+    current_app.logger.debug(__name__)
+    patient_role_id = Role.query.filter(
+        Role.name == ROLE.PATIENT).with_entities(Role.id).first()[0]
+    users_with_potential_assessment_status = User.query.join(
+        UserRoles).filter(
+            and_(User.id == UserRoles.user_id,
+                 User.deleted_id == None,
+                 UserRoles.role_id == patient_role_id))
+
+    for user in users_with_potential_assessment_status:
+        dogpile_cache.refresh(
+            overall_assessment_status, user.id)
+        for consent in user.all_consents:
+            dogpile_cache.refresh(
+                overall_assessment_status, user.id, consent.id)
+    duration = datetime.now() - before
+    message = 'Assessment Cache updated in {0.seconds} seconds'.format(
+        duration)
+    current_app.logger.debug(message)
+    update_runtime(job_id)
+    return message
