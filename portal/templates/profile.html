@@ -40,7 +40,7 @@
                     {%- else -%}
                         {%- if current_user.id != user.id -%}
                             {%- if user.email -%}
-                            {% trans user_email=user.email %}Profile for {{ user_email }}{% endtrans %}
+                            {% trans user_email=user.email %}Profile for {% endtrans %} {{ user_email }}
                             {%- else -%}
                             {% trans user_id=user.id %}Profile for #{{ user_id }}{% endtrans %}
                             {%- endif -%}
