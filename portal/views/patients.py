@@ -1,9 +1,11 @@
 """Patient view functions (i.e. not part of the API or auth)"""
-from flask import abort, Blueprint, jsonify, render_template, request, current_app
+from flask import abort, Blueprint, jsonify, render_template, request
+from flask import current_app, url_for
 from flask_user import roles_required
 from sqlalchemy import and_
 
 from ..extensions import oauth
+from ..models.app_text import MailResource, UserInviteEmail_ATMA
 from ..models.assessment_status import AssessmentStatus
 from ..models.intervention import Intervention, UserIntervention
 from ..models.organization import Organization, OrgTree, UserOrganization
@@ -149,9 +151,23 @@ def patient_profile(patient_id):
             # Need to extend with subject_id as the staff user is driving
             patient.assessment_link = '{url}&subject_id={id}'.format(
                 url=display.link_url, id=patient.id)
+
+    top_org = patient.first_top_organization()
+    first_org = patient.organizations[0]
+    invite_vars = {
+                   'first_name': patient.first_name,
+                   'last_name': patient.last_name,
+                   'parent_org': top_org.name if top_org else '',
+                   'clinic_name': first_org.name if first_org else '',
+                   'registrationlink': url_for('user_api.access_url',
+                                               _external=True,
+                                               user_id=patient.id)
+                  }
+    invite_email = MailResource(app_text(UserInviteEmail_ATMA.name_key()),
+                                variables=invite_vars)
     return render_template(
         'profile.html', user=patient,
-        current_user=user,
+        current_user=user, invite_email=invite_email,
         providerPerspective="true",
         consent_agreements=consent_agreements,
         user_interventions=user_interventions)

@@ -270,7 +270,7 @@
     });</script>
 {%- endmacro %}
 
-{% macro profileEmailForm(person) -%}
+{% macro profileEmailForm(person, invite_email) -%}
     {%- if person -%}
     <div id="sendEmailForm">
         <input type="hidden" name="_userId" id="_userId" value="{{person.id}}" />
@@ -381,11 +381,8 @@
                         {#- javascript variables are not available at template
                            rendering time.  insert a placeholder and then
                            replace once the variable is available. -#}
-                        body = '{{ app_text('profileSendEmail invite email_body', 'url_placeholder') | safe }}'.replace(/\(clinic name\)/g, clinicName);
-                        body = body.replace(/\(greeting\)/g, greeting);
-                        body = body.replace(/\(parent org\)/g, parentName);
-                        body = body.replace(/url_placeholder/g, decodeURIComponent(return_url));
-                        subject = '{{ app_text('profileSendEmail invite email_subject') }}'.replace(/\(clinic name\)/g, clinicName);
+                        body = {{ invite_email.body | safe }};
+                        subject = '{{ invite_email.subject }}';
                     };
                 }
                 else { // reminder
@@ -412,9 +409,9 @@
      });</script>
     {%- endif -%}
 {%- endmacro %}
-{% macro profileSendEmail(person) -%}
+{% macro profileSendEmail(person, invite_email) -%}
     {%- if person -%}
-        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person)}}</div>
+        <div class="form-group float-input-label well well-lg" id="profileSendEmailContainer">{{profileEmailForm(person, invite_email)}}</div>
     {% endif %}
 {%- endmacro %}
 {% macro profileStaffRegistrationEmail(person) -%}
@@ -1681,7 +1678,7 @@
         <div id="errorprofileSiteId" class="error-message"></div>
     </div>
 {%- endmacro %}
-{% macro profileCustomDetail(person) -%}
+{% macro profileCustomDetail(person, invite_email) -%}
      <div class="row">
         <div class="col-md-12 col-xs-12">
             <h4 class="profile-item-title detail-title">{{_("Three ways to complete questionnaire")}}</h4>
@@ -1692,7 +1689,7 @@
                     <br/>
                     <div class="text-muted custom-container-content">{{_("Invite or remind patient over email to complete their questionnaire")}}</div>
                     <br/>
-                    <div>{{profileEmailForm(person)}}</div>
+                    <div>{{profileEmailForm(person, invite_email)}}</div>
                 </div>
                 <div class="profile-item-container custom-container-item-right">
                     <h4 id="customLoginAsLoc" class="profile-item-title index-item">{{_("Log in as patient")}}</h4>
@@ -1972,11 +1969,11 @@
     {% endif %}
 {%- endmacro %}
 
-{% macro profile(person, current_user, consent_agreements, user_interventions) -%}
+{% macro profile(person, current_user, consent_agreements, user_interventions, invite_email) -%}
     <!-- remember to add xs class to side when custom content is present -->
     {%- if config.CUSTOM_PATIENT_DETAIL -%}
         {%- if current_user and person and current_user.has_role(ROLE.STAFF) and person.has_role(ROLE.PATIENT) -%}
-            {{ profileCustomDetail(person) }}
+            {{ profileCustomDetail(person, invite_email) }}
         {%- endif -%}
     {%- endif -%}
     {% if person and person.has_role(ROLE.PATIENT) -%}
@@ -2053,7 +2050,7 @@
                             {{resetPassword(person)}}
                         </div>
                         {%- if not config.CUSTOM_PATIENT_DETAIL -%}
-                        <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to patient")}}</p>{{profileSendEmail(person)}}</div>
+                        <div id="registrationEmailContainer" class="flex-item"><p class="text-muted communication-prompt registration-email-prompt">{{_("Send registration email to patient")}}</p>{{profileSendEmail(person, invite_email)}}</div>
                         {%- endif %}
                     </div>
                 </div>
