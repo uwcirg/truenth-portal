@@ -126,7 +126,7 @@ def finish_encounter(user):
     now = datetime.utcnow()
     # Look for any stale encounters needing to be closed out.
     query = Encounter.query.filter(Encounter.user_id==user.id).filter(
-        Encounter.status=='in-progress').filter(Encounter.end_time==None)
+        Encounter.status=='in-progress').filter(Encounter.end_time.is_(None))
     for encounter in query:
         encounter.status = 'finished'
         encounter.end_time = now
