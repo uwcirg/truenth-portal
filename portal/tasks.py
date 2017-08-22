@@ -17,7 +17,10 @@ from celery.utils.log import get_task_logger
 from .dogpile import dogpile_cache
 from .extensions import celery
 from .models.assessment_status import overall_assessment_status
+from .models.communication import Communication
+from .models.communication_request import queue_outstanding_messages
 from .models.role import Role, ROLE
+from .models.questionnaire_bank import QuestionnaireBank
 from .models.user import User, UserRoles
 from .models.scheduled_job import update_runtime
 
@@ -91,23 +94,36 @@ def cache_assessment_status(job_id=None):
     """
     before = datetime.now()
     current_app.logger.debug(__name__)
+
     patient_role_id = Role.query.filter(
         Role.name == ROLE.PATIENT).with_entities(Role.id).first()[0]
-    users_with_potential_assessment_status = User.query.join(
+    valid_patients = User.query.join(
         UserRoles).filter(
             and_(User.id == UserRoles.user_id,
                  User.deleted_id.is_(None),
                  UserRoles.role_id == patient_role_id))
 
-    for user in users_with_potential_assessment_status:
-        dogpile_cache.refresh(
-            overall_assessment_status, user.id)
-        for consent in user.all_consents:
-            dogpile_cache.refresh(
-                overall_assessment_status, user.id, consent.id)
+    for user in valid_patients:
+        dogpile_cache.refresh(overall_assessment_status, user.id)
+        for qb in QuestionnaireBank.qbs_for_user(
+                user=user, classification='baseline'):
+            queue_outstanding_messages(user=user, questionnaire_bank=qb)
+
     duration = datetime.now() - before
-    message = 'Assessment Cache updated in {0.seconds} seconds'.format(
-        duration)
+    message = (
+        'Assessment Cache updated and messages queued in {0.seconds}'
+        ' seconds'.format(duration))
     current_app.logger.debug(message)
     update_runtime(job_id)
     return message
+
+
+@celery.task
+def send_queued_communications(job_id=None):
+    "Look for communication objects ready to send"
+    ready = Communication.query.filter(Communication.status == 'prepared')
+    for communication in ready:
+        current_app.logger.debug("Collate ready communication {}".format(
+            communication))
+        communication.generate_and_send()
+    update_runtime(job_id)
