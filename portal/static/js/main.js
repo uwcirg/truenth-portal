@@ -2013,8 +2013,10 @@ var tnthAjax = {
                             };
                         });
                         /*
-                         * need to check sub-types e.g. privacy policy, that is required of user 
+                         * need to check terms of use types e.g. privacy policy, that is required of user 
                          * in addition to website terms of use
+                         * note, in eproms, website terms of use and privacy policy terms share the same checkbox, therefore 
+                         * for the purpose of checking, they need to be broken up into sub items and be checked respectively
                          */
                         $(this).find("[data-core-data-subtype]").each(function() {
                              if ($.trim($(this).attr("data-core-data-subtype")) == $.trim(item)) {
