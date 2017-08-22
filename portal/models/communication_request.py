@@ -1,11 +1,12 @@
 """CommunicationRequest model"""
+from datetime import datetime, timedelta
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import ENUM
 
+from .assessment_status import overall_assessment_status
 from .communication import Communication
 from ..database import db
 from .identifier import Identifier
-from .message import EmailMessage
 from .reference import Reference
 
 
@@ -122,76 +123,97 @@ class CommunicationRequestIdentifier(db.Model):
         name='_communication_request_identifier'),)
 
 
-def trigger_communications():
-    """Lookup and trigger any outstanding communications"""
+def queue_outstanding_messages(user, questionnaire_bank):
+    """Lookup and queue any outstanding communications
 
-    def completed_communication(user_id, communication_request_id):
-        "Return a matching completed communication, if found"
-        # if this request has been sent, move on
-        sent = Communication.query.filter(
+    Complex task, to determine if a communication should be queued.  Only
+    queue if a matching communication doesn't exist, user meets
+    preconditions defining event start, and hasn't yet fulfilled the point of
+    the communication (such as having completed a questionnaire for which this
+    communication is reminding them to do). And then of course, only
+    if the notify_days_after_event have passed.
+
+    Messages are queued by adding to the Communications table, with
+    'preparation' status.
+
+    """
+
+    def existing_communication(user_id, communication_request_id):
+        "Return a matching communication, if found"
+        existing = Communication.query.filter(
             Communication.user_id == user_id
         ).filter(
             Communication.communication_request_id == communication_request_id
-        ).filter(
-            Communication.status == 'completed').first()
-        return sent
+        ).first()
+        return existing
 
-    def pending_questionnaire_bank(user_id, questionnaire_bank):
-        """Return True if oustanding work in valid time remains
+    def unfinished_work(user, questionnaire_bank):
+        """Return True if user has oustanding work and valid time remains
 
         Users may have completed all the related questionnaires, or they may
-        have failed to do so prior to valid time allowed for each.
+        have failed to do so prior to expiration.
 
         :returns: True IFF there is remaining work for the user to complete at
         this time
 
         """
-        # Waiting on refactor of assessment status to take a QB
-        raise NotImplementedError("finish me")
+        if questionnaire_bank.classification != 'baseline':
+            raise NotImplementedError('only baseline communication wired up')
 
-    def generate_communication(user, communication_request):
-        # Fabricate an email_message and send
+        return overall_assessment_status(user) in (
+            'Due', 'Overdue', 'In Progress')
+
+    def queue_communication(user, communication_request):
+        """Create new communication object in preparation state"""
 
         communication = Communication(
             user_id=user.id,
             status='preparation',
             communication_request_id=communication_request.id)
         db.session.add(communication)
-        subject = communication_request.subject
-        body = communication_request.body
-        recipients = user.email
-
-        email = EmailMessage(
-            subject=subject, body=body,
-            recipients=recipients, sender=user.email,
-            user_id=user.id)
-        db.session.add(email)
-        email.send_message()
-        communication.message = email
-        communication.status = 'completed'
         db.session.commit()
 
-    for request in CommunicationRequest.query.filter(
-            CommunicationRequest.status == 'active'):
-        # Complex task, to determine if a communication
-        # should be sent.  We only send if the user qualifies,
-        # namely the user hasn't already been sent a matching
-        # communication and hasn't fulfilled the point of the
-        # communication (such as having completed a questionnaire
-        # for which this communication is reminding them to do)
+    def event_start(user):
+        """Lookup event trigger date - if available
 
-        for user in request.questionnaire_bank.eligible_users():
-            # Continue if matching messages already sent
-            if completed_communication(
-                    user_id=user.id,
-                    communication_request_id=request.id):
-                continue
+        Depends on QuestionnaireBank context.  If associated
+        by organization, return the consent date.  For
+        intervention association, use the treatment or biopsy date.
 
-            # Confirm reason for message remains
-            if pending_questionnaire_bank(
-                    user=user,
-                    questionnaire_bank=request.questionnaire_bank):
+        :returns: UTC event datetime - that is the base value for
+        communication calculations, or None if situation doesn't
+        apply.
 
-                generate_communication(
-                    user=user,
-                    communication_request=request)
+        """
+        if questionnaire_bank.organization_id:
+            # Questionnaires associated by organization
+            # use consent date as event start
+            if user.valid_consents and len(list(
+                    user.valid_consents)) > 0:
+                _consent = user.valid_consents[0]
+            if _consent:
+                return _consent.audit.timestamp
+            else:
+                return None
+
+        # TODO Pending work to associate QBs by intervion
+        return None
+
+    for request in questionnaire_bank.communication_requests:
+        if request.status != 'active':
+            continue
+
+        # Continue if matching message was already generated
+        if existing_communication(
+                user_id=user.id,
+                communication_request_id=request.id):
+            continue
+
+        # Confirm reason for message remains
+        if not unfinished_work(user, questionnaire_bank):
+            continue
+
+        basis = event_start(user, questionnaire_bank)
+        if basis and datetime.utcnow() - basis >= timedelta(
+                days=request.notify_days_after_event):
+            queue_communication(user=user, communication_request=request)
