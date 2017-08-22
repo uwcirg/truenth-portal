@@ -19,9 +19,9 @@ class QuestionnaireBank(db.Model):
     __tablename__ = 'questionnaire_banks'
     __table_args__ = (
         CheckConstraint('NOT(organization_id IS NULL AND '
-                            'intervention_id IS NULL) '
+                        'intervention_id IS NULL) '
                         'AND NOT(organization_id IS NOT NULL AND '
-                                'intervention_id IS NOT NULL)'),
+                        'intervention_id IS NOT NULL)'),
         )
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, nullable=False, unique=True)
